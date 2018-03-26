@@ -6,6 +6,10 @@ services:
     autoconfigure: true
     public: false
 
+  _instanceof:
+    App\Infrastructure\AbstractRepository:
+      tags: ['paella_core.repository']
+
   App\:
     resource: '../src/*'
     exclude: '../src/{Entity,Migrations,Tests,Kernel.php}'
@@ -14,3 +18,9 @@ services:
     resource: '../src/Http/Controller'
     tags: ['controller.service_arguments']
 
+  paella_core.pdo:
+    class: \PDO
+    arguments:
+      - 'mysql:dbname=%env(DATABASE_NAME)%;host=%env(DATABASE_HOST)%'
+      - '%env(DATABASE_USERNAME)%'
+      - '%env(DATABASE_PASSWORD)%'
