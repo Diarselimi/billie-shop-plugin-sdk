@@ -6,7 +6,6 @@ use App\DomainModel\AbstractEntity;
 
 class OrderEntity extends AbstractEntity
 {
-    private $id;
     private $amount;
     private $duration;
     private $externalCode;
@@ -19,18 +18,6 @@ class OrderEntity extends AbstractEntity
     private $deliveryAddressId;
     private $debtorPersonId;
     private $debtorExternalDataId;
-
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    public function setId($id)
-    {
-        $this->id = $id;
-
-        return $this;
-    }
 
     public function getAmount()
     {

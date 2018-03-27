@@ -11,7 +11,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
     {
     }
 
-    public function getOneByExternalCode(string $externalCode): OrderEntity
+    public function getOneByExternalCode(string $externalCode):? OrderEntity
     {
         return (new OrderEntity())
             ->setId(43)

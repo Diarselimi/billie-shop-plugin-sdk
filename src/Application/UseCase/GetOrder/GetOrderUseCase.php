@@ -7,17 +7,17 @@ use App\DomainModel\Order\OrderRepositoryInterface;
 
 class GetOrderUseCase
 {
-    private $repository;
+    private $orderRepository;
 
-    public function __construct(OrderRepositoryInterface $repository)
+    public function __construct(OrderRepositoryInterface $orderRepository)
     {
-        $this->repository = $repository;
+        $this->orderRepository = $orderRepository;
     }
 
     public function execute(GetOrderRequest $request)
     {
         $externalCode = $request->getExternalCode();
-        $order = $this->repository->getOneByExternalCodeRaw($externalCode);
+        $order = $this->orderRepository->getOneByExternalCodeRaw($externalCode);
 
         if (!$order) {
             throw new PaellaCoreCriticalException(
