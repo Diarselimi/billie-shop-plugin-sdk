@@ -7,9 +7,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-/**
- * Class ExceptionSubscriber
- */
 class ExceptionSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents()
