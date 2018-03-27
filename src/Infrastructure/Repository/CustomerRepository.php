@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Infrastructure;
+namespace App\Infrastructure\Repository;
 
 use App\DomainModel\Customer\CustomerEntity;
 use App\DomainModel\Customer\CustomerRepositoryInterface;
 
-class CustomerRepository implements CustomerRepositoryInterface
+class CustomerRepository extends AbstractRepository implements CustomerRepositoryInterface
 {
     public function insert(CustomerEntity $customer): void
     {

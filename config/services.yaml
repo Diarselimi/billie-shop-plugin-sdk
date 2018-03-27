@@ -7,7 +7,7 @@ services:
     public: false
 
   _instanceof:
-    App\Infrastructure\AbstractRepository:
+    App\Infrastructure\Repository\AbstractRepository:
       tags: ['paella_core.repository']
 
   App\:
@@ -25,5 +25,5 @@ services:
       - '%env(DATABASE_USERNAME)%'
       - '%env(DATABASE_PASSWORD)%'
 
-  App\DomainModel\Order\OrderRepositoryInterface: '@App\Infrastructure\OrderRepository'
-  App\DomainModel\Customer\CustomerRepositoryInterface: '@App\Infrastructure\CustomerRepository'
+  App\DomainModel\Order\OrderRepositoryInterface: '@App\Infrastructure\Repository\OrderRepository'
+  App\DomainModel\Customer\CustomerRepositoryInterface: '@App\Infrastructure\Repository\CustomerRepository'
