@@ -4,6 +4,6 @@ namespace App\DomainModel\Customer;
 
 interface CustomerRepositoryInterface
 {
-    public function insert(CustomerEntity $customerEntity): void;
+    public function insert(CustomerEntity $customer): void;
     public function getOneByApiKey(string $apiKey): CustomerEntity;
 }

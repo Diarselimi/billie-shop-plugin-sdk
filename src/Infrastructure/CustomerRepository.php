@@ -7,7 +7,7 @@ use App\DomainModel\Customer\CustomerRepositoryInterface;
 
 class CustomerRepository implements CustomerRepositoryInterface
 {
-    public function insert(CustomerEntity $customerEntity): void
+    public function insert(CustomerEntity $customer): void
     {
     }
 
