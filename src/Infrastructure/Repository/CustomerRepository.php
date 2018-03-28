@@ -11,7 +11,16 @@ class CustomerRepository extends AbstractRepository implements CustomerRepositor
     {
     }
 
-    public function getOneByApiKey(string $apiKey): CustomerEntity
+    public function getOneByApiKey(string $apiKey):? CustomerEntity
     {
+    }
+
+    public function getOneByApiKeyRaw(string $apiKey):? array
+    {
+        $customer = $this->fetch('SELECT * FROM customers WHERE api_key = :api_key', [
+            'api_key' => $apiKey,
+        ]);
+
+        return $customer ?: null;
     }
 }

@@ -10,36 +10,36 @@ class CustomerEntity extends AbstractEntity
     private $apiKey;
     private $roles;
 
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    public function setName($name)
+    public function setName(string $name): CustomerEntity
     {
         $this->name = $name;
 
         return $this;
     }
 
-    public function getApiKey()
+    public function getApiKey(): string
     {
         return $this->apiKey;
     }
 
-    public function setApiKey($apiKey)
+    public function setApiKey(string $apiKey): CustomerEntity
     {
         $this->apiKey = $apiKey;
 
         return $this;
     }
 
-    public function getRoles()
+    public function getRoles(): string
     {
         return $this->roles;
     }
 
-    public function setRoles($roles)
+    public function setRoles(string $roles): CustomerEntity
     {
         $this->roles = $roles;
 

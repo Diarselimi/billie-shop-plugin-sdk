@@ -7,3 +7,8 @@ get_order:
   path: /order/{externalCode}
   controller: App\Http\Controller\GetOrderController::execute
   methods: [GET]
+
+get_customer:
+  path: /customer/{apiKey}
+  controller: App\Http\Controller\GetCustomerController::execute
+  methods: [GET]

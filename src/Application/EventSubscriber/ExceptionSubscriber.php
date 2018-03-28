@@ -2,6 +2,7 @@
 
 namespace App\Application\EventSubscriber;
 
+use App\Application\PaellaCoreCriticalException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
@@ -20,9 +21,14 @@ class ExceptionSubscriber implements EventSubscriberInterface
     {
         $exception = $event->getException();
 
+        $responseCode = $exception instanceof PaellaCoreCriticalException && $exception->getResponseCode()
+            ? $exception->getResponseCode()
+            : JsonResponse::HTTP_BAD_REQUEST
+        ;
+
         $event->setResponse(new JsonResponse([
             'code' => $exception->getCode(),
             'message' => $exception->getMessage(),
-        ], JsonResponse::HTTP_BAD_REQUEST));
+        ], $responseCode));
     }
 }
