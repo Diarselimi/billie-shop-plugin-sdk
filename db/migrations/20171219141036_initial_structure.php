@@ -11,6 +11,9 @@ class InitialStructure extends AbstractMigration
             ->addColumn('name', 'string', ['null' => false])
             ->addColumn('api_key', 'string', ['null' => false])
             ->addColumn('roles', 'string', ['null' => false])
+            ->addColumn('is_active', 'boolean', ['null' => false])
+            ->addColumn('maximal_financing_limit', 'float', ['null' => false])
+            ->addColumn('current_financing_limit', 'float', ['null' => false])
             ->addColumn('created_at', 'datetime', ['null' => false])
             ->addColumn('updated_at', 'datetime', ['null' => false])
             ->create()
@@ -61,13 +64,11 @@ class InitialStructure extends AbstractMigration
         ;
 
         $this
-            ->table('customers_companies')
-            ->addColumn('customer_id', 'integer', ['null' => false])
+            ->table('companies')
             ->addColumn('debtor_id', 'string', ['null' => false])
             ->addColumn('merchant_id', 'string', ['null' => false])
             ->addColumn('created_at', 'datetime', ['null' => false])
             ->addColumn('updated_at', 'datetime', ['null' => false])
-            ->addForeignKey('customer_id', 'customers', 'id')
             ->create()
         ;
 
@@ -81,13 +82,15 @@ class InitialStructure extends AbstractMigration
             ->addColumn('internal_comment', 'string', ['null' => true])
             ->addColumn('invoice_number', 'string', ['null' => true])
             ->addColumn('invoice_url', 'string', ['null' => true])
-            ->addColumn('customers_companies_id', 'integer', ['null' => false])
+            ->addColumn('customer_id', 'integer', ['null' => false])
+            ->addColumn('company_id', 'integer', ['null' => true])
             ->addColumn('delivery_address_id', 'integer', ['null' => false])
             ->addColumn('debtor_person_id', 'integer', ['null' => false])
             ->addColumn('debtor_external_data_id', 'integer', ['null' => false])
             ->addColumn('created_at', 'datetime', ['null' => false])
             ->addColumn('updated_at', 'datetime', ['null' => false])
-            ->addForeignKey('customers_companies_id', 'customers_companies', 'id')
+            ->addForeignKey('customer_id', 'customers', 'id')
+            ->addForeignKey('company_id', 'companies', 'id')
             ->addForeignKey('delivery_address_id', 'addresses', 'id')
             ->addForeignKey('debtor_person_id', 'persons', 'id')
             ->addForeignKey('debtor_external_data_id', 'debtor_external_data', 'id')

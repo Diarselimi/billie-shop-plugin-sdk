@@ -15,7 +15,7 @@ class GetCustomerUseCase
         $this->customerRepository = $customerRepository;
     }
 
-    public function execute(GetCustomerRequest $request)
+    public function execute(GetCustomerRequest $request): GetCustomerResponse
     {
         $apiKey = $request->getApiKey();
         $customer = $this->customerRepository->getOneByApiKeyRaw($apiKey);

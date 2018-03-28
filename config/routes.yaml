@@ -8,6 +8,11 @@ get_order:
   controller: App\Http\Controller\GetOrderController::execute
   methods: [GET]
 
+create_order:
+  path: /order
+  controller: App\Http\Controller\CreateOrderController::execute
+  methods: [POST]
+
 get_customer:
   path: /customer/{apiKey}
   controller: App\Http\Controller\GetCustomerController::execute

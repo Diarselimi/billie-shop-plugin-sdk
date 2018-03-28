@@ -7,7 +7,7 @@ abstract class AbstractRepository
     /**
      * @var \PDO
      */
-    private $conn;
+    protected $conn;
 
     public function setConnection(\PDO $conn)
     {

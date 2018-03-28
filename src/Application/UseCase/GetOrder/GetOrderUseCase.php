@@ -14,7 +14,7 @@ class GetOrderUseCase
         $this->orderRepository = $orderRepository;
     }
 
-    public function execute(GetOrderRequest $request)
+    public function execute(GetOrderRequest $request): GetOrderResponse
     {
         $externalCode = $request->getExternalCode();
         $order = $this->orderRepository->getOneByExternalCodeRaw($externalCode);
