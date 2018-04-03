@@ -26,4 +26,5 @@ services:
       - '%env(DATABASE_PASSWORD)%'
 
   App\DomainModel\Order\OrderRepositoryInterface: '@App\Infrastructure\Repository\OrderRepository'
+  App\DomainModel\Order\AddressRepositoryInterface: '@App\Infrastructure\Repository\AddressRepository'
   App\DomainModel\Customer\CustomerRepositoryInterface: '@App\Infrastructure\Repository\CustomerRepository'

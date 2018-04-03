@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\EventSubscriber;
+namespace App\Http\EventSubscriber;
 
 use App\Application\PaellaCoreCriticalException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -19,6 +19,7 @@ class ExceptionSubscriber implements EventSubscriberInterface
 
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
+        return;
         $exception = $event->getException();
 
         $responseCode = $exception instanceof PaellaCoreCriticalException && $exception->getResponseCode()

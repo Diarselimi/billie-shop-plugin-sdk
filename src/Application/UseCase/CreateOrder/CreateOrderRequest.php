@@ -4,15 +4,201 @@ namespace App\Application\UseCase\CreateOrder;
 
 class CreateOrderRequest
 {
-    private $orderData;
+    private $amount;
+    private $comment;
+    private $duration;
+    private $externalCode;
 
-    public function __construct(array $orderData)
+    private $deliveryAddressHouseNumber;
+    private $deliveryAddressStreet;
+    private $deliveryAddressCity;
+    private $deliveryAddressPostalCode;
+    private $deliveryAddressCountry;
+
+    private $debtorCompanyAddressAddition;
+    private $debtorCompanyAddressHouseNumber;
+    private $debtorCompanyAddressStreet;
+    private $debtorCompanyAddressCity;
+    private $debtorCompanyAddressPostalCode;
+    private $debtorCompanyAddressCountry;
+
+    public function getAmount()
     {
-        $this->orderData = $orderData;
+        return $this->amount;
     }
 
-    public function getOrderData(): array
+    public function setAmount($amount)
     {
-        return $this->orderData;
+        $this->amount = $amount;
+
+        return $this;
+    }
+
+    public function getComment()
+    {
+        return $this->comment;
+    }
+
+    public function setComment($comment)
+    {
+        $this->comment = $comment;
+
+        return $this;
+    }
+
+    public function getDuration()
+    {
+        return $this->duration;
+    }
+
+    public function setDuration($duration)
+    {
+        $this->duration = $duration;
+
+        return $this;
+    }
+
+    public function getExternalCode()
+    {
+        return $this->externalCode;
+    }
+
+    public function setExternalCode($externalCode)
+    {
+        $this->externalCode = $externalCode;
+
+        return $this;
+    }
+
+    public function getDeliveryAddressHouseNumber()
+    {
+        return $this->deliveryAddressHouseNumber;
+    }
+
+    public function setDeliveryAddressHouseNumber($deliveryAddressHouseNumber)
+    {
+        $this->deliveryAddressHouseNumber = $deliveryAddressHouseNumber;
+
+        return $this;
+    }
+
+    public function getDeliveryAddressStreet()
+    {
+        return $this->deliveryAddressStreet;
+    }
+
+    public function setDeliveryAddressStreet($deliveryAddressStreet)
+    {
+        $this->deliveryAddressStreet = $deliveryAddressStreet;
+
+        return $this;
+    }
+
+    public function getDeliveryAddressCity()
+    {
+        return $this->deliveryAddressCity;
+    }
+
+    public function setDeliveryAddressCity($deliveryAddressCity)
+    {
+        $this->deliveryAddressCity = $deliveryAddressCity;
+
+        return $this;
+    }
+
+    public function getDeliveryAddressPostalCode()
+    {
+        return $this->deliveryAddressPostalCode;
+    }
+
+    public function setDeliveryAddressPostalCode($deliveryAddressPostalCode)
+    {
+        $this->deliveryAddressPostalCode = $deliveryAddressPostalCode;
+
+        return $this;
+    }
+
+    public function getDeliveryAddressCountry()
+    {
+        return $this->deliveryAddressCountry;
+    }
+
+    public function setDeliveryAddressCountry($deliveryAddressCountry)
+    {
+        $this->deliveryAddressCountry = $deliveryAddressCountry;
+
+        return $this;
+    }
+
+    public function getDebtorCompanyAddressAddition()
+    {
+        return $this->debtorCompanyAddressAddition;
+    }
+
+    public function setDebtorCompanyAddressAddition($debtorCompanyAddressAddition)
+    {
+        $this->debtorCompanyAddressAddition = $debtorCompanyAddressAddition;
+
+        return $this;
+    }
+
+    public function getDebtorCompanyAddressHouseNumber()
+    {
+        return $this->debtorCompanyAddressHouseNumber;
+    }
+
+    public function setDebtorCompanyAddressHouseNumber($debtorCompanyAddressHouseNumber)
+    {
+        $this->debtorCompanyAddressHouseNumber = $debtorCompanyAddressHouseNumber;
+
+        return $this;
+    }
+
+    public function getDebtorCompanyAddressStreet()
+    {
+        return $this->debtorCompanyAddressStreet;
+    }
+
+    public function setDebtorCompanyAddressStreet($debtorCompanyAddressStreet)
+    {
+        $this->debtorCompanyAddressStreet = $debtorCompanyAddressStreet;
+
+        return $this;
+    }
+
+    public function getDebtorCompanyAddressCity()
+    {
+        return $this->debtorCompanyAddressCity;
+    }
+
+    public function setDebtorCompanyAddressCity($debtorCompanyAddressCity)
+    {
+        $this->debtorCompanyAddressCity = $debtorCompanyAddressCity;
+
+        return $this;
+    }
+
+    public function getDebtorCompanyAddressPostalCode()
+    {
+        return $this->debtorCompanyAddressPostalCode;
+    }
+
+    public function setDebtorCompanyAddressPostalCode($debtorCompanyAddressPostalCode)
+    {
+        $this->debtorCompanyAddressPostalCode = $debtorCompanyAddressPostalCode;
+
+        return $this;
+    }
+
+    public function getDebtorCompanyAddressCountry()
+    {
+        return $this->debtorCompanyAddressCountry;
+    }
+
+    public function setDebtorCompanyAddressCountry($debtorCompanyAddressCountry)
+    {
+        $this->debtorCompanyAddressCountry = $debtorCompanyAddressCountry;
+
+        return $this;
     }
 }

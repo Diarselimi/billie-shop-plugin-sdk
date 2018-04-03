@@ -14,10 +14,14 @@ class OrderEntity extends AbstractEntity
     private $internalComment;
     private $invoiceNumber;
     private $invoiceUrl;
-    private $customersCompaniesId;
+    private $customerId;
+    private $companyId;
     private $deliveryAddressId;
     private $debtorPersonId;
     private $debtorExternalDataId;
+    private $paymentId;
+
+    const STATE_NEW = 'new';
 
     public function getAmount(): float
     {
@@ -115,14 +119,26 @@ class OrderEntity extends AbstractEntity
         return $this;
     }
 
-    public function getCustomersCompaniesId(): int
+    public function getCustomerId():? int
     {
-        return $this->customersCompaniesId;
+        return $this->customerId;
     }
 
-    public function setCustomersCompaniesId(int $customersCompaniesId): OrderEntity
+    public function setCustomerId(int $customerId): OrderEntity
     {
-        $this->customersCompaniesId = $customersCompaniesId;
+        $this->customerId = $customerId;
+
+        return $this;
+    }
+
+    public function getCompanyId():? int
+    {
+        return $this->companyId;
+    }
+
+    public function setCompanyId(int $companyId): OrderEntity
+    {
+        $this->companyId = $companyId;
 
         return $this;
     }
@@ -139,7 +155,7 @@ class OrderEntity extends AbstractEntity
         return $this;
     }
 
-    public function getDebtorPersonId(): int
+    public function getDebtorPersonId():? int
     {
         return $this->debtorPersonId;
     }
@@ -151,7 +167,7 @@ class OrderEntity extends AbstractEntity
         return $this;
     }
 
-    public function getDebtorExternalDataId(): int
+    public function getDebtorExternalDataId():? int
     {
         return $this->debtorExternalDataId;
     }
@@ -159,6 +175,18 @@ class OrderEntity extends AbstractEntity
     public function setDebtorExternalDataId(int $debtorExternalDataId): OrderEntity
     {
         $this->debtorExternalDataId = $debtorExternalDataId;
+
+        return $this;
+    }
+
+    public function getPaymentId():? string
+    {
+        return $this->paymentId;
+    }
+
+    public function setPaymentId(string $paymentId): OrderEntity
+    {
+        $this->paymentId = $paymentId;
 
         return $this;
     }
