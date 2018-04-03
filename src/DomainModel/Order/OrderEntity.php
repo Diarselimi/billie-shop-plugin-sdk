@@ -155,7 +155,7 @@ class OrderEntity extends AbstractEntity
         return $this;
     }
 
-    public function getDebtorPersonId():? int
+    public function getDebtorPersonId(): int
     {
         return $this->debtorPersonId;
     }

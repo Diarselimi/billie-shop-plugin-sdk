@@ -27,4 +27,5 @@ services:
 
   App\DomainModel\Order\OrderRepositoryInterface: '@App\Infrastructure\Repository\OrderRepository'
   App\DomainModel\Order\AddressRepositoryInterface: '@App\Infrastructure\Repository\AddressRepository'
+  App\DomainModel\Order\PersonRepositoryInterface: '@App\Infrastructure\Repository\PersonRepository'
   App\DomainModel\Customer\CustomerRepositoryInterface: '@App\Infrastructure\Repository\CustomerRepository'

@@ -31,11 +31,17 @@ class CreateOrderController
             ->setDeliveryAddressCountry($request->request->get('delivery_address_country'))
 
             ->setDebtorCompanyAddressAddition($request->request->get('debtor_company_address_addition'))
-            ->setDeliveryAddressHouseNumber($request->request->get('debtor_company_address_house_number'))
+            ->setDebtorCompanyAddressHouseNumber($request->request->get('debtor_company_address_house_number'))
             ->setDebtorCompanyAddressStreet($request->request->get('debtor_company_address_street'))
             ->setDebtorCompanyAddressPostalCode($request->request->get('debtor_company_address_postal_code'))
             ->setDebtorCompanyAddressCity($request->request->get('debtor_company_address_city'))
             ->setDebtorCompanyAddressCountry($request->request->get('debtor_company_address_country'))
+
+            ->setDebtorPersonGender($request->request->get('debtor_person_gender'))
+            ->setDebtorPersonFirstName($request->request->get('debtor_person_first_name'))
+            ->setDebtorPersonLastName($request->request->get('debtor_person_last_name'))
+            ->setDebtorPersonPhoneNumber($request->request->get('debtor_person_phone_number'))
+            ->setDebtorPersonEmail($request->request->get('debtor_person_email'))
         ;
 
         $this->useCase->execute($request);

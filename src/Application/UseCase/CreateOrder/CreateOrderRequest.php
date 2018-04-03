@@ -22,6 +22,12 @@ class CreateOrderRequest
     private $debtorCompanyAddressPostalCode;
     private $debtorCompanyAddressCountry;
 
+    private $debtorPersonGender;
+    private $debtorPersonFirstName;
+    private $debtorPersonLastName;
+    private $debtorPersonPhoneNumber;
+    private $debtorPersonEmail;
+
     public function getAmount()
     {
         return $this->amount;
@@ -198,6 +204,66 @@ class CreateOrderRequest
     public function setDebtorCompanyAddressCountry($debtorCompanyAddressCountry)
     {
         $this->debtorCompanyAddressCountry = $debtorCompanyAddressCountry;
+
+        return $this;
+    }
+
+    public function getDebtorPersonGender()
+    {
+        return $this->debtorPersonGender;
+    }
+
+    public function setDebtorPersonGender($debtorPersonGender)
+    {
+        $this->debtorPersonGender = $debtorPersonGender;
+
+        return $this;
+    }
+
+    public function getDebtorPersonFirstName()
+    {
+        return $this->debtorPersonFirstName;
+    }
+
+    public function setDebtorPersonFirstName($debtorPersonFirstName)
+    {
+        $this->debtorPersonFirstName = $debtorPersonFirstName;
+
+        return $this;
+    }
+
+    public function getDebtorPersonLastName()
+    {
+        return $this->debtorPersonLastName;
+    }
+
+    public function setDebtorPersonLastName($debtorPersonLastName)
+    {
+        $this->debtorPersonLastName = $debtorPersonLastName;
+
+        return $this;
+    }
+
+    public function getDebtorPersonPhoneNumber()
+    {
+        return $this->debtorPersonPhoneNumber;
+    }
+
+    public function setDebtorPersonPhoneNumber($debtorPersonPhoneNumber)
+    {
+        $this->debtorPersonPhoneNumber = $debtorPersonPhoneNumber;
+
+        return $this;
+    }
+
+    public function getDebtorPersonEmail()
+    {
+        return $this->debtorPersonEmail;
+    }
+
+    public function setDebtorPersonEmail($debtorPersonEmail)
+    {
+        $this->debtorPersonEmail = $debtorPersonEmail;
 
         return $this;
     }
