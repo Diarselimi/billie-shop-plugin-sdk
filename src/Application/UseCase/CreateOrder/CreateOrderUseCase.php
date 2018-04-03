@@ -5,6 +5,8 @@ namespace App\Application\UseCase\CreateOrder;
 use App\Application\PaellaCoreCriticalException;
 use App\DomainModel\Address\AddressEntityFactory;
 use App\DomainModel\Address\AddressRepositoryInterface;
+use App\DomainModel\DebtorExternalData\DebtorExternalDataEntityFactory;
+use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\Exception\RepositoryException;
 use App\DomainModel\Order\OrderEntityFactory;
 use App\DomainModel\Order\OrderRepositoryInterface;
@@ -16,24 +18,30 @@ class CreateOrderUseCase
     private $orderRepository;
     private $personRepository;
     private $addressRepository;
+    private $debtorExternalDataRepository;
     private $orderFactory;
     private $personFactory;
     private $addressFactory;
+    private $debtorExternalDataFactory;
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         PersonRepositoryInterface $personRepository,
         AddressRepositoryInterface $addressRepository,
+        DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
         OrderEntityFactory $orderFactory,
         PersonEntityFactory $personFactory,
-        AddressEntityFactory $addressFactory
+        AddressEntityFactory $addressFactory,
+        DebtorExternalDataEntityFactory $debtorExternalDataFactory
     ) {
         $this->orderRepository = $orderRepository;
         $this->personRepository = $personRepository;
         $this->addressRepository = $addressRepository;
+        $this->debtorExternalDataRepository = $debtorExternalDataRepository;
         $this->orderFactory = $orderFactory;
         $this->personFactory = $personFactory;
         $this->addressFactory = $addressFactory;
+        $this->debtorExternalDataFactory = $debtorExternalDataFactory;
     }
 
     public function execute(CreateOrderRequest $request)
@@ -66,6 +74,19 @@ class CreateOrderUseCase
             throw new PaellaCoreCriticalException();
         }
 
+        // debtor external data
+        $debtorExternalData = $this->debtorExternalDataFactory
+            ->createFromRequest($request)
+            ->setAddressId($debtorAddress->getId())
+        ;
+        try {
+            $this->debtorExternalDataRepository->insert($debtorExternalData);
+        } catch (RepositoryException $exception) {
+            throw new PaellaCoreCriticalException();
+        }
+        $order->setDebtorExternalDataId($debtorExternalData->getId());
+
+        // order
         try {
             $this->orderRepository->insert($order);
         } catch (RepositoryException $exception) {

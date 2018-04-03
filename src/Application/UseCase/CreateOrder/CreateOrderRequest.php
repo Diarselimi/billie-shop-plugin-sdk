@@ -15,6 +15,19 @@ class CreateOrderRequest
     private $deliveryAddressPostalCode;
     private $deliveryAddressCountry;
 
+    private $debtorCompanyMerchantCustomerId;
+
+    private $debtorCompanyName;
+    private $debtorCompanyTaxId;
+    private $debtorCompanyTaxNumber;
+    private $debtorCompanyRegistrationCourt;
+    private $debtorCompanyRegistrationNumber;
+    private $debtorCompanyIndustrySector;
+    private $debtorCompanySubindustrySector;
+    private $debtorCompanyEmployeesNumber;
+    private $debtorCompanyLegalForm;
+    private $debtorCompanyEstablishedCustomer;
+
     private $debtorCompanyAddressAddition;
     private $debtorCompanyAddressHouseNumber;
     private $debtorCompanyAddressStreet;
@@ -132,6 +145,138 @@ class CreateOrderRequest
     public function setDeliveryAddressCountry($deliveryAddressCountry)
     {
         $this->deliveryAddressCountry = $deliveryAddressCountry;
+
+        return $this;
+    }
+
+    public function getDebtorCompanyMerchantCustomerId()
+    {
+        return $this->debtorCompanyMerchantCustomerId;
+    }
+
+    public function setDebtorCompanyMerchantCustomerId($debtorCompanyMerchantCustomerId)
+    {
+        $this->debtorCompanyMerchantCustomerId = $debtorCompanyMerchantCustomerId;
+
+        return $this;
+    }
+
+    public function getDebtorCompanyName()
+    {
+        return $this->debtorCompanyName;
+    }
+
+    public function setDebtorCompanyName($debtorCompanyName)
+    {
+        $this->debtorCompanyName = $debtorCompanyName;
+
+        return $this;
+    }
+
+    public function getDebtorCompanyTaxId()
+    {
+        return $this->debtorCompanyTaxId;
+    }
+
+    public function setDebtorCompanyTaxId($debtorCompanyTaxId)
+    {
+        $this->debtorCompanyTaxId = $debtorCompanyTaxId;
+
+        return $this;
+    }
+
+    public function getDebtorCompanyTaxNumber()
+    {
+        return $this->debtorCompanyTaxNumber;
+    }
+
+    public function setDebtorCompanyTaxNumber($debtorCompanyTaxNumber)
+    {
+        $this->debtorCompanyTaxNumber = $debtorCompanyTaxNumber;
+
+        return $this;
+    }
+
+    public function getDebtorCompanyRegistrationCourt()
+    {
+        return $this->debtorCompanyRegistrationCourt;
+    }
+
+    public function setDebtorCompanyRegistrationCourt($debtorCompanyRegistrationCourt)
+    {
+        $this->debtorCompanyRegistrationCourt = $debtorCompanyRegistrationCourt;
+
+        return $this;
+    }
+
+    public function getDebtorCompanyRegistrationNumber()
+    {
+        return $this->debtorCompanyRegistrationNumber;
+    }
+
+    public function setDebtorCompanyRegistrationNumber($debtorCompanyRegistrationNumber)
+    {
+        $this->debtorCompanyRegistrationNumber = $debtorCompanyRegistrationNumber;
+
+        return $this;
+    }
+
+    public function getDebtorCompanyIndustrySector()
+    {
+        return $this->debtorCompanyIndustrySector;
+    }
+
+    public function setDebtorCompanyIndustrySector($debtorCompanyIndustrySector)
+    {
+        $this->debtorCompanyIndustrySector = $debtorCompanyIndustrySector;
+
+        return $this;
+    }
+
+    public function getDebtorCompanySubindustrySector()
+    {
+        return $this->debtorCompanySubindustrySector;
+    }
+
+    public function setDebtorCompanySubindustrySector($debtorCompanySubindustrySector)
+    {
+        $this->debtorCompanySubindustrySector = $debtorCompanySubindustrySector;
+
+        return $this;
+    }
+
+    public function getDebtorCompanyEmployeesNumber()
+    {
+        return $this->debtorCompanyEmployeesNumber;
+    }
+
+    public function setDebtorCompanyEmployeesNumber($debtorCompanyEmployeesNumber)
+    {
+        $this->debtorCompanyEmployeesNumber = $debtorCompanyEmployeesNumber;
+
+        return $this;
+    }
+
+    public function getDebtorCompanyLegalForm()
+    {
+        return $this->debtorCompanyLegalForm;
+    }
+
+    public function setDebtorCompanyLegalForm($debtorCompanyLegalForm)
+    {
+        $this->debtorCompanyLegalForm = $debtorCompanyLegalForm;
+
+        return $this;
+    }
+
+    public function getDebtorCompanyEstablishedCustomer()
+    {
+        return $this->debtorCompanyEstablishedCustomer;
+    }
+
+    public function setDebtorCompanyEstablishedCustomer($debtorCompanyEstablishedCustomer)
+    {
+        $this->debtorCompanyEstablishedCustomer = $debtorCompanyEstablishedCustomer;
 
         return $this;
     }

@@ -56,7 +56,7 @@ class InitialStructure extends AbstractMigration
             ->addColumn('registration_number', 'string', ['null' => true])
             ->addColumn('industry_sector', 'string', ['null' => false])
             ->addColumn('subindustry_sector', 'string', ['null' => false])
-            ->addColumn('number_of_employees', 'string', ['null' => true])
+            ->addColumn('employees_number', 'string', ['null' => true])
             ->addColumn('is_established_customer', 'boolean', ['null' => false])
             ->addColumn('created_at', 'datetime', ['null' => false])
             ->addColumn('updated_at', 'datetime', ['null' => false])

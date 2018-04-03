@@ -30,6 +30,18 @@ class CreateOrderController
             ->setDeliveryAddressCity($request->request->get('delivery_address_city'))
             ->setDeliveryAddressCountry($request->request->get('delivery_address_country'))
 
+            ->setDebtorCompanyMerchantCustomerId($request->request->get('debtor_company_merchant_customer_id'))
+            ->setDebtorCompanyName($request->request->get('debtor_company_name'))
+            ->setDebtorCompanyTaxId($request->request->get('debtor_company_tax_id'))
+            ->setDebtorCompanyTaxNumber($request->request->get('debtor_company_tax_number'))
+            ->setDebtorCompanyRegistrationCourt($request->request->get('debtor_company_registration_court'))
+            ->setDebtorCompanyRegistrationNumber($request->request->get('debtor_company_registration_number'))
+            ->setDebtorCompanyIndustrySector($request->request->get('debtor_company_industry_sector'))
+            ->setDebtorCompanySubindustrySector($request->request->get('debtor_company_subindustry_sector'))
+            ->setDebtorCompanyEmployeesNumber($request->request->get('debtor_company_employees_number'))
+            ->setDebtorCompanyLegalForm($request->request->get('debtor_company_legal_form'))
+            ->setDebtorCompanyEstablishedCustomer($request->request->get('debtor_company_established_customer'))
+
             ->setDebtorCompanyAddressAddition($request->request->get('debtor_company_address_addition'))
             ->setDebtorCompanyAddressHouseNumber($request->request->get('debtor_company_address_house_number'))
             ->setDebtorCompanyAddressStreet($request->request->get('debtor_company_address_street'))
