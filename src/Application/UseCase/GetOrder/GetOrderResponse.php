@@ -14,6 +14,11 @@ class GetOrderResponse
     private $companyAddressCity;
     private $companyAddressPostalCode;
     private $companyAddressCountry;
+    private $invoiceNumber;
+    private $payoutAmount;
+    private $feeAmount;
+    private $feeRate;
+    private $dueDate;
     private $reasons;
 
     public function getExternalCode(): string
@@ -144,6 +149,66 @@ class GetOrderResponse
     public function setReasons(?string $reasons): GetOrderResponse
     {
         $this->reasons = $reasons;
+
+        return $this;
+    }
+
+    public function getInvoiceNumber():? string
+    {
+        return $this->invoiceNumber;
+    }
+
+    public function setInvoiceNumber(string $invoiceNumber): GetOrderResponse
+    {
+        $this->invoiceNumber = $invoiceNumber;
+
+        return $this;
+    }
+
+    public function getPayoutAmount():? float
+    {
+        return $this->payoutAmount;
+    }
+
+    public function setPayoutAmount(float $payoutAmount): GetOrderResponse
+    {
+        $this->payoutAmount = $payoutAmount;
+
+        return $this;
+    }
+
+    public function getFeeAmount():? float
+    {
+        return $this->feeAmount;
+    }
+
+    public function setFeeAmount(float $feeAmount): GetOrderResponse
+    {
+        $this->feeAmount = $feeAmount;
+
+        return $this;
+    }
+
+    public function getFeeRate():? float
+    {
+        return $this->feeRate;
+    }
+
+    public function setFeeRate(float $feeRate): GetOrderResponse
+    {
+        $this->feeRate = $feeRate;
+
+        return $this;
+    }
+
+    public function getDueDate():? \DateTime
+    {
+        return $this->dueDate;
+    }
+
+    public function setDueDate(\DateTime $dueDate): GetOrderResponse
+    {
+        $this->dueDate = $dueDate;
 
         return $this;
     }

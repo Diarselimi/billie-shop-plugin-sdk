@@ -31,3 +31,4 @@ services:
   App\DomainModel\Customer\CustomerRepositoryInterface: '@App\Infrastructure\Repository\CustomerRepository'
   App\DomainModel\Customer\CompanyRepositoryInterface: '@App\Infrastructure\Repository\CompanyRepository'
   App\DomainModel\Alfred\AlfredInterface: '@App\Infrastructure\Alfred\Alfred'
+  App\DomainModel\Borscht\BorschtInterface: '@App\Infrastructure\Borscht\Borscht'

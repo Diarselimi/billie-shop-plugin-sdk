@@ -11,6 +11,7 @@ class DebtorDTO
     private $addressPostalCode;
     private $addressCity;
     private $addressCountry;
+    private $paymentId;
 
     public function getId(): int
     {
@@ -92,6 +93,18 @@ class DebtorDTO
     public function setAddressCountry(string $addressCountry): DebtorDTO
     {
         $this->addressCountry = $addressCountry;
+
+        return $this;
+    }
+
+    public function getPaymentId(): int
+    {
+        return $this->paymentId;
+    }
+
+    public function setPaymentId(int $paymentId): DebtorDTO
+    {
+        $this->paymentId = $paymentId;
 
         return $this;
     }

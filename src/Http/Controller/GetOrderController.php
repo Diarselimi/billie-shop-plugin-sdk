@@ -25,17 +25,25 @@ class GetOrderController
         $json = [
             'external_code' => $response->getExternalCode(),
             'state' => $response->getState(),
-        ];
-
-        if ($response->getCompanyAddressStreet()) {
-            $json['debtor_company'] = [
+            'debtor_company' => [
                 'name' => $response->getCompanyName(),
                 'house_number' => $response->getCompanyAddressHouseNumber(),
                 'street' => $response->getCompanyAddressStreet(),
                 'postal_code' => $response->getCompanyAddressPostalCode(),
                 'country' => $response->getCompanyAddressCountry(),
-            ];
-        }
+            ],
+            'bank_account' => [
+                'iban' => $response->getBankAccountIban(),
+                'bic' => $response->getBankAccountBic(),
+            ],
+            'invoice' => [
+                'number' => $response->getInvoiceNumber(),
+                'payout_amount' => $response->getPayoutAmount(),
+                'fee_amount' => $response->getFeeAmount(),
+                'fee_rate' => $response->getFeeRate(),
+                'due_date' => $response->getDueDate()->format('Y-m-d H:i:s'),
+            ],
+        ];
 
         return new JsonResponse($json);
     }

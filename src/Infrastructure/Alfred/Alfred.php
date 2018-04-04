@@ -16,6 +16,7 @@ class Alfred implements AlfredInterface
             ->setAddressPostalCode('10999')
             ->setAddressCity('Berlin')
             ->setAddressCountry('Germany')
+            ->setPaymentId(15)
         ;
     }
 

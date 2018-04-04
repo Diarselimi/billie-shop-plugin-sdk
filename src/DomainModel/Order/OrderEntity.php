@@ -21,8 +21,6 @@ class OrderEntity extends AbstractEntity
     private $debtorExternalDataId;
     private $paymentId;
 
-    const STATE_NEW = 'new';
-
     public function getAmount(): float
     {
         return $this->amount;
