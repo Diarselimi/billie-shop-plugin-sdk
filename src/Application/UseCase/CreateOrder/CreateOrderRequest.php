@@ -9,6 +9,7 @@ class CreateOrderRequest
     private $duration;
     private $externalCode;
 
+    private $deliveryAddressAddition;
     private $deliveryAddressHouseNumber;
     private $deliveryAddressStreet;
     private $deliveryAddressCity;
@@ -85,6 +86,18 @@ class CreateOrderRequest
     public function setExternalCode($externalCode)
     {
         $this->externalCode = $externalCode;
+
+        return $this;
+    }
+
+    public function getDeliveryAddressAddition()
+    {
+        return $this->deliveryAddressAddition;
+    }
+
+    public function setDeliveryAddressAddition($deliveryAddressAddition)
+    {
+        $this->deliveryAddressAddition = $deliveryAddressAddition;
 
         return $this;
     }

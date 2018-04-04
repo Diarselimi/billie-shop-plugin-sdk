@@ -5,6 +5,7 @@ namespace App\Application;
 class PaellaCoreCriticalException extends \RuntimeException
 {
     const CODE_NOT_FOUND = 400001;
+    const CODE_ORDER_COULD_NOT_BE_PERSISTED = 400002;
 
     private $responseCode;
 

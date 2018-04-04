@@ -27,7 +27,6 @@ class InitialStructure extends AbstractMigration
             ->addColumn('street', 'string', ['null' => false])
             ->addColumn('house', 'string', ['null' => false])
             ->addColumn('addition', 'string', ['null' => true])
-            ->addColumn('comment', 'string', ['null' => true])
             ->addColumn('created_at', 'datetime', ['null' => false])
             ->addColumn('updated_at', 'datetime', ['null' => false])
             ->create()
