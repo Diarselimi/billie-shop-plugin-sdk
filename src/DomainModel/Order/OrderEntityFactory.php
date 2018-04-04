@@ -13,6 +13,7 @@ class OrderEntityFactory
             ->setDuration($request->getDuration())
             ->setExternalComment($request->getComment())
             ->setExternalCode($request->getExternalCode())
+            ->setCustomerId($request->getCustomerId())
             ->setState(OrderEntity::STATE_NEW)
             ->setCreatedAt(new \DateTime())
             ->setUpdatedAt(new \DateTime())

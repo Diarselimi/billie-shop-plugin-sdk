@@ -4,6 +4,7 @@ namespace App\Http\Controller;
 
 use App\Application\UseCase\CreateOrder\CreateOrderRequest;
 use App\Application\UseCase\CreateOrder\CreateOrderUseCase;
+use App\Http\HttpConstantsInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -19,6 +20,7 @@ class CreateOrderController
     public function execute(Request $request)
     {
         $request = (new CreateOrderRequest())
+            ->setCustomerId($request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER))
             ->setAmount($request->request->get('amount'))
             ->setDuration($request->request->get('duration'))
             ->setComment($request->request->get('comment'))

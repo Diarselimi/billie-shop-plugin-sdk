@@ -37,20 +37,38 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
         $order->setId($id);
     }
 
-    public function getOneByExternalCode(string $externalCode):? OrderEntity
+    public function getOneByExternalCode(string $externalCode, int $customerId):? OrderEntity
     {
-        return (new OrderEntity())
-            ->setId(43)
-            ->setAmount(500)
-        ;
-    }
-
-    public function getOneByExternalCodeRaw(string $externalCode):? array
-    {
-        $order = $this->doFetch('SELECT * FROM orders WHERE external_code = :external_code', [
+        $order = $this->doFetch('
+          SELECT id, amount, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, delivery_address_id, customer_id, company_id, debtor_person_id, debtor_external_data_id, payment_id, created_at, updated_at 
+          FROM orders 
+          WHERE external_code = :external_code AND customer_id = :customer_id
+        ', [
             'external_code' => $externalCode,
+            'customer_id' => $customerId,
         ]);
 
-        return $order ?: null;
+        if (!$order) {
+            return null;
+        }
+
+        return (new OrderEntity())
+            ->setId($order['id'])
+            ->setAmount($order['amount'])
+            ->setExternalCode($order['external_code'])
+            ->setState($order['state'])
+            ->setExternalComment($order['external_comment'])
+            ->setInternalComment($order['internal_comment'])
+            ->setInvoiceNumber($order['invoice_number'])
+            ->setInvoiceUrl($order['invoice_url'])
+            ->setDeliveryAddressId($order['delivery_address_id'])
+            ->setCustomerId($order['customer_id'])
+            ->setCompanyId($order['company_id'])
+            ->setDebtorPersonId($order['debtor_person_id'])
+            ->setDebtorExternalDataId($order['debtor_external_data_id'])
+            ->setPaymentId($order['payment_id'])
+            ->setCreatedAt(new \DateTime($order['created_at']))
+            ->setUpdatedAt(new \DateTime($order['updated_at']))
+        ;
     }
 }

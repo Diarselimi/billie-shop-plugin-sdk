@@ -4,6 +4,7 @@ namespace App\Application\UseCase\CreateOrder;
 
 class CreateOrderRequest
 {
+    private $customerId;
     private $amount;
     private $comment;
     private $duration;
@@ -41,6 +42,18 @@ class CreateOrderRequest
     private $debtorPersonLastName;
     private $debtorPersonPhoneNumber;
     private $debtorPersonEmail;
+
+    public function getCustomerId()
+    {
+        return $this->customerId;
+    }
+
+    public function setCustomerId($customerId)
+    {
+        $this->customerId = $customerId;
+
+        return $this;
+    }
 
     public function getAmount()
     {

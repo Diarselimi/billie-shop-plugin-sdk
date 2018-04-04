@@ -19,7 +19,6 @@ class ExceptionSubscriber implements EventSubscriberInterface
 
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
-        return;
         $exception = $event->getException();
 
         $responseCode = $exception instanceof PaellaCoreCriticalException && $exception->getResponseCode()

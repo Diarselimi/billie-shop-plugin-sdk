@@ -136,7 +136,7 @@ class OrderEntity extends AbstractEntity
         return $this->companyId;
     }
 
-    public function setCompanyId(int $companyId): OrderEntity
+    public function setCompanyId(?int $companyId): OrderEntity
     {
         $this->companyId = $companyId;
 
@@ -184,7 +184,7 @@ class OrderEntity extends AbstractEntity
         return $this->paymentId;
     }
 
-    public function setPaymentId(string $paymentId): OrderEntity
+    public function setPaymentId(?string $paymentId): OrderEntity
     {
         $this->paymentId = $paymentId;
 
