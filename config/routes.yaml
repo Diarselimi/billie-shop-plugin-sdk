@@ -1,5 +1,5 @@
-health_check:
-  path: /health-check
+healthcheck:
+  path: /healthcheck
   controller: App\Http\Controller\HealthCheckController::execute
   methods: [GET]
 
