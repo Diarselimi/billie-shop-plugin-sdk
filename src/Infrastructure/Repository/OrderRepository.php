@@ -11,12 +11,14 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
     {
         $id = $this->doInsert('
             INSERT INTO orders
-            (amount, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, delivery_address_id, customer_id, company_id, debtor_person_id, debtor_external_data_id, payment_id, created_at, updated_at)
+            (amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, delivery_address_id, customer_id, company_id, debtor_person_id, debtor_external_data_id, payment_id, created_at, updated_at)
             VALUES
-            (:amount, :duration, :external_code, :state, :external_comment, :internal_comment, :invoice_number, :invoice_url, :delivery_address_id, :customer_id, :company_id, :debtor_person_id, :debtor_external_data_id, :payment_id, :created_at, :updated_at)
+            (:amount_net, :amount_gross, :amount_tax, :duration, :external_code, :state, :external_comment, :internal_comment, :invoice_number, :invoice_url, :delivery_address_id, :customer_id, :company_id, :debtor_person_id, :debtor_external_data_id, :payment_id, :created_at, :updated_at)
             
         ', [
-            'amount' => $order->getAmount(),
+            'amount_net' => $order->getAmountNet(),
+            'amount_gross' => $order->getAmountGross(),
+            'amount_tax' => $order->getAmountTax(),
             'duration' => $order->getDuration(),
             'external_code' => $order->getExternalCode(),
             'state' => $order->getState(),
@@ -40,7 +42,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
     public function getOneByExternalCode(string $externalCode, int $customerId):? OrderEntity
     {
         $order = $this->doFetch('
-          SELECT id, amount, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, delivery_address_id, customer_id, company_id, debtor_person_id, debtor_external_data_id, payment_id, created_at, updated_at 
+          SELECT id, amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, delivery_address_id, customer_id, company_id, debtor_person_id, debtor_external_data_id, payment_id, created_at, updated_at 
           FROM orders 
           WHERE external_code = :external_code AND customer_id = :customer_id
         ', [
@@ -54,7 +56,9 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
 
         return (new OrderEntity())
             ->setId($order['id'])
-            ->setAmount($order['amount'])
+            ->setAmountNet($order['amount_net'])
+            ->setAmountGross($order['amount_gross'])
+            ->setAmountTax($order['amount_tax'])
             ->setExternalCode($order['external_code'])
             ->setState($order['state'])
             ->setExternalComment($order['external_comment'])

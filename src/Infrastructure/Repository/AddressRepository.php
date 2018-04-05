@@ -11,9 +11,9 @@ class AddressRepository extends AbstractRepository implements AddressRepositoryI
     {
         $id = $this->doInsert('
             INSERT INTO addresses
-            (house, street, postal_code, city, country, addition, comment, created_at, updated_at)
+            (house, street, postal_code, city, country, addition, created_at, updated_at)
             VALUES
-            (:house, :street, :postal_code, :city, :country, :addition, :comment, :created_at, :updated_at)
+            (:house, :street, :postal_code, :city, :country, :addition, :created_at, :updated_at)
             
         ', [
             'house' => $address->getHouseNumber(),
@@ -22,7 +22,6 @@ class AddressRepository extends AbstractRepository implements AddressRepositoryI
             'city' => $address->getCity(),
             'country' => $address->getCountry(),
             'addition' => $address->getAddition(),
-            'comment' => $address->getComment(),
             'created_at' => $address->getCreatedAt()->format('Y-m-d H:i:s'),
             'updated_at' => $address->getUpdatedAt()->format('Y-m-d H:i:s'),
         ]);

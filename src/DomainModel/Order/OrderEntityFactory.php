@@ -9,19 +9,16 @@ class OrderEntityFactory
     public function createFromRequest(CreateOrderRequest $request): OrderEntity
     {
         return (new OrderEntity())
-            ->setAmount($request->getAmount())
+            ->setAmountNet($request->getAmountNet())
+            ->setAmountGross($request->getAmountGross())
+            ->setAmountTax($request->getAmountTax())
             ->setDuration($request->getDuration())
             ->setExternalComment($request->getComment())
             ->setExternalCode($request->getExternalCode())
             ->setCustomerId($request->getCustomerId())
-            ->setState(OrderEntity::STATE_NEW)
+            ->setState(OrderStateManager::STATE_NEW)
             ->setCreatedAt(new \DateTime())
             ->setUpdatedAt(new \DateTime())
         ;
-    }
-
-    public function createFromArray(array $order)
-    {
-
     }
 }

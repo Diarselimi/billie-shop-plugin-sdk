@@ -5,7 +5,9 @@ namespace App\Application\UseCase\CreateOrder;
 class CreateOrderRequest
 {
     private $customerId;
-    private $amount;
+    private $amountNet;
+    private $amountGross;
+    private $amountTax;
     private $comment;
     private $duration;
     private $externalCode;
@@ -55,14 +57,38 @@ class CreateOrderRequest
         return $this;
     }
 
-    public function getAmount()
+    public function getAmountNet()
     {
-        return $this->amount;
+        return $this->amountNet;
     }
 
-    public function setAmount($amount)
+    public function setAmountNet($amountNet)
     {
-        $this->amount = $amount;
+        $this->amountNet = $amountNet;
+
+        return $this;
+    }
+
+    public function getAmountGross()
+    {
+        return $this->amountGross;
+    }
+
+    public function setAmountGross($amountGross)
+    {
+        $this->amountGross = $amountGross;
+
+        return $this;
+    }
+
+    public function getAmountTax()
+    {
+        return $this->amountTax;
+    }
+
+    public function setAmountTax($amountTax)
+    {
+        $this->amountTax = $amountTax;
 
         return $this;
     }

@@ -73,7 +73,9 @@ class InitialStructure extends AbstractMigration
 
         $this
             ->table('orders')
-            ->addColumn('amount', 'float', ['null' => false])
+            ->addColumn('amount_net', 'float', ['null' => false])
+            ->addColumn('amount_gross', 'float', ['null' => false])
+            ->addColumn('amount_tax', 'float', ['null' => false])
             ->addColumn('duration', 'integer', ['null' => false])
             ->addColumn('external_code', 'string', ['null' => false])
             ->addColumn('state', 'string', ['null' => false])

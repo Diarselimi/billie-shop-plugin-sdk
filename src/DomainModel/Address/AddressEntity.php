@@ -12,7 +12,6 @@ class AddressEntity extends AbstractEntity
     private $street;
     private $houseNumber;
     private $addition;
-    private $comment;
 
     public function getCountry(): string
     {
@@ -82,18 +81,6 @@ class AddressEntity extends AbstractEntity
     public function setAddition(?string $addition): AddressEntity
     {
         $this->addition = $addition;
-
-        return $this;
-    }
-
-    public function getComment():? string
-    {
-        return $this->comment;
-    }
-
-    public function setComment(?string $comment): AddressEntity
-    {
-        $this->comment = $comment;
 
         return $this;
     }

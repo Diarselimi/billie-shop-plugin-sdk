@@ -9,11 +9,14 @@ class AddressEntityFactory
     public function createFromRequestDelivery(CreateOrderRequest $request): AddressEntity
     {
         return (new AddressEntity())
+            ->setAddition($request->getDeliveryAddressAddition())
             ->setHouseNumber($request->getDeliveryAddressHouseNumber())
             ->setStreet($request->getDeliveryAddressStreet())
             ->setPostalCode($request->getDeliveryAddressPostalCode())
             ->setCity($request->getDeliveryAddressCity())
             ->setCountry($request->getDeliveryAddressCountry())
+            ->setCreatedAt(new \DateTime())
+            ->setUpdatedAt(new \DateTime())
         ;
     }
 
@@ -26,6 +29,8 @@ class AddressEntityFactory
             ->setPostalCode($request->getDebtorCompanyAddressPostalCode())
             ->setCity($request->getDebtorCompanyAddressCity())
             ->setCountry($request->getDebtorCompanyAddressCountry())
+            ->setCreatedAt(new \DateTime())
+            ->setUpdatedAt(new \DateTime())
         ;
     }
 }

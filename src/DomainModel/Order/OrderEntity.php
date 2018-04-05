@@ -6,7 +6,9 @@ use App\DomainModel\AbstractEntity;
 
 class OrderEntity extends AbstractEntity
 {
-    private $amount;
+    private $amountNet;
+    private $amountGross;
+    private $amountTax;
     private $duration;
     private $externalCode;
     private $state;
@@ -21,14 +23,38 @@ class OrderEntity extends AbstractEntity
     private $debtorExternalDataId;
     private $paymentId;
 
-    public function getAmount(): float
+    public function getAmountNet(): float
     {
-        return $this->amount;
+        return $this->amountNet;
     }
 
-    public function setAmount(float $amount): OrderEntity
+    public function setAmountNet(float $amountNet): OrderEntity
     {
-        $this->amount = $amount;
+        $this->amountNet = $amountNet;
+
+        return $this;
+    }
+
+    public function getAmountGross(): float
+    {
+        return $this->amountGross;
+    }
+
+    public function setAmountGross(float $amountGross): OrderEntity
+    {
+        $this->amountGross = $amountGross;
+
+        return $this;
+    }
+
+    public function getAmountTax(): float
+    {
+        return $this->amountTax;
+    }
+
+    public function setAmountTax(float $amountTax): OrderEntity
+    {
+        $this->amountTax = $amountTax;
 
         return $this;
     }

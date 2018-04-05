@@ -21,7 +21,9 @@ class CreateOrderController
     {
         $request = (new CreateOrderRequest())
             ->setCustomerId($request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER))
-            ->setAmount($request->request->get('amount'))
+            ->setAmountNet($request->request->get('amount_net'))
+            ->setAmountGross($request->request->get('amount_gross'))
+            ->setAmountTax($request->request->get('amount_tax'))
             ->setDuration($request->request->get('duration'))
             ->setComment($request->request->get('comment'))
             ->setExternalCode($request->request->get('external_code'))

@@ -41,7 +41,7 @@ class GetOrderController
                 'payout_amount' => $response->getPayoutAmount(),
                 'fee_amount' => $response->getFeeAmount(),
                 'fee_rate' => $response->getFeeRate(),
-                'due_date' => $response->getDueDate()->format('Y-m-d H:i:s'),
+                'due_date' => $response->getDueDate() ? $response->getDueDate()->format('Y-m-d H:i:s') : null,
             ],
         ];
 
