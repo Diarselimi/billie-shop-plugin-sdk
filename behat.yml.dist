@@ -3,7 +3,8 @@ default:
     default:
       contexts:
         - behatch:context:rest
-        - PaellaCoreContext
+        - PaellaCoreContext:
+          kernel: '@kernel'
 
   extensions:
     Behatch\Extension: ~

@@ -38,6 +38,12 @@
     "fabpot/goutte": {
         "version": "v3.2.2"
     },
+    "fesor/json_matcher": {
+        "version": "0.2.3"
+    },
+    "fesor/json_spec": {
+        "version": "v1.0.1"
+    },
     "guzzlehttp/guzzle": {
         "version": "6.3.2"
     },
