@@ -14,8 +14,6 @@ class PersonEntityFactory
             ->setLastName($request->getDebtorPersonLastName())
             ->setPhoneNumber($request->getDebtorPersonPhoneNumber())
             ->setEmail($request->getDebtorPersonEmail())
-            ->setCreatedAt(new \DateTime())
-            ->setUpdatedAt(new \DateTime())
         ;
     }
 }

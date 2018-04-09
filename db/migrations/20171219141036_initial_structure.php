@@ -9,13 +9,13 @@ class InitialStructure extends AbstractMigration
         $this
             ->table('customers')
             ->addColumn('name', 'string', ['null' => false])
+            ->addColumn('available_financing_limit', 'float', ['null' => false])
             ->addColumn('api_key', 'string', ['null' => false])
             ->addColumn('roles', 'string', ['null' => false])
             ->addColumn('is_active', 'boolean', ['null' => false])
-            ->addColumn('maximal_financing_limit', 'float', ['null' => false])
-            ->addColumn('current_financing_limit', 'float', ['null' => false])
             ->addColumn('created_at', 'datetime', ['null' => false])
             ->addColumn('updated_at', 'datetime', ['null' => false])
+            ->addIndex('api_key', ['unique' => true])
             ->create()
         ;
 

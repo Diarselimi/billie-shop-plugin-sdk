@@ -42,7 +42,7 @@ class DebtorExternalDataEntity extends AbstractEntity
         return $this;
     }
 
-    public function getTaxNumber(): string
+    public function getTaxNumber():? string
     {
         return $this->taxNumber;
     }
@@ -54,7 +54,7 @@ class DebtorExternalDataEntity extends AbstractEntity
         return $this;
     }
 
-    public function getRegistrationNumber(): string
+    public function getRegistrationNumber():? string
     {
         return $this->registrationNumber;
     }
@@ -102,7 +102,7 @@ class DebtorExternalDataEntity extends AbstractEntity
         return $this;
     }
 
-    public function getEmployeesNumber(): string
+    public function getEmployeesNumber():? string
     {
         return $this->employees_number;
     }

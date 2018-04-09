@@ -1,0 +1,16 @@
+services:
+  App\DomainModel\Order\OrderRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\OrderRepository'
+    public: true
+  App\DomainModel\Customer\CustomerRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\CustomerRepository'
+    public: true
+  App\DomainModel\Address\AddressRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\AddressRepository'
+    public: true
+  App\DomainModel\Person\PersonRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\PersonRepository'
+    public: true
+  App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\DebtorExternalDataRepository'
+    public: true

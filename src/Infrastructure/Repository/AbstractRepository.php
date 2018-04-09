@@ -10,6 +10,12 @@ abstract class AbstractRepository
      * @var \PDO
      */
     protected $conn;
+    protected $deleteAllowed;
+
+    public function setDeleteAllowed(bool $deleteAllowed)
+    {
+        $this->deleteAllowed = $deleteAllowed;
+    }
 
     public function setConnection(\PDO $conn)
     {

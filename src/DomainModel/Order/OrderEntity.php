@@ -21,6 +21,7 @@ class OrderEntity extends AbstractEntity
     private $deliveryAddressId;
     private $debtorPersonId;
     private $debtorExternalDataId;
+    private $debtorExternalDataAddressId;
     private $paymentId;
 
     public function getAmountNet(): float
@@ -199,6 +200,18 @@ class OrderEntity extends AbstractEntity
     public function setDebtorExternalDataId(int $debtorExternalDataId): OrderEntity
     {
         $this->debtorExternalDataId = $debtorExternalDataId;
+
+        return $this;
+    }
+
+    public function getDebtorExternalDataAddressId():? int
+    {
+        return $this->debtorExternalDataAddressId;
+    }
+
+    public function setDebtorExternalDataAddressId(?int $debtorExternalDataAddressId): OrderEntity
+    {
+        $this->debtorExternalDataAddressId = $debtorExternalDataAddressId;
 
         return $this;
     }

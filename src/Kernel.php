@@ -65,7 +65,11 @@ class Kernel extends BaseKernel implements CompilerPassInterface
     {
         $connection = new Reference('paella_core.pdo');
         foreach ($container->findTaggedServiceIds('paella_core.repository') as $id => $tags) {
-            $container->findDefinition($id)->addMethodCall('setConnection', [$connection]);
+            $container
+                ->findDefinition($id)
+                ->addMethodCall('setConnection', [$connection])
+                ->addMethodCall('setDeleteAllowed', [$container->getParameter('kernel.debug')])
+            ;
         }
     }
 

@@ -29,13 +29,6 @@ class AddressRepository extends AbstractRepository implements AddressRepositoryI
         $address->setId($id);
     }
 
-    public function getOneById(int $id):? AddressEntity
-    {
-        return (new AddressEntity())
-            ->setId(43)
-        ;
-    }
-
     public function getOneByIdRaw(int $id):? array
     {
         $address = $this->doFetch('SELECT * FROM addresses WHERE id = :id', [

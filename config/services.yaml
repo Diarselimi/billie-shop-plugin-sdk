@@ -27,8 +27,9 @@ services:
       - '%env(DATABASE_PASSWORD)%'
 
   App\DomainModel\Order\OrderRepositoryInterface: '@App\Infrastructure\Repository\OrderRepository'
-  App\DomainModel\Order\AddressRepositoryInterface: '@App\Infrastructure\Repository\AddressRepository'
-  App\DomainModel\Order\PersonRepositoryInterface: '@App\Infrastructure\Repository\PersonRepository'
+  App\DomainModel\Address\AddressRepositoryInterface: '@App\Infrastructure\Repository\AddressRepository'
+  App\DomainModel\Person\PersonRepositoryInterface: '@App\Infrastructure\Repository\PersonRepository'
+  App\DomainModel\DebtorExternalData\DebtorExternalDataInterface: '@App\Infrastructure\Repository\DebtorExternalData'
   App\DomainModel\Customer\CustomerRepositoryInterface: '@App\Infrastructure\Repository\CustomerRepository'
   App\DomainModel\Customer\CompanyRepositoryInterface: '@App\Infrastructure\Repository\CompanyRepository'
   App\DomainModel\Alfred\AlfredInterface: '@App\Infrastructure\Alfred\Alfred'

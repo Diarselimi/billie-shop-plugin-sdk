@@ -4,11 +4,9 @@ Feature:
     And expect empty response
 
     Scenario: Successful order creation
-        Given I add "X-Api-User" header equal to "1"
-        And I add "Content-type" header equal to "application/json"
+        Given I add "Content-type" header equal to "application/json"
+        And I have a customer "Test Customer" with roles "ROLE_API_USER" and api key "test"
         When I send a POST request to "/order" with body:
-        And I have order with amount 100 and code 100 and duration 100 and amount 1000
-        And I have customer with api key 100 and name contorion
         """
         {
           "duration": 50,
@@ -49,3 +47,4 @@ Feature:
         """
         Then the response status code should be 201
         And the response should be empty
+        And I created the order A1

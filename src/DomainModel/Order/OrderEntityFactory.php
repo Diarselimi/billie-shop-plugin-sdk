@@ -17,8 +17,6 @@ class OrderEntityFactory
             ->setExternalCode($request->getExternalCode())
             ->setCustomerId($request->getCustomerId())
             ->setState(OrderStateManager::STATE_NEW)
-            ->setCreatedAt(new \DateTime())
-            ->setUpdatedAt(new \DateTime())
         ;
     }
 }

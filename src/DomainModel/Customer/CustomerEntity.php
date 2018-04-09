@@ -7,8 +7,10 @@ use App\DomainModel\AbstractEntity;
 class CustomerEntity extends AbstractEntity
 {
     private $name;
+    private $availableFinancingLimit;
     private $apiKey;
     private $roles;
+    private $isActive;
 
     public function getName(): string
     {
@@ -18,6 +20,18 @@ class CustomerEntity extends AbstractEntity
     public function setName(string $name): CustomerEntity
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getAvailableFinancingLimit(): float
+    {
+        return $this->availableFinancingLimit;
+    }
+
+    public function setAvailableFinancingLimit(float $availableFinancingLimit): CustomerEntity
+    {
+        $this->availableFinancingLimit = $availableFinancingLimit;
 
         return $this;
     }
@@ -42,6 +56,18 @@ class CustomerEntity extends AbstractEntity
     public function setRoles(string $roles): CustomerEntity
     {
         $this->roles = $roles;
+
+        return $this;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): CustomerEntity
+    {
+        $this->isActive = $isActive;
 
         return $this;
     }

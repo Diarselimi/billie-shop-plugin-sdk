@@ -15,8 +15,6 @@ class AddressEntityFactory
             ->setPostalCode($request->getDeliveryAddressPostalCode())
             ->setCity($request->getDeliveryAddressCity())
             ->setCountry($request->getDeliveryAddressCountry())
-            ->setCreatedAt(new \DateTime())
-            ->setUpdatedAt(new \DateTime())
         ;
     }
 
@@ -29,8 +27,6 @@ class AddressEntityFactory
             ->setPostalCode($request->getDebtorCompanyAddressPostalCode())
             ->setCity($request->getDebtorCompanyAddressCity())
             ->setCountry($request->getDebtorCompanyAddressCountry())
-            ->setCreatedAt(new \DateTime())
-            ->setUpdatedAt(new \DateTime())
         ;
     }
 }
