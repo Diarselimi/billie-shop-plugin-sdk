@@ -32,9 +32,9 @@ class CustomerRepository extends AbstractRepository implements CustomerRepositor
     public function getOneByApiKeyRaw(string $apiKey):? array
     {
         $customer = $this->doFetch('
-          SELECT id, name, api_key, roles, is_active, maximal_financing_limit, current_financing_limit, created_at, updated_at 
-          FROM customers WHERE 
-          api_key = :api_key
+          SELECT id, name, api_key, roles, is_active, available_financing_limit, created_at, updated_at 
+          FROM customers 
+          WHERE api_key = :api_key
         ', ['api_key' => $apiKey]);
 
         return $customer ?: null;

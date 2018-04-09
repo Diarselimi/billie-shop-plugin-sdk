@@ -8,6 +8,7 @@ use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Company\CompanyRepositoryInterface;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
+use Symfony\Component\HttpFoundation\Response;
 
 class GetOrderUseCase
 {
@@ -40,7 +41,8 @@ class GetOrderUseCase
         if (!$order) {
             throw new PaellaCoreCriticalException(
                 "Order #$externalCode not found",
-                PaellaCoreCriticalException::CODE_NOT_FOUND
+                PaellaCoreCriticalException::CODE_NOT_FOUND,
+                Response::HTTP_NOT_FOUND
             );
         }
 
