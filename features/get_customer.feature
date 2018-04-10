@@ -27,6 +27,6 @@ Feature:
             "api_key": "UIO543X",
             "roles": "ROLE_API_USER",
             "is_active": "1",
-            "available_financing_limit": "1000"
+            "available_financing_limit": "1000.00"
         }
         """

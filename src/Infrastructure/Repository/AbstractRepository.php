@@ -39,6 +39,6 @@ abstract class AbstractRepository
             throw new RepositoryException('Insert failed');
         }
 
-        return (int) $this->conn->query('SELECT LAST_INSERT_ID()')->fetchColumn();
+        return (int) $this->conn->lastInsertId();
     }
 }
