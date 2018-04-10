@@ -19,8 +19,6 @@ class DebtorExternalDataEntityFactory
             ->setSubindustrySector($request->getDebtorCompanySubindustrySector())
             ->setEmployeesNumber($request->getDebtorCompanyEmployeesNumber())
             ->setEstablishedCustomer($request->getDebtorCompanyEstablishedCustomer())
-            ->setCreatedAt(new \DateTime())
-            ->setUpdatedAt(new \DateTime())
         ;
     }
 }

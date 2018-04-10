@@ -9,7 +9,7 @@ class InitialStructure extends AbstractMigration
         $this
             ->table('customers')
             ->addColumn('name', 'string', ['null' => false])
-            ->addColumn('available_financing_limit', 'float', ['null' => false])
+            ->addColumn('available_financing_limit', 'decimal', ['null' => false, 'precision' => 20, 'scale' => 2])
             ->addColumn('api_key', 'string', ['null' => false])
             ->addColumn('roles', 'string', ['null' => false])
             ->addColumn('is_active', 'boolean', ['null' => false])
@@ -73,9 +73,9 @@ class InitialStructure extends AbstractMigration
 
         $this
             ->table('orders')
-            ->addColumn('amount_net', 'float', ['null' => false])
-            ->addColumn('amount_gross', 'float', ['null' => false])
-            ->addColumn('amount_tax', 'float', ['null' => false])
+            ->addColumn('amount_net', 'decimal', ['null' => false, 'precision' => 12, 'scale' => 2])
+            ->addColumn('amount_gross', 'decimal', ['null' => false, 'precision' => 12, 'scale' => 2])
+            ->addColumn('amount_tax', 'decimal', ['null' => false, 'precision' => 12, 'scale' => 2])
             ->addColumn('duration', 'integer', ['null' => false])
             ->addColumn('external_code', 'string', ['null' => false])
             ->addColumn('state', 'string', ['null' => false])
