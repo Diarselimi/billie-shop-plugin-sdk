@@ -10,90 +10,77 @@ class AddressEntity extends AbstractEntity
     private $city;
     private $postalCode;
     private $street;
-    private $house_number;
+    private $houseNumber;
     private $addition;
-    private $comment;
 
-    public function getCountry()
+    public function getCountry(): string
     {
         return $this->country;
     }
 
-    public function setCountry($country)
+    public function setCountry(string $country): AddressEntity
     {
         $this->country = $country;
 
         return $this;
     }
 
-    public function getCity()
+    public function getCity(): string
     {
         return $this->city;
     }
 
-    public function setCity($city)
+    public function setCity(string $city): AddressEntity
     {
         $this->city = $city;
 
         return $this;
     }
 
-    public function getPostalCode()
+    public function getPostalCode(): string
     {
         return $this->postalCode;
     }
 
-    public function setPostalCode($postalCode)
+    public function setPostalCode(string $postalCode): AddressEntity
     {
         $this->postalCode = $postalCode;
 
         return $this;
     }
 
-    public function getStreet()
+    public function getStreet(): string
     {
         return $this->street;
     }
 
-    public function setStreet($street)
+    public function setStreet(string $street): AddressEntity
     {
         $this->street = $street;
 
         return $this;
     }
 
-    public function getHouseNumber()
+    public function getHouseNumber(): string
     {
-        return $this->house_number;
+        return $this->houseNumber;
     }
 
-    public function setHouseNumber($house_number)
+    public function setHouseNumber(string $houseNumber): AddressEntity
     {
-        $this->house_number = $house_number;
+        $this->houseNumber = $houseNumber;
 
         return $this;
     }
 
-    public function getAddition()
+    public function getAddition():? string
     {
         return $this->addition;
     }
 
-    public function setAddition($addition)
+    public function setAddition(?string $addition): AddressEntity
     {
         $this->addition = $addition;
-
-        return $this;
-    }
-
-    public function getComment()
-    {
-        return $this->comment;
-    }
-
-    public function setComment($comment)
-    {
-        $this->comment = $comment;
 
         return $this;
     }

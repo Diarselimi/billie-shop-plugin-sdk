@@ -8,6 +8,6 @@ class HealthCheckController
 {
     public function execute()
     {
-        return new Response();
+        return new Response('Paella Core is alive');
     }
 }

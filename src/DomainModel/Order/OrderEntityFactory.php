@@ -2,13 +2,21 @@
 
 namespace App\DomainModel\Order;
 
+use App\Application\UseCase\CreateOrder\CreateOrderRequest;
+
 class OrderEntityFactory
 {
-    public function create(float $amount, int $duration)
+    public function createFromRequest(CreateOrderRequest $request): OrderEntity
     {
         return (new OrderEntity())
-            ->setAmount($amount)
-            ->setDuration($duration)
+            ->setAmountNet($request->getAmountNet())
+            ->setAmountGross($request->getAmountGross())
+            ->setAmountTax($request->getAmountTax())
+            ->setDuration($request->getDuration())
+            ->setExternalComment($request->getComment())
+            ->setExternalCode($request->getExternalCode())
+            ->setCustomerId($request->getCustomerId())
+            ->setState(OrderStateManager::STATE_NEW)
         ;
     }
 }

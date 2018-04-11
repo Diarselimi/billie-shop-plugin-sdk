@@ -10,8 +10,10 @@ abstract class AbstractEntity
 
     public function __construct()
     {
-        $this->createdAt = new \DateTime();
-        $this->updatedAt = new \DateTime();
+        $now = new \DateTime();
+
+        $this->createdAt = $now;
+        $this->updatedAt = $now;
     }
 
     public function getId(): int

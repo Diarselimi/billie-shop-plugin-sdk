@@ -1,9 +1,19 @@
-health_check:
-  path: /health-check
+healthcheck:
+  path: /healthcheck
   controller: App\Http\Controller\HealthCheckController::execute
   methods: [GET]
 
 get_order:
   path: /order/{externalCode}
   controller: App\Http\Controller\GetOrderController::execute
+  methods: [GET]
+
+create_order:
+  path: /order
+  controller: App\Http\Controller\CreateOrderController::execute
+  methods: [POST]
+
+get_customer:
+  path: /customer/{apiKey}
+  controller: App\Http\Controller\GetCustomerController::execute
   methods: [GET]
