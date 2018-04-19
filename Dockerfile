@@ -1,7 +1,5 @@
 FROM php:7.2-fpm
 
-RUN apt-get update && apt-get -y install procps
-
 # Apt caching proxy
 ARG APT_PROXY
 RUN if [ -n "$APT_PROXY" ]; then \
@@ -9,8 +7,21 @@ RUN if [ -n "$APT_PROXY" ]; then \
       echo 'Acquire::HTTPS::Proxy "false";' >> /etc/apt/apt.conf.d/01proxy; \
     fi
 
+# procps
+RUN apt-get update \
+    && apt-get install -y procps \
+    && apt-get clean -y && rm -rf /var/lib/apt/lists/*
+
 # pdo
 RUN docker-php-ext-install pdo pdo_mysql
+
+# Application environment
+ARG APP_ENV
+ENV APP_ROOT=/var/www/paella-core  \
+		APP_ENV=${APP_ENV:-dev}
+ENV PHP_USER_ID=33
+
+RUN ln -sfn "$APP_ROOT/docker/bin/docker-php-entrypoint" /usr/local/bin/docker-php-entrypoint
 
 # timecop
 ENV PHPTIMECOP_VERSION 1.2.10
@@ -25,14 +36,6 @@ RUN if [ $APP_ENV = 'dev' ]; then \
     docker-php-ext-install sockets \
     ; else echo 'skipped'; fi
 
-# Application environment
-ARG APP_ENV
-ENV APP_ROOT=/var/www/paella-core \
-		APP_ENV=${APP_ENV:-dev}
-ENV PHP_USER_ID=33
-
 #ansible-remove-me#COPY . $APP_ROOT
-
-RUN ln -sfn "$APP_ROOT/docker/bin/docker-php-entrypoint" /usr/local/bin/docker-php-entrypoint
 
 WORKDIR $APP_ROOT
