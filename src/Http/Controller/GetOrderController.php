@@ -25,6 +25,7 @@ class GetOrderController
         $json = [
             'external_code' => $response->getExternalCode(),
             'state' => $response->getState(),
+            'amount' => $response->getOriginalAmount(),
             'debtor_company' => [
                 'name' => $response->getCompanyName(),
                 'house_number' => $response->getCompanyAddressHouseNumber(),
@@ -43,6 +44,10 @@ class GetOrderController
                 'fee_rate' => $response->getFeeRate(),
                 'due_date' => $response->getDueDate() ? $response->getDueDate()->format('Y-m-d H:i:s') : null,
             ],
+            'debtor_external_data' => [
+                'address_country' => $response->getDebtorExternalDataAddressCountry(),
+                'industry_sector' => $response->getDebtorExternalDataIndustrySector(),
+            ]
         ];
 
         return new JsonResponse($json);

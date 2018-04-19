@@ -25,7 +25,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             'state' => $order->getState(),
             'external_comment' => $order->getExternalComment(),
             'internal_comment' => $order->getInternalComment(),
-            'invoice_number' => $order->getExternalComment(),
+            'invoice_number' => $order->getInvoiceNumber(),
             'invoice_url' => $order->getInvoiceUrl(),
             'delivery_address_id' => $order->getDeliveryAddressId(),
             'customer_id' => $order->getCustomerId(),

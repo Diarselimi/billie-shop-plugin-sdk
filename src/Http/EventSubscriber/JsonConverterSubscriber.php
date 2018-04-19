@@ -24,8 +24,11 @@ class JsonConverterSubscriber implements EventSubscriberInterface
         $json = $request->getContent();
         $requestData = json_decode($json, true);
 
-        if (is_null($requestData)) {
-            throw new PaellaCoreCriticalException("Request couldn't be decoded");
+        if (!$requestData) {
+            throw new PaellaCoreCriticalException(
+                "Request couldn't be decoded",
+                PaellaCoreCriticalException::CODE_REQUEST_DECODE_EXCEPTION
+            );
         }
 
         $request->request->add($requestData);

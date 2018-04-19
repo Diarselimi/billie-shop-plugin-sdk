@@ -98,5 +98,17 @@ class InitialStructure extends AbstractMigration
             ->addForeignKey('debtor_external_data_id', 'debtor_external_data', 'id')
             ->create()
         ;
+
+        $this
+            ->table('risk_checks')
+            ->addColumn('check_id', 'integer', ['null' => false])
+            ->addColumn('order_id', 'integer', ['null' => false])
+            ->addColumn('is_passed', 'string', ['null' => false])
+            ->addColumn('created_at', 'datetime', ['null' => false])
+            ->addColumn('updated_at', 'datetime', ['null' => false])
+            ->addForeignKey('order_id', 'orders', 'id')
+            ->addIndex('check_id', ['unique' => true])
+            ->create()
+        ;
     }
 }

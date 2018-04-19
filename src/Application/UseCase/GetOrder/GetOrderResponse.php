@@ -14,8 +14,11 @@ class GetOrderResponse
     private $companyAddressCity;
     private $companyAddressPostalCode;
     private $companyAddressCountry;
+    private $debtorExternalDataAddressCountry;
+    private $debtorExternalDataIndustrySector;
     private $invoiceNumber;
     private $payoutAmount;
+    private $originalAmount;
     private $feeAmount;
     private $feeRate;
     private $dueDate;
@@ -141,6 +144,30 @@ class GetOrderResponse
         return $this;
     }
 
+    public function getDebtorExternalDataAddressCountry(): string
+    {
+        return $this->debtorExternalDataAddressCountry;
+    }
+
+    public function setDebtorExternalDataAddressCountry(string $debtorExternalDataAddressCountry): GetOrderResponse
+    {
+        $this->debtorExternalDataAddressCountry = $debtorExternalDataAddressCountry;
+
+        return $this;
+    }
+
+    public function getDebtorExternalDataIndustrySector(): string
+    {
+        return $this->debtorExternalDataIndustrySector;
+    }
+
+    public function setDebtorExternalDataIndustrySector(string $debtorExternalDataIndustrySector): GetOrderResponse
+    {
+        $this->debtorExternalDataIndustrySector = $debtorExternalDataIndustrySector;
+
+        return $this;
+    }
+
     public function getReasons():? string
     {
         return $this->reasons;
@@ -173,6 +200,18 @@ class GetOrderResponse
     public function setPayoutAmount(float $payoutAmount): GetOrderResponse
     {
         $this->payoutAmount = $payoutAmount;
+
+        return $this;
+    }
+
+    public function getOriginalAmount():? float
+    {
+        return $this->originalAmount;
+    }
+
+    public function setOriginalAmount(float $originalAmount): GetOrderResponse
+    {
+        $this->originalAmount = $originalAmount;
 
         return $this;
     }

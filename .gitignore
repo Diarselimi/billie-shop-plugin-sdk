@@ -4,11 +4,6 @@
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
-
-###> symfony/web-server-bundle ###
-/.web-server-pid
-###< symfony/web-server-bundle ###
-
 /.idea
 
 ###> behat/symfony2-extension ###

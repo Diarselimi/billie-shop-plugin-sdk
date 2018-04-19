@@ -1,0 +1,7 @@
+eight_points_guzzle:
+  clients:
+    risky:
+      base_url: "%env(RISKY_URL)%"
+      options:
+        headers:
+          Content-Type: "application/json"

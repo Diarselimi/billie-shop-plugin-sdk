@@ -3,9 +3,11 @@
 namespace App\Application\UseCase\GetOrder;
 
 use App\Application\PaellaCoreCriticalException;
+use App\DomainModel\Address\AddressRepositoryInterface;
 use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Company\CompanyRepositoryInterface;
+use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
@@ -15,6 +17,8 @@ class GetOrderUseCase
 {
     private $orderRepository;
     private $companyRepository;
+    private $addressRepository;
+    private $debtorExternalDataRepository;
     private $alfred;
     private $borscht;
     private $orderStateManager;
@@ -22,12 +26,16 @@ class GetOrderUseCase
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         CompanyRepositoryInterface $companyRepository,
+        AddressRepositoryInterface $addressRepository,
+        DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
         AlfredInterface $alfred,
         BorschtInterface $borscht,
         OrderStateManager $orderStateManager
     ) {
         $this->orderRepository = $orderRepository;
         $this->companyRepository = $companyRepository;
+        $this->addressRepository = $addressRepository;
+        $this->debtorExternalDataRepository = $debtorExternalDataRepository;
         $this->alfred = $alfred;
         $this->borscht = $borscht;
         $this->orderStateManager = $orderStateManager;
@@ -47,9 +55,15 @@ class GetOrderUseCase
             );
         }
 
+        $debtorData = $this->debtorExternalDataRepository->getOneByIdRaw($order->getDebtorExternalDataId());
+        $debtorAddress = $this->addressRepository->getOneByIdRaw($debtorData['address_id']);
+
         $response = (new GetOrderResponse())
             ->setExternalCode($order->getExternalCode())
             ->setState($order->getState())
+            ->setOriginalAmount($order->getAmountGross())
+            ->setDebtorExternalDataAddressCountry($debtorAddress['country'])
+            ->setDebtorExternalDataIndustrySector($debtorData['industry_sector'])
         ;
 
         if ($order->getCompanyId()) {

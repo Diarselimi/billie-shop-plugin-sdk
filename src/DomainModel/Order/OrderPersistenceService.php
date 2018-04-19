@@ -43,7 +43,7 @@ class OrderPersistenceService
         $this->debtorExternalDataFactory = $debtorExternalDataFactory;
     }
 
-    public function persistFromRequest(CreateOrderRequest $request)
+    public function persistFromRequest(CreateOrderRequest $request): OrderEntity
     {
         $order = $this->orderFactory->createFromRequest($request);
 
@@ -72,8 +72,13 @@ class OrderPersistenceService
 
             // order
             $this->orderRepository->insert($order);
+
+            return $order;
         } catch (RepositoryException $exception) {
-            throw new PaellaCoreCriticalException(PaellaCoreCriticalException::CODE_ORDER_COULD_NOT_BE_PERSISTED);
+            throw new PaellaCoreCriticalException(
+                "Order can't be persisted",
+                PaellaCoreCriticalException::CODE_ORDER_COULD_NOT_BE_PERSISTED
+            );
         }
     }
 }
