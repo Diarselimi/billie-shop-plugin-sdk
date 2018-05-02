@@ -1,3 +1,5 @@
+config/secrets
+
 ###> symfony/framework-bundle ###
 /.env
 /public/bundles/

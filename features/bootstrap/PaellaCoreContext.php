@@ -11,34 +11,61 @@ use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonRepositoryInterface;
+use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\AfterScenarioScope;
+use Behat\Gherkin\Node\PyStringNode;
+use Behat\MinkExtension\Context\MinkContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
-use Behatch\Context\RestContext;
+use donatj\MockWebServer\MockWebServer;
+use donatj\MockWebServer\Response;
+use Symfony\Component\HttpKernel\KernelInterface;
 
-class PaellaCoreContext extends RestContext
+class PaellaCoreContext extends MinkContext implements Context
 {
     use KernelDictionary;
 
-    private $customer;
-    private $order;
+    private $server;
+    private static $count = 1;
+
+    public function __construct(KernelInterface $kernel)
+    {
+        $this->kernel = $kernel;
+        $this->server = new MockWebServer(8024);
+
+        $this->getCustomerRepository()->insert((new CustomerEntity())
+            ->setName('Behat User')
+            ->setIsActive(true)
+            ->setRoles('["ROLE_NOTHING"]')
+            ->setAvailableFinancingLimit(10000)
+            ->setApiKey('test')
+        );
+    }
 
     /**
-     * @Given I have a customer :username with roles :roles and api key :apiKey
+     * @AfterScenario
      */
-    public function iHaveACustomer($username, $roles, $apiKey)
+    public function cleanUpScenario(AfterScenarioScope $afterScenarioScope)
     {
-        $customer = (new CustomerEntity())
-            ->setName($username)
-            ->setApiKey($apiKey)
-            ->setAvailableFinancingLimit(1000)
-            ->setIsActive(true)
-            ->setRoles($roles)
-        ;
+        $this->server->stop();
+        $this->getConnection()->exec('
+            DELETE FROM risk_checks;
+            DELETE FROM orders;
+            DELETE FROM companies;
+            DELETE FROM persons;
+            DELETE FROM debtor_external_data;
+            DELETE FROM addresses;
+            DELETE FROM customers;
+            ALTER TABLE customers AUTO_INCREMENT = 1;
+        ');
+    }
 
-        $this->getCustomerRepository()->insert($customer);
-        $this->customer = $customer;
-
-        $this->request->setHttpHeader('X-Api-User', $customer->getId());
+    /**
+     * @Given I get from alfred :url endpoint response with status :status and body
+     */
+    public function iGetFromAlfredEndpointResponse(string $url, int $status, PyStringNode $body)
+    {
+        $this->server->start();
+        $this->server->setResponseOfPath($url, new Response($body, ['X-Count' => self::$count++], $status));
     }
 
     /**
@@ -94,38 +121,12 @@ class PaellaCoreContext extends RestContext
             ->setDebtorPersonId($person->getId())
             ->setDeliveryAddressId($deliveryAddress->getId())
             ->setDebtorExternalDataId($debtor->getId())
-            ->setDebtorExternalDataAddressId($debtorAddress->getId())
             ->setState(OrderStateManager::STATE_NEW)
-            ->setCustomerId($this->customer->getId())
+            ->setCustomerId(1)
             ->setExternalComment($comment)
         ;
 
         $this->getOrderRepository()->insert($order);
-        $this->order = $order;
-    }
-
-    /**
-     * @Then I created the order :externalCode
-     */
-    public function iCreatedTheOrder($externalCode)
-    {
-        $this->order = $this->getOrderRepository()->getOneByExternalCode($externalCode, $this->customer->getId());
-        $debtor = $this->getDebtorExternalDataRepository()->getOneByIdRaw($this->order->getDebtorExternalDataId());
-        $this->order->setDebtorExternalDataAddressId($debtor['address_id']);
-    }
-
-    /**
-     * @AfterScenario
-     */
-    public function cleanUpScenario(AfterScenarioScope $afterScenarioScope)
-    {
-        if ($this->order) {
-            $this->getOrderRepository()->delete($this->order);
-        }
-
-        if ($this->customer) {
-            $this->getCustomerRepository()->delete($this->customer);
-        }
     }
 
     private function getDebtorExternalDataRepository(): DebtorExternalDataRepositoryInterface
@@ -151,6 +152,11 @@ class PaellaCoreContext extends RestContext
     private function getCustomerRepository(): CustomerRepositoryInterface
     {
         return $this->get(CustomerRepositoryInterface::class);
+    }
+
+    private function getConnection(): \PDO
+    {
+        return $this->get('paella_core.pdo');
     }
 
     private function get(string $service)

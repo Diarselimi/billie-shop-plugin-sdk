@@ -68,9 +68,7 @@ class Kernel extends BaseKernel implements CompilerPassInterface
             $container
                 ->findDefinition($id)
                 ->addMethodCall('setConnection', [$connection])
-                ->addMethodCall('setDeleteAllowed', [$container->getParameter('kernel.debug')])
             ;
         }
     }
-
 }

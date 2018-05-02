@@ -32,8 +32,8 @@ if ($trustedHosts = $_SERVER['TRUSTED_HOSTS'] ?? false) {
     Request::setTrustedHosts(explode(',', $trustedHosts));
 }
 
-$kernel = new Kernel($env, $debug);
 $request = Request::createFromGlobals();
+$kernel = new Kernel($request->headers->has('X-Test') ? 'test' : $env, $debug);
 $response = $kernel->handle($request);
 $response->send();
 $kernel->terminate($request, $response);

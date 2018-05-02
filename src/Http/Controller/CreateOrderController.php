@@ -34,7 +34,7 @@ class CreateOrderController
             ->setDeliveryAddressCity($request->request->get('delivery_address_city'))
             ->setDeliveryAddressCountry($request->request->get('delivery_address_country'))
 
-            ->setDebtorCompanyMerchantCustomerId($request->request->get('debtor_company_merchant_customer_id'))
+            ->setMerchantCustomerId($request->request->get('merchant_customer_id'))
             ->setDebtorCompanyName($request->request->get('debtor_company_name'))
             ->setDebtorCompanyTaxId($request->request->get('debtor_company_tax_id'))
             ->setDebtorCompanyTaxNumber($request->request->get('debtor_company_tax_number'))

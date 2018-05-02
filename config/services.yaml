@@ -30,6 +30,10 @@ services:
     arguments:
       $client: '@eight_points_guzzle.client.risky'
 
+  App\Infrastructure\Alfred\Alfred:
+    arguments:
+      $client: '@eight_points_guzzle.client.alfred'
+
   App\DomainModel\Order\OrderRepositoryInterface: '@App\Infrastructure\Repository\OrderRepository'
   App\DomainModel\Address\AddressRepositoryInterface: '@App\Infrastructure\Repository\AddressRepository'
   App\DomainModel\Person\PersonRepositoryInterface: '@App\Infrastructure\Repository\PersonRepository'

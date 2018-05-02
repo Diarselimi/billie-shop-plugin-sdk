@@ -3,10 +3,18 @@
 namespace App\Infrastructure\Repository;
 
 use App\DomainModel\Company\CompanyEntity;
+use App\DomainModel\Company\CompanyEntityFactory;
 use App\DomainModel\Company\CompanyRepositoryInterface;
 
 class CompanyRepository extends AbstractRepository implements CompanyRepositoryInterface
 {
+    private $factory;
+
+    public function __construct(CompanyEntityFactory $factory)
+    {
+        $this->factory = $factory;
+    }
+
     public function insert(CompanyEntity $company): void
     {
         $id = $this->doInsert('
@@ -15,10 +23,10 @@ class CompanyRepository extends AbstractRepository implements CompanyRepositoryI
             VALUES
             (:merchant_id, :debtor_id, :created_at, :updated_at)
         ', [
-            'merchant_id' => $person->getMerchantId(),
-            'debtor_id' => $person->getDebtorId(),
-            'created_at' => $person->getCreatedAt()->format('Y-m-d H:i:s'),
-            'updated_at' => $person->getUpdatedAt()->format('Y-m-d H:i:s'),
+            'merchant_id' => $company->getMerchantId(),
+            'debtor_id' => $company->getDebtorId(),
+            'created_at' => $company->getCreatedAt()->format('Y-m-d H:i:s'),
+            'updated_at' => $company->getUpdatedAt()->format('Y-m-d H:i:s'),
         ]);
 
         $company->setId($id);
@@ -34,21 +42,19 @@ class CompanyRepository extends AbstractRepository implements CompanyRepositoryI
             return null;
         }
 
-        return (new CompanyEntity())
-            ->setId($company['id'])
-            ->setMerchantId($company['merchant_id'])
-            ->setDebtorId($company['debtor_id'])
-            ->setCreatedAt(new \DateTime($company['created_at']))
-            ->setUpdatedAt(new \DateTime($company['updated_at']))
-        ;
+        return $this->factory->createFromDatabaseRow($company);
     }
 
-    public function getOneByIdRaw(int $id):? array
+    public function getOneByMerchantId(string $merchantId):? CompanyEntity
     {
-        $address = $this->doFetch('SELECT * FROM addresses WHERE id = :id', [
-            'id' => $id,
+        $company = $this->doFetch('SELECT id, merchant_id, debtor_id, created_at, updated_at FROM companies WHERE merchant_id = :merchant_id', [
+            'merchant_id' => $merchantId,
         ]);
 
-        return $address ?: null;
+        if (!$company) {
+            return null;
+        }
+
+        return $this->factory->createFromDatabaseRow($company);
     }
 }

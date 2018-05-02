@@ -97,12 +97,12 @@ class DebtorDTO
         return $this;
     }
 
-    public function getPaymentId(): int
+    public function getPaymentId(): string
     {
         return $this->paymentId;
     }
 
-    public function setPaymentId(int $paymentId): DebtorDTO
+    public function setPaymentId(string $paymentId): DebtorDTO
     {
         $this->paymentId = $paymentId;
 

@@ -43,7 +43,7 @@ class OrderPersistenceService
         $this->debtorExternalDataFactory = $debtorExternalDataFactory;
     }
 
-    public function persistFromRequest(CreateOrderRequest $request): OrderEntity
+    public function persistFromRequest(CreateOrderRequest $request): OrderContainer
     {
         $order = $this->orderFactory->createFromRequest($request);
 
@@ -73,7 +73,13 @@ class OrderPersistenceService
             // order
             $this->orderRepository->insert($order);
 
-            return $order;
+            return (new OrderContainer())
+                ->setOrder($order)
+                ->setDebtorPerson($debtorPerson)
+                ->setDebtorExternalData($debtorExternalData)
+                ->setDebtorExternalDataAddress($debtorAddress)
+                ->setDeliveryAddress($deliveryAddress)
+            ;
         } catch (RepositoryException $exception) {
             throw new PaellaCoreCriticalException(
                 "Order can't be persisted",

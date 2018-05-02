@@ -77,29 +77,22 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
         ;
     }
 
-    public function delete(OrderEntity $order): void
+    public function update(OrderEntity $order): void
     {
-        if (!$this->deleteAllowed) {
-            throw new RepositoryException('Delete operation not allowed');
-        }
-
         $stmt = $this->conn->prepare('
-            DELETE FROM orders WHERE id = :order;
-            DELETE FROM persons WHERE id = :person;
-            DELETE FROM debtor_external_data WHERE id = :debtor_external_data;
-            DELETE FROM addresses WHERE id IN (:debtor_external_data_address, :delivery_address);
+            UPDATE orders 
+            SET company_id = :company_id
+            WHERE id = :id 
         ');
 
         $res = $stmt->execute([
-            'order' => $order->getId(),
-            'person' => $order->getDebtorPersonId(),
-            'debtor_external_data' => $order->getDebtorExternalDataId(),
-            'debtor_external_data_address' => $order->getDebtorExternalDataAddressId(),
-            'delivery_address' => $order->getDeliveryAddressId(),
+            'company_id' => $order->getCompanyId(),
+            'id' => $order->getId(),
         ]);
 
+
         if (!$res) {
-            throw new RepositoryException('Delete operation failed');
-        };
+            throw new RepositoryException('Update operation failed');
+        }
     }
 }

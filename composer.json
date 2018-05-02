@@ -3,6 +3,7 @@
     "license": "proprietary",
     "require": {
         "php": "^7.2",
+        "donatj/mock-webserver": "^2.0",
         "eightpoints/guzzle-bundle": "^7.3",
         "robmorgan/phinx": "^0.9.2",
         "symfony/console": "^4.0",

@@ -19,7 +19,7 @@ class CreateOrderRequest
     private $deliveryAddressPostalCode;
     private $deliveryAddressCountry;
 
-    private $debtorCompanyMerchantCustomerId;
+    private $merchantCustomerId;
 
     private $debtorCompanyName;
     private $debtorCompanyTaxId;
@@ -201,14 +201,14 @@ class CreateOrderRequest
         return $this;
     }
 
-    public function getDebtorCompanyMerchantCustomerId()
+    public function getMerchantCustomerId()
     {
-        return $this->debtorCompanyMerchantCustomerId;
+        return $this->merchantCustomerId;
     }
 
-    public function setDebtorCompanyMerchantCustomerId($debtorCompanyMerchantCustomerId)
+    public function setMerchantCustomerId($merchantCustomerId)
     {
-        $this->debtorCompanyMerchantCustomerId = $debtorCompanyMerchantCustomerId;
+        $this->merchantCustomerId = $merchantCustomerId;
 
         return $this;
     }
