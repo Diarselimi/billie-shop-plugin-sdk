@@ -10,3 +10,8 @@ eight_points_guzzle:
       options:
         headers:
           Content-Type: "application/json"
+    borscht:
+      base_url: "%env(BORSCHT_URL)%"
+      options:
+        headers:
+          Content-Type: "application/json"

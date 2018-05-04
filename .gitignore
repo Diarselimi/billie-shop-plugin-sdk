@@ -11,3 +11,7 @@ config/secrets
 ###> behat/symfony2-extension ###
 behat.yml
 ###< behat/symfony2-extension ###
+
+/config/secrets/
+
+/.php_cs.cache

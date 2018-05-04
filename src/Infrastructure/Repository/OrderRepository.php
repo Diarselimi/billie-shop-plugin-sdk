@@ -40,7 +40,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
         $order->setId($id);
     }
 
-    public function getOneByExternalCode(string $externalCode, int $customerId):? OrderEntity
+    public function getOneByExternalCode(string $externalCode, int $customerId): ?OrderEntity
     {
         $order = $this->doFetch('
           SELECT id, amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, delivery_address_id, customer_id, company_id, debtor_person_id, debtor_external_data_id, payment_id, created_at, updated_at 
@@ -73,8 +73,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             ->setDebtorExternalDataId($order['debtor_external_data_id'])
             ->setPaymentId($order['payment_id'])
             ->setCreatedAt(new \DateTime($order['created_at']))
-            ->setUpdatedAt(new \DateTime($order['updated_at']))
-        ;
+            ->setUpdatedAt(new \DateTime($order['updated_at']));
     }
 
     public function update(OrderEntity $order): void
@@ -87,6 +86,25 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
 
         $res = $stmt->execute([
             'company_id' => $order->getCompanyId(),
+            'id' => $order->getId(),
+        ]);
+
+
+        if (!$res) {
+            throw new RepositoryException('Update operation failed');
+        }
+    }
+
+    public function updateState(OrderEntity $order): void
+    {
+        $stmt = $this->conn->prepare('
+            UPDATE orders 
+            SET state = :state
+            WHERE id = :id 
+        ');
+
+        $res = $stmt->execute([
+            'state' => $order->getState(),
             'id' => $order->getId(),
         ]);
 

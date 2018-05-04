@@ -5,7 +5,7 @@ Feature:
     Scenario: Unsuccessful order retrieve
         Given I add "Content-type" header equal to "application/json"
         And I have a customer "Test Customer" with roles "ROLE_API_USER" and api key "test"
-        And I have an order "XF43Y" with amounts (1000, 900, 100), duration 30 and comment "test order"
+        And I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
         When I send a GET request to "/order/ABC"
         Then the response status code should be 404
         And print last JSON response
@@ -20,7 +20,7 @@ Feature:
     Scenario: Successful order retrieve
         Given I add "Content-type" header equal to "application/json"
         And I have a customer "Test Customer" with roles "ROLE_API_USER" and api key "test"
-        And I have an order "XF43Y" with amounts (1000, 900, 100), duration 30 and comment "test order"
+        And I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
         When I send a GET request to "/order/XF43Y"
         Then the JSON response should be:
         """

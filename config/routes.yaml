@@ -17,3 +17,8 @@ get_customer:
   path: /customer/{apiKey}
   controller: App\Http\Controller\GetCustomerController::execute
   methods: [GET]
+
+cancel_order:
+  path: /order/{externalCode}/cancel
+  controller: App\Http\Controller\CancelOrderController::execute
+  methods: [POST]

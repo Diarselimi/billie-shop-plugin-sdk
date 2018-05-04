@@ -34,6 +34,10 @@ services:
     arguments:
       $client: '@eight_points_guzzle.client.alfred'
 
+  App\Infrastructure\Borscht\Borscht:
+    arguments:
+      $client: '@eight_points_guzzle.client.borscht'
+
   App\DomainModel\Order\OrderRepositoryInterface: '@App\Infrastructure\Repository\OrderRepository'
   App\DomainModel\Address\AddressRepositoryInterface: '@App\Infrastructure\Repository\AddressRepository'
   App\DomainModel\Person\PersonRepositoryInterface: '@App\Infrastructure\Repository\PersonRepository'
@@ -41,6 +45,7 @@ services:
   App\DomainModel\Customer\CustomerRepositoryInterface: '@App\Infrastructure\Repository\CustomerRepository'
   App\DomainModel\Customer\CompanyRepositoryInterface: '@App\Infrastructure\Repository\CompanyRepository'
   App\DomainModel\Customer\RiskCheckRepositoryInterface: '@App\Infrastructure\Repository\RiskCheckRepository'
+  App\DomainModel\Company\CompanyRepositoryInterface: '@App\Infrastructure\Repository\CompanyRepository'
 
   App\DomainModel\Alfred\AlfredInterface: '@App\Infrastructure\Alfred\Alfred'
   App\DomainModel\Borscht\BorschtInterface: '@App\Infrastructure\Borscht\Borscht'

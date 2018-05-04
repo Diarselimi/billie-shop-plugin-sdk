@@ -5,6 +5,10 @@ namespace App\DomainModel\Order;
 interface OrderRepositoryInterface
 {
     public function insert(OrderEntity $order): void;
+
     public function update(OrderEntity $order): void;
-    public function getOneByExternalCode(string $externalCode, int $customerId):? OrderEntity;
+
+    public function updateState(OrderEntity $order);
+
+    public function getOneByExternalCode(string $externalCode, int $customerId): ?OrderEntity;
 }

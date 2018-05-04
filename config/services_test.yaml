@@ -22,3 +22,6 @@ services:
   App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface:
     alias: 'App\Infrastructure\Repository\DebtorExternalDataRepository'
     public: true
+  App\DomainModel\Company\CompanyRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\CompanyRepository'
+    public: true

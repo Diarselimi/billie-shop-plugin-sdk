@@ -21,7 +21,7 @@ class Alfred implements AlfredInterface
         $this->factory = $debtorFactory;
     }
 
-    public function getDebtor(int $debtorId):? DebtorDTO
+    public function getDebtor(int $debtorId): ?DebtorDTO
     {
         try {
             $response = $this->client->get("/debtor/$debtorId");
@@ -38,7 +38,7 @@ class Alfred implements AlfredInterface
             );
         }
 
-        $response = json_decode((string) $response->getBody(), true);
+        $response = json_decode((string)$response->getBody(), true);
         if (!$response) {
             throw new PaellaCoreCriticalException(
                 'Alfred response decode exception',
@@ -49,7 +49,7 @@ class Alfred implements AlfredInterface
         return $this->factory->createFromAlfredResponse($response);
     }
 
-    public function identifyDebtor(array $debtorData):? DebtorDTO
+    public function identifyDebtor(array $debtorData): ?DebtorDTO
     {
         try {
             $response = $this->client->post("/debtor/identify", [
@@ -68,7 +68,7 @@ class Alfred implements AlfredInterface
             );
         }
 
-        $response = json_decode((string) $response->getBody(), true);
+        $response = json_decode((string)$response->getBody(), true);
         if (!$response) {
             throw new PaellaCoreCriticalException(
                 'Alfred response decode exception',
@@ -79,12 +79,14 @@ class Alfred implements AlfredInterface
         return $this->factory->createFromAlfredResponse($response);
     }
 
-    public function lockDebtorLimit(int $debtorId, float $amount): bool
+    public function lockDebtorLimit(string $debtorId, float $amount): bool
     {
         try {
-            $this->client->post("/debtor/$debtorId/lock", ['json' => [
-                'amount' => $amount,
-            ]]);
+            $this->client->post("/debtor/$debtorId/lock", [
+                'json' => [
+                    'amount' => $amount,
+                ]
+            ]);
         } catch (TransferException $exception) {
             if ($exception->getCode() === Response::HTTP_PRECONDITION_FAILED) {
                 return false;
@@ -101,12 +103,14 @@ class Alfred implements AlfredInterface
         return true;
     }
 
-    public function unlockDebtorLimit(int $debtorId, float $amount): void
+    public function unlockDebtorLimit(string $debtorId, float $amount): void
     {
         try {
-            $this->client->post("/debtor/$debtorId/unlock", ['json' => [
-                'amount' => $amount,
-            ]]);
+            $this->client->post("/debtor/$debtorId/unlock", [
+                'json' => [
+                    'amount' => $amount,
+                ]
+            ]);
         } catch (TransferException $exception) {
             throw new PaellaCoreCriticalException(
                 'Alfred not available right now',

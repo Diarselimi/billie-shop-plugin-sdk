@@ -2,13 +2,14 @@
 
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\Address\AddressRepositoryInterface;
+use App\DomainModel\Company\CompanyEntity;
+use App\DomainModel\Company\CompanyRepositoryInterface;
 use App\DomainModel\Customer\CustomerEntity;
 use App\DomainModel\Customer\CustomerRepositoryInterface;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonRepositoryInterface;
 use Behat\Behat\Context\Context;
@@ -24,20 +25,24 @@ class PaellaCoreContext extends MinkContext implements Context
 {
     use KernelDictionary;
 
-    private $server;
-    private static $count = 1;
+    private $alfred;
+    private $borscht;
+    private static $countAlfred = 1;
+    private static $countBorscht = 1;
 
     public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;
-        $this->server = new MockWebServer(8024);
+        $this->alfred = new MockWebServer(8024);
+        $this->borscht = new MockWebServer(8025);
 
-        $this->getCustomerRepository()->insert((new CustomerEntity())
-            ->setName('Behat User')
-            ->setIsActive(true)
-            ->setRoles('["ROLE_NOTHING"]')
-            ->setAvailableFinancingLimit(10000)
-            ->setApiKey('test')
+        $this->getCustomerRepository()->insert(
+            (new CustomerEntity())
+                ->setName('Behat User')
+                ->setIsActive(true)
+                ->setRoles('["ROLE_NOTHING"]')
+                ->setAvailableFinancingLimit(10000)
+                ->setApiKey('test')
         );
     }
 
@@ -46,7 +51,8 @@ class PaellaCoreContext extends MinkContext implements Context
      */
     public function cleanUpScenario(AfterScenarioScope $afterScenarioScope)
     {
-        $this->server->stop();
+        $this->alfred->stop();
+        $this->borscht->stop();
         $this->getConnection()->exec('
             DELETE FROM risk_checks;
             DELETE FROM orders;
@@ -60,26 +66,55 @@ class PaellaCoreContext extends MinkContext implements Context
     }
 
     /**
+     * @Given I start alfred
+     */
+    public function iStartAlfred()
+    {
+        $this->alfred->start();
+    }
+
+    /**
+     * @Given I start borscht
+     */
+    public function iStartBorscht()
+    {
+        $this->borscht->start();
+    }
+
+    /**
      * @Given I get from alfred :url endpoint response with status :status and body
      */
     public function iGetFromAlfredEndpointResponse(string $url, int $status, PyStringNode $body)
     {
-        $this->server->start();
-        $this->server->setResponseOfPath($url, new Response($body, ['X-Count' => self::$count++], $status));
+        $this->alfred->start();
+        $this->alfred->setResponseOfPath($url, new Response($body, ['X-Count' => self::$countAlfred++], $status));
     }
 
     /**
-     * @Given I have an order :externalCode with amounts (:gross, :net, :tax), duration :duration and comment :comment
+     * @Given I get from borscht :url endpoint response with status :status and body
      */
-    public function iHaveAnOrder($externalCode, $gross, $net, $tax, $duration, $comment)
+    public function iGetFromBorschtEndpointResponse(string $url, int $status, PyStringNode $body)
     {
+        $this->borscht->start();
+        $this->borscht->setResponseOfPath($url, new Response($body, ['X-Count' => self::$countBorscht++], $status));
+    }
+
+    /**
+     * @Given I have a(n) :state order :externalCode with amounts :gross/:net/:tax, duration :duration and comment :comment
+     */
+    public function iHaveAnOrder($state, $externalCode, $gross, $net, $tax, $duration, $comment)
+    {
+        $company = (new CompanyEntity())
+            ->setDebtorId('1')
+            ->setMerchantId('test');
+        $this->getCompanyRepository()->insert($company);
+
         $person = (new PersonEntity())
             ->setFirstName('test')
             ->setLastName('test')
             ->setEmail('test')
             ->setPhoneNumber('test')
-            ->setGender('t')
-        ;
+            ->setGender('t');
         $this->getPersonRepository()->insert($person);
 
         $deliveryAddress = (new AddressEntity())
@@ -88,8 +123,7 @@ class PaellaCoreContext extends MinkContext implements Context
             ->setStreet('test')
             ->setPostalCode('test')
             ->setCity('test')
-            ->setCountry('TE')
-        ;
+            ->setCountry('TE');
         $this->getAddressRepository()->insert($deliveryAddress);
 
         $debtorAddress = (new AddressEntity())
@@ -98,8 +132,7 @@ class PaellaCoreContext extends MinkContext implements Context
             ->setStreet('test')
             ->setPostalCode('test')
             ->setCity('test')
-            ->setCountry('TE')
-        ;
+            ->setCountry('TE');
         $this->getAddressRepository()->insert($debtorAddress);
 
         $debtor = (new DebtorExternalDataEntity())
@@ -108,12 +141,12 @@ class PaellaCoreContext extends MinkContext implements Context
             ->setIndustrySector('test')
             ->setSubindustrySector('test')
             ->setEstablishedCustomer(true)
-            ->setAddressId($debtorAddress->getId())
-        ;
+            ->setAddressId($debtorAddress->getId());
         $this->getDebtorExternalDataRepository()->insert($debtor);
 
         $order = (new OrderEntity())
             ->setExternalCode($externalCode)
+            ->setState($state)
             ->setAmountNet($net)
             ->setAmountGross($gross)
             ->setAmountTax($tax)
@@ -121,29 +154,42 @@ class PaellaCoreContext extends MinkContext implements Context
             ->setDebtorPersonId($person->getId())
             ->setDeliveryAddressId($deliveryAddress->getId())
             ->setDebtorExternalDataId($debtor->getId())
-            ->setState(OrderStateManager::STATE_NEW)
             ->setCustomerId(1)
             ->setExternalComment($comment)
-        ;
+            ->setCompanyId($company->getId());
 
         $this->getOrderRepository()->insert($order);
+    }
+
+    /**
+     * @Given the order :orderId is :state
+     */
+    public function andTheOrderIsInState($orderId, $state)
+    {
+        $order = $this->getOrderRepository()->getOneByExternalCode($orderId, 1);
+        if ($order === null) {
+            throw new RuntimeException('Order not found');
+        }
+        if ($order->getState() !== $state) {
+            throw new RuntimeException(sprintf('Order is in %s state, but %s was expected.', $order->getState(), $state));
+        }
     }
 
     private function getDebtorExternalDataRepository(): DebtorExternalDataRepositoryInterface
     {
         return $this->get(DebtorExternalDataRepositoryInterface::class);
     }
-    
+
     private function getAddressRepository(): AddressRepositoryInterface
     {
         return $this->get(AddressRepositoryInterface::class);
     }
-    
+
     private function getPersonRepository(): PersonRepositoryInterface
     {
         return $this->get(PersonRepositoryInterface::class);
     }
-    
+
     private function getOrderRepository(): OrderRepositoryInterface
     {
         return $this->get(OrderRepositoryInterface::class);
@@ -152,6 +198,11 @@ class PaellaCoreContext extends MinkContext implements Context
     private function getCustomerRepository(): CustomerRepositoryInterface
     {
         return $this->get(CustomerRepositoryInterface::class);
+    }
+
+    private function getCompanyRepository(): CompanyRepositoryInterface
+    {
+        return $this->get(CompanyRepositoryInterface::class);
     }
 
     private function getConnection(): \PDO

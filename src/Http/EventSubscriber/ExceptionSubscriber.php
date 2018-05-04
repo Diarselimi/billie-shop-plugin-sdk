@@ -23,13 +23,11 @@ class ExceptionSubscriber implements EventSubscriberInterface
 
         $responseCode = $exception instanceof PaellaCoreCriticalException && $exception->getResponseCode()
             ? $exception->getResponseCode()
-            : JsonResponse::HTTP_BAD_REQUEST
-        ;
+            : JsonResponse::HTTP_BAD_REQUEST;
 
         $errorCode = $exception instanceof PaellaCoreCriticalException
             ? $exception->getErrorCode()
-            : $exception->getCode()
-        ;
+            : $exception->getCode();
 
         $event->setResponse(new JsonResponse([
             'code' => $errorCode,
