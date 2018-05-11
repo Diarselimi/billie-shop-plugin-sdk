@@ -164,14 +164,38 @@ class PaellaCoreContext extends MinkContext implements Context
     /**
      * @Given the order :orderId is :state
      */
-    public function andTheOrderIsInState($orderId, $state)
+    public function orderIsInState($orderId, $state)
     {
         $order = $this->getOrderRepository()->getOneByExternalCode($orderId, 1);
         if ($order === null) {
             throw new RuntimeException('Order not found');
         }
         if ($order->getState() !== $state) {
-            throw new RuntimeException(sprintf('Order is in %s state, but %s was expected.', $order->getState(), $state));
+            throw new RuntimeException(sprintf(
+                'Order is in %s state, but %s was expected.',
+                $order->getState(),
+                $state
+            ));
+        }
+    }
+
+    /**
+     * @Given the order :orderId :key is :value
+     */
+    public function orderDurationIs($orderId, $key, $value)
+    {
+        $order = $this->getOrderRepository()->getOneByExternalCode($orderId, 1);
+        if ($order === null) {
+            throw new RuntimeException('Order not found');
+        }
+        $actual = $order->{'get' . ucfirst($key)}();
+        if ($actual != $value) {
+            throw new RuntimeException(sprintf(
+                'Order %s is %s state, but %s was expected.',
+                $key,
+                $actual,
+                $value
+            ));
         }
     }
 

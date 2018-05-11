@@ -33,6 +33,16 @@ abstract class AbstractRepository
             throw new RepositoryException('Insert failed');
         }
 
-        return (int) $this->conn->lastInsertId();
+        return (int)$this->conn->lastInsertId();
+    }
+
+    protected function doUpdate(string $sql, array $params = [])
+    {
+        $stmt = $this->conn->prepare($sql);
+        $res = $stmt->execute($params);
+
+        if ($res !== true) {
+            throw new RepositoryException('Update operation failed');
+        }
     }
 }

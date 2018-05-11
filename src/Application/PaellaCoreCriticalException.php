@@ -16,6 +16,7 @@ class PaellaCoreCriticalException extends \RuntimeException
     const CODE_DEBTOR_COULD_NOT_BE_IDENTIFIED = 'debtor_not_identified';
     const CODE_DEBTOR_LIMIT_EXCEEDED = 'debtor_limit_exceeded';
     const CODE_USER_HEADER_MISSING = 'user_header_missing';
+    const CODE_ORDER_VALIDATION_FAILED = 'order_validation_failed';
 
     private $responseCode;
     private $errorCode;

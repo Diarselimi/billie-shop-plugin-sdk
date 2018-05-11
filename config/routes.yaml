@@ -22,3 +22,8 @@ cancel_order:
   path: /order/{externalCode}/cancel
   controller: App\Http\Controller\CancelOrderController::execute
   methods: [POST]
+
+update_order:
+  path: /order/{externalCode}
+  controller: App\Http\Controller\UpdateOrderController::execute
+  methods: [PATCH]

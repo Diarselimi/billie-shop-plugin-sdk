@@ -53,4 +53,24 @@ class Borscht implements BorschtInterface
             );
         }
     }
+
+    public function modifyOrder(OrderEntity $order): void
+    {
+        try {
+            $this->client->put('/order.json', [
+                'json' => [
+                    'order_id' => $order->getId(),
+                    'duration' => $order->getDuration(),
+                    'amount' => $order->getAmountGross(),
+                ],
+            ]);
+        } catch (TransferException $exception) {
+            throw new PaellaCoreCriticalException(
+                'Borscht is not available right now',
+                PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION,
+                null,
+                $exception
+            );
+        }
+    }
 }

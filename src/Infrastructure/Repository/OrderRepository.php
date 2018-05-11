@@ -57,6 +57,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
 
         return (new OrderEntity())
             ->setId($order['id'])
+            ->setDuration($order['duration'])
             ->setAmountNet($order['amount_net'])
             ->setAmountGross($order['amount_gross'])
             ->setAmountTax($order['amount_tax'])
@@ -76,41 +77,46 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             ->setUpdatedAt(new \DateTime($order['updated_at']));
     }
 
-    public function update(OrderEntity $order): void
+    public function updateCompany(OrderEntity $order): void
     {
-        $stmt = $this->conn->prepare('
+        $this->doUpdate('
             UPDATE orders 
             SET company_id = :company_id
             WHERE id = :id 
-        ');
-
-        $res = $stmt->execute([
+        ', [
             'company_id' => $order->getCompanyId(),
             'id' => $order->getId(),
         ]);
-
-
-        if (!$res) {
-            throw new RepositoryException('Update operation failed');
-        }
     }
 
     public function updateState(OrderEntity $order): void
     {
-        $stmt = $this->conn->prepare('
+        $this->doUpdate('
             UPDATE orders 
             SET state = :state
             WHERE id = :id 
-        ');
-
-        $res = $stmt->execute([
+        ', [
             'state' => $order->getState(),
             'id' => $order->getId(),
         ]);
+    }
 
-
-        if (!$res) {
-            throw new RepositoryException('Update operation failed');
-        }
+    public function update(OrderEntity $order): void
+    {
+        $this->doUpdate('
+            UPDATE orders
+            SET
+              amount_gross = :amount_gross,
+              amount_net = :amount_net,
+              amount_tax = :amount_tax,
+              duration = :duration
+            WHERE id = :id
+        ', [
+            'amount_gross' => $order->getAmountGross(),
+            'amount_net' => $order->getAmountNet(),
+            'amount_tax' => $order->getAmountTax(),
+            'duration' => $order->getDuration(),
+            'id' => $order->getId(),
+        ]);
     }
 }

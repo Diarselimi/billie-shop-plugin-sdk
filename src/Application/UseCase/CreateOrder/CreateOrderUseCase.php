@@ -63,7 +63,7 @@ class CreateOrderUseCase
         }
 
         $orderContainer->getOrder()->setCompanyId($debtor->getId());
-        $this->orderRepository->update($orderContainer->getOrder());
+        $this->orderRepository->updateCompany($orderContainer->getOrder());
 
         if (!$this->alfred->lockDebtorLimit($debtor->getDebtorId(), $orderContainer->getOrder()->getAmountGross())) {
             $this->reject($orderContainer, 'Debtor limit exceeded', PaellaException::CODE_DEBTOR_LIMIT_EXCEEDED);

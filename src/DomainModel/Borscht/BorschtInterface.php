@@ -11,4 +11,6 @@ interface BorschtInterface
     public function getOrderPaymentDetails(int $orderPaymentId): OrderPaymentDetailsDTO;
 
     public function cancelOrder(OrderEntity $order): void;
+
+    public function modifyOrder(OrderEntity $order): void;
 }
