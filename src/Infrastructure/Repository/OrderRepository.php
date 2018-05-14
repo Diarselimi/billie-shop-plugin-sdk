@@ -4,10 +4,19 @@ namespace App\Infrastructure\Repository;
 
 use App\DomainModel\Exception\RepositoryException;
 use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\Order\OrderLifecycleEvent;
 use App\DomainModel\Order\OrderRepositoryInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OrderRepository extends AbstractRepository implements OrderRepositoryInterface
 {
+    private $eventDispatcher;
+
+    public function __construct(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
     public function insert(OrderEntity $order): void
     {
         $id = $this->doInsert('
@@ -81,42 +90,22 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
     {
         $this->doUpdate('
             UPDATE orders 
-            SET company_id = :company_id
-            WHERE id = :id 
-        ', [
-            'company_id' => $order->getCompanyId(),
-            'id' => $order->getId(),
-        ]);
-    }
+            SET 
+              company_id = :company_id,
+              state = :state
+            WHERE id = :id
+        ');
 
-    public function updateState(OrderEntity $order): void
-    {
-        $this->doUpdate('
-            UPDATE orders 
-            SET state = :state
-            WHERE id = :id 
-        ', [
+        $res = $stmt->execute([
+            'company_id' => $order->getCompanyId(),
             'state' => $order->getState(),
             'id' => $order->getId(),
         ]);
-    }
 
-    public function update(OrderEntity $order): void
-    {
-        $this->doUpdate('
-            UPDATE orders
-            SET
-              amount_gross = :amount_gross,
-              amount_net = :amount_net,
-              amount_tax = :amount_tax,
-              duration = :duration
-            WHERE id = :id
-        ', [
-            'amount_gross' => $order->getAmountGross(),
-            'amount_net' => $order->getAmountNet(),
-            'amount_tax' => $order->getAmountTax(),
-            'duration' => $order->getDuration(),
-            'id' => $order->getId(),
-        ]);
+        if (!$res) {
+            throw new RepositoryException('Update operation failed');
+        }
+
+        $this->eventDispatcher->dispatch(OrderLifecycleEvent::UPDATED, new OrderLifecycleEvent($order));
     }
 }

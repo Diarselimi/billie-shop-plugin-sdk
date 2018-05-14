@@ -1,31 +1,31 @@
 framework:
-    workflows:
-      order:
-        type: 'state_machine'
-        marking_store:
-          type: 'single_state'
-          arguments:
-            - 'state'
-        supports: App\DomainModel\Order\OrderEntity
-        places:
-          - new
-          - approved
-          - rejected
-          - shipped
-          - cancelled
-        transitions:
-          approve:
-            from: new
-            to: approved
-          reject:
-            from: new
-            to: rejected
-          ship:
-            from: approved
-            to: shipped
-          cancel:
-            from: [new, approved]
-            to: cancelled
-          cancel_shipped:
-            from: [shipped]
-            to: cancelled
+  workflows:
+    order:
+      type: state_machine
+      marking_store:
+        type: single_state
+        arguments:
+          - state
+      supports: App\DomainModel\Order\OrderEntity
+      places:
+        - new
+        - created
+        - declined
+        - shipped
+        - canceled
+      transitions:
+        create:
+          from: new
+          to: created
+        decline:
+          from: new
+          to: declined
+        ship:
+          from: created
+          to: shipped
+        cancel:
+          from: [new, created]
+          to: canceled
+        cancel_shipped:
+          from: [shipped]
+          to: canceled

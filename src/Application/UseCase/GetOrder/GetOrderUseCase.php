@@ -74,6 +74,10 @@ class GetOrderUseCase
             $this->addInvoiceToOrder($order, $response);
         }
 
+        if ($this->orderStateManager->isDeclined($order)) {
+            $response->setReasons(['risk_policy']);
+        }
+
         return $response;
     }
 

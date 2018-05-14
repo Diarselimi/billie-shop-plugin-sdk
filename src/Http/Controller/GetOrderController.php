@@ -25,6 +25,7 @@ class GetOrderController
         $json = [
             'external_code' => $response->getExternalCode(),
             'state' => $response->getState(),
+            'reasons' => $response->getReasons() ?: [],
             'amount' => $response->getOriginalAmount(),
             'debtor_company' => [
                 'name' => $response->getCompanyName(),

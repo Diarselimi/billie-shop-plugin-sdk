@@ -1,5 +1,8 @@
 parameters:
   locale: 'en'
+  google_cloud_project_id: bbox-150315
+  google_cloud_credentials_file_path: '%kernel.root_dir%/../config/secrets/gcloud.json'
+  log_channel: paella_core
 
 services:
   _defaults:
@@ -10,6 +13,9 @@ services:
   _instanceof:
     App\Infrastructure\Repository\AbstractRepository:
       tags: ['paella_core.repository']
+
+    App\DomainModel\Monitoring\LoggingInterface:
+      tags: ['paella_core.logging']
 
   App\:
     resource: '../src/*'
@@ -46,7 +52,21 @@ services:
   App\DomainModel\Customer\CompanyRepositoryInterface: '@App\Infrastructure\Repository\CompanyRepository'
   App\DomainModel\Customer\RiskCheckRepositoryInterface: '@App\Infrastructure\Repository\RiskCheckRepository'
   App\DomainModel\Company\CompanyRepositoryInterface: '@App\Infrastructure\Repository\CompanyRepository'
+  App\DomainModel\OrderTransition\OrderTransitionRepositoryInterface: '@App\Infrastructure\Repository\OrderTransitionRepository'
 
   App\DomainModel\Alfred\AlfredInterface: '@App\Infrastructure\Alfred\Alfred'
   App\DomainModel\Borscht\BorschtInterface: '@App\Infrastructure\Borscht\Borscht'
   App\DomainModel\Risky\RiskyInterface: '@App\Infrastructure\Risky\Risky'
+
+  App\Infrastructure\Monitoring\StackdriverLogHandler:
+    arguments:
+      $loggingClient: !service
+        class: Google\Cloud\Logging\LoggingClient
+        arguments:
+          -
+            projectId: '%google_cloud_project_id%'
+            keyFilePath: '%google_cloud_credentials_file_path%'
+      $env: '%env(INSTANCE_SUFFIX)%'
+      $channel: '%log_channel%'
+
+  Symfony\Component\Workflow\Workflow: '@state_machine.order'

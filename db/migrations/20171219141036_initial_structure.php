@@ -59,6 +59,7 @@ class InitialStructure extends AbstractMigration
             ->addColumn('is_established_customer', 'boolean', ['null' => false])
             ->addColumn('created_at', 'datetime', ['null' => false])
             ->addColumn('updated_at', 'datetime', ['null' => false])
+            ->addForeignKey('address_id', 'addresses', 'id')
             ->create()
         ;
 

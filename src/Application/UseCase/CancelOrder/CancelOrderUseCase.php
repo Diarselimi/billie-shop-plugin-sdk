@@ -9,24 +9,24 @@ use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use App\Infrastructure\Repository\CompanyRepository;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Workflow\Registry;
+use Symfony\Component\Workflow\Workflow;
 
 class CancelOrderUseCase
 {
     private $orderRepository;
     private $alfred;
     private $borscht;
-    private $workflows;
+    private $workflow;
     private $companyRepository;
 
     public function __construct(
-        Registry $workflows,
+        Workflow $workflow,
         OrderRepositoryInterface $orderRepository,
         AlfredInterface $alfred,
         BorschtInterface $borscht,
         CompanyRepository $companyRepository
     ) {
-        $this->workflows = $workflows;
+        $this->workflow = $workflow;
         $this->orderRepository = $orderRepository;
         $this->alfred = $alfred;
         $this->borscht = $borscht;
@@ -46,23 +46,19 @@ class CancelOrderUseCase
             );
         }
 
-        // Transition
-        $stateMachine = $this->workflows->get($order);
-        if ($stateMachine->can($order, OrderStateManager::TRANSITION_CANCEL)) {
-            $stateMachine->apply($order, OrderStateManager::TRANSITION_CANCEL);
-        } elseif ($stateMachine->can($order, OrderStateManager::TRANSITION_CANCEL_SHIPPED)) {
+        if ($this->workflow->can($order, OrderStateManager::TRANSITION_CANCEL)) {
+            $this->workflow->apply($order, OrderStateManager::TRANSITION_CANCEL);
+        } elseif ($this->workflow->can($order, OrderStateManager::TRANSITION_CANCEL_SHIPPED)) {
             $this->borscht->cancelOrder($order);
-            $stateMachine->apply($order, OrderStateManager::TRANSITION_CANCEL_SHIPPED);
+            $this->workflow->apply($order, OrderStateManager::TRANSITION_CANCEL_SHIPPED);
         } else {
             throw new PaellaCoreCriticalException(
                 "Order #$externalCode can not be cancelled",
-                PaellaCoreCriticalException::CODE_ORDER_CANT_BE_CANCELLED,
-                Response::HTTP_BAD_REQUEST
+                PaellaCoreCriticalException::CODE_ORDER_CANT_BE_CANCELLED
             );
         }
-        $this->orderRepository->updateState($order);
+        $this->orderRepository->update($order);
 
-        // Unlock debtor limit
         $company = $this->companyRepository->getOneById($order->getCompanyId());
         if ($company === null) {
             throw new PaellaCoreCriticalException(sprintf('Company %s not found', $order->getCompanyId()));

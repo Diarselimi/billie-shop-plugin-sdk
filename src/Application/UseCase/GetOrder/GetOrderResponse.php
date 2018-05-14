@@ -168,12 +168,12 @@ class GetOrderResponse
         return $this;
     }
 
-    public function getReasons():? string
+    public function getReasons(): ?array
     {
         return $this->reasons;
     }
 
-    public function setReasons(?string $reasons): GetOrderResponse
+    public function setReasons(array $reasons): GetOrderResponse
     {
         $this->reasons = $reasons;
 

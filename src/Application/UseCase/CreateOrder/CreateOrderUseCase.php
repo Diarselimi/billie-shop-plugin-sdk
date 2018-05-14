@@ -2,24 +2,31 @@
 
 namespace App\Application\UseCase\CreateOrder;
 
-use App\Application\PaellaCoreCriticalException as PaellaException;
 use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Borscht\BorschtInterface;
+use App\DomainModel\Company\CompanyEntity;
 use App\DomainModel\Company\CompanyEntityFactory;
 use App\DomainModel\Company\CompanyRepositoryInterface;
+use App\DomainModel\Monitoring\LoggingInterface;
+use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\Order\OrderChecksRunnerService;
 use App\DomainModel\Order\OrderContainer;
 use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderStateManager;
+use Symfony\Component\Workflow\Workflow;
 
-class CreateOrderUseCase
+class CreateOrderUseCase implements LoggingInterface
 {
+    use LoggingTrait;
+
     private $orderPersistenceService;
     private $orderChecksRunnerService;
     private $alfred;
     private $companyRepository;
     private $companyFactory;
     private $orderRepository;
+    private $workflow;
 
     public function __construct(
         OrderPersistenceService $orderPersistenceService,
@@ -28,7 +35,8 @@ class CreateOrderUseCase
         BorschtInterface $borscht,
         CompanyRepositoryInterface $companyRepository,
         CompanyEntityFactory $companyEntityFactory,
-        OrderRepositoryInterface $orderRepository
+        OrderRepositoryInterface $orderRepository,
+        Workflow $workflow
     ) {
         $this->orderPersistenceService = $orderPersistenceService;
         $this->orderChecksRunnerService = $orderChecksRunnerService;
@@ -36,16 +44,45 @@ class CreateOrderUseCase
         $this->companyRepository = $companyRepository;
         $this->companyFactory = $companyEntityFactory;
         $this->orderRepository = $orderRepository;
+        $this->workflow = $workflow;
     }
 
-    public function execute(CreateOrderRequest $request)
+    public function execute(CreateOrderRequest $request): void
     {
         $orderContainer = $this->orderPersistenceService->persistFromRequest($request);
 
         if (!$this->orderChecksRunnerService->runPreconditionChecks($orderContainer)) {
-            $this->reject($orderContainer, 'Preconditions checks failed', PaellaException::CODE_ORDER_PRECONDITION_CHECKS_FAILED);
+            $this->reject($orderContainer, 'preconditions checks failed');
         }
 
+        $debtor = $this->retrieveDebtor($orderContainer, $request);
+        if (!$debtor) {
+            $this->reject($orderContainer, "debtor couldn't identified");
+
+            return;
+        }
+
+        $orderContainer->getOrder()->setCompanyId($debtor->getId());
+        $this->orderRepository->updateCompany($orderContainer->getOrder());
+
+        if (!$this->alfred->lockDebtorLimit($debtor->getDebtorId(), $orderContainer->getOrder()->getAmountGross())) {
+            $this->reject($orderContainer, 'debtor limit exceeded');
+
+            return;
+        }
+
+        if (!$this->orderChecksRunnerService->runChecks($orderContainer)) {
+            $this->alfred->unlockDebtorLimit($debtor->getDebtorId(), $orderContainer->getOrder()->getAmountGross());
+            $this->reject($orderContainer, 'checks failed');
+
+            return;
+        }
+
+        $this->approve($orderContainer);
+    }
+
+    private function retrieveDebtor(OrderContainer $orderContainer, CreateOrderRequest $request): ?CompanyEntity
+    {
         $merchantId = $request->getMerchantCustomerId();
         $debtor = $this->companyRepository->getOneByMerchantId($merchantId);
 
@@ -58,40 +95,34 @@ class CreateOrderUseCase
             }
         }
 
-        if (!$debtor) {
-            $this->reject($orderContainer, "Debtor couldn't identified", PaellaException::CODE_DEBTOR_COULD_NOT_BE_IDENTIFIED);
-        }
-
-        $orderContainer->getOrder()->setCompanyId($debtor->getId());
-        $this->orderRepository->updateCompany($orderContainer->getOrder());
-
-        if (!$this->alfred->lockDebtorLimit($debtor->getDebtorId(), $orderContainer->getOrder()->getAmountGross())) {
-            $this->reject($orderContainer, 'Debtor limit exceeded', PaellaException::CODE_DEBTOR_LIMIT_EXCEEDED);
-        }
-
-        if (!$this->orderChecksRunnerService->runChecks($orderContainer)) {
-            $this->alfred->unlockDebtorLimit($debtor->getDebtorId(), $orderContainer->getOrder()->getAmountGross());
-            $this->reject($orderContainer, 'Checks failed', PaellaException::CODE_ORDER_CHECKS_FAILED);
-        }
-
-        // approve order
+        return $debtor;
     }
 
-    private function identifyDebtor(OrderContainer $order)
+    private function identifyDebtor(OrderContainer $orderContainer)
     {
         return $this->alfred->identifyDebtor([
-            'name' => $order->getDebtorExternalData()->getName(),
-            'address_house' => $order->getDebtorExternalData()->getName(),
-            'address_street' => $order->getDebtorExternalDataAddress()->getStreet(),
-            'address_postal_code' => $order->getDebtorExternalDataAddress()->getPostalCode(),
-            'address_city' => $order->getDebtorExternalDataAddress()->getCity(),
-            'address_country' => $order->getDebtorExternalDataAddress()->getCountry(),
+            'name' => $orderContainer->getDebtorExternalData()->getName(),
+            'address_house' => $orderContainer->getDebtorExternalData()->getName(),
+            'address_street' => $orderContainer->getDebtorExternalDataAddress()->getStreet(),
+            'address_postal_code' => $orderContainer->getDebtorExternalDataAddress()->getPostalCode(),
+            'address_city' => $orderContainer->getDebtorExternalDataAddress()->getCity(),
+            'address_country' => $orderContainer->getDebtorExternalDataAddress()->getCountry(),
         ]);
     }
 
-    private function reject(OrderContainer $order, string $message, string $code)
+    private function reject(OrderContainer $orderContainer, string $message)
     {
-        // reject the order
-        throw new PaellaException($message, $code);
+        $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_DECLINE);
+        $this->orderRepository->update($orderContainer->getOrder());
+
+        $this->logInfo("Order declined because of $message");
+    }
+
+    private function approve(OrderContainer $orderContainer)
+    {
+        $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_CREATE);
+        $this->orderRepository->update($orderContainer->getOrder());
+
+        $this->logInfo("Order approved!");
     }
 }

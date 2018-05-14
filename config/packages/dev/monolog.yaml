@@ -1,0 +1,7 @@
+monolog:
+  handlers:
+    main:
+      type: "service"
+      path: "%kernel.logs_dir%/%kernel.environment%.log"
+      id: App\Infrastructure\Monitoring\StackdriverLogHandler
+      level: info
