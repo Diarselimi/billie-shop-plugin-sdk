@@ -73,4 +73,23 @@ class Borscht implements BorschtInterface
             );
         }
     }
+
+    public function confirmPayment(OrderEntity $order, float $amount): void
+    {
+        try {
+            $this->client->put('/merchant/payment.json', [
+                'json' => [
+                    'ticket_id' => $order->getId(),
+                    'amount' => $amount,
+                ],
+            ]);
+        } catch (TransferException $exception) {
+            throw new PaellaCoreCriticalException(
+                'Borscht is not available right now',
+                PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION,
+                null,
+                $exception
+            );
+        }
+    }
 }

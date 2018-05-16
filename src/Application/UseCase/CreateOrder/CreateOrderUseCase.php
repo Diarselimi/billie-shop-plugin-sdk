@@ -63,7 +63,7 @@ class CreateOrderUseCase implements LoggingInterface
         }
 
         $orderContainer->getOrder()->setCompanyId($debtor->getId());
-        $this->orderRepository->updateCompany($orderContainer->getOrder());
+        $this->orderRepository->update($orderContainer->getOrder());
 
         if (!$this->alfred->lockDebtorLimit($debtor->getDebtorId(), $orderContainer->getOrder()->getAmountGross())) {
             $this->reject($orderContainer, 'debtor limit exceeded');

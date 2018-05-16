@@ -8,6 +8,8 @@ class OrderStateManager
     const STATE_CREATED = 'created';
     const STATE_DECLINED = 'declined';
     const STATE_SHIPPED = 'shipped';
+    const STATE_PAID_OUT = 'paid_out';
+    const STATE_LATE = 'late';
     const STATE_CANCELED = 'canceled';
 
     const TRANSITION_CREATE = 'create';
@@ -19,6 +21,15 @@ class OrderStateManager
     public function wasShipped(OrderEntity $order): bool
     {
         return $order->getState() === self::STATE_SHIPPED;
+    }
+
+    public function canConfirmPayment(OrderEntity $order): bool
+    {
+        return \in_array($order->getState(), [
+            self::STATE_SHIPPED,
+            self::STATE_PAID_OUT,
+            self::STATE_LATE,
+        ], true);
     }
 
     public function isNew(OrderEntity $order): bool

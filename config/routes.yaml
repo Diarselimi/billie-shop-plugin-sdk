@@ -27,3 +27,8 @@ update_order:
   path: /order/{externalCode}
   controller: App\Http\Controller\UpdateOrderController::execute
   methods: [PATCH]
+
+confirm_order_payment:
+  path: /order/{externalCode}/confirm-payment
+  controller: App\Http\Controller\ConfirmOrderPaymentController::execute
+  methods: [POST]

@@ -86,26 +86,27 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             ->setUpdatedAt(new \DateTime($order['updated_at']));
     }
 
-    public function updateCompany(OrderEntity $order): void
+    public function update(OrderEntity $order): void
     {
         $this->doUpdate('
-            UPDATE orders 
-            SET 
+            UPDATE orders
+            SET
+              state = :state,
               company_id = :company_id,
-              state = :state
+              amount_gross = :amount_gross,
+              amount_net = :amount_net,
+              amount_tax = :amount_tax,
+              duration = :duration
             WHERE id = :id
-        ');
-
-        $res = $stmt->execute([
-            'company_id' => $order->getCompanyId(),
+        ', [
+            'amount_gross' => $order->getAmountGross(),
+            'amount_net' => $order->getAmountNet(),
+            'amount_tax' => $order->getAmountTax(),
+            'duration' => $order->getDuration(),
             'state' => $order->getState(),
+            'company_id' => $order->getCompanyId(),
             'id' => $order->getId(),
         ]);
-
-        if (!$res) {
-            throw new RepositoryException('Update operation failed');
-        }
-
         $this->eventDispatcher->dispatch(OrderLifecycleEvent::UPDATED, new OrderLifecycleEvent($order));
     }
 }
