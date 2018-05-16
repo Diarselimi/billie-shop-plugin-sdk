@@ -32,6 +32,7 @@ class GetOrderController
                 'house_number' => $response->getCompanyAddressHouseNumber(),
                 'street' => $response->getCompanyAddressStreet(),
                 'postal_code' => $response->getCompanyAddressPostalCode(),
+                'city' => $response->getCompanyAddressCity(),
                 'country' => $response->getCompanyAddressCountry(),
             ],
             'bank_account' => [
@@ -46,7 +47,11 @@ class GetOrderController
                 'due_date' => $response->getDueDate() ? $response->getDueDate()->format('Y-m-d H:i:s') : null,
             ],
             'debtor_external_data' => [
+                'name' => $response->getDebtorExternalDataCompanyName(),
                 'address_country' => $response->getDebtorExternalDataAddressCountry(),
+                'address_postal_code' => $response->getDebtorExternalDataAddressPostalCode(),
+                'address_street' => $response->getDebtorExternalDataAddressStreet(),
+                'address_house' => $response->getDebtorExternalDataAddressHouse(),
                 'industry_sector' => $response->getDebtorExternalDataIndustrySector(),
             ]
         ];

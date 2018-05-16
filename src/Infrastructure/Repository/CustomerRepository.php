@@ -3,11 +3,18 @@
 namespace App\Infrastructure\Repository;
 
 use App\DomainModel\Customer\CustomerEntity;
+use App\DomainModel\Customer\CustomerEntityFactory;
 use App\DomainModel\Customer\CustomerRepositoryInterface;
-use App\DomainModel\Exception\RepositoryException;
 
 class CustomerRepository extends AbstractRepository implements CustomerRepositoryInterface
 {
+    private $factory;
+
+    public function __construct(CustomerEntityFactory $factory)
+    {
+        $this->factory = $factory;
+    }
+
     public function insert(CustomerEntity $customer): void
     {
         $id = $this->doInsert('
@@ -29,30 +36,25 @@ class CustomerRepository extends AbstractRepository implements CustomerRepositor
         $customer->setId($id);
     }
 
+    public function getOneById(int $id): ?CustomerEntity
+    {
+        $row = $this->doFetch('
+          SELECT id, name, api_key, debtor_id, roles, is_active, available_financing_limit, created_at, updated_at 
+          FROM customers 
+          WHERE id = :id
+        ', ['id' => $id]);
+
+        return $row ? $this->factory->createFromDatabaseRow($row) : null;
+    }
+
     public function getOneByApiKeyRaw(string $apiKey):? array
     {
         $customer = $this->doFetch('
-          SELECT id, name, api_key, roles, is_active, available_financing_limit, created_at, updated_at 
+          SELECT id, name, api_key, debtor_id, roles, is_active, available_financing_limit, created_at, updated_at 
           FROM customers 
           WHERE api_key = :api_key
         ', ['api_key' => $apiKey]);
 
         return $customer ?: null;
-    }
-
-    public function delete(CustomerEntity $customer): void
-    {
-        if (!$this->deleteAllowed) {
-            throw new RepositoryException('Delete operation not allowed');
-        }
-
-        $stmt = $this->conn->prepare(' DELETE FROM customers WHERE id = :customer');
-        $res = $stmt->execute([
-            'customer' => $customer->getId(),
-        ]);
-
-        if (!$res) {
-            throw new RepositoryException('Delete operation failed');
-        };
     }
 }

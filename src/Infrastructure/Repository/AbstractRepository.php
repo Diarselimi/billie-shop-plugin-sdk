@@ -3,9 +3,13 @@
 namespace App\Infrastructure\Repository;
 
 use App\DomainModel\Exception\RepositoryException;
+use App\DomainModel\Monitoring\LoggingInterface;
+use App\DomainModel\Monitoring\LoggingTrait;
 
-abstract class AbstractRepository
+abstract class AbstractRepository implements LoggingInterface
 {
+    use LoggingTrait;
+
     /**
      * @var \PDO
      */
@@ -30,6 +34,11 @@ abstract class AbstractRepository
         $res = $stmt->execute($parameters);
 
         if (!$res) {
+            $this->logInfo('Insert failed', [
+                'query' => $query,
+                'params' => $parameters,
+            ]);
+
             throw new RepositoryException('Insert failed');
         }
 

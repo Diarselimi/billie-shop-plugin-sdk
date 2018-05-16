@@ -3,8 +3,8 @@
 namespace App\Application\UseCase\CreateOrder;
 
 use App\DomainModel\Alfred\AlfredInterface;
+use App\DomainModel\Alfred\DebtorDTO;
 use App\DomainModel\Borscht\BorschtInterface;
-use App\DomainModel\Company\CompanyEntity;
 use App\DomainModel\Company\CompanyEntityFactory;
 use App\DomainModel\Company\CompanyRepositoryInterface;
 use App\DomainModel\Monitoring\LoggingInterface;
@@ -55,24 +55,23 @@ class CreateOrderUseCase implements LoggingInterface
             $this->reject($orderContainer, 'preconditions checks failed');
         }
 
-        $debtor = $this->retrieveDebtor($orderContainer, $request);
-        if (!$debtor) {
+        $debtorDTO = $this->retrieveDebtor($orderContainer, $request);
+        if (is_null($debtorDTO)) {
             $this->reject($orderContainer, "debtor couldn't identified");
 
             return;
         }
 
-        $orderContainer->getOrder()->setCompanyId($debtor->getId());
         $this->orderRepository->update($orderContainer->getOrder());
 
-        if (!$this->alfred->lockDebtorLimit($debtor->getDebtorId(), $orderContainer->getOrder()->getAmountGross())) {
-            $this->reject($orderContainer, 'debtor limit exceeded');
+        if (!$this->alfred->lockDebtorLimit($orderContainer->getCompany()->getDebtorId(), $orderContainer->getOrder()->getAmountGross())) {
+            $this->reject($orderContainer, "debtor limit exceeded");
 
             return;
         }
 
-        if (!$this->orderChecksRunnerService->runChecks($orderContainer)) {
-            $this->alfred->unlockDebtorLimit($debtor->getDebtorId(), $orderContainer->getOrder()->getAmountGross());
+        if (!$this->orderChecksRunnerService->runChecks($orderContainer, $debtorDTO->getCrefoId())) {
+            $this->alfred->unlockDebtorLimit($orderContainer->getCompany()->getDebtorId(), $orderContainer->getOrder()->getAmountGross());
             $this->reject($orderContainer, 'checks failed');
 
             return;
@@ -81,7 +80,7 @@ class CreateOrderUseCase implements LoggingInterface
         $this->approve($orderContainer);
     }
 
-    private function retrieveDebtor(OrderContainer $orderContainer, CreateOrderRequest $request): ?CompanyEntity
+    private function retrieveDebtor(OrderContainer $orderContainer, CreateOrderRequest $request): ?DebtorDTO
     {
         $merchantId = $request->getMerchantCustomerId();
         $debtor = $this->companyRepository->getOneByMerchantId($merchantId);
@@ -92,17 +91,26 @@ class CreateOrderUseCase implements LoggingInterface
             if ($debtorDTO) {
                 $debtor = $this->companyFactory->createFromDebtorDTO($debtorDTO, $merchantId);
                 $this->companyRepository->insert($debtor);
+            } else {
+                return null;
             }
+        } else {
+            $debtorDTO = $this->alfred->getDebtor($debtor->getDebtorId());
         }
 
-        return $debtor;
+        $orderContainer
+            ->setCompany($debtor)
+            ->getOrder()->setCompanyId($debtor->getId())
+        ;
+
+        return $debtorDTO;
     }
 
     private function identifyDebtor(OrderContainer $orderContainer)
     {
         return $this->alfred->identifyDebtor([
             'name' => $orderContainer->getDebtorExternalData()->getName(),
-            'address_house' => $orderContainer->getDebtorExternalData()->getName(),
+            'address_house' => $orderContainer->getDebtorExternalDataAddress()->getHouseNumber(),
             'address_street' => $orderContainer->getDebtorExternalDataAddress()->getStreet(),
             'address_postal_code' => $orderContainer->getDebtorExternalDataAddress()->getPostalCode(),
             'address_city' => $orderContainer->getDebtorExternalDataAddress()->getCity(),

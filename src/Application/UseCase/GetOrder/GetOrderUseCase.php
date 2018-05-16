@@ -63,6 +63,10 @@ class GetOrderUseCase
             ->setState($order->getState())
             ->setOriginalAmount($order->getAmountGross())
             ->setDebtorExternalDataAddressCountry($debtorAddress['country'])
+            ->setDebtorExternalDataAddressPostalCode($debtorAddress['postal_code'])
+            ->setDebtorExternalDataAddressStreet($debtorAddress['street'])
+            ->setDebtorExternalDataAddressHouse($debtorAddress['house'])
+            ->setDebtorExternalDataCompanyName($debtorData['name'])
             ->setDebtorExternalDataIndustrySector($debtorData['industry_sector'])
         ;
 

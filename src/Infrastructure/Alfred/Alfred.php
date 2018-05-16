@@ -68,7 +68,7 @@ class Alfred implements AlfredInterface
             );
         }
 
-        $response = json_decode((string)$response->getBody(), true);
+        $response = json_decode((string) $response->getBody(), true);
         if (!$response) {
             throw new PaellaCoreCriticalException(
                 'Alfred response decode exception',

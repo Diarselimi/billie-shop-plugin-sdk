@@ -7,6 +7,7 @@ use Symfony\Component\EventDispatcher\Event;
 class OrderLifecycleEvent extends Event
 {
     const UPDATED = 'paella_core.order.update';
+    const CREATED = 'paella_core.order.created';
 
     private $order;
 

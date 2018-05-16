@@ -14,7 +14,11 @@ class GetOrderResponse
     private $companyAddressCity;
     private $companyAddressPostalCode;
     private $companyAddressCountry;
+    private $debtorExternalDataCompanyName;
     private $debtorExternalDataAddressCountry;
+    private $debtorExternalDataAddressPostalCode;
+    private $debtorExternalDataAddressStreet;
+    private $debtorExternalDataAddressHouse;
     private $debtorExternalDataIndustrySector;
     private $invoiceNumber;
     private $payoutAmount;
@@ -144,6 +148,18 @@ class GetOrderResponse
         return $this;
     }
 
+    public function getDebtorExternalDataCompanyName(): string
+    {
+        return $this->debtorExternalDataCompanyName;
+    }
+
+    public function setDebtorExternalDataCompanyName(string $debtorExternalDataCompanyName): GetOrderResponse
+    {
+        $this->debtorExternalDataCompanyName = $debtorExternalDataCompanyName;
+
+        return $this;
+    }
+
     public function getDebtorExternalDataAddressCountry(): string
     {
         return $this->debtorExternalDataAddressCountry;
@@ -152,6 +168,42 @@ class GetOrderResponse
     public function setDebtorExternalDataAddressCountry(string $debtorExternalDataAddressCountry): GetOrderResponse
     {
         $this->debtorExternalDataAddressCountry = $debtorExternalDataAddressCountry;
+
+        return $this;
+    }
+
+    public function getDebtorExternalDataAddressPostalCode(): string
+    {
+        return $this->debtorExternalDataAddressPostalCode;
+    }
+
+    public function setDebtorExternalDataAddressPostalCode(string $debtorExternalDataAddressPostalCode): GetOrderResponse
+    {
+        $this->debtorExternalDataAddressPostalCode = $debtorExternalDataAddressPostalCode;
+
+        return $this;
+    }
+
+    public function getDebtorExternalDataAddressStreet(): string
+    {
+        return $this->debtorExternalDataAddressStreet;
+    }
+
+    public function setDebtorExternalDataAddressStreet(string $debtorExternalDataAddressStreet): GetOrderResponse
+    {
+        $this->debtorExternalDataAddressStreet = $debtorExternalDataAddressStreet;
+
+        return $this;
+    }
+
+    public function getDebtorExternalDataAddressHouse(): string
+    {
+        return $this->debtorExternalDataAddressHouse;
+    }
+
+    public function setDebtorExternalDataAddressHouse(string $debtorExternalDataAddressHouse): GetOrderResponse
+    {
+        $this->debtorExternalDataAddressHouse = $debtorExternalDataAddressHouse;
 
         return $this;
     }

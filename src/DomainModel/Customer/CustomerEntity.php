@@ -9,6 +9,7 @@ class CustomerEntity extends AbstractEntity
     private $name;
     private $availableFinancingLimit;
     private $apiKey;
+    private $debtorId;
     private $roles;
     private $isActive;
 
@@ -44,6 +45,18 @@ class CustomerEntity extends AbstractEntity
     public function setApiKey(string $apiKey): CustomerEntity
     {
         $this->apiKey = $apiKey;
+
+        return $this;
+    }
+
+    public function getDebtorId(): string
+    {
+        return $this->debtorId;
+    }
+
+    public function setDebtorId(string $debtorId): CustomerEntity
+    {
+        $this->debtorId = $debtorId;
 
         return $this;
     }

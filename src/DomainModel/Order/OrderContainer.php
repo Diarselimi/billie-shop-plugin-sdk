@@ -3,12 +3,14 @@
 namespace App\DomainModel\Order;
 
 use App\DomainModel\Address\AddressEntity;
+use App\DomainModel\Company\CompanyEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\Person\PersonEntity;
 
 class OrderContainer
 {
     private $order;
+    private $company;
     private $debtorPerson;
     private $debtorExternalData;
     private $debtorExternalDataAddress;
@@ -22,6 +24,18 @@ class OrderContainer
     public function setOrder(OrderEntity $order): OrderContainer
     {
         $this->order = $order;
+
+        return $this;
+    }
+
+    public function getCompany(): CompanyEntity
+    {
+        return $this->company;
+    }
+
+    public function setCompany(CompanyEntity $company): OrderContainer
+    {
+        $this->company = $company;
 
         return $this;
     }

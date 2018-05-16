@@ -15,6 +15,8 @@ class DebtorFactory
             ->setAddressCity($data['address_city'])
             ->setAddressCountry($data['address_country'])
             ->setPaymentId($data['payment_id'])
+            ->setCrefoId($data['crefo_id'])
+            ->setSchufaId($data['schufa_id'])
         ;
     }
 }

@@ -26,9 +26,10 @@ class OrderTransitionManager
     {
         $orderId = $order->getId();
 
-        foreach ($this->transitions as $transition) {
+        foreach ($this->transitions as $key => $transition) {
             if ($transition->getOrderId() === $orderId) {
                 $this->transitionRepository->insert($transition);
+                unset($this->transitions[$key]);
             }
         }
     }

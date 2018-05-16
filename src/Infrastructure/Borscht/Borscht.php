@@ -14,26 +14,27 @@ class Borscht implements BorschtInterface
 {
     private $client;
 
-    public function __construct(
-        Client $client
-    ) {
+    public function __construct(Client $client)
+    {
         $this->client = $client;
     }
 
-    public function getDebtorPaymentDetails(int $debtorPaymentId): DebtorPaymentDetailsDTO
+    public function getDebtorPaymentDetails(string $debtorPaymentId): DebtorPaymentDetailsDTO
     {
         return (new DebtorPaymentDetailsDTO())
             ->setBankAccountBic('BICDEXXX')
-            ->setBankAccountIban('DE112233');
+            ->setBankAccountIban('DE112233')
+        ;
     }
 
-    public function getOrderPaymentDetails(int $orderPaymentId): OrderPaymentDetailsDTO
+    public function getOrderPaymentDetails(string $orderPaymentId): OrderPaymentDetailsDTO
     {
         return (new OrderPaymentDetailsDTO())
             ->setPayoutAmount(5000)
             ->setFeeAmount(100)
             ->setFeeRate(1.5)
-            ->setDueDate(new \DateTime());
+            ->setDueDate(new \DateTime())
+        ;
     }
 
     public function cancelOrder(OrderEntity $order): void

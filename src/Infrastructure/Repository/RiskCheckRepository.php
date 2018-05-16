@@ -17,7 +17,7 @@ class RiskCheckRepository extends AbstractRepository implements RiskCheckReposit
         ', [
             'order_id' => $riskCheck->getOrderId(),
             'check_id' => $riskCheck->getCheckId(),
-            'is_passed' => $riskCheck->isPassed(),
+            'is_passed' => (int) $riskCheck->isPassed(),
             'created_at' => $riskCheck->getCreatedAt()->format('Y-m-d H:i:s'),
             'updated_at' => $riskCheck->getUpdatedAt()->format('Y-m-d H:i:s'),
         ]);

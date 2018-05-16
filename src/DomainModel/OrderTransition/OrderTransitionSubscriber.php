@@ -6,6 +6,7 @@ use App\DomainModel\Monitoring\LoggingInterface;
 use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderLifecycleEvent;
+use App\DomainModel\Order\OrderStateManager;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Workflow\Event\Event;
 
@@ -43,11 +44,20 @@ class OrderTransitionSubscriber implements EventSubscriberInterface, LoggingInte
         $this->transitionManager->saveNewTransitions($event->getOrder());
     }
 
+    public function onOrderCreated(OrderLifecycleEvent $event)
+    {
+        $transitionEntity = $this->transitionFactory->create($event->getOrder()->getId(), OrderStateManager::STATE_NEW);
+
+        $this->transitionManager->registerNewTransition($transitionEntity);
+        $this->transitionManager->saveNewTransitions($event->getOrder());
+    }
+
     public static function getSubscribedEvents()
     {
         return [
             'workflow.order.completed' => 'onOrderTransitionCompleted',
             OrderLifecycleEvent::UPDATED => 'onOrderUpdated',
+            OrderLifecycleEvent::CREATED => 'onOrderCreated',
         ];
     }
 }

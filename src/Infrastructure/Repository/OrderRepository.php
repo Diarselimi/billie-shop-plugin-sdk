@@ -47,6 +47,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
         ]);
 
         $order->setId($id);
+        $this->eventDispatcher->dispatch(OrderLifecycleEvent::CREATED, new OrderLifecycleEvent($order));
     }
 
     public function getOneByExternalCode(string $externalCode, int $customerId): ?OrderEntity
@@ -107,6 +108,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             'company_id' => $order->getCompanyId(),
             'id' => $order->getId(),
         ]);
+
         $this->eventDispatcher->dispatch(OrderLifecycleEvent::UPDATED, new OrderLifecycleEvent($order));
     }
 }

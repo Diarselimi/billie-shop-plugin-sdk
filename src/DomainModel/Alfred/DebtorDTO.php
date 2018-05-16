@@ -12,6 +12,8 @@ class DebtorDTO
     private $addressCity;
     private $addressCountry;
     private $paymentId;
+    private $crefoId;
+    private $schufaId;
 
     public function getId(): int
     {
@@ -105,6 +107,30 @@ class DebtorDTO
     public function setPaymentId(string $paymentId): DebtorDTO
     {
         $this->paymentId = $paymentId;
+
+        return $this;
+    }
+
+    public function getCrefoId(): ?string
+    {
+        return $this->crefoId;
+    }
+
+    public function setCrefoId(?string $crefoId): DebtorDTO
+    {
+        $this->crefoId = $crefoId;
+
+        return $this;
+    }
+
+    public function getSchufaId(): ?string
+    {
+        return $this->schufaId;
+    }
+
+    public function setSchufaId(?string $schufaId): DebtorDTO
+    {
+        $this->schufaId = $schufaId;
 
         return $this;
     }

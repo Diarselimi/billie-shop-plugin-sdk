@@ -38,6 +38,7 @@ class ExceptionSubscriber implements EventSubscriberInterface, LoggingInterface
         $error = [
             'code' => $errorCode,
             'message' => $exception->getMessage(),
+            'stack' => $exception->getTraceAsString(),
         ];
 
         $this->logError('Critical exception', $error);
