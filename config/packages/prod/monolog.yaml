@@ -1,2 +1,2 @@
 imports:
-  - { resource: ../prod/monolog.yaml }
+  - { resource: ../dev/monolog.yaml }
