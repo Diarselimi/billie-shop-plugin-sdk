@@ -7,6 +7,7 @@ use App\DomainModel\Alfred\DebtorDTO;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Company\CompanyEntityFactory;
 use App\DomainModel\Company\CompanyRepositoryInterface;
+use App\DomainModel\Customer\CustomerRepositoryInterface;
 use App\DomainModel\Monitoring\LoggingInterface;
 use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\Order\OrderChecksRunnerService;
@@ -24,6 +25,7 @@ class CreateOrderUseCase implements LoggingInterface
     private $orderChecksRunnerService;
     private $alfred;
     private $companyRepository;
+    private $customerRepository;
     private $companyFactory;
     private $orderRepository;
     private $workflow;
@@ -34,6 +36,7 @@ class CreateOrderUseCase implements LoggingInterface
         AlfredInterface $alfred,
         BorschtInterface $borscht,
         CompanyRepositoryInterface $companyRepository,
+        CustomerRepositoryInterface $customerRepository,
         CompanyEntityFactory $companyEntityFactory,
         OrderRepositoryInterface $orderRepository,
         Workflow $workflow
@@ -42,6 +45,7 @@ class CreateOrderUseCase implements LoggingInterface
         $this->orderChecksRunnerService = $orderChecksRunnerService;
         $this->alfred = $alfred;
         $this->companyRepository = $companyRepository;
+        $this->customerRepository = $customerRepository;
         $this->companyFactory = $companyEntityFactory;
         $this->orderRepository = $orderRepository;
         $this->workflow = $workflow;
@@ -130,6 +134,10 @@ class CreateOrderUseCase implements LoggingInterface
     {
         $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_CREATE);
         $this->orderRepository->update($orderContainer->getOrder());
+
+        $customer = $orderContainer->getCustomer();
+        $customer->reduceAvailableFinancingLimit($orderContainer->getOrder()->getAmountGross());
+        $this->customerRepository->update($customer);
 
         $this->logInfo("Order approved!");
     }

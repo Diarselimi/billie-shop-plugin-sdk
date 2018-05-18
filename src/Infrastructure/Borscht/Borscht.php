@@ -21,9 +21,29 @@ class Borscht implements BorschtInterface
 
     public function getDebtorPaymentDetails(string $debtorPaymentId): DebtorPaymentDetailsDTO
     {
+        try {
+            $response = $this->client->get("/debtor/$debtorPaymentId.json");
+        } catch (TransferException $exception) {
+            throw new PaellaCoreCriticalException(
+                'Borscht is not available right now',
+                PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION,
+                null,
+                $exception
+            );
+        }
+
+        $response = (string) $response->getBody();
+        $response = json_decode($response, true);
+        if (!$response) {
+            throw new PaellaCoreCriticalException(
+                'Borscht response decode exception',
+                PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION
+            );
+        }
+
         return (new DebtorPaymentDetailsDTO())
-            ->setBankAccountBic('BICDEXXX')
-            ->setBankAccountIban('DE112233')
+            ->setBankAccountBic($response['bic'])
+            ->setBankAccountIban($response['iban'])
         ;
     }
 

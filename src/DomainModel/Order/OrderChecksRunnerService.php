@@ -2,18 +2,15 @@
 
 namespace App\DomainModel\Order;
 
-use App\DomainModel\Customer\CustomerRepositoryInterface;
 use App\DomainModel\Risky\RiskyInterface;
 
 class OrderChecksRunnerService
 {
     private $risky;
-    private $customerRepository;
 
-    public function __construct(RiskyInterface $risky, CustomerRepositoryInterface $customerRepository)
+    public function __construct(RiskyInterface $risky)
     {
         $this->risky = $risky;
-        $this->customerRepository = $customerRepository;
     }
 
     public function runPreconditionChecks(OrderContainer $order): bool
@@ -27,7 +24,7 @@ class OrderChecksRunnerService
 
     public function runChecks(OrderContainer $order, ?string $debtorCrefoId): bool
     {
-        $customer = $this->customerRepository->getOneById($order->getOrder()->getCustomerId());
+        $customer = $order->getCustomer();
         $debtorId = $order->getCompany()->getDebtorId();
 
         $debtorNotCustomerCheck = $debtorId !== $customer->getDebtorId();

@@ -4,6 +4,7 @@ namespace App\DomainModel\Order;
 
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\Company\CompanyEntity;
+use App\DomainModel\Customer\CustomerEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\Person\PersonEntity;
 
@@ -15,6 +16,7 @@ class OrderContainer
     private $debtorExternalData;
     private $debtorExternalDataAddress;
     private $deliveryAddress;
+    private $customer;
 
     public function getOrder(): OrderEntity
     {
@@ -84,6 +86,18 @@ class OrderContainer
     public function setDeliveryAddress(AddressEntity $deliveryAddress): OrderContainer
     {
         $this->deliveryAddress = $deliveryAddress;
+
+        return $this;
+    }
+
+    public function getCustomer(): CustomerEntity
+    {
+        return $this->customer;
+    }
+
+    public function setCustomer(CustomerEntity $customer): OrderContainer
+    {
+        $this->customer = $customer;
 
         return $this;
     }

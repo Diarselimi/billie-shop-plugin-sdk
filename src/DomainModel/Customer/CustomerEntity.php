@@ -37,6 +37,11 @@ class CustomerEntity extends AbstractEntity
         return $this;
     }
 
+    public function reduceAvailableFinancingLimit(float $delta): void
+    {
+        $this->availableFinancingLimit = $this->availableFinancingLimit - $delta;
+    }
+
     public function getApiKey(): string
     {
         return $this->apiKey;

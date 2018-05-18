@@ -17,7 +17,7 @@ class CompanyEntityFactory
         ;
     }
 
-    public function createFromDebtorDTO(DebtorDTO $debtor, string $merchantId)
+    public function createFromDebtorDTO(DebtorDTO $debtor, string $merchantId): CompanyEntity
     {
         return (new CompanyEntity())
             ->setMerchantId($merchantId)

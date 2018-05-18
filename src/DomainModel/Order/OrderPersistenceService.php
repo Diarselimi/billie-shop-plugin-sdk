@@ -6,6 +6,7 @@ use App\Application\PaellaCoreCriticalException;
 use App\Application\UseCase\CreateOrder\CreateOrderRequest;
 use App\DomainModel\Address\AddressEntityFactory;
 use App\DomainModel\Address\AddressRepositoryInterface;
+use App\DomainModel\Customer\CustomerRepositoryInterface;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntityFactory;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\Exception\RepositoryException;
@@ -18,6 +19,7 @@ class OrderPersistenceService
     private $personRepository;
     private $addressRepository;
     private $debtorExternalDataRepository;
+    private $customerRepository;
     private $orderFactory;
     private $personFactory;
     private $addressFactory;
@@ -28,6 +30,7 @@ class OrderPersistenceService
         PersonRepositoryInterface $personRepository,
         AddressRepositoryInterface $addressRepository,
         DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
+        CustomerRepositoryInterface $customerRepository,
         OrderEntityFactory $orderFactory,
         PersonEntityFactory $personFactory,
         AddressEntityFactory $addressFactory,
@@ -37,6 +40,7 @@ class OrderPersistenceService
         $this->personRepository = $personRepository;
         $this->addressRepository = $addressRepository;
         $this->debtorExternalDataRepository = $debtorExternalDataRepository;
+        $this->customerRepository = $customerRepository;
         $this->orderFactory = $orderFactory;
         $this->personFactory = $personFactory;
         $this->addressFactory = $addressFactory;
@@ -79,6 +83,7 @@ class OrderPersistenceService
                 ->setDebtorExternalData($debtorExternalData)
                 ->setDebtorExternalDataAddress($debtorAddress)
                 ->setDeliveryAddress($deliveryAddress)
+                ->setCustomer($this->customerRepository->getOneById($order->getCustomerId()))
             ;
         } catch (RepositoryException $exception) {
             throw new PaellaCoreCriticalException(

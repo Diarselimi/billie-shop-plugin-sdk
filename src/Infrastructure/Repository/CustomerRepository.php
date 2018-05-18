@@ -36,6 +36,20 @@ class CustomerRepository extends AbstractRepository implements CustomerRepositor
         $customer->setId($id);
     }
 
+    public function update(CustomerEntity $customer): void
+    {
+        $customer->setUpdatedAt(new \DateTime());
+        $this->doUpdate('
+            UPDATE customers 
+            SET available_financing_limit = :available_financing_limit, updated_at = :updated_at
+            WHERE id = :id
+        ', [
+            'id' => $customer->getId(),
+            'available_financing_limit' => $customer->getAvailableFinancingLimit(),
+            'updated_at' => $customer->getUpdatedAt()->format('Y-m-d H:i:s'),
+        ]);
+    }
+
     public function getOneById(int $id): ?CustomerEntity
     {
         $row = $this->doFetch('
