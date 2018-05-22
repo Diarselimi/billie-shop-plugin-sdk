@@ -6,8 +6,8 @@ use App\Application\PaellaCoreCriticalException;
 use App\DomainModel\Address\AddressRepositoryInterface;
 use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Borscht\BorschtInterface;
-use App\DomainModel\Company\CompanyRepositoryInterface;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
+use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 class GetOrderUseCase
 {
     private $orderRepository;
-    private $companyRepository;
+    private $merchantDebtorRepository;
     private $addressRepository;
     private $debtorExternalDataRepository;
     private $alfred;
@@ -25,7 +25,7 @@ class GetOrderUseCase
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
-        CompanyRepositoryInterface $companyRepository,
+        MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         AddressRepositoryInterface $addressRepository,
         DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
         AlfredInterface $alfred,
@@ -33,7 +33,7 @@ class GetOrderUseCase
         OrderStateManager $orderStateManager
     ) {
         $this->orderRepository = $orderRepository;
-        $this->companyRepository = $companyRepository;
+        $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->addressRepository = $addressRepository;
         $this->debtorExternalDataRepository = $debtorExternalDataRepository;
         $this->alfred = $alfred;
@@ -70,7 +70,7 @@ class GetOrderUseCase
             ->setDebtorExternalDataIndustrySector($debtorData['industry_sector'])
         ;
 
-        if ($order->getCompanyId()) {
+        if ($order->getMerchantDebtorId()) {
             $this->addCompanyToOrder($order, $response);
         }
 
@@ -87,7 +87,7 @@ class GetOrderUseCase
 
     private function addCompanyToOrder(OrderEntity $order, GetOrderResponse $response)
     {
-        $company = $this->companyRepository->getOneById($order->getCompanyId());
+        $company = $this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId());
         $debtor = $this->alfred->getDebtor($company->getDebtorId());
         $debtorPaymentDetails = $this->borscht->getDebtorPaymentDetails($debtor->getPaymentId());
 

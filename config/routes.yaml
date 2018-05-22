@@ -13,9 +13,9 @@ create_order:
   controller: App\Http\Controller\CreateOrderController::execute
   methods: [POST]
 
-get_customer:
-  path: /customer/{apiKey}
-  controller: App\Http\Controller\GetCustomerController::execute
+get_merchant:
+  path: /merchant/{apiKey}
+  controller: App\Http\Controller\GetMerchantController::execute
   methods: [GET]
 
 cancel_order:

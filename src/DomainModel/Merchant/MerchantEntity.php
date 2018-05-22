@@ -1,15 +1,15 @@
 <?php
 
-namespace App\DomainModel\Customer;
+namespace App\DomainModel\Merchant;
 
 use App\DomainModel\AbstractEntity;
 
-class CustomerEntity extends AbstractEntity
+class MerchantEntity extends AbstractEntity
 {
     private $name;
     private $availableFinancingLimit;
     private $apiKey;
-    private $debtorId;
+    private $companyId;
     private $roles;
     private $isActive;
 
@@ -18,7 +18,7 @@ class CustomerEntity extends AbstractEntity
         return $this->name;
     }
 
-    public function setName(string $name): CustomerEntity
+    public function setName(string $name): MerchantEntity
     {
         $this->name = $name;
 
@@ -30,7 +30,7 @@ class CustomerEntity extends AbstractEntity
         return $this->availableFinancingLimit;
     }
 
-    public function setAvailableFinancingLimit(float $availableFinancingLimit): CustomerEntity
+    public function setAvailableFinancingLimit(float $availableFinancingLimit): MerchantEntity
     {
         $this->availableFinancingLimit = $availableFinancingLimit;
 
@@ -47,21 +47,21 @@ class CustomerEntity extends AbstractEntity
         return $this->apiKey;
     }
 
-    public function setApiKey(string $apiKey): CustomerEntity
+    public function setApiKey(string $apiKey): MerchantEntity
     {
         $this->apiKey = $apiKey;
 
         return $this;
     }
 
-    public function getDebtorId(): string
+    public function getCompanyId(): string
     {
-        return $this->debtorId;
+        return $this->companyId;
     }
 
-    public function setDebtorId(string $debtorId): CustomerEntity
+    public function setCompanyId(string $companyId): MerchantEntity
     {
-        $this->debtorId = $debtorId;
+        $this->companyId = $companyId;
 
         return $this;
     }
@@ -71,7 +71,7 @@ class CustomerEntity extends AbstractEntity
         return $this->roles;
     }
 
-    public function setRoles(string $roles): CustomerEntity
+    public function setRoles(string $roles): MerchantEntity
     {
         $this->roles = $roles;
 
@@ -83,7 +83,7 @@ class CustomerEntity extends AbstractEntity
         return $this->isActive;
     }
 
-    public function setIsActive(bool $isActive): CustomerEntity
+    public function setIsActive(bool $isActive): MerchantEntity
     {
         $this->isActive = $isActive;
 

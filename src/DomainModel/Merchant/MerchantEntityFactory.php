@@ -1,17 +1,17 @@
 <?php
 
-namespace App\DomainModel\Customer;
+namespace App\DomainModel\Merchant;
 
-class CustomerEntityFactory
+class MerchantEntityFactory
 {
-    public function createFromDatabaseRow(array $row): CustomerEntity
+    public function createFromDatabaseRow(array $row): MerchantEntity
     {
-        return (new CustomerEntity())
+        return (new MerchantEntity())
             ->setId($row['id'])
             ->setName($row['name'])
             ->setApiKey($row['api_key'])
             ->setAvailableFinancingLimit($row['available_financing_limit'])
-            ->setDebtorId($row['debtor_id'])
+            ->setCompanyId($row['company_id'])
             ->setRoles($row['roles'])
             ->setIsActive((bool) $row['is_active'])
             ->setCreatedAt(new \DateTime($row['created_at']))

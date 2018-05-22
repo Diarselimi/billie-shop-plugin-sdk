@@ -10,8 +10,8 @@ services:
   App\DomainModel\Order\OrderRepositoryInterface:
     alias: 'App\Infrastructure\Repository\OrderRepository'
     public: true
-  App\DomainModel\Customer\CustomerRepositoryInterface:
-    alias: 'App\Infrastructure\Repository\CustomerRepository'
+  App\DomainModel\Customer\MerchantRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\MerchantRepository'
     public: true
   App\DomainModel\Address\AddressRepositoryInterface:
     alias: 'App\Infrastructure\Repository\AddressRepository'
@@ -22,6 +22,6 @@ services:
   App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface:
     alias: 'App\Infrastructure\Repository\DebtorExternalDataRepository'
     public: true
-  App\DomainModel\Company\CompanyRepositoryInterface:
-    alias: 'App\Infrastructure\Repository\CompanyRepository'
+  App\DomainModel\Company\MerchantDebtorRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\MerchantDebtor'
     public: true

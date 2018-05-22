@@ -16,8 +16,8 @@ class OrderEntity extends AbstractEntity
     private $internalComment;
     private $invoiceNumber;
     private $invoiceUrl;
-    private $customerId;
-    private $companyId;
+    private $merchantDebtorId;
+    private $merchantId;
     private $deliveryAddressId;
     private $debtorPersonId;
     private $debtorExternalDataId;
@@ -143,26 +143,26 @@ class OrderEntity extends AbstractEntity
         return $this;
     }
 
-    public function getCustomerId():? int
+    public function getMerchantDebtorId():? int
     {
-        return $this->customerId;
+        return $this->merchantDebtorId;
     }
 
-    public function setCustomerId(int $customerId): OrderEntity
+    public function setMerchantDebtorId(?int $merchantDebtorId): OrderEntity
     {
-        $this->customerId = $customerId;
+        $this->merchantDebtorId = $merchantDebtorId;
 
         return $this;
     }
 
-    public function getCompanyId():? int
+    public function getMerchantId(): int
     {
-        return $this->companyId;
+        return $this->merchantId;
     }
 
-    public function setCompanyId(?int $companyId): OrderEntity
+    public function setMerchantId(int $merchantId): OrderEntity
     {
-        $this->companyId = $companyId;
+        $this->merchantId = $merchantId;
 
         return $this;
     }

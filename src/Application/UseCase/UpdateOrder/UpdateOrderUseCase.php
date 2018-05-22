@@ -8,7 +8,7 @@ use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
-use App\Infrastructure\Repository\CompanyRepository;
+use App\Infrastructure\Repository\MerchantDebtorRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Workflow\Registry;
 
@@ -26,7 +26,7 @@ class UpdateOrderUseCase
         OrderRepositoryInterface $orderRepository,
         AlfredInterface $alfred,
         BorschtInterface $borscht,
-        CompanyRepository $companyRepository,
+        MerchantDebtorRepository $companyRepository,
         OrderStateManager $orderStateManager
     ) {
         $this->workflows = $workflows;
@@ -82,9 +82,9 @@ class UpdateOrderUseCase
 
             // Unlock debtor limit in alfred
             if ($amountChanged !== 0) {
-                $company = $this->companyRepository->getOneById($order->getCompanyId());
+                $company = $this->companyRepository->getOneById($order->getMerchantDebtorId());
                 if ($company === null) {
-                    throw new PaellaCoreCriticalException(sprintf('Company %s not found', $order->getCompanyId()));
+                    throw new PaellaCoreCriticalException(sprintf('Company %s not found', $order->getMerchantDebtorId()));
                 }
                 $this->alfred->unlockDebtorLimit($company->getDebtorId(), $amountChanged);
             }

@@ -3,20 +3,20 @@
 namespace App\DomainModel\Order;
 
 use App\DomainModel\Address\AddressEntity;
-use App\DomainModel\Company\CompanyEntity;
-use App\DomainModel\Customer\CustomerEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
+use App\DomainModel\Merchant\MerchantEntity;
+use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\Person\PersonEntity;
 
 class OrderContainer
 {
     private $order;
-    private $company;
+    private $merchantDebtor;
     private $debtorPerson;
     private $debtorExternalData;
     private $debtorExternalDataAddress;
     private $deliveryAddress;
-    private $customer;
+    private $merchant;
 
     public function getOrder(): OrderEntity
     {
@@ -30,14 +30,14 @@ class OrderContainer
         return $this;
     }
 
-    public function getCompany(): CompanyEntity
+    public function getMerchantDebtor(): MerchantDebtorEntity
     {
-        return $this->company;
+        return $this->merchantDebtor;
     }
 
-    public function setCompany(CompanyEntity $company): OrderContainer
+    public function setMerchantDebtor(MerchantDebtorEntity $merchantDebtor): OrderContainer
     {
-        $this->company = $company;
+        $this->merchantDebtor = $merchantDebtor;
 
         return $this;
     }
@@ -90,14 +90,14 @@ class OrderContainer
         return $this;
     }
 
-    public function getCustomer(): CustomerEntity
+    public function getMerchant(): MerchantEntity
     {
-        return $this->customer;
+        return $this->merchant;
     }
 
-    public function setCustomer(CustomerEntity $customer): OrderContainer
+    public function setMerchant(MerchantEntity $merchant): OrderContainer
     {
-        $this->customer = $customer;
+        $this->merchant = $merchant;
 
         return $this;
     }

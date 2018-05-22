@@ -2,7 +2,6 @@
 
 namespace App\Infrastructure\Repository;
 
-use App\DomainModel\Exception\RepositoryException;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderLifecycleEvent;
 use App\DomainModel\Order\OrderRepositoryInterface;
@@ -21,9 +20,9 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
     {
         $id = $this->doInsert('
             INSERT INTO orders
-            (amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, delivery_address_id, customer_id, company_id, debtor_person_id, debtor_external_data_id, payment_id, created_at, updated_at)
+            (amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, delivery_address_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, created_at, updated_at)
             VALUES
-            (:amount_net, :amount_gross, :amount_tax, :duration, :external_code, :state, :external_comment, :internal_comment, :invoice_number, :invoice_url, :delivery_address_id, :customer_id, :company_id, :debtor_person_id, :debtor_external_data_id, :payment_id, :created_at, :updated_at)
+            (:amount_net, :amount_gross, :amount_tax, :duration, :external_code, :state, :external_comment, :internal_comment, :invoice_number, :invoice_url, :delivery_address_id, :merchant_id, :debtor_person_id, :debtor_external_data_id, :payment_id, :created_at, :updated_at)
             
         ', [
             'amount_net' => $order->getAmountNet(),
@@ -37,8 +36,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             'invoice_number' => $order->getInvoiceNumber(),
             'invoice_url' => $order->getInvoiceUrl(),
             'delivery_address_id' => $order->getDeliveryAddressId(),
-            'customer_id' => $order->getCustomerId(),
-            'company_id' => $order->getCompanyId(),
+            'merchant_id' => $order->getMerchantId(),
             'debtor_person_id' => $order->getDebtorPersonId(),
             'debtor_external_data_id' => $order->getDebtorExternalDataId(),
             'payment_id' => $order->getPaymentId(),
@@ -50,15 +48,15 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
         $this->eventDispatcher->dispatch(OrderLifecycleEvent::CREATED, new OrderLifecycleEvent($order));
     }
 
-    public function getOneByExternalCode(string $externalCode, int $customerId): ?OrderEntity
+    public function getOneByExternalCode(string $externalCode, int $merchantId): ?OrderEntity
     {
         $order = $this->doFetch('
-          SELECT id, amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, delivery_address_id, customer_id, company_id, debtor_person_id, debtor_external_data_id, payment_id, created_at, updated_at 
+          SELECT id, amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, delivery_address_id, merchant_debtor_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, created_at, updated_at 
           FROM orders 
-          WHERE external_code = :external_code AND customer_id = :customer_id
+          WHERE external_code = :external_code AND merchant_id = :merchant_id
         ', [
             'external_code' => $externalCode,
-            'customer_id' => $customerId,
+            'merchant_id' => $merchantId,
         ]);
 
         if (!$order) {
@@ -78,8 +76,8 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             ->setInvoiceNumber($order['invoice_number'])
             ->setInvoiceUrl($order['invoice_url'])
             ->setDeliveryAddressId($order['delivery_address_id'])
-            ->setCustomerId($order['customer_id'])
-            ->setCompanyId($order['company_id'])
+            ->setMerchantDebtorId($order['merchant_debtor_id'])
+            ->setMerchantId($order['merchant_id'])
             ->setDebtorPersonId($order['debtor_person_id'])
             ->setDebtorExternalDataId($order['debtor_external_data_id'])
             ->setPaymentId($order['payment_id'])
@@ -105,7 +103,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             'amount_tax' => $order->getAmountTax(),
             'duration' => $order->getDuration(),
             'state' => $order->getState(),
-            'company_id' => $order->getCompanyId(),
+            'company_id' => $order->getMerchantDebtorId(),
             'id' => $order->getId(),
         ]);
 

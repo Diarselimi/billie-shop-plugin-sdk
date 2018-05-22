@@ -33,6 +33,12 @@ class GuzzleMonitoringSubscriber implements EventSubscriberInterface, LoggingInt
     public function onPostTransaction(PostTransactionEvent $event)
     {
         $transaction = $event->getTransaction();
+        if (!$transaction) {
+            $this->logError("Guzzle service {$event->getServiceName()} connection exception");
+
+            return;
+        }
+
         $responseIsSuccessful = in_array(
             $transaction->getStatusCode(),
             [Response::HTTP_OK, Response::HTTP_CREATED, Response::HTTP_NO_CONTENT],

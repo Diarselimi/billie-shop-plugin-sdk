@@ -154,9 +154,8 @@ class PaellaCoreContext extends MinkContext implements Context
             ->setDebtorPersonId($person->getId())
             ->setDeliveryAddressId($deliveryAddress->getId())
             ->setDebtorExternalDataId($debtor->getId())
-            ->setCustomerId(1)
             ->setExternalComment($comment)
-            ->setCompanyId($company->getId());
+            ->setMerchantDebtorId($company->getId());
 
         $this->getOrderRepository()->insert($order);
     }

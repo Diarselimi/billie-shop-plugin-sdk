@@ -20,7 +20,7 @@ class CreateOrderController
     public function execute(Request $request)
     {
         $request = (new CreateOrderRequest())
-            ->setCustomerId($request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER))
+            ->setMerchantId($request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER))
             ->setAmountNet($request->request->get('amount_net'))
             ->setAmountGross($request->request->get('amount_gross'))
             ->setAmountTax($request->request->get('amount_tax'))

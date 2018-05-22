@@ -5,9 +5,9 @@ namespace App\Application\UseCase\CreateOrder;
 use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Alfred\DebtorDTO;
 use App\DomainModel\Borscht\BorschtInterface;
-use App\DomainModel\Company\CompanyEntityFactory;
-use App\DomainModel\Company\CompanyRepositoryInterface;
-use App\DomainModel\Customer\CustomerRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\MerchantDebtor\MerchantDebtorEntityFactory;
+use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\Monitoring\LoggingInterface;
 use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\Order\OrderChecksRunnerService;
@@ -24,9 +24,9 @@ class CreateOrderUseCase implements LoggingInterface
     private $orderPersistenceService;
     private $orderChecksRunnerService;
     private $alfred;
-    private $companyRepository;
-    private $customerRepository;
-    private $companyFactory;
+    private $merchantDebtorRepository;
+    private $merchantRepository;
+    private $merchantDebtorFactory;
     private $orderRepository;
     private $workflow;
 
@@ -35,18 +35,18 @@ class CreateOrderUseCase implements LoggingInterface
         OrderChecksRunnerService $orderChecksRunnerService,
         AlfredInterface $alfred,
         BorschtInterface $borscht,
-        CompanyRepositoryInterface $companyRepository,
-        CustomerRepositoryInterface $customerRepository,
-        CompanyEntityFactory $companyEntityFactory,
+        MerchantDebtorRepositoryInterface $merchantDebtorRepository,
+        MerchantRepositoryInterface $merchantRepository,
+        MerchantDebtorEntityFactory $merchantDebtorFactory,
         OrderRepositoryInterface $orderRepository,
         Workflow $workflow
     ) {
         $this->orderPersistenceService = $orderPersistenceService;
         $this->orderChecksRunnerService = $orderChecksRunnerService;
         $this->alfred = $alfred;
-        $this->companyRepository = $companyRepository;
-        $this->customerRepository = $customerRepository;
-        $this->companyFactory = $companyEntityFactory;
+        $this->merchantDebtorRepository = $merchantDebtorRepository;
+        $this->merchantRepository = $merchantRepository;
+        $this->merchantDebtorFactory = $merchantDebtorFactory;
         $this->orderRepository = $orderRepository;
         $this->workflow = $workflow;
     }
@@ -68,14 +68,14 @@ class CreateOrderUseCase implements LoggingInterface
 
         $this->orderRepository->update($orderContainer->getOrder());
 
-        if (!$this->alfred->lockDebtorLimit($orderContainer->getCompany()->getDebtorId(), $orderContainer->getOrder()->getAmountGross())) {
+        if (!$this->alfred->lockDebtorLimit($orderContainer->getMerchantDebtor()->getDebtorId(), $orderContainer->getOrder()->getAmountGross())) {
             $this->reject($orderContainer, "debtor limit exceeded");
 
             return;
         }
 
         if (!$this->orderChecksRunnerService->runChecks($orderContainer, $debtorDTO->getCrefoId())) {
-            $this->alfred->unlockDebtorLimit($orderContainer->getCompany()->getDebtorId(), $orderContainer->getOrder()->getAmountGross());
+            $this->alfred->unlockDebtorLimit($orderContainer->getMerchantDebtor()->getDebtorId(), $orderContainer->getOrder()->getAmountGross());
             $this->reject($orderContainer, 'checks failed');
 
             return;
@@ -87,14 +87,14 @@ class CreateOrderUseCase implements LoggingInterface
     private function retrieveDebtor(OrderContainer $orderContainer, CreateOrderRequest $request): ?DebtorDTO
     {
         $merchantId = $request->getMerchantCustomerId();
-        $debtor = $this->companyRepository->getOneByMerchantId($merchantId);
+        $debtor = $this->merchantDebtorRepository->getOneByExternalId($merchantId);
 
         if (!$debtor) {
             $debtorDTO = $this->identifyDebtor($orderContainer);
 
             if ($debtorDTO) {
-                $debtor = $this->companyFactory->createFromDebtorDTO($debtorDTO, $merchantId);
-                $this->companyRepository->insert($debtor);
+                $debtor = $this->merchantDebtorFactory->createFromDebtorDTO($debtorDTO, $merchantId);
+                $this->merchantDebtorRepository->insert($debtor);
             } else {
                 return null;
             }
@@ -103,8 +103,8 @@ class CreateOrderUseCase implements LoggingInterface
         }
 
         $orderContainer
-            ->setCompany($debtor)
-            ->getOrder()->setCompanyId($debtor->getId())
+            ->setMerchantDebtor($debtor)
+            ->getOrder()->setMerchantDebtorId($debtor->getId())
         ;
 
         return $debtorDTO;
@@ -135,9 +135,9 @@ class CreateOrderUseCase implements LoggingInterface
         $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_CREATE);
         $this->orderRepository->update($orderContainer->getOrder());
 
-        $customer = $orderContainer->getCustomer();
+        $customer = $orderContainer->getMerchant();
         $customer->reduceAvailableFinancingLimit($orderContainer->getOrder()->getAmountGross());
-        $this->customerRepository->update($customer);
+        $this->merchantRepository->update($customer);
 
         $this->logInfo("Order approved!");
     }

@@ -15,7 +15,7 @@ class OrderEntityFactory
             ->setDuration($request->getDuration())
             ->setExternalComment($request->getComment())
             ->setExternalCode($request->getExternalCode())
-            ->setCustomerId($request->getCustomerId())
+            ->setMerchantId($request->getMerchantId())
             ->setState(OrderStateManager::STATE_NEW)
         ;
     }

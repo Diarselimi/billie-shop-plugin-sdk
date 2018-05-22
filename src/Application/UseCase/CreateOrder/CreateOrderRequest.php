@@ -4,7 +4,7 @@ namespace App\Application\UseCase\CreateOrder;
 
 class CreateOrderRequest
 {
-    private $customerId;
+    private $merchantId;
     private $amountNet;
     private $amountGross;
     private $amountTax;
@@ -45,14 +45,14 @@ class CreateOrderRequest
     private $debtorPersonPhoneNumber;
     private $debtorPersonEmail;
 
-    public function getCustomerId()
+    public function getMerchantId()
     {
-        return $this->customerId;
+        return $this->merchantId;
     }
 
-    public function setCustomerId($customerId)
+    public function setMerchantId($merchantId)
     {
-        $this->customerId = $customerId;
+        $this->merchantId = $merchantId;
 
         return $this;
     }

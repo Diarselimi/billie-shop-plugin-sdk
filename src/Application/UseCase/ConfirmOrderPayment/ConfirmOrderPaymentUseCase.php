@@ -3,14 +3,11 @@
 namespace App\Application\UseCase\ConfirmOrderPayment;
 
 use App\Application\PaellaCoreCriticalException;
-use App\Application\UseCase\ConfirmOrderPayment\ConfirmOrderPaymentRequest;
 use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
-use App\Infrastructure\Repository\CompanyRepository;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Workflow\Registry;
 
 class ConfirmOrderPaymentUseCase
 {

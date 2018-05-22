@@ -7,12 +7,13 @@ class InitialStructure extends AbstractMigration
     public function change()
     {
         $this
-            ->table('customers')
+            ->table('merchants')
             ->addColumn('name', 'string', ['null' => false])
             ->addColumn('available_financing_limit', 'decimal', ['null' => false, 'precision' => 20, 'scale' => 2])
             ->addColumn('api_key', 'string', ['null' => false])
             ->addColumn('roles', 'string', ['null' => false])
             ->addColumn('is_active', 'boolean', ['null' => false])
+            ->addColumn('company_id', 'string', ['null' => false])
             ->addColumn('created_at', 'datetime', ['null' => false])
             ->addColumn('updated_at', 'datetime', ['null' => false])
             ->addIndex('api_key', ['unique' => true])
@@ -64,11 +65,13 @@ class InitialStructure extends AbstractMigration
         ;
 
         $this
-            ->table('companies')
+            ->table('merchants_debtors')
             ->addColumn('debtor_id', 'string', ['null' => false])
-            ->addColumn('merchant_id', 'string', ['null' => false])
+            ->addColumn('merchant_id', 'integer', ['null' => false])
+            ->addColumn('external_id', 'string', ['null' => false])
             ->addColumn('created_at', 'datetime', ['null' => false])
             ->addColumn('updated_at', 'datetime', ['null' => false])
+            ->addForeignKey('merchant_id', 'merchants', 'id')
             ->create()
         ;
 
@@ -84,19 +87,28 @@ class InitialStructure extends AbstractMigration
             ->addColumn('internal_comment', 'string', ['null' => true])
             ->addColumn('invoice_number', 'string', ['null' => true])
             ->addColumn('invoice_url', 'string', ['null' => true])
-            ->addColumn('customer_id', 'integer', ['null' => false])
-            ->addColumn('company_id', 'integer', ['null' => true])
+            ->addColumn('merchant_debtor_id', 'integer', ['null' => true])
+            ->addColumn('merchant_id', 'integer', ['null' => true])
             ->addColumn('delivery_address_id', 'integer', ['null' => false])
             ->addColumn('debtor_person_id', 'integer', ['null' => false])
             ->addColumn('debtor_external_data_id', 'integer', ['null' => false])
             ->addColumn('payment_id', 'char', ['null' => true, 'limit' => 36])
             ->addColumn('created_at', 'datetime', ['null' => false])
             ->addColumn('updated_at', 'datetime', ['null' => false])
-            ->addForeignKey('customer_id', 'customers', 'id')
-            ->addForeignKey('company_id', 'companies', 'id')
+            ->addForeignKey('merchant_debtor_id', 'merchants_debtors', 'id')
+            ->addForeignKey('merchant_id', 'merchants', 'id')
             ->addForeignKey('delivery_address_id', 'addresses', 'id')
             ->addForeignKey('debtor_person_id', 'persons', 'id')
             ->addForeignKey('debtor_external_data_id', 'debtor_external_data', 'id')
+            ->create()
+        ;
+
+        $this
+            ->table('order_transitions')
+            ->addColumn('transition', 'string', ['null' => false])
+            ->addColumn('order_id', 'integer', ['null' => false])
+            ->addColumn('transited_at', 'datetime', ['null' => false])
+            ->addForeignKey('order_id', 'orders', 'id')
             ->create()
         ;
 

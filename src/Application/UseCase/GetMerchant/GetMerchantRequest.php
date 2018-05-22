@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Application\UseCase\GetCustomer;
+namespace App\Application\UseCase\GetMerchant;
 
-class GetCustomerRequest
+class GetMerchantRequest
 {
     private $apiKey;
 

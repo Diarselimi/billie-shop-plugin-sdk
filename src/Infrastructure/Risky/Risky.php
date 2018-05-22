@@ -37,7 +37,7 @@ class Risky implements RiskyInterface, LoggingInterface
             $response = $this->client->post("/risk-check/order/$name", [
                 'json' => [
                     'external_code' => $order->getExternalCode(),
-                    'customer_id' => $order->getCustomerId(),
+                    'merchant_id' => $order->getMerchantId(),
                 ],
             ]);
         } catch (TransferException $exception) {

@@ -24,10 +24,10 @@ class OrderChecksRunnerService
 
     public function runChecks(OrderContainer $order, ?string $debtorCrefoId): bool
     {
-        $customer = $order->getCustomer();
-        $debtorId = $order->getCompany()->getDebtorId();
+        $merchant = $order->getMerchant();
+        $debtorId = $order->getMerchantDebtor()->getDebtorId();
 
-        $debtorNotCustomerCheck = $debtorId !== $customer->getDebtorId();
+        $debtorNotCustomerCheck = $debtorId !== $merchant->getCompanyId();
         if (!$debtorNotCustomerCheck) {
             return false;
         }

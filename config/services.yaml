@@ -48,10 +48,9 @@ services:
   App\DomainModel\Address\AddressRepositoryInterface: '@App\Infrastructure\Repository\AddressRepository'
   App\DomainModel\Person\PersonRepositoryInterface: '@App\Infrastructure\Repository\PersonRepository'
   App\DomainModel\DebtorExternalData\DebtorExternalDataInterface: '@App\Infrastructure\Repository\DebtorExternalData'
-  App\DomainModel\Customer\CustomerRepositoryInterface: '@App\Infrastructure\Repository\CustomerRepository'
-  App\DomainModel\Customer\CompanyRepositoryInterface: '@App\Infrastructure\Repository\CompanyRepository'
+  App\DomainModel\Customer\MerchantRepositoryInterface: '@App\Infrastructure\Repository\MerchantRepository'
+  App\DomainModel\Customer\MerchantDebtorRepositoryInterface: '@App\Infrastructure\Repository\MerchantDebtorRepository'
   App\DomainModel\Customer\RiskCheckRepositoryInterface: '@App\Infrastructure\Repository\RiskCheckRepository'
-  App\DomainModel\Company\CompanyRepositoryInterface: '@App\Infrastructure\Repository\CompanyRepository'
   App\DomainModel\OrderTransition\OrderTransitionRepositoryInterface: '@App\Infrastructure\Repository\OrderTransitionRepository'
 
   App\DomainModel\Alfred\AlfredInterface: '@App\Infrastructure\Alfred\Alfred'
