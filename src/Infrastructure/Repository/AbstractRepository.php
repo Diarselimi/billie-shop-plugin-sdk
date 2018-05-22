@@ -45,13 +45,18 @@ abstract class AbstractRepository implements LoggingInterface
         return (int)$this->conn->lastInsertId();
     }
 
-    protected function doUpdate(string $sql, array $params = [])
+    protected function doUpdate(string $query, array $parameters = [])
     {
-        $stmt = $this->conn->prepare($sql);
-        $res = $stmt->execute($params);
+        $stmt = $this->conn->prepare($query);
+        $res = $stmt->execute($parameters);
 
         if ($res !== true) {
-            throw new RepositoryException('Update operation failed');
+            $this->logInfo('Update failed', [
+                'query' => $query,
+                'params' => $parameters,
+            ]);
+
+            throw new RepositoryException('Update failed');
         }
     }
 }

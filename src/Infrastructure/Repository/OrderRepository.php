@@ -91,7 +91,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             UPDATE orders
             SET
               state = :state,
-              company_id = :company_id,
+              merchant_debtor_id = :merchant_debtor_id,
               amount_gross = :amount_gross,
               amount_net = :amount_net,
               amount_tax = :amount_tax,
@@ -103,7 +103,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             'amount_tax' => $order->getAmountTax(),
             'duration' => $order->getDuration(),
             'state' => $order->getState(),
-            'company_id' => $order->getMerchantDebtorId(),
+            'merchant_debtor_id' => $order->getMerchantDebtorId(),
             'id' => $order->getId(),
         ]);
 

@@ -37,7 +37,7 @@ class ExceptionSubscriber implements EventSubscriberInterface, LoggingInterface
 
         $error = [
             'code' => $errorCode,
-            'message' => $exception->getMessage(),
+            'error' => $exception->getMessage(),
             'stack' => $exception->getTraceAsString(),
         ];
 
