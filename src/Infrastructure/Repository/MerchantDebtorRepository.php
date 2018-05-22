@@ -21,7 +21,7 @@ class MerchantDebtorRepository extends AbstractRepository implements MerchantDeb
             INSERT INTO merchants_debtors
             (merchant_id, debtor_id, external_id, created_at, updated_at)
             VALUES
-            (:merchant_id, :debtor_id, :created_at, :updated_at)
+            (:merchant_id, :debtor_id, :external_id, :created_at, :updated_at)
         ', [
             'merchant_id' => $merchantDebtor->getMerchantId(),
             'debtor_id' => $merchantDebtor->getDebtorId(),
