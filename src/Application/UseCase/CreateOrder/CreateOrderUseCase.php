@@ -93,7 +93,7 @@ class CreateOrderUseCase implements LoggingInterface
             $debtorDTO = $this->identifyDebtor($orderContainer);
 
             if ($debtorDTO) {
-                $debtor = $this->merchantDebtorFactory->createFromDebtorDTO($debtorDTO, $merchantId);
+                $debtor = $this->merchantDebtorFactory->createFromDebtorDTO($debtorDTO, $merchantId, $request->getMerchantId());
                 $this->merchantDebtorRepository->insert($debtor);
             } else {
                 return null;
