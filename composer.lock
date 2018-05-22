@@ -206,16 +206,16 @@
         },
         {
             "name": "google/cloud-core",
-            "version": "v1.20.0",
+            "version": "v1.20.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GoogleCloudPlatform/google-cloud-php-core.git",
-                "reference": "63657a1b296bebab390f0415625b4088643d099f"
+                "reference": "c2d69fb26af37d19ca70437229eb81cea2a90e59"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GoogleCloudPlatform/google-cloud-php-core/zipball/63657a1b296bebab390f0415625b4088643d099f",
-                "reference": "63657a1b296bebab390f0415625b4088643d099f",
+                "url": "https://api.github.com/repos/GoogleCloudPlatform/google-cloud-php-core/zipball/c2d69fb26af37d19ca70437229eb81cea2a90e59",
+                "reference": "c2d69fb26af37d19ca70437229eb81cea2a90e59",
                 "shasum": ""
             },
             "require": {
@@ -261,26 +261,26 @@
                 "Apache-2.0"
             ],
             "description": "Google Cloud PHP shared dependency, providing functionality useful to all components.",
-            "time": "2018-04-30T21:10:30+00:00"
+            "time": "2018-05-17T16:38:58+00:00"
         },
         {
             "name": "google/cloud-logging",
-            "version": "v1.10.4",
+            "version": "v1.10.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GoogleCloudPlatform/google-cloud-php-logging.git",
-                "reference": "1d620b40570baad0e48d760f7d91acde01c2e218"
+                "reference": "aa3ce76b8f86ce4cfacf81f9f27b399212761b64"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GoogleCloudPlatform/google-cloud-php-logging/zipball/1d620b40570baad0e48d760f7d91acde01c2e218",
-                "reference": "1d620b40570baad0e48d760f7d91acde01c2e218",
+                "url": "https://api.github.com/repos/GoogleCloudPlatform/google-cloud-php-logging/zipball/aa3ce76b8f86ce4cfacf81f9f27b399212761b64",
+                "reference": "aa3ce76b8f86ce4cfacf81f9f27b399212761b64",
                 "shasum": ""
             },
             "require": {
                 "google/cloud-core": "^1.14",
                 "google/gax": "^0.31.1",
-                "google/proto-client": "^0.37"
+                "google/proto-client": "^0.38.0"
             },
             "require-dev": {
                 "erusev/parsedown": "^1.6",
@@ -314,7 +314,7 @@
                 "Apache-2.0"
             ],
             "description": "Stackdriver Logging Client for PHP",
-            "time": "2018-04-30T21:10:30+00:00"
+            "time": "2018-05-08T16:06:53+00:00"
         },
         {
             "name": "google/gax",
@@ -369,16 +369,16 @@
         },
         {
             "name": "google/proto-client",
-            "version": "0.37.0",
+            "version": "0.38.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/proto-client-php.git",
-                "reference": "fa092b339351fc38d204e39ea2e8bf9d4084bf86"
+                "reference": "45c3ea33f016fa96735bd65455798579c3180889"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/proto-client-php/zipball/fa092b339351fc38d204e39ea2e8bf9d4084bf86",
-                "reference": "fa092b339351fc38d204e39ea2e8bf9d4084bf86",
+                "url": "https://api.github.com/repos/googleapis/proto-client-php/zipball/45c3ea33f016fa96735bd65455798579c3180889",
+                "reference": "45c3ea33f016fa96735bd65455798579c3180889",
                 "shasum": ""
             },
             "require": {
@@ -405,7 +405,7 @@
             "keywords": [
                 "google"
             ],
-            "time": "2018-04-13T18:48:01+00:00"
+            "time": "2018-05-07T20:03:13+00:00"
         },
         {
             "name": "google/protobuf",
@@ -450,16 +450,16 @@
         },
         {
             "name": "grpc/grpc",
-            "version": "1.10.0",
+            "version": "1.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/grpc/grpc-php.git",
-                "reference": "741f59bac86c7b5e45818c8f2eec6980921bce23"
+                "reference": "ad3f6a2bb47475a32a7cdf23da3f67957e0e5aab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/grpc/grpc-php/zipball/741f59bac86c7b5e45818c8f2eec6980921bce23",
-                "reference": "741f59bac86c7b5e45818c8f2eec6980921bce23",
+                "url": "https://api.github.com/repos/grpc/grpc-php/zipball/ad3f6a2bb47475a32a7cdf23da3f67957e0e5aab",
+                "reference": "ad3f6a2bb47475a32a7cdf23da3f67957e0e5aab",
                 "shasum": ""
             },
             "require": {
@@ -487,7 +487,7 @@
             "keywords": [
                 "rpc"
             ],
-            "time": "2018-03-28T22:54:08+00:00"
+            "time": "2018-05-15T22:09:16+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -1682,16 +1682,16 @@
         },
         {
             "name": "symfony/flex",
-            "version": "v1.0.79",
+            "version": "v1.0.80",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/flex.git",
-                "reference": "399e72968d5baa698788e6116fe0f47f269724e0"
+                "reference": "729aee08d62b47224e85b83c97e2824ff7d1735e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/flex/zipball/399e72968d5baa698788e6116fe0f47f269724e0",
-                "reference": "399e72968d5baa698788e6116fe0f47f269724e0",
+                "url": "https://api.github.com/repos/symfony/flex/zipball/729aee08d62b47224e85b83c97e2824ff7d1735e",
+                "reference": "729aee08d62b47224e85b83c97e2824ff7d1735e",
                 "shasum": ""
             },
             "require": {
@@ -1724,7 +1724,7 @@
                     "email": "fabien.potencier@gmail.com"
                 }
             ],
-            "time": "2018-04-27T05:19:26+00:00"
+            "time": "2018-05-02T19:08:56+00:00"
         },
         {
             "name": "symfony/framework-bundle",
