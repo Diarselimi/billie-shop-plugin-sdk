@@ -57,6 +57,8 @@ class CreateOrderUseCase implements LoggingInterface
 
         if (!$this->orderChecksRunnerService->runPreconditionChecks($orderContainer)) {
             $this->reject($orderContainer, 'preconditions checks failed');
+
+            return;
         }
 
         $debtorDTO = $this->retrieveDebtor($orderContainer, $request);
