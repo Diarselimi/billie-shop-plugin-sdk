@@ -126,12 +126,12 @@ class DebtorExternalDataEntity extends AbstractEntity
         return $this;
     }
 
-    public function isEstablishedCustomer(): bool
+    public function isEstablishedCustomer(): ?bool
     {
         return $this->establishedCustomer;
     }
 
-    public function setEstablishedCustomer(bool $establishedCustomer): DebtorExternalDataEntity
+    public function setEstablishedCustomer(?bool $establishedCustomer): DebtorExternalDataEntity
     {
         $this->establishedCustomer = $establishedCustomer;
 
