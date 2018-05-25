@@ -57,6 +57,8 @@ class CreateOrderUseCase implements LoggingInterface
 
         if (!$this->orderChecksRunnerService->runPreconditionChecks($orderContainer)) {
             $this->reject($orderContainer, 'preconditions checks failed');
+
+            return;
         }
 
         $debtorDTO = $this->retrieveDebtor($orderContainer, $request);
@@ -119,6 +121,10 @@ class CreateOrderUseCase implements LoggingInterface
             'address_postal_code' => $orderContainer->getDebtorExternalDataAddress()->getPostalCode(),
             'address_city' => $orderContainer->getDebtorExternalDataAddress()->getCity(),
             'address_country' => $orderContainer->getDebtorExternalDataAddress()->getCountry(),
+            'tax_id' => $orderContainer->getDebtorExternalData()->getTaxId(),
+            'tax_number' => $orderContainer->getDebtorExternalData()->getTaxNumber(),
+            'registration_number' => $orderContainer->getDebtorExternalData()->getRegistrationNumber(),
+            'registration_court' => $orderContainer->getDebtorExternalData()->getRegistrationCourt(),
         ]);
     }
 
