@@ -34,7 +34,7 @@ class Risky implements RiskyInterface, LoggingInterface
     public function runOrderCheck(OrderEntity $order, string $name): bool
     {
         try {
-            $response = $this->client->post("/risk-check/order/$name", [
+            $httpResponse = $this->client->post("/risk-check/order/$name", [
                 'json' => [
                     'external_code' => $order->getExternalCode(),
                     'merchant_id' => $order->getMerchantId(),
@@ -49,10 +49,14 @@ class Risky implements RiskyInterface, LoggingInterface
             );
         }
 
-        $response = (string) $response->getBody();
+        $response = (string) $httpResponse->getBody();
         $response = json_decode($response, true);
 
         if (!$response) {
+            $this->logError("Risky response couldn't be decoded", [
+                'response' => (string) $httpResponse->getBody(),
+            ]);
+
             throw new PaellaCoreCriticalException(
                 "Risky response couldn't be decoded",
                 PaellaCoreCriticalException::CODE_RISKY_EXCEPTION
@@ -71,7 +75,7 @@ class Risky implements RiskyInterface, LoggingInterface
         $address = $orderContainer->getDebtorExternalDataAddress();
 
         try {
-            $response = $this->client->post("/risk-check/company/company_b2b_score", [
+            $httpResponse = $this->client->post("/risk-check/company/company_b2b_score", [
                 'json' => [
                     'company_name' => $debtorData->getName(),
                     'house' => $address->getHouseNumber(),
@@ -96,10 +100,14 @@ class Risky implements RiskyInterface, LoggingInterface
             return false;
         }
 
-        $response = (string) $response->getBody();
+        $response = (string) $httpResponse->getBody();
         $response = json_decode($response, true);
 
         if (!$response) {
+            $this->logError("Risky response couldn't be decoded", [
+                'response' => (string) $httpResponse->getBody(),
+            ]);
+
             throw new PaellaCoreCriticalException(
                 "Risky response couldn't be decoded",
                 PaellaCoreCriticalException::CODE_RISKY_EXCEPTION
