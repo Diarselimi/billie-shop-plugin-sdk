@@ -3,11 +3,6 @@ parameters:
   google_cloud_project_id: bbox-150315
   google_cloud_credentials_file_path: '%kernel.root_dir%/../config/secrets/gcloud.json'
   log_channel: paella_core
-  pusher_cluster: eu
-  pusher_encoded: true
-  pusher_key: 675918b1320742f6a395
-  pusher_secret: 38f827db284383ddbd9a
-  pusher_app_id: 532195
 
 services:
   _defaults:
@@ -74,11 +69,3 @@ services:
       $channel: '%log_channel%'
 
   Symfony\Component\Workflow\Workflow: '@state_machine.order'
-
-  Pusher\Pusher:
-    public: true
-    arguments:
-      - '%pusher_key%'
-      - '%pusher_secret%'
-      - '%pusher_app_id%'
-      - {cluster: '%pusher_cluster%', encrypted: '%pusher_encoded%'}

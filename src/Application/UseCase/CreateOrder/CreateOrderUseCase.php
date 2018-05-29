@@ -15,7 +15,6 @@ use App\DomainModel\Order\OrderContainer;
 use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
-use Pusher\Pusher;
 use Symfony\Component\Workflow\Workflow;
 
 class CreateOrderUseCase implements LoggingInterface
@@ -30,7 +29,6 @@ class CreateOrderUseCase implements LoggingInterface
     private $merchantDebtorFactory;
     private $orderRepository;
     private $workflow;
-    private $pusher;
 
     public function __construct(
         OrderPersistenceService $orderPersistenceService,
@@ -41,8 +39,7 @@ class CreateOrderUseCase implements LoggingInterface
         MerchantRepositoryInterface $merchantRepository,
         MerchantDebtorEntityFactory $merchantDebtorFactory,
         OrderRepositoryInterface $orderRepository,
-        Workflow $workflow,
-        Pusher $pusher
+        Workflow $workflow
     ) {
         $this->orderPersistenceService = $orderPersistenceService;
         $this->orderChecksRunnerService = $orderChecksRunnerService;
@@ -52,7 +49,6 @@ class CreateOrderUseCase implements LoggingInterface
         $this->merchantDebtorFactory = $merchantDebtorFactory;
         $this->orderRepository = $orderRepository;
         $this->workflow = $workflow;
-        $this->pusher = $pusher;
     }
 
     public function execute(CreateOrderRequest $request): void
@@ -137,11 +133,6 @@ class CreateOrderUseCase implements LoggingInterface
         $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_DECLINE);
         $this->orderRepository->update($orderContainer->getOrder());
 
-        $this->pusher->trigger('billie_approvals', 'reject', [
-            'order_external_code' => $orderContainer->getOrder()->getExternalCode(),
-            'amount' => $orderContainer->getOrder()->getAmountGross(),
-        ]);
-
         $this->logInfo("Order declined because of $message");
     }
 
@@ -153,11 +144,6 @@ class CreateOrderUseCase implements LoggingInterface
         $customer = $orderContainer->getMerchant();
         $customer->reduceAvailableFinancingLimit($orderContainer->getOrder()->getAmountGross());
         $this->merchantRepository->update($customer);
-
-        $this->pusher->trigger('billie_approvals', 'approve', [
-            'order_external_code' => $orderContainer->getOrder()->getExternalCode(),
-            'amount' => $orderContainer->getOrder()->getAmountGross(),
-        ]);
 
         $this->logInfo("Order approved!");
     }

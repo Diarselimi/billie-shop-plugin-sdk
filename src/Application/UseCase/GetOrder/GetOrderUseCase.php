@@ -11,6 +11,7 @@ use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
+use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use Symfony\Component\HttpFoundation\Response;
 
 class GetOrderUseCase
@@ -22,6 +23,7 @@ class GetOrderUseCase
     private $alfred;
     private $borscht;
     private $orderStateManager;
+    private $declinedReasonsMapper;
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
@@ -30,7 +32,8 @@ class GetOrderUseCase
         DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
         AlfredInterface $alfred,
         BorschtInterface $borscht,
-        OrderStateManager $orderStateManager
+        OrderStateManager $orderStateManager,
+        OrderDeclinedReasonsMapper $declinedReasonsMapper
     ) {
         $this->orderRepository = $orderRepository;
         $this->merchantDebtorRepository = $merchantDebtorRepository;
@@ -39,6 +42,7 @@ class GetOrderUseCase
         $this->alfred = $alfred;
         $this->borscht = $borscht;
         $this->orderStateManager = $orderStateManager;
+        $this->declinedReasonsMapper = $declinedReasonsMapper;
     }
 
     public function execute(GetOrderRequest $request): GetOrderResponse
@@ -79,7 +83,7 @@ class GetOrderUseCase
         }
 
         if ($this->orderStateManager->isDeclined($order)) {
-            $response->setReasons(['risk_policy']);
+            $response->setReasons($this->declinedReasonsMapper->mapReasons($order));
         }
 
         return $response;

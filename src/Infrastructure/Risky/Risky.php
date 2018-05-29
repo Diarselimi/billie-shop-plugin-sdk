@@ -63,7 +63,7 @@ class Risky implements RiskyInterface, LoggingInterface
             );
         }
 
-        $check = $this->riskCheckFactory->create($order->getId(), $response['check_id'], $response['passed']);
+        $check = $this->riskCheckFactory->create($order->getId(), $response['check_id'], $name, $response['passed']);
         $this->riskCheckRepository->insert($check);
 
         return $check->isPassed();
@@ -114,7 +114,8 @@ class Risky implements RiskyInterface, LoggingInterface
             );
         }
 
-        $check = $this->riskCheckFactory->create($orderContainer->getOrder()->getId(), $response['check_id'], $response['passed']);
+        $id = $orderContainer->getOrder()->getId();
+        $check = $this->riskCheckFactory->create($id, $response['check_id'], 'company_b2b_score', $response['passed']);
         $this->riskCheckRepository->insert($check);
 
         return $check->isPassed();
