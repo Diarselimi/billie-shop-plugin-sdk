@@ -93,6 +93,7 @@ class InitialStructure extends AbstractMigration
             ->addColumn('debtor_person_id', 'integer', ['null' => false])
             ->addColumn('debtor_external_data_id', 'integer', ['null' => false])
             ->addColumn('payment_id', 'char', ['null' => true, 'limit' => 36])
+            ->addColumn('uuid', 'char', ['null' => false, 'limit' => 36])
             ->addColumn('created_at', 'datetime', ['null' => false])
             ->addColumn('updated_at', 'datetime', ['null' => false])
             ->addForeignKey('merchant_debtor_id', 'merchants_debtors', 'id')
