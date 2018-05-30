@@ -95,6 +95,9 @@
     "monolog/monolog": {
         "version": "1.23.0"
     },
+    "paragonie/random_compat": {
+        "version": "v2.0.12"
+    },
     "psr/cache": {
         "version": "1.0.1"
     },
@@ -110,8 +113,20 @@
     "psr/simple-cache": {
         "version": "1.0.1"
     },
+    "pusher/pusher-php-server": {
+        "version": "3.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "3.0",
+            "ref": "8dd3ea817217453e14ab596317177465211e01d2"
+        }
+    },
     "ralouphie/getallheaders": {
         "version": "2.0.5"
+    },
+    "ramsey/uuid": {
+        "version": "3.7.3"
     },
     "rize/uri-template": {
         "version": "0.3.2"

@@ -5,6 +5,7 @@ namespace App\Infrastructure\Repository;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderLifecycleEvent;
 use App\DomainModel\Order\OrderRepositoryInterface;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OrderRepository extends AbstractRepository implements OrderRepositoryInterface
@@ -20,9 +21,9 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
     {
         $id = $this->doInsert('
             INSERT INTO orders
-            (amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, delivery_address_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, created_at, updated_at)
+            (amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, delivery_address_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, uuid, created_at, updated_at)
             VALUES
-            (:amount_net, :amount_gross, :amount_tax, :duration, :external_code, :state, :external_comment, :internal_comment, :invoice_number, :invoice_url, :delivery_address_id, :merchant_id, :debtor_person_id, :debtor_external_data_id, :payment_id, :created_at, :updated_at)
+            (:amount_net, :amount_gross, :amount_tax, :duration, :external_code, :state, :external_comment, :internal_comment, :invoice_number, :invoice_url, :delivery_address_id, :merchant_id, :debtor_person_id, :debtor_external_data_id, :payment_id, :uuid, :created_at, :updated_at)
             
         ', [
             'amount_net' => $order->getAmountNet(),
@@ -40,6 +41,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             'debtor_person_id' => $order->getDebtorPersonId(),
             'debtor_external_data_id' => $order->getDebtorExternalDataId(),
             'payment_id' => $order->getPaymentId(),
+            'uuid' => Uuid::uuid4()->toString(),
             'created_at' => $order->getCreatedAt()->format('Y-m-d H:i:s'),
             'updated_at' => $order->getUpdatedAt()->format('Y-m-d H:i:s'),
         ]);

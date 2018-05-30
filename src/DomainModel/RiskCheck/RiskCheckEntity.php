@@ -8,6 +8,7 @@ class RiskCheckEntity extends AbstractEntity
 {
     private $checkId;
     private $orderId;
+    private $name;
     private $isPassed;
 
     public function getCheckId(): int
@@ -30,6 +31,18 @@ class RiskCheckEntity extends AbstractEntity
     public function setOrderId(int $orderId): RiskCheckEntity
     {
         $this->orderId = $orderId;
+
+        return $this;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): RiskCheckEntity
+    {
+        $this->name = $name;
 
         return $this;
     }

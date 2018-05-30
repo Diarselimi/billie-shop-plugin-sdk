@@ -90,12 +90,12 @@ class DebtorExternalDataEntity extends AbstractEntity
         return $this;
     }
 
-    public function getSubindustrySector(): string
+    public function getSubindustrySector(): ?string
     {
         return $this->subindustrySector;
     }
 
-    public function setSubindustrySector(string $subindustrySector): DebtorExternalDataEntity
+    public function setSubindustrySector(?string $subindustrySector): DebtorExternalDataEntity
     {
         $this->subindustrySector = $subindustrySector;
 
