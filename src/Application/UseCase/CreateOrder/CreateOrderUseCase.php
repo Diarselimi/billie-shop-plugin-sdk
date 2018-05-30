@@ -125,6 +125,7 @@ class CreateOrderUseCase implements LoggingInterface
             'tax_number' => $orderContainer->getDebtorExternalData()->getTaxNumber(),
             'registration_number' => $orderContainer->getDebtorExternalData()->getRegistrationNumber(),
             'registration_court' => $orderContainer->getDebtorExternalData()->getRegistrationCourt(),
+            'legal_form' => $orderContainer->getDebtorExternalData()->getLegalForm(),
         ]);
     }
 
