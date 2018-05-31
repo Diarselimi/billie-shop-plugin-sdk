@@ -37,6 +37,7 @@ class OrderChecksRunnerService implements LoggingInterface
         $merchant = $order->getMerchant();
         $debtorId = $order->getMerchantDebtor()->getDebtorId();
 
+        $this->logWaypoint('debtor != merchant check');
         $debtorNotCustomerCheck = $debtorId !== $merchant->getCompanyId();
         if (!$debtorNotCustomerCheck) {
             $this->logInfo('Debtor not customer check failed');
@@ -44,6 +45,7 @@ class OrderChecksRunnerService implements LoggingInterface
             return false;
         }
 
+        $this->logWaypoint('address check');
         $addressCheck = $this->risky->runOrderCheck($order->getOrder(), RiskyInterface::DEBTOR_ADDRESS);
         if (!$addressCheck) {
             $this->logInfo('Address check failed');
@@ -51,6 +53,7 @@ class OrderChecksRunnerService implements LoggingInterface
             return false;
         }
 
+        $this->logWaypoint('blacklist check');
         $blackListCheck = true;
         if (!$blackListCheck) {
             $this->logInfo('Black list check failed');
@@ -58,6 +61,7 @@ class OrderChecksRunnerService implements LoggingInterface
             return false;
         }
 
+        $this->logWaypoint('overdue check');
         $debtorOverDueCheck = true;
         if (!$debtorOverDueCheck) {
             $this->logInfo('Debtor overdue check failed');
@@ -65,6 +69,7 @@ class OrderChecksRunnerService implements LoggingInterface
             return false;
         }
 
+        $this->logWaypoint('debtor score check');
         $debtorScoreCheck = $this->risky->runDebtorScoreCheck($order, $debtorCrefoId);
         if (!$debtorScoreCheck) {
             $this->logInfo('Debtor score check failed');

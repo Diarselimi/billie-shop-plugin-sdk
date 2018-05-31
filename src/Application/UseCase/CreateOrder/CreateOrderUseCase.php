@@ -70,6 +70,7 @@ class CreateOrderUseCase implements LoggingInterface
 
         $this->orderRepository->update($orderContainer->getOrder());
 
+        $this->logWaypoint('limit check');
         if (!$this->alfred->lockDebtorLimit($orderContainer->getMerchantDebtor()->getDebtorId(), $orderContainer->getOrder()->getAmountGross())) {
             $this->reject($orderContainer, "debtor limit exceeded");
 
@@ -90,17 +91,23 @@ class CreateOrderUseCase implements LoggingInterface
     {
         $merchantId = $request->getMerchantCustomerId();
         $debtor = $this->merchantDebtorRepository->getOneByExternalId($merchantId);
+        $this->logWaypoint('known customer check');
 
         if (!$debtor) {
+            $this->logInfo('Start the debtor identification');
             $debtorDTO = $this->identifyDebtor($orderContainer);
 
             if ($debtorDTO) {
+                $this->logInfo('Debtor identified');
                 $debtor = $this->merchantDebtorFactory->createFromDebtorDTO($debtorDTO, $merchantId, $request->getMerchantId());
                 $this->merchantDebtorRepository->insert($debtor);
             } else {
+                $this->logInfo('Debtor could not be identification');
+
                 return null;
             }
         } else {
+            $this->logInfo('Debtor already known');
             $debtorDTO = $this->alfred->getDebtor($debtor->getDebtorId());
         }
 
