@@ -25,7 +25,9 @@ return [
         ]
     ],
     'paths' => [
-        'migrations' => '%%PHINX_CONFIG_DIR%%/db/migrations',
-        'seeds' => '%%PHINX_CONFIG_DIR%%/db/migrations',
+        'migrations' => [
+            '%%PHINX_CONFIG_DIR%%/db/migrations/common',
+            '%%PHINX_CONFIG_DIR%%/db/migrations/'.getenv('APP_ENV'),
+        ],
     ],
 ];

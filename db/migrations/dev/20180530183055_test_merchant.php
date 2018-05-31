@@ -1,13 +1,13 @@
 <?php
 
-use Phinx\Seed\AbstractSeed;
+use Phinx\Migration\AbstractMigration;
 
-class SeedTestMerchant extends AbstractSeed
+class TestMerchant extends AbstractMigration
 {
-    public function run()
+    public function up()
     {
         $now = (new \DateTime())->format('Y-m-d H:i:s');
-        $this->table('merchants')->insert([[
+        $this->table('merchants')->insert([
             'name' => 'Contorion',
             'available_financing_limit' => 2000000,
             'api_key' => 'billie',
@@ -16,6 +16,6 @@ class SeedTestMerchant extends AbstractSeed
             'company_id' => 4,
             'created_at' => $now,
             'updated_at' => $now,
-        ]])->save();
+        ])->saveData();
     }
 }
