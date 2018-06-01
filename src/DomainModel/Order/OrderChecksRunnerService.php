@@ -10,23 +10,30 @@ class OrderChecksRunnerService implements LoggingInterface
 {
     use LoggingTrait;
 
-    private $risky;
+    private const OVERDUE_MAX_DAYS = 30;
 
-    public function __construct(RiskyInterface $risky)
+    private $risky;
+    private $orderRepository;
+
+    public function __construct(RiskyInterface $risky, OrderRepositoryInterface $orderRepository)
     {
         $this->risky = $risky;
+        $this->orderRepository = $orderRepository;
     }
 
     public function runPreconditionChecks(OrderContainer $order): bool
     {
         $amountCheck = $this->risky->runOrderCheck($order->getOrder(), RiskyInterface::AMOUNT);
         $debtorCountryCheck = $this->risky->runOrderCheck($order->getOrder(), RiskyInterface::DEBTOR_COUNTRY);
-        $debtorIndustrySectorCheck = $this->risky->runOrderCheck($order->getOrder(), RiskyInterface::DEBTOR_INDUSTRY_SECTOR);
+        $debtorIndustrySectorCheck = $this->risky->runOrderCheck(
+            $order->getOrder(),
+            RiskyInterface::DEBTOR_INDUSTRY_SECTOR
+        );
 
         $this->logInfo('Precondition checks: amount: {amount}, country: {country}, industry sector: {industry}', [
-            'amount' => (int) $amountCheck,
-            'country' => (int) $debtorCountryCheck,
-            'industry' => (int) $debtorIndustrySectorCheck,
+            'amount' => (int)$amountCheck,
+            'country' => (int)$debtorCountryCheck,
+            'industry' => (int)$debtorIndustrySectorCheck,
         ]);
 
         return $amountCheck && $debtorCountryCheck && $debtorIndustrySectorCheck;
@@ -62,7 +69,7 @@ class OrderChecksRunnerService implements LoggingInterface
         }
 
         $this->logWaypoint('overdue check');
-        $debtorOverDueCheck = true;
+        $debtorOverDueCheck = $this->getMerchantDebtorOverdues($order);
         if (!$debtorOverDueCheck) {
             $this->logInfo('Debtor overdue check failed');
 
@@ -78,6 +85,20 @@ class OrderChecksRunnerService implements LoggingInterface
         }
 
         $this->logInfo('Main checks passed');
+
+        return true;
+    }
+
+    private function getMerchantDebtorOverdues(OrderContainer $order): bool
+    {
+        $overdues = $this->orderRepository->getCustomerOverdues($order->getOrder()->getMerchantDebtorId());
+        foreach ($overdues as $overdue) {
+            if ($overdue > static::OVERDUE_MAX_DAYS) {
+                $this->logInfo('Debtor overdue check failed');
+
+                return false;
+            }
+        }
 
         return true;
     }

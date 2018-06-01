@@ -49,7 +49,7 @@ class Risky implements RiskyInterface, LoggingInterface
             );
         }
 
-        $response = (string) $httpResponse->getBody();
+        $response = (string)$httpResponse->getBody();
         $response = json_decode($response, true);
 
         if (!$response) {

@@ -62,8 +62,8 @@ class CreateOrderUseCase implements LoggingInterface
         }
 
         $debtorDTO = $this->retrieveDebtor($orderContainer, $request);
-        if (is_null($debtorDTO)) {
-            $this->reject($orderContainer, "debtor couldn't identified");
+        if ($debtorDTO === null) {
+            $this->reject($orderContainer, "debtor couldn't be identified");
 
             return;
         }
@@ -71,14 +71,20 @@ class CreateOrderUseCase implements LoggingInterface
         $this->orderRepository->update($orderContainer->getOrder());
 
         $this->logWaypoint('limit check');
-        if (!$this->alfred->lockDebtorLimit($orderContainer->getMerchantDebtor()->getDebtorId(), $orderContainer->getOrder()->getAmountGross())) {
+        if (!$this->alfred->lockDebtorLimit(
+            $orderContainer->getMerchantDebtor()->getDebtorId(),
+            $orderContainer->getOrder()->getAmountGross()
+        )) {
             $this->reject($orderContainer, "debtor limit exceeded");
 
             return;
         }
 
         if (!$this->orderChecksRunnerService->runChecks($orderContainer, $debtorDTO->getCrefoId())) {
-            $this->alfred->unlockDebtorLimit($orderContainer->getMerchantDebtor()->getDebtorId(), $orderContainer->getOrder()->getAmountGross());
+            $this->alfred->unlockDebtorLimit(
+                $orderContainer->getMerchantDebtor()->getDebtorId(),
+                $orderContainer->getOrder()->getAmountGross()
+            );
             $this->reject($orderContainer, 'checks failed');
 
             return;
@@ -99,7 +105,11 @@ class CreateOrderUseCase implements LoggingInterface
 
             if ($debtorDTO) {
                 $this->logInfo('Debtor identified');
-                $debtor = $this->merchantDebtorFactory->createFromDebtorDTO($debtorDTO, $merchantId, $request->getMerchantId());
+                $debtor = $this->merchantDebtorFactory->createFromDebtorDTO(
+                    $debtorDTO,
+                    $merchantId,
+                    $request->getMerchantId()
+                );
                 $this->merchantDebtorRepository->insert($debtor);
             } else {
                 $this->logInfo('Debtor could not be identification');
@@ -113,8 +123,7 @@ class CreateOrderUseCase implements LoggingInterface
 
         $orderContainer
             ->setMerchantDebtor($debtor)
-            ->getOrder()->setMerchantDebtorId($debtor->getId())
-        ;
+            ->getOrder()->setMerchantDebtorId($debtor->getId());
 
         return $debtorDTO;
     }
