@@ -32,7 +32,7 @@ class Borscht implements BorschtInterface
             );
         }
 
-        $response = (string) $response->getBody();
+        $response = (string)$response->getBody();
         $response = json_decode($response, true);
         if (!$response) {
             throw new PaellaCoreCriticalException(
@@ -43,8 +43,7 @@ class Borscht implements BorschtInterface
 
         return (new DebtorPaymentDetailsDTO())
             ->setBankAccountBic($response['bic'])
-            ->setBankAccountIban($response['iban'])
-        ;
+            ->setBankAccountIban($response['iban']);
     }
 
     public function getOrderPaymentDetails(string $orderPaymentId): OrderPaymentDetailsDTO
@@ -53,8 +52,7 @@ class Borscht implements BorschtInterface
             ->setPayoutAmount(5000)
             ->setFeeAmount(100)
             ->setFeeRate(1.5)
-            ->setDueDate(new \DateTime())
-        ;
+            ->setDueDate(new \DateTime());
     }
 
     public function cancelOrder(OrderEntity $order): void
@@ -102,6 +100,28 @@ class Borscht implements BorschtInterface
                 'json' => [
                     'ticket_id' => $order->getId(),
                     'amount' => $amount,
+                ],
+            ]);
+        } catch (TransferException $exception) {
+            throw new PaellaCoreCriticalException(
+                'Borscht is not available right now',
+                PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION,
+                null,
+                $exception
+            );
+        }
+    }
+
+    public function ship(OrderEntity $order): void
+    {
+        try {
+            $this->client->post('/order.json', [
+                'json' => [
+                    'debtor_id' => $order->getMerchantDebtorId(),
+                    'invoice_number' => $order->getInvoiceNumber(),
+                    'billing_date' => $order->getCreatedAt()->format('Y-m-d H:i:s'),
+                    'duration' => $order->getDuration(),
+                    'amount' => $order->getAmountGross(),
                 ],
             ]);
         } catch (TransferException $exception) {

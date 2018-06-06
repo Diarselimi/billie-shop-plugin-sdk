@@ -15,4 +15,6 @@ interface BorschtInterface
     public function modifyOrder(OrderEntity $order): void;
 
     public function confirmPayment(OrderEntity $order, float $amount): void;
+
+    public function ship(OrderEntity $order): void;
 }
