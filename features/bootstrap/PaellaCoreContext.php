@@ -2,10 +2,8 @@
 
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\Address\AddressRepositoryInterface;
-use App\DomainModel\Company\CompanyEntity;
-use App\DomainModel\Company\CompanyRepositoryInterface;
-use App\DomainModel\Customer\CustomerEntity;
-use App\DomainModel\Customer\CustomerRepositoryInterface;
+use App\DomainModel\Merchant\MerchantEntity;
+use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
@@ -21,7 +19,7 @@ use donatj\MockWebServer\MockWebServer;
 use donatj\MockWebServer\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class PaellaCoreContext extends MinkContext implements Context
+class PaellaCoreContext extends MinkContext
 {
     use KernelDictionary;
 
@@ -39,13 +37,14 @@ class PaellaCoreContext extends MinkContext implements Context
         $this->borscht = new MockWebServer(8025);
         $this->risky = new MockWebServer(8026);
 
-        $this->getCustomerRepository()->insert(
-            (new CustomerEntity())
+        $this->getMerchantRepository()->insert(
+            (new MerchantEntity())
                 ->setName('Behat User')
                 ->setIsActive(true)
                 ->setRoles('["ROLE_NOTHING"]')
                 ->setAvailableFinancingLimit(10000)
                 ->setApiKey('test')
+                ->setCompanyId('1')
         );
     }
 
@@ -61,12 +60,12 @@ class PaellaCoreContext extends MinkContext implements Context
             DELETE FROM order_transitions;
             DELETE FROM risk_checks;
             DELETE FROM orders;
-            DELETE FROM companies;
             DELETE FROM persons;
             DELETE FROM debtor_external_data;
             DELETE FROM addresses;
-            DELETE FROM customers;
-            ALTER TABLE customers AUTO_INCREMENT = 1;
+            DELETE FROM merchants_debtors;
+            DELETE FROM merchants;
+            ALTER TABLE merchants AUTO_INCREMENT = 1;
         ');
     }
 
@@ -126,11 +125,6 @@ class PaellaCoreContext extends MinkContext implements Context
      */
     public function iHaveAnOrder($state, $externalCode, $gross, $net, $tax, $duration, $comment)
     {
-        $company = (new CompanyEntity())
-            ->setDebtorId('1')
-            ->setMerchantId('test');
-        $this->getCompanyRepository()->insert($company);
-
         $person = (new PersonEntity())
             ->setFirstName('test')
             ->setLastName('test')
@@ -177,7 +171,8 @@ class PaellaCoreContext extends MinkContext implements Context
             ->setDeliveryAddressId($deliveryAddress->getId())
             ->setDebtorExternalDataId($debtor->getId())
             ->setExternalComment($comment)
-            ->setMerchantDebtorId($company->getId());
+            ->setMerchantDebtorId('1')
+            ->setMerchantId('1');
 
         $this->getOrderRepository()->insert($order);
     }
@@ -250,14 +245,9 @@ class PaellaCoreContext extends MinkContext implements Context
         return $this->get(OrderRepositoryInterface::class);
     }
 
-    private function getCustomerRepository(): CustomerRepositoryInterface
+    private function getMerchantRepository(): MerchantRepositoryInterface
     {
-        return $this->get(CustomerRepositoryInterface::class);
-    }
-
-    private function getCompanyRepository(): CompanyRepositoryInterface
-    {
-        return $this->get(CompanyRepositoryInterface::class);
+        return $this->get(MerchantRepositoryInterface::class);
     }
 
     private function getConnection(): \PDO
