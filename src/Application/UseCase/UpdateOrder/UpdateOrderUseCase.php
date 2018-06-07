@@ -52,22 +52,26 @@ class UpdateOrderUseCase
 
         $changed = false;
         $amountChanged = 0;
-
-        // Amount
-        if ($request->getAmountGross() !== null && (float)$request->getAmountGross() !== $order->getAmountGross()) {
-            $amountChanged = $order->getAmountGross() - $request->getAmountGross();
-            $order
-                ->setAmountGross($request->getAmountGross())
-                ->setAmountNet($request->getAmountNet())
-                ->setAmountTax($request->getAmountTax());
-            $changed = true;
-        }
+        $durationChanged = false;
 
         // Duration
         if ($request->getDuration() !== null && $request->getDuration() !== $order->getDuration()) {
             if ($this->orderStateManager->wasShipped($order)) {
                 $order
                     ->setDuration($request->getDuration());
+                $changed = true;
+            }
+            $durationChanged = true;
+        }
+
+        // Amount
+        if ($request->getAmountGross() !== null && (float)$request->getAmountGross() !== $order->getAmountGross()) {
+            if ($this->orderStateManager->wasShipped($order) || !$durationChanged) {
+                $amountChanged = $order->getAmountGross() - $request->getAmountGross();
+                $order
+                    ->setAmountGross($request->getAmountGross())
+                    ->setAmountNet($request->getAmountNet())
+                    ->setAmountTax($request->getAmountTax());
                 $changed = true;
             }
         }
