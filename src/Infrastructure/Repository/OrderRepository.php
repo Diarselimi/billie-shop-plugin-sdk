@@ -100,8 +100,8 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
               amount_net = :amount_net,
               amount_tax = :amount_tax,
               duration = :duration,
-              shipped_at = :shipped_at
-              payment_id = :payment_id,
+              shipped_at = :shipped_at,
+              payment_id = :payment_id
             WHERE id = :id
         ', [
             'amount_gross' => $order->getAmountGross(),
