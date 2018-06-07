@@ -97,8 +97,6 @@ class OrderChecksRunnerService implements LoggingInterface
         $overdues = $this->orderRepository->getCustomerOverdues($order->getOrder()->getMerchantDebtorId());
         foreach ($overdues as $overdue) {
             if ($overdue > static::OVERDUE_MAX_DAYS) {
-                $this->logInfo('Debtor overdue check failed');
-
                 return false;
             }
         }

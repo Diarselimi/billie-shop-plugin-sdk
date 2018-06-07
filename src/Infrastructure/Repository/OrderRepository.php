@@ -131,14 +131,14 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             SELECT CEIL((:current_time - UNIX_TIMESTAMP(`shipped_at`) - (`duration` * 86400)) / 86400) as `overdue`
             FROM `orders`
             WHERE `merchant_debtor_id` = :merchant_debtor_id
-            AND `state` = :status
+            AND `state` = :state
             AND `shipped_at` IS NOT NULL
         ';
         $stmt = $this->conn->prepare($query);
         $stmt->execute([
             'current_time' => time(),
             'merchant_debtor_id' => $merchantDebtorId,
-            'status' => OrderStateManager::STATE_LATE,
+            'state' => OrderStateManager::STATE_LATE,
         ]);
 
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {

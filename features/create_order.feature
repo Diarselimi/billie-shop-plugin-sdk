@@ -71,14 +71,8 @@ Feature:
         }
         """
         And print last JSON response
-        And the response status code should be 403
-        And the JSON response should be:
-        """
-        {
-            "code":"order_rejected",
-            "message":"debtor couldn\u0027t be identified"
-        }
-        """
+        And the response should be empty
+        Then the order A1 is declined
 
     Scenario: Successful order creation
         Given I add "Content-type" header equal to "application/json"
@@ -108,7 +102,7 @@ Feature:
         And I get from alfred "/debtor/identify" endpoint response with status 200 and body
         """
         {
-          "id": 4,
+          "id": 1,
           "payment_id": "test",
           "name": "Test User Company",
           "address_house": "10",
@@ -116,7 +110,9 @@ Feature:
           "address_city": "Berlin",
           "address_postal_code": "10179",
           "address_country": "DE",
-          "address_addition": null
+          "address_addition": null,
+          "crefo_id": "123",
+          "schufa_id": "123"
         }
         """
         When I send a POST request to "/order" with body:
@@ -187,10 +183,24 @@ Feature:
             "passed": true
         }
         """
-        And I get from alfred "/debtor/identify" endpoint response with status 200 and body
+        And I get from risky "/risk-check/order/order_debtor_address" endpoint response with status 200 and body
         """
         {
-          "id": 4,
+            "check_id": 4,
+            "passed": true
+        }
+        """
+        And I get from risky "/risk-check/company/company_b2b_score" endpoint response with status 200 and body
+        """
+        {
+            "check_id": 5,
+            "passed": true
+        }
+        """
+        And I get from alfred "/debtor/1" endpoint response with status 200 and body
+        """
+        {
+          "id": 1,
           "payment_id": "test",
           "name": "Test User Company",
           "address_house": "10",
@@ -198,7 +208,9 @@ Feature:
           "address_city": "Berlin",
           "address_postal_code": "10179",
           "address_country": "DE",
-          "address_addition": null
+          "address_addition": null,
+          "crefo_id": "123",
+          "schufa_id": "123"
         }
         """
         And I have a late order XLO123 with amounts 1002/901/101, duration 30 and comment "test order"
@@ -243,11 +255,6 @@ Feature:
         }
         """
         Then print last response
-        And the response status code should be 403
-        And the JSON response should be:
-        """
-        {
-            "code":"order_rejected",
-            "message":"checks failed"
-        }
-        """
+        And the response status code should be 201
+        And the response should be empty
+        Then the order A1 is declined

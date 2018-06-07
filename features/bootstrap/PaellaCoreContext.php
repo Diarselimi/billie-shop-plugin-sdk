@@ -165,7 +165,7 @@ class PaellaCoreContext extends MinkContext
         $merchantDebtor = (new MerchantDebtorEntity())
             ->setMerchantId('1')
             ->setDebtorId('1')
-            ->setExternalId('1');
+            ->setExternalId('XX12');
         $this->getMerchantDebtorRepository()->insert($merchantDebtor);
 
         $order = (new OrderEntity())
@@ -202,6 +202,9 @@ class PaellaCoreContext extends MinkContext
     {
         $order = $this->getOrderRepository()->getOneByExternalCode($orderId, 1);
         if ($order === null) {
+            if ($state === 'null') {
+                return;
+            }
             throw new RuntimeException('Order not found');
         }
         if ($order->getState() !== $state) {
