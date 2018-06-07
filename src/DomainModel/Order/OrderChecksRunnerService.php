@@ -5,6 +5,7 @@ namespace App\DomainModel\Order;
 use App\DomainModel\Monitoring\LoggingInterface;
 use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\Risky\RiskyInterface;
+use App\DomainModel\Alfred\AlfredInterface;
 
 class OrderChecksRunnerService implements LoggingInterface
 {
@@ -14,11 +15,13 @@ class OrderChecksRunnerService implements LoggingInterface
 
     private $risky;
     private $orderRepository;
+    private $alfred;
 
-    public function __construct(RiskyInterface $risky, OrderRepositoryInterface $orderRepository)
+    public function __construct(RiskyInterface $risky, OrderRepositoryInterface $orderRepository, AlfredInterface $alfred)
     {
         $this->risky = $risky;
         $this->orderRepository = $orderRepository;
+        $this->alfred = $alfred;
     }
 
     public function runPreconditionChecks(OrderContainer $order): bool
@@ -61,8 +64,8 @@ class OrderChecksRunnerService implements LoggingInterface
         }
 
         $this->logWaypoint('blacklist check');
-        $blackListCheck = true;
-        if (!$blackListCheck) {
+        $blacklistCheck = $this->alfred->isDebtorBlacklisted($debtorId);
+        if ($blacklistCheck) {
             $this->logInfo('Black list check failed');
 
             return false;
