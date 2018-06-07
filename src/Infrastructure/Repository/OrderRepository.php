@@ -22,9 +22,9 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
     {
         $id = $this->doInsert('
             INSERT INTO orders
-            (amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, delivery_address_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, uuid, created_at, updated_at)
+            (amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, delivery_address_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, uuid, created_at, updated_at, merchant_debtor_id)
             VALUES
-            (:amount_net, :amount_gross, :amount_tax, :duration, :external_code, :state, :external_comment, :internal_comment, :invoice_number, :invoice_url, :delivery_address_id, :merchant_id, :debtor_person_id, :debtor_external_data_id, :payment_id, :uuid, :created_at, :updated_at)
+            (:amount_net, :amount_gross, :amount_tax, :duration, :external_code, :state, :external_comment, :internal_comment, :invoice_number, :invoice_url, :delivery_address_id, :merchant_id, :debtor_person_id, :debtor_external_data_id, :payment_id, :uuid, :created_at, :updated_at, :merchant_debtor_id)
             
         ', [
             'amount_net' => $order->getAmountNet(),
@@ -45,6 +45,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             'uuid' => Uuid::uuid4()->toString(),
             'created_at' => $order->getCreatedAt()->format('Y-m-d H:i:s'),
             'updated_at' => $order->getUpdatedAt()->format('Y-m-d H:i:s'),
+            'merchant_debtor_id' => $order->getMerchantDebtorId(),
         ]);
 
         $order->setId($id);

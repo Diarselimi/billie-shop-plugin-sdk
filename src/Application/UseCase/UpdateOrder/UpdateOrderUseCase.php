@@ -5,10 +5,10 @@ namespace App\Application\UseCase\UpdateOrder;
 use App\Application\PaellaCoreCriticalException;
 use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Borscht\BorschtInterface;
+use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
-use App\Infrastructure\Repository\MerchantDebtorRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Workflow\Registry;
 
@@ -18,22 +18,20 @@ class UpdateOrderUseCase
     private $alfred;
     private $borscht;
     private $workflows;
-    private $companyRepository;
+    private $merchantDebtorRepository;
     private $orderStateManager;
 
     public function __construct(
-        Registry $workflows,
         OrderRepositoryInterface $orderRepository,
         AlfredInterface $alfred,
         BorschtInterface $borscht,
-        MerchantDebtorRepository $companyRepository,
+        MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         OrderStateManager $orderStateManager
     ) {
-        $this->workflows = $workflows;
         $this->orderRepository = $orderRepository;
         $this->alfred = $alfred;
         $this->borscht = $borscht;
-        $this->companyRepository = $companyRepository;
+        $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->orderStateManager = $orderStateManager;
     }
 
@@ -82,11 +80,14 @@ class UpdateOrderUseCase
 
             // Unlock debtor limit in alfred
             if ($amountChanged !== 0) {
-                $company = $this->companyRepository->getOneById($order->getMerchantDebtorId());
-                if ($company === null) {
-                    throw new PaellaCoreCriticalException(sprintf('Company %s not found', $order->getMerchantDebtorId()));
+                $merchantDebtor = $this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId());
+                if ($merchantDebtor === null) {
+                    throw new PaellaCoreCriticalException(sprintf(
+                        'Company %s not found',
+                        $order->getMerchantDebtorId()
+                    ));
                 }
-                $this->alfred->unlockDebtorLimit($company->getDebtorId(), $amountChanged);
+                $this->alfred->unlockDebtorLimit($merchantDebtor->getDebtorId(), $amountChanged);
             }
 
             // Update the order

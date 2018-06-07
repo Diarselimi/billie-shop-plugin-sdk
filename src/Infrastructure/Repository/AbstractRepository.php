@@ -55,6 +55,7 @@ abstract class AbstractRepository implements LoggingInterface
             $this->logInfo('Update failed', [
                 'query' => $query,
                 'params' => $parameters,
+                'error' => $stmt->errorInfo(),
             ]);
 
             throw new RepositoryException('Update failed');

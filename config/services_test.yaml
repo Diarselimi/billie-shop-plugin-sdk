@@ -28,3 +28,6 @@ services:
   App\DomainModel\Merchant\MerchantRepositoryInterface:
     alias: 'App\Infrastructure\Repository\MerchantRepository'
     public: true
+  App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\MerchantDebtorRepository'
+    public: true

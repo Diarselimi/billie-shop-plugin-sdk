@@ -6,6 +6,8 @@ use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
+use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
+use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Person\PersonEntity;
@@ -160,6 +162,12 @@ class PaellaCoreContext extends MinkContext
             ->setAddressId($debtorAddress->getId());
         $this->getDebtorExternalDataRepository()->insert($debtor);
 
+        $merchantDebtor = (new MerchantDebtorEntity())
+            ->setMerchantId('1')
+            ->setDebtorId('1')
+            ->setExternalId('1');
+        $this->getMerchantDebtorRepository()->insert($merchantDebtor);
+
         $order = (new OrderEntity())
             ->setExternalCode($externalCode)
             ->setState($state)
@@ -171,7 +179,7 @@ class PaellaCoreContext extends MinkContext
             ->setDeliveryAddressId($deliveryAddress->getId())
             ->setDebtorExternalDataId($debtor->getId())
             ->setExternalComment($comment)
-            ->setMerchantDebtorId('1')
+            ->setMerchantDebtorId($merchantDebtor->getId())
             ->setMerchantId('1');
 
         $this->getOrderRepository()->insert($order);
@@ -248,6 +256,11 @@ class PaellaCoreContext extends MinkContext
     private function getMerchantRepository(): MerchantRepositoryInterface
     {
         return $this->get(MerchantRepositoryInterface::class);
+    }
+
+    private function getMerchantDebtorRepository(): MerchantDebtorRepositoryInterface
+    {
+        return $this->get(MerchantDebtorRepositoryInterface::class);
     }
 
     private function getConnection(): \PDO
