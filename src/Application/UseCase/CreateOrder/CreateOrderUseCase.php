@@ -4,7 +4,6 @@ namespace App\Application\UseCase\CreateOrder;
 
 use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Alfred\DebtorDTO;
-use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntityFactory;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
@@ -34,7 +33,6 @@ class CreateOrderUseCase implements LoggingInterface
         OrderPersistenceService $orderPersistenceService,
         OrderChecksRunnerService $orderChecksRunnerService,
         AlfredInterface $alfred,
-        BorschtInterface $borscht,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         MerchantRepositoryInterface $merchantRepository,
         MerchantDebtorEntityFactory $merchantDebtorFactory,
@@ -68,6 +66,7 @@ class CreateOrderUseCase implements LoggingInterface
             return;
         }
 
+        $orderContainer->getOrder()->setPaymentId($debtorDTO->getPaymentId());
         $this->orderRepository->update($orderContainer->getOrder());
 
         $this->logWaypoint('limit check');
