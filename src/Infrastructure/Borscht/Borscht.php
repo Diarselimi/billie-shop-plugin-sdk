@@ -117,9 +117,9 @@ class Borscht implements BorschtInterface
         try {
             $this->client->post('/order.json', [
                 'json' => [
-                    'debtor_id' => $order->getMerchantDebtorId(),
+                    'debtor_id' => $order->getPaymentId(),
                     'invoice_number' => $order->getInvoiceNumber(),
-                    'billing_date' => $order->getCreatedAt()->format('Y-m-d H:i:s'),
+                    'billing_date' => $order->getCreatedAt()->format('Y-m-d'),
                     'duration' => $order->getDuration(),
                     'amount' => $order->getAmountGross(),
                 ],

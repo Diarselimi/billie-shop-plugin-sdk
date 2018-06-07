@@ -12,10 +12,8 @@ use Symfony\Component\Workflow\Workflow;
 class ShipOrderUseCase
 {
     private $orderRepository;
-    private $alfred;
     private $borscht;
     private $workflow;
-    private $companyRepository;
 
     public function __construct(
         Workflow $workflow,
@@ -45,6 +43,9 @@ class ShipOrderUseCase
                 PaellaCoreCriticalException::CODE_ORDER_CANT_BE_SHIPPED
             );
         }
+
+        $order->setInvoiceNumber($request->getInvoiceNumber());
+
         $this->borscht->ship($order);
         $this->workflow->apply($order, OrderStateManager::TRANSITION_SHIP);
         $this->orderRepository->update($order);

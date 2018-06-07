@@ -24,7 +24,8 @@ class ShipOrderController
     {
         $orderRequest = new ShipOrderRequest(
             $externalCode,
-            $request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER)
+            $request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER),
+            $request->request->get('invoice_number')
         );
         $this->useCase->execute($orderRequest);
 
