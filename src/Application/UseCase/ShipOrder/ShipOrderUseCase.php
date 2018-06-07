@@ -45,6 +45,7 @@ class ShipOrderUseCase
         }
 
         $order->setInvoiceNumber($request->getInvoiceNumber());
+        $order->setShippedAt(new \DateTime());
 
         $this->borscht->ship($order);
         $this->workflow->apply($order, OrderStateManager::TRANSITION_SHIP);

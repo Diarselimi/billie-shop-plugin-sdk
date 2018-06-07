@@ -102,7 +102,8 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
               amount_tax = :amount_tax,
               duration = :duration,
               shipped_at = :shipped_at,
-              payment_id = :payment_id
+              payment_id = :payment_id,
+              invoice_number = :invoice_number
             WHERE id = :id
         ', [
             'amount_gross' => $order->getAmountGross(),
@@ -113,6 +114,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             'merchant_debtor_id' => $order->getMerchantDebtorId(),
             'shipped_at' => $order->getShippedAt() ? $order->getShippedAt()->format('Y-m-d H:i:s') : null,
             'payment_id' => $order->getPaymentId(),
+            'invoice_number' => $order->getInvoiceNumber(),
             'id' => $order->getId(),
         ]);
 
