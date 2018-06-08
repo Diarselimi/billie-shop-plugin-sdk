@@ -22,6 +22,7 @@ class OrderEntity extends AbstractEntity
     private $debtorPersonId;
     private $debtorExternalDataId;
     private $paymentId;
+    private $shippedAt;
 
     public function getAmountNet(): float
     {
@@ -95,7 +96,7 @@ class OrderEntity extends AbstractEntity
         return $this;
     }
 
-    public function getExternalComment():? string
+    public function getExternalComment(): ?string
     {
         return $this->externalComment;
     }
@@ -107,7 +108,7 @@ class OrderEntity extends AbstractEntity
         return $this;
     }
 
-    public function getInternalComment():? string
+    public function getInternalComment(): ?string
     {
         return $this->internalComment;
     }
@@ -119,7 +120,7 @@ class OrderEntity extends AbstractEntity
         return $this;
     }
 
-    public function getInvoiceNumber():? string
+    public function getInvoiceNumber(): ?string
     {
         return $this->invoiceNumber;
     }
@@ -131,7 +132,7 @@ class OrderEntity extends AbstractEntity
         return $this;
     }
 
-    public function getInvoiceUrl():? string
+    public function getInvoiceUrl(): ?string
     {
         return $this->invoiceUrl;
     }
@@ -143,7 +144,7 @@ class OrderEntity extends AbstractEntity
         return $this;
     }
 
-    public function getMerchantDebtorId():? int
+    public function getMerchantDebtorId(): ?int
     {
         return $this->merchantDebtorId;
     }
@@ -191,7 +192,7 @@ class OrderEntity extends AbstractEntity
         return $this;
     }
 
-    public function getDebtorExternalDataId():? int
+    public function getDebtorExternalDataId(): ?int
     {
         return $this->debtorExternalDataId;
     }
@@ -203,7 +204,7 @@ class OrderEntity extends AbstractEntity
         return $this;
     }
 
-    public function getPaymentId():? string
+    public function getPaymentId(): ?string
     {
         return $this->paymentId;
     }
@@ -211,6 +212,18 @@ class OrderEntity extends AbstractEntity
     public function setPaymentId(?string $paymentId): OrderEntity
     {
         $this->paymentId = $paymentId;
+
+        return $this;
+    }
+
+    public function getShippedAt(): ?\DateTime
+    {
+        return $this->shippedAt;
+    }
+
+    public function setShippedAt(\DateTime $shippedAt = null)
+    {
+        $this->shippedAt = $shippedAt;
 
         return $this;
     }

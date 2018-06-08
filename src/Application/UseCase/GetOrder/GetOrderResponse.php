@@ -237,7 +237,7 @@ class GetOrderResponse
         return $this->invoiceNumber;
     }
 
-    public function setInvoiceNumber(string $invoiceNumber): GetOrderResponse
+    public function setInvoiceNumber(?string $invoiceNumber): GetOrderResponse
     {
         $this->invoiceNumber = $invoiceNumber;
 

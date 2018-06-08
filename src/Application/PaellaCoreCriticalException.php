@@ -17,6 +17,8 @@ class PaellaCoreCriticalException extends \RuntimeException
     const CODE_DEBTOR_LIMIT_EXCEEDED = 'debtor_limit_exceeded';
     const CODE_USER_HEADER_MISSING = 'user_header_missing';
     const CODE_ORDER_VALIDATION_FAILED = 'order_validation_failed';
+    const CODE_ORDER_REJECTED = 'order_rejected';
+    const CODE_ORDER_CANT_BE_SHIPPED = 'order_ship_failed';
 
     private $responseCode;
     private $errorCode;

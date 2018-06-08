@@ -4,7 +4,6 @@ namespace App\Application\UseCase\CreateOrder;
 
 use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Alfred\DebtorDTO;
-use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntityFactory;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
@@ -34,7 +33,6 @@ class CreateOrderUseCase implements LoggingInterface
         OrderPersistenceService $orderPersistenceService,
         OrderChecksRunnerService $orderChecksRunnerService,
         AlfredInterface $alfred,
-        BorschtInterface $borscht,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         MerchantRepositoryInterface $merchantRepository,
         MerchantDebtorEntityFactory $merchantDebtorFactory,
@@ -62,22 +60,30 @@ class CreateOrderUseCase implements LoggingInterface
         }
 
         $debtorDTO = $this->retrieveDebtor($orderContainer, $request);
-        if (is_null($debtorDTO)) {
-            $this->reject($orderContainer, "debtor couldn't identified");
+        if ($debtorDTO === null) {
+            $this->reject($orderContainer, "debtor couldn't be identified");
 
             return;
         }
 
+        $orderContainer->getOrder()->setPaymentId($debtorDTO->getPaymentId());
         $this->orderRepository->update($orderContainer->getOrder());
 
-        if (!$this->alfred->lockDebtorLimit($orderContainer->getMerchantDebtor()->getDebtorId(), $orderContainer->getOrder()->getAmountGross())) {
+        $this->logWaypoint('limit check');
+        if (!$this->alfred->lockDebtorLimit(
+            $orderContainer->getMerchantDebtor()->getDebtorId(),
+            $orderContainer->getOrder()->getAmountGross()
+        )) {
             $this->reject($orderContainer, "debtor limit exceeded");
 
             return;
         }
 
         if (!$this->orderChecksRunnerService->runChecks($orderContainer, $debtorDTO->getCrefoId())) {
-            $this->alfred->unlockDebtorLimit($orderContainer->getMerchantDebtor()->getDebtorId(), $orderContainer->getOrder()->getAmountGross());
+            $this->alfred->unlockDebtorLimit(
+                $orderContainer->getMerchantDebtor()->getDebtorId(),
+                $orderContainer->getOrder()->getAmountGross()
+            );
             $this->reject($orderContainer, 'checks failed');
 
             return;
@@ -90,24 +96,33 @@ class CreateOrderUseCase implements LoggingInterface
     {
         $merchantId = $request->getMerchantCustomerId();
         $debtor = $this->merchantDebtorRepository->getOneByExternalId($merchantId);
+        $this->logWaypoint('known customer check');
 
         if (!$debtor) {
+            $this->logInfo('Start the debtor identification');
             $debtorDTO = $this->identifyDebtor($orderContainer);
 
             if ($debtorDTO) {
-                $debtor = $this->merchantDebtorFactory->createFromDebtorDTO($debtorDTO, $merchantId, $request->getMerchantId());
+                $this->logInfo('Debtor identified');
+                $debtor = $this->merchantDebtorFactory->createFromDebtorDTO(
+                    $debtorDTO,
+                    $merchantId,
+                    $request->getMerchantId()
+                );
                 $this->merchantDebtorRepository->insert($debtor);
             } else {
+                $this->logInfo('Debtor could not be identification');
+
                 return null;
             }
         } else {
+            $this->logInfo('Debtor already known');
             $debtorDTO = $this->alfred->getDebtor($debtor->getDebtorId());
         }
 
         $orderContainer
             ->setMerchantDebtor($debtor)
-            ->getOrder()->setMerchantDebtorId($debtor->getId())
-        ;
+            ->getOrder()->setMerchantDebtorId($debtor->getId());
 
         return $debtorDTO;
     }

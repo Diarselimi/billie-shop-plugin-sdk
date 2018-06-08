@@ -32,3 +32,8 @@ confirm_order_payment:
   path: /order/{externalCode}/confirm-payment
   controller: App\Http\Controller\ConfirmOrderPaymentController::execute
   methods: [POST]
+
+ship_order:
+  path: /order/{externalCode}/ship
+  controller: App\Http\Controller\ShipOrderController::execute
+  methods: [POST]

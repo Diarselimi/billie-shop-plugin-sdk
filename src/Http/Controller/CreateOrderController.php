@@ -27,13 +27,11 @@ class CreateOrderController
             ->setDuration($request->request->get('duration'))
             ->setComment($request->request->get('comment'))
             ->setExternalCode($request->request->get('external_code'))
-
             ->setDeliveryAddressHouseNumber($request->request->get('delivery_address_house_number'))
             ->setDeliveryAddressStreet($request->request->get('delivery_address_street'))
             ->setDeliveryAddressPostalCode($request->request->get('delivery_address_postal_code'))
             ->setDeliveryAddressCity($request->request->get('delivery_address_city'))
             ->setDeliveryAddressCountry($request->request->get('delivery_address_country'))
-
             ->setMerchantCustomerId($request->request->get('merchant_customer_id'))
             ->setDebtorCompanyName($request->request->get('debtor_company_name'))
             ->setDebtorCompanyTaxId($request->request->get('debtor_company_tax_id'))
@@ -45,20 +43,17 @@ class CreateOrderController
             ->setDebtorCompanyEmployeesNumber($request->request->get('debtor_company_employees_number'))
             ->setDebtorCompanyLegalForm($request->request->get('debtor_company_legal_form'))
             ->setDebtorCompanyEstablishedCustomer($request->request->get('debtor_company_established_customer'))
-
             ->setDebtorCompanyAddressAddition($request->request->get('debtor_company_address_addition'))
             ->setDebtorCompanyAddressHouseNumber($request->request->get('debtor_company_address_house_number'))
             ->setDebtorCompanyAddressStreet($request->request->get('debtor_company_address_street'))
             ->setDebtorCompanyAddressPostalCode($request->request->get('debtor_company_address_postal_code'))
             ->setDebtorCompanyAddressCity($request->request->get('debtor_company_address_city'))
             ->setDebtorCompanyAddressCountry($request->request->get('debtor_company_address_country'))
-
             ->setDebtorPersonGender($request->request->get('debtor_person_gender'))
             ->setDebtorPersonFirstName($request->request->get('debtor_person_first_name'))
             ->setDebtorPersonLastName($request->request->get('debtor_person_last_name'))
             ->setDebtorPersonPhoneNumber($request->request->get('debtor_person_phone_number'))
-            ->setDebtorPersonEmail($request->request->get('debtor_person_email'))
-        ;
+            ->setDebtorPersonEmail($request->request->get('debtor_person_email'));
 
         $this->useCase->execute($request);
 

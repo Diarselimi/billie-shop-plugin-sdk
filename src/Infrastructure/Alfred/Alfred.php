@@ -120,4 +120,20 @@ class Alfred implements AlfredInterface
             );
         }
     }
+
+    public function isDebtorBlacklisted(string $debtorId): bool
+    {
+        try {
+            $response = $this->client->get("/debtor/$debtorId/is-blacklisted");
+            $response = json_decode((string) $response->getBody(), true);
+            return $response['is_debtor_blacklisted'];
+        } catch (TransferException $exception) {
+            throw new PaellaCoreCriticalException(
+                'Alfred not available right now',
+                PaellaCoreCriticalException::CODE_ALFRED_EXCEPTION,
+                null,
+                $exception
+            );
+        }
+    }
 }

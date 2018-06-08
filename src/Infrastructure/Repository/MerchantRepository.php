@@ -18,10 +18,10 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
     public function insert(MerchantEntity $merchant): void
     {
         $id = $this->doInsert('
-            INSERT INTO customers 
-            (name, api_key, roles, is_active, available_financing_limit, created_at, updated_at)
+            INSERT INTO merchants 
+            (name, api_key, roles, is_active, available_financing_limit, created_at, updated_at, company_id)
             VALUES
-            (:name, :api_key, :roles, :is_active, :available_financing_limit, :created_at, :updated_at)
+            (:name, :api_key, :roles, :is_active, :available_financing_limit, :created_at, :updated_at, :company_id)
             
         ', [
             'name' => $merchant->getName(),
@@ -31,6 +31,7 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
             'available_financing_limit' => $merchant->getAvailableFinancingLimit(),
             'created_at' => $merchant->getCreatedAt()->format('Y-m-d H:i:s'),
             'updated_at' => $merchant->getUpdatedAt()->format('Y-m-d H:i:s'),
+            'company_id' => $merchant->getCompanyId(),
         ]);
 
         $merchant->setId($id);
@@ -61,7 +62,7 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
         return $row ? $this->factory->createFromDatabaseRow($row) : null;
     }
 
-    public function getOneByApiKeyRaw(string $apiKey):? array
+    public function getOneByApiKeyRaw(string $apiKey): ?array
     {
         $customer = $this->doFetch('
           SELECT id, name, api_key, company_id, roles, is_active, available_financing_limit, created_at, updated_at 

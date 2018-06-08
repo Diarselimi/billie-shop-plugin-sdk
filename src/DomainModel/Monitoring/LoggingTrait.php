@@ -27,4 +27,9 @@ trait LoggingTrait
     {
         $this->logger->error($text, $context);
     }
+
+    public function logWaypoint(string $text)
+    {
+        $this->logger->info("[waypoint] $text");
+    }
 }
