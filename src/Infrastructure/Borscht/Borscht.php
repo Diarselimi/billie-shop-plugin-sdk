@@ -48,11 +48,31 @@ class Borscht implements BorschtInterface
 
     public function getOrderPaymentDetails(string $orderPaymentId): OrderPaymentDetailsDTO
     {
+        try {
+            $response = $this->client->get("/order/$orderPaymentId.json");
+        } catch (TransferException $exception) {
+            throw new PaellaCoreCriticalException(
+                'Borscht is not available right now',
+                PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION,
+                null,
+                $exception
+            );
+        }
+
+        $response = (string)$response->getBody();
+        $response = json_decode($response, true);
+        if (!$response) {
+            throw new PaellaCoreCriticalException(
+                'Borscht response decode exception',
+                PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION
+            );
+        }
+
         return (new OrderPaymentDetailsDTO())
-            ->setPayoutAmount(5000)
-            ->setFeeAmount(100)
-            ->setFeeRate(1.5)
-            ->setDueDate(new \DateTime());
+            ->setPayoutAmount($response['payout_amount'])
+            ->setFeeAmount($response['fee_amount'])
+            ->setFeeRate($response['fee_rate'])
+            ->setDueDate($response['due_date']);
     }
 
     public function cancelOrder(OrderEntity $order): void
