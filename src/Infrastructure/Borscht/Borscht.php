@@ -77,7 +77,7 @@ class Borscht implements BorschtInterface
         try {
             $this->client->delete('/order.json', [
                 'json' => [
-                    'ticket_id' => $order->getId(),
+                    'ticket_id' => $order->getPaymentId(),
                 ],
             ]);
         } catch (TransferException $exception) {
@@ -95,7 +95,7 @@ class Borscht implements BorschtInterface
         try {
             $this->client->put('/order.json', [
                 'json' => [
-                    'ticket_id' => $order->getId(),
+                    'ticket_id' => $order->getPaymentId(),
                     'duration' => $order->getDuration(),
                     'amount' => $order->getAmountGross(),
                 ],
@@ -115,7 +115,7 @@ class Borscht implements BorschtInterface
         try {
             $this->client->put('/merchant/payment.json', [
                 'json' => [
-                    'ticket_id' => $order->getId(),
+                    'ticket_id' => $order->getPaymentId(),
                     'amount' => $amount,
                 ],
             ]);
