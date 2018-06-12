@@ -3,7 +3,9 @@
 namespace App\Application\UseCase\ShipOrder;
 
 use App\Application\PaellaCoreCriticalException;
+use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Borscht\BorschtInterface;
+use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,16 +14,22 @@ use Symfony\Component\Workflow\Workflow;
 class ShipOrderUseCase
 {
     private $orderRepository;
+    private $merchantDebtorRepository;
+    private $alfred;
     private $borscht;
     private $workflow;
 
     public function __construct(
         Workflow $workflow,
         OrderRepositoryInterface $orderRepository,
+        MerchantDebtorRepositoryInterface $merchantDebtorRepository,
+        AlfredInterface $alfred,
         BorschtInterface $borscht
     ) {
         $this->workflow = $workflow;
         $this->orderRepository = $orderRepository;
+        $this->merchantDebtorRepository = $merchantDebtorRepository;
+        $this->alfred = $alfred;
         $this->borscht = $borscht;
     }
 
@@ -30,6 +38,7 @@ class ShipOrderUseCase
         $externalCode = $request->getExternalCode();
         $customerId = $request->getCustomerId();
         $order = $this->orderRepository->getOneByExternalCode($externalCode, $customerId);
+
         if (!$order) {
             throw new PaellaCoreCriticalException(
                 "Order #$externalCode not found",
@@ -44,10 +53,17 @@ class ShipOrderUseCase
             );
         }
 
-        $order->setInvoiceNumber($request->getInvoiceNumber());
-        $order->setShippedAt(new \DateTime());
+        $order
+            ->setInvoiceNumber($request->getInvoiceNumber())
+            ->setShippedAt(new \DateTime())
+        ;
 
-        $this->borscht->ship($order);
+        $company = $this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId());
+        $debtor = $this->alfred->getDebtor($company->getDebtorId());
+
+        $paymentDetails = $this->borscht->ship($order, $debtor->getPaymentId());
+        $order->setPaymentId($paymentDetails->getId());
+
         $this->workflow->apply($order, OrderStateManager::TRANSITION_SHIP);
         $this->orderRepository->update($order);
     }

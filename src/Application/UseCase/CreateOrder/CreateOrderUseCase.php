@@ -66,7 +66,6 @@ class CreateOrderUseCase implements LoggingInterface
             return;
         }
 
-        $orderContainer->getOrder()->setPaymentId($debtorDTO->getPaymentId());
         $this->orderRepository->update($orderContainer->getOrder());
 
         $this->logWaypoint('limit check');
