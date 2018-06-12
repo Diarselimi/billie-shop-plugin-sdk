@@ -10,14 +10,12 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Workflow\Registry;
 
 class UpdateOrderUseCase
 {
     private $orderRepository;
     private $alfred;
     private $borscht;
-    private $workflows;
     private $merchantDebtorRepository;
     private $orderStateManager;
 
@@ -65,7 +63,10 @@ class UpdateOrderUseCase
         }
 
         // Amount
-        if ($request->getAmountGross() !== null && (float)$request->getAmountGross() !== $order->getAmountGross()) {
+        if ($request->getAmountGross() !== null && (float)$request->getAmountGross() !== $order->getAmountGross()
+            || $request->getAmountNet() !== null && (float)$request->getAmountNet() !== $order->getAmountNet()
+            || $request->getAmountTax() !== null && (float)$request->getAmountTax() !== $order->getAmountTax()
+        ) {
             if ($this->orderStateManager->wasShipped($order) || !$durationChanged) {
                 $amountChanged = $order->getAmountGross() - $request->getAmountGross();
                 $order
@@ -101,18 +102,23 @@ class UpdateOrderUseCase
 
     private function validate(OrderEntity $order, UpdateOrderRequest $request): void
     {
-        if (!empty($request->getAmountGross()) &&
-            ($request->getAmountGross() > $order->getAmountGross() || $request->getAmountNet() > $order->getAmountNet() || $request->getAmountTax() > $order->getAmountTax())
-        ) {
+        if (!empty($request->getAmountGross()) && (
+            $request->getAmountGross() > $order->getAmountGross()
+            || $request->getAmountNet() > $order->getAmountNet()
+            || $request->getAmountTax() > $order->getAmountTax()
+        )) {
             throw new PaellaCoreCriticalException(
                 'Invalid amount',
-                PaellaCoreCriticalException::CODE_ORDER_VALIDATION_FAILED
+                PaellaCoreCriticalException::CODE_ORDER_VALIDATION_FAILED,
+                Response::HTTP_PRECONDITION_FAILED
             );
         }
+
         if (!empty($request->getDuration()) && $request->getDuration() < $order->getDuration()) {
             throw new PaellaCoreCriticalException(
                 'Invalid duration',
-                PaellaCoreCriticalException::CODE_ORDER_VALIDATION_FAILED
+                PaellaCoreCriticalException::CODE_ORDER_VALIDATION_FAILED,
+                Response::HTTP_PRECONDITION_FAILED
             );
         }
     }

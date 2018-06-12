@@ -80,7 +80,7 @@ class Borscht implements BorschtInterface
         try {
             $this->client->delete('/order.json', [
                 'json' => [
-                    'order_id' => $order->getId(),
+                    'ticket_id' => $order->getId(),
                 ],
             ]);
         } catch (TransferException $exception) {
@@ -98,7 +98,7 @@ class Borscht implements BorschtInterface
         try {
             $this->client->put('/order.json', [
                 'json' => [
-                    'order_id' => $order->getId(),
+                    'ticket_id' => $order->getId(),
                     'duration' => $order->getDuration(),
                     'amount' => $order->getAmountGross(),
                 ],
