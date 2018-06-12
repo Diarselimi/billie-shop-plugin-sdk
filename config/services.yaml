@@ -69,3 +69,8 @@ services:
       $channel: '%log_channel%'
 
   Symfony\Component\Workflow\Workflow: '@state_machine.order'
+
+  Raven_Client:
+    class: Raven_Client
+    arguments:
+      - '%env(SENTRY_DSN)%'

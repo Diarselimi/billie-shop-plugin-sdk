@@ -95,6 +95,9 @@
     "monolog/monolog": {
         "version": "1.23.0"
     },
+    "ozean12/sentry": {
+        "version": "1.9.x-dev"
+    },
     "paragonie/random_compat": {
         "version": "v2.0.12"
     },
