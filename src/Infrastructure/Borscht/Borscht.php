@@ -171,7 +171,7 @@ class Borscht implements BorschtInterface
             ->setOutstandingAmount($response['outstanding_amount'])
             ->setFeeAmount($response['fee_amount'])
             ->setFeeRate($response['fee_rate'])
-            ->setDueDate($response['due_date'])
+            ->setDueDate(new \DateTime($response['due_date']))
         ;
     }
 }
