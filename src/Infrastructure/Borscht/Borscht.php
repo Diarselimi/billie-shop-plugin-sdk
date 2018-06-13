@@ -96,6 +96,7 @@ class Borscht implements BorschtInterface
             $this->client->put('/order.json', [
                 'json' => [
                     'ticket_id' => $order->getPaymentId(),
+                    'invoice_number' => $order->getInvoiceNumber(),
                     'duration' => $order->getDuration(),
                     'amount' => $order->getAmountGross(),
                 ],

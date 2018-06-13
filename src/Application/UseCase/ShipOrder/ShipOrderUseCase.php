@@ -55,6 +55,7 @@ class ShipOrderUseCase
 
         $order
             ->setInvoiceNumber($request->getInvoiceNumber())
+            ->setInvoiceUrl($request->getInvoiceUrl())
             ->setShippedAt(new \DateTime())
         ;
 

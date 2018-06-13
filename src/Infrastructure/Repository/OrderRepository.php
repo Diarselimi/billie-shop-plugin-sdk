@@ -85,9 +85,10 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             ->setDebtorPersonId($order['debtor_person_id'])
             ->setDebtorExternalDataId($order['debtor_external_data_id'])
             ->setPaymentId($order['payment_id'])
+            ->setShippedAt($order['shipped_at'] ? new \DateTime($order['shipped_at']) : $order['shipped_at'])
             ->setCreatedAt(new \DateTime($order['created_at']))
             ->setUpdatedAt(new \DateTime($order['updated_at']))
-            ->setShippedAt($order['shipped_at'] ? new \DateTime($order['shipped_at']) : $order['shipped_at']);
+        ;
     }
 
     public function update(OrderEntity $order): void
@@ -103,7 +104,8 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
               duration = :duration,
               shipped_at = :shipped_at,
               payment_id = :payment_id,
-              invoice_number = :invoice_number
+              invoice_number = :invoice_number,
+              invoice_url = :invoice_url
             WHERE id = :id
         ', [
             'amount_gross' => $order->getAmountGross(),
@@ -115,6 +117,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             'shipped_at' => $order->getShippedAt() ? $order->getShippedAt()->format('Y-m-d H:i:s') : null,
             'payment_id' => $order->getPaymentId(),
             'invoice_number' => $order->getInvoiceNumber(),
+            'invoice_url' => $order->getInvoiceUrl(),
             'id' => $order->getId(),
         ]);
 

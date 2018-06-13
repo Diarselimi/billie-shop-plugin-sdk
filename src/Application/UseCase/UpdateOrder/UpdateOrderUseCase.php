@@ -38,6 +38,7 @@ class UpdateOrderUseCase
         $externalCode = $request->getExternalCode();
         $customerId = $request->getCustomerId();
         $order = $this->orderRepository->getOneByExternalCode($externalCode, $customerId);
+
         if (!$order) {
             throw new PaellaCoreCriticalException(
                 "Order #$externalCode not found",
@@ -55,8 +56,7 @@ class UpdateOrderUseCase
         // Duration
         if ($request->getDuration() !== null && $request->getDuration() !== $order->getDuration()) {
             if ($this->orderStateManager->wasShipped($order)) {
-                $order
-                    ->setDuration($request->getDuration());
+                $order->setDuration($request->getDuration());
                 $changed = true;
             }
             $durationChanged = true;
@@ -78,6 +78,13 @@ class UpdateOrderUseCase
         }
 
         if ($changed) {
+            if ($amountChanged !== 0) {
+                $order
+                    ->setInvoiceNumber($request->getInvoiceNumber())
+                    ->setInvoiceUrl($request->getInvoiceUrl())
+                ;
+            }
+
             // Modify order in borscht
             if ($this->orderStateManager->wasShipped($order)) {
                 $this->borscht->modifyOrder($order);
