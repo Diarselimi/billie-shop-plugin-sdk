@@ -95,7 +95,7 @@ class UpdateOrderUseCase
             }
 
             // Unlock debtor limit in alfred
-            if ($amountChanged !== 0) {
+            if ((int) $amountChanged !== 0) {
                 $merchantDebtor = $this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId());
                 if ($merchantDebtor === null) {
                     throw new PaellaCoreCriticalException(sprintf(
