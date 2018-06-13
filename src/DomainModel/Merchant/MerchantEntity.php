@@ -37,6 +37,11 @@ class MerchantEntity extends AbstractEntity
         return $this;
     }
 
+    public function increaseAvailableFinancingLimit(float $delta): void
+    {
+        $this->availableFinancingLimit = $this->availableFinancingLimit + $delta;
+    }
+
     public function reduceAvailableFinancingLimit(float $delta): void
     {
         $this->availableFinancingLimit = $this->availableFinancingLimit - $delta;

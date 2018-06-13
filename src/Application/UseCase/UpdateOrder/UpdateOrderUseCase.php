@@ -5,6 +5,7 @@ namespace App\Application\UseCase\UpdateOrder;
 use App\Application\PaellaCoreCriticalException;
 use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Borscht\BorschtInterface;
+use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
@@ -17,6 +18,7 @@ class UpdateOrderUseCase
     private $alfred;
     private $borscht;
     private $merchantDebtorRepository;
+    private $merchantRepository;
     private $orderStateManager;
 
     public function __construct(
@@ -24,20 +26,22 @@ class UpdateOrderUseCase
         AlfredInterface $alfred,
         BorschtInterface $borscht,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
+        MerchantRepositoryInterface $merchantRepository,
         OrderStateManager $orderStateManager
     ) {
         $this->orderRepository = $orderRepository;
         $this->alfred = $alfred;
         $this->borscht = $borscht;
         $this->merchantDebtorRepository = $merchantDebtorRepository;
+        $this->merchantRepository = $merchantRepository;
         $this->orderStateManager = $orderStateManager;
     }
 
     public function execute(UpdateOrderRequest $request): void
     {
         $externalCode = $request->getExternalCode();
-        $customerId = $request->getCustomerId();
-        $order = $this->orderRepository->getOneByExternalCode($externalCode, $customerId);
+        $merchantId = $request->getMerchantId();
+        $order = $this->orderRepository->getOneByExternalCode($externalCode, $merchantId);
 
         if (!$order) {
             throw new PaellaCoreCriticalException(
@@ -100,6 +104,10 @@ class UpdateOrderUseCase
                     ));
                 }
                 $this->alfred->unlockDebtorLimit($merchantDebtor->getDebtorId(), $amountChanged);
+
+                $merchant = $this->merchantRepository->getOneById($merchantId);
+                $merchant->increaseAvailableFinancingLimit($amountChanged);
+                $this->merchantRepository->update($merchant);
             }
 
             // Update the order

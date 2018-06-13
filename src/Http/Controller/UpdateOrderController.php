@@ -21,7 +21,7 @@ class UpdateOrderController
     public function execute(string $externalCode, Request $request): JsonResponse
     {
         $orderRequest = (new UpdateOrderRequest($externalCode))
-            ->setCustomerId($request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER))
+            ->setMerchantId($request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER))
             ->setAmountGross($request->request->get('amount_gross'))
             ->setAmountNet($request->request->get('amount_net'))
             ->setAmountTax($request->request->get('amount_tax'))

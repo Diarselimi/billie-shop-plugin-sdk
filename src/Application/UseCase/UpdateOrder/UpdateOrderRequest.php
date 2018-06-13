@@ -7,7 +7,7 @@ class UpdateOrderRequest
     private $externalCode;
     private $invoiceNumber;
     private $invoiceUrl;
-    private $customerId;
+    private $merchantId;
     private $amountGross;
     private $amountNet;
     private $amountTax;
@@ -47,14 +47,14 @@ class UpdateOrderRequest
         return $this;
     }
 
-    public function getCustomerId(): int
+    public function getMerchantId(): int
     {
-        return $this->customerId;
+        return $this->merchantId;
     }
 
-    public function setCustomerId($customerId): UpdateOrderRequest
+    public function setMerchantId($merchantId): UpdateOrderRequest
     {
-        $this->customerId = $customerId;
+        $this->merchantId = $merchantId;
 
         return $this;
     }
