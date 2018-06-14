@@ -4,10 +4,24 @@ namespace App\DomainModel\Borscht;
 
 class OrderPaymentDetailsDTO
 {
+    private $id;
     private $payoutAmount;
+    private $outstandingAmount;
     private $feeAmount;
     private $feeRate;
     private $dueDate;
+
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    public function setId(string $id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
 
     public function getPayoutAmount(): float
     {
@@ -17,6 +31,18 @@ class OrderPaymentDetailsDTO
     public function setPayoutAmount(float $payoutAmount): OrderPaymentDetailsDTO
     {
         $this->payoutAmount = $payoutAmount;
+
+        return $this;
+    }
+
+    public function getOutstandingAmount(): float
+    {
+        return $this->outstandingAmount;
+    }
+
+    public function setOutstandingAmount(float $outstandingAmount)
+    {
+        $this->outstandingAmount = $outstandingAmount;
 
         return $this;
     }

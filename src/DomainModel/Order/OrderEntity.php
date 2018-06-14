@@ -221,7 +221,7 @@ class OrderEntity extends AbstractEntity
         return $this->shippedAt;
     }
 
-    public function setShippedAt(\DateTime $shippedAt = null)
+    public function setShippedAt(\DateTime $shippedAt = null): OrderEntity
     {
         $this->shippedAt = $shippedAt;
 

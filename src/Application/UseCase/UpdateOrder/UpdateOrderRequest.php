@@ -5,7 +5,9 @@ namespace App\Application\UseCase\UpdateOrder;
 class UpdateOrderRequest
 {
     private $externalCode;
-    private $customerId;
+    private $invoiceNumber;
+    private $invoiceUrl;
+    private $merchantId;
     private $amountGross;
     private $amountNet;
     private $amountTax;
@@ -21,60 +23,84 @@ class UpdateOrderRequest
         return $this->externalCode;
     }
 
-    public function getCustomerId(): int
+    public function getInvoiceNumber(): ?string
     {
-        return $this->customerId;
+        return $this->invoiceNumber;
     }
 
-    public function setCustomerId($customerId): UpdateOrderRequest
+    public function setInvoiceNumber(?string $invoiceNumber)
     {
-        $this->customerId = $customerId;
+        $this->invoiceNumber = $invoiceNumber;
 
         return $this;
     }
 
-    public function getAmountNet()
+    public function getInvoiceUrl(): ?string
+    {
+        return $this->invoiceUrl;
+    }
+
+    public function setInvoiceUrl(?string $invoiceUrl)
+    {
+        $this->invoiceUrl = $invoiceUrl;
+
+        return $this;
+    }
+
+    public function getMerchantId(): int
+    {
+        return $this->merchantId;
+    }
+
+    public function setMerchantId($merchantId): UpdateOrderRequest
+    {
+        $this->merchantId = $merchantId;
+
+        return $this;
+    }
+
+    public function getAmountNet(): ?float
     {
         return $this->amountNet;
     }
 
-    public function setAmountNet($amount): UpdateOrderRequest
+    public function setAmountNet(?float $amount): UpdateOrderRequest
     {
         $this->amountNet = $amount;
 
         return $this;
     }
 
-    public function getAmountGross()
+    public function getAmountGross(): ?float
     {
         return $this->amountGross;
     }
 
-    public function setAmountGross($amount): UpdateOrderRequest
+    public function setAmountGross(?float $amount): UpdateOrderRequest
     {
         $this->amountGross = $amount;
 
         return $this;
     }
 
-    public function getAmountTax()
+    public function getAmountTax(): ?float
     {
         return $this->amountTax;
     }
 
-    public function setAmountTax($amount): UpdateOrderRequest
+    public function setAmountTax(?float $amount): UpdateOrderRequest
     {
         $this->amountTax = $amount;
 
         return $this;
     }
 
-    public function getDuration()
+    public function getDuration(): ?int
     {
         return $this->duration;
     }
 
-    public function setDuration($duration): UpdateOrderRequest
+    public function setDuration(?int $duration): UpdateOrderRequest
     {
         $this->duration = $duration;
 

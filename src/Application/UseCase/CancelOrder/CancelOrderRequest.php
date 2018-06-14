@@ -5,12 +5,12 @@ namespace App\Application\UseCase\CancelOrder;
 class CancelOrderRequest
 {
     private $externalCode;
-    private $customerId;
+    private $merchantId;
 
-    public function __construct(string $externalCode, int $customerId)
+    public function __construct(string $externalCode, int $merchantId)
     {
         $this->externalCode = $externalCode;
-        $this->customerId = $customerId;
+        $this->merchantId = $merchantId;
     }
 
     public function getExternalCode(): string
@@ -18,8 +18,8 @@ class CancelOrderRequest
         return $this->externalCode;
     }
 
-    public function getCustomerId(): int
+    public function getMerchantId(): int
     {
-        return $this->customerId;
+        return $this->merchantId;
     }
 }

@@ -44,7 +44,7 @@ class GetOrderController
                 'payout_amount' => $response->getPayoutAmount(),
                 'fee_amount' => $response->getFeeAmount(),
                 'fee_rate' => $response->getFeeRate(),
-                'due_date' => $response->getDueDate() ? $response->getDueDate()->format('Y-m-d H:i:s') : null,
+                'due_date' => $response->getDueDate() ? $response->getDueDate()->format('Y-m-d') : null,
             ],
             'debtor_external_data' => [
                 'name' => $response->getDebtorExternalDataCompanyName(),

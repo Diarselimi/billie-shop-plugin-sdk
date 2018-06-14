@@ -61,6 +61,7 @@ class Borscht implements BorschtInterface
 
         $response = (string)$response->getBody();
         $response = json_decode($response, true);
+
         if (!$response) {
             throw new PaellaCoreCriticalException(
                 'Borscht response decode exception',
@@ -68,11 +69,7 @@ class Borscht implements BorschtInterface
             );
         }
 
-        return (new OrderPaymentDetailsDTO())
-            ->setPayoutAmount($response['payout_amount'])
-            ->setFeeAmount($response['fee_amount'])
-            ->setFeeRate($response['fee_rate'])
-            ->setDueDate($response['due_date']);
+        return $this->populateTicketResponseDTO($response);
     }
 
     public function cancelOrder(OrderEntity $order): void
@@ -80,7 +77,7 @@ class Borscht implements BorschtInterface
         try {
             $this->client->delete('/order.json', [
                 'json' => [
-                    'order_id' => $order->getId(),
+                    'ticket_id' => $order->getPaymentId(),
                 ],
             ]);
         } catch (TransferException $exception) {
@@ -98,7 +95,8 @@ class Borscht implements BorschtInterface
         try {
             $this->client->put('/order.json', [
                 'json' => [
-                    'order_id' => $order->getId(),
+                    'ticket_id' => $order->getPaymentId(),
+                    'invoice_number' => $order->getInvoiceNumber(),
                     'duration' => $order->getDuration(),
                     'amount' => $order->getAmountGross(),
                 ],
@@ -118,7 +116,7 @@ class Borscht implements BorschtInterface
         try {
             $this->client->put('/merchant/payment.json', [
                 'json' => [
-                    'ticket_id' => $order->getId(),
+                    'ticket_id' => $order->getPaymentId(),
                     'amount' => $amount,
                 ],
             ]);
@@ -132,12 +130,12 @@ class Borscht implements BorschtInterface
         }
     }
 
-    public function ship(OrderEntity $order): void
+    public function ship(OrderEntity $order, string $debtorPaymentId): OrderPaymentDetailsDTO
     {
         try {
-            $this->client->post('/order.json', [
+            $response = $this->client->post('/order.json', [
                 'json' => [
-                    'debtor_id' => $order->getPaymentId(),
+                    'debtor_id' => $debtorPaymentId,
                     'invoice_number' => $order->getInvoiceNumber(),
                     'billing_date' => $order->getCreatedAt()->format('Y-m-d'),
                     'duration' => $order->getDuration(),
@@ -152,5 +150,29 @@ class Borscht implements BorschtInterface
                 $exception
             );
         }
+
+        $response = (string)$response->getBody();
+        $response = json_decode($response, true);
+
+        if (!$response) {
+            throw new PaellaCoreCriticalException(
+                'Borscht response decode exception',
+                PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION
+            );
+        }
+
+        return $this->populateTicketResponseDTO($response);
+    }
+
+    private function populateTicketResponseDTO(array $response): OrderPaymentDetailsDTO
+    {
+        return (new OrderPaymentDetailsDTO())
+            ->setId($response['id'])
+            ->setPayoutAmount($response['payout_amount'])
+            ->setOutstandingAmount($response['outstanding_amount'])
+            ->setFeeAmount($response['fee_amount'])
+            ->setFeeRate($response['fee_rate'])
+            ->setDueDate(new \DateTime($response['due_date']))
+        ;
     }
 }
