@@ -9,6 +9,7 @@ use App\DomainModel\Borscht\OrderPaymentDetailsDTO;
 use App\DomainModel\Monitoring\LoggingInterface;
 use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\Borscht\OrderPaymentDetailsFactory;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
 
@@ -17,10 +18,12 @@ class Borscht implements BorschtInterface, LoggingInterface
     use LoggingTrait;
 
     private $client;
+    private $paymentDetailsFactory;
 
-    public function __construct(Client $client)
+    public function __construct(Client $client, OrderPaymentDetailsFactory $paymentDetailsFactory)
     {
         $this->client = $client;
+        $this->paymentDetailsFactory = $paymentDetailsFactory;
     }
 
     public function getDebtorPaymentDetails(string $debtorPaymentId): DebtorPaymentDetailsDTO
@@ -73,7 +76,7 @@ class Borscht implements BorschtInterface, LoggingInterface
             );
         }
 
-        return $this->populateTicketResponseDTO($response);
+        return $this->paymentDetailsFactory->createFromBorschtResponse($response);
     }
 
     public function cancelOrder(OrderEntity $order): void
@@ -187,18 +190,6 @@ class Borscht implements BorschtInterface, LoggingInterface
             );
         }
 
-        return $this->populateTicketResponseDTO($response);
-    }
-
-    private function populateTicketResponseDTO(array $response): OrderPaymentDetailsDTO
-    {
-        return (new OrderPaymentDetailsDTO())
-            ->setId($response['id'])
-            ->setPayoutAmount($response['payout_amount'])
-            ->setOutstandingAmount($response['outstanding_amount'])
-            ->setFeeAmount($response['fee_amount'])
-            ->setFeeRate($response['fee_rate'])
-            ->setDueDate(new \DateTime($response['due_date']))
-        ;
+        return $this->paymentDetailsFactory->createFromBorschtResponse($response);
     }
 }

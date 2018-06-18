@@ -16,6 +16,7 @@ class OrderStateManager
     const TRANSITION_CREATE = 'create';
     const TRANSITION_DECLINE = 'decline';
     const TRANSITION_SHIP = 'ship';
+    const TRANSITION_LATE = 'late';
     const TRANSITION_CANCEL = 'cancel';
     const TRANSITION_CANCEL_SHIPPED = 'cancel_shipped';
 

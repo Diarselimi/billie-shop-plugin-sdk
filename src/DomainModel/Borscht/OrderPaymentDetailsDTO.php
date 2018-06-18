@@ -4,7 +4,10 @@ namespace App\DomainModel\Borscht;
 
 class OrderPaymentDetailsDTO
 {
+    private const STATE_LATE = 'late';
+
     private $id;
+    private $state;
     private $payoutAmount;
     private $outstandingAmount;
     private $feeAmount;
@@ -16,9 +19,21 @@ class OrderPaymentDetailsDTO
         return $this->id;
     }
 
-    public function setId(string $id)
+    public function setId(string $id): OrderPaymentDetailsDTO
     {
         $this->id = $id;
+
+        return $this;
+    }
+
+    public function getState(): string
+    {
+        return $this->state;
+    }
+
+    public function setState(string $state): OrderPaymentDetailsDTO
+    {
+        $this->state = $state;
 
         return $this;
     }
@@ -40,7 +55,7 @@ class OrderPaymentDetailsDTO
         return $this->outstandingAmount;
     }
 
-    public function setOutstandingAmount(float $outstandingAmount)
+    public function setOutstandingAmount(float $outstandingAmount): OrderPaymentDetailsDTO
     {
         $this->outstandingAmount = $outstandingAmount;
 
@@ -81,5 +96,10 @@ class OrderPaymentDetailsDTO
         $this->dueDate = $dueDate;
 
         return $this;
+    }
+
+    public function isLate(): bool
+    {
+        return $this->getState() === self::STATE_LATE;
     }
 }

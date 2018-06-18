@@ -1,0 +1,21 @@
+old_sound_rabbit_mq:
+  connections:
+    default:
+      host:     "%env(RABBITMQ_HOST)%"
+      port:     5672
+      user:     "%env(RABBITMQ_USERNAME)%"
+      password: "%env(RABBITMQ_PASSWORD)%"
+      vhost:    '/'
+      lazy:     true
+      connection_timeout: 3
+      read_write_timeout: 3
+      keepalive: false
+      heartbeat: 0
+      use_socket: false
+  consumers:
+    order_payment_state_change:
+      connection:       default
+      exchange_options: { name: 'order_payment_state_change%env(INSTANCE_SUFFIX)%', type: direct }
+      queue_options:    { name: 'order_payment_state_change%env(INSTANCE_SUFFIX)%'}
+      callback:         App\Amqp\Consumer\OrderPaymentStateChangeConsumer
+      qos_options:      {prefetch_size: 0, prefetch_count: 1, global: false}

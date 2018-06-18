@@ -10,5 +10,7 @@ interface OrderRepositoryInterface
 
     public function getOneByExternalCode(string $externalCode, int $customerId): ?OrderEntity;
 
+    public function getOneByPaymentId(string $paymentId): ?OrderEntity;
+
     public function getCustomerOverdues(int $merchantDebtorId): \Generator;
 }

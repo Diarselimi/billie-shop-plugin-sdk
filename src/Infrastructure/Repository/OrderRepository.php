@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Repository;
 
 use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\Order\OrderEntityFactory;
 use App\DomainModel\Order\OrderLifecycleEvent;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use Ramsey\Uuid\Uuid;
@@ -12,10 +13,12 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class OrderRepository extends AbstractRepository implements OrderRepositoryInterface
 {
     private $eventDispatcher;
+    private $orderFactory;
 
-    public function __construct(EventDispatcherInterface $eventDispatcher)
+    public function __construct(EventDispatcherInterface $eventDispatcher, OrderEntityFactory $orderFactory)
     {
         $this->eventDispatcher = $eventDispatcher;
+        $this->orderFactory = $orderFactory;
     }
 
     public function insert(OrderEntity $order): void
@@ -67,28 +70,24 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             return null;
         }
 
-        return (new OrderEntity())
-            ->setId($order['id'])
-            ->setDuration($order['duration'])
-            ->setAmountNet($order['amount_net'])
-            ->setAmountGross($order['amount_gross'])
-            ->setAmountTax($order['amount_tax'])
-            ->setExternalCode($order['external_code'])
-            ->setState($order['state'])
-            ->setExternalComment($order['external_comment'])
-            ->setInternalComment($order['internal_comment'])
-            ->setInvoiceNumber($order['invoice_number'])
-            ->setInvoiceUrl($order['invoice_url'])
-            ->setDeliveryAddressId($order['delivery_address_id'])
-            ->setMerchantDebtorId($order['merchant_debtor_id'])
-            ->setMerchantId($order['merchant_id'])
-            ->setDebtorPersonId($order['debtor_person_id'])
-            ->setDebtorExternalDataId($order['debtor_external_data_id'])
-            ->setPaymentId($order['payment_id'])
-            ->setShippedAt($order['shipped_at'] ? new \DateTime($order['shipped_at']) : $order['shipped_at'])
-            ->setCreatedAt(new \DateTime($order['created_at']))
-            ->setUpdatedAt(new \DateTime($order['updated_at']))
-        ;
+        return $this->orderFactory->createFromDatabaseRow($order);
+    }
+
+    public function getOneByPaymentId(string $paymentId): ?OrderEntity
+    {
+        $order = $this->doFetch('
+          SELECT id, amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, delivery_address_id, merchant_debtor_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, created_at, updated_at, shipped_at
+          FROM orders
+          WHERE payment_id = :payment_id
+        ', [
+            'payment_id' => $paymentId,
+        ]);
+
+        if (!$order) {
+            return null;
+        }
+
+        return $this->orderFactory->createFromDatabaseRow($order);
     }
 
     public function update(OrderEntity $order): void
