@@ -62,7 +62,7 @@ class ShipOrderUseCase
         $company = $this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId());
         $debtor = $this->alfred->getDebtor($company->getDebtorId());
 
-        $paymentDetails = $this->borscht->ship($order, $debtor->getPaymentId());
+        $paymentDetails = $this->borscht->createOrder($order, $debtor->getPaymentId());
         $order->setPaymentId($paymentDetails->getId());
 
         $this->workflow->apply($order, OrderStateManager::TRANSITION_SHIP);
