@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infrastructure\Monitoring;
+namespace App\Infrastructure\Monitoring\Sentry;
 
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
@@ -20,13 +20,22 @@ class SentrySubscriber implements EventSubscriberInterface
     public function __construct(\Raven_Client $client)
     {
         $this->client = $client;
+        $serializers = [
+            new \Raven_DefaultObjectSerializer(),
+            new SentryPrimaryKeySerializer(),
+        ];
+
+        foreach ($serializers as $serializer) {
+            $this->client->getSerializer()->getObjectSerializer()->addSerializer($serializer);
+            $this->client->getReprSerializer()->getObjectSerializer()->addSerializer($serializer);
+        }
     }
 
     public static function getSubscribedEvents()
     {
         return [
-            KernelEvents::EXCEPTION => 'onKernelHttpException',
-            ConsoleEvents::ERROR => 'onConsoleHttpException',
+            KernelEvents::EXCEPTION => ['onKernelHttpException', 100],
+            ConsoleEvents::ERROR => ['onConsoleHttpException', 100],
             KernelEvents::REQUEST => 'onKernelHttpRequest',
         ];
     }
