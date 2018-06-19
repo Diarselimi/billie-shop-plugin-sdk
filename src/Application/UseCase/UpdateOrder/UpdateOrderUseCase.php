@@ -7,13 +7,17 @@ use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
+use App\DomainModel\Monitoring\LoggingInterface;
+use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use Symfony\Component\HttpFoundation\Response;
 
-class UpdateOrderUseCase
+class UpdateOrderUseCase implements LoggingInterface
 {
+    use LoggingTrait;
+
     private $orderRepository;
     private $alfred;
     private $borscht;
@@ -53,70 +57,87 @@ class UpdateOrderUseCase
 
         $this->validate($order, $request);
 
-        $changed = false;
-        $amountChanged = 0;
-        $durationChanged = false;
-
-        // Duration
-        if ($request->getDuration() !== null && $request->getDuration() !== $order->getDuration()) {
-            if ($this->orderStateManager->wasShipped($order)) {
-                $order->setDuration($request->getDuration());
-                $changed = true;
-            }
-            $durationChanged = true;
-        }
-
-        // Amount
-        if ($request->getAmountGross() !== null && (float)$request->getAmountGross() !== $order->getAmountGross()
+        $durationChanged = $request->getDuration() !== null && $request->getDuration() !== $order->getDuration();
+        $amountChanged = $request->getAmountGross() !== null && (float)$request->getAmountGross() !== $order->getAmountGross()
             || $request->getAmountNet() !== null && (float)$request->getAmountNet() !== $order->getAmountNet()
             || $request->getAmountTax() !== null && (float)$request->getAmountTax() !== $order->getAmountTax()
-        ) {
-            if ($this->orderStateManager->wasShipped($order) || !$durationChanged) {
-                $amountChanged = $order->getAmountGross() - $request->getAmountGross();
-                $order
-                    ->setAmountGross($request->getAmountGross())
-                    ->setAmountNet($request->getAmountNet())
-                    ->setAmountTax($request->getAmountTax());
-                $changed = true;
-            }
+        ;
+
+        $this->logInfo('Start order update, state {state}, duration changed: {duration}, amount changed: {amount}', [
+            'state' => $order->getState(),
+            'duration' => (int) $durationChanged,
+            'amount' => (int) $amountChanged,
+        ]);
+
+        if ($durationChanged && $this->orderStateManager->wasShipped($order) && !$this->orderStateManager->isLate($order)) {
+            $this->updateDuration($order, $request);
         }
 
-        if ($changed) {
-            if ($amountChanged !== 0) {
-                $order
-                    ->setInvoiceNumber($request->getInvoiceNumber())
-                    ->setInvoiceUrl($request->getInvoiceUrl())
-                ;
-            }
-
-            // Modify order in borscht
-            if ($this->orderStateManager->wasShipped($order)) {
-                $this->borscht->modifyOrder($order);
-            }
-
-            // Unlock debtor limit in alfred
-            if ((int) $amountChanged !== 0) {
-                $merchantDebtor = $this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId());
-                if ($merchantDebtor === null) {
-                    throw new PaellaCoreCriticalException(sprintf(
-                        'Company %s not found',
-                        $order->getMerchantDebtorId()
-                    ));
-                }
-                $this->alfred->unlockDebtorLimit($merchantDebtor->getDebtorId(), $amountChanged);
-
-                $merchant = $this->merchantRepository->getOneById($merchantId);
-                $merchant->increaseAvailableFinancingLimit($amountChanged);
-                $this->merchantRepository->update($merchant);
-            }
-
-            // Update the order
-            $this->orderRepository->update($order);
+        if ($amountChanged && ($this->orderStateManager->wasShipped($order) || !$durationChanged)) {
+            $this->updateAmount($order, $request);
         }
+    }
+
+    private function updateDuration(OrderEntity $order, UpdateOrderRequest $request)
+    {
+        $duration = $request->getDuration();
+
+        $this->logInfo('Update duration', [
+            'old' => $order->getDuration(),
+            'new' => $duration,
+        ]);
+
+        $order->setDuration($duration);
+        $this->borscht->modifyOrder($order);
+        $this->orderRepository->update($order);
+    }
+
+    private function updateAmount(OrderEntity $order, UpdateOrderRequest $request)
+    {
+        $this->logInfo('Update amount', [
+            'old_gross' => $order->getAmountGross(),
+            'new_gross' => $request->getAmountGross(),
+
+            'old_net' => $order->getAmountNet(),
+            'new_net' => $request->getAmountNet(),
+
+            'old_tax' => $order->getAmountTax(),
+            'new_tax' => $request->getAmountTax(),
+        ]);
+
+        $amountChanged = $order->getAmountGross() - $request->getAmountGross();
+        $order
+            ->setAmountGross($request->getAmountGross())
+            ->setAmountNet($request->getAmountNet())
+            ->setAmountTax($request->getAmountTax())
+            ->setInvoiceNumber($request->getInvoiceNumber())
+            ->setInvoiceUrl($request->getInvoiceUrl())
+        ;
+
+        if ($this->orderStateManager->wasShipped($order)) {
+            $this->logInfo('Do partial cancellation in Borscht');
+            $this->borscht->modifyOrder($order);
+        }
+
+        $merchantDebtor = $this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId());
+        if ($merchantDebtor === null) {
+            throw new PaellaCoreCriticalException(sprintf(
+                'Company %s not found',
+                $order->getMerchantDebtorId()
+            ));
+        }
+        $this->alfred->unlockDebtorLimit($merchantDebtor->getDebtorId(), $amountChanged);
+
+        $merchant = $this->merchantRepository->getOneById($request->getMerchantId());
+        $merchant->increaseAvailableFinancingLimit($amountChanged);
+
+        $this->merchantRepository->update($merchant);
+        $this->orderRepository->update($order);
     }
 
     private function validate(OrderEntity $order, UpdateOrderRequest $request): void
     {
+        //TODO: does not belong here
         if (!empty($request->getAmountGross()) && (
             $request->getAmountGross() > $order->getAmountGross()
             || $request->getAmountNet() > $order->getAmountNet()
