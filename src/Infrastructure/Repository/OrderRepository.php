@@ -12,6 +12,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OrderRepository extends AbstractRepository implements OrderRepositoryInterface
 {
+    const SELECT_FIELDS = 'id, amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, delivery_address_id, merchant_debtor_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, created_at, updated_at, shipped_at';
+
     private $eventDispatcher;
     private $orderFactory;
 
@@ -28,7 +30,6 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             (amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, delivery_address_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, uuid, created_at, updated_at, merchant_debtor_id)
             VALUES
             (:amount_net, :amount_gross, :amount_tax, :duration, :external_code, :state, :external_comment, :internal_comment, :invoice_number, :invoice_url, :delivery_address_id, :merchant_id, :debtor_person_id, :debtor_external_data_id, :payment_id, :uuid, :created_at, :updated_at, :merchant_debtor_id)
-            
         ', [
             'amount_net' => $order->getAmountNet(),
             'amount_gross' => $order->getAmountGross(),
@@ -58,7 +59,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
     public function getOneByExternalCode(string $externalCode, int $merchantId): ?OrderEntity
     {
         $order = $this->doFetch('
-          SELECT id, amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, delivery_address_id, merchant_debtor_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, created_at, updated_at, shipped_at
+          SELECT ' . self::SELECT_FIELDS . '
           FROM orders
           WHERE external_code = :external_code AND merchant_id = :merchant_id
         ', [
@@ -70,13 +71,13 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             return null;
         }
 
-        return $this->orderFactory->createFromDatabaseRow($order);
+        return $this->createOrderEntity($order);
     }
 
     public function getOneByPaymentId(string $paymentId): ?OrderEntity
     {
         $order = $this->doFetch('
-          SELECT id, amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, delivery_address_id, merchant_debtor_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, created_at, updated_at, shipped_at
+          SELECT ' . self::SELECT_FIELDS . '
           FROM orders
           WHERE payment_id = :payment_id
         ', [
@@ -87,7 +88,24 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             return null;
         }
 
-        return $this->orderFactory->createFromDatabaseRow($order);
+        return $this->createOrderEntity($order);
+    }
+
+    public function getOneByUuid(string $uuid): ?OrderEntity
+    {
+        $order = $this->doFetch('
+          SELECT ' . self::SELECT_FIELDS . '
+          FROM orders
+          WHERE uuid = :uuid
+        ', [
+            'uuid' => $uuid,
+        ]);
+
+        if (!$order) {
+            return null;
+        }
+
+        return $this->createOrderEntity($order);
     }
 
     public function update(OrderEntity $order): void
@@ -148,5 +166,31 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
                 yield (int)$row['overdue'];
             }
         }
+    }
+
+    private function createOrderEntity(array $order)
+    {
+        return (new OrderEntity())
+            ->setId($order['id'])
+            ->setDuration($order['duration'])
+            ->setAmountNet($order['amount_net'])
+            ->setAmountGross($order['amount_gross'])
+            ->setAmountTax($order['amount_tax'])
+            ->setExternalCode($order['external_code'])
+            ->setState($order['state'])
+            ->setExternalComment($order['external_comment'])
+            ->setInternalComment($order['internal_comment'])
+            ->setInvoiceNumber($order['invoice_number'])
+            ->setInvoiceUrl($order['invoice_url'])
+            ->setDeliveryAddressId($order['delivery_address_id'])
+            ->setMerchantDebtorId($order['merchant_debtor_id'])
+            ->setMerchantId($order['merchant_id'])
+            ->setDebtorPersonId($order['debtor_person_id'])
+            ->setDebtorExternalDataId($order['debtor_external_data_id'])
+            ->setPaymentId($order['payment_id'])
+            ->setCreatedAt(new \DateTime($order['created_at']))
+            ->setUpdatedAt(new \DateTime($order['updated_at']))
+            ->setShippedAt($order['shipped_at'] ? new \DateTime($order['shipped_at']) : $order['shipped_at'])
+        ;
     }
 }

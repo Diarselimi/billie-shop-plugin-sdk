@@ -12,6 +12,7 @@ class MerchantEntity extends AbstractEntity
     private $companyId;
     private $roles;
     private $isActive;
+    private $webhookUrl;
 
     public function getName(): string
     {
@@ -91,6 +92,18 @@ class MerchantEntity extends AbstractEntity
     public function setIsActive(bool $isActive): MerchantEntity
     {
         $this->isActive = $isActive;
+
+        return $this;
+    }
+
+    public function getWebhookUrl(): ?string
+    {
+        return $this->webhookUrl;
+    }
+
+    public function setWebhookUrl(?string $webhookUrl): MerchantEntity
+    {
+        $this->webhookUrl = $webhookUrl;
 
         return $this;
     }

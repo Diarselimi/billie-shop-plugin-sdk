@@ -44,6 +44,10 @@ services:
     arguments:
       $client: '@eight_points_guzzle.client.borscht'
 
+  App\Infrastructure\Client\Guzzle\WebhookClient:
+    arguments:
+      $client: '@eight_points_guzzle.client.webhook'
+
   App\DomainModel\Order\OrderRepositoryInterface: '@App\Infrastructure\Repository\OrderRepository'
   App\DomainModel\Address\AddressRepositoryInterface: '@App\Infrastructure\Repository\AddressRepository'
   App\DomainModel\Person\PersonRepositoryInterface: '@App\Infrastructure\Repository\PersonRepository'
@@ -53,6 +57,7 @@ services:
   App\DomainModel\Customer\RiskCheckRepositoryInterface: '@App\Infrastructure\Repository\RiskCheckRepository'
   App\DomainModel\OrderTransition\OrderTransitionRepositoryInterface: '@App\Infrastructure\Repository\OrderTransitionRepository'
 
+  App\DomainModel\Webhook\WebhookClientInterface: '@App\Infrastructure\Client\Guzzle\WebhookClient'
   App\DomainModel\Alfred\AlfredInterface: '@App\Infrastructure\Alfred\Alfred'
   App\DomainModel\Borscht\BorschtInterface: '@App\Infrastructure\Borscht\Borscht'
   App\DomainModel\Risky\RiskyInterface: '@App\Infrastructure\Risky\Risky'
