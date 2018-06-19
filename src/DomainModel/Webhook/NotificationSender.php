@@ -2,13 +2,19 @@
 
 namespace App\DomainModel\Webhook;
 
-use App\DomainModel\Webhook\WebhookClientInterface;
-use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Merchant\MerchantEntity;
 
 class NotificationSender
 {
-    const ALLOWED_EVENTS = ['reminder', 'dunning1', 'dunning2', 'dunning3', 'rebooking', 'payment', 'dca'];
+    const EVENT_REMINDER = 'reminder';
+    const EVENT_DUNNING1 = 'dunning1';
+    const EVENT_DUNNING2 = 'dunning2';
+    const EVENT_DUNNING3 = 'dunning3';
+    const EVENT_REBOOKING = 'rebooking';
+    const EVENT_PAYMENT = 'payment';
+    const EVENT_DCA = 'dca';
+
+    const ALLOWED_EVENTS = [self::EVENT_REMINDER, self::EVENT_DUNNING1, self::EVENT_DUNNING2, self::EVENT_DUNNING3, self::EVENT_REBOOKING, self::EVENT_PAYMENT, self::EVENT_DCA];
 
     private $webhookClient;
 

@@ -12,7 +12,9 @@ framework:
         - created
         - declined
         - shipped
+        - paid_out
         - late
+        - complete
         - canceled
       transitions:
         create:
@@ -24,12 +26,18 @@ framework:
         ship:
           from: created
           to: shipped
-        late:
+        pay_out:
           from: shipped
+          to: paid_out
+        late:
+          from: [shipped, paid_out]
           to: late
+        complete:
+          from: [shipped, paid_out, late]
+          to: complete
         cancel:
           from: [new, created]
           to: canceled
         cancel_shipped:
-          from: [shipped, late]
+          from: [shipped, paid_out, late]
           to: canceled

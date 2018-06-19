@@ -71,7 +71,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             return null;
         }
 
-        return $this->createOrderEntity($order);
+        return $this->orderFactory->createFromDatabaseRow($order);
     }
 
     public function getOneByPaymentId(string $paymentId): ?OrderEntity
@@ -88,7 +88,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             return null;
         }
 
-        return $this->createOrderEntity($order);
+        return $this->orderFactory->createFromDatabaseRow($order);
     }
 
     public function getOneByUuid(string $uuid): ?OrderEntity
@@ -105,7 +105,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             return null;
         }
 
-        return $this->createOrderEntity($order);
+        return $this->orderFactory->createFromDatabaseRow($order);
     }
 
     public function update(OrderEntity $order): void
@@ -166,31 +166,5 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
                 yield (int)$row['overdue'];
             }
         }
-    }
-
-    private function createOrderEntity(array $order)
-    {
-        return (new OrderEntity())
-            ->setId($order['id'])
-            ->setDuration($order['duration'])
-            ->setAmountNet($order['amount_net'])
-            ->setAmountGross($order['amount_gross'])
-            ->setAmountTax($order['amount_tax'])
-            ->setExternalCode($order['external_code'])
-            ->setState($order['state'])
-            ->setExternalComment($order['external_comment'])
-            ->setInternalComment($order['internal_comment'])
-            ->setInvoiceNumber($order['invoice_number'])
-            ->setInvoiceUrl($order['invoice_url'])
-            ->setDeliveryAddressId($order['delivery_address_id'])
-            ->setMerchantDebtorId($order['merchant_debtor_id'])
-            ->setMerchantId($order['merchant_id'])
-            ->setDebtorPersonId($order['debtor_person_id'])
-            ->setDebtorExternalDataId($order['debtor_external_data_id'])
-            ->setPaymentId($order['payment_id'])
-            ->setCreatedAt(new \DateTime($order['created_at']))
-            ->setUpdatedAt(new \DateTime($order['updated_at']))
-            ->setShippedAt($order['shipped_at'] ? new \DateTime($order['shipped_at']) : $order['shipped_at'])
-        ;
     }
 }

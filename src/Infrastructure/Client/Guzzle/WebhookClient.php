@@ -26,17 +26,13 @@ class WebhookClient implements WebhookClientInterface, LoggingInterface
             'order_id' => $notification->getOrderId(),
         ];
 
-        if (!is_null($notification->getAmount())) {
-            $data['amount'] = $notification->getAmount();
-        }
+        $extraData = array_filter([
+            'amount' => $notification->getAmount(),
+            'open_amount' => $notification->getOpenAmount(),
+            'url_notification' => $notification->getUrlNotification(),
+        ]);
 
-        if (!is_null($notification->getOpenAmount())) {
-            $data['open_amount'] = $notification->getOpenAmount();
-        }
-
-        if (!is_null($notification->getUrlNotification())) {
-            $data['url_notification'] = $notification->getUrlNotification();
-        }
+        $data = array_merge($data, $extraData);
 
         $this->logInfo('Webhook request', [
             'url' => $url,

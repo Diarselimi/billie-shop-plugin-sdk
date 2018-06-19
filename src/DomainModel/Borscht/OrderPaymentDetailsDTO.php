@@ -5,6 +5,9 @@ namespace App\DomainModel\Borscht;
 class OrderPaymentDetailsDTO
 {
     private const STATE_LATE = 'late';
+    private const STATE_PAID_OUT = 'paid_out';
+    private const STATE_PAID_PARTIALLY = 'paid_partially';
+    private const STATE_PAID_FULLY = 'paid';
 
     private $id;
     private $state;
@@ -101,5 +104,20 @@ class OrderPaymentDetailsDTO
     public function isLate(): bool
     {
         return $this->getState() === self::STATE_LATE;
+    }
+
+    public function isPaidOut(): bool
+    {
+        return $this->getState() === self::STATE_PAID_OUT;
+    }
+
+    public function isPaidPartially(): bool
+    {
+        return $this->getState() === self::STATE_PAID_PARTIALLY;
+    }
+
+    public function isPaidFully(): bool
+    {
+        return $this->getState() === self::STATE_PAID_FULLY;
     }
 }

@@ -10,13 +10,16 @@ class OrderStateManager
     const STATE_SHIPPED = 'shipped';
     const STATE_PAID_OUT = 'paid_out';
     const STATE_LATE = 'late';
+    const STATE_COMPLETE = 'complete';
     const STATE_CANCELED = 'canceled';
 
     const TRANSITION_NEW = 'new';
     const TRANSITION_CREATE = 'create';
     const TRANSITION_DECLINE = 'decline';
+    const TRANSITION_PAY_OUT = 'pay_out';
     const TRANSITION_SHIP = 'ship';
     const TRANSITION_LATE = 'late';
+    const TRANSITION_COMPLETE = 'complete';
     const TRANSITION_CANCEL = 'cancel';
     const TRANSITION_CANCEL_SHIPPED = 'cancel_shipped';
 

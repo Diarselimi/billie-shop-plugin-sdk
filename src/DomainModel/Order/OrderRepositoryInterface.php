@@ -12,5 +12,7 @@ interface OrderRepositoryInterface
 
     public function getOneByPaymentId(string $paymentId): ?OrderEntity;
 
+    public function getOneByUuid(string $uuid): ?OrderEntity;
+
     public function getCustomerOverdues(int $merchantDebtorId): \Generator;
 }
