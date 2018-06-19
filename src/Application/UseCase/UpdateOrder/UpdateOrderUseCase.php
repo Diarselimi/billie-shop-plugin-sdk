@@ -110,9 +110,14 @@ class UpdateOrderUseCase implements LoggingInterface
             ->setAmountGross($request->getAmountGross())
             ->setAmountNet($request->getAmountNet())
             ->setAmountTax($request->getAmountTax())
-            ->setInvoiceNumber($request->getInvoiceNumber())
-            ->setInvoiceUrl($request->getInvoiceUrl())
         ;
+
+        if ($this->orderStateManager->wasShipped($order)) {
+            $order
+                ->setInvoiceNumber($request->getInvoiceNumber())
+                ->setInvoiceUrl($request->getInvoiceUrl())
+            ;
+        }
 
         if ($this->orderStateManager->wasShipped($order)) {
             $this->logInfo('Do partial cancellation in Borscht');
