@@ -31,7 +31,13 @@ class OrderTransitionSubscriber implements EventSubscriberInterface, LoggingInte
         $order = $event->getSubject();
         $transitionName = $event->getTransition()->getName();
 
-        $transitionEntity = $this->transitionFactory->create($order->getId(), $transitionName);
+        $transitionEntity = $this->transitionFactory->create(
+            $order->getId(),
+            $event->getTransition()->getFroms()[0],
+            $event->getTransition()->getTos()[0],
+            $transitionName
+        );
+
         $this->transitionManager->registerNewTransition($transitionEntity);
 
         $this->logInfo("Order transition $transitionName executed", [
@@ -46,7 +52,12 @@ class OrderTransitionSubscriber implements EventSubscriberInterface, LoggingInte
 
     public function onOrderCreated(OrderLifecycleEvent $event)
     {
-        $transitionEntity = $this->transitionFactory->create($event->getOrder()->getId(), OrderStateManager::STATE_NEW);
+        $transitionEntity = $this->transitionFactory->create(
+            $event->getOrder()->getId(),
+            null,
+            OrderStateManager::STATE_NEW,
+            OrderStateManager::TRANSITION_NEW
+        );
 
         $this->transitionManager->registerNewTransition($transitionEntity);
         $this->transitionManager->saveNewTransitions($event->getOrder());
