@@ -69,12 +69,12 @@ class UpdateOrderUseCase implements LoggingInterface
             'amount' => (int) $amountChanged,
         ]);
 
-        if ($durationChanged && $this->orderStateManager->wasShipped($order) && !$this->orderStateManager->isLate($order)) {
-            $this->updateDuration($order, $request);
-        }
-
         if ($amountChanged && ($this->orderStateManager->wasShipped($order) || !$durationChanged)) {
             $this->updateAmount($order, $request);
+        }
+
+        if ($durationChanged && $this->orderStateManager->wasShipped($order) && !$this->orderStateManager->isLate($order)) {
+            $this->updateDuration($order, $request);
         }
     }
 
