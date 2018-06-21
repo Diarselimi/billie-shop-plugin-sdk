@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+
+sed -i "s/^\s*set daemon.*$/  set daemon ${MONIT_CYCLE:-5}/" /etc/monit/monitrc
+MONIT_MONITORS=/etc/monit/conf-available/*
+for f in ${MONIT_MONITORS}
+do
+  ln -sfn $f /etc/monit/conf.d/${f##*/}
+done
+service monit restart

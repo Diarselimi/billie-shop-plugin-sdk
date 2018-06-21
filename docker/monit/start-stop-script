@@ -1,0 +1,23 @@
+#!/bin/bash
+
+PID_FILE=$2
+SCRIPT=$3
+RUNAS=$4
+CURRENT_PID=`cat ${PID_FILE}`
+case $1 in
+  start)
+    kill -9 ${CURRENT_PID};
+    echo "Starting script...";
+    $(cat /usr/local/bin/project-env) && ${SCRIPT} > /dev/null 2>&1 &
+    echo $! > "${PID_FILE}"
+    echo "Script `cat ${PID_FILE}` was started.";
+  ;;
+  stop)
+    kill -9 ${CURRENT_PID};
+    echo "Script ${CURRENT_PID} was stopped.";
+  ;;
+  *)
+    echo "Usage: start-stop-script {start|stop} PATH_TO_PID_FILE SCRIPT_TO_RUN"
+  ;;
+esac
+exit 0
