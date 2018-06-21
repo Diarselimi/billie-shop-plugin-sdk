@@ -3,7 +3,6 @@
 namespace App\Application\UseCase\CancelOrder;
 
 use App\Application\PaellaCoreCriticalException;
-use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\Order\OrderRepositoryInterface;
@@ -15,7 +14,6 @@ use Symfony\Component\Workflow\Workflow;
 class CancelOrderUseCase
 {
     private $orderRepository;
-    private $alfred;
     private $borscht;
     private $workflow;
     private $companyRepository;
@@ -24,14 +22,12 @@ class CancelOrderUseCase
     public function __construct(
         Workflow $workflow,
         OrderRepositoryInterface $orderRepository,
-        AlfredInterface $alfred,
         BorschtInterface $borscht,
         MerchantDebtorRepository $companyRepository,
         MerchantRepositoryInterface $merchantRepository
     ) {
         $this->workflow = $workflow;
         $this->orderRepository = $orderRepository;
-        $this->alfred = $alfred;
         $this->borscht = $borscht;
         $this->companyRepository = $companyRepository;
         $this->merchantRepository = $merchantRepository;
@@ -67,8 +63,6 @@ class CancelOrderUseCase
         if ($company === null) {
             throw new PaellaCoreCriticalException(sprintf('Company %s not found', $order->getMerchantDebtorId()));
         }
-
-        $this->alfred->unlockDebtorLimit($company->getDebtorId(), $order->getAmountGross());
 
         $merchant = $this->merchantRepository->getOneById($merchantId);
         $merchant->increaseAvailableFinancingLimit($order->getAmountGross());

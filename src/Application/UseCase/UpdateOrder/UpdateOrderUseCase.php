@@ -3,7 +3,6 @@
 namespace App\Application\UseCase\UpdateOrder;
 
 use App\Application\PaellaCoreCriticalException;
-use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
@@ -19,7 +18,6 @@ class UpdateOrderUseCase implements LoggingInterface
     use LoggingTrait;
 
     private $orderRepository;
-    private $alfred;
     private $borscht;
     private $merchantDebtorRepository;
     private $merchantRepository;
@@ -27,14 +25,12 @@ class UpdateOrderUseCase implements LoggingInterface
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
-        AlfredInterface $alfred,
         BorschtInterface $borscht,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         MerchantRepositoryInterface $merchantRepository,
         OrderStateManager $orderStateManager
     ) {
         $this->orderRepository = $orderRepository;
-        $this->alfred = $alfred;
         $this->borscht = $borscht;
         $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->merchantRepository = $merchantRepository;
@@ -131,7 +127,6 @@ class UpdateOrderUseCase implements LoggingInterface
                 $order->getMerchantDebtorId()
             ));
         }
-        $this->alfred->unlockDebtorLimit($merchantDebtor->getDebtorId(), $amountChanged);
 
         $merchant = $this->merchantRepository->getOneById($request->getMerchantId());
         $merchant->increaseAvailableFinancingLimit($amountChanged);
