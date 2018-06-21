@@ -265,16 +265,16 @@
         },
         {
             "name": "google/cloud-logging",
-            "version": "v1.12.0",
+            "version": "v1.12.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GoogleCloudPlatform/google-cloud-php-logging.git",
-                "reference": "db1155a6c3a98d4b1c45a44b3bd3830d13a06414"
+                "reference": "4da8b2a1efa11dc7809cbcb5b59e135a870c220b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GoogleCloudPlatform/google-cloud-php-logging/zipball/db1155a6c3a98d4b1c45a44b3bd3830d13a06414",
-                "reference": "db1155a6c3a98d4b1c45a44b3bd3830d13a06414",
+                "url": "https://api.github.com/repos/GoogleCloudPlatform/google-cloud-php-logging/zipball/4da8b2a1efa11dc7809cbcb5b59e135a870c220b",
+                "reference": "4da8b2a1efa11dc7809cbcb5b59e135a870c220b",
                 "shasum": ""
             },
             "require": {
@@ -314,7 +314,7 @@
                 "Apache-2.0"
             ],
             "description": "Stackdriver Logging Client for PHP",
-            "time": "2018-06-12T16:51:43+00:00"
+            "time": "2018-06-20T16:07:22+00:00"
         },
         {
             "name": "google/gax",
