@@ -34,13 +34,16 @@ class OrderOutstandingAmountChangeUseCase
             throw new PaellaCoreCriticalException('Order not found', PaellaCoreCriticalException::CODE_NOT_FOUND);
         }
 
-        if (!$orderAmountChangeDetails->isPayment()) {
-            return;
-        }
-
         $merchant = $this->merchantRepository->getOneById($order->getMerchantId());
         if (is_null($merchant)) {
             throw new MerchantNotFoundException();
+        }
+
+        $merchant->increaseAvailableFinancingLimit($orderAmountChangeDetails->getAmountChange());
+        $this->merchantRepository->update($merchant);
+
+        if (!$orderAmountChangeDetails->isPayment()) {
+            return;
         }
 
         $notification = (new NotificationDTO())
