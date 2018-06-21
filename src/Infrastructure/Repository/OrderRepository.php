@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OrderRepository extends AbstractRepository implements OrderRepositoryInterface
 {
-    const SELECT_FIELDS = 'id, amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, delivery_address_id, merchant_debtor_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, created_at, updated_at, shipped_at';
+    const SELECT_FIELDS = 'id, amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, proof_of_delivery_url, delivery_address_id, merchant_debtor_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, created_at, updated_at, shipped_at';
 
     private $eventDispatcher;
     private $orderFactory;
@@ -27,9 +27,9 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
     {
         $id = $this->doInsert('
             INSERT INTO orders
-            (amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, delivery_address_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, uuid, created_at, updated_at, merchant_debtor_id)
+            (amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, proof_of_delivery_url, delivery_address_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, uuid, created_at, updated_at, merchant_debtor_id)
             VALUES
-            (:amount_net, :amount_gross, :amount_tax, :duration, :external_code, :state, :external_comment, :internal_comment, :invoice_number, :invoice_url, :delivery_address_id, :merchant_id, :debtor_person_id, :debtor_external_data_id, :payment_id, :uuid, :created_at, :updated_at, :merchant_debtor_id)
+            (:amount_net, :amount_gross, :amount_tax, :duration, :external_code, :state, :external_comment, :internal_comment, :invoice_number, :invoice_url, :proof_of_delivery_url, :delivery_address_id, :merchant_id, :debtor_person_id, :debtor_external_data_id, :payment_id, :uuid, :created_at, :updated_at, :merchant_debtor_id)
         ', [
             'amount_net' => $order->getAmountNet(),
             'amount_gross' => $order->getAmountGross(),
@@ -41,6 +41,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             'internal_comment' => $order->getInternalComment(),
             'invoice_number' => $order->getInvoiceNumber(),
             'invoice_url' => $order->getInvoiceUrl(),
+            'proof_of_delivery_url' => $order->getProofOfDeliveryUrl(),
             'delivery_address_id' => $order->getDeliveryAddressId(),
             'merchant_id' => $order->getMerchantId(),
             'debtor_person_id' => $order->getDebtorPersonId(),
@@ -122,7 +123,8 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
               shipped_at = :shipped_at,
               payment_id = :payment_id,
               invoice_number = :invoice_number,
-              invoice_url = :invoice_url
+              invoice_url = :invoice_url,
+              proof_of_delivery_url = :proof_of_delivery_url
             WHERE id = :id
         ', [
             'amount_gross' => $order->getAmountGross(),
@@ -135,6 +137,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             'payment_id' => $order->getPaymentId(),
             'invoice_number' => $order->getInvoiceNumber(),
             'invoice_url' => $order->getInvoiceUrl(),
+            'proof_of_delivery_url' => $order->getProofOfDeliveryUrl(),
             'id' => $order->getId(),
         ]);
 

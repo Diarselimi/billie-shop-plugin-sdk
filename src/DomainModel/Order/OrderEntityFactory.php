@@ -34,6 +34,7 @@ class OrderEntityFactory
             ->setInternalComment($row['internal_comment'])
             ->setInvoiceNumber($row['invoice_number'])
             ->setInvoiceUrl($row['invoice_url'])
+            ->setProofOfDeliveryUrl($row['proof_of_delivery_url'])
             ->setDeliveryAddressId($row['delivery_address_id'])
             ->setMerchantDebtorId($row['merchant_debtor_id'])
             ->setMerchantId($row['merchant_id'])

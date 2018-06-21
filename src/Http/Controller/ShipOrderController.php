@@ -25,6 +25,7 @@ class ShipOrderController
             ->setCustomerId($request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER))
             ->setInvoiceNumber($request->request->get('invoice_number'))
             ->setInvoiceUrl($request->request->get('invoice_url'))
+            ->setProofOfDeliveryUrl($request->request->get('proof_of_delivery_url'))
         ;
         $this->useCase->execute($orderRequest);
 
