@@ -1,8 +1,3 @@
-healthcheck:
-  path: /healthcheck
-  controller: App\Http\Controller\HealthCheckController::execute
-  methods: [GET]
-
 get_order:
   path: /order/{externalCode}
   controller: App\Http\Controller\GetOrderController::execute
@@ -37,3 +32,8 @@ ship_order:
   path: /order/{externalCode}/ship
   controller: App\Http\Controller\ShipOrderController::execute
   methods: [POST]
+
+health_check:
+  path: /healthcheck
+  controller:  App\Infrastructure\Monitoring\Controller\HealthCheckController::execute
+  methods: [GET]

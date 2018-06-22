@@ -2,7 +2,7 @@ parameters:
   locale: 'en'
   google_cloud_project_id: bbox-150315
   google_cloud_credentials_file_path: '%kernel.root_dir%/../config/secrets/gcloud.json'
-  log_channel: paella_core
+  project_name: paella_core
 
 services:
   _defaults:
@@ -62,6 +62,14 @@ services:
   App\DomainModel\Borscht\BorschtInterface: '@App\Infrastructure\Borscht\Borscht'
   App\DomainModel\Risky\RiskyInterface: '@App\Infrastructure\Risky\Risky'
 
+  Symfony\Component\Workflow\Workflow: '@state_machine.order'
+
+  # monitoring
+  Raven_Client:
+    class: Raven_Client
+    arguments:
+      - '%env(SENTRY_DSN)%'
+
   App\Infrastructure\Monitoring\StackdriverLogHandler:
     arguments:
       $loggingClient: !service
@@ -71,11 +79,11 @@ services:
             projectId: '%google_cloud_project_id%'
             keyFilePath: '%google_cloud_credentials_file_path%'
       $env: '%env(INSTANCE_SUFFIX)%'
-      $channel: '%log_channel%'
+      $channel: '%project_name%'
 
-  Symfony\Component\Workflow\Workflow: '@state_machine.order'
-
-  Raven_Client:
-    class: Raven_Client
-    arguments:
-      - '%env(SENTRY_DSN)%'
+  App\Infrastructure\Monitoring\Controller\:
+    resource: '../src/Infrastructure/Monitoring/Controller'
+    tags: ['controller.service_arguments']
+    bind:
+      $projectName: '%project_name%'
+  # end of monitoring

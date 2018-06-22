@@ -19,7 +19,13 @@ class RequestCheckSubscriber implements EventSubscriberInterface
 
     public function onKernelRequest(GetResponseEvent $event)
     {
-        if (!$event->getRequest()->headers->has(HttpConstantsInterface::REQUEST_HEADER_API_USER)) {
+        $request = $event->getRequest();
+
+        if ($request->get('_route') === HttpConstantsInterface::ROUTE_HEALTH_CHECK) {
+            return;
+        }
+
+        if (!$request->headers->has(HttpConstantsInterface::REQUEST_HEADER_API_USER)) {
             throw new Exception('User header is missing', Exception::CODE_USER_HEADER_MISSING);
         }
     }
