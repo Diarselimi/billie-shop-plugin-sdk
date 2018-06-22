@@ -1,0 +1,3 @@
+check process order_payment_state_change with pidfile /var/run/paellacore/order_payment_state_change.pid
+        start program = "/usr/local/bin/start-stop-script start /var/run/paellacore/order_payment_state_change.pid '/var/www/paella-core/bin/console rabbitmq:consumer -m 1 order_payment_state_change'"
+                as uid www-data and with gid www-data

@@ -19,4 +19,31 @@ class OrderEntityFactory
             ->setState(OrderStateManager::STATE_NEW)
         ;
     }
+
+    public function createFromDatabaseRow(array $row): OrderEntity
+    {
+        return (new OrderEntity())
+            ->setId($row['id'])
+            ->setDuration($row['duration'])
+            ->setAmountNet($row['amount_net'])
+            ->setAmountGross($row['amount_gross'])
+            ->setAmountTax($row['amount_tax'])
+            ->setExternalCode($row['external_code'])
+            ->setState($row['state'])
+            ->setExternalComment($row['external_comment'])
+            ->setInternalComment($row['internal_comment'])
+            ->setInvoiceNumber($row['invoice_number'])
+            ->setInvoiceUrl($row['invoice_url'])
+            ->setProofOfDeliveryUrl($row['proof_of_delivery_url'])
+            ->setDeliveryAddressId($row['delivery_address_id'])
+            ->setMerchantDebtorId($row['merchant_debtor_id'])
+            ->setMerchantId($row['merchant_id'])
+            ->setDebtorPersonId($row['debtor_person_id'])
+            ->setDebtorExternalDataId($row['debtor_external_data_id'])
+            ->setPaymentId($row['payment_id'])
+            ->setShippedAt($row['shipped_at'] ? new \DateTime($row['shipped_at']) : $row['shipped_at'])
+            ->setCreatedAt(new \DateTime($row['created_at']))
+            ->setUpdatedAt(new \DateTime($row['updated_at']))
+        ;
+    }
 }

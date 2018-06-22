@@ -16,5 +16,5 @@ interface BorschtInterface
 
     public function confirmPayment(OrderEntity $order, float $amount): void;
 
-    public function ship(OrderEntity $order, string $debtorPaymentId): OrderPaymentDetailsDTO;
+    public function createOrder(OrderEntity $order, string $debtorPaymentId): OrderPaymentDetailsDTO;
 }

@@ -56,13 +56,14 @@ class ShipOrderUseCase
         $order
             ->setInvoiceNumber($request->getInvoiceNumber())
             ->setInvoiceUrl($request->getInvoiceUrl())
+            ->setProofOfDeliveryUrl($request->getProofOfDeliveryUrl())
             ->setShippedAt(new \DateTime())
         ;
 
         $company = $this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId());
         $debtor = $this->alfred->getDebtor($company->getDebtorId());
 
-        $paymentDetails = $this->borscht->ship($order, $debtor->getPaymentId());
+        $paymentDetails = $this->borscht->createOrder($order, $debtor->getPaymentId());
         $order->setPaymentId($paymentDetails->getId());
 
         $this->workflow->apply($order, OrderStateManager::TRANSITION_SHIP);

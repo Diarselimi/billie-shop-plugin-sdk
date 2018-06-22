@@ -5,3 +5,4 @@ monolog:
       path: "%kernel.logs_dir%/%kernel.environment%.log"
       id: App\Infrastructure\Monitoring\StackdriverLogHandler
       level: info
+      channels: ["!translation", "!request"]

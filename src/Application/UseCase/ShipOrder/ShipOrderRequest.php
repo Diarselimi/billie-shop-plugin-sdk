@@ -8,6 +8,7 @@ class ShipOrderRequest
     private $customerId;
     private $invoiceNumber;
     private $invoiceUrl;
+    private $proofOfDeliveryUrl;
 
     public function getExternalCode(): string
     {
@@ -27,6 +28,11 @@ class ShipOrderRequest
     public function getInvoiceUrl(): string
     {
         return $this->invoiceUrl;
+    }
+
+    public function getProofOfDeliveryUrl(): ?string
+    {
+        return $this->proofOfDeliveryUrl;
     }
 
     public function setExternalCode(string $externalCode): ShipOrderRequest
@@ -53,6 +59,13 @@ class ShipOrderRequest
     public function setInvoiceUrl(string $invoiceUrl): ShipOrderRequest
     {
         $this->invoiceUrl = $invoiceUrl;
+
+        return $this;
+    }
+
+    public function setProofOfDeliveryUrl(?string $proofOfDeliveryUrl): ShipOrderRequest
+    {
+        $this->proofOfDeliveryUrl = $proofOfDeliveryUrl;
 
         return $this;
     }

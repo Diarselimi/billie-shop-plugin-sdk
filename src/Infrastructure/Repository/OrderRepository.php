@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Repository;
 
 use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\Order\OrderEntityFactory;
 use App\DomainModel\Order\OrderLifecycleEvent;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use Ramsey\Uuid\Uuid;
@@ -11,21 +12,24 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OrderRepository extends AbstractRepository implements OrderRepositoryInterface
 {
-    private $eventDispatcher;
+    const SELECT_FIELDS = 'id, amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, proof_of_delivery_url, delivery_address_id, merchant_debtor_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, created_at, updated_at, shipped_at';
 
-    public function __construct(EventDispatcherInterface $eventDispatcher)
+    private $eventDispatcher;
+    private $orderFactory;
+
+    public function __construct(EventDispatcherInterface $eventDispatcher, OrderEntityFactory $orderFactory)
     {
         $this->eventDispatcher = $eventDispatcher;
+        $this->orderFactory = $orderFactory;
     }
 
     public function insert(OrderEntity $order): void
     {
         $id = $this->doInsert('
             INSERT INTO orders
-            (amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, delivery_address_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, uuid, created_at, updated_at, merchant_debtor_id)
+            (amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, proof_of_delivery_url, delivery_address_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, uuid, created_at, updated_at, merchant_debtor_id)
             VALUES
-            (:amount_net, :amount_gross, :amount_tax, :duration, :external_code, :state, :external_comment, :internal_comment, :invoice_number, :invoice_url, :delivery_address_id, :merchant_id, :debtor_person_id, :debtor_external_data_id, :payment_id, :uuid, :created_at, :updated_at, :merchant_debtor_id)
-            
+            (:amount_net, :amount_gross, :amount_tax, :duration, :external_code, :state, :external_comment, :internal_comment, :invoice_number, :invoice_url, :proof_of_delivery_url, :delivery_address_id, :merchant_id, :debtor_person_id, :debtor_external_data_id, :payment_id, :uuid, :created_at, :updated_at, :merchant_debtor_id)
         ', [
             'amount_net' => $order->getAmountNet(),
             'amount_gross' => $order->getAmountGross(),
@@ -37,6 +41,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             'internal_comment' => $order->getInternalComment(),
             'invoice_number' => $order->getInvoiceNumber(),
             'invoice_url' => $order->getInvoiceUrl(),
+            'proof_of_delivery_url' => $order->getProofOfDeliveryUrl(),
             'delivery_address_id' => $order->getDeliveryAddressId(),
             'merchant_id' => $order->getMerchantId(),
             'debtor_person_id' => $order->getDebtorPersonId(),
@@ -55,7 +60,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
     public function getOneByExternalCode(string $externalCode, int $merchantId): ?OrderEntity
     {
         $order = $this->doFetch('
-          SELECT id, amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, delivery_address_id, merchant_debtor_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, created_at, updated_at, shipped_at
+          SELECT ' . self::SELECT_FIELDS . '
           FROM orders
           WHERE external_code = :external_code AND merchant_id = :merchant_id
         ', [
@@ -67,28 +72,41 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             return null;
         }
 
-        return (new OrderEntity())
-            ->setId($order['id'])
-            ->setDuration($order['duration'])
-            ->setAmountNet($order['amount_net'])
-            ->setAmountGross($order['amount_gross'])
-            ->setAmountTax($order['amount_tax'])
-            ->setExternalCode($order['external_code'])
-            ->setState($order['state'])
-            ->setExternalComment($order['external_comment'])
-            ->setInternalComment($order['internal_comment'])
-            ->setInvoiceNumber($order['invoice_number'])
-            ->setInvoiceUrl($order['invoice_url'])
-            ->setDeliveryAddressId($order['delivery_address_id'])
-            ->setMerchantDebtorId($order['merchant_debtor_id'])
-            ->setMerchantId($order['merchant_id'])
-            ->setDebtorPersonId($order['debtor_person_id'])
-            ->setDebtorExternalDataId($order['debtor_external_data_id'])
-            ->setPaymentId($order['payment_id'])
-            ->setShippedAt($order['shipped_at'] ? new \DateTime($order['shipped_at']) : $order['shipped_at'])
-            ->setCreatedAt(new \DateTime($order['created_at']))
-            ->setUpdatedAt(new \DateTime($order['updated_at']))
-        ;
+        return $this->orderFactory->createFromDatabaseRow($order);
+    }
+
+    public function getOneByPaymentId(string $paymentId): ?OrderEntity
+    {
+        $order = $this->doFetch('
+          SELECT ' . self::SELECT_FIELDS . '
+          FROM orders
+          WHERE payment_id = :payment_id
+        ', [
+            'payment_id' => $paymentId,
+        ]);
+
+        if (!$order) {
+            return null;
+        }
+
+        return $this->orderFactory->createFromDatabaseRow($order);
+    }
+
+    public function getOneByUuid(string $uuid): ?OrderEntity
+    {
+        $order = $this->doFetch('
+          SELECT ' . self::SELECT_FIELDS . '
+          FROM orders
+          WHERE uuid = :uuid
+        ', [
+            'uuid' => $uuid,
+        ]);
+
+        if (!$order) {
+            return null;
+        }
+
+        return $this->orderFactory->createFromDatabaseRow($order);
     }
 
     public function update(OrderEntity $order): void
@@ -105,7 +123,8 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
               shipped_at = :shipped_at,
               payment_id = :payment_id,
               invoice_number = :invoice_number,
-              invoice_url = :invoice_url
+              invoice_url = :invoice_url,
+              proof_of_delivery_url = :proof_of_delivery_url
             WHERE id = :id
         ', [
             'amount_gross' => $order->getAmountGross(),
@@ -118,6 +137,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             'payment_id' => $order->getPaymentId(),
             'invoice_number' => $order->getInvoiceNumber(),
             'invoice_url' => $order->getInvoiceUrl(),
+            'proof_of_delivery_url' => $order->getProofOfDeliveryUrl(),
             'id' => $order->getId(),
         ]);
 

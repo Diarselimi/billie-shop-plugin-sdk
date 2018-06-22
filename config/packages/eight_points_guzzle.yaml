@@ -15,3 +15,7 @@ eight_points_guzzle:
       options:
         headers:
           Content-Type: "application/json"
+    webhook:
+      options:
+        headers:
+          Content-Type: "application/json"

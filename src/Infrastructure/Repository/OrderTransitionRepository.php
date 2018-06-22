@@ -11,12 +11,14 @@ class OrderTransitionRepository extends AbstractRepository implements OrderTrans
     {
         $id = $this->doInsert('
             INSERT INTO order_transitions
-            (order_id, transition, transited_at)
+            (order_id, `from`, `to`, transition, transited_at)
             VALUES
-            (:order_id, :transition, :transited_at)
+            (:order_id, :from, :to, :transition, :transited_at)
             
         ', [
             'order_id' => $transition->getOrderId(),
+            'from' => $transition->getFrom(),
+            'to' => $transition->getTo(),
             'transition' => $transition->getTransition(),
             'transited_at' => $transition->getTransitedAt()->format('Y-m-d H:i:s'),
         ]);

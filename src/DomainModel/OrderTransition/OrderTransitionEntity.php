@@ -6,10 +6,12 @@ class OrderTransitionEntity
 {
     private $id;
     private $orderId;
+    private $from;
+    private $to;
     private $transition;
     private $transitedAt;
 
-    public function getId(): int
+    public function getId():? int
     {
         return $this->id;
     }
@@ -29,6 +31,30 @@ class OrderTransitionEntity
     public function setOrderId(int $orderId): OrderTransitionEntity
     {
         $this->orderId = $orderId;
+
+        return $this;
+    }
+
+    public function getFrom():? string
+    {
+        return $this->from;
+    }
+
+    public function setFrom(?string $from): OrderTransitionEntity
+    {
+        $this->from = $from;
+
+        return $this;
+    }
+
+    public function getTo(): string
+    {
+        return $this->to;
+    }
+
+    public function setTo(string $to): OrderTransitionEntity
+    {
+        $this->to = $to;
 
         return $this;
     }

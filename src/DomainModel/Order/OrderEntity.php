@@ -16,6 +16,7 @@ class OrderEntity extends AbstractEntity
     private $internalComment;
     private $invoiceNumber;
     private $invoiceUrl;
+    private $proofOfDeliveryUrl;
     private $merchantDebtorId;
     private $merchantId;
     private $deliveryAddressId;
@@ -140,6 +141,18 @@ class OrderEntity extends AbstractEntity
     public function setInvoiceUrl(?string $invoiceUrl): OrderEntity
     {
         $this->invoiceUrl = $invoiceUrl;
+
+        return $this;
+    }
+
+    public function getProofOfDeliveryUrl(): ?string
+    {
+        return $this->proofOfDeliveryUrl;
+    }
+
+    public function setProofOfDeliveryUrl(?string $proofOfDeliveryUrl): OrderEntity
+    {
+        $this->proofOfDeliveryUrl = $proofOfDeliveryUrl;
 
         return $this;
     }

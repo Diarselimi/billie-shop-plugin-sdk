@@ -8,6 +8,8 @@ use App\DomainModel\Merchant\MerchantRepositoryInterface;
 
 class MerchantRepository extends AbstractRepository implements MerchantRepositoryInterface
 {
+    const SELECT_FIELDS = 'id, name, api_key, company_id, roles, is_active, available_financing_limit, webhook_url, created_at, updated_at';
+
     private $factory;
 
     public function __construct(MerchantEntityFactory $factory)
@@ -18,11 +20,10 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
     public function insert(MerchantEntity $merchant): void
     {
         $id = $this->doInsert('
-            INSERT INTO merchants 
-            (name, api_key, roles, is_active, available_financing_limit, created_at, updated_at, company_id)
+            INSERT INTO merchants
+            (name, api_key, roles, is_active, available_financing_limit, created_at, updated_at, company_id, webhook_url)
             VALUES
-            (:name, :api_key, :roles, :is_active, :available_financing_limit, :created_at, :updated_at, :company_id)
-            
+            (:name, :api_key, :roles, :is_active, :available_financing_limit, :created_at, :updated_at, :company_id, :webhook_url)
         ', [
             'name' => $merchant->getName(),
             'api_key' => $merchant->getApiKey(),
@@ -32,6 +33,7 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
             'created_at' => $merchant->getCreatedAt()->format('Y-m-d H:i:s'),
             'updated_at' => $merchant->getUpdatedAt()->format('Y-m-d H:i:s'),
             'company_id' => $merchant->getCompanyId(),
+            'webhook_url' => $merchant->getWebhookUrl(),
         ]);
 
         $merchant->setId($id);
@@ -41,7 +43,7 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
     {
         $merchant->setUpdatedAt(new \DateTime());
         $this->doUpdate('
-            UPDATE merchants 
+            UPDATE merchants
             SET available_financing_limit = :available_financing_limit, updated_at = :updated_at
             WHERE id = :id
         ', [
@@ -54,8 +56,8 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
     public function getOneById(int $id): ?MerchantEntity
     {
         $row = $this->doFetch('
-          SELECT id, name, api_key, company_id, roles, is_active, available_financing_limit, created_at, updated_at 
-          FROM merchants 
+          SELECT ' . self::SELECT_FIELDS . '
+          FROM merchants
           WHERE id = :id
         ', ['id' => $id]);
 
@@ -65,8 +67,8 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
     public function getOneByApiKeyRaw(string $apiKey): ?array
     {
         $customer = $this->doFetch('
-          SELECT id, name, api_key, company_id, roles, is_active, available_financing_limit, created_at, updated_at 
-          FROM merchants 
+          SELECT ' . self::SELECT_FIELDS . '
+          FROM merchants
           WHERE api_key = :api_key
         ', ['api_key' => $apiKey]);
 
