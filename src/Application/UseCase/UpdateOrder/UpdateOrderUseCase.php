@@ -3,6 +3,7 @@
 namespace App\Application\UseCase\UpdateOrder;
 
 use App\Application\PaellaCoreCriticalException;
+use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
@@ -17,21 +18,24 @@ class UpdateOrderUseCase implements LoggingInterface
 {
     use LoggingTrait;
 
-    private $orderRepository;
     private $borscht;
+    private $alfred;
+    private $orderRepository;
     private $merchantDebtorRepository;
     private $merchantRepository;
     private $orderStateManager;
 
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
         BorschtInterface $borscht,
+        AlfredInterface $alfred,
+        OrderRepositoryInterface $orderRepository,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         MerchantRepositoryInterface $merchantRepository,
         OrderStateManager $orderStateManager
     ) {
-        $this->orderRepository = $orderRepository;
         $this->borscht = $borscht;
+        $this->alfred = $alfred;
+        $this->orderRepository = $orderRepository;
         $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->merchantRepository = $merchantRepository;
         $this->orderStateManager = $orderStateManager;
@@ -101,7 +105,6 @@ class UpdateOrderUseCase implements LoggingInterface
             'new_tax' => $request->getAmountTax(),
         ]);
 
-        $amountChanged = $order->getAmountGross() - $request->getAmountGross();
         $order
             ->setAmountGross($request->getAmountGross())
             ->setAmountNet($request->getAmountNet())
@@ -121,17 +124,12 @@ class UpdateOrderUseCase implements LoggingInterface
         }
 
         $merchantDebtor = $this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId());
-        if ($merchantDebtor === null) {
-            throw new PaellaCoreCriticalException(sprintf(
-                'Company %s not found',
-                $order->getMerchantDebtorId()
-            ));
-        }
+        $this->alfred->unlockDebtorLimit($merchantDebtor->getDebtorId(), $order->getAmountGross());
 
-        $merchant = $this->merchantRepository->getOneById($request->getMerchantId());
-        $merchant->increaseAvailableFinancingLimit($amountChanged);
-
+        $merchant = $this->merchantRepository->getOneById($order->getMerchantId());
+        $merchant->increaseAvailableFinancingLimit($order->getAmountGross());
         $this->merchantRepository->update($merchant);
+
         $this->orderRepository->update($order);
     }
 

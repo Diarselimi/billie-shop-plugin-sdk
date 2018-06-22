@@ -3,6 +3,7 @@
 namespace App\Application\UseCase\CancelOrder;
 
 use App\Application\PaellaCoreCriticalException;
+use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\Order\OrderRepositoryInterface;
@@ -14,22 +15,25 @@ use Symfony\Component\Workflow\Workflow;
 class CancelOrderUseCase
 {
     private $orderRepository;
+    private $alfred;
     private $borscht;
     private $workflow;
-    private $companyRepository;
+    private $merchantDebtorRepository;
     private $merchantRepository;
 
     public function __construct(
         Workflow $workflow,
         OrderRepositoryInterface $orderRepository,
+        AlfredInterface $alfred,
         BorschtInterface $borscht,
-        MerchantDebtorRepository $companyRepository,
+        MerchantDebtorRepository $merchantDebtorRepository,
         MerchantRepositoryInterface $merchantRepository
     ) {
         $this->workflow = $workflow;
         $this->orderRepository = $orderRepository;
+        $this->alfred = $alfred;
         $this->borscht = $borscht;
-        $this->companyRepository = $companyRepository;
+        $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->merchantRepository = $merchantRepository;
     }
 
@@ -38,6 +42,7 @@ class CancelOrderUseCase
         $externalCode = $request->getExternalCode();
         $merchantId = $request->getMerchantId();
         $order = $this->orderRepository->getOneByExternalCode($externalCode, $merchantId);
+
         if (!$order) {
             throw new PaellaCoreCriticalException(
                 "Order #$externalCode not found",
@@ -47,6 +52,13 @@ class CancelOrderUseCase
         }
 
         if ($this->workflow->can($order, OrderStateManager::TRANSITION_CANCEL)) {
+            $merchant = $this->merchantRepository->getOneById($merchantId);
+            $merchant->increaseAvailableFinancingLimit($order->getAmountGross());
+            $this->merchantRepository->update($merchant);
+
+            $company = $this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId());
+            $this->alfred->unlockDebtorLimit($company->getDebtorId(), $order->getAmountGross());
+
             $this->workflow->apply($order, OrderStateManager::TRANSITION_CANCEL);
         } elseif ($this->workflow->can($order, OrderStateManager::TRANSITION_CANCEL_SHIPPED)) {
             $this->borscht->cancelOrder($order);
@@ -59,13 +71,9 @@ class CancelOrderUseCase
         }
         $this->orderRepository->update($order);
 
-        $company = $this->companyRepository->getOneById($order->getMerchantDebtorId());
+        $company = $this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId());
         if ($company === null) {
             throw new PaellaCoreCriticalException(sprintf('Company %s not found', $order->getMerchantDebtorId()));
         }
-
-        $merchant = $this->merchantRepository->getOneById($merchantId);
-        $merchant->increaseAvailableFinancingLimit($order->getAmountGross());
-        $this->merchantRepository->update($merchant);
     }
 }

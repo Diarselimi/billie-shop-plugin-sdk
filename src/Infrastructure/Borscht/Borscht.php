@@ -140,7 +140,7 @@ class Borscht implements BorschtInterface, LoggingInterface
         ]);
 
         try {
-            $this->client->put('/merchant/payment.json', [
+            $this->client->post('/merchant/payment.json', [
                 'json' => $json,
             ]);
         } catch (TransferException $exception) {
