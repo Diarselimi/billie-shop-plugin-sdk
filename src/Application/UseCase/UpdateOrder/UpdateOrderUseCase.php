@@ -73,7 +73,7 @@ class UpdateOrderUseCase implements LoggingInterface
             $this->updateAmount($order, $request);
         }
 
-        if ($durationChanged && $this->orderStateManager->wasShipped($order) && !$this->orderStateManager->isLate($order)) {
+        if ($durationChanged) {
             $this->updateDuration($order, $request);
         }
     }
@@ -86,6 +86,14 @@ class UpdateOrderUseCase implements LoggingInterface
             'old' => $order->getDuration(),
             'new' => $duration,
         ]);
+
+        if (!$this->orderStateManager->wasShipped($order) || $this->orderStateManager->isLate($order)) {
+            throw new PaellaCoreCriticalException(
+                'Update duration not possible',
+                PaellaCoreCriticalException::CODE_ORDER_DURATION_CANT_BE_UPDATED,
+                Response::HTTP_PRECONDITION_FAILED
+            );
+        }
 
         $order->setDuration($duration);
         $this->borscht->modifyOrder($order);
@@ -123,11 +131,13 @@ class UpdateOrderUseCase implements LoggingInterface
             $this->borscht->modifyOrder($order);
         }
 
+        $amountChanged = $order->getAmountGross() - $request->getAmountGross();
+
         $merchantDebtor = $this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId());
-        $this->alfred->unlockDebtorLimit($merchantDebtor->getDebtorId(), $order->getAmountGross());
+        $this->alfred->unlockDebtorLimit($merchantDebtor->getDebtorId(), $amountChanged);
 
         $merchant = $this->merchantRepository->getOneById($order->getMerchantId());
-        $merchant->increaseAvailableFinancingLimit($order->getAmountGross());
+        $merchant->increaseAvailableFinancingLimit($amountChanged);
         $this->merchantRepository->update($merchant);
 
         $this->orderRepository->update($order);

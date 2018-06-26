@@ -19,6 +19,7 @@ class PaellaCoreCriticalException extends \RuntimeException
     const CODE_ORDER_VALIDATION_FAILED = 'order_validation_failed';
     const CODE_ORDER_REJECTED = 'order_rejected';
     const CODE_ORDER_CANT_BE_SHIPPED = 'order_ship_failed';
+    const CODE_ORDER_DURATION_CANT_BE_UPDATED = 'order_duration_update_not_possible';
 
     private $responseCode;
     private $errorCode;
