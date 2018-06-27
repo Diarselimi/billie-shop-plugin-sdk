@@ -113,6 +113,7 @@ class UpdateOrderUseCase implements LoggingInterface
             'new_tax' => $request->getAmountTax(),
         ]);
 
+        $amountChanged = $order->getAmountGross() - $request->getAmountGross();
         $order
             ->setAmountGross($request->getAmountGross())
             ->setAmountNet($request->getAmountNet())
@@ -129,9 +130,11 @@ class UpdateOrderUseCase implements LoggingInterface
         if ($this->orderStateManager->wasShipped($order)) {
             $this->logInfo('Do partial cancellation in Borscht');
             $this->borscht->modifyOrder($order);
+
+            return;
         }
 
-        $amountChanged = $order->getAmountGross() - $request->getAmountGross();
+        $this->logInfo('Do update order without Borscht');
 
         $merchantDebtor = $this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId());
         $this->alfred->unlockDebtorLimit($merchantDebtor->getDebtorId(), $amountChanged);
