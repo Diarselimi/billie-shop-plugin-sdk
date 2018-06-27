@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\Monitoring\Sentry;
 
+use App\Application\PaellaCoreCriticalException;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -71,6 +72,10 @@ class SentrySubscriber implements EventSubscriberInterface
 
     private function isIgnored(\Throwable $throwable): bool
     {
+        if ($throwable instanceof PaellaCoreCriticalException) {
+            return true;
+        }
+
         $skipCapture = [];
 
         foreach ($skipCapture as $className) {
