@@ -127,6 +127,14 @@ class UpdateOrderUseCase implements LoggingInterface
             ;
         }
 
+        $this->orderRepository->update($order);
+
+        if ($amountChanged == 0.) {
+            $this->logInfo('Gross amount was not changed, do nothing');
+
+            return;
+        }
+
         if ($this->orderStateManager->wasShipped($order)) {
             $this->logInfo('Do partial cancellation in Borscht');
             $this->borscht->modifyOrder($order);
@@ -142,8 +150,6 @@ class UpdateOrderUseCase implements LoggingInterface
         $merchant = $this->merchantRepository->getOneById($order->getMerchantId());
         $merchant->increaseAvailableFinancingLimit($amountChanged);
         $this->merchantRepository->update($merchant);
-
-        $this->orderRepository->update($order);
     }
 
     private function validate(OrderEntity $order, UpdateOrderRequest $request): void
