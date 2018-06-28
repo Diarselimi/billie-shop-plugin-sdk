@@ -102,6 +102,14 @@ class UpdateOrderUseCase implements LoggingInterface
 
     private function updateAmount(OrderEntity $order, UpdateOrderRequest $request)
     {
+        if ($this->orderStateManager->isCanceled($order) || $this->orderStateManager->isComplete($order)) {
+            throw new PaellaCoreCriticalException(
+                'Update amount not possible',
+                PaellaCoreCriticalException::CODE_ORDER_AMOUNT_CANT_BE_UPDATED,
+                Response::HTTP_PRECONDITION_FAILED
+            );
+        }
+
         $this->logInfo('Update amount', [
             'old_gross' => $order->getAmountGross(),
             'new_gross' => $request->getAmountGross(),
