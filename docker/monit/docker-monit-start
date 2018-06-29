@@ -1,6 +1,9 @@
 #!/bin/sh
 set -e
 
+test -d /var/run/billie || mkdir /var/run/billie
+chown -R www-data:www-data /var/run/billie
+
 sed -i "s/^\s*set daemon.*$/  set daemon ${MONIT_CYCLE:-5}/" /etc/monit/monitrc
 MONIT_MONITORS=/etc/monit/conf-available/*
 for f in ${MONIT_MONITORS}

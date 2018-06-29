@@ -12,12 +12,13 @@ RUN docker-php-ext-install bcmath
 RUN apt-get update && \
     apt-get install -y --no-install-recommends monit && \
     apt-get clean -y && rm -rf /var/lib/apt/lists/*
-COPY ./docker/monit/start-stop-script /usr/local/bin/
-RUN mkdir /var/run/paellacore && chown www-data:www-data /var/run/paellacore && \
-    rm -rf /etc/monit/conf.d/* && \
-    rm -rf /etc/monit/conf-available/* && \
-    chmod 0755 /usr/local/bin/start-stop-script && \
-    ln -s $APP_ROOT/docker/monit/docker-monit-start /usr/local/bin/docker-monit-start
+RUN rm -rf /etc/monit/conf.d/* && \
+    rm -rf /etc/monit/conf-available/*
 COPY ./docker/monit/monitors /etc/monit/conf-available
+
+# start-stop-script
+COPY ./docker/monit/start-stop-script /usr/local/bin/
+RUN chmod 0755 /usr/local/bin/start-stop-script && \
+    ln -s $APP_ROOT/docker/monit/docker-monit-start /usr/local/bin/docker-monit-start
 
 #ansible-remove-me#COPY . $APP_ROOT

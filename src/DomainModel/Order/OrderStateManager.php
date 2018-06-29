@@ -55,4 +55,14 @@ class OrderStateManager
     {
         return $order->getState() === self::STATE_DECLINED;
     }
+
+    public function isComplete(OrderEntity $order): bool
+    {
+        return $order->getState() === self::STATE_COMPLETE;
+    }
+
+    public function isCanceled(OrderEntity $order): bool
+    {
+        return $order->getState() === self::STATE_CANCELED;
+    }
 }
