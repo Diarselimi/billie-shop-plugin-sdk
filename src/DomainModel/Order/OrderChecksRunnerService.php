@@ -4,78 +4,78 @@ namespace App\DomainModel\Order;
 
 use App\DomainModel\Monitoring\LoggingInterface;
 use App\DomainModel\Monitoring\LoggingTrait;
+use App\DomainModel\RiskCheck\Checker\CheckInterface;
+use App\DomainModel\RiskCheck\Checker\CheckResult;
+use App\DomainModel\RiskCheck\RiskCheckEntityFactory;
+use App\DomainModel\RiskCheck\RiskCheckRepositoryInterface;
 use App\DomainModel\Risky\RiskyInterface;
-use App\DomainModel\Alfred\AlfredInterface;
+use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class OrderChecksRunnerService implements LoggingInterface
 {
     use LoggingTrait;
 
-    private const OVERDUE_MAX_DAYS = 30;
-
-    private $risky;
+    private $producer;
+    private $riskCheckRepository;
+    private $riskCheckFactory;
     private $orderRepository;
-    private $alfred;
+    private $risky;
+    private $checkLoader;
+    private $sentry;
 
-    public function __construct(RiskyInterface $risky, OrderRepositoryInterface $orderRepository, AlfredInterface $alfred)
-    {
-        $this->risky = $risky;
+    public function __construct(
+        ProducerInterface $producer,
+        RiskCheckRepositoryInterface $riskCheckRepository,
+        RiskCheckEntityFactory $riskCheckFactory,
+        OrderRepositoryInterface $orderRepository,
+        RiskyInterface $risky,
+        ServiceLocator $checkLoader,
+        \Raven_Client $sentry
+    ) {
+        $this->producer = $producer;
+        $this->riskCheckRepository = $riskCheckRepository;
+        $this->riskCheckFactory = $riskCheckFactory;
         $this->orderRepository = $orderRepository;
-        $this->alfred = $alfred;
+        $this->risky = $risky;
+        $this->checkLoader = $checkLoader;
+        $this->sentry = $sentry;
     }
 
     public function runPreconditionChecks(OrderContainer $order): bool
     {
-        $amountCheck = $this->risky->runOrderCheck($order->getOrder(), RiskyInterface::AMOUNT);
-        $debtorCountryCheck = $this->risky->runOrderCheck($order->getOrder(), RiskyInterface::DEBTOR_COUNTRY);
-        $debtorIndustrySectorCheck = $this->risky->runOrderCheck(
-            $order->getOrder(),
-            RiskyInterface::DEBTOR_INDUSTRY_SECTOR
-        );
+        $amountCheckResult = $this->check($order, 'amount');
+        $debtorCountryCheckResult = $this->check($order, 'debtor_country');
+        $debtorIndustrySectorCheckResult = $this->check($order, 'debtor_industry_sector');
 
-        $this->logInfo('Precondition checks: amount: {amount}, country: {country}, industry sector: {industry}', [
-            'amount' => (int)$amountCheck,
-            'country' => (int)$debtorCountryCheck,
-            'industry' => (int)$debtorIndustrySectorCheck,
-        ]);
-
-        return $amountCheck && $debtorCountryCheck && $debtorIndustrySectorCheck;
+        return $amountCheckResult && $debtorCountryCheckResult && $debtorIndustrySectorCheckResult;
     }
 
     public function runChecks(OrderContainer $order, ?string $debtorCrefoId): bool
     {
-        $merchant = $order->getMerchant();
-        $debtorId = $order->getMerchantDebtor()->getDebtorId();
-
         $this->logWaypoint('debtor != merchant check');
-        $debtorNotCustomerCheck = $debtorId !== $merchant->getCompanyId();
-        if (!$debtorNotCustomerCheck) {
-            $this->logInfo('Debtor not customer check failed');
-
+        $debtorNotCustomerCheckResult = $this->check($order, 'debtor_not_customer');
+        if (!$debtorNotCustomerCheckResult) {
             return false;
         }
 
         $this->logWaypoint('address check');
-        $addressCheck = $this->risky->runOrderCheck($order->getOrder(), RiskyInterface::DEBTOR_ADDRESS);
-        if (!$addressCheck) {
+        $this->logWaypoint('company name check');
+        $nameCheckResult = $this->check($order, 'debtor_name');
+        $addressCheckResult = $this->check($order, 'debtor_address');
+        if (!$nameCheckResult || !$addressCheckResult) {
             $this->logInfo('Address check failed');
-
-            return false;
         }
 
         $this->logWaypoint('blacklist check');
-        $blacklistCheck = $this->alfred->isDebtorBlacklisted($debtorId);
-        if ($blacklistCheck) {
-            $this->logInfo('Black list check failed');
-
+        $debtorBlacklistedCheckResult = $this->check($order, 'debtor_blacklisted');
+        if (!$debtorBlacklistedCheckResult) {
             return false;
         }
 
         $this->logWaypoint('overdue check');
-        $debtorOverDueCheck = $this->getMerchantDebtorOverdues($order);
-        if (!$debtorOverDueCheck) {
-            $this->logInfo('Debtor overdue check failed');
-
+        $debtorOverDueCheckResult = $this->check($order, 'debtor_overdue');
+        if (!$debtorOverDueCheckResult) {
             return false;
         }
 
@@ -92,15 +92,51 @@ class OrderChecksRunnerService implements LoggingInterface
         return true;
     }
 
-    private function getMerchantDebtorOverdues(OrderContainer $order): bool
+    private function check(OrderContainer $order, string $name): bool
     {
-        $overdues = $this->orderRepository->getCustomerOverdues($order->getOrder()->getMerchantDebtorId());
-        foreach ($overdues as $overdue) {
-            if ($overdue > static::OVERDUE_MAX_DAYS) {
-                return false;
-            }
+        $check = $this->getCheck($name);
+        $result = $check->check($order);
+
+        $this->logInfo('Check result: {check} -> {result}', [
+            'check' => $name,
+            'result' => (int) $result->isPassed(),
+            'attributes' => $result->getAttributes(),
+        ]);
+
+        $this->publishCheckResult($result, $order);
+
+        return $result->isPassed();
+    }
+
+    public function publishCheckResult(CheckResult $checkResult, OrderContainer $order)
+    {
+        $riskCheckEntity = $this->riskCheckFactory->createFromCheckResult($checkResult, $order->getOrder()->getId());
+        $this->riskCheckRepository->insert($riskCheckEntity);
+        $riskCheckData = [
+            'event_id' => $riskCheckEntity->getId(),
+            'is_passed' => $checkResult->isPassed(),
+            'name' => $checkResult->getName(),
+            'attributes' => $checkResult->getAttributes(),
+        ];
+
+        try {
+            $this->producer->publish(json_encode($riskCheckData), 'risk_check_result_paella');
+        } catch (\ErrorException $exception) {
+            $this->logError('[suppressed] Rabbit producer exception', [
+                'exception' => $exception,
+                'data' => $riskCheckData,
+            ]);
+
+            $this->sentry->captureException($exception);
+        }
+    }
+
+    private function getCheck($name): CheckInterface
+    {
+        if (!$this->checkLoader->has($name)) {
+            throw new \RuntimeException("Risk check {$name} not registered");
         }
 
-        return true;
+        return $this->checkLoader->get($name);
     }
 }

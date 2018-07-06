@@ -34,10 +34,35 @@ class RiskCheckRepository extends AbstractRepository implements RiskCheckReposit
         $riskCheck->setId($id);
     }
 
+    public function update(RiskCheckEntity $riskCheck): void
+    {
+        $this->doUpdate('
+            UPDATE risk_checks
+            SET check_id = :check_id
+            WHERE id = :id
+        ', [
+            'id' => $riskCheck->getId(),
+            'check_id' => $riskCheck->getCheckId(),
+        ]);
+    }
+
+    public function getOneById(int $id):? RiskCheckEntity
+    {
+        $row = $this->doFetch('
+            SELECT id, order_id, check_id, name, is_passed, created_at, updated_at
+            FROM risk_checks
+            WHERE id = :id
+        ', [
+            'id' => $id,
+        ]);
+
+        return $row ? $this->factory->createFromDatabaseRow($row) : null;
+    }
+
     public function getOneByName(int $orderId, string $name):? RiskCheckEntity
     {
         $row = $this->doFetch('
-            SELECT order_id, check_id, name, is_passed, created_at, updated_at
+            SELECT id, order_id, check_id, name, is_passed, created_at, updated_at
             FROM risk_checks
             WHERE order_id = :order_id AND name = :name
         ', [

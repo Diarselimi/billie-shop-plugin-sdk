@@ -6,7 +6,6 @@ use App\Application\UseCase\OrderOutstandingAmountChange\OrderOutstandingAmountC
 use App\Application\UseCase\OrderOutstandingAmountChange\OrderOutstandingAmountChangeUseCase;
 use App\DomainModel\Borscht\OrderAmountChangeFactory;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
-use OldSound\RabbitMqBundle\RabbitMq\Exception\AckStopConsumerException;
 use PhpAmqpLib\Message\AMQPMessage;
 
 class OrderOutstandingAmountChangeConsumer implements ConsumerInterface
@@ -32,6 +31,7 @@ class OrderOutstandingAmountChangeConsumer implements ConsumerInterface
         $request = new OrderOutstandingAmountChangeRequest($paymentDetails);
         $this->useCase->execute($request);
 
-        throw new AckStopConsumerException();
+        // dead loop prevention is disabled
+//        throw new AckStopConsumerException();
     }
 }

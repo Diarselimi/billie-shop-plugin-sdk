@@ -14,6 +14,7 @@ use App\DomainModel\Order\OrderContainer;
 use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
+use App\DomainModel\RiskCheck\Checker\CheckResult;
 use Symfony\Component\Workflow\Workflow;
 
 class CreateOrderUseCase implements LoggingInterface
@@ -66,13 +67,16 @@ class CreateOrderUseCase implements LoggingInterface
             return;
         }
 
+        $orderContainer->setDebtorCompany($debtorDTO);
         $this->orderRepository->update($orderContainer->getOrder());
 
         $this->logWaypoint('limit check');
-        if (!$this->alfred->lockDebtorLimit(
+        $limitLocked = $this->alfred->lockDebtorLimit(
             $orderContainer->getMerchantDebtor()->getDebtorId(),
             $orderContainer->getOrder()->getAmountGross()
-        )) {
+        );
+        $this->orderChecksRunnerService->publishCheckResult(new CheckResult($limitLocked, 'limit', []), $orderContainer);
+        if (!$limitLocked) {
             $this->reject($orderContainer, "debtor limit exceeded");
 
             return;

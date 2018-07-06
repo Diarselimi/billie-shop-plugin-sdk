@@ -64,6 +64,24 @@ services:
 
   Symfony\Component\Workflow\Workflow: '@state_machine.order'
 
+  OldSound\RabbitMqBundle\RabbitMq\ProducerInterface: '@old_sound_rabbit_mq.paella_events_producer'
+
+  App\DomainModel\Order\OrderChecksRunnerService:
+    arguments:
+      $checkLoader: !service
+        class: Symfony\Component\DependencyInjection\ServiceLocator
+        tags: ['container.service_locator']
+        arguments:
+          -
+            amount: '@App\DomainModel\RiskCheck\Checker\AmountCheck'
+            debtor_country: '@App\DomainModel\RiskCheck\Checker\DebtorCountryCheck'
+            debtor_industry_sector: '@App\DomainModel\RiskCheck\Checker\DebtorIndustrySectorCheck'
+            debtor_not_customer: '@App\DomainModel\RiskCheck\Checker\DebtorNotCustomerCheck'
+            debtor_overdue: '@App\DomainModel\RiskCheck\Checker\DebtorOverdueCheck'
+            debtor_name: '@App\DomainModel\RiskCheck\Checker\DebtorNameCheck'
+            debtor_address: '@App\DomainModel\RiskCheck\Checker\DebtorAddressCheck'
+            debtor_blacklisted: '@App\DomainModel\RiskCheck\Checker\DebtorBlacklistedCheck'
+
   # monitoring
   Raven_Client:
     class: Raven_Client

@@ -11,12 +11,12 @@ class RiskCheckEntity extends AbstractEntity
     private $name;
     private $isPassed;
 
-    public function getCheckId(): int
+    public function getCheckId():? int
     {
         return $this->checkId;
     }
 
-    public function setCheckId(int $checkId): RiskCheckEntity
+    public function setCheckId(?int $checkId): RiskCheckEntity
     {
         $this->checkId = $checkId;
 
