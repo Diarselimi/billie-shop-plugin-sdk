@@ -13,8 +13,10 @@ class BeforeProcessingSubscriber implements EventSubscriberInterface, LoggingInt
 
     public function beforeProcessing(BeforeProcessingMessageEvent $event)
     {
+        // dead loop prevention is disabled
+
         $message = $event->getAMQPMessage();
-        $message->get('channel')->basic_ack($message->get('delivery_tag'));
+//        $message->get('channel')->basic_ack($message->get('delivery_tag'));
 
         $this->logInfo('Queue message received', [
             'body' => $message->getBody(),

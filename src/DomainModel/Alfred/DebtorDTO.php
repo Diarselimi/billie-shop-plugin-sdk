@@ -14,6 +14,7 @@ class DebtorDTO
     private $paymentId;
     private $crefoId;
     private $schufaId;
+    private $isBlacklisted;
 
     public function getId(): int
     {
@@ -131,6 +132,18 @@ class DebtorDTO
     public function setSchufaId(?string $schufaId): DebtorDTO
     {
         $this->schufaId = $schufaId;
+
+        return $this;
+    }
+
+    public function isBlacklisted():? bool
+    {
+        return $this->isBlacklisted;
+    }
+
+    public function setIsBlacklisted(?bool $isBlacklisted): DebtorDTO
+    {
+        $this->isBlacklisted = $isBlacklisted;
 
         return $this;
     }

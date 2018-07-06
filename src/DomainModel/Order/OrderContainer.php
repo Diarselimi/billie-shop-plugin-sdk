@@ -3,6 +3,7 @@
 namespace App\DomainModel\Order;
 
 use App\DomainModel\Address\AddressEntity;
+use App\DomainModel\Alfred\DebtorDTO;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
@@ -15,6 +16,7 @@ class OrderContainer
     private $debtorPerson;
     private $debtorExternalData;
     private $debtorExternalDataAddress;
+    private $debtorCompany;
     private $deliveryAddress;
     private $merchant;
 
@@ -74,6 +76,18 @@ class OrderContainer
     public function setDebtorExternalDataAddress(AddressEntity $debtorExternalDataAddress): OrderContainer
     {
         $this->debtorExternalDataAddress = $debtorExternalDataAddress;
+
+        return $this;
+    }
+
+    public function getDebtorCompany():? DebtorDTO
+    {
+        return $this->debtorCompany;
+    }
+
+    public function setDebtorCompany(DebtorDTO $debtorCompany): OrderContainer
+    {
+        $this->debtorCompany = $debtorCompany;
 
         return $this;
     }

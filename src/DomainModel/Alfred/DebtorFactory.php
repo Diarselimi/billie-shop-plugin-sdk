@@ -17,6 +17,7 @@ class DebtorFactory
             ->setPaymentId($data['payment_id'])
             ->setCrefoId($data['crefo_id'])
             ->setSchufaId($data['schufa_id'])
+            ->setIsBlacklisted($data['is_blacklisted'])
         ;
     }
 }

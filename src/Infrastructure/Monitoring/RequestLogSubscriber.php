@@ -26,7 +26,7 @@ class RequestLogSubscriber implements EventSubscriberInterface, LoggingInterface
     public static function getSubscribedEvents()
     {
         return [
-            KernelEvents::REQUEST => 'onRequest',
+            KernelEvents::REQUEST => ['onRequest', 9],
         ];
     }
 }

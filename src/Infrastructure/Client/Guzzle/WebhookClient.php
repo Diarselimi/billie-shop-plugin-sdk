@@ -6,7 +6,9 @@ use App\DomainModel\Webhook\WebhookClientInterface;
 use App\DomainModel\Webhook\NotificationDTO;
 use App\DomainModel\Monitoring\LoggingInterface;
 use App\DomainModel\Monitoring\LoggingTrait;
+use App\DomainModel\Webhook\WebhookCommunicationException;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\TransferException;
 
 class WebhookClient implements WebhookClientInterface, LoggingInterface
 {
@@ -39,6 +41,10 @@ class WebhookClient implements WebhookClientInterface, LoggingInterface
             'request' => $data
         ]);
 
-        $this->client->post($url, $data);
+        try {
+            $this->client->post($url, $data);
+        } catch (TransferException $exception) {
+            throw new WebhookCommunicationException('Webhook communication exception', null, $exception);
+        }
     }
 }

@@ -6,7 +6,6 @@ use App\Application\UseCase\OrderPaymentStateChange\OrderPaymentStateChangeReque
 use App\Application\UseCase\OrderPaymentStateChange\OrderPaymentStateChangeUseCase;
 use App\DomainModel\Borscht\OrderPaymentDetailsFactory;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
-use OldSound\RabbitMqBundle\RabbitMq\Exception\AckStopConsumerException;
 use PhpAmqpLib\Message\AMQPMessage;
 
 class OrderPaymentStateChangeConsumer implements ConsumerInterface
@@ -32,6 +31,7 @@ class OrderPaymentStateChangeConsumer implements ConsumerInterface
         $request = new OrderPaymentStateChangeRequest($paymentDetails);
         $this->useCase->execute($request);
 
-        throw new AckStopConsumerException();
+        // dead loop prevention is disabled
+//        throw new AckStopConsumerException();
     }
 }
