@@ -28,13 +28,12 @@ class WebhookClient implements WebhookClientInterface, LoggingInterface
             'order_id' => $notification->getOrderId(),
         ];
 
-        $extraData = array_filter([
-            'amount' => $notification->getAmount(),
-            'open_amount' => $notification->getOpenAmount(),
-            'url_notification' => $notification->getUrlNotification(),
-        ]);
-
-        $data = array_merge($data, $extraData);
+        if ($notification->isEventTypePayment()) {
+            $data['amount'] = $notification->getAmount();
+            $data['open_amount'] = $notification->getOpenAmount();
+        } else {
+            $data['url_notification'] = $notification->getUrlNotification();
+        }
 
         $this->logInfo('Webhook request', [
             'url' => $url,
@@ -42,7 +41,9 @@ class WebhookClient implements WebhookClientInterface, LoggingInterface
         ]);
 
         try {
-            $this->client->post($url, $data);
+            $this->client->post($url, [
+                'json' => $data,
+            ]);
         } catch (TransferException $exception) {
             throw new WebhookCommunicationException('Webhook communication exception', null, $exception);
         }
