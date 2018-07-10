@@ -47,7 +47,7 @@ class OrderOutstandingAmountChangeUseCase
         }
 
         $notification = (new NotificationDTO())
-            ->setEventName(NotificationSender::EVENT_PAYMENT)
+            ->setEventName(NotificationDTO::EVENT_PAYMENT)
             ->setOrderId($order->getExternalCode())
             ->setAmount($orderAmountChangeDetails->getPaidAmount())
             ->setOpenAmount($orderAmountChangeDetails->getOutstandingAmount())

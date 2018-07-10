@@ -10,15 +10,15 @@ class NotificationSender implements LoggingInterface
 {
     use LoggingTrait;
 
-    const EVENT_REMINDER = 'reminder';
-    const EVENT_DUNNING1 = 'dunning1';
-    const EVENT_DUNNING2 = 'dunning2';
-    const EVENT_DUNNING3 = 'dunning3';
-    const EVENT_REBOOKING = 'rebooking';
-    const EVENT_PAYMENT = 'payment';
-    const EVENT_DCA = 'dca';
-
-    const ALLOWED_EVENTS = [self::EVENT_REMINDER, self::EVENT_DUNNING1, self::EVENT_DUNNING2, self::EVENT_DUNNING3, self::EVENT_REBOOKING, self::EVENT_PAYMENT, self::EVENT_DCA];
+    const ALLOWED_EVENTS = [
+        NotificationDTO::EVENT_REMINDER,
+        NotificationDTO::EVENT_DUNNING1,
+        NotificationDTO::EVENT_DUNNING2,
+        NotificationDTO::EVENT_DUNNING3,
+        NotificationDTO::EVENT_REBOOKING,
+        NotificationDTO::EVENT_PAYMENT,
+        NotificationDTO::EVENT_DCA
+    ];
 
     private $webhookClient;
     private $sentry;
