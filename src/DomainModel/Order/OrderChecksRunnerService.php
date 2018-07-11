@@ -65,6 +65,8 @@ class OrderChecksRunnerService implements LoggingInterface
         $addressCheckResult = $this->check($order, 'debtor_address');
         if (!$nameCheckResult || !$addressCheckResult) {
             $this->logInfo('Address check failed');
+
+            return false;
         }
 
         $this->logWaypoint('blacklist check');
