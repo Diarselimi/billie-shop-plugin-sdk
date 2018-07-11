@@ -59,11 +59,17 @@ class OrderChecksRunnerService implements LoggingInterface
             return false;
         }
 
-        $this->logWaypoint('address check');
         $this->logWaypoint('company name check');
         $nameCheckResult = $this->check($order, 'debtor_name');
+        if (!$nameCheckResult) {
+            $this->logInfo('Company name check failed');
+
+            return false;
+        }
+
+        $this->logWaypoint('address check');
         $addressCheckResult = $this->check($order, 'debtor_address');
-        if (!$nameCheckResult || !$addressCheckResult) {
+        if (!$addressCheckResult) {
             $this->logInfo('Address check failed');
 
             return false;
