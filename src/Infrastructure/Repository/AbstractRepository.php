@@ -22,6 +22,11 @@ abstract class AbstractRepository implements LoggingInterface
 
     protected function doFetch(string $query, array $parameters = [])
     {
+        $this->logInfo('Prepare fetch query', [
+            'query' => $query,
+            'params' => $parameters,
+        ]);
+
         $stmt = $this->conn->prepare($query);
         $stmt->execute($parameters);
 
