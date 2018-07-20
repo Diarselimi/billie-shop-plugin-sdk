@@ -6,6 +6,8 @@ use App\DomainModel\AbstractEntity;
 
 class OrderEntity extends AbstractEntity
 {
+    private const STATE_LATE = 'late';
+
     private $amountNet;
     private $amountGross;
     private $amountTax;
@@ -95,6 +97,11 @@ class OrderEntity extends AbstractEntity
         $this->state = $state;
 
         return $this;
+    }
+
+    public function isLate(): bool
+    {
+        return $this->getState() === self::STATE_LATE;
     }
 
     public function getExternalComment(): ?string

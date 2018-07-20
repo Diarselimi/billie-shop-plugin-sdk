@@ -27,7 +27,7 @@ class OrderPaymentStateChangeUseCase
             throw new PaellaCoreCriticalException('Order not found', PaellaCoreCriticalException::CODE_NOT_FOUND);
         }
 
-        if ($orderPaymentDetails->isLate()) {
+        if ($orderPaymentDetails->isLate() && !$order->isLate()) {
             $this->workflow->apply($order, OrderStateManager::TRANSITION_LATE);
             $this->orderRepository->update($order);
         } elseif ($orderPaymentDetails->isPaidOut()) {
