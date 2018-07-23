@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Monitoring\Sentry;
 
 use App\Application\PaellaCoreCriticalException;
+use App\Infrastructure\Monitoring\RidProvider;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -13,14 +14,16 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class SentrySubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var \Raven_Client
-     */
-    protected $client;
+    private $client;
+    private $ridProvider;
+    private $instance;
 
-    public function __construct(\Raven_Client $client)
+    public function __construct(\Raven_Client $client, RidProvider $ridProvider, string $env)
     {
         $this->client = $client;
+        $this->ridProvider = $ridProvider;
+        $this->instance = substr($env, 1);
+
         $serializers = [
             new \Raven_DefaultObjectSerializer(),
             new SentryPrimaryKeySerializer(),
@@ -56,7 +59,7 @@ class SentrySubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->client->captureException($exception);
+        $this->captureException($exception);
     }
 
     public function onConsoleHttpException(ConsoleErrorEvent $event)
@@ -67,7 +70,7 @@ class SentrySubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->client->captureException($error);
+        $this->captureException($error);
     }
 
     private function isIgnored(\Throwable $throwable): bool
@@ -85,5 +88,15 @@ class SentrySubscriber implements EventSubscriberInterface
         }
 
         return false;
+    }
+
+    private function captureException(\Throwable $exception)
+    {
+        $this->client->captureException($exception, [
+            'tags' => [
+                'rid' => $this->ridProvider->getRid(),
+                'instance' => $this->instance,
+            ],
+        ]);
     }
 }

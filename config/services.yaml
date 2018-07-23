@@ -83,6 +83,10 @@ services:
             debtor_blacklisted: '@App\DomainModel\RiskCheck\Checker\DebtorBlacklistedCheck'
 
   # monitoring
+  App\Infrastructure\Monitoring\Sentry\SentrySubscriber:
+    arguments:
+      $env: '%env(INSTANCE_SUFFIX)%'
+
   Raven_Client:
     class: Raven_Client
     arguments:
