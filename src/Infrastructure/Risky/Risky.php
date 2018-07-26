@@ -88,7 +88,6 @@ class Risky implements RiskyInterface, LoggingInterface
                     'tax_id' => $debtorData->getTaxId(),
                     'tax_number' => $debtorData->getTaxNumber(),
                     'crefo_id' => $crefoId,
-                    'legal_form' => $debtorData->getLegalForm(),
                 ],
             ]);
         } catch (TransferException $exception) {
