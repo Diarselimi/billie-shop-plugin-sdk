@@ -19,7 +19,7 @@ services:
 
   App\:
     resource: '../src/*'
-    exclude: '../src/{Entity,Migrations,Tests,Kernel.php}'
+    exclude: '../src/{Entity,Migrations,Tests,Test,Kernel.php}'
 
   App\Http\Controller\:
     resource: '../src/Http/Controller'
