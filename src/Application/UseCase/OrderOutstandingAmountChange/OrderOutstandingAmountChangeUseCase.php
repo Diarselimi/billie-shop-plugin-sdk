@@ -5,24 +5,31 @@ namespace App\Application\UseCase\OrderOutstandingAmountChange;
 use App\Application\PaellaCoreCriticalException;
 use App\DomainModel\Merchant\MerchantNotFoundException;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Monitoring\LoggingInterface;
+use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Webhook\NotificationDTO;
 use App\DomainModel\Webhook\NotificationSender;
 
-class OrderOutstandingAmountChangeUseCase
+class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 {
+    use LoggingTrait;
+
     private $orderRepository;
     private $merchantRepository;
     private $notificationSender;
+    private $sentry;
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         MerchantRepositoryInterface $merchantRepository,
-        NotificationSender $notificationSender
+        NotificationSender $notificationSender,
+        \Raven_Client $sentry
     ) {
         $this->orderRepository = $orderRepository;
         $this->merchantRepository = $merchantRepository;
         $this->notificationSender = $notificationSender;
+        $this->sentry = $sentry;
     }
 
     public function execute(OrderOutstandingAmountChangeRequest $request)
@@ -31,7 +38,13 @@ class OrderOutstandingAmountChangeUseCase
         $order = $this->orderRepository->getOneByPaymentId($orderAmountChangeDetails->getId());
 
         if (!$order) {
-            throw new PaellaCoreCriticalException('Order not found', PaellaCoreCriticalException::CODE_NOT_FOUND);
+            $this->logError('[suppressed] Trying to change state for non-existing order', [
+                'payment_id' => $orderAmountChangeDetails->getId(),
+            ]);
+
+            $this->sentry->captureException(new PaellaCoreCriticalException('Order not found'));
+
+            return;
         }
 
         $merchant = $this->merchantRepository->getOneById($order->getMerchantId());
