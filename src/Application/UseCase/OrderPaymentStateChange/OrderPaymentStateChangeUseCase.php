@@ -3,19 +3,31 @@
 namespace App\Application\UseCase\OrderPaymentStateChange;
 
 use App\Application\PaellaCoreCriticalException;
+use App\DomainModel\Monitoring\LoggingInterface;
+use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use Symfony\Component\Workflow\Workflow;
 
-class OrderPaymentStateChangeUseCase
+class OrderPaymentStateChangeUseCase implements LoggingInterface
 {
+    use LoggingTrait;
+
     private $orderRepository;
     private $workflow;
+    private $orderStateManager;
+    private $sentry;
 
-    public function __construct(OrderRepositoryInterface $orderRepository, Workflow $workflow)
-    {
+    public function __construct(
+        OrderRepositoryInterface $orderRepository,
+        Workflow $workflow,
+        OrderStateManager $orderStateManager,
+        \Raven_Client $sentry
+    ) {
         $this->orderRepository = $orderRepository;
         $this->workflow = $workflow;
+        $this->orderStateManager = $orderStateManager;
+        $this->sentry = $sentry;
     }
 
     public function execute(OrderPaymentStateChangeRequest $request)
@@ -24,10 +36,27 @@ class OrderPaymentStateChangeUseCase
         $order = $this->orderRepository->getOneByPaymentId($orderPaymentDetails->getId());
 
         if (!$order) {
-            throw new PaellaCoreCriticalException('Order not found', PaellaCoreCriticalException::CODE_NOT_FOUND);
+            $this->logError('[suppressed] Trying to change state for non-existing order', [
+                'payment_id' => $orderPaymentDetails->getId(),
+            ]);
+
+            $this->sentry->captureException(new PaellaCoreCriticalException('Order not found'));
+
+            return;
         }
 
-        if ($orderPaymentDetails->isLate() && !$order->isLate()) {
+        if ($this->orderStateManager->isCanceled($order)) {
+            $this->logError('[suppressed] Trying to change state for canceled order', [
+                'new_state' => $orderPaymentDetails->getState(),
+                'order_id' => $order->getId(),
+            ]);
+
+            $this->sentry->captureException(new PaellaCoreCriticalException('Order state change not possible'));
+
+            return;
+        }
+
+        if ($orderPaymentDetails->isLate() && !$this->orderStateManager->isLate($order)) {
             $this->workflow->apply($order, OrderStateManager::TRANSITION_LATE);
             $this->orderRepository->update($order);
         } elseif ($orderPaymentDetails->isPaidOut()) {
