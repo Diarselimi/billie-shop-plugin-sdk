@@ -12,36 +12,36 @@ class PersonEntity extends AbstractEntity
     private $phoneNumber;
     private $email;
 
-    public function getGender(): string
+    public function getGender(): ?string
     {
         return $this->gender;
     }
 
-    public function setGender(string $gender): PersonEntity
+    public function setGender(?string $gender): PersonEntity
     {
         $this->gender = $gender;
 
         return $this;
     }
 
-    public function getFirstName(): string
+    public function getFirstName(): ?string
     {
         return $this->firstName;
     }
 
-    public function setFirstName(string $firstName): PersonEntity
+    public function setFirstName(?string $firstName): PersonEntity
     {
         $this->firstName = $firstName;
 
         return $this;
     }
 
-    public function getLastName(): string
+    public function getLastName(): ?string
     {
         return $this->lastName;
     }
 
-    public function setLastName(string $lastName): PersonEntity
+    public function setLastName(?string $lastName): PersonEntity
     {
         $this->lastName = $lastName;
 
