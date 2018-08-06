@@ -158,7 +158,7 @@ class Borscht implements BorschtInterface, LoggingInterface
         $json = [
             'debtor_id' => $debtorPaymentId,
             'invoice_number' => $order->getInvoiceNumber(),
-            'billing_date' => $order->getCreatedAt()->format('Y-m-d'),
+            'billing_date' => $order->getShippedAt()->format('Y-m-d'),
             'duration' => $order->getDuration(),
             'amount' => $order->getAmountGross(),
         ];
