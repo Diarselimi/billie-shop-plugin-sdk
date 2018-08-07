@@ -48,12 +48,12 @@ class PersonEntity extends AbstractEntity
         return $this;
     }
 
-    public function getPhoneNumber(): string
+    public function getPhoneNumber(): ?string
     {
         return $this->phoneNumber;
     }
 
-    public function setPhoneNumber(string $phoneNumber): PersonEntity
+    public function setPhoneNumber(?string $phoneNumber): PersonEntity
     {
         $this->phoneNumber = $phoneNumber;
 
