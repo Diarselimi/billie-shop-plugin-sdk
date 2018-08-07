@@ -11,6 +11,7 @@ use App\DomainModel\RiskCheck\RiskCheckEntityFactory;
 use App\DomainModel\RiskCheck\RiskCheckRepositoryInterface;
 use App\DomainModel\Risky\RiskyInterface;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\TransferException;
 
 class Risky implements RiskyInterface, LoggingInterface
@@ -90,13 +91,18 @@ class Risky implements RiskyInterface, LoggingInterface
                     'crefo_id' => $crefoId,
                 ],
             ]);
-        } catch (TransferException $exception) {
-            $this->logError('Debtor score failed', [
+        } catch (ClientException $exception) {
+            $this->logError("Risky couldn't score debtor", [
                 'code' => $exception->getCode(),
                 'error' => $exception->getMessage(),
             ]);
 
             return false;
+        } catch (TransferException $exception) {
+            throw new PaellaCoreCriticalException(
+                "Risky returned exception on debtor score check",
+                PaellaCoreCriticalException::CODE_RISKY_EXCEPTION
+            );
         }
 
         $response = (string) $httpResponse->getBody();
