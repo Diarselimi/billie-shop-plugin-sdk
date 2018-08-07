@@ -35,7 +35,7 @@ class MerchantDebtorRepository extends AbstractRepository implements MerchantDeb
 
     public function getOneById(int $id):? MerchantDebtorEntity
     {
-        $company = $this->doFetch('
+        $company = $this->doFetchOne('
           SELECT id, merchant_id, debtor_id, external_id, created_at, updated_at 
           FROM merchants_debtors 
           WHERE id = :id
@@ -52,7 +52,7 @@ class MerchantDebtorRepository extends AbstractRepository implements MerchantDeb
 
     public function getOneByExternalId(string $externalId):? MerchantDebtorEntity
     {
-        $company = $this->doFetch('
+        $company = $this->doFetchOne('
           SELECT id, merchant_id, debtor_id, external_id, created_at, updated_at 
           FROM merchants_debtors 
           WHERE external_id = :external_id', [

@@ -35,7 +35,7 @@ class DebtorExternalDataRepository extends AbstractRepository implements DebtorE
 
     public function getOneByIdRaw(int $id):? array
     {
-        $address = $this->doFetch('SELECT * FROM debtor_external_data WHERE id = :id', [
+        $address = $this->doFetchOne('SELECT * FROM debtor_external_data WHERE id = :id', [
             'id' => $id,
         ]);
 

@@ -48,7 +48,7 @@ class RiskCheckRepository extends AbstractRepository implements RiskCheckReposit
 
     public function getOneById(int $id):? RiskCheckEntity
     {
-        $row = $this->doFetch('
+        $row = $this->doFetchOne('
             SELECT id, order_id, check_id, name, is_passed, created_at, updated_at
             FROM risk_checks
             WHERE id = :id
@@ -61,7 +61,7 @@ class RiskCheckRepository extends AbstractRepository implements RiskCheckReposit
 
     public function getOneByName(int $orderId, string $name):? RiskCheckEntity
     {
-        $row = $this->doFetch('
+        $row = $this->doFetchOne('
             SELECT id, order_id, check_id, name, is_passed, created_at, updated_at
             FROM risk_checks
             WHERE order_id = :order_id AND name = :name
@@ -71,5 +71,18 @@ class RiskCheckRepository extends AbstractRepository implements RiskCheckReposit
         ]);
 
         return $row ? $this->factory->createFromDatabaseRow($row) : null;
+    }
+
+    public function findByOrder(int $orderId): array
+    {
+        $rows = $this->doFetchMultiple('
+            SELECT id, order_id, check_id, name, is_passed, created_at, updated_at
+            FROM risk_checks
+            WHERE order_id = :order_id
+        ', [
+            'order_id' => $orderId,
+        ]);
+
+        return $rows ? $this->factory->createFromMultipleDatabaseRows($rows) : null;
     }
 }

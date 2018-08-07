@@ -36,7 +36,7 @@ class PersonRepository extends AbstractRepository implements PersonRepositoryInt
 
     public function getOneByIdRaw(int $id):? array
     {
-        $address = $this->doFetch('SELECT * FROM addresses WHERE id = :id', [
+        $address = $this->doFetchOne('SELECT * FROM addresses WHERE id = :id', [
             'id' => $id,
         ]);
 
