@@ -19,7 +19,7 @@ services:
 
   App\:
     resource: '../src/*'
-    exclude: '../src/{Entity,Migrations,Tests,Kernel.php}'
+    exclude: '../src/{Entity,Migrations,Tests,Test,Kernel.php}'
 
   App\Http\Controller\:
     resource: '../src/Http/Controller'
@@ -31,6 +31,7 @@ services:
       - 'mysql:dbname=%env(DATABASE_NAME)%;host=%env(DATABASE_HOST)%'
       - '%env(DATABASE_USERNAME)%'
       - '%env(DATABASE_PASSWORD)%'
+      - {3: !php/const \PDO::ERRMODE_EXCEPTION}
 
   App\Infrastructure\Risky\Risky:
     arguments:

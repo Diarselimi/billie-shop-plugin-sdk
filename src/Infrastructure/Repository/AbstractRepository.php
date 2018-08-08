@@ -2,7 +2,6 @@
 
 namespace App\Infrastructure\Repository;
 
-use App\DomainModel\Exception\RepositoryException;
 use App\DomainModel\Monitoring\LoggingInterface;
 use App\DomainModel\Monitoring\LoggingTrait;
 
@@ -20,7 +19,12 @@ abstract class AbstractRepository implements LoggingInterface
         $this->conn = $conn;
     }
 
-    protected function doFetch(string $query, array $parameters = [])
+    protected function doFetchOne(string $query, array $parameters = [])
+    {
+        return $this->exec($query, $parameters)->fetch(\PDO::FETCH_ASSOC);
+    }
+
+    protected function doFetchMultiple(string $query, array $parameters = [])
     {
         $this->logInfo('Prepare fetch query', [
             'query' => $query,
@@ -30,40 +34,31 @@ abstract class AbstractRepository implements LoggingInterface
         $stmt = $this->conn->prepare($query);
         $stmt->execute($parameters);
 
-        return $stmt->fetch(\PDO::FETCH_ASSOC);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     protected function doInsert(string $query, array $parameters = []): int
     {
-        $stmt = $this->conn->prepare($query);
-        $res = $stmt->execute($parameters);
+        $this->exec($query, $parameters);
 
-        if (!$res) {
-            $this->logInfo('Insert failed', [
-                'query' => $query,
-                'params' => $parameters,
-                'error' => $stmt->errorInfo(),
-            ]);
-
-            throw new RepositoryException('Insert failed');
-        }
-
-        return (int)$this->conn->lastInsertId();
+        return (int) $this->conn->lastInsertId();
     }
 
     protected function doUpdate(string $query, array $parameters = [])
     {
+        $this->exec($query, $parameters);
+    }
+
+    private function exec(string $query, array $parameters = []): \PDOStatement
+    {
+        $this->logInfo('Prepare query', [
+            'query' => $query,
+            'params' => $parameters,
+        ]);
+
         $stmt = $this->conn->prepare($query);
-        $res = $stmt->execute($parameters);
+        $stmt->execute($parameters);
 
-        if ($res !== true) {
-            $this->logInfo('Update failed', [
-                'query' => $query,
-                'params' => $parameters,
-                'error' => $stmt->errorInfo(),
-            ]);
-
-            throw new RepositoryException('Update failed');
-        }
+        return $stmt;
     }
 }

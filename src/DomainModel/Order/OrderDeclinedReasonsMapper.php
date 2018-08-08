@@ -3,12 +3,13 @@
 namespace App\DomainModel\Order;
 
 use App\DomainModel\RiskCheck\RiskCheckRepositoryInterface;
-use App\DomainModel\Risky\RiskyInterface;
 
 class OrderDeclinedReasonsMapper
 {
-    const REASON_GENERIC = 'risk_policy';
-    const REASON_ADDRESS_MISMATCH = 'debtor_address';
+    private const REASON_RISK_POLICY = 'risk_policy';
+    private const REASON_DEBTOR_NOT_IDENTIFIED = 'debtor_not_identified';
+    private const REASON_DEBTOR_LIMIT_EXCEEDED = 'debtor_limit_exceeded';
+    private const REASON_ADDRESS_MISMATCH = 'debtor_address';
 
     private $riskCheckRepository;
 
@@ -19,13 +20,21 @@ class OrderDeclinedReasonsMapper
 
     public function mapReasons(OrderEntity $order): array
     {
-        $reason = self::REASON_GENERIC;
+        $riskChecksToReasons = [
+            'debtor_identified' => self::REASON_DEBTOR_NOT_IDENTIFIED,
+            'limit' => self::REASON_DEBTOR_LIMIT_EXCEEDED,
+            'debtor_name' => self::REASON_ADDRESS_MISMATCH,
+            'debtor_address' => self::REASON_ADDRESS_MISMATCH,
+        ];
+        $mappedChecks = array_keys($riskChecksToReasons);
 
-        $addressCheck = $this->riskCheckRepository->getOneByName($order->getId(), RiskyInterface::DEBTOR_ADDRESS);
-        if ($addressCheck && !$addressCheck->isPassed()) {
-            $reason = self::REASON_ADDRESS_MISMATCH;
+        $checks = $this->riskCheckRepository->findByOrder($order->getId());
+        foreach ($checks as $check) {
+            if (!$check->isPassed() && \in_array($check->getName(), $mappedChecks)) {
+                return [$riskChecksToReasons[$check->getName()]];
+            }
         }
 
-        return [$reason];
+        return [self::REASON_RISK_POLICY];
     }
 }

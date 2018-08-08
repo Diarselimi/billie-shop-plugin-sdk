@@ -1,0 +1,12 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  App\Test\TestGuzzleSubscriber:
+    arguments:
+      $mockServerUrl: ''
+      $servicesToMock: []
+      $servicesToProxyHeader: [risky, alfred]
+    tags: ['paella_core.logging']

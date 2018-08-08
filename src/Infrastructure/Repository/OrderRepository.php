@@ -59,7 +59,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
 
     public function getOneByExternalCode(string $externalCode, int $merchantId): ?OrderEntity
     {
-        $order = $this->doFetch('
+        $order = $this->doFetchOne('
           SELECT ' . self::SELECT_FIELDS . '
           FROM orders
           WHERE external_code = :external_code AND merchant_id = :merchant_id
@@ -77,7 +77,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
 
     public function getOneByPaymentId(string $paymentId): ?OrderEntity
     {
-        $order = $this->doFetch('
+        $order = $this->doFetchOne('
           SELECT ' . self::SELECT_FIELDS . '
           FROM orders
           WHERE payment_id = :payment_id
@@ -94,7 +94,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
 
     public function getOneByUuid(string $uuid): ?OrderEntity
     {
-        $order = $this->doFetch('
+        $order = $this->doFetchOne('
           SELECT ' . self::SELECT_FIELDS . '
           FROM orders
           WHERE uuid = :uuid

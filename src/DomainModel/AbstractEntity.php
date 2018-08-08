@@ -16,7 +16,7 @@ abstract class AbstractEntity
         $this->updatedAt = $now;
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }

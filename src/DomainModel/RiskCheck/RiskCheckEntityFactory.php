@@ -25,6 +25,14 @@ class RiskCheckEntityFactory
         ;
     }
 
+    /**
+     * @return RiskCheckEntity[]|array
+     */
+    public function createFromMultipleDatabaseRows(array $rows): array
+    {
+        return array_map([$this, 'createFromDatabaseRow'], $rows);
+    }
+
     public function createFromDatabaseRow(array $row): RiskCheckEntity
     {
         return (new RiskCheckEntity())

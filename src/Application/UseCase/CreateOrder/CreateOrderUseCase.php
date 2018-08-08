@@ -17,6 +17,9 @@ use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\RiskCheck\Checker\CheckResult;
 use Symfony\Component\Workflow\Workflow;
 
+/**
+ * @TODO: refactor the whole class
+ */
 class CreateOrderUseCase implements LoggingInterface
 {
     use LoggingTrait;
@@ -61,6 +64,12 @@ class CreateOrderUseCase implements LoggingInterface
         }
 
         $debtorDTO = $this->retrieveDebtor($orderContainer, $request);
+        $debtorIdentified = $debtorDTO !== null;
+        $this->orderChecksRunnerService->publishCheckResult(
+            new CheckResult($debtorIdentified, 'debtor_identified', []),
+            $orderContainer
+        );
+
         if ($debtorDTO === null) {
             $this->reject($orderContainer, "debtor couldn't be identified");
 
@@ -75,7 +84,12 @@ class CreateOrderUseCase implements LoggingInterface
             $orderContainer->getMerchantDebtor()->getDebtorId(),
             $orderContainer->getOrder()->getAmountGross()
         );
-        $this->orderChecksRunnerService->publishCheckResult(new CheckResult($limitLocked, 'limit', []), $orderContainer);
+
+        $this->orderChecksRunnerService->publishCheckResult(
+            new CheckResult($limitLocked, 'limit', []),
+            $orderContainer
+        );
+
         if (!$limitLocked) {
             $this->reject($orderContainer, "debtor limit exceeded");
 

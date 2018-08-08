@@ -55,7 +55,7 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
 
     public function getOneById(int $id): ?MerchantEntity
     {
-        $row = $this->doFetch('
+        $row = $this->doFetchOne('
           SELECT ' . self::SELECT_FIELDS . '
           FROM merchants
           WHERE id = :id
@@ -66,7 +66,7 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
 
     public function getOneByApiKeyRaw(string $apiKey): ?array
     {
-        $customer = $this->doFetch('
+        $customer = $this->doFetchOne('
           SELECT ' . self::SELECT_FIELDS . '
           FROM merchants
           WHERE api_key = :api_key
