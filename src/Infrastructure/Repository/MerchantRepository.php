@@ -8,7 +8,7 @@ use App\DomainModel\Merchant\MerchantRepositoryInterface;
 
 class MerchantRepository extends AbstractRepository implements MerchantRepositoryInterface
 {
-    const SELECT_FIELDS = 'id, name, api_key, company_id, roles, is_active, available_financing_limit, webhook_url, created_at, updated_at';
+    const SELECT_FIELDS = 'id, name, api_key, company_id, roles, is_active, available_financing_limit, webhook_url, webhook_authorization, created_at, updated_at';
 
     private $factory;
 
@@ -21,9 +21,9 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
     {
         $id = $this->doInsert('
             INSERT INTO merchants
-            (name, api_key, roles, is_active, available_financing_limit, created_at, updated_at, company_id, webhook_url)
+            (name, api_key, roles, is_active, available_financing_limit, created_at, updated_at, company_id, webhook_url, webhook_authorization)
             VALUES
-            (:name, :api_key, :roles, :is_active, :available_financing_limit, :created_at, :updated_at, :company_id, :webhook_url)
+            (:name, :api_key, :roles, :is_active, :available_financing_limit, :created_at, :updated_at, :company_id, :webhook_url, :webhook_authorization)
         ', [
             'name' => $merchant->getName(),
             'api_key' => $merchant->getApiKey(),
@@ -34,6 +34,7 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
             'updated_at' => $merchant->getUpdatedAt()->format('Y-m-d H:i:s'),
             'company_id' => $merchant->getCompanyId(),
             'webhook_url' => $merchant->getWebhookUrl(),
+            'webhook_authorization' => $merchant->getWebhookAuthorization(),
         ]);
 
         $merchant->setId($id);

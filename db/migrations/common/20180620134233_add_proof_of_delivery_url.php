@@ -8,6 +8,7 @@ class AddProofOfDeliveryUrl extends AbstractMigration
     {
         $this->table('orders')
             ->addColumn('proof_of_delivery_url', 'string', ['null' => true, 'after' => 'invoice_url'])
-            ->update();
+            ->update()
+        ;
     }
 }

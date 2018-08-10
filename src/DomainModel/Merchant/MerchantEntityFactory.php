@@ -15,6 +15,7 @@ class MerchantEntityFactory
             ->setRoles($row['roles'])
             ->setIsActive((bool) $row['is_active'])
             ->setWebhookUrl($row['webhook_url'])
+            ->setWebhookAuthorization($row['webhook_authorization'])
             ->setCreatedAt(new \DateTime($row['created_at']))
             ->setUpdatedAt(new \DateTime($row['updated_at']))
         ;

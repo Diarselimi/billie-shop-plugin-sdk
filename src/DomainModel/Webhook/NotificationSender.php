@@ -40,7 +40,11 @@ class NotificationSender implements LoggingInterface
         }
 
         try {
-            $this->webhookClient->sendNotification($merchant->getWebhookUrl(), $notification);
+            $this->webhookClient->sendNotification(
+                $merchant->getWebhookUrl(),
+                $merchant->getWebhookAuthorization(),
+                $notification
+            );
         } catch (WebhookCommunicationException $exception) {
             $this->logError('[suppressed] Webhook exception', [
                 'exception' => $exception,

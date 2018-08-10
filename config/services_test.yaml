@@ -1,6 +1,5 @@
 services:
-  paella_core.pdo:
-    class: \PDO
+  App\Infrastructure\PDO\PDO:
     arguments:
       - 'mysql:dbname=%env(DATABASE_NAME)%;host=%env(DATABASE_HOST)%'
       - '%env(DATABASE_USERNAME)%'

@@ -35,6 +35,11 @@ class TestGuzzleSubscriber implements EventSubscriberInterface, LoggingInterface
 
     public function onPreTransaction(PreTransactionEvent $event)
     {
+        //@TODO: add support for cli and amqp at some point in time
+        if (!$this->request) {
+            return;
+        }
+
         $testHeader = $this->request->headers->get(self::HEADER_NAME);
         if (!$testHeader) {
             return;
