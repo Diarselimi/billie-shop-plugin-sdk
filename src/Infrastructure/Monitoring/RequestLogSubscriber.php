@@ -14,10 +14,16 @@ class RequestLogSubscriber implements EventSubscriberInterface, LoggingInterface
 
     public function onRequest(GetResponseEvent $event)
     {
+        $ignoredRoutes = ['health_check'];
         $request = $event->getRequest();
+        $route = $request->get('_route');
+
+        if (\in_array($route, $ignoredRoutes, true)) {
+            return;
+        }
 
         $this->logInfo('Request to {route} received', [
-            'route' => $request->get('_route'),
+            'route' => $route,
             'url' => $request->getUri(),
             'body' => $request->getContent(),
         ]);
