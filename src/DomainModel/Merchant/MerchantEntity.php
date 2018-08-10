@@ -13,6 +13,7 @@ class MerchantEntity extends AbstractEntity
     private $roles;
     private $isActive;
     private $webhookUrl;
+    private $webhookAuthorization;
 
     public function getName(): string
     {
@@ -104,6 +105,18 @@ class MerchantEntity extends AbstractEntity
     public function setWebhookUrl(?string $webhookUrl): MerchantEntity
     {
         $this->webhookUrl = $webhookUrl;
+
+        return $this;
+    }
+
+    public function getWebhookAuthorization(): ?string
+    {
+        return $this->webhookAuthorization;
+    }
+
+    public function setWebhookAuthorization(?string $webhookAuthorization): MerchantEntity
+    {
+        $this->webhookAuthorization = $webhookAuthorization;
 
         return $this;
     }

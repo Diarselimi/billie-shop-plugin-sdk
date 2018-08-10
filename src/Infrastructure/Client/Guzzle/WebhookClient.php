@@ -21,7 +21,7 @@ class WebhookClient implements WebhookClientInterface, LoggingInterface
         $this->client = $client;
     }
 
-    public function sendNotification(string $url, NotificationDTO $notification): void
+    public function sendNotification(string $url, ?string $authorisation, NotificationDTO $notification): void
     {
         $data = [
             'event' => $notification->getEventName(),
@@ -40,9 +40,15 @@ class WebhookClient implements WebhookClientInterface, LoggingInterface
             'request' => $data
         ]);
 
+        $headers = ['Content-Type' => 'application/json'];
+        if ($authorisation) {
+            $headers['X-Api-Key'] = $authorisation;
+        }
+
         try {
             $this->client->post($url, [
                 'json' => $data,
+                'headers' => $headers,
             ]);
         } catch (TransferException $exception) {
             throw new WebhookCommunicationException('Webhook communication exception', null, $exception);
