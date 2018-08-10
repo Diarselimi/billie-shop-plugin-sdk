@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\Infrastructure\PDO\PDO;
+use App\Infrastructure\PDO\PDOStatementExecutor;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Resource\FileResource;
@@ -63,9 +65,13 @@ class Kernel extends BaseKernel implements CompilerPassInterface
 
     public function process(ContainerBuilder $container)
     {
-        $connection = new Reference('paella_core.pdo');
+        $connection = new Reference(PDO::class);
+        $statementExecutor = new Reference(PDOStatementExecutor::class);
         foreach ($container->findTaggedServiceIds('paella_core.repository') as $id => $tags) {
-            $container->findDefinition($id)->addMethodCall('setConnection', [$connection]);
+            $container->findDefinition($id)
+                ->addMethodCall('setConnection', [$connection])
+                ->addMethodCall('setStatementExecutor', [$statementExecutor])
+            ;
         }
 
         $logger = new Reference('Psr\Log\LoggerInterface');

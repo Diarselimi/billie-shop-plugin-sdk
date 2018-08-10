@@ -5,6 +5,7 @@ namespace App\Amqp\EventSubscriber;
 use App\DomainModel\Monitoring\LoggingInterface;
 use App\DomainModel\Monitoring\LoggingTrait;
 use OldSound\RabbitMqBundle\Event\BeforeProcessingMessageEvent;
+use PhpAmqpLib\Message\AMQPMessage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class BeforeProcessingSubscriber implements EventSubscriberInterface, LoggingInterface
@@ -13,19 +14,29 @@ class BeforeProcessingSubscriber implements EventSubscriberInterface, LoggingInt
 
     public function beforeProcessing(BeforeProcessingMessageEvent $event)
     {
-        // dead loop prevention is disabled
-
         $message = $event->getAMQPMessage();
-//        $message->get('channel')->basic_ack($message->get('delivery_tag'));
 
+        $this->logEvent($message);
+        $this->preventDeadLoop($message);
+    }
+
+    public static function getSubscribedEvents()
+    {
+        return [BeforeProcessingMessageEvent::NAME => 'beforeProcessing'];
+    }
+
+    private function logEvent(AMQPMessage $message)
+    {
         $this->logInfo('Queue message received', [
             'body' => $message->getBody(),
             'queue' => $message->get('routing_key'),
         ]);
     }
 
-    public static function getSubscribedEvents()
+    private function preventDeadLoop(AMQPMessage $message)
     {
-        return [BeforeProcessingMessageEvent::NAME => 'beforeProcessing'];
+        return; // disabled
+
+        $message->get('channel')->basic_ack($message->get('delivery_tag'));
     }
 }

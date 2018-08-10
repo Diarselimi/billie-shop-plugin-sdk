@@ -6,6 +6,7 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderEntityFactory;
 use App\DomainModel\Order\OrderLifecycleEvent;
 use App\DomainModel\Order\OrderRepositoryInterface;
+use App\Infrastructure\PDO\PDO;
 use Ramsey\Uuid\Uuid;
 use App\DomainModel\Order\OrderStateManager;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -27,9 +28,49 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
     {
         $id = $this->doInsert('
             INSERT INTO orders
-            (amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, proof_of_delivery_url, delivery_address_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, uuid, created_at, updated_at, merchant_debtor_id)
-            VALUES
-            (:amount_net, :amount_gross, :amount_tax, :duration, :external_code, :state, :external_comment, :internal_comment, :invoice_number, :invoice_url, :proof_of_delivery_url, :delivery_address_id, :merchant_id, :debtor_person_id, :debtor_external_data_id, :payment_id, :uuid, :created_at, :updated_at, :merchant_debtor_id)
+            (
+              amount_net, 
+              amount_gross, 
+              amount_tax, 
+              duration, 
+              external_code, 
+              state, 
+              external_comment, 
+              internal_comment, 
+              invoice_number, 
+              invoice_url, 
+              proof_of_delivery_url, 
+              delivery_address_id, 
+              merchant_id, 
+              debtor_person_id, 
+              debtor_external_data_id, 
+              merchant_debtor_id,
+              payment_id, 
+              uuid, 
+              created_at, 
+              updated_at
+            ) VALUES (
+              :amount_net, 
+              :amount_gross, 
+              :amount_tax, 
+              :duration, 
+              :external_code, 
+              :state, 
+              :external_comment, 
+              :internal_comment, 
+              :invoice_number, 
+              :invoice_url, 
+              :proof_of_delivery_url, 
+              :delivery_address_id, 
+              :merchant_id, 
+              :debtor_person_id, 
+              :debtor_external_data_id, 
+              :merchant_debtor_id,
+              :payment_id, 
+              :uuid, 
+              :created_at, 
+              :updated_at
+            )
         ', [
             'amount_net' => $order->getAmountNet(),
             'amount_gross' => $order->getAmountGross(),
@@ -157,14 +198,15 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             AND `state` = :state
             AND `shipped_at` IS NOT NULL
         ';
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute([
+
+        $params = [
             'current_time' => time(),
             'merchant_debtor_id' => $merchantDebtorId,
             'state' => OrderStateManager::STATE_LATE,
-        ]);
+        ];
 
-        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+        $stmt = $this->exec($query, $params);
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             if ($row['overdue'] > 0) {
                 yield (int)$row['overdue'];
             }

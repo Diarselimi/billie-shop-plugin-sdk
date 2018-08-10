@@ -4,37 +4,41 @@ namespace App\Infrastructure\Repository;
 
 use App\DomainModel\Monitoring\LoggingInterface;
 use App\DomainModel\Monitoring\LoggingTrait;
+use App\Infrastructure\PDO\PDO;
+use App\Infrastructure\PDO\PDOStatementExecutor;
 
 abstract class AbstractRepository implements LoggingInterface
 {
     use LoggingTrait;
 
     /**
-     * @var \PDO
+     * @var PDO
      */
-    protected $conn;
+    private $conn;
 
-    public function setConnection(\PDO $conn)
+    /**
+     * @var PDOStatementExecutor
+     */
+    private $statementExecutor;
+
+    public function setConnection(PDO $pdo)
     {
-        $this->conn = $conn;
+        $this->conn = $pdo;
+    }
+
+    public function setStatementExecutor(PDOStatementExecutor $statementExecutor): void
+    {
+        $this->statementExecutor = $statementExecutor;
     }
 
     protected function doFetchOne(string $query, array $parameters = [])
     {
-        return $this->exec($query, $parameters)->fetch(\PDO::FETCH_ASSOC);
+        return $this->exec($query, $parameters)->fetch(PDO::FETCH_ASSOC);
     }
 
     protected function doFetchMultiple(string $query, array $parameters = [])
     {
-        $this->logInfo('Prepare fetch query', [
-            'query' => $query,
-            'params' => $parameters,
-        ]);
-
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute($parameters);
-
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        return $this->exec($query, $parameters)->fetchAll(PDO::FETCH_ASSOC);
     }
 
     protected function doInsert(string $query, array $parameters = []): int
@@ -49,16 +53,13 @@ abstract class AbstractRepository implements LoggingInterface
         $this->exec($query, $parameters);
     }
 
-    private function exec(string $query, array $parameters = []): \PDOStatement
+    protected function exec(string $query, array $parameters = []): \PDOStatement
     {
-        $this->logInfo('Prepare query', [
+        $this->logInfo('[pdo] Prepare query', [
             'query' => $query,
             'params' => $parameters,
         ]);
 
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute($parameters);
-
-        return $stmt;
+        return $this->statementExecutor->executeWithReconnect($query, $parameters);
     }
 }
