@@ -38,8 +38,11 @@ class ExceptionSubscriber implements EventSubscriberInterface, LoggingInterface
         $error = [
             'code' => $errorCode,
             'error' => $exception->getMessage(),
-            'stack' => $exception->getTraceAsString(),
         ];
+
+        if (!$exception instanceof PaellaCoreCriticalException) {
+            $error['stack'] = $exception->getTraceAsString();
+        }
 
         $this->logError('Critical exception', $error);
         $event->setResponse(new JsonResponse($error, $responseCode));
