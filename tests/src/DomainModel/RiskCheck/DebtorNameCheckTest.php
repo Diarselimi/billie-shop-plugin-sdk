@@ -36,10 +36,17 @@ class DebtorNameCheckTest extends TestCase
      *
      * @dataProvider compareByCompanyNameProvider
      */
-    public function testCompareByCompanyName(string $nameFromOrder, string $nameFromRegistry, string $legalForm, bool $expectedResult)
-    {
+    public function testCompareByCompanyName(
+        string $nameFromOrder,
+        string $nameFromRegistry,
+        string $legalForm,
+        bool $expectedResult
+    ) {
         $this->comparator->expects($this->never())->method('compareWithPersonName');
-        $this->comparator->expects($this->once())->method('compareWithCompanyName')->with($nameFromOrder, $nameFromRegistry)->willReturn($expectedResult);
+        $this->comparator->expects($this->once())->method('compareWithCompanyName')
+            ->with($nameFromOrder, $nameFromRegistry)
+            ->willReturn($expectedResult)
+        ;
 
         $order = (new OrderContainer())
             ->setDebtorCompany((new DebtorDTO())->setName($nameFromRegistry))
@@ -54,8 +61,49 @@ class DebtorNameCheckTest extends TestCase
     {
         return [
             ['order name', 'registry name', '6023', true],
-            ['order name', 'registry name', '6023', false],
-            ['order name', 'registry name', '2001, 2018, 2021', false],
+            ['order name', 'registry name', '2001, 2018, 2021', true],
+        ];
+    }
+
+    /**
+     * Test check
+     * When the legal form is not a sole trader
+     * Then we should compare by company name
+     *
+     * @dataProvider compareByCompanyNameWithSwapProvider
+     */
+    public function testCompareByCompanyNameWithSwap(
+        string $nameFromOrder,
+        string $nameFromRegistry,
+        string $legalForm,
+        bool $expectedFirstResult,
+        bool $expectedSecondResult
+    ) {
+        $this->comparator->expects($this->never())->method('compareWithPersonName');
+        $this->comparator->expects($this->at(0))->method('compareWithCompanyName')
+            ->with($nameFromOrder, $nameFromRegistry)
+            ->willReturn($expectedFirstResult)
+        ;
+
+        $this->comparator->expects($this->at(1))->method('compareWithCompanyName')
+            ->with($nameFromRegistry, $nameFromOrder)
+            ->willReturn($expectedSecondResult)
+        ;
+
+        $order = (new OrderContainer())
+            ->setDebtorCompany((new DebtorDTO())->setName($nameFromRegistry))
+            ->setDebtorExternalData((new DebtorExternalDataEntity())->setName($nameFromOrder)->setLegalForm($legalForm))
+        ;
+        $result = $this->check->check($order);
+
+        $this->assertEquals($expectedSecondResult, $result->isPassed());
+    }
+
+    public function compareByCompanyNameWithSwapProvider(): array
+    {
+        return [
+//            ['order name', 'registry name', '6023', false, false],
+            ['order name', 'registry name', '6023', false, true],
         ];
     }
 
@@ -72,11 +120,13 @@ class DebtorNameCheckTest extends TestCase
         string $personFirstName,
         string $personLastName,
         string $legalForm,
-        bool $shouldCompareWithPerson,
         bool $expectedResult
     ) {
-        $this->comparator->expects($this->exactly((int) $shouldCompareWithPerson))->method('compareWithPersonName')->with($nameFromRegistry, $personFirstName, $personLastName);
-        $this->comparator->expects($this->once())->method('compareWithCompanyName')->with($nameFromOrder, $nameFromRegistry)->willReturn($expectedResult);
+        $this->comparator->expects($this->once())->method('compareWithPersonName')
+            ->with($nameFromRegistry, $personFirstName, $personLastName)
+            ->willReturn($expectedResult)
+        ;
+        $this->comparator->expects($this->exactly(2))->method('compareWithCompanyName')->willReturn(false);
 
         $order = (new OrderContainer())
             ->setDebtorCompany((new DebtorDTO())->setName($nameFromRegistry))
@@ -91,10 +141,10 @@ class DebtorNameCheckTest extends TestCase
     public function compareByCompanyAndPersonNameProvider(): array
     {
         return [
-            ['order name', 'registry name', 'First', 'Last', '6022', false, true],
-            ['order name', 'registry name', 'First', 'Last', '6022', true, false],
-            ['order name', 'registry name', 'First', 'Last', '2001, 2018, 2022', true, false],
-            ['order name', 'registry name', 'First', 'Last', '2001, 2018, 2022', false, true],
+            ['order name', 'registry name', 'First', 'Last', '6022', true],
+            ['order name', 'registry name', 'First', 'Last', '6022', false],
+            ['order name', 'registry name', 'First', 'Last', '2001, 2018, 2022', true],
+            ['order name', 'registry name', 'First', 'Last', '2001, 2018, 2022', false],
         ];
     }
 }

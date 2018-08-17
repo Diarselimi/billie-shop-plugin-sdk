@@ -22,11 +22,15 @@ class DebtorNameCheck implements CheckInterface
         $nameFromRegistry = $order->getDebtorCompany()->getName();
         $nameFromOrder = $order->getDebtorExternalData()->getName();
 
-        $result = $this->nameComparator->compareWithCompanyName($nameFromOrder, $nameFromRegistry);
         $attributes = [
             'name_registry' => $nameFromRegistry,
             'name_order' => $nameFromOrder,
         ];
+
+        $result = $this->nameComparator->compareWithCompanyName($nameFromOrder, $nameFromRegistry);
+        if (!$result) {
+            $result = $this->nameComparator->compareWithCompanyName($nameFromRegistry, $nameFromOrder);
+        }
 
         if (!$result && $this->canCompareWithPerson($order)) {
             $debtorPerson = $order->getDebtorPerson();
