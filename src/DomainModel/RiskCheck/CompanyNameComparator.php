@@ -11,7 +11,7 @@ class CompanyNameComparator
     const PERCENTAGE_OF_SIMILAR_WORD = 80;
     const PERCENTAGE_OF_SIMILAR_NAME = 75;
 
-    public function compare(string $companyName1, string $companyName2): bool
+    public function compareWithCompanyName(string $companyName1, string $companyName2): bool
     {
         if (empty($companyName1) && empty($companyName2)) {
             return true;
@@ -23,6 +23,17 @@ class CompanyNameComparator
             $this->getMeaningfulWords($companyName1),
             $this->getMeaningfulWords($companyName2)
         );
+    }
+
+    public function compareWithPersonName(string $companyName, string $personFirstName, string $personLastName): bool
+    {
+        if (empty($companyName) && empty($personFirstName) && empty($personLastName)) {
+            return true;
+        } elseif (empty($companyName) || empty($personFirstName) || empty($personLastName)) {
+            return false;
+        }
+
+        return \stripos($companyName, $personFirstName) !== false && \stripos($companyName, $personLastName) !== false;
     }
 
     private function getMeaningfulWords(string $name): array

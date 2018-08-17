@@ -15,3 +15,8 @@ behat.yml
 /config/secrets/
 
 /.php_cs.cache
+
+###> symfony/phpunit-bridge ###
+.phpunit
+/phpunit.xml
+###< symfony/phpunit-bridge ###
