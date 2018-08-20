@@ -59,6 +59,9 @@ class CompanyNameComparatorTest extends TestCase
             ['someßcompany', 'somesscompany'],
             ['company gesellschaft', 'company gmbh'],
             ['companygesellschaft', 'company gmbh'],
+
+            ['Marktgemeinde Bruckmühl - Bauhof', 'Marktgemeinde Bruckmühl'],
+            ['RWTH Aachen University', 'Rheinisch-Westfälisch Technische Hochschule (RWTH) Aachen'],
         ];
     }
 
@@ -83,7 +86,7 @@ class CompanyNameComparatorTest extends TestCase
             ['', 'b'],
             ['a', 'b'],
             ['com', 'company'],
-            ['any company name GmbH', 'bit different company name GmbH'],
+            ['any company GmbH', 'bit different company name GmbH'],
             ['any longer company name GmbH', 'bit longer different c0mp4ny name GmbH'],
         ];
     }
