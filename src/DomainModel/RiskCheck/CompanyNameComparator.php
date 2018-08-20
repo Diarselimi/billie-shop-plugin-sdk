@@ -8,7 +8,7 @@ class CompanyNameComparator
 
     const LEGAL_FORMS_JOINED = ['gesellschaft mit beschränkter haftung', 'gesellschaft mbh', 'gesellschaft'];
 
-    const PERCENTAGE_OF_SIMILAR_WORD = 80;
+    const PERCENTAGE_OF_SIMILAR_WORD = 66;
     const PERCENTAGE_OF_SIMILAR_NAME = 75;
 
     public function compareWithCompanyName(string $companyName1, string $companyName2): bool
