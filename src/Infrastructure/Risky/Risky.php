@@ -64,16 +64,16 @@ class Risky implements RiskyInterface, LoggingInterface
             );
         }
 
-        $check = $this->riskCheckFactory->create($order->getId(), $response['check_id'], $name, $response['passed']);
-        $this->riskCheckRepository->insert($check);
+        $this->saveCheckResult($order->getId(), $response['check_id'], $name, $response['passed']);
 
-        return $check->isPassed();
+        return $response['passed'];
     }
 
     public function runDebtorScoreCheck(OrderContainer $orderContainer, ?string $crefoId): bool
     {
         $debtorData = $orderContainer->getDebtorExternalData();
         $address = $orderContainer->getDebtorExternalDataAddress();
+        $id = $orderContainer->getOrder()->getId();
 
         try {
             $httpResponse = $this->client->post("/risk-check/company/company_b2b_score", [
@@ -97,6 +97,8 @@ class Risky implements RiskyInterface, LoggingInterface
                 'error' => $exception->getMessage(),
             ]);
 
+            $this->saveCheckResult($id, null, 'company_b2b_score', false);
+
             return false;
         } catch (TransferException $exception) {
             throw new PaellaCoreCriticalException(
@@ -119,10 +121,14 @@ class Risky implements RiskyInterface, LoggingInterface
             );
         }
 
-        $id = $orderContainer->getOrder()->getId();
-        $check = $this->riskCheckFactory->create($id, $response['check_id'], 'company_b2b_score', $response['passed']);
-        $this->riskCheckRepository->insert($check);
+        $this->saveCheckResult($id, $response['check_id'], 'company_b2b_score', $response['passed']);
 
-        return $check->isPassed();
+        return $response['passed'];
+    }
+
+    private function saveCheckResult(int $orderId, ?int $checkId, string $name, bool $isPassed): void
+    {
+        $check = $this->riskCheckFactory->create($orderId, $checkId, $name, $isPassed);
+        $this->riskCheckRepository->insert($check);
     }
 }
