@@ -12,6 +12,8 @@ class DebtorAddressCheck implements CheckInterface, LoggingInterface
 
     public const NAME = 'debtor_address';
     private const MAX_DISTANCE_STREET = 3;
+    private const HOUSE_RANGE_REGEXP = '/^\s*([0-9]+)\s*-\s*([0-9]+)\s*$/';
+    private const HOUSE_NUMBER_REGEXP = '/^\s*([0-9]+).*$/';
 
     public function check(OrderContainer $order): CheckResult
     {
@@ -39,16 +41,40 @@ class DebtorAddressCheck implements CheckInterface, LoggingInterface
         return levenshtein(strtolower($streetFromRegistry), strtolower($streetFromOrder)) <= self::MAX_DISTANCE_STREET;
     }
 
-    private function isHouseMatch(string $houseFromRegistry, string $houseFromOrder): bool
+    public function isHouseMatch(string $houseFromRegistry, string $houseFromOrder): bool
     {
         $this->logWaypoint('house number check');
+
+        if (preg_match(self::HOUSE_NUMBER_REGEXP, $houseFromRegistry) || preg_match(self::HOUSE_NUMBER_REGEXP, $houseFromOrder)) {
+            return $this->isHouseRangesMatch($houseFromRegistry, $houseFromOrder);
+        }
+
+        return $this->isHouseNumbersMatch($houseFromRegistry, $houseFromOrder);
+    }
+
+    private function isHouseRangesMatch(string $houseFromRegistry, string $houseFromOrder): bool
+    {
+        $commonHouseNumbers = array_intersect(
+            $this->createHouseNumbersArrayFromString($houseFromRegistry),
+            $this->createHouseNumbersArrayFromString($houseFromOrder)
+        );
+
+        return !empty($commonHouseNumbers);
+    }
+
+    private function isHouseNumbersMatch(string $houseFromRegistry, string $houseFromOrder): bool
+    {
         $matches = [];
 
-        preg_match('/^(\d*).*$/', $houseFromRegistry, $matches);
-        $houseFromRegistry = isset($matches[1]) ? $matches[1] : '';
+        if (!preg_match(self::HOUSE_NUMBER_REGEXP, $houseFromRegistry, $matches)) {
+            return false;
+        }
+        $houseFromRegistry = $matches[1];
 
-        preg_match('/^(\d*).*$/', $houseFromOrder, $matches);
-        $houseFromOrder = isset($matches[1]) ? $matches[1] : '';
+        if (!preg_match(self::HOUSE_NUMBER_REGEXP, $houseFromOrder, $matches)) {
+            return false;
+        }
+        $houseFromOrder = $matches[1];
 
         return strtolower($houseFromRegistry) === strtolower($houseFromOrder);
     }
@@ -58,5 +84,20 @@ class DebtorAddressCheck implements CheckInterface, LoggingInterface
         $this->logWaypoint('postal code check');
 
         return strtolower($postalCodeFromRegistry) === strtolower($postalCodeFromOrder);
+    }
+
+    private function createHouseNumbersArrayFromString(string $string): array
+    {
+        $matches = [];
+
+        if (preg_match(self::HOUSE_RANGE_REGEXP, $string, $matches)) {
+            return range($matches[1], $matches[2]);
+        }
+
+        if (preg_match(self::HOUSE_NUMBER_REGEXP, $string, $matches)) {
+            return [$matches[1]];
+        }
+
+        return [];
     }
 }

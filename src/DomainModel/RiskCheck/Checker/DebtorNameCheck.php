@@ -8,6 +8,7 @@ use App\DomainModel\RiskCheck\CompanyNameComparator;
 class DebtorNameCheck implements CheckInterface
 {
     public const NAME = 'debtor_name';
+    private const LEGAL_FORMS_FOR_PERSON_COMPARISON = ['6022', '2001, 2018, 2022', '4001', '4022', '3001'];
 
     private $nameComparator;
 
@@ -20,11 +21,35 @@ class DebtorNameCheck implements CheckInterface
     {
         $nameFromRegistry = $order->getDebtorCompany()->getName();
         $nameFromOrder = $order->getDebtorExternalData()->getName();
-        $result = $this->nameComparator->compare($nameFromOrder, $nameFromRegistry);
 
-        return new CheckResult($result, self::NAME, [
+        $attributes = [
             'name_registry' => $nameFromRegistry,
             'name_order' => $nameFromOrder,
-        ]);
+        ];
+
+        $result = $this->nameComparator->compareWithCompanyName($nameFromOrder, $nameFromRegistry);
+        if (!$result) {
+            $result = $this->nameComparator->compareWithCompanyName($nameFromRegistry, $nameFromOrder);
+        }
+
+        if (!$result && $this->canCompareWithPerson($order)) {
+            $debtorPerson = $order->getDebtorPerson();
+
+            $result = $this->nameComparator->compareWithPersonName(
+                $nameFromRegistry,
+                $debtorPerson->getFirstName(),
+                $debtorPerson->getLastName()
+            );
+
+            $attributes['person_first_name'] = $debtorPerson->getFirstName();
+            $attributes['person_last_name'] = $debtorPerson->getLastName();
+        }
+
+        return new CheckResult($result, self::NAME, $attributes);
+    }
+
+    private function canCompareWithPerson(OrderContainer $order): bool
+    {
+        return \in_array($order->getDebtorExternalData()->getLegalForm(), self::LEGAL_FORMS_FOR_PERSON_COMPARISON, true);
     }
 }

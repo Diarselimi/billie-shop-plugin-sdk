@@ -4,14 +4,14 @@ namespace App\DomainModel\RiskCheck;
 
 class CompanyNameComparator
 {
-    const LEGAL_FORMS_SEPARATED = ['gmbh', 'gesellschaft mit beschränkter haftung', 'mit beschränkter haftung', 'freie berufe', 'gewerbebetrieb', 'gbr', 'ltd', 'gbr / arge', 'einzelfirma', 'ohg', 'kg', 'ag', 'ug', 'eg', 'se', 'kommanditgesellschaft', 'aktiengesellschaft', 'eingetragene genossenschaft', 'verein', 'kgaa', 'kommanditgesellschaft auf aktien', 'vvag', 'körperschaft öffentlichen rechts', 'stiftung', 'anstalt öffentlichen rechts', 'landwirtschaftlicher betrieb', 'partnerschaftsgesellschaft', 'partg mbb', 'ewiv', 'limited', 'ug (haftungsbeschränkt)', '(haftungsbeschränkt)', 'sarl', 'gesellschaft mbh', 'gesellschaft', 'limited', 'sarl', '& co. kg', '& co.kg', '& co. kgaa', 'und co. kg', 'und co. kgaa', '& co kg', '& co kgaa', 'und co kg', 'und co kgaa', '+ co kg', '+ co kgaa', '&co.kg', '&co.kgaa', '&co.', '+co.', 'kg&co.kg', 'ag&co.kg', 'ug&co.kg', 'eg&co.kg', 'se&co.kg', 'kg&co.kgaa', 'ag&co.kgaa', 'ug&co.kgaa', 'eg&co.kgaa', 'se&co.kgaa', 'gemeinnützige gmbh', 'ggmbh', 'e. k.', 'e.k.', 'ltd. & co. kg', 'e. v.', 'e.v.', 'sàrl', 'GmbH&Co.KG' ];
+    const LEGAL_FORMS_SEPARATED = ['gmbh', 'gesellschaft mit beschränkter haftung', 'mit beschränkter haftung', 'freie berufe', 'gewerbebetrieb', 'gbr', 'ltd', 'gbr / arge', 'einzelfirma', 'ohg', 'kg', 'ag', 'ug', 'eg', 'se', 'kommanditgesellschaft', 'aktiengesellschaft', 'eingetragene genossenschaft', 'verein', 'kgaa', 'kommanditgesellschaft auf aktien', 'vvag', 'körperschaft öffentlichen rechts', 'stiftung', 'anstalt öffentlichen rechts', 'landwirtschaftlicher betrieb', 'partnerschaftsgesellschaft', 'partg mbb', 'ewiv', 'limited', 'ug (haftungsbeschränkt)', '(haftungsbeschränkt)', 'sarl', 'gesellschaft mbh', 'gesellschaft', 'limited', 'sarl', '& co. kg', '& co.kg', '& co. kgaa', 'und co. kg', 'und co. kgaa', '& co kg', '& co kgaa', 'und co kg', 'und co kgaa', '+ co kg', '+ co kgaa', '&co.kg', '&co.kgaa', '&co.', '+co.', 'kg&co.kg', 'ag&co.kg', 'ug&co.kg', 'eg&co.kg', 'se&co.kg', 'kg&co.kgaa', 'ag&co.kgaa', 'ug&co.kgaa', 'eg&co.kgaa', 'se&co.kgaa', 'gemeinnützige gmbh', 'ggmbh', 'e. k.', 'e.k.', 'ltd. & co. kg', 'e. v.', 'e.v.', 'sàrl', 'GmbH&Co.KG', 'mbH'];
 
     const LEGAL_FORMS_JOINED = ['gesellschaft mit beschränkter haftung', 'gesellschaft mbh', 'gesellschaft'];
 
-    const PERCENTAGE_OF_SIMILAR_WORD = 80;
-    const PERCENTAGE_OF_SIMILAR_NAME = 75;
+    const PERCENTAGE_OF_SIMILAR_WORD = 75;
+    const PERCENTAGE_OF_SIMILAR_NAME = 66;
 
-    public function compare(string $companyName1, string $companyName2): bool
+    public function compareWithCompanyName(string $companyName1, string $companyName2): bool
     {
         if (empty($companyName1) && empty($companyName2)) {
             return true;
@@ -23,6 +23,17 @@ class CompanyNameComparator
             $this->getMeaningfulWords($companyName1),
             $this->getMeaningfulWords($companyName2)
         );
+    }
+
+    public function compareWithPersonName(string $companyName, string $personFirstName, string $personLastName): bool
+    {
+        if (empty($companyName) && empty($personFirstName) && empty($personLastName)) {
+            return true;
+        } elseif (empty($companyName) || empty($personFirstName) || empty($personLastName)) {
+            return false;
+        }
+
+        return \stripos($companyName, $personFirstName) !== false && \stripos($companyName, $personLastName) !== false;
     }
 
     private function getMeaningfulWords(string $name): array
