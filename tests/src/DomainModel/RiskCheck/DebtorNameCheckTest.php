@@ -67,48 +67,6 @@ class DebtorNameCheckTest extends TestCase
 
     /**
      * Test check
-     * When the legal form is not a sole trader
-     * Then we should compare by company name
-     *
-     * @dataProvider compareByCompanyNameWithSwapProvider
-     */
-    public function testCompareByCompanyNameWithSwap(
-        string $nameFromOrder,
-        string $nameFromRegistry,
-        string $legalForm,
-        bool $expectedFirstResult,
-        bool $expectedSecondResult
-    ) {
-        $this->comparator->expects($this->never())->method('compareWithPersonName');
-        $this->comparator->expects($this->at(0))->method('compareWithCompanyName')
-            ->with($nameFromOrder, $nameFromRegistry)
-            ->willReturn($expectedFirstResult)
-        ;
-
-        $this->comparator->expects($this->at(1))->method('compareWithCompanyName')
-            ->with($nameFromRegistry, $nameFromOrder)
-            ->willReturn($expectedSecondResult)
-        ;
-
-        $order = (new OrderContainer())
-            ->setDebtorCompany((new DebtorDTO())->setName($nameFromRegistry))
-            ->setDebtorExternalData((new DebtorExternalDataEntity())->setName($nameFromOrder)->setLegalForm($legalForm))
-        ;
-        $result = $this->check->check($order);
-
-        $this->assertEquals($expectedSecondResult, $result->isPassed());
-    }
-
-    public function compareByCompanyNameWithSwapProvider(): array
-    {
-        return [
-//            ['order name', 'registry name', '6023', false, false],
-            ['order name', 'registry name', '6023', false, true],
-        ];
-    }
-
-    /**
-     * Test check
      * When the legal form is a sole trader
      * Then we should compare by company name and by person
      *
@@ -126,7 +84,7 @@ class DebtorNameCheckTest extends TestCase
             ->with($nameFromRegistry, $personFirstName, $personLastName)
             ->willReturn($expectedResult)
         ;
-        $this->comparator->expects($this->exactly(2))->method('compareWithCompanyName')->willReturn(false);
+        $this->comparator->expects($this->once())->method('compareWithCompanyName')->willReturn(false);
 
         $order = (new OrderContainer())
             ->setDebtorCompany((new DebtorDTO())->setName($nameFromRegistry))

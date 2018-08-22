@@ -2,14 +2,20 @@
 
 namespace App\DomainModel\RiskCheck;
 
+use VRia\Utils\NoDiacritic;
+
 class CompanyNameComparator
 {
     const LEGAL_FORMS_SEPARATED = ['gmbh', 'gesellschaft mit beschränkter haftung', 'mit beschränkter haftung', 'freie berufe', 'gewerbebetrieb', 'gbr', 'ltd', 'gbr / arge', 'einzelfirma', 'ohg', 'kg', 'ag', 'ug', 'eg', 'se', 'kommanditgesellschaft', 'aktiengesellschaft', 'eingetragene genossenschaft', 'verein', 'kgaa', 'kommanditgesellschaft auf aktien', 'vvag', 'körperschaft öffentlichen rechts', 'stiftung', 'anstalt öffentlichen rechts', 'landwirtschaftlicher betrieb', 'partnerschaftsgesellschaft', 'partg mbb', 'ewiv', 'limited', 'ug (haftungsbeschränkt)', '(haftungsbeschränkt)', 'sarl', 'gesellschaft mbh', 'gesellschaft', 'limited', 'sarl', '& co. kg', '& co.kg', '& co. kgaa', 'und co. kg', 'und co. kgaa', '& co kg', '& co kgaa', 'und co kg', 'und co kgaa', '+ co kg', '+ co kgaa', '&co.kg', '&co.kgaa', '&co.', '+co.', 'kg&co.kg', 'ag&co.kg', 'ug&co.kg', 'eg&co.kg', 'se&co.kg', 'kg&co.kgaa', 'ag&co.kgaa', 'ug&co.kgaa', 'eg&co.kgaa', 'se&co.kgaa', 'gemeinnützige gmbh', 'ggmbh', 'e. k.', 'e.k.', 'ltd. & co. kg', 'e. v.', 'e.v.', 'sàrl', 'GmbH&Co.KG', 'mbH'];
 
     const LEGAL_FORMS_JOINED = ['gesellschaft mit beschränkter haftung', 'gesellschaft mbh', 'gesellschaft'];
 
-    const PERCENTAGE_OF_SIMILAR_WORD = 75;
+    const LEVENSTHEIN_DISTANCE_ALLOWED_PERCENTAGE = 1/5;
+    const LEVENSTHEIN_DISTANCE_MAX = 3;
+
     const PERCENTAGE_OF_SIMILAR_NAME = 66;
+
+    const LOCALE = 'de';
 
     public function compareWithCompanyName(string $companyName1, string $companyName2): bool
     {
@@ -22,6 +28,12 @@ class CompanyNameComparator
         return $this->areSimilarNames(
             $this->getMeaningfulWords($companyName1),
             $this->getMeaningfulWords($companyName2)
+        ) || $this->areSimilarNames( // try different order
+            $this->getMeaningfulWords($companyName2),
+            $this->getMeaningfulWords($companyName1)
+        ) || $this->areSimilarNames( // try as single concatenated word with no whitespace
+            [preg_replace('/\W/', '', join('', $this->getMeaningfulWords($companyName1)))],
+            [preg_replace('/\W/', '', join('', $this->getMeaningfulWords($companyName2)))]
         );
     }
 
@@ -80,9 +92,8 @@ class CompanyNameComparator
 
     private function areWordsSimilar(string $word1, string $word2): bool
     {
-        similar_text(strtolower($word1), strtolower($word2), $percentage);
-
-        return $percentage >= self::PERCENTAGE_OF_SIMILAR_WORD;
+        $levenshtein_distance = levenshtein(strtolower(NoDiacritic::filter($word1, self::LOCALE)), strtolower(NoDiacritic::filter($word2, self::LOCALE)));
+        return $levenshtein_distance <= min(self::LEVENSTHEIN_DISTANCE_MAX, min(strlen($word1), strlen($word2)) * self::LEVENSTHEIN_DISTANCE_ALLOWED_PERCENTAGE);
     }
 
     private function isSimilarWordInName(string $word, array $wordsOfName): bool

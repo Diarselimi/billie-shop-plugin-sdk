@@ -18,7 +18,8 @@
         "symfony/monolog-bundle": "^3.2",
         "symfony/proxy-manager-bridge": "^4.0",
         "symfony/workflow": "^4.0",
-        "symfony/yaml": "^4.0"
+        "symfony/yaml": "^4.0",
+        "vria/nodiacritic": "^0.1.2"
     },
     "require-dev": {
         "behat/mink": "^1.7",
