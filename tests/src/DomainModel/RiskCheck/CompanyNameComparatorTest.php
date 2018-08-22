@@ -51,7 +51,7 @@ class CompanyNameComparatorTest extends TestCase
             ['three words', 'three words name'],
             ['three', 'three words name'],
             ['four words name company', 'four words different name'],
-            ['four words name company', 'four words a bit different names'],
+            ['four words name company', 'four words a bit different name'],
             ['four w0rds n4mes company', 'four words a bit different names'],
             ['four w0rds ug (haftungsbeschränkt) n4mes company', 'four words a bit different names'],
             ['four w0rds ug (haftungsbeschränkt) n4mes company', 'four words a bit different names eg&co.kgaa'],
@@ -59,7 +59,24 @@ class CompanyNameComparatorTest extends TestCase
             ['someßcompany', 'somesscompany'],
             ['company gesellschaft', 'company gmbh'],
             ['companygesellschaft', 'company gmbh'],
-
+            // shorter name as second parameter
+            ["Company GmbH Suffix", "Company GmbH"],
+            // ß
+            ["fooßbar", "foossbar"],
+            // Umlauts
+            ["Fooöbar Bazäqux GmbH & Co. KG", "Foooebar Bazaequx GmbH & Co. KG"],
+            // Superfluous whitespace
+            ["S O M E - W O R D S  AG", "SOME-WORDS AG"],
+            // Superfluous special characters
+            ["Words AG", "wo.rds Aktiengesellschaft"],
+             // Superfluous parens and two worlds from right match in left
+            ["ABC Place Type", "Acronym Be Cool (ABC) Place"],
+            // Typos
+            ["1234x", "1234y"], // allow one typo in five letter words
+            ["12345", "12345x"], // allow superfulous character in five letter words
+            ["1234567890", "123x567x90"], // allow Two typos in ten letter words
+            ["1234567890", "1234x567x890"], // allow two superfluous letters in ten letter words
+            // some real world examples
             ['Marktgemeinde Bruckmühl - Bauhof', 'Marktgemeinde Bruckmühl'],
             ['RWTH Aachen University', 'Rheinisch-Westfälisch Technische Hochschule (RWTH) Aachen'],
         ];
@@ -88,6 +105,10 @@ class CompanyNameComparatorTest extends TestCase
             ['com', 'company'],
             ['any company GmbH', 'bit different company name GmbH'],
             ['any longer company name GmbH', 'bit longer different c0mp4ny name GmbH'],
+            // Typos
+            ["12x4", "12y4"], // allow no typos in 4 letter words
+            ["1234567890", "12x45x78x0"], // allow no three typos in ten letter words
+            ["1234567890", "1x234x567x890"], // allow no three superfluous letters in ten letter words
         ];
     }
 
