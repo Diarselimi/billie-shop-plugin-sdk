@@ -12,6 +12,7 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonRepositoryInterface;
+use App\Infrastructure\PDO\PDO;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
@@ -268,7 +269,7 @@ class PaellaCoreContext extends MinkContext
 
     private function getConnection(): \PDO
     {
-        return $this->get('paella_core.pdo');
+        return $this->get(PDO::class);
     }
 
     private function get(string $service)

@@ -37,6 +37,6 @@ Feature:
         """
         {
             "code": "order_payment_confirmation_failed",
-            "message": "Order #CO123 payment can not be confirmed"
+            "error": "Order #CO123 payment can not be confirmed"
         }
         """
