@@ -149,12 +149,12 @@ class DebtorDTO
         return $this;
     }
 
-    public function isIdentifiedByPerson():? bool
+    public function isIdentifiedByPerson(): bool
     {
         return $this->isIdentifiedByPerson;
     }
 
-    public function setIsIdentifiedByPerson(?bool $isIdentifiedByPerson): DebtorDTO
+    public function setIsIdentifiedByPerson(?bool $isIdentifiedByPerson = false): DebtorDTO
     {
         $this->isIdentifiedByPerson = $isIdentifiedByPerson;
 
