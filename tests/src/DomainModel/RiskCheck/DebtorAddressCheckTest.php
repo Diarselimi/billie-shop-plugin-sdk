@@ -71,4 +71,27 @@ class DebtorAddressCheckTest extends TestCase
             ['1-5a', '5a', false],
         ];
     }
+
+    /**
+     * Test is postal code match
+     * When we do the address check
+     * We have to check that postal code is match
+     *
+     * @dataProvider postalCodeMatchProvider
+     */
+    public function testIsPostalCodeMatch(string $postalCodeFromRegistry, string $postalCodeFromOrder, bool $expectedResult)
+    {
+        $this->assertEquals($expectedResult, $this->check->isPostalCodeMatch($postalCodeFromRegistry, $postalCodeFromOrder));
+    }
+
+    public function postalCodeMatchProvider(): array
+    {
+        return [
+            ['10969', '10969', true],
+            ['10699', '10969', true],
+            ['19609', '19069', true],
+            ['10969', '10996', false],
+            ['10999', '10969', false],
+        ];
+    }
 }

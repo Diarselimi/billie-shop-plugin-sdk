@@ -79,11 +79,28 @@ class DebtorAddressCheck implements CheckInterface, LoggingInterface
         return strtolower($houseFromRegistry) === strtolower($houseFromOrder);
     }
 
-    private function isPostalCodeMatch(string $postalCodeFromRegistry, string $postalCodeFromOrder): bool
+    public function isPostalCodeMatch(string $postalCodeFromRegistry, string $postalCodeFromOrder): bool
     {
         $this->logWaypoint('postal code check');
 
-        return strtolower($postalCodeFromRegistry) === strtolower($postalCodeFromOrder);
+        if ($postalCodeFromRegistry === $postalCodeFromOrder) {
+            return true;
+        }
+
+        preg_match("/^(\d{1})(\d*)(\d{1})$/", $postalCodeFromRegistry, $registrySlices);
+        preg_match("/^(\d{1})(\d*)(\d{1})$/", $postalCodeFromOrder, $orderSlices);
+
+        if ($registrySlices[1] !== $orderSlices[1] || $registrySlices[3] !== $orderSlices[3]) {
+            return false;
+        }
+
+        $registryDigits = str_split($registrySlices[2]);
+        $orderDigits = str_split($orderSlices[2]);
+
+        sort($registryDigits);
+        sort($orderDigits);
+
+        return $registryDigits === $orderDigits;
     }
 
     private function createHouseNumbersArrayFromString(string $string): array
