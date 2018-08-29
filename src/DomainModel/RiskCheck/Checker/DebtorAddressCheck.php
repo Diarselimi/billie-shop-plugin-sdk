@@ -100,6 +100,13 @@ class DebtorAddressCheck implements CheckInterface, LoggingInterface
         sort($registryDigits);
         sort($orderDigits);
 
+        if ($registryDigits === $orderDigits) {
+            $this->logInfo('[yellowcard] postal code fuzzy match', [
+                'registry' => $postalCodeFromRegistry,
+                'order' => $postalCodeFromOrder,
+            ]);
+        }
+
         return $registryDigits === $orderDigits;
     }
 
