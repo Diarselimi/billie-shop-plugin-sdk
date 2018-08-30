@@ -160,6 +160,10 @@ class CompanyNameComparatorTest extends TestCase
             ['First Middle Last', 'First', 'Last'],
             ['First Middle Last', 'middle', 'last'],
             ['Prefix First Middle Last Suffix', 'First', 'Last'],
+            ['FIRST LASST', 'First', 'Laßt'],
+            // Compount name with dash
+            ['First-Middle Last Suffix', 'First Middle', 'Last'],
+            ['First Middle Last Suffix', 'First-Middle', 'Last']
         ];
     }
 }
