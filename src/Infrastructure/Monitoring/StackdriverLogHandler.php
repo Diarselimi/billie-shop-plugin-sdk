@@ -31,7 +31,10 @@ class StackdriverLogHandler extends AbstractProcessingHandler
             'topic' => $record['channel'],
         ]);
 
-        $logger = $this->loggingClient->psrLogger($this->channel, ['batchEnabled' => true]);
-        $logger->log($record['level_name'], $record['message'], $record['context']);
+        try {
+            $logger = $this->loggingClient->psrLogger($this->channel, ['batchEnabled' => true]);
+            $logger->log($record['level_name'], $record['message'], $record['context']);
+        } catch (\Exception $exception) {
+        }
     }
 }
