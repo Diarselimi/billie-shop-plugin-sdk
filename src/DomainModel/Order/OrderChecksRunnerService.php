@@ -51,7 +51,7 @@ class OrderChecksRunnerService implements LoggingInterface
         return $amountCheckResult && $debtorCountryCheckResult && $debtorIndustrySectorCheckResult;
     }
 
-    public function runChecks(OrderContainer $order, ?string $debtorCrefoId): bool
+    public function runChecks(OrderContainer $order, bool $isIdentifiedByPerson, ?string $debtorCrefoId): bool
     {
         $this->logWaypoint('debtor != merchant check');
         $debtorNotCustomerCheckResult = $this->check($order, 'debtor_not_customer');
@@ -88,7 +88,7 @@ class OrderChecksRunnerService implements LoggingInterface
         }
 
         $this->logWaypoint('debtor score check');
-        $debtorScoreCheck = $this->risky->runDebtorScoreCheck($order, $debtorCrefoId);
+        $debtorScoreCheck = $this->risky->runDebtorScoreCheck($order, $isIdentifiedByPerson, $debtorCrefoId);
         if (!$debtorScoreCheck) {
             $this->logInfo('Debtor score check failed');
 

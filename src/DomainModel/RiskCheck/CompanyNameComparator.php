@@ -45,7 +45,18 @@ class CompanyNameComparator
             return false;
         }
 
-        return \stripos($companyName, $personFirstName) !== false && \stripos($companyName, $personLastName) !== false;
+        return \stripos($this->normalizePersonName($companyName), $this->normalizePersonName($personFirstName)) !== false && \stripos($this->normalizePersonName($companyName), $this->normalizePersonName($personLastName)) !== false;
+    }
+
+    private function normalizeText(string $text): string
+    {
+      return strtolower(NoDiacritic::filter($text, self::LOCALE));
+    }
+
+    private function normalizePersonName(string $text): string
+    {
+      // Replace all non-letters with spaces
+      return preg_replace("/[^A-Za-z ]/", ' ', $this->normalizeText($text));
     }
 
     private function getMeaningfulWords(string $name): array
@@ -92,7 +103,7 @@ class CompanyNameComparator
 
     private function areWordsSimilar(string $word1, string $word2): bool
     {
-        $levenshtein_distance = levenshtein(strtolower(NoDiacritic::filter($word1, self::LOCALE)), strtolower(NoDiacritic::filter($word2, self::LOCALE)));
+        $levenshtein_distance = levenshtein($this->normalizeText($word1), $this->normalizeText($word2));
         return $levenshtein_distance <= min(self::LEVENSTHEIN_DISTANCE_MAX, min(strlen($word1), strlen($word2)) * self::LEVENSTHEIN_DISTANCE_ALLOWED_PERCENTAGE);
     }
 

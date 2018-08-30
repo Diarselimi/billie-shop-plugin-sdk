@@ -69,16 +69,22 @@ class Risky implements RiskyInterface, LoggingInterface
         return $response['passed'];
     }
 
-    public function runDebtorScoreCheck(OrderContainer $orderContainer, ?string $crefoId): bool
+    public function runDebtorScoreCheck(OrderContainer $orderContainer, bool $isIdentifiedByPerson, ?string $crefoId): bool
     {
         $debtorData = $orderContainer->getDebtorExternalData();
         $address = $orderContainer->getDebtorExternalDataAddress();
         $id = $orderContainer->getOrder()->getId();
 
         try {
+            // @TODO: crazy hack
+            $companyName = $isIdentifiedByPerson
+                ? $orderContainer->getDebtorPerson()->getFirstName().' '.$orderContainer->getDebtorPerson()->getLastName()
+                : $debtorData->getName()
+            ;
+
             $httpResponse = $this->client->post("/risk-check/company/company_b2b_score", [
                 'json' => [
-                    'company_name' => $debtorData->getName(),
+                    'company_name' => $companyName,
                     'house' => $address->getHouseNumber(),
                     'street' => $address->getStreet(),
                     'postal_code' => $address->getPostalCode(),

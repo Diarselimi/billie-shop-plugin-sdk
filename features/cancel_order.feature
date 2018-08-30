@@ -13,19 +13,19 @@ Feature:
         Then print last response
         Then the response status code should be 204
         And the response should be empty
-        And the order "CO123" is cancelled
+        And the order "CO123" is canceled
 
-    Scenario: Successful approved order cancellation
+    Scenario: Successful created order cancellation
         Given I add "Content-type" header equal to "application/json"
         And I add "X-Test" header equal to 1
         And I add "X-Api-User" header equal to 1
-        And I have an approved order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+        And I have a created order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
         And I start alfred
         When I send a POST request to "/order/CO123/cancel"
         Then print last response
         Then the response status code should be 204
         And the response should be empty
-        And the order "CO123" is cancelled
+        And the order "CO123" is canceled
 
     Scenario: Successful shipped order cancellation
         Given I add "Content-type" header equal to "application/json"
@@ -38,32 +38,38 @@ Feature:
         Then print last response
         Then the response status code should be 204
         And the response should be empty
-        And the order "CO123" is cancelled
+        And the order "CO123" is canceled
 
-    Scenario: Unsuccessful rejected order cancellation
+    Scenario: Unsuccessful declined order cancellation
         Given I add "Content-type" header equal to "application/json"
         And I add "X-Test" header equal to 1
         And I add "X-Api-User" header equal to 1
-        And I have a rejected order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+        And I have a declined order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
         When I send a POST request to "/order/CO123/cancel"
         Then print last response
         Then the response status code should be 400
         And the JSON response should be:
         """
-        {"code":"order_cancel_failed","message":"Order #CO123 can not be cancelled"}
+        {
+            "code": "order_cancel_failed",
+            "error": "Order #CO123 can not be cancelled"
+        }
         """
 
-    Scenario: Unsuccessful cancelled order cancellation
+    Scenario: Unsuccessful canceled order cancellation
         Given I add "Content-type" header equal to "application/json"
         And I add "X-Test" header equal to 1
         And I add "X-Api-User" header equal to 1
-        And I have a cancelled order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+        And I have a canceled order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
         When I send a POST request to "/order/CO123/cancel"
         Then print last response
         Then the response status code should be 400
         And the JSON response should be:
         """
-        {"code":"order_cancel_failed","message":"Order #CO123 can not be cancelled"}
+        {
+            "code": "order_cancel_failed",
+            "error": "Order #CO123 can not be cancelled"
+        }
         """
 
     Scenario: Not existing order cancellation
@@ -75,5 +81,8 @@ Feature:
         Then the response status code should be 404
         And the JSON response should be:
         """
-        {"code":"not_found","message":"Order #CO123 not found"}
+        {
+            "code": "not_found",
+            "error": "Order #CO123 not found"
+        }
         """

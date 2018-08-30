@@ -15,6 +15,7 @@ class DebtorDTO
     private $crefoId;
     private $schufaId;
     private $isBlacklisted;
+    private $isIdentifiedByPerson;
 
     public function getId(): int
     {
@@ -144,6 +145,18 @@ class DebtorDTO
     public function setIsBlacklisted(?bool $isBlacklisted): DebtorDTO
     {
         $this->isBlacklisted = $isBlacklisted;
+
+        return $this;
+    }
+
+    public function isIdentifiedByPerson(): bool
+    {
+        return $this->isIdentifiedByPerson;
+    }
+
+    public function setIsIdentifiedByPerson(bool $isIdentifiedByPerson): DebtorDTO
+    {
+        $this->isIdentifiedByPerson = $isIdentifiedByPerson;
 
         return $this;
     }

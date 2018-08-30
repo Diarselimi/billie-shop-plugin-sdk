@@ -18,20 +18,21 @@ Feature:
         }
         """
     Then print last response
-    Then the response status code should be 204
-    And the response should be empty
-    And the order "CO123" duration is 30
-    And the order "CO123" amountGross is 1000
+    Then the response status code should be 412
+    And the JSON response should be:
+    """
+    {"code":"order_duration_update_not_possible","error":"Update duration not possible"}
+    """
 
   Scenario: Case 1.1: Order exists, not yet shipped, due date provided, valid new amount
     Given I add "Content-type" header equal to "application/json"
     And I add "X-Test" header equal to 1
     And I add "X-Api-User" header equal to 1
+    And I start alfred
     And I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
     When I send a PATCH request to "/order/CO123" with body:
         """
         {
-          "duration": 50,
           "amount_gross": 500,
           "amount_net": 400,
           "amount_tax": 20
@@ -41,7 +42,7 @@ Feature:
     Then the response status code should be 204
     And the response should be empty
     And the order "CO123" duration is 30
-    And the order "CO123" amountGross is 1000
+    And the order "CO123" amountGross is 500
 
   Scenario: Case 2: Order exists, not yet shipped, due date unchanged/not set, valid new amount
     Given I add "Content-type" header equal to "application/json"
@@ -112,7 +113,7 @@ Feature:
     And the order "CO123" amountNet is 400
     And the order "CO123" amountTax is 20
 
-  Scenario: Case 5: Order exists, is shipped but not paid back, new due date invalid
+  Scenario: Case 5: Order exists, is shipped but not paid back, new duration invalid
     Given I add "Content-type" header equal to "application/json"
     And I add "X-Test" header equal to 1
     And I add "X-Api-User" header equal to 1
@@ -126,7 +127,11 @@ Feature:
         }
         """
     Then print last response
-    Then the response status code should be 400
+    Then the response status code should be 412
+    And the JSON response should be:
+    """
+    {"code":"order_validation_failed","error":"Invalid duration"}
+    """
 
   Scenario: Case 6: Order exists, is shipped but not paid back, new amount invalid
     Given I add "Content-type" header equal to "application/json"
@@ -144,7 +149,11 @@ Feature:
         }
         """
     Then print last response
-    Then the response status code should be 400
+    Then the response status code should be 412
+    And the JSON response should be:
+    """
+    {"code":"order_validation_failed","error":"Invalid amount"}
+    """
 
   Scenario: Case 7: Order exists, is shipped but not paid back, valid new due date, valid new amount
     Given I add "Content-type" header equal to "application/json"
@@ -174,13 +183,13 @@ Feature:
     And I add "X-Test" header equal to 1
     And I add "X-Api-User" header equal to 1
     When I send a PATCH request to "/order/CO123" with body:
-        """
-        {
-          "duration": 50,
-          "amount_net": 400,
-          "amount_gross": 500,
-          "amount_tax": 20
-        }
-        """
+    """
+    {
+        "duration": 50,
+        "amount_net": 400,
+        "amount_gross": 500,
+        "amount_tax": 20
+    }
+    """
     Then print last response
     Then the response status code should be 404
