@@ -59,7 +59,7 @@ class TestGuzzleSubscriber implements EventSubscriberInterface, LoggingInterface
 
         if (\in_array($service, $this->servicesToMock)) {
             $path = "$this->mockServerUrl/$service";
-            $uri = $transaction->getUri()->withPath($path);
+            $uri = (new Uri($path))->withQuery($transaction->getUri()->getQuery());
 
             $transaction = $transaction->withUri($uri);
             $this->log("Service $service url mocked to $path");
