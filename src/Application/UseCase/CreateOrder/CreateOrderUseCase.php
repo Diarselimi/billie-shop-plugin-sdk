@@ -64,17 +64,23 @@ class CreateOrderUseCase implements LoggingInterface
         }
 
         $debtorDTO = $this->retrieveDebtor($orderContainer, $request);
-        $debtorIdentified = $debtorDTO !== null;
-        $this->orderChecksRunnerService->publishCheckResult(
-            new CheckResult($debtorIdentified, 'debtor_identified', []),
-            $orderContainer
-        );
-
         if ($debtorDTO === null) {
+            $this->orderChecksRunnerService->publishCheckResult(
+                new CheckResult(false, 'debtor_identified', ['debtor_found' => 0]),
+                $orderContainer
+            );
             $this->reject($orderContainer, "debtor couldn't be identified");
 
             return;
         }
+
+        $this->orderChecksRunnerService->publishCheckResult(
+            new CheckResult(true, 'debtor_identified', [
+                'debtor_found' => 1,
+                'debor_company_id' => $debtorDTO->getId(),
+            ]),
+            $orderContainer
+        );
 
         $orderContainer->setDebtorCompany($debtorDTO);
         $this->orderRepository->update($orderContainer->getOrder());
