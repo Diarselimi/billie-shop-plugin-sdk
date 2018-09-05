@@ -58,9 +58,11 @@ class TestGuzzleSubscriber implements EventSubscriberInterface, LoggingInterface
         $this->log("Service $service test header added");
 
         if (\in_array($service, $this->servicesToMock)) {
-            $url = "$this->mockServerUrl/$service";
-            $transaction = $transaction->withUri(new Uri($url));
-            $this->log("Service $service url mocked to $url");
+            $path = "$this->mockServerUrl/$service";
+            $uri = $transaction->getUri()->withPath($path);
+
+            $transaction = $transaction->withUri($uri);
+            $this->log("Service $service url mocked to $path");
         }
 
         $event->setTransaction($transaction);
