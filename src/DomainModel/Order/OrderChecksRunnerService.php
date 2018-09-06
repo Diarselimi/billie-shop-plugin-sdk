@@ -2,6 +2,7 @@
 
 namespace App\DomainModel\Order;
 
+use App\Application\PaellaCoreCriticalException;
 use App\DomainModel\Monitoring\LoggingInterface;
 use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\RiskCheck\Checker\CheckInterface;
@@ -51,7 +52,7 @@ class OrderChecksRunnerService implements LoggingInterface
         return $amountCheckResult && $debtorCountryCheckResult && $debtorIndustrySectorCheckResult;
     }
 
-    public function runChecks(OrderContainer $order, bool $isIdentifiedByPerson, ?string $debtorCrefoId): bool
+    public function runChecks(OrderContainer $order, ?string $debtorCrefoId): bool
     {
         $this->logWaypoint('debtor != merchant check');
         $debtorNotCustomerCheckResult = $this->check($order, 'debtor_not_customer');
@@ -88,7 +89,7 @@ class OrderChecksRunnerService implements LoggingInterface
         }
 
         $this->logWaypoint('debtor score check');
-        $debtorScoreCheck = $this->risky->runDebtorScoreCheck($order, $isIdentifiedByPerson, $debtorCrefoId);
+        $debtorScoreCheck = $this->runDebtorScoreCheck($order, $debtorCrefoId);
         if (!$debtorScoreCheck) {
             $this->logInfo('Debtor score check failed');
 
@@ -98,22 +99,6 @@ class OrderChecksRunnerService implements LoggingInterface
         $this->logInfo('Main checks passed');
 
         return true;
-    }
-
-    private function check(OrderContainer $order, string $name): bool
-    {
-        $check = $this->getCheck($name);
-        $result = $check->check($order);
-
-        $this->logInfo('Check result: {check} -> {result}', [
-            'check' => $name,
-            'result' => (int) $result->isPassed(),
-            'attributes' => $result->getAttributes(),
-        ]);
-
-        $this->publishCheckResult($result, $order);
-
-        return $result->isPassed();
     }
 
     public function publishCheckResult(CheckResult $checkResult, OrderContainer $order)
@@ -137,6 +122,43 @@ class OrderChecksRunnerService implements LoggingInterface
 
             $this->sentry->captureException($exception);
         }
+    }
+
+    private function runDebtorScoreCheck(OrderContainer $order, ?string $debtorCrefoId): bool
+    {
+        try {
+            $name = $order->getDebtorCompany()->getName();
+            $riskyResult = $this->risky->runDebtorScoreCheck($order, $name, $debtorCrefoId);
+        } catch (PaellaCoreCriticalException $exception) {
+            $riskyResult = null;
+        }
+
+        if (!$riskyResult || !$riskyResult->isPassed()) {
+            $name = "{$order->getDebtorPerson()->getFirstName()} {$order->getDebtorPerson()->getLastName()}";
+            $riskyResult = $this->risky->runDebtorScoreCheck($order, $name, $debtorCrefoId);
+        }
+
+        $checkResult = new CheckResult($riskyResult->isPassed(), 'company_b2b_score', []);
+        $riskCheckEntity = $this->riskCheckFactory->createFromCheckResult($checkResult, $order->getOrder()->getId());
+        $this->riskCheckRepository->insert($riskCheckEntity);
+
+        return $riskyResult && $riskyResult->isPassed();
+    }
+
+    private function check(OrderContainer $order, string $name): bool
+    {
+        $check = $this->getCheck($name);
+        $result = $check->check($order);
+
+        $this->logInfo('Check result: {check} -> {result}', [
+            'check' => $name,
+            'result' => (int) $result->isPassed(),
+            'attributes' => $result->getAttributes(),
+        ]);
+
+        $this->publishCheckResult($result, $order);
+
+        return $result->isPassed();
     }
 
     private function getCheck($name): CheckInterface

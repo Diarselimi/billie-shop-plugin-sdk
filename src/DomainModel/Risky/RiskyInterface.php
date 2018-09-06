@@ -3,11 +3,9 @@
 namespace App\DomainModel\Risky;
 
 use App\DomainModel\Order\OrderContainer;
-use App\DomainModel\Order\OrderEntity;
+use App\Infrastructure\Risky\RiskyResultDTO;
 
 interface RiskyInterface
 {
-    public function runOrderCheck(OrderEntity $order, string $name): bool;
-
-    public function runDebtorScoreCheck(OrderContainer $orderContainer, bool $isIdentifiedByPerson, ?string $crefoId): bool;
+    public function runDebtorScoreCheck(OrderContainer $orderContainer, string $companyName, ?string $crefoId): RiskyResultDTO;
 }

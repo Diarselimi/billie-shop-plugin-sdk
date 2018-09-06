@@ -102,7 +102,7 @@ class CreateOrderUseCase implements LoggingInterface
             return;
         }
 
-        if (!$this->orderChecksRunnerService->runChecks($orderContainer, $debtorDTO->isIdentifiedByPerson(), $debtorDTO->getCrefoId())) {
+        if (!$this->orderChecksRunnerService->runChecks($orderContainer, $debtorDTO->getCrefoId())) {
             $this->alfred->unlockDebtorLimit(
                 $orderContainer->getMerchantDebtor()->getDebtorId(),
                 $orderContainer->getOrder()->getAmountGross()
