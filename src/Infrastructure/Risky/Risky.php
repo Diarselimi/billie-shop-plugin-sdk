@@ -58,8 +58,16 @@ class Risky implements RiskyInterface, LoggingInterface
                 'error' => $exception->getMessage(),
             ]);
 
-            return new RiskyResultDTO(false, null);
+            throw new PaellaCoreCriticalException(
+                "Risky couldn't score debtor",
+                PaellaCoreCriticalException::CODE_RISKY_EXCEPTION
+            );
         } catch (TransferException $exception) {
+            $this->logError("Risky score exception", [
+                'code' => $exception->getCode(),
+                'error' => $exception->getMessage(),
+            ]);
+
             throw new PaellaCoreCriticalException(
                 "Risky returned exception on debtor score check",
                 PaellaCoreCriticalException::CODE_RISKY_EXCEPTION
