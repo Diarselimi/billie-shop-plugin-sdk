@@ -6,7 +6,6 @@ use App\Application\PaellaCoreCriticalException;
 use App\DomainModel\Monitoring\LoggingInterface;
 use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\Order\OrderContainer;
-use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\RiskCheck\RiskCheckEntityFactory;
 use App\DomainModel\RiskCheck\RiskCheckRepositoryInterface;
 use App\DomainModel\Risky\RiskyInterface;
@@ -32,56 +31,12 @@ class Risky implements RiskyInterface, LoggingInterface
         $this->riskCheckFactory = $riskCheckFactory;
     }
 
-    public function runOrderCheck(OrderEntity $order, string $name): bool
-    {
-        try {
-            $httpResponse = $this->client->post("/risk-check/order/$name", [
-                'json' => [
-                    'external_code' => $order->getExternalCode(),
-                    'merchant_id' => $order->getMerchantId(),
-                ],
-            ]);
-        } catch (TransferException $exception) {
-            throw new PaellaCoreCriticalException(
-                'Risky not available right now',
-                PaellaCoreCriticalException::CODE_RISKY_EXCEPTION,
-                null,
-                $exception
-            );
-        }
-
-        $response = (string)$httpResponse->getBody();
-        $response = json_decode($response, true);
-
-        if (!$response) {
-            $this->logError("Risky response couldn't be decoded", [
-                'response' => (string) $httpResponse->getBody(),
-            ]);
-
-            throw new PaellaCoreCriticalException(
-                "Risky response couldn't be decoded",
-                PaellaCoreCriticalException::CODE_RISKY_EXCEPTION
-            );
-        }
-
-        $this->saveCheckResult($order->getId(), $response['check_id'], $name, $response['passed']);
-
-        return $response['passed'];
-    }
-
-    public function runDebtorScoreCheck(OrderContainer $orderContainer, bool $isIdentifiedByPerson, ?string $crefoId): bool
+    public function runDebtorScoreCheck(OrderContainer $orderContainer, string $companyName, ?string $crefoId): RiskyResultDTO
     {
         $debtorData = $orderContainer->getDebtorExternalData();
         $address = $orderContainer->getDebtorExternalDataAddress();
-        $id = $orderContainer->getOrder()->getId();
 
         try {
-            // @TODO: crazy hack
-            $companyName = $isIdentifiedByPerson
-                ? $orderContainer->getDebtorPerson()->getFirstName().' '.$orderContainer->getDebtorPerson()->getLastName()
-                : $debtorData->getName()
-            ;
-
             $httpResponse = $this->client->post("/risk-check/company/company_b2b_score", [
                 'json' => [
                     'company_name' => $companyName,
@@ -103,9 +58,7 @@ class Risky implements RiskyInterface, LoggingInterface
                 'error' => $exception->getMessage(),
             ]);
 
-            $this->saveCheckResult($id, null, 'company_b2b_score', false);
-
-            return false;
+            return new RiskyResultDTO(false, null);
         } catch (TransferException $exception) {
             throw new PaellaCoreCriticalException(
                 "Risky returned exception on debtor score check",
@@ -127,14 +80,6 @@ class Risky implements RiskyInterface, LoggingInterface
             );
         }
 
-        $this->saveCheckResult($id, $response['check_id'], 'company_b2b_score', $response['passed']);
-
-        return $response['passed'];
-    }
-
-    private function saveCheckResult(int $orderId, ?int $checkId, string $name, bool $isPassed): void
-    {
-        $check = $this->riskCheckFactory->create($orderId, $checkId, $name, $isPassed);
-        $this->riskCheckRepository->insert($check);
+        return new RiskyResultDTO($response['passed'], $response['check_id']);
     }
 }

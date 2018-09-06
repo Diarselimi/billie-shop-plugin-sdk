@@ -13,7 +13,7 @@ class DebtorAddressCheck implements CheckInterface, LoggingInterface
     public const NAME = 'debtor_address';
     private const MAX_DISTANCE_STREET = 3;
     private const HOUSE_RANGE_REGEXP = '/^\s*([0-9]+)\s*-\s*([0-9]+)\s*$/';
-    private const HOUSE_NUMBER_REGEXP = '/^\s*([0-9]+).*$/';
+    private const HOUSE_NUMBER_REGEXP = '/^[\s0]*([0-9]+).*$/';
 
     public function check(OrderContainer $order): CheckResult
     {
@@ -44,6 +44,10 @@ class DebtorAddressCheck implements CheckInterface, LoggingInterface
     public function isHouseMatch(string $houseFromRegistry, string $houseFromOrder): bool
     {
         $this->logWaypoint('house number check');
+
+        if (!$houseFromRegistry) {
+            return true;
+        }
 
         if (preg_match(self::HOUSE_NUMBER_REGEXP, $houseFromRegistry) || preg_match(self::HOUSE_NUMBER_REGEXP, $houseFromOrder)) {
             return $this->isHouseRangesMatch($houseFromRegistry, $houseFromOrder);

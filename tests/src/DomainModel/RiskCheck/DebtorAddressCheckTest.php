@@ -42,6 +42,12 @@ class DebtorAddressCheckTest extends TestCase
             ['1foo', '1bar', true],
             ['1 foo', '1 bar', true],
             ['1 5', '1 2', true],
+            ['0013', '13', true],
+            ['13', '0013', true],
+            ['00013', '013', true],
+            ['', '5', true],
+            ['', 'blabla', true],
+            ['', '', true],
 
             ['1', '1-2', true], // ranges
             ['1', '1 - 2', true],
@@ -60,8 +66,6 @@ class DebtorAddressCheckTest extends TestCase
             ['1-   5', '4   - 10 ', true],
 
             ['1', '', false], // negative cases
-            ['', '11', false],
-            ['', '', false],
             ['1', '11', false],
             ['12', '11', false],
             ['a5', 'a5', false],
