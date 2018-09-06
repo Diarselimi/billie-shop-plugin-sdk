@@ -127,7 +127,7 @@ class OrderChecksRunnerService implements LoggingInterface
     private function runDebtorScoreCheck(OrderContainer $order, ?string $debtorCrefoId): bool
     {
         try {
-            $name = $order->getDebtorCompany()->getName();
+            $name = $order->getDebtorExternalData()->getName();
             $riskyResult = $this->risky->runDebtorScoreCheck($order, $name, $debtorCrefoId);
         } catch (PaellaCoreCriticalException $exception) {
             $riskyResult = null;
