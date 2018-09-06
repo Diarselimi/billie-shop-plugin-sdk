@@ -133,16 +133,16 @@ class OrderChecksRunnerService implements LoggingInterface
             $riskyResult = null;
         }
 
-        if (!$riskyResult || !$riskyResult->isPassed()) {
+        if (!$riskyResult) {
             $name = "{$order->getDebtorPerson()->getFirstName()} {$order->getDebtorPerson()->getLastName()}";
             $riskyResult = $this->risky->runDebtorScoreCheck($order, $name, $debtorCrefoId);
         }
 
-        $checkResult = new CheckResult($riskyResult->isPassed(), 'company_b2b_score', []);
+        $checkResult = new CheckResult($riskyResult && $riskyResult->isPassed(), 'company_b2b_score', []);
         $riskCheckEntity = $this->riskCheckFactory->createFromCheckResult($checkResult, $order->getOrder()->getId());
         $this->riskCheckRepository->insert($riskCheckEntity);
 
-        return $riskyResult && $riskyResult->isPassed();
+        return $checkResult->isPassed();
     }
 
     private function check(OrderContainer $order, string $name): bool
