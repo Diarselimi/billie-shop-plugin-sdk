@@ -135,7 +135,11 @@ class OrderChecksRunnerService implements LoggingInterface
 
         if (!$riskyResult) {
             $name = "{$order->getDebtorPerson()->getFirstName()} {$order->getDebtorPerson()->getLastName()}";
-            $riskyResult = $this->risky->runDebtorScoreCheck($order, $name, $debtorCrefoId);
+            try {
+                $riskyResult = $this->risky->runDebtorScoreCheck($order, $name, $debtorCrefoId);
+            } catch (PaellaCoreCriticalException $exception) {
+                $riskyResult = null;
+            }
         }
 
         $checkResult = new CheckResult($riskyResult && $riskyResult->isPassed(), 'company_b2b_score', []);
