@@ -76,6 +76,8 @@ class OrderChecksRunnerService implements LoggingInterface
             return false;
         }
 
+        $order->getMerchantDebtor()->setIsDebtorIdValid(true);
+
         $this->logWaypoint('blacklist check');
         $debtorBlacklistedCheckResult = $this->check($order, 'debtor_blacklisted');
         if (!$debtorBlacklistedCheckResult) {

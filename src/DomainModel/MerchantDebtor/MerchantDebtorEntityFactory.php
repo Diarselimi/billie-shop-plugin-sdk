@@ -13,6 +13,7 @@ class MerchantDebtorEntityFactory
             ->setMerchantId($row['merchant_id'])
             ->setDebtorId($row['debtor_id'])
             ->setExternalId($row['external_id'])
+            ->setIsDebtorIdValid($row['debtor_id_validation'])
             ->setCreatedAt(new \DateTime($row['created_at']))
             ->setUpdatedAt(new \DateTime($row['updated_at']))
         ;

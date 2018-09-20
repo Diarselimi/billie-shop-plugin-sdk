@@ -19,13 +19,14 @@ class MerchantDebtorRepository extends AbstractRepository implements MerchantDeb
     {
         $id = $this->doInsert('
             INSERT INTO merchants_debtors
-            (merchant_id, debtor_id, external_id, created_at, updated_at)
+            (merchant_id, debtor_id, external_id, debtor_id_validation, created_at, updated_at)
             VALUES
-            (:merchant_id, :debtor_id, :external_id, :created_at, :updated_at)
+            (:merchant_id, :debtor_id, :external_id, :debtor_id_validation, :created_at, :updated_at)
         ', [
             'merchant_id' => $merchantDebtor->getMerchantId(),
             'debtor_id' => $merchantDebtor->getDebtorId(),
             'external_id' => $merchantDebtor->getExternalId(),
+            'debtor_id_validation' => (int) $merchantDebtor->isDebtorIdValid(),
             'created_at' => $merchantDebtor->getCreatedAt()->format('Y-m-d H:i:s'),
             'updated_at' => $merchantDebtor->getUpdatedAt()->format('Y-m-d H:i:s'),
         ]);
@@ -33,11 +34,24 @@ class MerchantDebtorRepository extends AbstractRepository implements MerchantDeb
         $merchantDebtor->setId($id);
     }
 
+    public function update(MerchantDebtorEntity $merchantDebtor): void
+    {
+        $this->doUpdate('
+            UPDATE merchants_debtors
+            SET
+              debtor_id_validation = :debtor_id_validation
+            WHERE id = :id
+        ', [
+            'debtor_id_validation' => (int) $merchantDebtor->isDebtorIdValid(),
+            'id' => $merchantDebtor->getId(),
+        ]);
+    }
+
     public function getOneById(int $id):? MerchantDebtorEntity
     {
         $company = $this->doFetchOne('
-          SELECT id, merchant_id, debtor_id, external_id, created_at, updated_at 
-          FROM merchants_debtors 
+          SELECT id, merchant_id, debtor_id, external_id, debtor_id_validation, created_at, updated_at
+          FROM merchants_debtors
           WHERE id = :id
         ', [
             'id' => $id,
@@ -53,10 +67,12 @@ class MerchantDebtorRepository extends AbstractRepository implements MerchantDeb
     public function getOneByExternalId(string $externalId):? MerchantDebtorEntity
     {
         $company = $this->doFetchOne('
-          SELECT id, merchant_id, debtor_id, external_id, created_at, updated_at 
-          FROM merchants_debtors 
-          WHERE external_id = :external_id', [
+          SELECT id, merchant_id, debtor_id, external_id, debtor_id_validation, created_at, updated_at
+          FROM merchants_debtors
+          WHERE external_id = :external_id
+          AND debtor_id_validation = :debtor_id_validation', [
             'external_id' => $externalId,
+            'debtor_id_validation' => 1,
         ]);
 
         if (!$company) {
