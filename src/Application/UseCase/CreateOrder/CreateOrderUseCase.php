@@ -181,7 +181,6 @@ class CreateOrderUseCase implements LoggingInterface
     {
         $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_CREATE);
         $this->orderRepository->update($orderContainer->getOrder());
-        $this->merchantDebtorRepository->update($orderContainer->getMerchantDebtor());
 
         $customer = $orderContainer->getMerchant();
         $customer->reduceAvailableFinancingLimit($orderContainer->getOrder()->getAmountGross());

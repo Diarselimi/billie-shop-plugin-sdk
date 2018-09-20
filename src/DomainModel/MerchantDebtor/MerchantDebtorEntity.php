@@ -9,7 +9,6 @@ class MerchantDebtorEntity extends AbstractEntity
     private $merchantId;
     private $debtorId;
     private $externalId;
-    private $isDebtorIdValid = false;
 
     public function getMerchantId(): string
     {
@@ -43,18 +42,6 @@ class MerchantDebtorEntity extends AbstractEntity
     public function setExternalId(string $externalId): MerchantDebtorEntity
     {
         $this->externalId = $externalId;
-
-        return $this;
-    }
-
-    public function isDebtorIdValid(): bool
-    {
-        return $this->isDebtorIdValid;
-    }
-
-    public function setIsDebtorIdValid(bool $isDebtorIdValid): MerchantDebtorEntity
-    {
-        $this->isDebtorIdValid = $isDebtorIdValid;
 
         return $this;
     }
