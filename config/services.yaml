@@ -28,7 +28,7 @@ services:
   App\Infrastructure\PDO\PDO:
     lazy: true
     arguments:
-      - 'mysql:dbname=%env(DATABASE_NAME)%;host=%env(DATABASE_HOST)%'
+      - 'mysql:dbname=%env(DATABASE_NAME)%;host=%env(DATABASE_HOST)%;charset=UTF8'
       - '%env(DATABASE_USERNAME)%'
       - '%env(DATABASE_PASSWORD)%'
 
