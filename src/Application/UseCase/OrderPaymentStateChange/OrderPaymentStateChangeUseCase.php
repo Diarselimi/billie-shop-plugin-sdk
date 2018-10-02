@@ -7,6 +7,7 @@ use App\DomainModel\Monitoring\LoggingInterface;
 use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
+use Symfony\Component\Workflow\Exception\NotEnabledTransitionException;
 use Symfony\Component\Workflow\Workflow;
 
 class OrderPaymentStateChangeUseCase implements LoggingInterface
@@ -56,15 +57,24 @@ class OrderPaymentStateChangeUseCase implements LoggingInterface
             return;
         }
 
-        if ($orderPaymentDetails->isLate() && !$this->orderStateManager->isLate($order)) {
-            $this->workflow->apply($order, OrderStateManager::TRANSITION_LATE);
-            $this->orderRepository->update($order);
-        } elseif ($orderPaymentDetails->isPaidOut()) {
-            $this->workflow->apply($order, OrderStateManager::TRANSITION_PAY_OUT);
-            $this->orderRepository->update($order);
-        } elseif ($orderPaymentDetails->isPaidFully()) {
-            $this->workflow->apply($order, OrderStateManager::STATE_COMPLETE);
-            $this->orderRepository->update($order);
+        try {
+            if ($orderPaymentDetails->isLate() && !$this->orderStateManager->isLate($order)) {
+                $this->workflow->apply($order, OrderStateManager::TRANSITION_LATE);
+                $this->orderRepository->update($order);
+            } elseif ($orderPaymentDetails->isPaidOut()) {
+                $this->workflow->apply($order, OrderStateManager::TRANSITION_PAY_OUT);
+                $this->orderRepository->update($order);
+            } elseif ($orderPaymentDetails->isPaidFully()) {
+                $this->workflow->apply($order, OrderStateManager::STATE_COMPLETE);
+                $this->orderRepository->update($order);
+            }
+        } catch (NotEnabledTransitionException $exception) {
+            $this->logError('[suppressed] State transition for order not available', [
+                'transition' => $exception->getTransitionName(),
+                'order_id' => $order->getId(),
+            ]);
+
+            $this->sentry->captureException($exception);
         }
     }
 }
