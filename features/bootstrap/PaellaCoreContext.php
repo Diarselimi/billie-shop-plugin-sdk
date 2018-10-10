@@ -166,7 +166,7 @@ class PaellaCoreContext extends MinkContext
         $merchantDebtor = (new MerchantDebtorEntity())
             ->setMerchantId('1')
             ->setDebtorId('1')
-            ->setExternalId('XX12');
+        ;
         $this->getMerchantDebtorRepository()->insert($merchantDebtor);
 
         $order = (new OrderEntity())

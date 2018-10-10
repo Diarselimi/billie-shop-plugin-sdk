@@ -5,6 +5,7 @@ namespace App\Application\UseCase\CreateOrder;
 use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Alfred\DebtorDTO;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntityFactory;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\Monitoring\LoggingInterface;
@@ -117,35 +118,34 @@ class CreateOrderUseCase implements LoggingInterface
 
     private function retrieveDebtor(OrderContainer $orderContainer, CreateOrderRequest $request): ?DebtorDTO
     {
-        $merchantId = $request->getMerchantCustomerId();
-        $debtor = $this->merchantDebtorRepository->getOneByExternalId($merchantId);
-        $this->logWaypoint('known customer check');
+        $this->logInfo('Start the debtor identification');
+        $debtorDTO = $this->identifyDebtor($orderContainer);
 
-        if (!$debtor) {
-            $this->logInfo('Start the debtor identification');
-            $debtorDTO = $this->identifyDebtor($orderContainer);
+        if (!$debtorDTO) {
+            $this->logInfo('Debtor could not be identified');
 
-            if ($debtorDTO) {
-                $this->logInfo('Debtor identified');
-                $debtor = $this->merchantDebtorFactory->createFromDebtorDTO(
-                    $debtorDTO,
-                    $merchantId,
-                    $request->getMerchantId()
-                );
-                $this->merchantDebtorRepository->insert($debtor);
-            } else {
-                $this->logInfo('Debtor could not be identification');
+            return null;
+        }
 
-                return null;
-            }
-        } else {
+        $this->logInfo('Debtor identified');
+
+        $merchantId = $request->getMerchantId();
+        $debtorId = $debtorDTO->getId();
+
+        $merchantDebtor = $this->merchantDebtorRepository->getOneByMerchantAndDebtorId($merchantId, $debtorId);
+
+        if ($merchantDebtor) {
             $this->logInfo('Debtor already known');
-            $debtorDTO = $this->alfred->getDebtor($debtor->getDebtorId());
+        } else {
+            $this->logInfo('Register new Debtor');
+            $merchantDebtor = $this->merchantDebtorFactory->create($debtorId, $merchantId);
+            $this->merchantDebtorRepository->insert($merchantDebtor);
         }
 
         $orderContainer
-            ->setMerchantDebtor($debtor)
-            ->getOrder()->setMerchantDebtorId($debtor->getId());
+            ->setMerchantDebtor($merchantDebtor)
+            ->getOrder()->setMerchantDebtorId($merchantDebtor->getId())
+        ;
 
         return $debtorDTO;
     }

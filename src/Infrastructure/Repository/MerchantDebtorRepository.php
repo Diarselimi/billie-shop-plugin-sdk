@@ -19,13 +19,12 @@ class MerchantDebtorRepository extends AbstractRepository implements MerchantDeb
     {
         $id = $this->doInsert('
             INSERT INTO merchants_debtors
-            (merchant_id, debtor_id, external_id, created_at, updated_at)
+            (merchant_id, debtor_id, created_at, updated_at)
             VALUES
-            (:merchant_id, :debtor_id, :external_id, :created_at, :updated_at)
+            (:merchant_id, :debtor_id, :created_at, :updated_at)
         ', [
             'merchant_id' => $merchantDebtor->getMerchantId(),
             'debtor_id' => $merchantDebtor->getDebtorId(),
-            'external_id' => $merchantDebtor->getExternalId(),
             'created_at' => $merchantDebtor->getCreatedAt()->format('Y-m-d H:i:s'),
             'updated_at' => $merchantDebtor->getUpdatedAt()->format('Y-m-d H:i:s'),
         ]);
@@ -33,10 +32,10 @@ class MerchantDebtorRepository extends AbstractRepository implements MerchantDeb
         $merchantDebtor->setId($id);
     }
 
-    public function getOneById(int $id):? MerchantDebtorEntity
+    public function getOneById(int $id): ?MerchantDebtorEntity
     {
         $company = $this->doFetchOne('
-          SELECT id, merchant_id, debtor_id, external_id, created_at, updated_at 
+          SELECT id, merchant_id, debtor_id, created_at, updated_at 
           FROM merchants_debtors 
           WHERE id = :id
         ', [
@@ -50,19 +49,17 @@ class MerchantDebtorRepository extends AbstractRepository implements MerchantDeb
         return $this->factory->createFromDatabaseRow($company);
     }
 
-    public function getOneByExternalId(string $externalId):? MerchantDebtorEntity
+    public function getOneByMerchantAndDebtorId(string $merchantId, string $debtorId): ?MerchantDebtorEntity
     {
-        $company = $this->doFetchOne('
-          SELECT id, merchant_id, debtor_id, external_id, created_at, updated_at 
+        $row = $this->doFetchOne('
+          SELECT id, merchant_id, debtor_id, created_at, updated_at 
           FROM merchants_debtors 
-          WHERE external_id = :external_id', [
-            'external_id' => $externalId,
+          WHERE merchant_id = :merchant_id
+          AND debtor_id = :debtor_id', [
+            'merchant_id' => $merchantId,
+            'debtor_id' => $debtorId,
         ]);
 
-        if (!$company) {
-            return null;
-        }
-
-        return $this->factory->createFromDatabaseRow($company);
+        return $row ? $this->factory->createFromDatabaseRow($row) : null;
     }
 }

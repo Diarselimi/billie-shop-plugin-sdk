@@ -2,8 +2,6 @@
 
 namespace App\DomainModel\MerchantDebtor;
 
-use App\DomainModel\Alfred\DebtorDTO;
-
 class MerchantDebtorEntityFactory
 {
     public function createFromDatabaseRow(array $row): MerchantDebtorEntity
@@ -12,22 +10,19 @@ class MerchantDebtorEntityFactory
             ->setId($row['id'])
             ->setMerchantId($row['merchant_id'])
             ->setDebtorId($row['debtor_id'])
-            ->setExternalId($row['external_id'])
             ->setCreatedAt(new \DateTime($row['created_at']))
             ->setUpdatedAt(new \DateTime($row['updated_at']))
         ;
     }
 
-    public function createFromDebtorDTO(DebtorDTO $debtor, string $externalId, string $merchantId): MerchantDebtorEntity
+    public function create(string $debtorId, string $merchantId): MerchantDebtorEntity
     {
         $now = new \DateTime();
 
         return (new MerchantDebtorEntity())
             ->setMerchantId($merchantId)
-            ->setDebtorId($debtor->getId())
-            ->setExternalId($externalId)
+            ->setDebtorId($debtorId)
             ->setCreatedAt($now)
-            ->setUpdatedAt($now)
-        ;
+            ->setUpdatedAt($now);
     }
 }
