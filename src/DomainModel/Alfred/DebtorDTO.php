@@ -11,7 +11,6 @@ class DebtorDTO
     private $addressPostalCode;
     private $addressCity;
     private $addressCountry;
-    private $paymentId;
     private $crefoId;
     private $schufaId;
     private $isBlacklisted;
@@ -96,18 +95,6 @@ class DebtorDTO
     public function setAddressCountry(string $addressCountry): DebtorDTO
     {
         $this->addressCountry = $addressCountry;
-
-        return $this;
-    }
-
-    public function getPaymentId(): string
-    {
-        return $this->paymentId;
-    }
-
-    public function setPaymentId(string $paymentId): DebtorDTO
-    {
-        $this->paymentId = $paymentId;
 
         return $this;
     }

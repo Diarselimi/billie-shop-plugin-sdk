@@ -4,6 +4,8 @@ namespace App\Application\UseCase\CreateOrder;
 
 use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Alfred\DebtorDTO;
+use App\DomainModel\Borscht\BorschtInterface;
+use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntityFactory;
@@ -33,11 +35,13 @@ class CreateOrderUseCase implements LoggingInterface
     private $merchantDebtorFactory;
     private $orderRepository;
     private $workflow;
+    private $borscht;
 
     public function __construct(
         OrderPersistenceService $orderPersistenceService,
         OrderChecksRunnerService $orderChecksRunnerService,
         AlfredInterface $alfred,
+        BorschtInterface $borscht,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         MerchantRepositoryInterface $merchantRepository,
         MerchantDebtorEntityFactory $merchantDebtorFactory,
@@ -47,6 +51,7 @@ class CreateOrderUseCase implements LoggingInterface
         $this->orderPersistenceService = $orderPersistenceService;
         $this->orderChecksRunnerService = $orderChecksRunnerService;
         $this->alfred = $alfred;
+        $this->borscht = $borscht;
         $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->merchantRepository = $merchantRepository;
         $this->merchantDebtorFactory = $merchantDebtorFactory;
@@ -138,8 +143,7 @@ class CreateOrderUseCase implements LoggingInterface
             $this->logInfo('Debtor already known');
         } else {
             $this->logInfo('Register new Debtor');
-            $merchantDebtor = $this->merchantDebtorFactory->create($debtorId, $merchantId);
-            $this->merchantDebtorRepository->insert($merchantDebtor);
+            $merchantDebtor = $this->registerMerchantDebtor($debtorId, $orderContainer->getMerchant());
         }
 
         $orderContainer
@@ -148,6 +152,21 @@ class CreateOrderUseCase implements LoggingInterface
         ;
 
         return $debtorDTO;
+    }
+
+    private function registerMerchantDebtor(string $debtorId, MerchantEntity $merchant): MerchantDebtorEntity
+    {
+        $paymentDebtor = $this->borscht->registerDebtor($merchant->getPaymentMerchantId());
+
+        $merchantDebtor = $this->merchantDebtorFactory->create(
+            $debtorId,
+            $merchant->getId(),
+            $paymentDebtor->getPaymentDebtorId()
+        );
+
+        $this->merchantDebtorRepository->insert($merchantDebtor);
+
+        return $merchantDebtor;
     }
 
     private function identifyDebtor(OrderContainer $orderContainer)

@@ -45,6 +45,7 @@ class PaellaCoreContext extends MinkContext
                 ->setName('Behat User')
                 ->setIsActive(true)
                 ->setRoles('["ROLE_NOTHING"]')
+                ->setPaymentMerchantId('f2ec4d5e-79f4-40d6-b411-31174b6519ac')
                 ->setAvailableFinancingLimit(10000)
                 ->setApiKey('test')
                 ->setCompanyId('1')

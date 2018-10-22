@@ -8,6 +8,7 @@ class MerchantDebtorEntity extends AbstractEntity
 {
     private $merchantId;
     private $debtorId;
+    private $paymentDebtorId;
 
     public function getMerchantId(): string
     {
@@ -29,6 +30,18 @@ class MerchantDebtorEntity extends AbstractEntity
     public function setDebtorId(string $debtorId): MerchantDebtorEntity
     {
         $this->debtorId = $debtorId;
+
+        return $this;
+    }
+
+    public function getPaymentDebtorId(): ?string
+    {
+        return $this->paymentDebtorId;
+    }
+
+    public function setPaymentDebtorId(?string $paymentDebtorId): MerchantDebtorEntity
+    {
+        $this->paymentDebtorId = $paymentDebtorId;
 
         return $this;
     }

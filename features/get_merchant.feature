@@ -31,6 +31,7 @@ Feature:
             "name": "Behat User",
             "api_key": "test",
             "company_id": "1",
+            "payment_merchant_id": "f2ec4d5e-79f4-40d6-b411-31174b6519ac",
             "roles": "[\u0022ROLE_NOTHING\u0022]",
             "is_active": "1",
             "available_financing_limit": "10000.00",

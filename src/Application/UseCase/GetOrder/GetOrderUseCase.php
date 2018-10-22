@@ -93,7 +93,7 @@ class GetOrderUseCase
     {
         $company = $this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId());
         $debtor = $this->alfred->getDebtor($company->getDebtorId());
-        $debtorPaymentDetails = $this->borscht->getDebtorPaymentDetails($debtor->getPaymentId());
+        $debtorPaymentDetails = $this->borscht->getDebtorPaymentDetails($company->getPaymentDebtorId());
 
         $response
             ->setCompanyName($debtor->getName())

@@ -6,6 +6,8 @@ use App\DomainModel\Order\OrderEntity;
 
 interface BorschtInterface
 {
+    public function registerDebtor(string $paymentMerchantId): DebtorPaymentRegistrationDTO;
+
     public function getDebtorPaymentDetails(string $debtorPaymentId): DebtorPaymentDetailsDTO;
 
     public function getOrderPaymentDetails(string $orderPaymentId): OrderPaymentDetailsDTO;

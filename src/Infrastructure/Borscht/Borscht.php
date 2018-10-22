@@ -5,13 +5,15 @@ namespace App\Infrastructure\Borscht;
 use App\Application\PaellaCoreCriticalException;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Borscht\DebtorPaymentDetailsDTO;
+use App\DomainModel\Borscht\DebtorPaymentRegistrationDTO;
 use App\DomainModel\Borscht\OrderPaymentDetailsDTO;
+use App\DomainModel\Borscht\OrderPaymentDetailsFactory;
 use App\DomainModel\Monitoring\LoggingInterface;
 use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Borscht\OrderPaymentDetailsFactory;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
+use Symfony\Component\HttpFoundation\Response;
 
 class Borscht implements BorschtInterface, LoggingInterface
 {
@@ -191,5 +193,44 @@ class Borscht implements BorschtInterface, LoggingInterface
         }
 
         return $this->paymentDetailsFactory->createFromBorschtResponse($response);
+    }
+
+    public function registerDebtor(string $paymentMerchantId): DebtorPaymentRegistrationDTO
+    {
+        try {
+            $response = $this->client->post('debtor.json', [
+                'headers' => [
+                    'x-merchant-id' => $paymentMerchantId
+                ]
+            ]);
+        } catch (TransferException $exception) {
+            if ($exception->getCode() === Response::HTTP_NOT_FOUND) {
+                throw new PaellaCoreCriticalException(
+                    'Merchant not found',
+                    PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION,
+                    null,
+                    $exception
+                );
+            }
+
+            throw new PaellaCoreCriticalException(
+                'Borscht is not available right now',
+                PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION,
+                null,
+                $exception
+            );
+        }
+
+        $response = (string)$response->getBody();
+        $response = json_decode($response, true);
+
+        if (!$response) {
+            throw new PaellaCoreCriticalException(
+                'Borscht response decode exception',
+                PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION
+            );
+        }
+
+        return new DebtorPaymentRegistrationDTO($response['debtor_id']);
     }
 }

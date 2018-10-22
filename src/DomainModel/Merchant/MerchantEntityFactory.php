@@ -12,6 +12,7 @@ class MerchantEntityFactory
             ->setApiKey($row['api_key'])
             ->setAvailableFinancingLimit($row['available_financing_limit'])
             ->setCompanyId($row['company_id'])
+            ->setPaymentMerchantId($row['payment_merchant_id'])
             ->setRoles($row['roles'])
             ->setIsActive((bool) $row['is_active'])
             ->setWebhookUrl($row['webhook_url'])

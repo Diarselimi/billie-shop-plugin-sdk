@@ -3,7 +3,6 @@
 namespace App\Application\UseCase\ShipOrder;
 
 use App\Application\PaellaCoreCriticalException;
-use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\Order\OrderRepositoryInterface;
@@ -15,7 +14,6 @@ class ShipOrderUseCase
 {
     private $orderRepository;
     private $merchantDebtorRepository;
-    private $alfred;
     private $borscht;
     private $workflow;
 
@@ -23,13 +21,11 @@ class ShipOrderUseCase
         Workflow $workflow,
         OrderRepositoryInterface $orderRepository,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
-        AlfredInterface $alfred,
         BorschtInterface $borscht
     ) {
         $this->workflow = $workflow;
         $this->orderRepository = $orderRepository;
         $this->merchantDebtorRepository = $merchantDebtorRepository;
-        $this->alfred = $alfred;
         $this->borscht = $borscht;
     }
 
@@ -61,9 +57,7 @@ class ShipOrderUseCase
         ;
 
         $company = $this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId());
-        $debtor = $this->alfred->getDebtor($company->getDebtorId());
-
-        $paymentDetails = $this->borscht->createOrder($order, $debtor->getPaymentId());
+        $paymentDetails = $this->borscht->createOrder($order, $company->getPaymentDebtorId());
         $order->setPaymentId($paymentDetails->getId());
 
         $this->workflow->apply($order, OrderStateManager::TRANSITION_SHIP);
