@@ -6,8 +6,9 @@ class MigrateExtAndPaymentIds extends AbstractMigration
 {
     public function change()
     {
-        // reassign the order with the same debtor to the latest one
+        // have to put all queries in one, otherwise database goes away
         $this->execute('
+            # reassign the order with the same debtor to the latest one
             UPDATE orders
             SET merchant_debtor_id = (
                 SELECT proper_merchant_debtor.id
@@ -21,10 +22,8 @@ class MigrateExtAndPaymentIds extends AbstractMigration
                 LIMIT 1
             )
             WHERE merchant_debtor_id IS NOT NULL;
-        ');
-
-        // kill duplicated debtors
-        $this->execute('
+            
+            # kill duplicated debtors
             DELETE FROM target 
             USING merchants_debtors as target
             WHERE target.debtor_id IN (
@@ -33,18 +32,11 @@ class MigrateExtAndPaymentIds extends AbstractMigration
                 WHERE source.debtor_id = target.debtor_id
                 AND source.id > target.id
             );
-        ');
-
-        // copy debtor payment ids from webapp to core
-        $this->execute('
+            
+            #copy debtor payment ids from webapp to core
             UPDATE paella.merchants_debtors 
             INNER JOIN webapp.companies ON webapp.companies.id = paella.merchants_debtors.debtor_id
             SET paella.merchants_debtors.payment_debtor_id = webapp.companies.payment_id;
         ');
-
-        $this->table('merchant_debtors')
-            ->addIndex(['merchant_id', 'debtor_id'], ['unique' => true])
-            ->update()
-        ;
     }
 }

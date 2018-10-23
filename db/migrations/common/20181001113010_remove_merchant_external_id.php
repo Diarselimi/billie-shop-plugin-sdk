@@ -11,6 +11,11 @@ class RemoveMerchantExternalId extends AbstractMigration
             ->update()
         ;
 
+        $this->table('merchant_debtors')
+            ->addIndex(['merchant_id', 'debtor_id'], ['unique' => true])
+            ->update()
+        ;
+        
         $this->table('debtor_external_data')
             ->addColumn('merchant_external_id', 'string', ['null' => true, 'after' => 'is_established_customer'])
             ->update()
