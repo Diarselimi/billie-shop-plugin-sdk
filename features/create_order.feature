@@ -198,7 +198,7 @@ Feature:
             "passed": true
         }
         """
-        And I get from alfred "/debtor/1" endpoint response with status 200 and body
+        And I get from alfred "/debtor/identify" endpoint response with status 200 and body
         """
         {
             "id": 1,
