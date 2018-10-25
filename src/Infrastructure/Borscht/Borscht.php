@@ -13,13 +13,17 @@ use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\Order\OrderEntity;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
-use Symfony\Component\HttpFoundation\Response;
 
 class Borscht implements BorschtInterface, LoggingInterface
 {
     use LoggingTrait;
 
+    private const ERR_DEFAULT_MESSAGE = 'Payments API call was not successful';
+
+    private const ERR_BODY_DECODE_MESSAGE = 'Borscht response decode exception';
+
     private $client;
+
     private $paymentDetailsFactory;
 
     public function __construct(Client $client, OrderPaymentDetailsFactory $paymentDetailsFactory)
@@ -34,18 +38,18 @@ class Borscht implements BorschtInterface, LoggingInterface
             $response = $this->client->get("/debtor/$debtorPaymentId.json");
         } catch (TransferException $exception) {
             throw new PaellaCoreCriticalException(
-                'Borscht is not available right now',
+                self::ERR_DEFAULT_MESSAGE,
                 PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION,
                 null,
                 $exception
             );
         }
 
-        $response = (string)$response->getBody();
+        $response = (string) $response->getBody();
         $response = json_decode($response, true);
         if (!$response) {
             throw new PaellaCoreCriticalException(
-                'Borscht response decode exception',
+                self::ERR_BODY_DECODE_MESSAGE,
                 PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION
             );
         }
@@ -61,19 +65,19 @@ class Borscht implements BorschtInterface, LoggingInterface
             $response = $this->client->get("/order/$orderPaymentId.json");
         } catch (TransferException $exception) {
             throw new PaellaCoreCriticalException(
-                'Borscht is not available right now',
+                self::ERR_DEFAULT_MESSAGE,
                 PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION,
                 null,
                 $exception
             );
         }
 
-        $response = (string)$response->getBody();
+        $response = (string) $response->getBody();
         $response = json_decode($response, true);
 
         if (!$response) {
             throw new PaellaCoreCriticalException(
-                'Borscht response decode exception',
+                self::ERR_BODY_DECODE_MESSAGE,
                 PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION
             );
         }
@@ -95,7 +99,7 @@ class Borscht implements BorschtInterface, LoggingInterface
             ]);
         } catch (TransferException $exception) {
             throw new PaellaCoreCriticalException(
-                'Borscht is not available right now',
+                self::ERR_DEFAULT_MESSAGE,
                 PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION,
                 null,
                 $exception
@@ -122,7 +126,7 @@ class Borscht implements BorschtInterface, LoggingInterface
             ]);
         } catch (TransferException $exception) {
             throw new PaellaCoreCriticalException(
-                'Borscht is not available right now',
+                self::ERR_DEFAULT_MESSAGE,
                 PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION,
                 null,
                 $exception
@@ -147,7 +151,7 @@ class Borscht implements BorschtInterface, LoggingInterface
             ]);
         } catch (TransferException $exception) {
             throw new PaellaCoreCriticalException(
-                'Borscht is not available right now',
+                self::ERR_DEFAULT_MESSAGE,
                 PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION,
                 null,
                 $exception
@@ -175,19 +179,19 @@ class Borscht implements BorschtInterface, LoggingInterface
             ]);
         } catch (TransferException $exception) {
             throw new PaellaCoreCriticalException(
-                'Borscht is not available right now',
+                self::ERR_DEFAULT_MESSAGE,
                 PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION,
                 null,
                 $exception
             );
         }
 
-        $response = (string)$response->getBody();
+        $response = (string) $response->getBody();
         $response = json_decode($response, true);
 
         if (!$response) {
             throw new PaellaCoreCriticalException(
-                'Borscht response decode exception',
+                self::ERR_BODY_DECODE_MESSAGE,
                 PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION
             );
         }
@@ -200,33 +204,24 @@ class Borscht implements BorschtInterface, LoggingInterface
         try {
             $response = $this->client->post('debtor.json', [
                 'headers' => [
-                    'x-merchant-id' => $paymentMerchantId
-                ]
+                    'x-merchant-id' => $paymentMerchantId,
+                ],
             ]);
         } catch (TransferException $exception) {
-            if ($exception->getCode() === Response::HTTP_NOT_FOUND) {
-                throw new PaellaCoreCriticalException(
-                    'Merchant not found',
-                    PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION,
-                    null,
-                    $exception
-                );
-            }
-
             throw new PaellaCoreCriticalException(
-                'Borscht is not available right now',
+                self::ERR_DEFAULT_MESSAGE,
                 PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION,
                 null,
                 $exception
             );
         }
 
-        $response = (string)$response->getBody();
+        $response = (string) $response->getBody();
         $response = json_decode($response, true);
 
         if (!$response) {
             throw new PaellaCoreCriticalException(
-                'Borscht response decode exception',
+                self::ERR_BODY_DECODE_MESSAGE,
                 PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION
             );
         }
