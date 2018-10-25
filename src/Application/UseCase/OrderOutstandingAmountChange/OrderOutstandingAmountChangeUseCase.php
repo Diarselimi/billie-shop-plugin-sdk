@@ -6,6 +6,7 @@ use App\Application\PaellaCoreCriticalException;
 use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Merchant\MerchantNotFoundException;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\Monitoring\LoggingInterface;
 use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\Order\OrderRepositoryInterface;
@@ -18,20 +19,28 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
     use LoggingTrait;
 
     private $orderRepository;
+
     private $merchantRepository;
+
+    private $merchantDebtorRepository;
+
     private $notificationSender;
+
     private $sentry;
+
     private $alfred;
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         MerchantRepositoryInterface $merchantRepository,
+        MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         NotificationSender $notificationSender,
         Raven_Client $sentry,
         AlfredInterface $alfred
     ) {
         $this->orderRepository = $orderRepository;
         $this->merchantRepository = $merchantRepository;
+        $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->notificationSender = $notificationSender;
         $this->sentry = $sentry;
         $this->alfred = $alfred;
@@ -43,9 +52,12 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
         $order = $this->orderRepository->getOneByPaymentId($orderAmountChangeDetails->getId());
 
         if (!$order) {
-            $this->logError('[suppressed] Trying to change state for non-existing order', [
-                'payment_id' => $orderAmountChangeDetails->getId(),
-            ]);
+            $this->logError(
+                '[suppressed] Trying to change state for non-existing order',
+                [
+                    'payment_id' => $orderAmountChangeDetails->getId(),
+                ]
+            );
 
             $this->sentry->captureException(new PaellaCoreCriticalException('Order not found'));
 
@@ -59,8 +71,24 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 
         $merchant->increaseAvailableFinancingLimit($orderAmountChangeDetails->getAmountChange());
 
-        // unlock debtor limit in alfred
-        $this->alfred->unlockDebtorLimit($order->getMerchantDebtorId(), $orderAmountChangeDetails->getAmountChange());
+        $merchantDebtor = $this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId());
+
+        if (!$merchantDebtor) {
+            $this->logError(
+                '[suppressed] Merchant Debtor not found.',
+                [
+                    'payment_id' => $order->getId(),
+                    'merchant_debtor_id' => $order->getMerchantDebtorId(),
+                ]
+            );
+            $this->sentry->captureException(
+                new PaellaCoreCriticalException('Merchant Debtor not found for order #' . $order->getId())
+            );
+
+            return;
+        }
+
+        $this->alfred->unlockDebtorLimit($merchantDebtor->getDebtorId(), $orderAmountChangeDetails->getAmountChange());
 
         $this->merchantRepository->update($merchant);
 
@@ -72,7 +100,8 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
             ->setEventName(NotificationDTO::EVENT_PAYMENT)
             ->setOrderId($order->getExternalCode())
             ->setAmount($orderAmountChangeDetails->getPaidAmount())
-            ->setOpenAmount($orderAmountChangeDetails->getOutstandingAmount());
+            ->setOpenAmount($orderAmountChangeDetails->getOutstandingAmount())
+        ;
 
         $this->notificationSender->send($merchant, $notification);
     }
