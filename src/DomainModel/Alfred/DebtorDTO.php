@@ -5,14 +5,23 @@ namespace App\DomainModel\Alfred;
 class DebtorDTO
 {
     private $id;
+
     private $name;
+
     private $addressHouse;
+
     private $addressStreet;
+
     private $addressPostalCode;
+
     private $addressCity;
+
     private $addressCountry;
+
     private $crefoId;
+
     private $schufaId;
+
     private $isBlacklisted;
 
     public function getId(): int
@@ -39,12 +48,12 @@ class DebtorDTO
         return $this;
     }
 
-    public function getAddressHouse(): string
+    public function getAddressHouse(): ?string
     {
         return $this->addressHouse;
     }
 
-    public function setAddressHouse(string $addressHouse): DebtorDTO
+    public function setAddressHouse(?string $addressHouse): DebtorDTO
     {
         $this->addressHouse = $addressHouse;
 
@@ -123,7 +132,7 @@ class DebtorDTO
         return $this;
     }
 
-    public function isBlacklisted():? bool
+    public function isBlacklisted(): ? bool
     {
         return $this->isBlacklisted;
     }
