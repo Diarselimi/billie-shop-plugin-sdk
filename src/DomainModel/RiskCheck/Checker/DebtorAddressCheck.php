@@ -41,7 +41,7 @@ class DebtorAddressCheck implements CheckInterface, LoggingInterface
         return levenshtein(strtolower($streetFromRegistry), strtolower($streetFromOrder)) <= self::MAX_DISTANCE_STREET;
     }
 
-    public function isHouseMatch(string $houseFromRegistry, string $houseFromOrder): bool
+    public function isHouseMatch(?string $houseFromRegistry, string $houseFromOrder): bool
     {
         $this->logWaypoint('house number check');
 
