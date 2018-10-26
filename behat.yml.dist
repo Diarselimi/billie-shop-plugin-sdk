@@ -1,11 +1,16 @@
 default:
+  autoload:
+    '': '%paths.base%/bdd/features/bootstrap'
+
   suites:
     default:
+      paths: [ '%paths.base%/bdd/features' ]
       contexts:
         - behatch:context:rest
         - json_spec
         - PaellaCoreContext:
             kernel: '@kernel'
+
   extensions:
     Behatch\Extension: ~
     JsonSpec\Behat\Extension: ~
@@ -14,5 +19,5 @@ default:
       goutte: ~
     Behat\Symfony2Extension:
       kernel:
-        bootstrap: features/bootstrap/bootstrap.php
+        bootstrap: bdd/features/bootstrap/bootstrap.php
         class: App\Kernel

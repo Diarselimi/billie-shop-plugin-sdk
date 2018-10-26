@@ -27,10 +27,15 @@ class PaellaCoreContext extends MinkContext
     use KernelDictionary;
 
     private $alfred;
+
     private $borscht;
+
     private $risky;
+
     private static $countAlfred = 1;
+
     private static $countBorscht = 1;
+
     private static $countRisky = 1;
 
     public function __construct(KernelInterface $kernel)
@@ -207,6 +212,7 @@ class PaellaCoreContext extends MinkContext
             if ($state === 'null') {
                 return;
             }
+
             throw new RuntimeException('Order not found');
         }
         if ($order->getState() !== $state) {
