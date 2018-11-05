@@ -19,6 +19,7 @@ class DebtorExternalDataEntityFactory
             ->setSubindustrySector($request->getDebtorCompanySubindustrySector())
             ->setEmployeesNumber($request->getDebtorCompanyEmployeesNumber())
             ->setEstablishedCustomer($request->getDebtorCompanyEstablishedCustomer())
+            ->setMerchantExternalId($request->getMerchantCustomerId())
         ;
     }
 }

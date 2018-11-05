@@ -5,27 +5,49 @@ namespace App\Application\UseCase\GetOrder;
 class GetOrderResponse
 {
     private $externalCode;
+
     private $state;
+
     private $bankAccountIban;
+
     private $bankAccountBic;
+
     private $companyName;
+
     private $companyAddressHouseNumber;
+
     private $companyAddressStreet;
+
     private $companyAddressCity;
+
     private $companyAddressPostalCode;
+
     private $companyAddressCountry;
+
     private $debtorExternalDataCompanyName;
+
     private $debtorExternalDataAddressCountry;
+
     private $debtorExternalDataAddressPostalCode;
+
     private $debtorExternalDataAddressStreet;
+
     private $debtorExternalDataAddressHouse;
+
     private $debtorExternalDataIndustrySector;
+
     private $invoiceNumber;
+
     private $payoutAmount;
+
     private $originalAmount;
+
     private $feeAmount;
+
     private $feeRate;
+
     private $dueDate;
+
     private $reasons;
 
     public function getExternalCode(): string
@@ -52,7 +74,7 @@ class GetOrderResponse
         return $this;
     }
 
-    public function getBankAccountIban():? string
+    public function getBankAccountIban(): ? string
     {
         return $this->bankAccountIban;
     }
@@ -64,7 +86,7 @@ class GetOrderResponse
         return $this;
     }
 
-    public function getBankAccountBic():? string
+    public function getBankAccountBic(): ? string
     {
         return $this->bankAccountBic;
     }
@@ -76,7 +98,7 @@ class GetOrderResponse
         return $this;
     }
 
-    public function getCompanyName():? string
+    public function getCompanyName(): ? string
     {
         return $this->companyName;
     }
@@ -88,19 +110,19 @@ class GetOrderResponse
         return $this;
     }
 
-    public function getCompanyAddressHouseNumber():? string
+    public function getCompanyAddressHouseNumber(): ? string
     {
         return $this->companyAddressHouseNumber;
     }
 
-    public function setCompanyAddressHouseNumber(string $companyAddressHouseNumber): GetOrderResponse
+    public function setCompanyAddressHouseNumber(?string $companyAddressHouseNumber): GetOrderResponse
     {
         $this->companyAddressHouseNumber = $companyAddressHouseNumber;
 
         return $this;
     }
 
-    public function getCompanyAddressStreet():? string
+    public function getCompanyAddressStreet(): ? string
     {
         return $this->companyAddressStreet;
     }
@@ -112,7 +134,7 @@ class GetOrderResponse
         return $this;
     }
 
-    public function getCompanyAddressCity():? string
+    public function getCompanyAddressCity(): ? string
     {
         return $this->companyAddressCity;
     }
@@ -124,7 +146,7 @@ class GetOrderResponse
         return $this;
     }
 
-    public function getCompanyAddressPostalCode():? string
+    public function getCompanyAddressPostalCode(): ? string
     {
         return $this->companyAddressPostalCode;
     }
@@ -136,7 +158,7 @@ class GetOrderResponse
         return $this;
     }
 
-    public function getCompanyAddressCountry():? string
+    public function getCompanyAddressCountry(): ? string
     {
         return $this->companyAddressCountry;
     }
@@ -232,7 +254,7 @@ class GetOrderResponse
         return $this;
     }
 
-    public function getInvoiceNumber():? string
+    public function getInvoiceNumber(): ? string
     {
         return $this->invoiceNumber;
     }
@@ -244,7 +266,7 @@ class GetOrderResponse
         return $this;
     }
 
-    public function getPayoutAmount():? float
+    public function getPayoutAmount(): ? float
     {
         return $this->payoutAmount;
     }
@@ -256,7 +278,7 @@ class GetOrderResponse
         return $this;
     }
 
-    public function getOriginalAmount():? float
+    public function getOriginalAmount(): ? float
     {
         return $this->originalAmount;
     }
@@ -268,7 +290,7 @@ class GetOrderResponse
         return $this;
     }
 
-    public function getFeeAmount():? float
+    public function getFeeAmount(): ? float
     {
         return $this->feeAmount;
     }
@@ -280,7 +302,7 @@ class GetOrderResponse
         return $this;
     }
 
-    public function getFeeRate():? float
+    public function getFeeRate(): ? float
     {
         return $this->feeRate;
     }
@@ -292,7 +314,7 @@ class GetOrderResponse
         return $this;
     }
 
-    public function getDueDate():? \DateTime
+    public function getDueDate(): ? \DateTime
     {
         return $this->dueDate;
     }

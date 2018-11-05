@@ -20,3 +20,7 @@ behat.yml
 .phpunit
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
+
+###> phpspec/phpspec ###
+phpspec.yml
+###< phpspec/phpspec ###

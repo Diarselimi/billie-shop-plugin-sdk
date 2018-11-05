@@ -27,10 +27,15 @@ class PaellaCoreContext extends MinkContext
     use KernelDictionary;
 
     private $alfred;
+
     private $borscht;
+
     private $risky;
+
     private static $countAlfred = 1;
+
     private static $countBorscht = 1;
+
     private static $countRisky = 1;
 
     public function __construct(KernelInterface $kernel)
@@ -45,6 +50,7 @@ class PaellaCoreContext extends MinkContext
                 ->setName('Behat User')
                 ->setIsActive(true)
                 ->setRoles('["ROLE_NOTHING"]')
+                ->setPaymentMerchantId('f2ec4d5e-79f4-40d6-b411-31174b6519ac')
                 ->setAvailableFinancingLimit(10000)
                 ->setApiKey('test')
                 ->setCompanyId('1')
@@ -166,7 +172,7 @@ class PaellaCoreContext extends MinkContext
         $merchantDebtor = (new MerchantDebtorEntity())
             ->setMerchantId('1')
             ->setDebtorId('1')
-            ->setExternalId('XX12');
+        ;
         $this->getMerchantDebtorRepository()->insert($merchantDebtor);
 
         $order = (new OrderEntity())
@@ -206,6 +212,7 @@ class PaellaCoreContext extends MinkContext
             if ($state === 'null') {
                 return;
             }
+
             throw new RuntimeException('Order not found');
         }
         if ($order->getState() !== $state) {

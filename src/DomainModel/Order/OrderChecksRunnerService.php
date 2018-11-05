@@ -12,10 +12,15 @@ use App\DomainModel\RiskCheck\RiskCheckRepositoryInterface;
 use App\DomainModel\Risky\RiskyInterface;
 use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
+use App\DomainModel\Person\PersonEntity;
 
 class OrderChecksRunnerService implements LoggingInterface
 {
     use LoggingTrait;
+
+    //TODO: This is duplicated in SchufaIdentification file in alfred project. Score company should be move to alfred
+    private const LEGAL_FORMS_SEARCH_BY_PERSON = ["6022", "2001, 2018, 2022", "4001", "4022", "3001", "99999"];
 
     private $producer;
     private $riskCheckRepository;
@@ -133,9 +138,13 @@ class OrderChecksRunnerService implements LoggingInterface
             $riskyResult = null;
         }
 
-        if (!$riskyResult) {
+        if ((is_null($riskyResult) || !$riskyResult->isPassed()) && $this->shouldScoreByPersonName($order->getDebtorPerson(), $order->getDebtorExternalData())) {
             $name = "{$order->getDebtorPerson()->getFirstName()} {$order->getDebtorPerson()->getLastName()}";
-            $riskyResult = $this->risky->runDebtorScoreCheck($order, $name, $debtorCrefoId);
+            try {
+                $riskyResult = $this->risky->runDebtorScoreCheck($order, $name, $debtorCrefoId);
+            } catch (PaellaCoreCriticalException $exception) {
+                $riskyResult = null;
+            }
         }
 
         $checkResult = new CheckResult($riskyResult && $riskyResult->isPassed(), 'company_b2b_score', []);
@@ -143,6 +152,15 @@ class OrderChecksRunnerService implements LoggingInterface
         $this->riskCheckRepository->insert($riskCheckEntity);
 
         return $checkResult->isPassed();
+    }
+
+    private function shouldScoreByPersonName(PersonEntity $person, DebtorExternalDataEntity $debtorExternalData): bool
+    {
+        if (is_null($person->getFirstName()) || is_null($person->getLastName())) {
+            return false;
+        }
+
+        return in_array($debtorExternalData->getLegalForm(), self::LEGAL_FORMS_SEARCH_BY_PERSON);
     }
 
     private function check(OrderContainer $order, string $name): bool

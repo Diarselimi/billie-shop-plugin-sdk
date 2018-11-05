@@ -14,6 +14,7 @@ class TestMerchant extends AbstractMigration
             'roles' => '["ROLE_API_USER"]',
             'is_active' => true,
             'company_id' => 4,
+            'payment_merchant_id' => 'b95adad7-f747-45b9-b3cb-7851c4b90fac',
             'created_at' => $now,
             'updated_at' => $now,
         ])->saveData();

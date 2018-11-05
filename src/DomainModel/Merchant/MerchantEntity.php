@@ -10,6 +10,7 @@ class MerchantEntity extends AbstractEntity
     private $availableFinancingLimit;
     private $apiKey;
     private $companyId;
+    private $paymentMerchantId;
     private $roles;
     private $isActive;
     private $webhookUrl;
@@ -117,6 +118,18 @@ class MerchantEntity extends AbstractEntity
     public function setWebhookAuthorization(?string $webhookAuthorization): MerchantEntity
     {
         $this->webhookAuthorization = $webhookAuthorization;
+
+        return $this;
+    }
+
+    public function getPaymentMerchantId(): ?string
+    {
+        return $this->paymentMerchantId;
+    }
+
+    public function setPaymentMerchantId(?string $paymentMerchantId): MerchantEntity
+    {
+        $this->paymentMerchantId = $paymentMerchantId;
 
         return $this;
     }

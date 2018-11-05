@@ -1,0 +1,10 @@
+extensions:
+  Memio\SpecGen\MemioSpecGenExtension: ~
+
+suites:
+  main_suite:
+    namespace: App
+    psr4_prefix: App\
+    spec_prefix: spec
+    src_path: "%paths.config%/src"
+    spec_path: "%paths.config%/bdd/"

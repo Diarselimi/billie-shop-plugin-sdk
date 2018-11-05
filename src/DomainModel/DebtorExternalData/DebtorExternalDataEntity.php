@@ -16,6 +16,7 @@ class DebtorExternalDataEntity extends AbstractEntity
     private $employees_number;
     private $legalForm;
     private $establishedCustomer;
+    private $merchantExternalId;
     private $addressId;
 
     public function getName(): string
@@ -134,6 +135,18 @@ class DebtorExternalDataEntity extends AbstractEntity
     public function setEstablishedCustomer(?bool $establishedCustomer): DebtorExternalDataEntity
     {
         $this->establishedCustomer = $establishedCustomer;
+
+        return $this;
+    }
+
+    public function getMerchantExternalId(): ?string
+    {
+        return $this->merchantExternalId;
+    }
+
+    public function setMerchantExternalId(string $merchantExternalId): DebtorExternalDataEntity
+    {
+        $this->merchantExternalId = $merchantExternalId;
 
         return $this;
     }
