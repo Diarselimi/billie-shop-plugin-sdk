@@ -2,6 +2,7 @@
 
 namespace App\Application\UseCase\CancelOrder;
 
+use App\Application\Exception\FraudOrderException;
 use App\Application\PaellaCoreCriticalException;
 use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Borscht\BorschtInterface;
@@ -15,10 +16,15 @@ use Symfony\Component\Workflow\Workflow;
 class CancelOrderUseCase
 {
     private $orderRepository;
+
     private $alfred;
+
     private $borscht;
+
     private $workflow;
+
     private $merchantDebtorRepository;
+
     private $merchantRepository;
 
     public function __construct(
@@ -49,6 +55,10 @@ class CancelOrderUseCase
                 PaellaCoreCriticalException::CODE_NOT_FOUND,
                 Response::HTTP_NOT_FOUND
             );
+        }
+
+        if ($order->getMarkedAsFraudAt()) {
+            throw new FraudOrderException();
         }
 
         if ($this->workflow->can($order, OrderStateManager::TRANSITION_CANCEL)) {

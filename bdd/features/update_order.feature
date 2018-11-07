@@ -193,3 +193,26 @@ Feature:
     """
     Then print last response
     Then the response status code should be 404
+
+  Scenario: Case 9: Order was marked as fraud
+    Given I add "X-Test" header equal to 1
+    And I add "X-Api-User" header equal to 1
+    And I have a created order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+    And The order "CO123" was already marked as fraud
+    When I send a PATCH request to "/order/CO123" with body:
+        """
+        {
+          "duration": 30,
+          "amount_gross": 500,
+          "amount_net": 400,
+          "amount_tax": 20
+        }
+        """
+    Then the response status code should be 403
+    And print last JSON response
+    And the JSON response should be:
+        """
+        {
+            "error": "Order was marked as fraud"
+        }
+        """

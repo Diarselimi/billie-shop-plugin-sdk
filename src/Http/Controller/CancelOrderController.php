@@ -2,12 +2,14 @@
 
 namespace App\Http\Controller;
 
+use App\Application\Exception\FraudOrderException;
 use App\Application\UseCase\CancelOrder\CancelOrderRequest;
 use App\Application\UseCase\CancelOrder\CancelOrderUseCase;
 use App\Http\HttpConstantsInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class CancelOrderController
 {
@@ -20,11 +22,15 @@ class CancelOrderController
 
     public function execute(string $externalCode, Request $request): JsonResponse
     {
-        $orderRequest = new CancelOrderRequest(
-            $externalCode,
-            $request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER)
-        );
-        $this->useCase->execute($orderRequest);
+        try {
+            $orderRequest = new CancelOrderRequest(
+                $externalCode,
+                $request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER)
+            );
+            $this->useCase->execute($orderRequest);
+        } catch (FraudOrderException $e) {
+            throw new AccessDeniedHttpException($e->getMessage());
+        }
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }

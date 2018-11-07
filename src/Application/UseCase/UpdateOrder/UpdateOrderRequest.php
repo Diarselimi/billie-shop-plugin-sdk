@@ -5,12 +5,19 @@ namespace App\Application\UseCase\UpdateOrder;
 class UpdateOrderRequest
 {
     private $externalCode;
+
     private $invoiceNumber;
+
     private $invoiceUrl;
+
     private $merchantId;
+
     private $amountGross;
+
     private $amountNet;
+
     private $amountTax;
+
     private $duration;
 
     public function __construct(string $externalCode)

@@ -2,6 +2,7 @@
 
 namespace App\Application\UseCase\UpdateOrder;
 
+use App\Application\Exception\FraudOrderException;
 use App\Application\PaellaCoreCriticalException;
 use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Borscht\BorschtInterface;
@@ -19,10 +20,15 @@ class UpdateOrderUseCase implements LoggingInterface
     use LoggingTrait;
 
     private $borscht;
+
     private $alfred;
+
     private $orderRepository;
+
     private $merchantDebtorRepository;
+
     private $merchantRepository;
+
     private $orderStateManager;
 
     public function __construct(
@@ -58,9 +64,9 @@ class UpdateOrderUseCase implements LoggingInterface
         $this->validate($order, $request);
 
         $durationChanged = $request->getDuration() !== null && $request->getDuration() !== $order->getDuration();
-        $amountChanged = $request->getAmountGross() !== null && (float)$request->getAmountGross() !== $order->getAmountGross()
-            || $request->getAmountNet() !== null && (float)$request->getAmountNet() !== $order->getAmountNet()
-            || $request->getAmountTax() !== null && (float)$request->getAmountTax() !== $order->getAmountTax()
+        $amountChanged = $request->getAmountGross() !== null && (float) $request->getAmountGross() !== $order->getAmountGross()
+            || $request->getAmountNet() !== null && (float) $request->getAmountNet() !== $order->getAmountNet()
+            || $request->getAmountTax() !== null && (float) $request->getAmountTax() !== $order->getAmountTax()
         ;
 
         $this->logInfo('Start order update, state {state}, duration changed: {duration}, amount changed: {amount}', [
@@ -162,6 +168,12 @@ class UpdateOrderUseCase implements LoggingInterface
 
     private function validate(OrderEntity $order, UpdateOrderRequest $request): void
     {
+        if ($order->getMarkedAsFraudAt()) {
+            $externalCode = $order->getExternalCode();
+
+            throw new FraudOrderException();
+        }
+
         //TODO: does not belong here
         if (!empty($request->getAmountGross()) && (
             $request->getAmountGross() > $order->getAmountGross()

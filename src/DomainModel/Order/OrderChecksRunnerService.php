@@ -23,11 +23,17 @@ class OrderChecksRunnerService implements LoggingInterface
     private const LEGAL_FORMS_SEARCH_BY_PERSON = ["6022", "2001, 2018, 2022", "4001", "4022", "3001", "99999"];
 
     private $producer;
+
     private $riskCheckRepository;
+
     private $riskCheckFactory;
+
     private $orderRepository;
+
     private $risky;
+
     private $checkLoader;
+
     private $sentry;
 
     public function __construct(
@@ -140,6 +146,7 @@ class OrderChecksRunnerService implements LoggingInterface
 
         if ((is_null($riskyResult) || !$riskyResult->isPassed()) && $this->shouldScoreByPersonName($order->getDebtorPerson(), $order->getDebtorExternalData())) {
             $name = "{$order->getDebtorPerson()->getFirstName()} {$order->getDebtorPerson()->getLastName()}";
+
             try {
                 $riskyResult = $this->risky->runDebtorScoreCheck($order, $name, $debtorCrefoId);
             } catch (PaellaCoreCriticalException $exception) {

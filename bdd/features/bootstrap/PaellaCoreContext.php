@@ -21,10 +21,13 @@ use Behat\Symfony2Extension\Context\KernelDictionary;
 use donatj\MockWebServer\MockWebServer;
 use donatj\MockWebServer\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Webmozart\Assert\Assert;
 
 class PaellaCoreContext extends MinkContext
 {
     use KernelDictionary;
+
+    const MERCHANT_ID = 1;
 
     private $alfred;
 
@@ -170,7 +173,7 @@ class PaellaCoreContext extends MinkContext
         $this->getDebtorExternalDataRepository()->insert($debtor);
 
         $merchantDebtor = (new MerchantDebtorEntity())
-            ->setMerchantId('1')
+            ->setMerchantId(self::MERCHANT_ID)
             ->setDebtorId('1')
         ;
         $this->getMerchantDebtorRepository()->insert($merchantDebtor);
@@ -242,6 +245,49 @@ class PaellaCoreContext extends MinkContext
                 $value
             ));
         }
+    }
+
+    /**
+     * @Given /^The order "([^"]*)" was already marked as fraud$/
+     */
+    public function theOrderWasAlreadyMarkedAsFraud($orderExternalCode)
+    {
+        $order = $order = $this->getOrder($orderExternalCode);
+
+        $order->setMarkedAsFraudAt(new DateTime());
+
+        $this->getOrderRepository()->update($order);
+    }
+
+    /**
+     * @Given The order :orderExternalCode has UUID :uuid
+     */
+    public function theOrderHasUUID($orderExternalCode, $uuid)
+    {
+        $this->getConnection()
+            ->prepare("UPDATE orders SET uuid = :uuid WHERE external_code = :orderExternalCode")
+            ->execute([':uuid' => $uuid, ':orderExternalCode' => $orderExternalCode]);
+    }
+
+    /**
+     * @Given /^The order "([^"]*)" is marked as fraud$/
+     */
+    public function theOrderIsMarkedAsFraud($orderExternalCode)
+    {
+        $order = $this->getOrder($orderExternalCode);
+
+        Assert::notNull($order->getMarkedAsFraudAt());
+    }
+
+    private function getOrder($orderExternalCode, $customerId = self::MERCHANT_ID): OrderEntity
+    {
+        $order = $this->getOrderRepository()->getOneByExternalCode($orderExternalCode, $customerId);
+
+        if ($order === null) {
+            throw new RuntimeException('Order not found');
+        }
+
+        return $order;
     }
 
     private function getDebtorExternalDataRepository(): DebtorExternalDataRepositoryInterface

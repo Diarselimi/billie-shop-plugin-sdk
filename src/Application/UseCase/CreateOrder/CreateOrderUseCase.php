@@ -28,13 +28,21 @@ class CreateOrderUseCase implements LoggingInterface
     use LoggingTrait;
 
     private $orderPersistenceService;
+
     private $orderChecksRunnerService;
+
     private $alfred;
+
     private $merchantDebtorRepository;
+
     private $merchantRepository;
+
     private $merchantDebtorFactory;
+
     private $orderRepository;
+
     private $workflow;
+
     private $borscht;
 
     public function __construct(

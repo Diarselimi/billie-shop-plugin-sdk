@@ -13,8 +13,11 @@ use Symfony\Component\Workflow\Workflow;
 class ShipOrderUseCase
 {
     private $orderRepository;
+
     private $merchantDebtorRepository;
+
     private $borscht;
+
     private $workflow;
 
     public function __construct(

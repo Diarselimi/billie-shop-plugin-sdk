@@ -33,6 +33,11 @@ ship_order:
   controller: App\Http\Controller\ShipOrderController::execute
   methods: [POST]
 
+mark_order_as_fraud:
+  path: /order/{uuid}/mark-as-fraud
+  controller: App\Http\Controller\MarkOrderAsFraudController::execute
+  methods: [POST]
+
 health_check:
   path: /healthcheck
   controller:  App\Infrastructure\Monitoring\Controller\HealthCheckController::execute

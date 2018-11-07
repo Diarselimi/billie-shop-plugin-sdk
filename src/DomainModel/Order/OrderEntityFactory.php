@@ -42,6 +42,7 @@ class OrderEntityFactory
             ->setDebtorExternalDataId($row['debtor_external_data_id'])
             ->setPaymentId($row['payment_id'])
             ->setShippedAt($row['shipped_at'] ? new \DateTime($row['shipped_at']) : $row['shipped_at'])
+            ->setMarkedAsFraudAt($row['marked_as_fraud_at'] ? new \DateTime($row['marked_as_fraud_at']) : $row['marked_as_fraud_at'])
             ->setCreatedAt(new \DateTime($row['created_at']))
             ->setUpdatedAt(new \DateTime($row['updated_at']))
         ;

@@ -9,6 +9,7 @@ use GuzzleHttp\Exception\RequestException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 class ExceptionSubscriber implements EventSubscriberInterface, LoggingInterface
@@ -26,6 +27,12 @@ class ExceptionSubscriber implements EventSubscriberInterface, LoggingInterface
     {
         $exception = $event->getException();
         $previousException = $exception->getPrevious();
+
+        if ($exception instanceof HttpException) {
+            $event->setResponse(new JsonResponse(['error' => $exception->getMessage()], $exception->getStatusCode()));
+
+            return;
+        }
 
         $responseCode = $exception instanceof PaellaCoreCriticalException && $exception->getResponseCode()
             ? $exception->getResponseCode()

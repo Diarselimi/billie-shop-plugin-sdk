@@ -7,7 +7,9 @@ use App\DomainModel\AbstractEntity;
 class MerchantDebtorEntity extends AbstractEntity
 {
     private $merchantId;
+
     private $debtorId;
+
     private $paymentDebtorId;
 
     public function getMerchantId(): string
