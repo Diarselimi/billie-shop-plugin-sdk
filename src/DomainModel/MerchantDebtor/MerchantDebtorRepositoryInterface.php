@@ -9,4 +9,6 @@ interface MerchantDebtorRepositoryInterface
     public function getOneById(int $id): ?MerchantDebtorEntity;
 
     public function getOneByMerchantAndDebtorId(string $merchantId, string $debtorId): ?MerchantDebtorEntity;
+
+    public function getOneByMerchantExternalId(string $externalMerchantId, string $merchantId): ?MerchantDebtorEntity;
 }
