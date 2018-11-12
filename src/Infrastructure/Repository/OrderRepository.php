@@ -6,9 +6,10 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderEntityFactory;
 use App\DomainModel\Order\OrderLifecycleEvent;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\Infrastructure\PDO\PDO;
-use Ramsey\Uuid\Uuid;
 use App\DomainModel\Order\OrderStateManager;
+use App\Infrastructure\PDO\PDO;
+use Generator;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OrderRepository extends AbstractRepository implements OrderRepositoryInterface
@@ -189,10 +190,10 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
     }
 
     /**
-     * @param  int        $merchantDebtorId
-     * @return \Generator
+     * @param  int             $merchantDebtorId
+     * @return Generator|int[]
      */
-    public function getCustomerOverdues(int $merchantDebtorId): \Generator
+    public function getCustomerOverdues(int $merchantDebtorId): Generator
     {
         $query = '
             SELECT CEIL((:current_time - UNIX_TIMESTAMP(`shipped_at`) - (`duration` * 86400)) / 86400) as `overdue`
@@ -213,6 +214,25 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             if ($row['overdue'] > 0) {
                 yield (int) $row['overdue'];
             }
+        }
+    }
+
+    public function getWithInvoiceNumber(int $limit, int $lastId = 0): Generator
+    {
+        $stmt = $this->exec(
+            'SELECT id, merchant_id, invoice_number
+              FROM orders
+              WHERE invoice_number IS NOT NULL
+              AND id > :lastId
+              ORDER BY id ASC
+              LIMIT ' . $limit,
+            [
+                'lastId' => $lastId,
+            ]
+        );
+
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            yield $row;
         }
     }
 }

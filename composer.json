@@ -3,6 +3,7 @@
     "license": "proprietary",
     "require": {
         "php": "^7.2",
+        "aws/aws-sdk-php-symfony": "^2.0",
         "donatj/mock-webserver": "^2.0",
         "eightpoints/guzzle-bundle": "^7.3",
         "google/cloud-logging": "^1.10",
