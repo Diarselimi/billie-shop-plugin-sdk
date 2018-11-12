@@ -69,14 +69,15 @@ class MerchantDebtorRepository extends AbstractRepository implements MerchantDeb
                 SELECT merchant_debtor_id
                 FROM orders
                 INNER JOIN debtor_external_data ON orders.debtor_external_data_id = debtor_external_data.id
-                WHERE orders.state NOT IN :states
+                WHERE orders.state NOT IN (:state_new, :state_declined)
                 AND orders.merchant_id = :merchant_id
                 AND debtor_external_data.merchant_external_id = :merchant_external_id
                 ORDER BY orders.id DESC
                 LIMIT 1
             )
         ', [
-            'states' => [OrderStateManager::STATE_NEW, OrderStateManager::STATE_DECLINED],
+            'state_new' => OrderStateManager::STATE_NEW,
+            'state_declined' => OrderStateManager::STATE_DECLINED,
             'merchant_external_id' => $merchantExternalId,
             'merchant_id' => $merchantId,
         ]);
