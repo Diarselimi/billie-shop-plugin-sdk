@@ -28,13 +28,21 @@ class CreateOrderUseCase implements LoggingInterface
     use LoggingTrait;
 
     private $orderPersistenceService;
+
     private $orderChecksRunnerService;
+
     private $alfred;
+
     private $merchantDebtorRepository;
+
     private $merchantRepository;
+
     private $merchantDebtorFactory;
+
     private $orderRepository;
+
     private $workflow;
+
     private $borscht;
 
     public function __construct(
@@ -123,8 +131,26 @@ class CreateOrderUseCase implements LoggingInterface
 
     private function retrieveDebtor(OrderContainer $orderContainer, CreateOrderRequest $request): ?DebtorDTO
     {
-        $this->logInfo('Start the debtor identification');
-        $debtorDTO = $this->identifyDebtor($orderContainer);
+        $this->logInfo('Check if the merchant customer already known');
+        $merchantDebtor = $this->merchantDebtorRepository->getOneByMerchantExternalId(
+            $orderContainer->getDebtorExternalData()->getMerchantExternalId(),
+            $request->getMerchantId()
+        );
+
+        if ($merchantDebtor) {
+            $this->logInfo('Found the existing merchant customer');
+            $debtorDTO = $this->alfred->getDebtor($merchantDebtor->getDebtorId());
+        } else {
+            $this->logInfo('Start the debtor identification');
+            $debtorDTO = $this->identifyDebtor($orderContainer);
+
+            if ($debtorDTO) {
+                $merchantDebtor = $this->merchantDebtorRepository->getOneByMerchantAndDebtorId(
+                    $request->getMerchantId(),
+                    $debtorDTO->getId()
+                );
+            }
+        }
 
         if (!$debtorDTO) {
             $this->logInfo('Debtor could not be identified');
@@ -134,16 +160,11 @@ class CreateOrderUseCase implements LoggingInterface
 
         $this->logInfo('Debtor identified');
 
-        $merchantId = $request->getMerchantId();
-        $debtorId = $debtorDTO->getId();
-
-        $merchantDebtor = $this->merchantDebtorRepository->getOneByMerchantAndDebtorId($merchantId, $debtorId);
-
         if ($merchantDebtor) {
-            $this->logInfo('Debtor already known');
+            $this->logInfo('Debtor already in the system');
         } else {
-            $this->logInfo('Register new Debtor');
-            $merchantDebtor = $this->registerMerchantDebtor($debtorId, $orderContainer->getMerchant());
+            $this->logInfo('Add new debtor to the system');
+            $merchantDebtor = $this->registerMerchantDebtor($debtorDTO->getId(), $orderContainer->getMerchant());
         }
 
         $orderContainer
