@@ -5,6 +5,7 @@ namespace App\Infrastructure\Repository;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntityFactory;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
+use App\DomainModel\Order\OrderStateManager;
 
 class MerchantDebtorRepository extends AbstractRepository implements MerchantDebtorRepositoryInterface
 {
@@ -55,6 +56,29 @@ class MerchantDebtorRepository extends AbstractRepository implements MerchantDeb
           AND debtor_id = :debtor_id', [
             'merchant_id' => $merchantId,
             'debtor_id' => $debtorId,
+        ]);
+
+        return $row ? $this->factory->createFromDatabaseRow($row) : null;
+    }
+
+    public function getOneByMerchantExternalId(string $merchantExternalId, string $merchantId): ?MerchantDebtorEntity
+    {
+        $row = $this->doFetchOne('
+            SELECT * FROM merchants_debtors
+            WHERE merchants_debtors.id = (
+                SELECT merchant_debtor_id
+                FROM orders
+                INNER JOIN debtor_external_data ON orders.debtor_external_data_id = debtor_external_data.id
+                WHERE orders.state NOT IN :states
+                AND orders.merchant_id = :merchant_id
+                AND debtor_external_data.merchant_external_id = :merchant_external_id
+                ORDER BY orders.id DESC
+                LIMIT 1
+            )
+        ', [
+            'states' => [OrderStateManager::STATE_NEW, OrderStateManager::STATE_DECLINED],
+            'merchant_external_id' => $merchantExternalId,
+            'merchant_id' => $merchantId,
         ]);
 
         return $row ? $this->factory->createFromDatabaseRow($row) : null;
