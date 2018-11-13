@@ -33,6 +33,11 @@ ship_order:
   controller: App\Http\Controller\ShipOrderController::execute
   methods: [POST]
 
+create_order_invoice:
+  path: /order/{externalCode}/invoice
+  controller: App\Http\Controller\CreateOrderInvoiceController::execute
+  methods: [POST]
+
 mark_order_as_fraud:
   path: /order/{uuid}/mark-as-fraud
   controller: App\Http\Controller\MarkOrderAsFraudController::execute

@@ -70,6 +70,7 @@ class PaellaCoreContext extends MinkContext
         $this->risky->stop();
         $this->getConnection()->exec('
             DELETE FROM order_transitions;
+            DELETE FROM order_invoices;
             DELETE FROM risk_checks;
             DELETE FROM orders;
             DELETE FROM persons;
