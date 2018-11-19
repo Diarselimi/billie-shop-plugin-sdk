@@ -8,6 +8,7 @@ use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\Address\AddressRepositoryInterface;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
+use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 
@@ -55,18 +56,11 @@ class MarkOrderAsFraudUseCase
         $order->setMarkedAsFraudAt(new \DateTime());
         $this->orderRepository->update($order);
 
-        $deliveryAddress = $this->addressRepository->getOneById($order->getDeliveryAddressId());
-
-        $debtorData = $this->debtorExternalDataRepository->getOneById($order->getDebtorExternalDataId());
-        $debtorAddress = $this->addressRepository->getOneById($debtorData->getAddressId());
-
-        if (
-            ($this->orderStateManager->isLate($order) || $this->orderStateManager->isPaidOut($order)) &&
-            $this->isDeliveryAddressDifferentToDebtorAddress($deliveryAddress, $debtorAddress) &&
-            ($debtorData->isEstablishedCustomer() === null || $order->getAmountGross() > self::ORDER_AMOUNT_LIMIT)
-        ) {
-            $this->borscht->createFraudReclaim($order->getPaymentId());
+        if (!$this->isEligibleForFraudReclaim($order)) {
+            throw new FraudReclaimActionException();
         }
+
+        $this->borscht->createFraudReclaim($order->getPaymentId());
     }
 
     private function isDeliveryAddressDifferentToDebtorAddress(AddressEntity $deliveryAddress, AddressEntity $debtorAddress): bool
@@ -75,5 +69,18 @@ class MarkOrderAsFraudUseCase
             $deliveryAddress->getPostalCode() !== $debtorAddress->getPostalCode() ||
             $deliveryAddress->getStreet() !== $debtorAddress->getStreet() ||
             $deliveryAddress->getHouseNumber() !== $debtorAddress->getHouseNumber();
+    }
+
+    private function isEligibleForFraudReclaim(OrderEntity $order): bool
+    {
+        $deliveryAddress = $this->addressRepository->getOneById($order->getDeliveryAddressId());
+
+        $debtorData = $this->debtorExternalDataRepository->getOneById($order->getDebtorExternalDataId());
+        $debtorAddress = $this->addressRepository->getOneById($debtorData->getAddressId());
+
+        return ($this->orderStateManager->isLate($order) || $this->orderStateManager->isPaidOut($order)) &&
+            $this->isDeliveryAddressDifferentToDebtorAddress($deliveryAddress, $debtorAddress) &&
+            ($debtorData->isEstablishedCustomer() === null || $order->getAmountGross() > self::ORDER_AMOUNT_LIMIT)
+        ;
     }
 }

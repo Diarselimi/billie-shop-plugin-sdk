@@ -160,7 +160,7 @@ class PaellaCoreContext extends MinkContext
             ->setHouseNumber('test')
             ->setStreet('test')
             ->setPostalCode('test')
-            ->setCity('test')
+            ->setCity('test22')
             ->setCountry('TE');
         $this->getAddressRepository()->insert($debtorAddress);
 
@@ -191,7 +191,9 @@ class PaellaCoreContext extends MinkContext
             ->setDebtorExternalDataId($debtor->getId())
             ->setExternalComment($comment)
             ->setMerchantDebtorId($merchantDebtor->getId())
-            ->setMerchantId('1');
+            ->setMerchantId('1')
+            ->setPaymentId('test')
+        ;
 
         $this->getOrderRepository()->insert($order);
     }
@@ -266,8 +268,8 @@ class PaellaCoreContext extends MinkContext
     public function theOrderHasUUID($orderExternalCode, $uuid)
     {
         $this->getConnection()
-            ->prepare("UPDATE orders SET uuid = :uuid WHERE external_code = :orderExternalCode")
-            ->execute([':uuid' => $uuid, ':orderExternalCode' => $orderExternalCode]);
+             ->prepare("UPDATE orders SET uuid = :uuid WHERE external_code = :orderExternalCode")
+             ->execute([':uuid' => $uuid, ':orderExternalCode' => $orderExternalCode]);
     }
 
     /**
