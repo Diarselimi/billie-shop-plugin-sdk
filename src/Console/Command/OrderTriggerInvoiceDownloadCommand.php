@@ -47,7 +47,7 @@ class OrderTriggerInvoiceDownloadCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $basePath = trim($input->getOption('base-path'), '/ ');
-        $basePath = empty($basePath) ? "/{$basePath}/" : '/';
+        $basePath = empty($basePath) ? '/' : "/{$basePath}/";
         $limit = (int) $input->getOption('limit');
         $lastId = (int) $input->getOption('last-id');
         $newLastId = $this->useCase->execute($limit, $lastId, $basePath);
