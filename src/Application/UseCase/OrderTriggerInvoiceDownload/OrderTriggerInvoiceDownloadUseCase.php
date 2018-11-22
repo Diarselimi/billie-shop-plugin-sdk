@@ -24,10 +24,8 @@ class OrderTriggerInvoiceDownloadUseCase implements LoggingInterface
         $this->eventPublisher = $eventPublisher;
     }
 
-    /**
-     * @return int The last processed order ID
-     */
-    public function execute(int $limit, int $lastId = 0): int
+    // Returns the last processed order ID
+    public function execute(int $limit, int $lastId = 0, string $basePath = '/'): int
     {
         $orders = $this->orderRepository->getWithInvoiceNumber($limit, $lastId);
 
@@ -36,7 +34,7 @@ class OrderTriggerInvoiceDownloadUseCase implements LoggingInterface
             $merchantId = $orderRow['merchant_id'];
             $orderId = $orderRow['id'];
 
-            if (!$this->eventPublisher->publish($orderId, $merchantId, $orderRow['invoice_number'])) {
+            if (!$this->eventPublisher->publish($orderId, $merchantId, $orderRow['invoice_number'], $basePath)) {
                 throw new PaellaCoreCriticalException(
                     "Cannot publish invoice download event for order #" . $orderId . ". LastID was " . $lastId
                 );

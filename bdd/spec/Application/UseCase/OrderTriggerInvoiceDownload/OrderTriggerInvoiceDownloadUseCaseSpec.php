@@ -16,6 +16,8 @@ class OrderTriggerInvoiceDownloadUseCaseSpec extends ObjectBehavior
 
     private const INVOICE_NUMBER = 'DE124087293182842194-1';
 
+    private const BASE_PATH = '/';
+
     public function it_is_initializable()
     {
         $this->shouldHaveType(OrderTriggerInvoiceDownloadUseCase::class);
@@ -37,17 +39,16 @@ class OrderTriggerInvoiceDownloadUseCaseSpec extends ObjectBehavior
             ->shouldBeCalledOnce()
             ->willReturn(
                 $this->getSampleGenerator()
-            )
-        ;
+            );
 
         $eventPublisher->publish(
             self::ORDER_ID,
             self::MERCHANT_ID,
-            self::INVOICE_NUMBER
+            self::INVOICE_NUMBER,
+            self::BASE_PATH
         )
             ->shouldBeCalledTimes(1)
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
 
         $this->execute(0, 0)->shouldReturn(self::ORDER_ID);
     }
@@ -61,8 +62,7 @@ class OrderTriggerInvoiceDownloadUseCaseSpec extends ObjectBehavior
             ->shouldBeCalledOnce()
             ->willReturn(
                 $this->getEmptyGenerator()
-            )
-        ;
+            );
 
         $eventPublisher->publish()->shouldNotBeCalled();
 
@@ -78,17 +78,16 @@ class OrderTriggerInvoiceDownloadUseCaseSpec extends ObjectBehavior
             ->shouldBeCalledOnce()
             ->willReturn(
                 $this->getSampleGenerator()
-            )
-        ;
+            );
 
         $eventPublisher->publish(
             self::ORDER_ID,
             self::MERCHANT_ID,
-            self::INVOICE_NUMBER
+            self::INVOICE_NUMBER,
+            self::BASE_PATH
         )
             ->shouldBeCalledTimes(1)
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
         $this->shouldThrow(PaellaCoreCriticalException::class)->during('execute', [0, 0]);
     }

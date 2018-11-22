@@ -13,7 +13,7 @@ class InvoiceDownloadEventPublisher implements LoggingInterface, InvoiceDownload
 
     private const SNS_EVENT_NAME = 'order.invoice_download_triggered';
 
-    private const SNS_URL_TEMPLATE = '/Billie_Invoice_%s.pdf';
+    private const INVOICE_URL_TEMPLATE = '%sBillie_Invoice_%s.pdf';
 
     private $snsClient;
 
@@ -25,9 +25,9 @@ class InvoiceDownloadEventPublisher implements LoggingInterface, InvoiceDownload
         $this->snsTopicArn = $snsTopicArn;
     }
 
-    public function publish(int $orderId, int $merchantId, string $invoiceNumber): bool
+    public function publish(int $orderId, int $merchantId, string $invoiceNumber, string $basePath = '/'): bool
     {
-        $event = $this->buildEvent($orderId, $merchantId, $invoiceNumber);
+        $event = $this->buildEvent($orderId, $merchantId, $invoiceNumber, $basePath);
 
         try {
             $this->snsClient->publish($event);
@@ -44,7 +44,7 @@ class InvoiceDownloadEventPublisher implements LoggingInterface, InvoiceDownload
         return false;
     }
 
-    private function buildEvent(int $orderId, int $merchantId, string $invoiceNumber): array
+    private function buildEvent(int $orderId, int $merchantId, string $invoiceNumber, string $basePath = '/'): array
     {
         return [
             "TopicArn" => $this->snsTopicArn,
@@ -66,7 +66,7 @@ class InvoiceDownloadEventPublisher implements LoggingInterface, InvoiceDownload
                 ],
                 "invoiceUrl" => [
                     "DataType" => "String",
-                    "StringValue" => sprintf(self::SNS_URL_TEMPLATE, $invoiceNumber),
+                    "StringValue" => sprintf(self::INVOICE_URL_TEMPLATE, $basePath, $invoiceNumber),
                 ],
                 "eventType" => [
                     "DataType" => "String",

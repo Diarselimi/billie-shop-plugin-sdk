@@ -28,21 +28,29 @@ class OrderTriggerInvoiceDownloadCommand extends Command
             invoice_number and triggers an event to download and archive the related document.'
             )
             ->addOption(
+                'base-path',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Absolute base path where the files are located.',
+                null
+            )
+            ->addOption(
                 'limit',
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Limits the number of processed rows and events.',
                 1000
             )
-            ->addOption('last-id', null, InputOption::VALUE_REQUIRED, 'Last successfully processed order ID.', 0)
-        ;
+            ->addOption('last-id', null, InputOption::VALUE_REQUIRED, 'Last successfully processed order ID.', 0);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $basePath = trim($input->getOption('base-path'), '/ ');
+        $basePath = empty($basePath) ? "/{$basePath}/" : '/';
         $limit = (int) $input->getOption('limit');
         $lastId = (int) $input->getOption('last-id');
-        $newLastId = $this->useCase->execute($limit, $lastId);
+        $newLastId = $this->useCase->execute($limit, $lastId, $basePath);
 
         if ($lastId === $newLastId) {
             $output->writeln("There are no more orders to process.");

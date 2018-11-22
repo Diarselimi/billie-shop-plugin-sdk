@@ -35,7 +35,17 @@ class InvoiceDownloadEventPublisherSpec extends ObjectBehavior
     {
         $event = $this->getExpectedEventPayload();
         $snsClient->publish($event)->shouldBeCalledOnce();
-        $this->publish(self::ORDER_ID, self::MERCHANT_ID, self::INVOICE_NUMBER)->shouldReturn(true);
+        $this->publish(self::ORDER_ID, self::MERCHANT_ID, self::INVOICE_NUMBER)
+            ->shouldReturn(true);
+    }
+
+    public function it_should_publish_event_with_expected_path_in_payload(SnsClient $snsClient)
+    {
+        $path = '/foo/';
+        $event = $this->getExpectedEventPayload($path);
+        $snsClient->publish($event)->shouldBeCalledOnce();
+        $this->publish(self::ORDER_ID, self::MERCHANT_ID, self::INVOICE_NUMBER, $path)
+            ->shouldReturn(true);
     }
 
     public function it_should_log_error_if_SnsException_is_thrown(
@@ -46,10 +56,11 @@ class InvoiceDownloadEventPublisherSpec extends ObjectBehavior
         $this->setLogger($logger);
         $event = $this->getExpectedEventPayload();
         $snsClient->publish($event)->willThrow(SnsException::class);
-        $this->publish(self::ORDER_ID, self::MERCHANT_ID, self::INVOICE_NUMBER)->shouldReturn(false);
+        $this->publish(self::ORDER_ID, self::MERCHANT_ID, self::INVOICE_NUMBER)
+            ->shouldReturn(false);
     }
 
-    private function getExpectedEventPayload(): array
+    private function getExpectedEventPayload(string $basePath = '/'): array
     {
         return [
             "TopicArn" => self::SNS_ARN,
@@ -71,7 +82,7 @@ class InvoiceDownloadEventPublisherSpec extends ObjectBehavior
                 ],
                 "invoiceUrl" => [
                     "DataType" => "String",
-                    "StringValue" => sprintf('/Billie_Invoice_%s.pdf', self::INVOICE_NUMBER),
+                    "StringValue" => sprintf('%sBillie_Invoice_%s.pdf', $basePath, self::INVOICE_NUMBER),
                 ],
                 "eventType" => [
                     "DataType" => "String",
