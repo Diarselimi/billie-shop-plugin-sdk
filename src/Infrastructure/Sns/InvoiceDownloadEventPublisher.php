@@ -25,9 +25,9 @@ class InvoiceDownloadEventPublisher implements LoggingInterface, InvoiceDownload
         $this->snsTopicArn = $snsTopicArn;
     }
 
-    public function publish(int $orderId, int $merchantId, string $invoiceNumber, string $basePath = '/'): bool
+    public function publish(string $orderExternalCode, int $merchantId, string $invoiceNumber, string $basePath = '/'): bool
     {
-        $event = $this->buildEvent($orderId, $merchantId, $invoiceNumber, $basePath);
+        $event = $this->buildEvent($orderExternalCode, $merchantId, $invoiceNumber, $basePath);
 
         try {
             $this->snsClient->publish($event);
@@ -36,7 +36,7 @@ class InvoiceDownloadEventPublisher implements LoggingInterface, InvoiceDownload
         } catch (SnsException $ex) {
             $this->logError(
                 'Failed to publish ' . self::SNS_EVENT_NAME .
-                " SNS event for order #{$orderId}. Error message was: " .
+                " SNS event for order #{$orderExternalCode}. Error message was: " .
                 $ex->getAwsErrorMessage()
             );
         }
@@ -44,17 +44,17 @@ class InvoiceDownloadEventPublisher implements LoggingInterface, InvoiceDownload
         return false;
     }
 
-    private function buildEvent(int $orderId, int $merchantId, string $invoiceNumber, string $basePath = '/'): array
+    private function buildEvent(string $orderExternalCode, int $merchantId, string $invoiceNumber, string $basePath = '/'): array
     {
         return [
             "TopicArn" => $this->snsTopicArn,
-            "Message" => "Invoice Transfer for order #{$orderId}",
-            "Subject" => "Invoice Transfer for order #{$orderId}",
+            "Message" => "Invoice Transfer for order #{$orderExternalCode}",
+            "Subject" => "Invoice Transfer for order #{$orderExternalCode}",
             "MessageStructure" => "string",
             "MessageAttributes" => [
                 "orderExternalCode" => [
                     "DataType" => "String",
-                    "StringValue" => $orderId,
+                    "StringValue" => $orderExternalCode,
                 ],
                 "merchantId" => [
                     "DataType" => "Number",

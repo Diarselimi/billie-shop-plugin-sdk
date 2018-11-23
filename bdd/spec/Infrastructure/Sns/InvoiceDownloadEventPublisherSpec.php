@@ -6,12 +6,11 @@ use App\Infrastructure\Sns\InvoiceDownloadEventPublisher;
 use Aws\Sns\Exception\SnsException;
 use Aws\Sns\SnsClient;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
 
 class InvoiceDownloadEventPublisherSpec extends ObjectBehavior
 {
-    private const ORDER_ID = 123;
+    private const ORDER_EXTERNAL_CODE = "testCode";
 
     private const MERCHANT_ID = 2001;
 
@@ -26,16 +25,18 @@ class InvoiceDownloadEventPublisherSpec extends ObjectBehavior
         $this->shouldHaveType(InvoiceDownloadEventPublisher::class);
     }
 
-    public function let(SnsClient $snsClient)
+    public function let(SnsClient $snsClient, LoggerInterface $logger)
     {
         $this->beConstructedWith($snsClient, self::SNS_ARN);
+
+        $this->setLogger($logger);
     }
 
     public function it_should_publish_event_with_expected_payload(SnsClient $snsClient)
     {
         $event = $this->getExpectedEventPayload();
         $snsClient->publish($event)->shouldBeCalledOnce();
-        $this->publish(self::ORDER_ID, self::MERCHANT_ID, self::INVOICE_NUMBER)
+        $this->publish(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID, self::INVOICE_NUMBER)
             ->shouldReturn(true);
     }
 
@@ -44,19 +45,15 @@ class InvoiceDownloadEventPublisherSpec extends ObjectBehavior
         $path = '/foo/';
         $event = $this->getExpectedEventPayload($path);
         $snsClient->publish($event)->shouldBeCalledOnce();
-        $this->publish(self::ORDER_ID, self::MERCHANT_ID, self::INVOICE_NUMBER, $path)
+        $this->publish(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID, self::INVOICE_NUMBER, $path)
             ->shouldReturn(true);
     }
 
-    public function it_should_log_error_if_SnsException_is_thrown(
-        LoggerInterface $logger,
-        SnsClient $snsClient
-    ) {
-        $logger->error(Argument::containingString(self::EVENT_NAME), [])->shouldBeCalledOnce();
-        $this->setLogger($logger);
+    public function it_should_log_error_if_SnsException_is_thrown(SnsClient $snsClient)
+    {
         $event = $this->getExpectedEventPayload();
         $snsClient->publish($event)->willThrow(SnsException::class);
-        $this->publish(self::ORDER_ID, self::MERCHANT_ID, self::INVOICE_NUMBER)
+        $this->publish(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID, self::INVOICE_NUMBER)
             ->shouldReturn(false);
     }
 
@@ -64,13 +61,13 @@ class InvoiceDownloadEventPublisherSpec extends ObjectBehavior
     {
         return [
             "TopicArn" => self::SNS_ARN,
-            "Message" => "Invoice Transfer for order #" . self::ORDER_ID,
-            "Subject" => "Invoice Transfer for order #" . self::ORDER_ID,
+            "Message" => "Invoice Transfer for order #" . self::ORDER_EXTERNAL_CODE,
+            "Subject" => "Invoice Transfer for order #" . self::ORDER_EXTERNAL_CODE,
             "MessageStructure" => "string",
             "MessageAttributes" => [
                 "orderExternalCode" => [
                     "DataType" => "String",
-                    "StringValue" => self::ORDER_ID,
+                    "StringValue" => self::ORDER_EXTERNAL_CODE,
                 ],
                 "merchantId" => [
                     "DataType" => "Number",

@@ -220,7 +220,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
     public function getWithInvoiceNumber(int $limit, int $lastId = 0): Generator
     {
         $stmt = $this->exec(
-            'SELECT id, merchant_id, invoice_number
+            'SELECT id, external_code, merchant_id, invoice_number
               FROM orders
               WHERE invoice_number IS NOT NULL
               AND id > :lastId

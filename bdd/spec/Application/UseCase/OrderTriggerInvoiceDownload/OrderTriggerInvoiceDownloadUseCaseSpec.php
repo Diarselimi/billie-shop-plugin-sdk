@@ -12,6 +12,8 @@ class OrderTriggerInvoiceDownloadUseCaseSpec extends ObjectBehavior
 {
     private const ORDER_ID = 123;
 
+    private const ORDER_EXTERNAL_CODE = "testCode";
+
     private const MERCHANT_ID = 2001;
 
     private const INVOICE_NUMBER = 'DE124087293182842194-1';
@@ -42,7 +44,7 @@ class OrderTriggerInvoiceDownloadUseCaseSpec extends ObjectBehavior
             );
 
         $eventPublisher->publish(
-            self::ORDER_ID,
+            self::ORDER_EXTERNAL_CODE,
             self::MERCHANT_ID,
             self::INVOICE_NUMBER,
             self::BASE_PATH
@@ -81,7 +83,7 @@ class OrderTriggerInvoiceDownloadUseCaseSpec extends ObjectBehavior
             );
 
         $eventPublisher->publish(
-            self::ORDER_ID,
+            self::ORDER_EXTERNAL_CODE,
             self::MERCHANT_ID,
             self::INVOICE_NUMBER,
             self::BASE_PATH
@@ -101,6 +103,7 @@ class OrderTriggerInvoiceDownloadUseCaseSpec extends ObjectBehavior
     {
         yield [
             'id' => self::ORDER_ID,
+            'external_code' => self::ORDER_EXTERNAL_CODE,
             'merchant_id' => self::MERCHANT_ID,
             'invoice_number' => self::INVOICE_NUMBER,
         ];

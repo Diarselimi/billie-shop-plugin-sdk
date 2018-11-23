@@ -33,8 +33,9 @@ class OrderTriggerInvoiceDownloadUseCase implements LoggingInterface
             /** @var array $orderRow */
             $merchantId = $orderRow['merchant_id'];
             $orderId = $orderRow['id'];
+            $orderExternalCode = $orderRow['external_code'];
 
-            if (!$this->eventPublisher->publish($orderId, $merchantId, $orderRow['invoice_number'], $basePath)) {
+            if (!$this->eventPublisher->publish($orderExternalCode, $merchantId, $orderRow['invoice_number'], $basePath)) {
                 throw new PaellaCoreCriticalException(
                     "Cannot publish invoice download event for order #" . $orderId . ". LastID was " . $lastId
                 );
