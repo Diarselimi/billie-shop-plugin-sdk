@@ -61,12 +61,20 @@ class UpdateOrderUseCase implements LoggingInterface
             );
         }
 
+        if ($order->getMarkedAsFraudAt()) {
+            throw new FraudOrderException();
+        }
+
         $this->validate($order, $request);
 
         $durationChanged = $request->getDuration() !== null && $request->getDuration() !== $order->getDuration();
         $amountChanged = $request->getAmountGross() !== null && (float) $request->getAmountGross() !== $order->getAmountGross()
             || $request->getAmountNet() !== null && (float) $request->getAmountNet() !== $order->getAmountNet()
             || $request->getAmountTax() !== null && (float) $request->getAmountTax() !== $order->getAmountTax()
+        ;
+        $invoiceChanged = !$amountChanged
+            && $request->getInvoiceNumber() !== null && $request->getInvoiceNumber() !== $order->getInvoiceNumber()
+            || $request->getInvoiceUrl() !== null && $request->getInvoiceUrl() !== $order->getInvoiceUrl()
         ;
 
         $this->logInfo('Start order update, state {state}, duration changed: {duration}, amount changed: {amount}', [
@@ -77,6 +85,10 @@ class UpdateOrderUseCase implements LoggingInterface
 
         if ($amountChanged && ($this->orderStateManager->wasShipped($order) || !$durationChanged)) {
             $this->updateAmount($order, $request);
+        }
+
+        if ($invoiceChanged) {
+            $this->updateInvoiceDetails($order, $request);
         }
 
         if ($durationChanged) {
@@ -166,14 +178,27 @@ class UpdateOrderUseCase implements LoggingInterface
         $this->merchantRepository->update($merchant);
     }
 
-    private function validate(OrderEntity $order, UpdateOrderRequest $request): void
+    private function updateInvoiceDetails(OrderEntity $order, UpdateOrderRequest $request): void
     {
-        if ($order->getMarkedAsFraudAt()) {
-            $externalCode = $order->getExternalCode();
-
-            throw new FraudOrderException();
+        if ($this->orderStateManager->isCanceled($order) || $this->orderStateManager->isComplete($order)
+            || !$this->orderStateManager->wasShipped($order)
+        ) {
+            throw new PaellaCoreCriticalException(
+                'Update invoice is not possible',
+                PaellaCoreCriticalException::CODE_ORDER_INVOICE_CANT_BE_UPDATED,
+                Response::HTTP_PRECONDITION_FAILED
+            );
         }
 
+        $order->setInvoiceNumber($request->getInvoiceNumber())->setInvoiceUrl($request->getInvoiceUrl());
+
+        $this->orderRepository->update($order);
+
+        $this->borscht->modifyOrder($order);
+    }
+
+    private function validate(OrderEntity $order, UpdateOrderRequest $request): void
+    {
         //TODO: does not belong here
         if (!empty($request->getAmountGross()) && (
             $request->getAmountGross() > $order->getAmountGross()
