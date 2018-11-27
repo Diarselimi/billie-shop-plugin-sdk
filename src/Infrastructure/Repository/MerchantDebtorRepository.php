@@ -20,13 +20,14 @@ class MerchantDebtorRepository extends AbstractRepository implements MerchantDeb
     {
         $id = $this->doInsert('
             INSERT INTO merchants_debtors
-            (merchant_id, debtor_id, payment_debtor_id, created_at, updated_at)
+            (merchant_id, debtor_id, payment_debtor_id, financing_limit, created_at, updated_at)
             VALUES
-            (:merchant_id, :debtor_id, :payment_debtor_id, :created_at, :updated_at)
+            (:merchant_id, :debtor_id, :payment_debtor_id, :financing_limit, :created_at, :updated_at)
         ', [
             'merchant_id' => $merchantDebtor->getMerchantId(),
             'debtor_id' => $merchantDebtor->getDebtorId(),
             'payment_debtor_id' => $merchantDebtor->getPaymentDebtorId(),
+            'financing_limit' => $merchantDebtor->getFinancingLimit(),
             'created_at' => $merchantDebtor->getCreatedAt()->format('Y-m-d H:i:s'),
             'updated_at' => $merchantDebtor->getUpdatedAt()->format('Y-m-d H:i:s'),
         ]);
@@ -34,11 +35,26 @@ class MerchantDebtorRepository extends AbstractRepository implements MerchantDeb
         $merchantDebtor->setId($id);
     }
 
+    public function update(MerchantDebtorEntity $merchantDebtor): void
+    {
+        $merchantDebtor->setUpdatedAt(new \DateTime());
+
+        $id = $this->doUpdate('
+            UPDATE merchants_debtors
+            SET financing_limit = :financing_limit, updated_at = :updated_at
+            WHERE id = :id
+        ', [
+            'id' => $merchantDebtor->getId(),
+            'financing_limit' => $merchantDebtor->getFinancingLimit(),
+            'updated_at' => $merchantDebtor->getUpdatedAt()->format('Y-m-d H:i:s'),
+        ]);
+    }
+
     public function getOneById(int $id): ?MerchantDebtorEntity
     {
         $row = $this->doFetchOne('
-          SELECT id, merchant_id, debtor_id, payment_debtor_id, created_at, updated_at 
-          FROM merchants_debtors 
+          SELECT id, merchant_id, debtor_id, payment_debtor_id, financing_limit, created_at, updated_at 
+          FROM merchants_debtors
           WHERE id = :id
         ', [
             'id' => $id,
@@ -50,8 +66,8 @@ class MerchantDebtorRepository extends AbstractRepository implements MerchantDeb
     public function getOneByMerchantAndDebtorId(string $merchantId, string $debtorId): ?MerchantDebtorEntity
     {
         $row = $this->doFetchOne('
-          SELECT id, merchant_id, debtor_id, payment_debtor_id, created_at, updated_at 
-          FROM merchants_debtors 
+          SELECT id, merchant_id, debtor_id, payment_debtor_id, financing_limit, created_at, updated_at
+          FROM merchants_debtors
           WHERE merchant_id = :merchant_id
           AND debtor_id = :debtor_id', [
             'merchant_id' => $merchantId,

@@ -3,7 +3,6 @@
 namespace App\Application\UseCase\UpdateOrder;
 
 use App\Application\PaellaCoreCriticalException;
-use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
@@ -12,6 +11,7 @@ use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
+use App\DomainModel\Order\LimitsService;
 use Symfony\Component\HttpFoundation\Response;
 
 class UpdateOrderUseCase implements LoggingInterface
@@ -19,22 +19,27 @@ class UpdateOrderUseCase implements LoggingInterface
     use LoggingTrait;
 
     private $borscht;
-    private $alfred;
+
+    private $limitsService;
+
     private $orderRepository;
+
     private $merchantDebtorRepository;
+
     private $merchantRepository;
+
     private $orderStateManager;
 
     public function __construct(
         BorschtInterface $borscht,
-        AlfredInterface $alfred,
+        LimitsService $limitsService,
         OrderRepositoryInterface $orderRepository,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         MerchantRepositoryInterface $merchantRepository,
         OrderStateManager $orderStateManager
     ) {
         $this->borscht = $borscht;
-        $this->alfred = $alfred;
+        $this->limitsService = $limitsService;
         $this->orderRepository = $orderRepository;
         $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->merchantRepository = $merchantRepository;
@@ -58,9 +63,9 @@ class UpdateOrderUseCase implements LoggingInterface
         $this->validate($order, $request);
 
         $durationChanged = $request->getDuration() !== null && $request->getDuration() !== $order->getDuration();
-        $amountChanged = $request->getAmountGross() !== null && (float)$request->getAmountGross() !== $order->getAmountGross()
-            || $request->getAmountNet() !== null && (float)$request->getAmountNet() !== $order->getAmountNet()
-            || $request->getAmountTax() !== null && (float)$request->getAmountTax() !== $order->getAmountTax()
+        $amountChanged = $request->getAmountGross() !== null && (float) $request->getAmountGross() !== $order->getAmountGross()
+            || $request->getAmountNet() !== null && (float) $request->getAmountNet() !== $order->getAmountNet()
+            || $request->getAmountTax() !== null && (float) $request->getAmountTax() !== $order->getAmountTax()
         ;
 
         $this->logInfo('Start order update, state {state}, duration changed: {duration}, amount changed: {amount}', [
@@ -153,7 +158,7 @@ class UpdateOrderUseCase implements LoggingInterface
         $this->logInfo('Do update order without Borscht');
 
         $merchantDebtor = $this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId());
-        $this->alfred->unlockDebtorLimit($merchantDebtor->getDebtorId(), $amountChanged);
+        $this->limitsService->unlock($merchantDebtor, $amountChanged);
 
         $merchant = $this->merchantRepository->getOneById($order->getMerchantId());
         $merchant->increaseAvailableFinancingLimit($amountChanged);
