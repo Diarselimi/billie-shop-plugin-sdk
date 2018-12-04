@@ -4,11 +4,11 @@ namespace App\Application\UseCase\CancelOrder;
 
 use App\Application\Exception\FraudOrderException;
 use App\Application\PaellaCoreCriticalException;
-use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
+use App\DomainModel\Order\LimitsService;
 use App\Infrastructure\Repository\MerchantDebtorRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Workflow\Workflow;
@@ -17,7 +17,7 @@ class CancelOrderUseCase
 {
     private $orderRepository;
 
-    private $alfred;
+    private $limitsService;
 
     private $borscht;
 
@@ -30,14 +30,14 @@ class CancelOrderUseCase
     public function __construct(
         Workflow $workflow,
         OrderRepositoryInterface $orderRepository,
-        AlfredInterface $alfred,
+        LimitsService $limitsService,
         BorschtInterface $borscht,
         MerchantDebtorRepository $merchantDebtorRepository,
         MerchantRepositoryInterface $merchantRepository
     ) {
         $this->workflow = $workflow;
         $this->orderRepository = $orderRepository;
-        $this->alfred = $alfred;
+        $this->limitsService = $limitsService;
         $this->borscht = $borscht;
         $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->merchantRepository = $merchantRepository;
@@ -67,7 +67,7 @@ class CancelOrderUseCase
             $this->merchantRepository->update($merchant);
 
             $company = $this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId());
-            $this->alfred->unlockDebtorLimit($company->getDebtorId(), $order->getAmountGross());
+            $this->limitsService->unlock($company, $order->getAmountGross());
 
             $this->workflow->apply($order, OrderStateManager::TRANSITION_CANCEL);
         } elseif ($this->workflow->can($order, OrderStateManager::TRANSITION_CANCEL_SHIPPED)) {

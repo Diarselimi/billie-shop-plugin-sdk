@@ -12,6 +12,8 @@ class MerchantDebtorEntity extends AbstractEntity
 
     private $paymentDebtorId;
 
+    private $financingLimit;
+
     public function getMerchantId(): string
     {
         return $this->merchantId;
@@ -46,5 +48,38 @@ class MerchantDebtorEntity extends AbstractEntity
         $this->paymentDebtorId = $paymentDebtorId;
 
         return $this;
+    }
+
+    public function getFinancingLimit(): ?float
+    {
+        return $this->financingLimit;
+    }
+
+    public function setFinancingLimit(float $financingLimit): MerchantDebtorEntity
+    {
+        $this->financingLimit = $financingLimit;
+
+        return $this;
+    }
+
+    public function increaseFinancingLimit(float $financingLimit): bool
+    {
+        $this->financingLimit += $financingLimit;
+
+        return true;
+    }
+
+    public function reduceFinancingLimit(float $financingLimit): bool
+    {
+        $newLimit = $this->financingLimit - $financingLimit;
+
+        //TODO: Create a Limit which can not be negative
+        if ($newLimit < 0) {
+            return false;
+        }
+
+        $this->financingLimit = $newLimit;
+
+        return true;
     }
 }

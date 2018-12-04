@@ -17,6 +17,7 @@ use App\DomainModel\Order\OrderContainer;
 use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
+use App\DomainModel\Order\LimitsService;
 use App\DomainModel\RiskCheck\Checker\CheckResult;
 use Symfony\Component\Workflow\Workflow;
 
@@ -45,6 +46,8 @@ class CreateOrderUseCase implements LoggingInterface
 
     private $borscht;
 
+    private $limitsService;
+
     public function __construct(
         OrderPersistenceService $orderPersistenceService,
         OrderChecksRunnerService $orderChecksRunnerService,
@@ -54,7 +57,8 @@ class CreateOrderUseCase implements LoggingInterface
         MerchantRepositoryInterface $merchantRepository,
         MerchantDebtorEntityFactory $merchantDebtorFactory,
         OrderRepositoryInterface $orderRepository,
-        Workflow $workflow
+        Workflow $workflow,
+        LimitsService $limitsService
     ) {
         $this->orderPersistenceService = $orderPersistenceService;
         $this->orderChecksRunnerService = $orderChecksRunnerService;
@@ -65,6 +69,7 @@ class CreateOrderUseCase implements LoggingInterface
         $this->merchantDebtorFactory = $merchantDebtorFactory;
         $this->orderRepository = $orderRepository;
         $this->workflow = $workflow;
+        $this->limitsService = $limitsService;
     }
 
     public function execute(CreateOrderRequest $request): void
@@ -100,27 +105,29 @@ class CreateOrderUseCase implements LoggingInterface
         $this->orderRepository->update($orderContainer->getOrder());
 
         $this->logWaypoint('limit check');
-        $limitLocked = $this->alfred->lockDebtorLimit(
-            $orderContainer->getMerchantDebtor()->getDebtorId(),
+
+        $limitsLocked = $this->limitsService->lock(
+            $orderContainer->getMerchantDebtor(),
             $orderContainer->getOrder()->getAmountGross()
         );
 
         $this->orderChecksRunnerService->publishCheckResult(
-            new CheckResult($limitLocked, 'limit', []),
+            new CheckResult($limitsLocked, 'limit', []),
             $orderContainer
         );
 
-        if (!$limitLocked) {
+        if (!$limitsLocked) {
             $this->reject($orderContainer, "debtor limit exceeded");
 
             return;
         }
 
         if (!$this->orderChecksRunnerService->runChecks($orderContainer, $debtorDTO->getCrefoId())) {
-            $this->alfred->unlockDebtorLimit(
-                $orderContainer->getMerchantDebtor()->getDebtorId(),
+            $this->limitsService->unlock(
+                $orderContainer->getMerchantDebtor(),
                 $orderContainer->getOrder()->getAmountGross()
             );
+
             $this->reject($orderContainer, 'checks failed');
 
             return;

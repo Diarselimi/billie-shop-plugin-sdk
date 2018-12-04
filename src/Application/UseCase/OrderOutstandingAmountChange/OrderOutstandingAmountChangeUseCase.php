@@ -3,13 +3,13 @@
 namespace App\Application\UseCase\OrderOutstandingAmountChange;
 
 use App\Application\PaellaCoreCriticalException;
-use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Merchant\MerchantNotFoundException;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\Monitoring\LoggingInterface;
 use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\LimitsService;
 use App\DomainModel\Webhook\NotificationDTO;
 use App\DomainModel\Webhook\NotificationSender;
 use Raven_Client;
@@ -28,7 +28,7 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 
     private $sentry;
 
-    private $alfred;
+    private $limitsService;
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
@@ -36,14 +36,14 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         NotificationSender $notificationSender,
         Raven_Client $sentry,
-        AlfredInterface $alfred
+        LimitsService $limitsService
     ) {
         $this->orderRepository = $orderRepository;
         $this->merchantRepository = $merchantRepository;
         $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->notificationSender = $notificationSender;
         $this->sentry = $sentry;
-        $this->alfred = $alfred;
+        $this->limitsService = $limitsService;
     }
 
     public function execute(OrderOutstandingAmountChangeRequest $request)
@@ -88,7 +88,7 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
             return;
         }
 
-        $this->alfred->unlockDebtorLimit($merchantDebtor->getDebtorId(), $orderAmountChangeDetails->getAmountChange());
+        $this->limitsService->unlock($merchantDebtor, $orderAmountChangeDetails->getAmountChange());
 
         $this->merchantRepository->update($merchant);
 
