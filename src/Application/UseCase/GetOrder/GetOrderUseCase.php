@@ -17,12 +17,19 @@ use Symfony\Component\HttpFoundation\Response;
 class GetOrderUseCase
 {
     private $orderRepository;
+
     private $merchantDebtorRepository;
+
     private $addressRepository;
+
     private $debtorExternalDataRepository;
+
     private $alfred;
+
     private $borscht;
+
     private $orderStateManager;
+
     private $declinedReasonsMapper;
 
     public function __construct(

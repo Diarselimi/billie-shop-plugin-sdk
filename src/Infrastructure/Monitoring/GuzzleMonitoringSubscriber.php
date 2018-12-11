@@ -51,14 +51,14 @@ class GuzzleMonitoringSubscriber implements EventSubscriberInterface, LoggingInt
         if ($responseIsSuccessful) {
             $this->logInfo("Guzzle service {$event->getServiceName()} success", [
                 'code' => $transaction->getStatusCode(),
-                'body' => (string)$transaction->getBody(),
-                'headers' =>  json_encode($transaction->getHeaders()),
+                'body' => (string) $transaction->getBody(),
+                'headers' => json_encode($transaction->getHeaders()),
             ]);
         } else {
             $this->logError("Guzzle service {$event->getServiceName()} exception", [
                 'code' => $transaction->getStatusCode(),
-                'body' => (string)$transaction->getBody(),
-                'headers' =>  json_encode($transaction->getHeaders()),
+                'body' => (string) $transaction->getBody(),
+                'headers' => json_encode($transaction->getHeaders()),
             ]);
         }
     }

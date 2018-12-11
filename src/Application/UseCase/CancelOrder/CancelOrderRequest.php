@@ -5,6 +5,7 @@ namespace App\Application\UseCase\CancelOrder;
 class CancelOrderRequest
 {
     private $externalCode;
+
     private $merchantId;
 
     public function __construct(string $externalCode, int $merchantId)

@@ -3,10 +3,18 @@
 namespace App\Infrastructure\Repository;
 
 use App\DomainModel\Address\AddressEntity;
+use App\DomainModel\Address\AddressEntityFactory;
 use App\DomainModel\Address\AddressRepositoryInterface;
 
 class AddressRepository extends AbstractRepository implements AddressRepositoryInterface
 {
+    private $addressEntityFactory;
+
+    public function __construct(AddressEntityFactory $addressEntityFactory)
+    {
+        $this->addressEntityFactory = $addressEntityFactory;
+    }
+
     public function insert(AddressEntity $address): void
     {
         $id = $this->doInsert('
@@ -29,12 +37,19 @@ class AddressRepository extends AbstractRepository implements AddressRepositoryI
         $address->setId($id);
     }
 
-    public function getOneByIdRaw(int $id):? array
+    public function getOneByIdRaw(int $id): ? array
     {
         $address = $this->doFetchOne('SELECT * FROM addresses WHERE id = :id', [
             'id' => $id,
         ]);
 
         return $address ?: null;
+    }
+
+    public function getOneById(int $id): ?AddressEntity
+    {
+        $rawAddress = $this->getOneByIdRaw($id);
+
+        return ($rawAddress) ? $this->addressEntityFactory->createFromDatabaseRow($rawAddress) : null;
     }
 }

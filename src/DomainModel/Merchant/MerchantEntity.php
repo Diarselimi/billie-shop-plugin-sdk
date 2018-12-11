@@ -7,13 +7,21 @@ use App\DomainModel\AbstractEntity;
 class MerchantEntity extends AbstractEntity
 {
     private $name;
+
     private $availableFinancingLimit;
+
     private $apiKey;
+
     private $companyId;
+
     private $paymentMerchantId;
+
     private $roles;
+
     private $isActive;
+
     private $webhookUrl;
+
     private $webhookAuthorization;
 
     public function getName(): string

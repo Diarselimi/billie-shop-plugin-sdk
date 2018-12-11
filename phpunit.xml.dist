@@ -14,7 +14,16 @@
         <env name="APP_DEBUG" value="1" />
         <env name="APP_SECRET" value="s$cretf0rt3st" />
         <env name="SHELL_VERBOSITY" value="-1" />
+        <env name="SENTRY_DSN" value=""/>
+        <env name="INSTANCE_SUFFIX" value=""/>
         <!-- define your env variables for the test env here -->
+
+        <!-- ###+ aws/aws-sdk-php-symfony ### -->
+        <env name="AWS_REGION" value="test"/>
+        <env name="AWS_ACCESS_KEY_ID" value="not-a-real-key"/>
+        <env name="AWS_SECRET_ACCESS_KEY" value="@@not-a-real-secret"/>
+        <env name="RECEIVE_INVOICES_SNS_TOPIC_ARN" value="test-arn"/>
+        <!-- ###- aws/aws-sdk-php-symfony ### -->
     </php>
 
     <testsuites>

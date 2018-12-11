@@ -9,23 +9,42 @@ class OrderEntity extends AbstractEntity
     private const STATE_LATE = 'late';
 
     private $amountNet;
+
     private $amountGross;
+
     private $amountTax;
+
     private $duration;
+
     private $externalCode;
+
     private $state;
+
     private $externalComment;
+
     private $internalComment;
+
     private $invoiceNumber;
+
     private $invoiceUrl;
+
     private $proofOfDeliveryUrl;
+
     private $merchantDebtorId;
+
     private $merchantId;
+
     private $deliveryAddressId;
+
     private $debtorPersonId;
+
     private $debtorExternalDataId;
+
     private $paymentId;
+
     private $shippedAt;
+
+    private $markedAsFraudAt;
 
     public function getAmountNet(): float
     {
@@ -244,6 +263,18 @@ class OrderEntity extends AbstractEntity
     public function setShippedAt(\DateTime $shippedAt = null): OrderEntity
     {
         $this->shippedAt = $shippedAt;
+
+        return $this;
+    }
+
+    public function getMarkedAsFraudAt(): ?\DateTime
+    {
+        return $this->markedAsFraudAt;
+    }
+
+    public function setMarkedAsFraudAt(\DateTime $markedAsFraudAt = null): OrderEntity
+    {
+        $this->markedAsFraudAt = $markedAsFraudAt;
 
         return $this;
     }

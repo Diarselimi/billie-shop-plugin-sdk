@@ -2,6 +2,7 @@
 
 namespace App\Application\UseCase\ConfirmOrderPayment;
 
+use App\Application\Exception\FraudOrderException;
 use App\Application\PaellaCoreCriticalException;
 use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Borscht\BorschtInterface;
@@ -12,7 +13,9 @@ use Symfony\Component\HttpFoundation\Response;
 class ConfirmOrderPaymentUseCase
 {
     private $orderRepository;
+
     private $borscht;
+
     private $orderStateManager;
 
     public function __construct(
@@ -37,6 +40,10 @@ class ConfirmOrderPaymentUseCase
                 PaellaCoreCriticalException::CODE_NOT_FOUND,
                 Response::HTTP_NOT_FOUND
             );
+        }
+
+        if ($order->getMarkedAsFraudAt()) {
+            throw new FraudOrderException();
         }
 
         $amount = $request->getAmount();

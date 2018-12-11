@@ -228,4 +228,18 @@ class Borscht implements BorschtInterface, LoggingInterface
 
         return new DebtorPaymentRegistrationDTO($response['debtor_id']);
     }
+
+    public function createFraudReclaim(string $orderPaymentId): void
+    {
+        try {
+            $this->client->post("/order/$orderPaymentId/fraud-reclaim.json");
+        } catch (TransferException $exception) {
+            throw new PaellaCoreCriticalException(
+                'Fraud reclaim request to Borscht failed',
+                PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION,
+                null,
+                $exception
+            );
+        }
+    }
 }

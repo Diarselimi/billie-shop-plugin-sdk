@@ -3,6 +3,7 @@ parameters:
   google_cloud_project_id: bbox-150315
   google_cloud_credentials_file_path: '%kernel.root_dir%/../config/secrets/gcloud.json'
   project_name: paella_core
+  receive_invoices_sns_topic_arn: '%env(RECEIVE_INVOICES_SNS_TOPIC_ARN)%'
 
 services:
   _defaults:
@@ -109,3 +110,8 @@ services:
     bind:
       $projectName: '%project_name%'
   # end of monitoring
+
+  App\Infrastructure\Sns\InvoiceDownloadEventPublisher:
+    arguments:
+      - '@aws.sns'
+      - '%receive_invoices_sns_topic_arn%'

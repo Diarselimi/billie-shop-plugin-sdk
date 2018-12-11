@@ -11,8 +11,11 @@ class DebtorAddressCheck implements CheckInterface, LoggingInterface
     use LoggingTrait;
 
     public const NAME = 'debtor_address';
+
     private const MAX_DISTANCE_STREET = 3;
+
     private const HOUSE_RANGE_REGEXP = '/^\s*([0-9]+)\s*-\s*([0-9]+)\s*$/';
+
     private const HOUSE_NUMBER_REGEXP = '/^[\s0]*([0-9]+).*$/';
 
     public function check(OrderContainer $order): CheckResult

@@ -2,6 +2,7 @@
 
 namespace App\Application\UseCase\CancelOrder;
 
+use App\Application\Exception\FraudOrderException;
 use App\Application\PaellaCoreCriticalException;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
@@ -54,6 +55,10 @@ class CancelOrderUseCase
                 PaellaCoreCriticalException::CODE_NOT_FOUND,
                 Response::HTTP_NOT_FOUND
             );
+        }
+
+        if ($order->getMarkedAsFraudAt()) {
+            throw new FraudOrderException();
         }
 
         if ($this->workflow->can($order, OrderStateManager::TRANSITION_CANCEL)) {

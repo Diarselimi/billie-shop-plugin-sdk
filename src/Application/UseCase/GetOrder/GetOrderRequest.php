@@ -5,6 +5,7 @@ namespace App\Application\UseCase\GetOrder;
 class GetOrderRequest
 {
     private $externalCode;
+
     private $customerId;
 
     public function __construct(string $externalCode, int $customerId)

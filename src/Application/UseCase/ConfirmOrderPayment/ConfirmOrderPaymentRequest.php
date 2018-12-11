@@ -5,7 +5,9 @@ namespace App\Application\UseCase\ConfirmOrderPayment;
 class ConfirmOrderPaymentRequest
 {
     private $externalCode;
+
     private $customerId;
+
     private $amount;
 
     public function __construct(string $externalCode, int $customerId, float $amount)

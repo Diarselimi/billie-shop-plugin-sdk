@@ -7,16 +7,27 @@ use App\DomainModel\AbstractEntity;
 class DebtorExternalDataEntity extends AbstractEntity
 {
     private $name;
+
     private $taxId;
+
     private $taxNumber;
+
     private $registrationNumber;
+
     private $registrationCourt;
+
     private $industrySector;
+
     private $subindustrySector;
+
     private $employees_number;
+
     private $legalForm;
+
     private $establishedCustomer;
+
     private $merchantExternalId;
+
     private $addressId;
 
     public function getName(): string
@@ -31,7 +42,7 @@ class DebtorExternalDataEntity extends AbstractEntity
         return $this;
     }
 
-    public function getTaxId():? string
+    public function getTaxId(): ? string
     {
         return $this->taxId;
     }
@@ -43,7 +54,7 @@ class DebtorExternalDataEntity extends AbstractEntity
         return $this;
     }
 
-    public function getTaxNumber():? string
+    public function getTaxNumber(): ? string
     {
         return $this->taxNumber;
     }
@@ -55,7 +66,7 @@ class DebtorExternalDataEntity extends AbstractEntity
         return $this;
     }
 
-    public function getRegistrationNumber():? string
+    public function getRegistrationNumber(): ? string
     {
         return $this->registrationNumber;
     }
@@ -67,7 +78,7 @@ class DebtorExternalDataEntity extends AbstractEntity
         return $this;
     }
 
-    public function getRegistrationCourt():? string
+    public function getRegistrationCourt(): ? string
     {
         return $this->registrationCourt;
     }
@@ -103,7 +114,7 @@ class DebtorExternalDataEntity extends AbstractEntity
         return $this;
     }
 
-    public function getEmployeesNumber():? string
+    public function getEmployeesNumber(): ? string
     {
         return $this->employees_number;
     }

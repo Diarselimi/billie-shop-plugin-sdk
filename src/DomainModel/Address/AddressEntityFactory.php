@@ -29,4 +29,19 @@ class AddressEntityFactory
             ->setCountry($request->getDebtorCompanyAddressCountry())
         ;
     }
+
+    public function createFromDatabaseRow(array $row): AddressEntity
+    {
+        return (new AddressEntity())
+            ->setId($row['id'])
+            ->setCountry($row['country'])
+            ->setCity($row['city'])
+            ->setPostalCode($row['postal_code'])
+            ->setStreet($row['street'])
+            ->setHouseNumber($row['house'])
+            ->setAddition('addition')
+            ->setCreatedAt(new \DateTime($row['created_at']))
+            ->setUpdatedAt(new \DateTime($row['updated_at']))
+        ;
+    }
 }

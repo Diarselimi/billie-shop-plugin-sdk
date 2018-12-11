@@ -8,7 +8,8 @@ use App\DomainModel\RiskCheck\CompanyNameComparator;
 class DebtorNameCheck implements CheckInterface
 {
     public const NAME = 'debtor_name';
-    private const LEGAL_FORMS_FOR_PERSON_COMPARISON = ['6022', '2001, 2018, 2022', '4001', '4022', '3001', '99999'];
+
+    private const LEGAL_FORMS_FOR_PERSON_COMPARISON = ['6022', '2001, 2018, 2022', '2001', '2018', '2022', '4001', '4022', '3001', '99999'];
 
     private $nameComparator;
 

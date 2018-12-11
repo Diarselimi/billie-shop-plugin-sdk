@@ -2,6 +2,8 @@
 
 namespace App\DomainModel\Order;
 
+use Generator;
+
 interface OrderRepositoryInterface
 {
     public function insert(OrderEntity $order): void;
@@ -14,5 +16,7 @@ interface OrderRepositoryInterface
 
     public function getOneByUuid(string $uuid): ?OrderEntity;
 
-    public function getCustomerOverdues(int $merchantDebtorId): \Generator;
+    public function getCustomerOverdues(int $merchantDebtorId): Generator;
+
+    public function getWithInvoiceNumber(int $limit, int $lastId = 0): Generator;
 }

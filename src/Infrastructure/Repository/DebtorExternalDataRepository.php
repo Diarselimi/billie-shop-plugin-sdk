@@ -3,10 +3,18 @@
 namespace App\Infrastructure\Repository;
 
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
+use App\DomainModel\DebtorExternalData\DebtorExternalDataEntityFactory;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 
 class DebtorExternalDataRepository extends AbstractRepository implements DebtorExternalDataRepositoryInterface
 {
+    private $debtorExternalDataEntityFactory;
+
+    public function __construct(DebtorExternalDataEntityFactory $debtorExternalDataEntityFactory)
+    {
+        $this->debtorExternalDataEntityFactory = $debtorExternalDataEntityFactory;
+    }
+
     public function insert(DebtorExternalDataEntity $debtor): void
     {
         $id = $this->doInsert('
@@ -41,5 +49,12 @@ class DebtorExternalDataRepository extends AbstractRepository implements DebtorE
         ]);
 
         return $address ?: null;
+    }
+
+    public function getOneById(int $id): ?DebtorExternalDataEntity
+    {
+        $debtorRowData = $this->getOneByIdRaw($id);
+
+        return ($debtorRowData) ? $this->debtorExternalDataEntityFactory->createFromDatabaseRow($debtorRowData) : null;
     }
 }

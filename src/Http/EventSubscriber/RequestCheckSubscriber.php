@@ -21,7 +21,10 @@ class RequestCheckSubscriber implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        if ($request->get('_route') === HttpConstantsInterface::ROUTE_HEALTH_CHECK) {
+        if (in_array($request->get('_route'), [
+            HttpConstantsInterface::ROUTE_HEALTH_CHECK,
+            HttpConstantsInterface::ROUTE_MARK_ORDER_AS_FRAUD,
+        ], true)) {
             return;
         }
 

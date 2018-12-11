@@ -6,16 +6,18 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderEntityFactory;
 use App\DomainModel\Order\OrderLifecycleEvent;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\Infrastructure\PDO\PDO;
-use Ramsey\Uuid\Uuid;
 use App\DomainModel\Order\OrderStateManager;
+use App\Infrastructure\PDO\PDO;
+use Generator;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OrderRepository extends AbstractRepository implements OrderRepositoryInterface
 {
-    const SELECT_FIELDS = 'id, amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, proof_of_delivery_url, delivery_address_id, merchant_debtor_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, created_at, updated_at, shipped_at';
+    const SELECT_FIELDS = 'id, amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, proof_of_delivery_url, delivery_address_id, merchant_debtor_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, created_at, updated_at, shipped_at, marked_as_fraud_at';
 
     private $eventDispatcher;
+
     private $orderFactory;
 
     public function __construct(EventDispatcherInterface $eventDispatcher, OrderEntityFactory $orderFactory)
@@ -165,7 +167,8 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
               payment_id = :payment_id,
               invoice_number = :invoice_number,
               invoice_url = :invoice_url,
-              proof_of_delivery_url = :proof_of_delivery_url
+              proof_of_delivery_url = :proof_of_delivery_url,
+              marked_as_fraud_at = :marked_as_fraud_at
             WHERE id = :id
         ', [
             'amount_gross' => $order->getAmountGross(),
@@ -179,6 +182,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             'invoice_number' => $order->getInvoiceNumber(),
             'invoice_url' => $order->getInvoiceUrl(),
             'proof_of_delivery_url' => $order->getProofOfDeliveryUrl(),
+            'marked_as_fraud_at' => $order->getMarkedAsFraudAt() ? $order->getMarkedAsFraudAt()->format('Y-m-d H:i:s') : null,
             'id' => $order->getId(),
         ]);
 
@@ -186,10 +190,10 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
     }
 
     /**
-     * @param int $merchantDebtorId
-     * @return \Generator
+     * @param  int             $merchantDebtorId
+     * @return Generator|int[]
      */
-    public function getCustomerOverdues(int $merchantDebtorId): \Generator
+    public function getCustomerOverdues(int $merchantDebtorId): Generator
     {
         $query = '
             SELECT CEIL((:current_time - UNIX_TIMESTAMP(`shipped_at`) - (`duration` * 86400)) / 86400) as `overdue`
@@ -208,8 +212,27 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
         $stmt = $this->exec($query, $params);
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             if ($row['overdue'] > 0) {
-                yield (int)$row['overdue'];
+                yield (int) $row['overdue'];
             }
+        }
+    }
+
+    public function getWithInvoiceNumber(int $limit, int $lastId = 0): Generator
+    {
+        $stmt = $this->exec(
+            'SELECT id, external_code, merchant_id, invoice_number
+              FROM orders
+              WHERE invoice_number IS NOT NULL
+              AND id > :lastId
+              ORDER BY id ASC
+              LIMIT ' . $limit,
+            [
+                'lastId' => $lastId,
+            ]
+        );
+
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            yield $row;
         }
     }
 }

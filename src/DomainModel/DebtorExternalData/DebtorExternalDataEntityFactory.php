@@ -22,4 +22,24 @@ class DebtorExternalDataEntityFactory
             ->setMerchantExternalId($request->getMerchantCustomerId())
         ;
     }
+
+    public function createFromDatabaseRow(array $row): DebtorExternalDataEntity
+    {
+        return (new DebtorExternalDataEntity())
+            ->setId($row['id'])
+            ->setName($row['name'])
+            ->setTaxId($row['tax_id'])
+            ->setTaxNumber($row['tax_number'])
+            ->setRegistrationNumber($row['registration_number'])
+            ->setRegistrationCourt($row['registration_court'])
+            ->setIndustrySector($row['industry_sector'])
+            ->setSubindustrySector($row['subindustry_sector'])
+            ->setEmployeesNumber($row['employees_number'])
+            ->setLegalForm($row['legal_form'])
+            ->setEstablishedCustomer($row['is_established_customer'])
+            ->setAddressId($row['address_id'])
+            ->setCreatedAt(new \DateTime($row['created_at']))
+            ->setUpdatedAt(new \DateTime($row['updated_at']))
+        ;
+    }
 }
