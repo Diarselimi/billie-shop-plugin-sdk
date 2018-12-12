@@ -224,6 +224,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
               FROM orders
               WHERE invoice_number IS NOT NULL
               AND id > :lastId
+              AND NOT EXISTS (SELECT * FROM order_invoices WHERE order_invoices.order_id = orders.id)
               ORDER BY id ASC
               LIMIT ' . $limit,
             [
