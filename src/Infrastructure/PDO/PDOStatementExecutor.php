@@ -30,8 +30,8 @@ class PDOStatementExecutor implements LoggingInterface
             $this->logInfo('[pdo] Query succeeded');
         } catch (PDOException $exception) {
             if (
-                isset($exception->errorInfo[1]) &&
-                in_array($exception->errorInfo[1], [PDO::ERROR_GONE_AWAY, PDO::ERROR_LOST_CONNECTION])
+                !isset($exception->errorInfo[1])
+                || !in_array($exception->errorInfo[1], [PDO::ERROR_GONE_AWAY, PDO::ERROR_LOST_CONNECTION])
             ) {
                 $this->logError('[pdo] Unhandled exception', ['exception' => $exception]);
 
