@@ -25,11 +25,15 @@ class OrderTriggerInvoiceDownloadUseCase implements LoggingInterface
     }
 
     // Returns the last processed order ID
-    public function execute(int $limit, int $lastId = 0, string $basePath = '/'): int
+    public function execute(int $limit, int $batchSize, int $sleepTime, int $lastId = 0, string $basePath = '/'): int
     {
         $orders = $this->orderRepository->getWithInvoiceNumber($limit, $lastId);
 
-        foreach ($orders as $orderRow) {
+        foreach ($orders as $index => $orderRow) {
+            if ($index !== 0 && $index % $batchSize === 0) {
+                sleep($sleepTime);
+            }
+
             /** @var array $orderRow */
             $merchantId = $orderRow['merchant_id'];
             $orderId = $orderRow['id'];

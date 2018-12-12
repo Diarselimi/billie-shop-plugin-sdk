@@ -41,7 +41,9 @@ class OrderTriggerInvoiceDownloadCommand extends Command
                 'Limits the number of processed rows and events.',
                 1000
             )
-            ->addOption('last-id', null, InputOption::VALUE_REQUIRED, 'Last successfully processed order ID.', 0);
+            ->addOption('last-id', null, InputOption::VALUE_REQUIRED, 'Last successfully processed order ID.', 0)
+            ->addOption('batch-size', null, InputOption::VALUE_REQUIRED, 'The size of a batch before sleep.', 100)
+            ->addOption('sleep-time', null, InputOption::VALUE_REQUIRED, 'Time to sleep between the batches', 10);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -50,7 +52,9 @@ class OrderTriggerInvoiceDownloadCommand extends Command
         $basePath = empty($basePath) ? '/' : "/{$basePath}/";
         $limit = (int) $input->getOption('limit');
         $lastId = (int) $input->getOption('last-id');
-        $newLastId = $this->useCase->execute($limit, $lastId, $basePath);
+        $batchSize = (int) $input->getOption('batch-size');
+        $sleepTime = (int) $input->getOption('sleep-time');
+        $newLastId = $this->useCase->execute($limit, $batchSize, $sleepTime, $lastId, $basePath);
 
         if ($lastId === $newLastId) {
             $output->writeln("There are no more orders to process.");
