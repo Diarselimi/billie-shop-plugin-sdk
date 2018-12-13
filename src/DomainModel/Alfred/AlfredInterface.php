@@ -13,4 +13,6 @@ interface AlfredInterface
     public function unlockDebtorLimit(string $debtorId, float $amount): void;
 
     public function isDebtorBlacklisted(string $debtorId): bool;
+
+    public function isEligibleForPayAfterDelivery(string $debtorId): bool;
 }

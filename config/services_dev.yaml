@@ -8,5 +8,5 @@ services:
     arguments:
       $mockServerUrl: ''
       $servicesToMock: []
-      $servicesToProxyHeader: [risky, alfred]
+      $servicesToProxyHeader: [alfred]
     tags: ['paella_core.logging']

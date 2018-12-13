@@ -1,10 +1,5 @@
 eight_points_guzzle:
   clients:
-    risky:
-      base_url: "%env(string:RISKY_URL)%"
-      options:
-        headers:
-          Content-Type: "application/json"
     alfred:
       base_url: "%env(string:ALFRED_URL)%"
       options:

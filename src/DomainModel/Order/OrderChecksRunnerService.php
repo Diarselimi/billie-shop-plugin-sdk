@@ -2,25 +2,19 @@
 
 namespace App\DomainModel\Order;
 
-use App\Application\PaellaCoreCriticalException;
+use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Monitoring\LoggingInterface;
 use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\RiskCheck\Checker\CheckInterface;
 use App\DomainModel\RiskCheck\Checker\CheckResult;
 use App\DomainModel\RiskCheck\RiskCheckEntityFactory;
 use App\DomainModel\RiskCheck\RiskCheckRepositoryInterface;
-use App\DomainModel\Risky\RiskyInterface;
 use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
-use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
-use App\DomainModel\Person\PersonEntity;
 
 class OrderChecksRunnerService implements LoggingInterface
 {
     use LoggingTrait;
-
-    //TODO: This is duplicated in SchufaIdentification file in alfred project. Score company should be move to alfred
-    private const LEGAL_FORMS_SEARCH_BY_PERSON = ["6022", "2001, 2018, 2022", "2001", "2018", "2022", "4001", "4022", "3001", "99999"];
 
     private $producer;
 
@@ -28,9 +22,7 @@ class OrderChecksRunnerService implements LoggingInterface
 
     private $riskCheckFactory;
 
-    private $orderRepository;
-
-    private $risky;
+    private $alfred;
 
     private $checkLoader;
 
@@ -40,16 +32,14 @@ class OrderChecksRunnerService implements LoggingInterface
         ProducerInterface $producer,
         RiskCheckRepositoryInterface $riskCheckRepository,
         RiskCheckEntityFactory $riskCheckFactory,
-        OrderRepositoryInterface $orderRepository,
-        RiskyInterface $risky,
+        AlfredInterface $alfred,
         ServiceLocator $checkLoader,
         \Raven_Client $sentry
     ) {
         $this->producer = $producer;
         $this->riskCheckRepository = $riskCheckRepository;
         $this->riskCheckFactory = $riskCheckFactory;
-        $this->orderRepository = $orderRepository;
-        $this->risky = $risky;
+        $this->alfred = $alfred;
         $this->checkLoader = $checkLoader;
         $this->sentry = $sentry;
     }
@@ -63,7 +53,7 @@ class OrderChecksRunnerService implements LoggingInterface
         return $amountCheckResult && $debtorCountryCheckResult && $debtorIndustrySectorCheckResult;
     }
 
-    public function runChecks(OrderContainer $order, ?string $debtorCrefoId): bool
+    public function runChecks(OrderContainer $order): bool
     {
         $this->logWaypoint('debtor != merchant check');
         $debtorNotCustomerCheckResult = $this->check($order, 'debtor_not_customer');
@@ -100,8 +90,8 @@ class OrderChecksRunnerService implements LoggingInterface
         }
 
         $this->logWaypoint('debtor score check');
-        $debtorScoreCheck = $this->runDebtorScoreCheck($order, $debtorCrefoId);
-        if (!$debtorScoreCheck) {
+        $isDebtorEligible = $this->isDebtorEligible($order);
+        if (!$isDebtorEligible) {
             $this->logInfo('Debtor score check failed');
 
             return false;
@@ -135,39 +125,16 @@ class OrderChecksRunnerService implements LoggingInterface
         }
     }
 
-    private function runDebtorScoreCheck(OrderContainer $order, ?string $debtorCrefoId): bool
+    private function isDebtorEligible(OrderContainer $order): bool
     {
-        try {
-            $name = $order->getDebtorExternalData()->getName();
-            $riskyResult = $this->risky->runDebtorScoreCheck($order, $name, $debtorCrefoId);
-        } catch (PaellaCoreCriticalException $exception) {
-            $riskyResult = null;
-        }
+        $debtorId = $order->getMerchantDebtor()->getDebtorId();
+        $passed = $this->alfred->isEligibleForPayAfterDelivery($debtorId);
 
-        if ((is_null($riskyResult) || !$riskyResult->isPassed()) && $this->shouldScoreByPersonName($order->getDebtorPerson(), $order->getDebtorExternalData())) {
-            $name = "{$order->getDebtorPerson()->getFirstName()} {$order->getDebtorPerson()->getLastName()}";
-
-            try {
-                $riskyResult = $this->risky->runDebtorScoreCheck($order, $name, $debtorCrefoId);
-            } catch (PaellaCoreCriticalException $exception) {
-                $riskyResult = null;
-            }
-        }
-
-        $checkResult = new CheckResult($riskyResult && $riskyResult->isPassed(), 'company_b2b_score', []);
+        $checkResult = new CheckResult($passed, 'company_b2b_score', []);
         $riskCheckEntity = $this->riskCheckFactory->createFromCheckResult($checkResult, $order->getOrder()->getId());
         $this->riskCheckRepository->insert($riskCheckEntity);
 
         return $checkResult->isPassed();
-    }
-
-    private function shouldScoreByPersonName(PersonEntity $person, DebtorExternalDataEntity $debtorExternalData): bool
-    {
-        if (is_null($person->getFirstName()) || is_null($person->getLastName())) {
-            return false;
-        }
-
-        return in_array($debtorExternalData->getLegalForm(), self::LEGAL_FORMS_SEARCH_BY_PERSON);
     }
 
     private function check(OrderContainer $order, string $name): bool

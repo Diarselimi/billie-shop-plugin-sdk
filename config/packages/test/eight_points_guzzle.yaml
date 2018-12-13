@@ -1,7 +1,5 @@
 eight_points_guzzle:
   clients:
-    risky:
-      base_url: "http://localhost:8026"
     alfred:
       base_url: "http://localhost:8024"
     borscht:
