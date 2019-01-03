@@ -33,10 +33,6 @@ services:
       - '%env(DATABASE_USERNAME)%'
       - '%env(DATABASE_PASSWORD)%'
 
-  App\Infrastructure\Risky\Risky:
-    arguments:
-      $client: '@eight_points_guzzle.client.risky'
-
   App\Infrastructure\Alfred\Alfred:
     arguments:
       $client: '@eight_points_guzzle.client.alfred'
@@ -61,7 +57,6 @@ services:
   App\DomainModel\Webhook\WebhookClientInterface: '@App\Infrastructure\Client\Guzzle\WebhookClient'
   App\DomainModel\Alfred\AlfredInterface: '@App\Infrastructure\Alfred\Alfred'
   App\DomainModel\Borscht\BorschtInterface: '@App\Infrastructure\Borscht\Borscht'
-  App\DomainModel\Risky\RiskyInterface: '@App\Infrastructure\Risky\Risky'
 
   Symfony\Component\Workflow\Workflow: '@state_machine.order'
 

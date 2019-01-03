@@ -33,20 +33,15 @@ class PaellaCoreContext extends MinkContext
 
     private $borscht;
 
-    private $risky;
-
     private static $countAlfred = 1;
 
     private static $countBorscht = 1;
-
-    private static $countRisky = 1;
 
     public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;
         $this->alfred = new MockWebServer(8024);
         $this->borscht = new MockWebServer(8025);
-        $this->risky = new MockWebServer(8026);
 
         $this->getMerchantRepository()->insert(
             (new MerchantEntity())
@@ -67,7 +62,6 @@ class PaellaCoreContext extends MinkContext
     {
         $this->alfred->stop();
         $this->borscht->stop();
-        $this->risky->stop();
         $this->getConnection()->exec('
             DELETE FROM order_transitions;
             DELETE FROM order_invoices;
@@ -99,14 +93,6 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
-     * @Given I start risky
-     */
-    public function iStartRisky()
-    {
-        $this->risky->start();
-    }
-
-    /**
      * @Given I get from alfred :url endpoint response with status :status and body
      */
     public function iGetFromAlfredEndpointResponse(string $url, int $status, PyStringNode $body)
@@ -122,15 +108,6 @@ class PaellaCoreContext extends MinkContext
     {
         $this->borscht->start();
         $this->borscht->setResponseOfPath($url, new Response($body, ['X-Count' => self::$countBorscht++], $status));
-    }
-
-    /**
-     * @Given I get from risky :url endpoint response with status :status and body
-     */
-    public function iGetFromRiskyEndpointResponse(string $url, int $status, PyStringNode $body)
-    {
-        $this->risky->start();
-        $this->risky->setResponseOfPath($url, new Response($body, ['X-Count' => self::$countRisky++], $status));
     }
 
     /**

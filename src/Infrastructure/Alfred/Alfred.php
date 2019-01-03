@@ -2,7 +2,6 @@
 
 namespace App\Infrastructure\Alfred;
 
-use App\Application\PaellaCoreCriticalException;
 use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Alfred\DebtorDTO;
 use App\DomainModel\Alfred\DebtorFactory;
@@ -13,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 class Alfred implements AlfredInterface
 {
     private $client;
+
     private $factory;
 
     public function __construct(Client $client, DebtorFactory $debtorFactory)
@@ -30,20 +30,12 @@ class Alfred implements AlfredInterface
                 return null;
             }
 
-            throw new PaellaCoreCriticalException(
-                'Alfred not available right now',
-                PaellaCoreCriticalException::CODE_ALFRED_EXCEPTION,
-                null,
-                $exception
-            );
+            throw new AlfredRequestException($exception->getCode(), $exception);
         }
 
         $response = json_decode((string) $response->getBody(), true);
         if (!$response) {
-            throw new PaellaCoreCriticalException(
-                'Alfred response decode exception',
-                PaellaCoreCriticalException::CODE_ALFRED_EXCEPTION
-            );
+            throw new AlfredResponseDecodeException();
         }
 
         return $this->factory->createFromAlfredResponse($response);
@@ -60,20 +52,12 @@ class Alfred implements AlfredInterface
                 return null;
             }
 
-            throw new PaellaCoreCriticalException(
-                'Alfred not available right now',
-                PaellaCoreCriticalException::CODE_ALFRED_EXCEPTION,
-                null,
-                $exception
-            );
+            throw new AlfredRequestException($exception->getCode(), $exception);
         }
 
         $response = json_decode((string) $response->getBody(), true);
         if (!$response) {
-            throw new PaellaCoreCriticalException(
-                'Alfred response decode exception',
-                PaellaCoreCriticalException::CODE_ALFRED_EXCEPTION
-            );
+            throw new AlfredResponseDecodeException();
         }
 
         return $this->factory->createFromAlfredResponse($response);
@@ -85,19 +69,14 @@ class Alfred implements AlfredInterface
             $this->client->post("/debtor/$debtorId/lock", [
                 'json' => [
                     'amount' => $amount,
-                ]
+                ],
             ]);
         } catch (TransferException $exception) {
             if ($exception->getCode() === Response::HTTP_PRECONDITION_FAILED) {
                 return false;
             }
 
-            throw new PaellaCoreCriticalException(
-                'Alfred not available right now',
-                PaellaCoreCriticalException::CODE_ALFRED_EXCEPTION,
-                null,
-                $exception
-            );
+            throw new AlfredRequestException($exception->getCode(), $exception);
         }
 
         return true;
@@ -109,15 +88,10 @@ class Alfred implements AlfredInterface
             $this->client->post("/debtor/$debtorId/unlock", [
                 'json' => [
                     'amount' => $amount,
-                ]
+                ],
             ]);
         } catch (TransferException $exception) {
-            throw new PaellaCoreCriticalException(
-                'Alfred not available right now',
-                PaellaCoreCriticalException::CODE_ALFRED_EXCEPTION,
-                null,
-                $exception
-            );
+            throw new AlfredRequestException($exception->getCode(), $exception);
         }
     }
 
@@ -126,14 +100,28 @@ class Alfred implements AlfredInterface
         try {
             $response = $this->client->get("/debtor/$debtorId/is-blacklisted");
             $response = json_decode((string) $response->getBody(), true);
+            if (!$response) {
+                throw new AlfredResponseDecodeException();
+            }
+
             return $response['is_debtor_blacklisted'];
         } catch (TransferException $exception) {
-            throw new PaellaCoreCriticalException(
-                'Alfred not available right now',
-                PaellaCoreCriticalException::CODE_ALFRED_EXCEPTION,
-                null,
-                $exception
-            );
+            throw new AlfredRequestException($exception->getCode(), $exception);
+        }
+    }
+
+    public function isEligibleForPayAfterDelivery(string $debtorId): bool
+    {
+        try {
+            $response = $this->client->get("/debtor/$debtorId/is-eligible-for-pay-after-delivery");
+            $response = json_decode((string) $response->getBody(), true);
+            if (!$response) {
+                throw new AlfredResponseDecodeException();
+            }
+
+            return $response['is_eligible'];
+        } catch (TransferException $exception) {
+            throw new AlfredRequestException($exception->getCode(), $exception);
         }
     }
 }
