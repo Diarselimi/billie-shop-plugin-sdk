@@ -7,7 +7,7 @@ use App\DomainModel\MerchantSettings\MerchantSettingsEntityFactory;
 use App\DomainModel\MerchantSettings\MerchantSettingsNotFoundException;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
 
-class MerchantSettingsRepository implements MerchantSettingsRepositoryInterface
+class MerchantSettingsRepository extends AbstractRepository implements MerchantSettingsRepositoryInterface
 {
     const SELECT_FIELDS = 'id, merchant_id, debtor_financing_limit, min_order_amount, created_at, updated_at';
 
