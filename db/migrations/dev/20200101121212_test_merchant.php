@@ -11,7 +11,7 @@ class TestMerchant extends AbstractMigration
             'name' => 'Contorion',
             'available_financing_limit' => 2000000,
             'api_key' => 'billie',
-            'roles' => '["ROLE_API_USER"]',
+            'roles' => '["ROLE_API_USER", "ROLE_CAN_HANDLE_INVOICES"]',
             'is_active' => true,
             'company_id' => 4,
             'payment_merchant_id' => 'b95adad7-f747-45b9-b3cb-7851c4b90fac',
