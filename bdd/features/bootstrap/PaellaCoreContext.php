@@ -72,6 +72,7 @@ class PaellaCoreContext extends MinkContext
             DELETE FROM addresses;
             DELETE FROM merchants_debtors;
             DELETE FROM merchants;
+            DELETE FROM merchant_settings;
             ALTER TABLE merchants AUTO_INCREMENT = 1;
         ');
     }

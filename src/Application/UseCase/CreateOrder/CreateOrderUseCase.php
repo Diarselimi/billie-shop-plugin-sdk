@@ -10,14 +10,16 @@ use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntityFactory;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
+use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
+use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
 use App\DomainModel\Monitoring\LoggingInterface;
 use App\DomainModel\Monitoring\LoggingTrait;
+use App\DomainModel\Order\LimitsService;
 use App\DomainModel\Order\OrderChecksRunnerService;
 use App\DomainModel\Order\OrderContainer;
 use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
-use App\DomainModel\Order\LimitsService;
 use App\DomainModel\RiskCheck\Checker\CheckResult;
 use Symfony\Component\Workflow\Workflow;
 
@@ -48,6 +50,13 @@ class CreateOrderUseCase implements LoggingInterface
 
     private $limitsService;
 
+    private $merchantSettingsRepository;
+
+    /**
+     * @var MerchantSettingsEntity
+     */
+    private $merchantSettings;
+
     public function __construct(
         OrderPersistenceService $orderPersistenceService,
         OrderChecksRunnerService $orderChecksRunnerService,
@@ -58,7 +67,8 @@ class CreateOrderUseCase implements LoggingInterface
         MerchantDebtorEntityFactory $merchantDebtorFactory,
         OrderRepositoryInterface $orderRepository,
         Workflow $workflow,
-        LimitsService $limitsService
+        LimitsService $limitsService,
+        MerchantSettingsRepositoryInterface $merchantSettingsRepository
     ) {
         $this->orderPersistenceService = $orderPersistenceService;
         $this->orderChecksRunnerService = $orderChecksRunnerService;
@@ -70,6 +80,7 @@ class CreateOrderUseCase implements LoggingInterface
         $this->orderRepository = $orderRepository;
         $this->workflow = $workflow;
         $this->limitsService = $limitsService;
+        $this->merchantSettingsRepository = $merchantSettingsRepository;
     }
 
     public function execute(CreateOrderRequest $request): void
@@ -81,6 +92,10 @@ class CreateOrderUseCase implements LoggingInterface
 
             return;
         }
+
+        $this->merchantSettings = $this->merchantSettingsRepository->getOneByMerchantOrFail(
+            $request->getMerchantId()
+        );
 
         $debtorDTO = $this->retrieveDebtor($orderContainer, $request);
         if ($debtorDTO === null) {
@@ -189,7 +204,8 @@ class CreateOrderUseCase implements LoggingInterface
         $merchantDebtor = $this->merchantDebtorFactory->create(
             $debtorId,
             $merchant->getId(),
-            $paymentDebtor->getPaymentDebtorId()
+            $paymentDebtor->getPaymentDebtorId(),
+            $this->merchantSettings->getDebtorFinancingLimit()
         );
 
         $this->merchantDebtorRepository->insert($merchantDebtor);

@@ -4,8 +4,6 @@ namespace App\DomainModel\MerchantDebtor;
 
 class MerchantDebtorEntityFactory
 {
-    private const DEFAULT_FINANCING_LIMIT = 7500; //TODO: Move default limit to Merchant table in DB
-
     public function createFromDatabaseRow(array $row): MerchantDebtorEntity
     {
         return (new MerchantDebtorEntity())
@@ -16,19 +14,24 @@ class MerchantDebtorEntityFactory
             ->setFinancingLimit($row['financing_limit'])
             ->setCreatedAt(new \DateTime($row['created_at']))
             ->setUpdatedAt(new \DateTime($row['updated_at']))
-        ;
+            ;
     }
 
-    public function create(string $debtorId, string $merchantId, string $paymentDebtorId): MerchantDebtorEntity
-    {
+    public function create(
+        string $debtorId,
+        string $merchantId,
+        string $paymentDebtorId,
+        float $financingLimit
+    ): MerchantDebtorEntity {
         $now = new \DateTime();
 
         return (new MerchantDebtorEntity())
             ->setMerchantId($merchantId)
             ->setDebtorId($debtorId)
             ->setPaymentDebtorId($paymentDebtorId)
-            ->setFinancingLimit(self::DEFAULT_FINANCING_LIMIT)
+            ->setFinancingLimit($financingLimit)
             ->setCreatedAt($now)
-            ->setUpdatedAt($now);
+            ->setUpdatedAt($now)
+            ;
     }
 }
