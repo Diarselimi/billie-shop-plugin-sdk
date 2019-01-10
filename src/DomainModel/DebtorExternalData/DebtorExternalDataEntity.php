@@ -6,6 +6,14 @@ use App\DomainModel\AbstractEntity;
 
 class DebtorExternalDataEntity extends AbstractEntity
 {
+    public const LEGAL_FORMS_FOR_PERSON_COMPARISON = [
+        '6022', '2001, 2018, 2022', '2001', '2018', '2022', '4001', '4022', '3001', '99999',
+    ];
+
+    public const LEGAL_FORMS_FOR_SOLE_TRADERS = [
+        '6022', '2001, 2018, 2022', '2001', '2018', '2022', '4001', '4022', '3001', '99999', '9999', '7001',
+    ];
+
     private $name;
 
     private $taxId;
@@ -129,6 +137,11 @@ class DebtorExternalDataEntity extends AbstractEntity
     public function getLegalForm(): string
     {
         return $this->legalForm;
+    }
+
+    public function isLegalFormSoleTrader(): bool
+    {
+        return in_array($this->legalForm, self::LEGAL_FORMS_FOR_SOLE_TRADERS, true);
     }
 
     public function setLegalForm(string $legalForm): DebtorExternalDataEntity

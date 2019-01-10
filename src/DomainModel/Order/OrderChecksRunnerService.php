@@ -28,13 +28,16 @@ class OrderChecksRunnerService implements LoggingInterface
 
     private $sentry;
 
+    private $orderRepository;
+
     public function __construct(
         ProducerInterface $producer,
         RiskCheckRepositoryInterface $riskCheckRepository,
         RiskCheckEntityFactory $riskCheckFactory,
         AlfredInterface $alfred,
         ServiceLocator $checkLoader,
-        \Raven_Client $sentry
+        \Raven_Client $sentry,
+        OrderRepositoryInterface $orderRepository
     ) {
         $this->producer = $producer;
         $this->riskCheckRepository = $riskCheckRepository;
@@ -42,6 +45,7 @@ class OrderChecksRunnerService implements LoggingInterface
         $this->alfred = $alfred;
         $this->checkLoader = $checkLoader;
         $this->sentry = $sentry;
+        $this->orderRepository = $orderRepository;
     }
 
     public function runPreconditionChecks(OrderContainer $order): bool
@@ -92,7 +96,7 @@ class OrderChecksRunnerService implements LoggingInterface
         $this->logWaypoint('debtor score check');
         $isDebtorEligible = $this->isDebtorEligible($order);
         if (!$isDebtorEligible) {
-            $this->logInfo('Debtor score check failed');
+            $this->logInfo('debtor score check did not pass');
 
             return false;
         }
@@ -128,7 +132,11 @@ class OrderChecksRunnerService implements LoggingInterface
     private function isDebtorEligible(OrderContainer $order): bool
     {
         $debtorId = $order->getMerchantDebtor()->getDebtorId();
-        $passed = $this->alfred->isEligibleForPayAfterDelivery($debtorId);
+        $passed = $this->alfred->isEligibleForPayAfterDelivery(
+            $debtorId,
+            $order->getDebtorExternalData()->isLegalFormSoleTrader(),
+            $this->orderRepository->debtorHasAtLeastOneFullyPaidOrder($debtorId)
+        );
 
         $checkResult = new CheckResult($passed, 'company_b2b_score', []);
         $riskCheckEntity = $this->riskCheckFactory->createFromCheckResult($checkResult, $order->getOrder()->getId());
