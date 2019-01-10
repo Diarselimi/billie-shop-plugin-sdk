@@ -14,5 +14,5 @@ interface AlfredInterface
 
     public function isDebtorBlacklisted(string $debtorId): bool;
 
-    public function isEligibleForPayAfterDelivery(string $debtorId): bool;
+    public function isEligibleForPayAfterDelivery(string $debtorId, bool $isSoleTrader, bool $hasPaidInvoice): bool;
 }

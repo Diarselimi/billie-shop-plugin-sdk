@@ -19,4 +19,6 @@ interface OrderRepositoryInterface
     public function getCustomerOverdues(int $merchantDebtorId): Generator;
 
     public function getWithInvoiceNumber(int $limit, int $lastId = 0): Generator;
+
+    public function debtorHasAtLeastOneFullyPaidOrder(int $debtorId): bool;
 }

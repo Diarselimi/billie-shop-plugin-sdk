@@ -110,11 +110,17 @@ class Alfred implements AlfredInterface
         }
     }
 
-    public function isEligibleForPayAfterDelivery(string $debtorId): bool
+    public function isEligibleForPayAfterDelivery(string $debtorId, bool $isSoleTrader, bool $hasPaidInvoice): bool
     {
         try {
-            $response = $this->client->get("/debtor/$debtorId/is-eligible-for-pay-after-delivery");
+            $response = $this->client->get("/debtor/$debtorId/is-eligible-for-pay-after-delivery", [
+                'query' => [
+                    'is_sole_trader' => $isSoleTrader,
+                    'has_paid_invoice' => $hasPaidInvoice,
+                ],
+            ]);
             $response = json_decode((string) $response->getBody(), true);
+
             if (!$response) {
                 throw new AlfredResponseDecodeException();
             }

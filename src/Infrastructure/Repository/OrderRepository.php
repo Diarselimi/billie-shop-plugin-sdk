@@ -182,7 +182,8 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             'invoice_number' => $order->getInvoiceNumber(),
             'invoice_url' => $order->getInvoiceUrl(),
             'proof_of_delivery_url' => $order->getProofOfDeliveryUrl(),
-            'marked_as_fraud_at' => $order->getMarkedAsFraudAt() ? $order->getMarkedAsFraudAt()->format('Y-m-d H:i:s') : null,
+            'marked_as_fraud_at' => $order->getMarkedAsFraudAt() ? $order->getMarkedAsFraudAt()->format('Y-m-d H:i:s')
+                : null,
             'id' => $order->getId(),
         ]);
 
@@ -190,7 +191,8 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
     }
 
     /**
-     * @param  int             $merchantDebtorId
+     * @param int $merchantDebtorId
+     *
      * @return Generator|int[]
      */
     public function getCustomerOverdues(int $merchantDebtorId): Generator
@@ -235,5 +237,25 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             yield $row;
         }
+    }
+
+    public function debtorHasAtLeastOneFullyPaidOrder(int $debtorId): bool
+    {
+        $result = $this->doFetchOne(
+            'SELECT COUNT(id) as total
+              FROM orders
+              WHERE state = :state
+              AND orders.merchant_debtor_id IN (SELECT id FROM merchants_debtors WHERE debtor_id = :debtor_id)',
+            [
+                'state' => OrderStateManager::STATE_COMPLETE,
+                'debtor_id' => $debtorId,
+            ]
+        );
+
+        if (!$result) {
+            return false;
+        }
+
+        return $result['total'] > 0;
     }
 }

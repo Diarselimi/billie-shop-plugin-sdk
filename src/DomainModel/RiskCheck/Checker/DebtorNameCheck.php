@@ -2,14 +2,13 @@
 
 namespace App\DomainModel\RiskCheck\Checker;
 
+use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\Order\OrderContainer;
 use App\DomainModel\RiskCheck\CompanyNameComparator;
 
 class DebtorNameCheck implements CheckInterface
 {
     public const NAME = 'debtor_name';
-
-    private const LEGAL_FORMS_FOR_PERSON_COMPARISON = ['6022', '2001, 2018, 2022', '2001', '2018', '2022', '4001', '4022', '3001', '99999'];
 
     private $nameComparator;
 
@@ -47,6 +46,10 @@ class DebtorNameCheck implements CheckInterface
 
     private function canCompareWithPerson(OrderContainer $order): bool
     {
-        return \in_array($order->getDebtorExternalData()->getLegalForm(), self::LEGAL_FORMS_FOR_PERSON_COMPARISON, true);
+        return in_array(
+            $order->getDebtorExternalData()->getLegalForm(),
+            DebtorExternalDataEntity::LEGAL_FORMS_FOR_PERSON_COMPARISON,
+            true
+        );
     }
 }
