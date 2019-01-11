@@ -20,7 +20,6 @@ class ConfirmOrderPaymentUseCase
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
-        AlfredInterface $alfred,
         BorschtInterface $borscht,
         OrderStateManager $orderStateManager
     ) {

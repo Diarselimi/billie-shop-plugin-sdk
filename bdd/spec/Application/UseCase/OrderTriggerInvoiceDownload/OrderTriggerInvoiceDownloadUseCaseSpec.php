@@ -52,7 +52,7 @@ class OrderTriggerInvoiceDownloadUseCaseSpec extends ObjectBehavior
             ->shouldBeCalledTimes(1)
             ->willReturn(true);
 
-        $this->execute(0, 0)->shouldReturn(self::ORDER_ID);
+        $this->execute(0, 0, 0, 0)->shouldReturn(self::ORDER_ID);
     }
 
     public function it_should_return_same_lastId_if_no_orders_found(
@@ -68,7 +68,7 @@ class OrderTriggerInvoiceDownloadUseCaseSpec extends ObjectBehavior
 
         $eventPublisher->publish()->shouldNotBeCalled();
 
-        $this->execute(50, 10)->shouldReturn(10);
+        $this->execute(50, 0, 0, 10)->shouldReturn(10);
     }
 
     public function it_should_throw_exception_if_publisher_failed(
@@ -91,7 +91,7 @@ class OrderTriggerInvoiceDownloadUseCaseSpec extends ObjectBehavior
             ->shouldBeCalledTimes(1)
             ->willReturn(false);
 
-        $this->shouldThrow(PaellaCoreCriticalException::class)->during('execute', [0, 0]);
+        $this->shouldThrow(PaellaCoreCriticalException::class)->during('execute', [0, 0, 0, 0]);
     }
 
     private function getEmptyGenerator(): \Generator

@@ -9,10 +9,10 @@ use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\Monitoring\LoggingInterface;
 use App\DomainModel\Monitoring\LoggingTrait;
+use App\DomainModel\Order\LimitsService;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
-use App\DomainModel\Order\LimitsService;
 use Symfony\Component\HttpFoundation\Response;
 
 class UpdateOrderUseCase implements LoggingInterface
@@ -66,21 +66,23 @@ class UpdateOrderUseCase implements LoggingInterface
         }
 
         $this->validate($order, $request);
+        $this->updateChangedData($order, $request);
+    }
 
+    private function updateChangedData(OrderEntity $order, UpdateOrderRequest $request)
+    {
         $durationChanged = $request->getDuration() !== null && $request->getDuration() !== $order->getDuration();
         $amountChanged = $request->getAmountGross() !== null && (float) $request->getAmountGross() !== $order->getAmountGross()
             || $request->getAmountNet() !== null && (float) $request->getAmountNet() !== $order->getAmountNet()
-            || $request->getAmountTax() !== null && (float) $request->getAmountTax() !== $order->getAmountTax()
-        ;
+            || $request->getAmountTax() !== null && (float) $request->getAmountTax() !== $order->getAmountTax();
         $invoiceChanged = !$amountChanged
             && $request->getInvoiceNumber() !== null && $request->getInvoiceNumber() !== $order->getInvoiceNumber()
-            || $request->getInvoiceUrl() !== null && $request->getInvoiceUrl() !== $order->getInvoiceUrl()
-        ;
+            || $request->getInvoiceUrl() !== null && $request->getInvoiceUrl() !== $order->getInvoiceUrl();
 
         $this->logInfo('Start order update, state {state}, duration changed: {duration}, amount changed: {amount}', [
             'state' => $order->getState(),
-            'duration' => (int) $durationChanged,
-            'amount' => (int) $amountChanged,
+            'duration_changed' => (int) $durationChanged,
+            'amount_changed' => (int) $amountChanged,
         ]);
 
         if ($amountChanged && ($this->orderStateManager->wasShipped($order) || !$durationChanged)) {
@@ -114,8 +116,7 @@ class UpdateOrderUseCase implements LoggingInterface
         }
 
         $order->setDuration($duration);
-        $this->borscht->modifyOrder($order);
-        $this->orderRepository->update($order);
+        $this->applyUpdate($order);
     }
 
     private function updateAmount(OrderEntity $order, UpdateOrderRequest $request)
@@ -143,19 +144,15 @@ class UpdateOrderUseCase implements LoggingInterface
         $order
             ->setAmountGross($request->getAmountGross())
             ->setAmountNet($request->getAmountNet())
-            ->setAmountTax($request->getAmountTax())
-        ;
+            ->setAmountTax($request->getAmountTax());
 
         if ($this->orderStateManager->wasShipped($order)) {
             $order
                 ->setInvoiceNumber($request->getInvoiceNumber())
-                ->setInvoiceUrl($request->getInvoiceUrl())
-            ;
+                ->setInvoiceUrl($request->getInvoiceUrl());
         }
 
-        $this->orderRepository->update($order);
-
-        if ($amountChanged == 0.) {
+        if ($amountChanged == 0.0) {
             $this->logInfo('Gross amount was not changed, do nothing');
 
             return;
@@ -163,13 +160,20 @@ class UpdateOrderUseCase implements LoggingInterface
 
         if ($this->orderStateManager->wasShipped($order)) {
             $this->logInfo('Do partial cancellation in Borscht');
-            $this->borscht->modifyOrder($order);
+            $this->applyUpdate($order);
 
             return;
         }
 
         $this->logInfo('Do update order without Borscht');
+        $this->orderRepository->update($order);
 
+        $this->logInfo('Do update merchant limit without Borscht');
+        $this->updateMerchantLimit($order, $amountChanged);
+    }
+
+    private function updateMerchantLimit(OrderEntity $order, float $amountChanged)
+    {
         $merchantDebtor = $this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId());
         $this->limitsService->unlock($merchantDebtor, $amountChanged);
 
@@ -192,19 +196,35 @@ class UpdateOrderUseCase implements LoggingInterface
 
         $order->setInvoiceNumber($request->getInvoiceNumber())->setInvoiceUrl($request->getInvoiceUrl());
 
-        $this->orderRepository->update($order);
+        $this->applyUpdate($order);
+    }
 
-        $this->borscht->modifyOrder($order);
+    private function applyUpdate(OrderEntity $order)
+    {
+        try {
+            $this->borscht->modifyOrder($order);
+        } catch (PaellaCoreCriticalException $e) {
+            $this->logError(
+                'Borscht responded with an error when updating the order.',
+                [
+                    'order' => $order->getId(),
+                    'error' => $e,
+                ]
+            );
+
+            throw $e;
+        }
+        $this->orderRepository->update($order);
     }
 
     private function validate(OrderEntity $order, UpdateOrderRequest $request): void
     {
         //TODO: does not belong here
         if (!empty($request->getAmountGross()) && (
-            $request->getAmountGross() > $order->getAmountGross()
-            || $request->getAmountNet() > $order->getAmountNet()
-            || $request->getAmountTax() > $order->getAmountTax()
-        )) {
+                $request->getAmountGross() > $order->getAmountGross()
+                || $request->getAmountNet() > $order->getAmountNet()
+                || $request->getAmountTax() > $order->getAmountTax()
+            )) {
             throw new PaellaCoreCriticalException(
                 'Invalid amount',
                 PaellaCoreCriticalException::CODE_ORDER_VALIDATION_FAILED,
