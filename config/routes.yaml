@@ -43,6 +43,11 @@ mark_order_as_fraud:
   controller: App\Http\Controller\MarkOrderAsFraudController::execute
   methods: [POST]
 
+update_merchant_with_order_dunning_step:
+  path: /order/{uuid}/update-dunning-step
+  controller: App\Http\Controller\UpdateMerchantWithOrderDunningStepController::execute
+  methods: [POST]
+
 health_check:
   path: /healthcheck
   controller:  App\Infrastructure\Monitoring\Controller\HealthCheckController::execute

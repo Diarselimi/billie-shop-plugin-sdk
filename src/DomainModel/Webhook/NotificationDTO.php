@@ -4,18 +4,16 @@ namespace App\DomainModel\Webhook;
 
 class NotificationDTO
 {
-    const EVENT_REMINDER = 'reminder';
-    const EVENT_DUNNING1 = 'dunning1';
-    const EVENT_DUNNING2 = 'dunning2';
-    const EVENT_DUNNING3 = 'dunning3';
-    const EVENT_REBOOKING = 'rebooking';
     const EVENT_PAYMENT = 'payment';
-    const EVENT_DCA = 'dca';
 
     private $eventName;
+
     private $orderId;
+
     private $amount;
+
     private $openAmount;
+
     private $urlNotification;
 
     public function setEventName(string $eventName): NotificationDTO
