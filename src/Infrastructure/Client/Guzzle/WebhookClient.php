@@ -37,18 +37,24 @@ class WebhookClient implements WebhookClientInterface, LoggingInterface
 
         $this->logInfo('Webhook request', [
             'url' => $url,
-            'request' => $data
+            'request' => $data,
         ]);
 
         $headers = ['Content-Type' => 'application/json'];
+        $auth = [];
         if ($authorisation) {
-            $headers['X-Api-Key'] = $authorisation;
+            if (strpos($authorisation, ':') === false) {
+                $headers['X-Api-Key'] = $authorisation;
+            } else {
+                $auth = explode(':', $authorisation);
+            }
         }
 
         try {
             $this->client->post($url, [
                 'json' => $data,
                 'headers' => $headers,
+                'auth' => $auth,
             ]);
         } catch (TransferException $exception) {
             throw new WebhookCommunicationException('Webhook communication exception', null, $exception);
