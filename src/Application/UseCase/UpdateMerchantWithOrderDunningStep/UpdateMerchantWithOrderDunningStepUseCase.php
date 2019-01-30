@@ -3,27 +3,21 @@
 namespace App\Application\UseCase\UpdateMerchantWithOrderDunningStep;
 
 use App\Application\Exception\OrderNotFoundException;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\Webhook\NotificationDTO;
-use App\DomainModel\Webhook\NotificationSender;
+use App\DomainModel\OrderNotification\NotificationScheduler;
 
 class UpdateMerchantWithOrderDunningStepUseCase
 {
     private $orderRepository;
 
-    private $merchantRepository;
-
-    private $notificationSender;
+    private $notificationScheduler;
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
-        MerchantRepositoryInterface $merchantRepository,
-        NotificationSender $notificationSender
+        NotificationScheduler $notificationScheduler
     ) {
         $this->orderRepository = $orderRepository;
-        $this->merchantRepository = $merchantRepository;
-        $this->notificationSender = $notificationSender;
+        $this->notificationScheduler = $notificationScheduler;
     }
 
     public function execute(UpdateMerchantWithOrderDunningStepRequest $request): void
@@ -34,13 +28,11 @@ class UpdateMerchantWithOrderDunningStepUseCase
             throw new OrderNotFoundException("Order with UUID: {$request->getOrderUuid()} not found");
         }
 
-        $merchant = $this->merchantRepository->getOneById($order->getMerchantId());
+        $payload = [
+            'event' => $request->getStep(),
+            'order_id' => $order->getExternalCode(),
+        ];
 
-        $notification = (new NotificationDTO())
-            ->setEventName($request->getStep())
-            ->setOrderId($order->getExternalCode())
-        ;
-
-        $this->notificationSender->send($merchant, $notification);
+        $this->notificationScheduler->createAndSchedule($order, $payload);
     }
 }

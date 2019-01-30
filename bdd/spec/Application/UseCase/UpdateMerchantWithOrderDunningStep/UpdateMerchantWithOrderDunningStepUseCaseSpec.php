@@ -5,12 +5,9 @@ namespace spec\App\Application\UseCase\UpdateMerchantWithOrderDunningStep;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\UpdateMerchantWithOrderDunningStep\UpdateMerchantWithOrderDunningStepRequest;
 use App\Application\UseCase\UpdateMerchantWithOrderDunningStep\UpdateMerchantWithOrderDunningStepUseCase;
-use App\DomainModel\Merchant\MerchantEntity;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\Webhook\NotificationDTO;
-use App\DomainModel\Webhook\NotificationSender;
+use App\DomainModel\OrderNotification\NotificationScheduler;
 use PhpSpec\ObjectBehavior;
 
 class UpdateMerchantWithOrderDunningStepUseCaseSpec extends ObjectBehavior
@@ -25,10 +22,9 @@ class UpdateMerchantWithOrderDunningStepUseCaseSpec extends ObjectBehavior
 
     public function let(
         OrderRepositoryInterface $orderRepository,
-        MerchantRepositoryInterface $merchantRepository,
-        NotificationSender $notificationSender
+        NotificationScheduler $notificationScheduler
     ) {
-        $this->beConstructedWith($orderRepository, $merchantRepository, $notificationSender);
+        $this->beConstructedWith($orderRepository, $notificationScheduler);
     }
 
     public function it_is_initializable()
@@ -47,10 +43,8 @@ class UpdateMerchantWithOrderDunningStepUseCaseSpec extends ObjectBehavior
 
     public function it_sends_notification_to_merchant_webhook_with_dunning_step(
         OrderRepositoryInterface $orderRepository,
-        MerchantRepositoryInterface $merchantRepository,
-        NotificationSender $notificationSender,
-        OrderEntity $orderEntity,
-        MerchantEntity $merchantEntity
+        NotificationScheduler $notificationScheduler,
+        OrderEntity $orderEntity
     ) {
         $request = new UpdateMerchantWithOrderDunningStepRequest(self::ORDER_UUID, 'Dunning');
 
@@ -58,12 +52,9 @@ class UpdateMerchantWithOrderDunningStepUseCaseSpec extends ObjectBehavior
         $orderEntity->getMerchantId()->willReturn(self::MERCHANT_ID);
         $orderRepository->getOneByUuid(self::ORDER_UUID)->shouldBeCalled()->willReturn($orderEntity);
 
-        $merchantEntity->getId()->willReturn(self::MERCHANT_ID);
-        $merchantRepository->getOneById(self::MERCHANT_ID)->shouldBeCalled()->willReturn($merchantEntity);
-
-        $notification = (new NotificationDTO())->setEventName('Dunning')->setOrderId(self::ORDER_EXTENRAL_ID);
-        $notificationSender
-            ->send($merchantEntity, $notification)
+        $payload = ['event' => 'Dunning', 'order_id' => self::ORDER_EXTENRAL_ID];
+        $notificationScheduler
+            ->createAndSchedule($orderEntity, $payload)
             ->shouldBeCalled()
         ;
 

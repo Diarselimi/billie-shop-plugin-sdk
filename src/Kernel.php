@@ -73,10 +73,5 @@ class Kernel extends BaseKernel implements CompilerPassInterface
                 ->addMethodCall('setStatementExecutor', [$statementExecutor])
             ;
         }
-
-        $logger = new Reference('Psr\Log\LoggerInterface');
-        foreach ($container->findTaggedServiceIds('paella_core.logging') as $id => $tags) {
-            $container->findDefinition($id)->addMethodCall('setLogger', [$logger]);
-        }
     }
 }
