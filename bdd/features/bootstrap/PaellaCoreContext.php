@@ -8,6 +8,8 @@ use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
+use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
+use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Person\PersonEntity;
@@ -53,6 +55,15 @@ class PaellaCoreContext extends MinkContext
                 ->setApiKey('test')
                 ->setCompanyId('1')
         );
+
+        $this->getMerchantSettingsRepository()->insert(
+            (new MerchantSettingsEntity())
+                ->setMerchantId(1)
+                ->setDebtorFinancingLimit(10000)
+                ->setMinOrderAmount(0)
+                ->setCreatedAt(new DateTime())
+                ->setUpdatedAt(new DateTime())
+        );
     }
 
     /**
@@ -71,8 +82,8 @@ class PaellaCoreContext extends MinkContext
             DELETE FROM debtor_external_data;
             DELETE FROM addresses;
             DELETE FROM merchants_debtors;
-            DELETE FROM merchants;
             DELETE FROM merchant_settings;
+            DELETE FROM merchants;
             ALTER TABLE merchants AUTO_INCREMENT = 1;
         ');
     }
@@ -154,7 +165,9 @@ class PaellaCoreContext extends MinkContext
         $merchantDebtor = (new MerchantDebtorEntity())
             ->setMerchantId(self::MERCHANT_ID)
             ->setDebtorId('1')
-        ;
+            ->setPaymentDebtorId(1)
+            ->setFinancingLimit(1000);
+
         $this->getMerchantDebtorRepository()->insert($merchantDebtor);
 
         $order = (new OrderEntity())
@@ -294,6 +307,11 @@ class PaellaCoreContext extends MinkContext
     private function getMerchantRepository(): MerchantRepositoryInterface
     {
         return $this->get(MerchantRepositoryInterface::class);
+    }
+
+    private function getMerchantSettingsRepository(): MerchantSettingsRepositoryInterface
+    {
+        return $this->get(MerchantSettingsRepositoryInterface::class);
     }
 
     private function getMerchantDebtorRepository(): MerchantDebtorRepositoryInterface

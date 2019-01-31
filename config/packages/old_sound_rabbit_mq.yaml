@@ -31,7 +31,16 @@ old_sound_rabbit_mq:
       queue_options:    { name: 'risk_check_result_paella%env(INSTANCE_SUFFIX)%', routing_keys: ['risk_check_result_paella'] }
       callback:         App\Amqp\Consumer\RiskCheckResultConsumer
       qos_options:      {prefetch_size: 0, prefetch_count: 1, global: false}
+    notification_delivery:
+      connection:       default
+      exchange_options: { name: 'paella_delayed_events%env(INSTANCE_SUFFIX)%', type: 'x-delayed-message', arguments: {x-delayed-type: ['S', 'direct']} }
+      queue_options:    { name: 'notification_delivery_paella%env(INSTANCE_SUFFIX)%', routing_keys: ['notification_delivery_paella'] }
+      callback:         App\Amqp\Consumer\NotificationDeliveryConsumer
   producers:
     paella_events:
       connection:       default
       exchange_options: { name: 'paella_events%env(INSTANCE_SUFFIX)%', type: direct }
+    paella_delayed_events:
+      connection:       default
+      exchange_options: { name: 'paella_delayed_events%env(INSTANCE_SUFFIX)%', type: 'x-delayed-message', arguments: {x-delayed-type: ['S', 'direct']} }
+

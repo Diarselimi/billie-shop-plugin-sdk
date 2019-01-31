@@ -135,6 +135,23 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
         return $this->orderFactory->createFromDatabaseRow($order);
     }
 
+    public function getOneById(int $id): ?OrderEntity
+    {
+        $order = $this->doFetchOne('
+          SELECT ' . self::SELECT_FIELDS . '
+          FROM orders
+          WHERE id = :id
+        ', [
+            'id' => $id,
+        ]);
+
+        if (!$order) {
+            return null;
+        }
+
+        return $this->orderFactory->createFromDatabaseRow($order);
+    }
+
     public function getOneByUuid(string $uuid): ?OrderEntity
     {
         $order = $this->doFetchOne('

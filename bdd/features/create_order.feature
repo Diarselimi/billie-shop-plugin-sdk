@@ -80,6 +80,12 @@ Feature:
             "is_eligible": true
         }
         """
+        And I get from borscht "/debtor.json" endpoint response with status 200 and body
+        """
+        {
+            "debtor_id": 1
+        }
+        """
         When I send a POST request to "/order" with body:
         """
         {
@@ -221,6 +227,12 @@ Feature:
         """
         {
             "passed": is_eligible
+        }
+        """
+        And I get from borscht "/debtor.json" endpoint response with status 200 and body
+        """
+        {
+            "debtor_id": 1
         }
         """
         When I send a POST request to "/order" with body:

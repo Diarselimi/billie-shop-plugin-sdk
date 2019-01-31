@@ -10,6 +10,9 @@ services:
     autowire: true
     autoconfigure: true
     public: false
+    bind:
+      $producer: '@old_sound_rabbit_mq.paella_events_producer'
+      $delayedProducer: '@old_sound_rabbit_mq.paella_delayed_events_producer'
 
   _instanceof:
     App\Infrastructure\Repository\AbstractRepository:
@@ -17,6 +20,13 @@ services:
 
     App\DomainModel\Monitoring\LoggingInterface:
       tags: ['paella_core.logging']
+      calls:
+      - method: setLogger
+        arguments:
+        - '@Psr\Log\LoggerInterface'
+      - method: setSentry
+        arguments:
+        - '@Raven_Client'
 
   App\:
     resource: '../src/*'
@@ -41,7 +51,7 @@ services:
     arguments:
       $client: '@eight_points_guzzle.client.borscht'
 
-  App\Infrastructure\Client\Guzzle\WebhookClient:
+  App\Infrastructure\OrderNotification\NotificationSender:
     arguments:
       $client: '@eight_points_guzzle.client.webhook'
 
@@ -54,13 +64,10 @@ services:
   App\DomainModel\Customer\RiskCheckRepositoryInterface: '@App\Infrastructure\Repository\RiskCheckRepository'
   App\DomainModel\OrderTransition\OrderTransitionRepositoryInterface: '@App\Infrastructure\Repository\OrderTransitionRepository'
 
-  App\DomainModel\Webhook\WebhookClientInterface: '@App\Infrastructure\Client\Guzzle\WebhookClient'
   App\DomainModel\Alfred\AlfredInterface: '@App\Infrastructure\Alfred\Alfred'
   App\DomainModel\Borscht\BorschtInterface: '@App\Infrastructure\Borscht\Borscht'
 
   Symfony\Component\Workflow\Workflow: '@state_machine.order'
-
-  OldSound\RabbitMqBundle\RabbitMq\ProducerInterface: '@old_sound_rabbit_mq.paella_events_producer'
 
   App\DomainModel\Order\OrderChecksRunnerService:
     arguments:

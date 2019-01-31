@@ -10,3 +10,11 @@ services:
       $servicesToMock: []
       $servicesToProxyHeader: [alfred]
     tags: ['paella_core.logging']
+    calls:
+    - method: setLogger
+      arguments:
+      - '@Psr\Log\LoggerInterface'
+    - method: setSentry
+      arguments:
+      - '@Raven_Client'
+

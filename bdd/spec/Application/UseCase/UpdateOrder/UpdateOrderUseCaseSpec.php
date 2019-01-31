@@ -6,12 +6,12 @@ use App\Application\Exception\FraudOrderException;
 use App\Application\PaellaCoreCriticalException;
 use App\Application\UseCase\UpdateOrder\UpdateOrderRequest;
 use App\Application\UseCase\UpdateOrder\UpdateOrderUseCase;
-use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
+use App\DomainModel\Order\LimitsService;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
@@ -43,7 +43,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
 
     public function let(
         BorschtInterface $borscht,
-        AlfredInterface $alfred,
+        LimitsService $limitsService,
         OrderRepositoryInterface $orderRepository,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         MerchantRepositoryInterface $merchantRepository,
@@ -69,7 +69,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
 
         $this->beConstructedWith(
             $borscht,
-            $alfred,
+            $limitsService,
             $orderRepository,
             $merchantDebtorRepository,
             $merchantRepository,
@@ -109,8 +109,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $orderRepository
             ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
             ->shouldBeCalled()
-            ->willReturn($order)
-        ;
+            ->willReturn($order);
 
         $this->shouldThrow(FraudOrderException::class)->during('execute', [$request]);
     }
@@ -128,8 +127,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $orderRepository
             ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
             ->shouldBeCalled()
-            ->willReturn($order)
-        ;
+            ->willReturn($order);
 
         $this->shouldThrow(PaellaCoreCriticalException::class)->during('execute', [$request]);
     }
@@ -153,8 +151,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $orderRepository
             ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
             ->shouldBeCalled()
-            ->willReturn($order)
-        ;
+            ->willReturn($order);
 
         $this->shouldThrow(PaellaCoreCriticalException::class)->during('execute', [$request]);
     }
@@ -182,8 +179,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $orderRepository
             ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
             ->shouldBeCalled()
-            ->willReturn($order)
-        ;
+            ->willReturn($order);
 
         $order->setDuration($newDuration)->shouldBeCalled();
         $borscht->modifyOrder($order)->shouldBeCalled();
@@ -206,8 +202,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $orderRepository
             ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
             ->shouldBeCalled()
-            ->willReturn($order)
-        ;
+            ->willReturn($order);
 
         $this->shouldThrow(PaellaCoreCriticalException::class)->during('execute', [$request]);
     }
@@ -232,8 +227,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $orderRepository
             ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
             ->shouldBeCalled()
-            ->willReturn($order)
-        ;
+            ->willReturn($order);
 
         $this->shouldThrow(PaellaCoreCriticalException::class)->during('execute', [$request]);
     }
@@ -265,8 +259,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $orderRepository
             ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
             ->shouldBeCalled()
-            ->willReturn($order)
-        ;
+            ->willReturn($order);
 
         $order->setAmountGross($newAmountGross)->shouldBeCalled()->willReturn($order);
         $order->setAmountNet($newAmountNet)->shouldBeCalled()->willReturn($order);
@@ -284,13 +277,13 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
     public function it_updates_order_amounts_and_unlocks_the_debtor_limit(
         OrderRepositoryInterface $orderRepository,
         OrderStateManager $orderStateManager,
-        AlfredInterface $alfred,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         MerchantRepositoryInterface $merchantRepository,
         UpdateOrderRequest $request,
         OrderEntity $order,
         MerchantDebtorEntity $merchantDebtor,
-        MerchantEntity $merchant
+        MerchantEntity $merchant,
+        LimitsService $limitsService
     ) {
         $newAmountGross = self::ORDER_AMOUNT_GROSS - 10;
         $newAmountNet = self::ORDER_AMOUNT_NET - 10;
@@ -311,8 +304,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $orderRepository
             ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
             ->shouldBeCalled()
-            ->willReturn($order)
-        ;
+            ->willReturn($order);
 
         $order->setAmountGross($newAmountGross)->shouldBeCalled()->willReturn($order);
         $order->setAmountNet($newAmountNet)->shouldBeCalled()->willReturn($order);
@@ -323,7 +315,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $merchantDebtor->getDebtorId()->willReturn(self::ORDER_DEBTOR_ID);
         $merchantDebtorRepository->getOneById(self::ORDER_MERCHANT_DEBTOR_ID)->shouldBeCalled()->willReturn($merchantDebtor);
 
-        $alfred->unlockDebtorLimit(self::ORDER_DEBTOR_ID, $amountChanged)->shouldBeCalled();
+        $limitsService->unlock($merchantDebtor, $amountChanged)->shouldBeCalled()->willReturn(true);
 
         $merchantRepository->getOneById(self::ORDER_MERCHANT_ID)->willReturn($merchant);
 
@@ -356,8 +348,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $orderRepository
             ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
             ->shouldBeCalled()
-            ->willReturn($order)
-        ;
+            ->willReturn($order);
 
         $this->shouldThrow(PaellaCoreCriticalException::class)->during('execute', [$request]);
     }
@@ -385,8 +376,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $orderRepository
             ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
             ->shouldBeCalled()
-            ->willReturn($order)
-        ;
+            ->willReturn($order);
 
         $this->shouldThrow(PaellaCoreCriticalException::class)->during('execute', [$request]);
     }
@@ -415,8 +405,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $orderRepository
             ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
             ->shouldBeCalled()
-            ->willReturn($order)
-        ;
+            ->willReturn($order);
 
         $order->setInvoiceNumber($newInvoiceNumber)->shouldBeCalled()->willReturn($order);
         $order->setInvoiceUrl($newInvoiceUrl)->shouldBeCalled()->willReturn($order);

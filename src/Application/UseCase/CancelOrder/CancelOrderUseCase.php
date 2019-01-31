@@ -76,7 +76,8 @@ class CancelOrderUseCase
         } else {
             throw new PaellaCoreCriticalException(
                 "Order #$externalCode can not be cancelled",
-                PaellaCoreCriticalException::CODE_ORDER_CANT_BE_CANCELLED
+                PaellaCoreCriticalException::CODE_ORDER_CANT_BE_CANCELLED,
+                Response::HTTP_BAD_REQUEST
             );
         }
         $this->orderRepository->update($order);

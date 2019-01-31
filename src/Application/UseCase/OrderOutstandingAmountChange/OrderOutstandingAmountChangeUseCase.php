@@ -10,13 +10,14 @@ use App\DomainModel\Monitoring\LoggingInterface;
 use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\LimitsService;
-use App\DomainModel\Webhook\NotificationDTO;
-use App\DomainModel\Webhook\NotificationSender;
+use App\DomainModel\OrderNotification\NotificationScheduler;
 use Raven_Client;
 
 class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 {
     use LoggingTrait;
+
+    private const NOTIFICATION_EVENT = 'payment';
 
     private $orderRepository;
 
@@ -24,7 +25,7 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 
     private $merchantDebtorRepository;
 
-    private $notificationSender;
+    private $notificationScheduler;
 
     private $sentry;
 
@@ -34,14 +35,14 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
         OrderRepositoryInterface $orderRepository,
         MerchantRepositoryInterface $merchantRepository,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
-        NotificationSender $notificationSender,
+        NotificationScheduler $notificationScheduler,
         Raven_Client $sentry,
         LimitsService $limitsService
     ) {
         $this->orderRepository = $orderRepository;
         $this->merchantRepository = $merchantRepository;
         $this->merchantDebtorRepository = $merchantDebtorRepository;
-        $this->notificationSender = $notificationSender;
+        $this->notificationScheduler = $notificationScheduler;
         $this->sentry = $sentry;
         $this->limitsService = $limitsService;
     }
@@ -96,13 +97,13 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
             return;
         }
 
-        $notification = (new NotificationDTO())
-            ->setEventName(NotificationDTO::EVENT_PAYMENT)
-            ->setOrderId($order->getExternalCode())
-            ->setAmount($orderAmountChangeDetails->getPaidAmount())
-            ->setOpenAmount($orderAmountChangeDetails->getOutstandingAmount())
-        ;
+        $payload = [
+            'event' => self::NOTIFICATION_EVENT,
+            'order_id' => $order->getExternalCode(),
+            'amount' => $orderAmountChangeDetails->getPaidAmount(),
+            'open_amount' => $orderAmountChangeDetails->getOutstandingAmount(),
+        ];
 
-        $this->notificationSender->send($merchant, $notification);
+        $this->notificationScheduler->createAndSchedule($order, $payload);
     }
 }
