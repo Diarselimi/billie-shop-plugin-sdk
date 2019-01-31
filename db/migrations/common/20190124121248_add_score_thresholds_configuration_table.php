@@ -21,13 +21,12 @@ class AddScoreThresholdsConfigurationTable extends AbstractMigration
 
         $this->table('merchant_settings')
              ->addColumn('score_thresholds_configuration_id', 'integer', ['null' => true, 'after' => 'min_order_amount'])
-            ->addForeignKey('score_thresholds_configuration_id', 'score_thresholds_configuration')
              ->update()
         ;
 
         $this->table('merchants_debtors')
              ->addColumn('score_thresholds_configuration_id', 'integer', ['null' => true, 'after' => 'financing_limit'])
-            ->addForeignKey('score_thresholds_configuration_id', 'score_thresholds_configuration')
+             ->addForeignKey('score_thresholds_configuration_id', 'score_thresholds_configuration')
              ->update()
         ;
     }

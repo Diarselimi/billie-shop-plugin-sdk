@@ -8,6 +8,7 @@ class ChangeMerchantScoreThresholdsConfigurationIdToNotNull extends AbstractMigr
     {
         $this->table('merchant_settings')
             ->changeColumn('score_thresholds_configuration_id', 'integer', ['null' => false])
+            ->addForeignKey('score_thresholds_configuration_id', 'score_thresholds_configuration')
             ->update()
         ;
     }
