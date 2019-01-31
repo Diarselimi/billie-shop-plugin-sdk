@@ -102,7 +102,7 @@ Feature:
             "delivery_address_country": "DE",
             "delivery_address_street": "Aachnerstr.",
             "merchant_customer_id": "XX12",
-            "debtor_company_name": "Alex GmbH",
+            "debtor_company_name": "Test User Company",
             "debtor_company_tax_id": "456",
             "debtor_company_tax_number": "456",
             "debtor_company_registration_number": "456",
@@ -113,11 +113,11 @@ Feature:
             "debtor_company_employees_number": "456",
             "debtor_company_established_customer": true,
             "debtor_company_address_addition": "asad",
-            "debtor_company_address_house_number": 52,
+            "debtor_company_address_house_number": 10,
             "debtor_company_address_city": "Berlin",
-            "debtor_company_address_postal_code": "10999",
+            "debtor_company_address_postal_code": "10179",
             "debtor_company_address_country": "DE",
-            "debtor_company_address_street": "Aachnerstr.",
+            "debtor_company_address_street": "Heinrich-Heine-Platz",
             "debtor_person_gender": "m",
             "debtor_person_first_name": "David",
             "debtor_person_last_name": "Breva",
@@ -154,6 +154,12 @@ Feature:
         """
         {
             "is_eligible": true
+        }
+        """
+        And I get from borscht "/debtor.json" endpoint response with status 200 and body
+        """
+        {
+            "debtor_id": 2
         }
         """
         And I have a late order XLO123 with amounts 1002/901/101, duration 30 and comment "test order"

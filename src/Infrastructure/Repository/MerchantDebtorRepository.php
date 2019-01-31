@@ -20,14 +20,15 @@ class MerchantDebtorRepository extends AbstractRepository implements MerchantDeb
     {
         $id = $this->doInsert('
             INSERT INTO merchants_debtors
-            (merchant_id, debtor_id, payment_debtor_id, financing_limit, created_at, updated_at)
+            (merchant_id, debtor_id, payment_debtor_id, financing_limit, score_thresholds_configuration_id, created_at, updated_at)
             VALUES
-            (:merchant_id, :debtor_id, :payment_debtor_id, :financing_limit, :created_at, :updated_at)
+            (:merchant_id, :debtor_id, :payment_debtor_id, :financing_limit, :score_thresholds_configuration_id, :created_at, :updated_at)
         ', [
             'merchant_id' => $merchantDebtor->getMerchantId(),
             'debtor_id' => $merchantDebtor->getDebtorId(),
             'payment_debtor_id' => $merchantDebtor->getPaymentDebtorId(),
             'financing_limit' => $merchantDebtor->getFinancingLimit(),
+            'score_thresholds_configuration_id' => $merchantDebtor->getScoreThresholdsConfigurationId(),
             'created_at' => $merchantDebtor->getCreatedAt()->format('Y-m-d H:i:s'),
             'updated_at' => $merchantDebtor->getUpdatedAt()->format('Y-m-d H:i:s'),
         ]);
@@ -53,7 +54,7 @@ class MerchantDebtorRepository extends AbstractRepository implements MerchantDeb
     public function getOneById(int $id): ?MerchantDebtorEntity
     {
         $row = $this->doFetchOne('
-          SELECT id, merchant_id, debtor_id, payment_debtor_id, financing_limit, created_at, updated_at 
+          SELECT id, merchant_id, debtor_id, payment_debtor_id, financing_limit, score_thresholds_configuration_id, created_at, updated_at 
           FROM merchants_debtors
           WHERE id = :id
         ', [
@@ -66,7 +67,7 @@ class MerchantDebtorRepository extends AbstractRepository implements MerchantDeb
     public function getOneByMerchantAndDebtorId(string $merchantId, string $debtorId): ?MerchantDebtorEntity
     {
         $row = $this->doFetchOne('
-          SELECT id, merchant_id, debtor_id, payment_debtor_id, financing_limit, created_at, updated_at
+          SELECT id, merchant_id, debtor_id, payment_debtor_id, financing_limit, score_thresholds_configuration_id, created_at, updated_at
           FROM merchants_debtors
           WHERE merchant_id = :merchant_id
           AND debtor_id = :debtor_id', [

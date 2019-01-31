@@ -14,6 +14,8 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonRepositoryInterface;
+use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntity;
+use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
 use App\Infrastructure\PDO\PDO;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\AfterScenarioScope;
@@ -53,14 +55,27 @@ class PaellaCoreContext extends MinkContext
                 ->setPaymentMerchantId('f2ec4d5e-79f4-40d6-b411-31174b6519ac')
                 ->setAvailableFinancingLimit(10000)
                 ->setApiKey('test')
-                ->setCompanyId('1')
+                ->setCompanyId('10')
         );
+
+        $scoreThreshold = (new ScoreThresholdsConfigurationEntity())
+            ->setCrefoLowScoreThreshold(350)
+            ->setCrefoHighScoreThreshold(400)
+            ->setSchufaLowScoreThreshold(200)
+            ->setSchufaAverageScoreThreshold(220)
+            ->setSchufaHighScoreThreshold(260)
+            ->setSchufaSoleTraderScoreThreshold(235)
+            ->setCreatedAt(new \DateTime())
+            ->setUpdatedAt(new \DateTime())
+        ;
+        $this->getScoreThresholdsConfigurationRepository()->insert($scoreThreshold);
 
         $this->getMerchantSettingsRepository()->insert(
             (new MerchantSettingsEntity())
                 ->setMerchantId(1)
                 ->setDebtorFinancingLimit(10000)
                 ->setMinOrderAmount(0)
+                ->setScoreThresholdsConfigurationId($scoreThreshold->getId())
                 ->setCreatedAt(new DateTime())
                 ->setUpdatedAt(new DateTime())
         );
@@ -84,6 +99,8 @@ class PaellaCoreContext extends MinkContext
             DELETE FROM merchants_debtors;
             DELETE FROM merchant_settings;
             DELETE FROM merchants;
+            DELETE FROM merchants_debtors;
+            DELETE FROM score_thresholds_configuration;
             ALTER TABLE merchants AUTO_INCREMENT = 1;
         ');
     }
@@ -164,9 +181,10 @@ class PaellaCoreContext extends MinkContext
 
         $merchantDebtor = (new MerchantDebtorEntity())
             ->setMerchantId(self::MERCHANT_ID)
-            ->setDebtorId('1')
+            ->setDebtorId('2')
             ->setPaymentDebtorId(1)
-            ->setFinancingLimit(1000);
+            ->setFinancingLimit(1000)
+        ;
 
         $this->getMerchantDebtorRepository()->insert($merchantDebtor);
 
@@ -317,6 +335,11 @@ class PaellaCoreContext extends MinkContext
     private function getMerchantDebtorRepository(): MerchantDebtorRepositoryInterface
     {
         return $this->get(MerchantDebtorRepositoryInterface::class);
+    }
+
+    private function getScoreThresholdsConfigurationRepository(): ScoreThresholdsConfigurationRepositoryInterface
+    {
+        return $this->get(ScoreThresholdsConfigurationRepositoryInterface::class);
     }
 
     private function getConnection(): \PDO

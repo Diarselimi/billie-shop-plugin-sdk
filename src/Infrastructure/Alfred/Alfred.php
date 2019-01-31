@@ -110,13 +110,19 @@ class Alfred implements AlfredInterface
         }
     }
 
-    public function isEligibleForPayAfterDelivery(string $debtorId, bool $isSoleTrader, bool $hasPaidInvoice): bool
+    public function isEligibleForPayAfterDelivery(IsEligibleForPayAfterDeliveryRequestDTO $requestDTO): bool
     {
         try {
-            $response = $this->client->get("/debtor/$debtorId/is-eligible-for-pay-after-delivery", [
+            $response = $this->client->get("/debtor/{$requestDTO->getDebtorId()}/is-eligible-for-pay-after-delivery", [
                 'query' => [
-                    'is_sole_trader' => $isSoleTrader,
-                    'has_paid_invoice' => $hasPaidInvoice,
+                    'is_sole_trader' => $requestDTO->isSoleTrader(),
+                    'has_paid_invoice' => $requestDTO->isHasPaidInvoice(),
+                    'crefo_low_score_threshold' => $requestDTO->getCrefoLowScoreThreshold(),
+                    'crefo_high_score_threshold' => $requestDTO->getCrefoHighScoreThreshold(),
+                    'schufa_low_score_threshold' => $requestDTO->getSchufaLowScoreThreshold(),
+                    'schufa_average_score_threshold' => $requestDTO->getSchufaAverageScoreThreshold(),
+                    'schufa_high_score_threshold' => $requestDTO->getSchufaHighScoreThreshold(),
+                    'schufa_sole_trader_score_threshold' => $requestDTO->getSchufaSoleTraderScoreThreshold(),
                 ],
             ]);
             $response = json_decode((string) $response->getBody(), true);

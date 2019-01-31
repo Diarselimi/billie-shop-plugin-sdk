@@ -7,18 +7,28 @@ use App\DomainModel\Alfred\DebtorDTO;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
+use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\Person\PersonEntity;
 
 class OrderContainer
 {
     private $order;
+
     private $merchantDebtor;
+
     private $debtorPerson;
+
     private $debtorExternalData;
+
     private $debtorExternalDataAddress;
+
     private $debtorCompany;
+
     private $deliveryAddress;
+
     private $merchant;
+
+    private $merchantSettings;
 
     public function getOrder(): OrderEntity
     {
@@ -80,7 +90,7 @@ class OrderContainer
         return $this;
     }
 
-    public function getDebtorCompany():? DebtorDTO
+    public function getDebtorCompany(): ? DebtorDTO
     {
         return $this->debtorCompany;
     }
@@ -112,6 +122,18 @@ class OrderContainer
     public function setMerchant(MerchantEntity $merchant): OrderContainer
     {
         $this->merchant = $merchant;
+
+        return $this;
+    }
+
+    public function getMerchantSettings(): MerchantSettingsEntity
+    {
+        return $this->merchantSettings;
+    }
+
+    public function setMerchantSettings(MerchantSettingsEntity $merchantSettings): OrderContainer
+    {
+        $this->merchantSettings = $merchantSettings;
 
         return $this;
     }

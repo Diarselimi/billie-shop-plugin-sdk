@@ -97,6 +97,8 @@ class CreateOrderUseCase implements LoggingInterface
             $request->getMerchantId()
         );
 
+        $orderContainer->setMerchantSettings($this->merchantSettings);
+
         $debtorDTO = $this->retrieveDebtor($orderContainer, $request);
         if ($debtorDTO === null) {
             $this->orderChecksRunnerService->publishCheckResult(

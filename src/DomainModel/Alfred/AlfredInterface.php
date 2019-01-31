@@ -2,6 +2,8 @@
 
 namespace App\DomainModel\Alfred;
 
+use App\Infrastructure\Alfred\IsEligibleForPayAfterDeliveryRequestDTO;
+
 interface AlfredInterface
 {
     public function getDebtor(int $debtorId): ?DebtorDTO;
@@ -14,5 +16,5 @@ interface AlfredInterface
 
     public function isDebtorBlacklisted(string $debtorId): bool;
 
-    public function isEligibleForPayAfterDelivery(string $debtorId, bool $isSoleTrader, bool $hasPaidInvoice): bool;
+    public function isEligibleForPayAfterDelivery(IsEligibleForPayAfterDeliveryRequestDTO $requestDTO): bool;
 }
