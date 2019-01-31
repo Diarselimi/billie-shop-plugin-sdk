@@ -7,6 +7,7 @@ class TestMerchant extends AbstractMigration
     public function up()
     {
         $now = (new \DateTime())->format('Y-m-d H:i:s');
+
         $this->table('merchants')->insert([
             'name' => 'Contorion',
             'available_financing_limit' => 2000000,
@@ -18,5 +19,29 @@ class TestMerchant extends AbstractMigration
             'created_at' => $now,
             'updated_at' => $now,
         ])->saveData();
+
+        $this->table('score_thresholds_configuration')->insert([
+            'crefo_low_score_threshold' => 300,
+            'crefo_high_score_threshold' => 360,
+            'schufa_low_score_threshold' => 270,
+            'schufa_average_score_threshold' => 293,
+            'schufa_high_score_threshold' => 360,
+            'schufa_sole_trader_score_threshold' => 317,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ])->saveData();
+
+        $id = $this->getAdapter()->getConnection()->lastInsertId();
+
+        $this->execute("
+            INSERT INTO merchant_settings (merchant_id, debtor_financing_limit, min_order_amount, score_thresholds_configuration_id, created_at, updated_at)
+            SELECT merchants.id as merchant_id, 
+                   7500 as debtor_financing_limit,
+                   0 as min_order_amount,
+                   {$id} as score_thresholds_configuration_id,
+                   '{$now}' as created_at,
+                   '{$now}' as updated_at
+            FROM merchants WHERE merchants.id NOT IN (SELECT merchant_id FROM merchant_settings);
+        ");
     }
 }
