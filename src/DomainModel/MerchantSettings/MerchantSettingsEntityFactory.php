@@ -13,6 +13,7 @@ class MerchantSettingsEntityFactory
             ->setMerchantId((int) $data['merchant_id'])
             ->setDebtorFinancingLimit((float) $data['debtor_financing_limit'])
             ->setMinOrderAmount((float) $data['min_order_amount'])
-            ;
+            ->setScoreThresholdsConfigurationId($data['score_thresholds_configuration_id'])
+        ;
     }
 }

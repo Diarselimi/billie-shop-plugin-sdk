@@ -9,6 +9,8 @@ use App\DomainModel\RiskCheck\Checker\CheckInterface;
 use App\DomainModel\RiskCheck\Checker\CheckResult;
 use App\DomainModel\RiskCheck\RiskCheckEntityFactory;
 use App\DomainModel\RiskCheck\RiskCheckRepositoryInterface;
+use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
+use App\Infrastructure\Alfred\IsEligibleForPayAfterDeliveryRequestDTOFactory;
 use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
@@ -30,6 +32,10 @@ class OrderChecksRunnerService implements LoggingInterface
 
     private $orderRepository;
 
+    private $scoreThresholdsConfigurationRepository;
+
+    private $eligibleForPayAfterDeliveryRequestDTOFactory;
+
     public function __construct(
         ProducerInterface $producer,
         RiskCheckRepositoryInterface $riskCheckRepository,
@@ -37,7 +43,9 @@ class OrderChecksRunnerService implements LoggingInterface
         AlfredInterface $alfred,
         ServiceLocator $checkLoader,
         \Raven_Client $sentry,
-        OrderRepositoryInterface $orderRepository
+        OrderRepositoryInterface $orderRepository,
+        ScoreThresholdsConfigurationRepositoryInterface $scoreThresholdsConfigurationRepository,
+        IsEligibleForPayAfterDeliveryRequestDTOFactory $eligibleForPayAfterDeliveryRequestDTOFactory
     ) {
         $this->producer = $producer;
         $this->riskCheckRepository = $riskCheckRepository;
@@ -46,6 +54,8 @@ class OrderChecksRunnerService implements LoggingInterface
         $this->checkLoader = $checkLoader;
         $this->sentry = $sentry;
         $this->orderRepository = $orderRepository;
+        $this->scoreThresholdsConfigurationRepository = $scoreThresholdsConfigurationRepository;
+        $this->eligibleForPayAfterDeliveryRequestDTOFactory = $eligibleForPayAfterDeliveryRequestDTOFactory;
     }
 
     public function runPreconditionChecks(OrderContainer $order): bool
@@ -132,11 +142,26 @@ class OrderChecksRunnerService implements LoggingInterface
     private function isDebtorEligible(OrderContainer $order): bool
     {
         $debtorId = $order->getMerchantDebtor()->getDebtorId();
-        $passed = $this->alfred->isEligibleForPayAfterDelivery(
+        $merchantSettings = $order->getMerchantSettings();
+        $merchantDebtor = $order->getMerchantDebtor();
+
+        $merchantScoreThresholds = ($merchantSettings->getScoreThresholdsConfigurationId()) ?
+            $this->scoreThresholdsConfigurationRepository->getById($merchantSettings->getScoreThresholdsConfigurationId())
+            : null;
+
+        $debtorScoreThresholds = ($merchantDebtor->getScoreThresholdsConfigurationId()) ?
+            $this->scoreThresholdsConfigurationRepository->getById($merchantDebtor->getScoreThresholdsConfigurationId())
+            : null;
+
+        $IsEligibleForPayAfterDeliveryRequestDTO = $this->eligibleForPayAfterDeliveryRequestDTOFactory->create(
             $debtorId,
             $order->getDebtorExternalData()->isLegalFormSoleTrader(),
-            $this->orderRepository->debtorHasAtLeastOneFullyPaidOrder($debtorId)
+            $this->orderRepository->debtorHasAtLeastOneFullyPaidOrder($debtorId),
+            $merchantScoreThresholds,
+            $debtorScoreThresholds
         );
+
+        $passed = $this->alfred->isEligibleForPayAfterDelivery($IsEligibleForPayAfterDeliveryRequestDTO);
 
         $checkResult = new CheckResult($passed, 'company_b2b_score', []);
         $riskCheckEntity = $this->riskCheckFactory->createFromCheckResult($checkResult, $order->getOrder()->getId());

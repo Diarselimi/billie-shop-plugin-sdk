@@ -12,9 +12,10 @@ class MerchantDebtorEntityFactory
             ->setDebtorId($row['debtor_id'])
             ->setPaymentDebtorId($row['payment_debtor_id'])
             ->setFinancingLimit($row['financing_limit'])
+            ->setScoreThresholdsConfigurationId($row['score_thresholds_configuration_id'])
             ->setCreatedAt(new \DateTime($row['created_at']))
             ->setUpdatedAt(new \DateTime($row['updated_at']))
-            ;
+        ;
     }
 
     public function create(
@@ -32,6 +33,6 @@ class MerchantDebtorEntityFactory
             ->setFinancingLimit($financingLimit)
             ->setCreatedAt($now)
             ->setUpdatedAt($now)
-            ;
+        ;
     }
 }

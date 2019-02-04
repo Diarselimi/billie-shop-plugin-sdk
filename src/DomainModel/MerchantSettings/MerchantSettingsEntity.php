@@ -12,6 +12,8 @@ class MerchantSettingsEntity extends AbstractEntity
 
     private $minOrderAmount;
 
+    private $scoreThresholdsConfigurationId;
+
     public function getMerchantId(): int
     {
         return $this->merchantId;
@@ -44,6 +46,18 @@ class MerchantSettingsEntity extends AbstractEntity
     public function setMinOrderAmount(float $minOrderAmount): MerchantSettingsEntity
     {
         $this->minOrderAmount = $minOrderAmount;
+
+        return $this;
+    }
+
+    public function getScoreThresholdsConfigurationId(): int
+    {
+        return $this->scoreThresholdsConfigurationId;
+    }
+
+    public function setScoreThresholdsConfigurationId(int $scoreThresholdsConfigurationId): MerchantSettingsEntity
+    {
+        $this->scoreThresholdsConfigurationId = $scoreThresholdsConfigurationId;
 
         return $this;
     }
