@@ -84,14 +84,14 @@ class IdentifyAndScoreDebtorUseCase
 
         $merchantSettings = $this->merchantSettingsRepository->getOneByMerchant($merchant->getId());
 
-        $paymentDebtorId = $this->paymentService->registerDebtor($merchant->getPaymentMerchantId())->getPaymentDebtorId();
-
-        $merchantDebtor = $this->createMerchantDebtor(
-            $merchant,
-            $merchantSettings,
-            $identifiedDebtor->getId(),
-            $paymentDebtorId
+        $merchantDebtor = $this->merchantDebtorRepository->getOneByMerchantAndDebtorId(
+            $merchant->getId(),
+            $identifiedDebtor->getId()
         );
+
+        if (!$merchantDebtor) {
+            $merchantDebtor = $this->createMerchantDebtor($merchant, $merchantSettings, $identifiedDebtor->getId());
+        }
 
         $isEligible = null;
 
@@ -105,9 +105,10 @@ class IdentifyAndScoreDebtorUseCase
     private function createMerchantDebtor(
         MerchantEntity $merchant,
         MerchantSettingsEntity $merchantSettings,
-        string $debtorId,
-        string $paymentDebtorId
+        string $debtorId
     ): MerchantDebtorEntity {
+        $paymentDebtorId = $this->paymentService->registerDebtor($merchant->getPaymentMerchantId())->getPaymentDebtorId();
+
         $merchantDebtor = $this->merchantDebtorFactory->create(
             $debtorId,
             $merchant->getId(),
