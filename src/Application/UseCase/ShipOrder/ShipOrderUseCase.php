@@ -16,7 +16,7 @@ class ShipOrderUseCase
 
     private $merchantDebtorRepository;
 
-    private $borscht;
+    private $paymentsService;
 
     private $workflow;
 
@@ -24,12 +24,12 @@ class ShipOrderUseCase
         Workflow $workflow,
         OrderRepositoryInterface $orderRepository,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
-        BorschtInterface $borscht
+        BorschtInterface $paymentsService
     ) {
         $this->workflow = $workflow;
         $this->orderRepository = $orderRepository;
         $this->merchantDebtorRepository = $merchantDebtorRepository;
-        $this->borscht = $borscht;
+        $this->paymentsService = $paymentsService;
     }
 
     public function execute(ShipOrderRequest $request): void
@@ -60,7 +60,7 @@ class ShipOrderUseCase
         ;
 
         $company = $this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId());
-        $paymentDetails = $this->borscht->createOrder($order, $company->getPaymentDebtorId());
+        $paymentDetails = $this->paymentsService->createOrder($order, $company->getPaymentDebtorId());
         $order->setPaymentId($paymentDetails->getId());
 
         $this->workflow->apply($order, OrderStateManager::TRANSITION_SHIP);
