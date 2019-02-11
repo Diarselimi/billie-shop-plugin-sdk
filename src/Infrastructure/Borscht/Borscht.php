@@ -13,6 +13,7 @@ use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\Order\OrderEntity;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
+use Psr\Http\Message\ResponseInterface;
 
 class Borscht implements BorschtInterface, LoggingInterface
 {
@@ -45,18 +46,11 @@ class Borscht implements BorschtInterface, LoggingInterface
             );
         }
 
-        $response = (string) $response->getBody();
-        $response = json_decode($response, true);
-        if (!$response) {
-            throw new PaellaCoreCriticalException(
-                self::ERR_BODY_DECODE_MESSAGE,
-                PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION
-            );
-        }
+        $decodedResponse = $this->decodeResponse($response);
 
         return (new DebtorPaymentDetailsDTO())
-            ->setBankAccountBic($response['bic'])
-            ->setBankAccountIban($response['iban']);
+            ->setBankAccountBic($decodedResponse['bic'])
+            ->setBankAccountIban($decodedResponse['iban']);
     }
 
     public function getOrderPaymentDetails(string $orderPaymentId): OrderPaymentDetailsDTO
@@ -72,17 +66,9 @@ class Borscht implements BorschtInterface, LoggingInterface
             );
         }
 
-        $response = (string) $response->getBody();
-        $response = json_decode($response, true);
+        $decodedResponse = $this->decodeResponse($response);
 
-        if (!$response) {
-            throw new PaellaCoreCriticalException(
-                self::ERR_BODY_DECODE_MESSAGE,
-                PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION
-            );
-        }
-
-        return $this->paymentDetailsFactory->createFromBorschtResponse($response);
+        return $this->paymentDetailsFactory->createFromBorschtResponse($decodedResponse);
     }
 
     public function cancelOrder(OrderEntity $order): void
@@ -167,6 +153,7 @@ class Borscht implements BorschtInterface, LoggingInterface
             'billing_date' => $order->getShippedAt()->format('Y-m-d'),
             'duration' => $order->getDuration(),
             'amount' => $order->getAmountGross(),
+            'order_code' => $order->getExternalCode(),
         ];
 
         $this->logInfo('Create borscht ticket', [
@@ -186,17 +173,9 @@ class Borscht implements BorschtInterface, LoggingInterface
             );
         }
 
-        $response = (string) $response->getBody();
-        $response = json_decode($response, true);
+        $decodedResponse = $this->decodeResponse($response);
 
-        if (!$response) {
-            throw new PaellaCoreCriticalException(
-                self::ERR_BODY_DECODE_MESSAGE,
-                PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION
-            );
-        }
-
-        return $this->paymentDetailsFactory->createFromBorschtResponse($response);
+        return $this->paymentDetailsFactory->createFromBorschtResponse($decodedResponse);
     }
 
     public function registerDebtor(string $paymentMerchantId): DebtorPaymentRegistrationDTO
@@ -216,17 +195,9 @@ class Borscht implements BorschtInterface, LoggingInterface
             );
         }
 
-        $response = (string) $response->getBody();
-        $response = json_decode($response, true);
+        $decodedResponse = $this->decodeResponse($response);
 
-        if (!$response) {
-            throw new PaellaCoreCriticalException(
-                self::ERR_BODY_DECODE_MESSAGE,
-                PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION
-            );
-        }
-
-        return new DebtorPaymentRegistrationDTO($response['debtor_id']);
+        return new DebtorPaymentRegistrationDTO($decodedResponse['debtor_id']);
     }
 
     public function createFraudReclaim(string $orderPaymentId): void
@@ -241,5 +212,20 @@ class Borscht implements BorschtInterface, LoggingInterface
                 $exception
             );
         }
+    }
+
+    private function decodeResponse(ResponseInterface $response): array
+    {
+        $response = (string) $response->getBody();
+        $decodedResponse = json_decode($response, true);
+
+        if (!$decodedResponse) {
+            throw new PaellaCoreCriticalException(
+                self::ERR_BODY_DECODE_MESSAGE,
+                PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION
+            );
+        }
+
+        return $decodedResponse;
     }
 }
