@@ -10,7 +10,6 @@ use App\DomainModel\OrderNotification\NotificationSenderInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 
-// TODO: cover with tests
 class NotificationSender implements NotificationSenderInterface, LoggingInterface
 {
     use LoggingTrait;
@@ -30,20 +29,17 @@ class NotificationSender implements NotificationSenderInterface, LoggingInterfac
         ]);
 
         $headers = ['Content-Type' => 'application/json'];
-        $auth = [];
-        if ($authorisation) {
-            if (strpos($authorisation, ':') === false) {
-                $headers['X-Api-Key'] = $authorisation;
-            } else {
-                $auth = explode(':', $authorisation);
-            }
+
+        if ($authorisation && strpos($authorisation, ':') !== false) {
+            $authorisationHeaderNameValue = explode(':', $authorisation);
+
+            $headers[$authorisationHeaderNameValue[0]] = trim($authorisationHeaderNameValue[1]);
         }
 
         try {
             $response = $this->client->post($url, [
                 'json' => $data,
                 'headers' => $headers,
-                'auth' => $auth,
             ]);
         } catch (RequestException $exception) {
             $this->logSuppressedException($exception, 'Exception while delivering notification');
