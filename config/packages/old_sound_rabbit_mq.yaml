@@ -36,6 +36,12 @@ old_sound_rabbit_mq:
       exchange_options: { name: 'paella_delayed_events%env(INSTANCE_SUFFIX)%', type: 'x-delayed-message', arguments: {x-delayed-type: ['S', 'direct']} }
       queue_options:    { name: 'notification_delivery_paella%env(INSTANCE_SUFFIX)%', routing_keys: ['notification_delivery_paella'] }
       callback:         App\Amqp\Consumer\NotificationDeliveryConsumer
+    order_debtor_identification_v2:
+      connection:       default
+      exchange_options: { name: 'paella_events%env(INSTANCE_SUFFIX)%', type: direct }
+      queue_options:    { name: 'order_debtor_identification_v2_paella%env(INSTANCE_SUFFIX)%', routing_keys: ['order_debtor_identification_v2_paella'] }
+      callback:         App\Amqp\Consumer\OrderDebtorIdentificationV2Consumer
+      qos_options:      {prefetch_size: 0, prefetch_count: 1, global: false}
   producers:
     paella_events:
       connection:       default

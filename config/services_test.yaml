@@ -36,3 +36,6 @@ services:
   App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface:
     alias: 'App\Infrastructure\Repository\ScoreThresholdsConfigurationRepository'
     public: true
+  App\DomainModel\OrderIdentification\OrderIdentificationRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\OrderIdentificationRepository'
+    public: true
