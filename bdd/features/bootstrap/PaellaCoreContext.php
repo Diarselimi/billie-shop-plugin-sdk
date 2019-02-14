@@ -12,6 +12,7 @@ use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\OrderIdentification\OrderIdentificationRepositoryInterface;
 use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonRepositoryInterface;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntity;
@@ -24,7 +25,10 @@ use Behat\MinkExtension\Context\MinkContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use donatj\MockWebServer\MockWebServer;
 use donatj\MockWebServer\Response;
+use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
 
 class PaellaCoreContext extends MinkContext
@@ -88,9 +92,11 @@ class PaellaCoreContext extends MinkContext
     {
         $this->alfred->stop();
         $this->borscht->stop();
+
         $this->getConnection()->exec('
             DELETE FROM order_transitions;
             DELETE FROM order_invoices;
+            DELETE FROM order_identifications;
             DELETE FROM risk_checks;
             DELETE FROM orders;
             DELETE FROM persons;
@@ -102,6 +108,7 @@ class PaellaCoreContext extends MinkContext
             DELETE FROM merchants_debtors;
             DELETE FROM score_thresholds_configuration;
             ALTER TABLE merchants AUTO_INCREMENT = 1;
+            ALTER TABLE orders AUTO_INCREMENT = 1;
         ');
     }
 
@@ -291,6 +298,53 @@ class PaellaCoreContext extends MinkContext
         Assert::notNull($order->getMarkedAsFraudAt());
     }
 
+    /**
+     * @Given I start :consumerName consumer to consume :messagesCount message
+     */
+    public function iStartOrder_debtor_identification_vconsumerToConsumerMessage($consumerName, $messagesCount)
+    {
+        $command = __DIR__ . "/../../../bin/console --env=test rabbitmq:consumer -m {$messagesCount} {$consumerName}";
+
+        $process = new Process($command);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new ProcessFailedException($process);
+        }
+    }
+
+    /**
+     * @When I push message to :queueName queue and routing key :routingKey with the following content:
+     */
+    public function iPushMessageToOrder_debtor_identification_v2_paellaQueueWithTheFollowingContent(
+        $queueName,
+        $routingKey,
+        PyStringNode $string
+    ) {
+        /** @var ProducerInterface $producerService */
+        $producerService = $this->get(sprintf('old_sound_rabbit_mq.%s_producer', $queueName));
+
+        $producerService->publish($string, $routingKey);
+    }
+
+    /**
+     * @Given order_identifications table should have a new record with:
+     */
+    public function order_identificationsTablShouldHaveANewRecordWith(\Behat\Gherkin\Node\TableNode $table)
+    {
+        $repo = $this->getOrderIdentificationRepository();
+
+        foreach ($table as $row) {
+            $record = $repo->findOneByOrderAndCompanyIds(
+                (int) $row['order_id'],
+                !empty($row['v1_company_id']) ? (int) $row['v1_company_id'] : null,
+                !empty($row['v2_company_id']) ? (int) $row['v2_company_id'] : null
+            );
+
+            Assert::notNull($record);
+        }
+    }
+
     private function getOrder($orderExternalCode, $customerId = self::MERCHANT_ID): OrderEntity
     {
         $order = $this->getOrderRepository()->getOneByExternalCode($orderExternalCode, $customerId);
@@ -340,6 +394,11 @@ class PaellaCoreContext extends MinkContext
     private function getScoreThresholdsConfigurationRepository(): ScoreThresholdsConfigurationRepositoryInterface
     {
         return $this->get(ScoreThresholdsConfigurationRepositoryInterface::class);
+    }
+
+    private function getOrderIdentificationRepository(): OrderIdentificationRepositoryInterface
+    {
+        return $this->get(OrderIdentificationRepositoryInterface::class);
     }
 
     private function getConnection(): \PDO

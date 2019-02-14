@@ -17,10 +17,12 @@ use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\Order\LimitsService;
 use App\DomainModel\Order\OrderChecksRunnerService;
 use App\DomainModel\Order\OrderContainer;
+use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\RiskCheck\Checker\CheckResult;
+use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 use Symfony\Component\Workflow\Workflow;
 
 /**
@@ -52,10 +54,9 @@ class CreateOrderUseCase implements LoggingInterface
 
     private $merchantSettingsRepository;
 
-    /**
-     * @var MerchantSettingsEntity
-     */
     private $merchantSettings;
+
+    private $producer;
 
     public function __construct(
         OrderPersistenceService $orderPersistenceService,
@@ -68,7 +69,8 @@ class CreateOrderUseCase implements LoggingInterface
         OrderRepositoryInterface $orderRepository,
         Workflow $workflow,
         LimitsService $limitsService,
-        MerchantSettingsRepositoryInterface $merchantSettingsRepository
+        MerchantSettingsRepositoryInterface $merchantSettingsRepository,
+        ProducerInterface $producer
     ) {
         $this->orderPersistenceService = $orderPersistenceService;
         $this->orderChecksRunnerService = $orderChecksRunnerService;
@@ -81,6 +83,7 @@ class CreateOrderUseCase implements LoggingInterface
         $this->workflow = $workflow;
         $this->limitsService = $limitsService;
         $this->merchantSettingsRepository = $merchantSettingsRepository;
+        $this->producer = $producer;
     }
 
     public function execute(CreateOrderRequest $request): void
@@ -100,6 +103,9 @@ class CreateOrderUseCase implements LoggingInterface
         $orderContainer->setMerchantSettings($this->merchantSettings);
 
         $debtorDTO = $this->retrieveDebtor($orderContainer, $request);
+
+        $this->triggerV2DebtorIdentification($orderContainer->getOrder(), $debtorDTO);
+
         if ($debtorDTO === null) {
             $this->orderChecksRunnerService->publishCheckResult(
                 new CheckResult(false, 'debtor_identified', ['debtor_found' => 0]),
@@ -252,5 +258,21 @@ class CreateOrderUseCase implements LoggingInterface
         $this->merchantRepository->update($customer);
 
         $this->logInfo("Order approved!");
+    }
+
+    private function triggerV2DebtorIdentification(OrderEntity $order, ?DebtorDTO $identifiedDebtorDTO): void
+    {
+        $data = [
+            'order_id' => $order->getId(),
+            'v1_company_id' => $identifiedDebtorDTO ? $identifiedDebtorDTO->getId() : null,
+        ];
+
+        try {
+            $this->producer->publish(json_encode($data), 'order_debtor_identification_v2_paella');
+        } catch (\Exception $exception) {
+            $this->logSuppressedException($exception, 'Rabbit producer exception', ['data' => $data]);
+
+            $this->sentry->captureException($exception);
+        }
     }
 }

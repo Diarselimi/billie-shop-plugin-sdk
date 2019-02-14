@@ -63,6 +63,28 @@ class Alfred implements AlfredInterface
         return $this->factory->createFromAlfredResponse($response);
     }
 
+    public function identifyDebtorV2(array $debtorData): ?DebtorDTO
+    {
+        try {
+            $response = $this->client->post("/debtor/identify/v2", [
+                'json' => $debtorData,
+            ]);
+        } catch (TransferException $exception) {
+            if ($exception->getCode() === Response::HTTP_NOT_FOUND) {
+                return null;
+            }
+
+            throw new AlfredRequestException($exception->getCode(), $exception);
+        }
+
+        $response = json_decode((string) $response->getBody(), true);
+        if (!$response) {
+            throw new AlfredResponseDecodeException();
+        }
+
+        return $this->factory->createFromAlfredResponse($response);
+    }
+
     public function lockDebtorLimit(string $debtorId, float $amount): bool
     {
         try {

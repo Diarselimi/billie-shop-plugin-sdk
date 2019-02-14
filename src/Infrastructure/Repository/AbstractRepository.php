@@ -11,6 +11,8 @@ abstract class AbstractRepository implements LoggingInterface
 {
     use LoggingTrait;
 
+    const DATE_FORMAT = 'Y-m-d H:i:s';
+
     /**
      * @var PDO
      */

@@ -1,0 +1,50 @@
+<?php
+
+namespace App\DomainModel\OrderIdentification;
+
+use App\DomainModel\AbstractEntity;
+
+class OrderIdentificationEntity extends AbstractEntity
+{
+    private $orderId;
+
+    private $v1CompanyId;
+
+    private $v2CompanyId;
+
+    public function getOrderId(): int
+    {
+        return $this->orderId;
+    }
+
+    public function setOrderId(int $orderId): OrderIdentificationEntity
+    {
+        $this->orderId = $orderId;
+
+        return $this;
+    }
+
+    public function getV1CompanyId(): ? int
+    {
+        return $this->v1CompanyId;
+    }
+
+    public function setV1CompanyId(?int $v1CompanyId): OrderIdentificationEntity
+    {
+        $this->v1CompanyId = $v1CompanyId;
+
+        return $this;
+    }
+
+    public function getV2CompanyId(): ? int
+    {
+        return $this->v2CompanyId;
+    }
+
+    public function setV2CompanyId(?int $v2CompanyId): OrderIdentificationEntity
+    {
+        $this->v2CompanyId = $v2CompanyId;
+
+        return $this;
+    }
+}

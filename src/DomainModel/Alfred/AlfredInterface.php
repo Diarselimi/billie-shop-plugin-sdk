@@ -10,6 +10,8 @@ interface AlfredInterface
 
     public function identifyDebtor(array $debtorData): ?DebtorDTO;
 
+    public function identifyDebtorV2(array $debtorData): ?DebtorDTO;
+
     public function lockDebtorLimit(string $debtorId, float $amount): bool;
 
     public function unlockDebtorLimit(string $debtorId, float $amount): void;
