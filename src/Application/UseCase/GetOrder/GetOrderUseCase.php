@@ -4,7 +4,7 @@ namespace App\Application\UseCase\GetOrder;
 
 use App\Application\PaellaCoreCriticalException;
 use App\DomainModel\Address\AddressRepositoryInterface;
-use App\DomainModel\Alfred\AlfredInterface;
+use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
@@ -24,7 +24,7 @@ class GetOrderUseCase
 
     private $debtorExternalDataRepository;
 
-    private $alfred;
+    private $companiesService;
 
     private $borscht;
 
@@ -37,7 +37,7 @@ class GetOrderUseCase
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         AddressRepositoryInterface $addressRepository,
         DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
-        AlfredInterface $alfred,
+        CompaniesServiceInterface $companiesService,
         BorschtInterface $borscht,
         OrderStateManager $orderStateManager,
         OrderDeclinedReasonsMapper $declinedReasonsMapper
@@ -46,7 +46,7 @@ class GetOrderUseCase
         $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->addressRepository = $addressRepository;
         $this->debtorExternalDataRepository = $debtorExternalDataRepository;
-        $this->alfred = $alfred;
+        $this->companiesService = $companiesService;
         $this->borscht = $borscht;
         $this->orderStateManager = $orderStateManager;
         $this->declinedReasonsMapper = $declinedReasonsMapper;
@@ -99,7 +99,7 @@ class GetOrderUseCase
     private function addCompanyToOrder(OrderEntity $order, GetOrderResponse $response)
     {
         $company = $this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId());
-        $debtor = $this->alfred->getDebtor($company->getDebtorId());
+        $debtor = $this->companiesService->getDebtor($company->getDebtorId());
         $debtorPaymentDetails = $this->borscht->getDebtorPaymentDetails($company->getPaymentDebtorId());
 
         $response

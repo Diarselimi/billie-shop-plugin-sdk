@@ -55,19 +55,9 @@ services:
     arguments:
       $client: '@eight_points_guzzle.client.webhook'
 
-  App\DomainModel\Order\OrderRepositoryInterface: '@App\Infrastructure\Repository\OrderRepository'
-  App\DomainModel\Address\AddressRepositoryInterface: '@App\Infrastructure\Repository\AddressRepository'
-  App\DomainModel\Person\PersonRepositoryInterface: '@App\Infrastructure\Repository\PersonRepository'
-  App\DomainModel\DebtorExternalData\DebtorExternalDataInterface: '@App\Infrastructure\Repository\DebtorExternalData'
-  App\DomainModel\Customer\MerchantRepositoryInterface: '@App\Infrastructure\Repository\MerchantRepository'
-  App\DomainModel\Customer\MerchantDebtorRepositoryInterface: '@App\Infrastructure\Repository\MerchantDebtorRepository'
-  App\DomainModel\Customer\RiskCheckRepositoryInterface: '@App\Infrastructure\Repository\RiskCheckRepository'
-  App\DomainModel\OrderTransition\OrderTransitionRepositoryInterface: '@App\Infrastructure\Repository\OrderTransitionRepository'
-
-  App\DomainModel\Alfred\AlfredInterface: '@App\Infrastructure\Alfred\Alfred'
-  App\DomainModel\Borscht\BorschtInterface: '@App\Infrastructure\Borscht\Borscht'
-
   Symfony\Component\Workflow\Workflow: '@state_machine.order'
+
+  Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter: '@serializer.name_converter.camel_case_to_snake_case'
 
   App\DomainModel\Order\OrderChecksRunnerService:
     arguments:
@@ -84,6 +74,7 @@ services:
             debtor_name: '@App\DomainModel\RiskCheck\Checker\DebtorNameCheck'
             debtor_address: '@App\DomainModel\RiskCheck\Checker\DebtorAddressCheck'
             debtor_blacklisted: '@App\DomainModel\RiskCheck\Checker\DebtorBlacklistedCheck'
+            available_financing_limit: '@App\DomainModel\RiskCheck\Checker\AvailableFinancingLimitCheck'
 
   # monitoring
   App\Infrastructure\Monitoring\Sentry\SentrySubscriber:

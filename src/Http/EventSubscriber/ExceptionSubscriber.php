@@ -2,18 +2,29 @@
 
 namespace App\Http\EventSubscriber;
 
+use App\Application\Exception\RequestValidationException;
 use App\Application\PaellaCoreCriticalException;
 use App\DomainModel\Monitoring\LoggingInterface;
 use App\DomainModel\Monitoring\LoggingTrait;
 use GuzzleHttp\Exception\RequestException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 class ExceptionSubscriber implements EventSubscriberInterface, LoggingInterface
 {
+    private $camelCaseToSnakeCaseNameConverter;
+
+    public function __construct(CamelCaseToSnakeCaseNameConverter $camelCaseToSnakeCaseNameConverter)
+    {
+        $this->camelCaseToSnakeCaseNameConverter = $camelCaseToSnakeCaseNameConverter;
+    }
+
     use LoggingTrait;
 
     public static function getSubscribedEvents()
@@ -30,6 +41,21 @@ class ExceptionSubscriber implements EventSubscriberInterface, LoggingInterface
 
         if ($exception instanceof HttpException) {
             $event->setResponse(new JsonResponse(['error' => $exception->getMessage()], $exception->getStatusCode()));
+
+            return;
+        }
+
+        if ($exception instanceof RequestValidationException) {
+            /** @var ConstraintViolationInterface $validationError */
+            foreach ($exception->getValidationErrors() as $validationError) {
+                $errors[] = [
+                    'source' => $this->camelCaseToSnakeCaseNameConverter->normalize($validationError->getPropertyPath()),
+                    'title' => $validationError->getMessage(),
+                    'code' => $exception->getMessage(),
+                ];
+            }
+
+            $event->setResponse(new JsonResponse(['errors' => $errors], Response::HTTP_BAD_REQUEST));
 
             return;
         }

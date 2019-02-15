@@ -3,7 +3,6 @@
 namespace App\DomainModel\Order;
 
 use App\DomainModel\Address\AddressEntity;
-use App\DomainModel\Alfred\DebtorDTO;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;

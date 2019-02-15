@@ -3,6 +3,7 @@
 namespace App\DomainModel\MerchantDebtor;
 
 use App\DomainModel\AbstractEntity;
+use App\DomainModel\DebtorCompany\DebtorCompany;
 
 class MerchantDebtorEntity extends AbstractEntity
 {
@@ -13,6 +14,8 @@ class MerchantDebtorEntity extends AbstractEntity
     private $paymentDebtorId;
 
     private $financingLimit;
+
+    private $debtorCompany;
 
     private $scoreThresholdsConfigurationId;
 
@@ -83,6 +86,18 @@ class MerchantDebtorEntity extends AbstractEntity
         $this->financingLimit = $newLimit;
 
         return true;
+    }
+
+    public function getDebtorCompany(): DebtorCompany
+    {
+        return $this->debtorCompany;
+    }
+
+    public function setDebtorCompany(DebtorCompany $debtorCompany): MerchantDebtorEntity
+    {
+        $this->debtorCompany = $debtorCompany;
+
+        return $this;
     }
 
     public function getScoreThresholdsConfigurationId(): ? int

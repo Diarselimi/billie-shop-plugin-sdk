@@ -2,48 +2,59 @@
 
 namespace App\Application\UseCase\CreateOrder;
 
+use App\Application\UseCase\CreateOrder\Request\CreateOrderAmountRequest;
+use App\Application\UseCase\CreateOrder\Request\CreateOrderDebtorCompanyRequest;
+use App\Application\UseCase\CreateOrder\Request\CreateOrderDebtorPersonRequest;
+use App\Application\UseCase\CreateOrder\Request\CreateOrderDeliveryAddressRequest;
+use Symfony\Component\Validator\Constraints as Assert;
+use App\Application\Validator\Constraint as CreateOrderUseCaseConstraints;
+
 class CreateOrderRequest
 {
+    /**
+     * @Assert\NotBlank()
+     * @Assert\Type(type="numeric")
+     */
     private $merchantId;
-    private $amountNet;
-    private $amountGross;
-    private $amountTax;
+
+    /**
+     * @Assert\Valid()
+     */
+    private $amount;
+
+    /**
+     * @Assert\Length(max=255)
+     */
     private $comment;
+
+    /**
+     * @Assert\NotBlank()
+     * @Assert\Type(type="int")
+     * @Assert\Range(min=1, max=120)
+     */
     private $duration;
+
+    /**
+     * @CreateOrderUseCaseConstraints\OrderExternalCode()
+     * @Assert\NotBlank()
+     * @Assert\Length(max=255)
+     */
     private $externalCode;
 
-    private $deliveryAddressAddition;
-    private $deliveryAddressHouseNumber;
-    private $deliveryAddressStreet;
-    private $deliveryAddressCity;
-    private $deliveryAddressPostalCode;
-    private $deliveryAddressCountry;
+    /**
+     * @Assert\Valid()
+     */
+    private $deliveryAddress;
 
-    private $merchantCustomerId;
+    /**
+     * @Assert\Valid()
+     */
+    private $debtorCompany;
 
-    private $debtorCompanyName;
-    private $debtorCompanyTaxId;
-    private $debtorCompanyTaxNumber;
-    private $debtorCompanyRegistrationCourt;
-    private $debtorCompanyRegistrationNumber;
-    private $debtorCompanyIndustrySector;
-    private $debtorCompanySubindustrySector;
-    private $debtorCompanyEmployeesNumber;
-    private $debtorCompanyLegalForm;
-    private $debtorCompanyEstablishedCustomer;
-
-    private $debtorCompanyAddressAddition;
-    private $debtorCompanyAddressHouseNumber;
-    private $debtorCompanyAddressStreet;
-    private $debtorCompanyAddressCity;
-    private $debtorCompanyAddressPostalCode;
-    private $debtorCompanyAddressCountry;
-
-    private $debtorPersonGender;
-    private $debtorPersonFirstName;
-    private $debtorPersonLastName;
-    private $debtorPersonPhoneNumber;
-    private $debtorPersonEmail;
+    /**
+     * @Assert\Valid()
+     */
+    private $debtorPerson;
 
     public function getMerchantId()
     {
@@ -57,38 +68,14 @@ class CreateOrderRequest
         return $this;
     }
 
-    public function getAmountNet()
+    public function getAmount(): CreateOrderAmountRequest
     {
-        return $this->amountNet;
+        return $this->amount;
     }
 
-    public function setAmountNet($amountNet)
+    public function setAmount(CreateOrderAmountRequest $amount): CreateOrderRequest
     {
-        $this->amountNet = $amountNet;
-
-        return $this;
-    }
-
-    public function getAmountGross()
-    {
-        return $this->amountGross;
-    }
-
-    public function setAmountGross($amountGross)
-    {
-        $this->amountGross = $amountGross;
-
-        return $this;
-    }
-
-    public function getAmountTax()
-    {
-        return $this->amountTax;
-    }
-
-    public function setAmountTax($amountTax)
-    {
-        $this->amountTax = $amountTax;
+        $this->amount = $amount;
 
         return $this;
     }
@@ -129,338 +116,38 @@ class CreateOrderRequest
         return $this;
     }
 
-    public function getDeliveryAddressAddition()
+    public function getDeliveryAddress(): CreateOrderDeliveryAddressRequest
     {
-        return $this->deliveryAddressAddition;
+        return $this->deliveryAddress;
     }
 
-    public function setDeliveryAddressAddition($deliveryAddressAddition)
+    public function setDeliveryAddress(CreateOrderDeliveryAddressRequest $deliveryAddress): CreateOrderRequest
     {
-        $this->deliveryAddressAddition = $deliveryAddressAddition;
+        $this->deliveryAddress = $deliveryAddress;
 
         return $this;
     }
 
-    public function getDeliveryAddressHouseNumber()
+    public function getDebtorPerson(): CreateOrderDebtorPersonRequest
     {
-        return $this->deliveryAddressHouseNumber;
+        return $this->debtorPerson;
     }
 
-    public function setDeliveryAddressHouseNumber($deliveryAddressHouseNumber)
+    public function setDebtorPerson(CreateOrderDebtorPersonRequest $debtorPerson): CreateOrderRequest
     {
-        $this->deliveryAddressHouseNumber = $deliveryAddressHouseNumber;
+        $this->debtorPerson = $debtorPerson;
 
         return $this;
     }
 
-    public function getDeliveryAddressStreet()
+    public function getDebtorCompany(): CreateOrderDebtorCompanyRequest
     {
-        return $this->deliveryAddressStreet;
+        return $this->debtorCompany;
     }
 
-    public function setDeliveryAddressStreet($deliveryAddressStreet)
+    public function setDebtorCompany(CreateOrderDebtorCompanyRequest $debtorCompany): CreateOrderRequest
     {
-        $this->deliveryAddressStreet = $deliveryAddressStreet;
-
-        return $this;
-    }
-
-    public function getDeliveryAddressCity()
-    {
-        return $this->deliveryAddressCity;
-    }
-
-    public function setDeliveryAddressCity($deliveryAddressCity)
-    {
-        $this->deliveryAddressCity = $deliveryAddressCity;
-
-        return $this;
-    }
-
-    public function getDeliveryAddressPostalCode()
-    {
-        return $this->deliveryAddressPostalCode;
-    }
-
-    public function setDeliveryAddressPostalCode($deliveryAddressPostalCode)
-    {
-        $this->deliveryAddressPostalCode = $deliveryAddressPostalCode;
-
-        return $this;
-    }
-
-    public function getDeliveryAddressCountry()
-    {
-        return $this->deliveryAddressCountry;
-    }
-
-    public function setDeliveryAddressCountry($deliveryAddressCountry)
-    {
-        $this->deliveryAddressCountry = $deliveryAddressCountry;
-
-        return $this;
-    }
-
-    public function getMerchantCustomerId()
-    {
-        return $this->merchantCustomerId;
-    }
-
-    public function setMerchantCustomerId($merchantCustomerId)
-    {
-        $this->merchantCustomerId = $merchantCustomerId;
-
-        return $this;
-    }
-
-    public function getDebtorCompanyName()
-    {
-        return $this->debtorCompanyName;
-    }
-
-    public function setDebtorCompanyName($debtorCompanyName)
-    {
-        $this->debtorCompanyName = $debtorCompanyName;
-
-        return $this;
-    }
-
-    public function getDebtorCompanyTaxId()
-    {
-        return $this->debtorCompanyTaxId;
-    }
-
-    public function setDebtorCompanyTaxId($debtorCompanyTaxId)
-    {
-        $this->debtorCompanyTaxId = $debtorCompanyTaxId;
-
-        return $this;
-    }
-
-    public function getDebtorCompanyTaxNumber()
-    {
-        return $this->debtorCompanyTaxNumber;
-    }
-
-    public function setDebtorCompanyTaxNumber($debtorCompanyTaxNumber)
-    {
-        $this->debtorCompanyTaxNumber = $debtorCompanyTaxNumber;
-
-        return $this;
-    }
-
-    public function getDebtorCompanyRegistrationCourt()
-    {
-        return $this->debtorCompanyRegistrationCourt;
-    }
-
-    public function setDebtorCompanyRegistrationCourt($debtorCompanyRegistrationCourt)
-    {
-        $this->debtorCompanyRegistrationCourt = $debtorCompanyRegistrationCourt;
-
-        return $this;
-    }
-
-    public function getDebtorCompanyRegistrationNumber()
-    {
-        return $this->debtorCompanyRegistrationNumber;
-    }
-
-    public function setDebtorCompanyRegistrationNumber($debtorCompanyRegistrationNumber)
-    {
-        $this->debtorCompanyRegistrationNumber = $debtorCompanyRegistrationNumber;
-
-        return $this;
-    }
-
-    public function getDebtorCompanyIndustrySector()
-    {
-        return $this->debtorCompanyIndustrySector;
-    }
-
-    public function setDebtorCompanyIndustrySector($debtorCompanyIndustrySector)
-    {
-        $this->debtorCompanyIndustrySector = $debtorCompanyIndustrySector;
-
-        return $this;
-    }
-
-    public function getDebtorCompanySubindustrySector()
-    {
-        return $this->debtorCompanySubindustrySector;
-    }
-
-    public function setDebtorCompanySubindustrySector($debtorCompanySubindustrySector)
-    {
-        $this->debtorCompanySubindustrySector = $debtorCompanySubindustrySector;
-
-        return $this;
-    }
-
-    public function getDebtorCompanyEmployeesNumber()
-    {
-        return $this->debtorCompanyEmployeesNumber;
-    }
-
-    public function setDebtorCompanyEmployeesNumber($debtorCompanyEmployeesNumber)
-    {
-        $this->debtorCompanyEmployeesNumber = $debtorCompanyEmployeesNumber;
-
-        return $this;
-    }
-
-    public function getDebtorCompanyLegalForm()
-    {
-        return $this->debtorCompanyLegalForm;
-    }
-
-    public function setDebtorCompanyLegalForm($debtorCompanyLegalForm)
-    {
-        $this->debtorCompanyLegalForm = $debtorCompanyLegalForm;
-
-        return $this;
-    }
-
-    public function getDebtorCompanyEstablishedCustomer()
-    {
-        return $this->debtorCompanyEstablishedCustomer;
-    }
-
-    public function setDebtorCompanyEstablishedCustomer($debtorCompanyEstablishedCustomer)
-    {
-        $this->debtorCompanyEstablishedCustomer = $debtorCompanyEstablishedCustomer;
-
-        return $this;
-    }
-
-    public function getDebtorCompanyAddressAddition()
-    {
-        return $this->debtorCompanyAddressAddition;
-    }
-
-    public function setDebtorCompanyAddressAddition($debtorCompanyAddressAddition)
-    {
-        $this->debtorCompanyAddressAddition = $debtorCompanyAddressAddition;
-
-        return $this;
-    }
-
-    public function getDebtorCompanyAddressHouseNumber()
-    {
-        return $this->debtorCompanyAddressHouseNumber;
-    }
-
-    public function setDebtorCompanyAddressHouseNumber($debtorCompanyAddressHouseNumber)
-    {
-        $this->debtorCompanyAddressHouseNumber = $debtorCompanyAddressHouseNumber;
-
-        return $this;
-    }
-
-    public function getDebtorCompanyAddressStreet()
-    {
-        return $this->debtorCompanyAddressStreet;
-    }
-
-    public function setDebtorCompanyAddressStreet($debtorCompanyAddressStreet)
-    {
-        $this->debtorCompanyAddressStreet = $debtorCompanyAddressStreet;
-
-        return $this;
-    }
-
-    public function getDebtorCompanyAddressCity()
-    {
-        return $this->debtorCompanyAddressCity;
-    }
-
-    public function setDebtorCompanyAddressCity($debtorCompanyAddressCity)
-    {
-        $this->debtorCompanyAddressCity = $debtorCompanyAddressCity;
-
-        return $this;
-    }
-
-    public function getDebtorCompanyAddressPostalCode()
-    {
-        return $this->debtorCompanyAddressPostalCode;
-    }
-
-    public function setDebtorCompanyAddressPostalCode($debtorCompanyAddressPostalCode)
-    {
-        $this->debtorCompanyAddressPostalCode = $debtorCompanyAddressPostalCode;
-
-        return $this;
-    }
-
-    public function getDebtorCompanyAddressCountry()
-    {
-        return $this->debtorCompanyAddressCountry;
-    }
-
-    public function setDebtorCompanyAddressCountry($debtorCompanyAddressCountry)
-    {
-        $this->debtorCompanyAddressCountry = $debtorCompanyAddressCountry;
-
-        return $this;
-    }
-
-    public function getDebtorPersonGender()
-    {
-        return $this->debtorPersonGender;
-    }
-
-    public function setDebtorPersonGender($debtorPersonGender)
-    {
-        $this->debtorPersonGender = $debtorPersonGender;
-
-        return $this;
-    }
-
-    public function getDebtorPersonFirstName()
-    {
-        return $this->debtorPersonFirstName;
-    }
-
-    public function setDebtorPersonFirstName($debtorPersonFirstName)
-    {
-        $this->debtorPersonFirstName = $debtorPersonFirstName;
-
-        return $this;
-    }
-
-    public function getDebtorPersonLastName()
-    {
-        return $this->debtorPersonLastName;
-    }
-
-    public function setDebtorPersonLastName($debtorPersonLastName)
-    {
-        $this->debtorPersonLastName = $debtorPersonLastName;
-
-        return $this;
-    }
-
-    public function getDebtorPersonPhoneNumber()
-    {
-        return $this->debtorPersonPhoneNumber;
-    }
-
-    public function setDebtorPersonPhoneNumber($debtorPersonPhoneNumber)
-    {
-        $this->debtorPersonPhoneNumber = $debtorPersonPhoneNumber;
-
-        return $this;
-    }
-
-    public function getDebtorPersonEmail()
-    {
-        return $this->debtorPersonEmail;
-    }
-
-    public function setDebtorPersonEmail($debtorPersonEmail)
-    {
-        $this->debtorPersonEmail = $debtorPersonEmail;
+        $this->debtorCompany = $debtorCompany;
 
         return $this;
     }

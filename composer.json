@@ -3,8 +3,11 @@
     "license": "proprietary",
     "require": {
         "php": "^7.2",
+        "ext-json": "*",
         "aws/aws-sdk-php-symfony": "^2.0",
+        "doctrine/annotations": "^1.6",
         "donatj/mock-webserver": "^2.0",
+        "egulias/email-validator": "^2.1",
         "eightpoints/guzzle-bundle": "^7.3",
         "google/cloud-logging": "^1.10",
         "ozean12/sentry": "dev-master",
@@ -18,7 +21,9 @@
         "symfony/lts": "^4@dev",
         "symfony/monolog-bundle": "^3.2",
         "symfony/proxy-manager-bridge": "^4.0",
+        "symfony/serializer": "^4.0",
         "symfony/stopwatch": "^4.0",
+        "symfony/validator": "^4.0",
         "symfony/workflow": "^4.0",
         "symfony/yaml": "^4.0",
         "vria/nodiacritic": "^0.1.2"

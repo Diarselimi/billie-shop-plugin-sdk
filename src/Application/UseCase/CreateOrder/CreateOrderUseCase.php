@@ -2,16 +2,11 @@
 
 namespace App\Application\UseCase\CreateOrder;
 
-use App\DomainModel\Alfred\AlfredInterface;
-use App\DomainModel\Alfred\DebtorDTO;
-use App\DomainModel\Borscht\BorschtInterface;
-use App\DomainModel\Merchant\MerchantEntity;
+use App\Application\Exception\RequestValidationException;
+use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\MerchantDebtor\DebtorFinderService;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
-use App\DomainModel\MerchantDebtor\MerchantDebtorEntityFactory;
-use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
-use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
-use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
 use App\DomainModel\Monitoring\LoggingInterface;
 use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\Order\LimitsService;
@@ -22,12 +17,10 @@ use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\RiskCheck\Checker\CheckResult;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 use Symfony\Component\Workflow\Workflow;
 
-/**
- * @TODO: refactor the whole class
- */
 class CreateOrderUseCase implements LoggingInterface
 {
     use LoggingTrait;
@@ -36,58 +29,46 @@ class CreateOrderUseCase implements LoggingInterface
 
     private $orderChecksRunnerService;
 
-    private $alfred;
-
-    private $merchantDebtorRepository;
-
     private $merchantRepository;
-
-    private $merchantDebtorFactory;
 
     private $orderRepository;
 
     private $workflow;
 
-    private $borscht;
-
     private $limitsService;
 
-    private $merchantSettingsRepository;
+    private $debtorFinderService;
 
-    private $merchantSettings;
+    private $validator;
 
     private $producer;
 
     public function __construct(
         OrderPersistenceService $orderPersistenceService,
         OrderChecksRunnerService $orderChecksRunnerService,
-        AlfredInterface $alfred,
-        BorschtInterface $borscht,
-        MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         MerchantRepositoryInterface $merchantRepository,
-        MerchantDebtorEntityFactory $merchantDebtorFactory,
         OrderRepositoryInterface $orderRepository,
         Workflow $workflow,
         LimitsService $limitsService,
-        MerchantSettingsRepositoryInterface $merchantSettingsRepository,
+        DebtorFinderService $debtorFinderService,
+        ValidatorInterface $validator,
         ProducerInterface $producer
     ) {
         $this->orderPersistenceService = $orderPersistenceService;
         $this->orderChecksRunnerService = $orderChecksRunnerService;
-        $this->alfred = $alfred;
-        $this->borscht = $borscht;
-        $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->merchantRepository = $merchantRepository;
-        $this->merchantDebtorFactory = $merchantDebtorFactory;
         $this->orderRepository = $orderRepository;
         $this->workflow = $workflow;
         $this->limitsService = $limitsService;
-        $this->merchantSettingsRepository = $merchantSettingsRepository;
+        $this->debtorFinderService = $debtorFinderService;
+        $this->validator = $validator;
         $this->producer = $producer;
     }
 
     public function execute(CreateOrderRequest $request): void
     {
+        $this->validateRequest($request);
+
         $orderContainer = $this->orderPersistenceService->persistFromRequest($request);
 
         if (!$this->orderChecksRunnerService->runPreconditionChecks($orderContainer)) {
@@ -96,50 +77,15 @@ class CreateOrderUseCase implements LoggingInterface
             return;
         }
 
-        $this->merchantSettings = $this->merchantSettingsRepository->getOneByMerchantOrFail(
-            $request->getMerchantId()
-        );
-
-        $orderContainer->setMerchantSettings($this->merchantSettings);
-
-        $debtorDTO = $this->retrieveDebtor($orderContainer, $request);
-
-        $this->triggerV2DebtorIdentification($orderContainer->getOrder(), $debtorDTO);
-
-        if ($debtorDTO === null) {
-            $this->orderChecksRunnerService->publishCheckResult(
-                new CheckResult(false, 'debtor_identified', ['debtor_found' => 0]),
-                $orderContainer
-            );
+        if ($this->identifyDebtor($orderContainer, $request->getMerchantId()) === null) {
             $this->reject($orderContainer, "debtor couldn't be identified");
 
             return;
         }
 
-        $this->orderChecksRunnerService->publishCheckResult(
-            new CheckResult(true, 'debtor_identified', [
-                'debtor_found' => 1,
-                'debor_company_id' => $debtorDTO->getId(),
-            ]),
-            $orderContainer
-        );
-
-        $orderContainer->setDebtorCompany($debtorDTO);
         $this->orderRepository->update($orderContainer->getOrder());
 
-        $this->logWaypoint('limit check');
-
-        $limitsLocked = $this->limitsService->lock(
-            $orderContainer->getMerchantDebtor(),
-            $orderContainer->getOrder()->getAmountGross()
-        );
-
-        $this->orderChecksRunnerService->publishCheckResult(
-            new CheckResult($limitsLocked, 'limit', []),
-            $orderContainer
-        );
-
-        if (!$limitsLocked) {
+        if (!$this->checkLimit($orderContainer)) {
             $this->reject($orderContainer, "debtor limit exceeded");
 
             return;
@@ -159,85 +105,66 @@ class CreateOrderUseCase implements LoggingInterface
         $this->approve($orderContainer);
     }
 
-    private function retrieveDebtor(OrderContainer $orderContainer, CreateOrderRequest $request): ?DebtorDTO
+    private function validateRequest(CreateOrderRequest $request): void
     {
-        $this->logInfo('Check if the merchant customer already known');
-        $merchantDebtor = $this->merchantDebtorRepository->getOneByMerchantExternalId(
-            $orderContainer->getDebtorExternalData()->getMerchantExternalId(),
-            $request->getMerchantId()
-        );
+        $validationErrors = $this->validator->validate($request);
 
-        if ($merchantDebtor) {
-            $this->logInfo('Found the existing merchant customer');
-            $debtorDTO = $this->alfred->getDebtor($merchantDebtor->getDebtorId());
-        } else {
-            $this->logInfo('Start the debtor identification');
-            $debtorDTO = $this->identifyDebtor($orderContainer);
-
-            if ($debtorDTO) {
-                $merchantDebtor = $this->merchantDebtorRepository->getOneByMerchantAndDebtorId(
-                    $request->getMerchantId(),
-                    $debtorDTO->getId()
-                );
-            }
+        if ($validationErrors->count() === 0) {
+            return;
         }
 
-        if (!$debtorDTO) {
-            $this->logInfo('Debtor could not be identified');
+        throw new RequestValidationException($validationErrors);
+    }
+
+    private function identifyDebtor(OrderContainer $orderContainer, int $merchantId): ? MerchantDebtorEntity
+    {
+        $merchantDebtor = $this->debtorFinderService->findDebtor($orderContainer, $merchantId);
+
+        $this->triggerV2DebtorIdentification(
+            $orderContainer->getOrder(),
+            $merchantDebtor ? $merchantDebtor->getDebtorCompany() : null
+        );
+
+        if ($merchantDebtor === null) {
+            $this->orderChecksRunnerService->publishCheckResult(
+                new CheckResult(false, 'debtor_identified', ['debtor_found' => 0]),
+                $orderContainer
+            );
 
             return null;
         }
 
-        $this->logInfo('Debtor identified');
-
-        if ($merchantDebtor) {
-            $this->logInfo('Debtor already in the system');
-        } else {
-            $this->logInfo('Add new debtor to the system');
-            $merchantDebtor = $this->registerMerchantDebtor($debtorDTO->getId(), $orderContainer->getMerchant());
-        }
+        $this->orderChecksRunnerService->publishCheckResult(
+            new CheckResult(true, 'debtor_identified', [
+                'debtor_found' => 1,
+                'debor_company_id' => $merchantDebtor->getDebtorCompany()->getId(),
+            ]),
+            $orderContainer
+        );
 
         $orderContainer
             ->setMerchantDebtor($merchantDebtor)
             ->getOrder()->setMerchantDebtorId($merchantDebtor->getId())
         ;
 
-        return $debtorDTO;
-    }
-
-    private function registerMerchantDebtor(string $debtorId, MerchantEntity $merchant): MerchantDebtorEntity
-    {
-        $paymentDebtor = $this->borscht->registerDebtor($merchant->getPaymentMerchantId());
-
-        $merchantDebtor = $this->merchantDebtorFactory->create(
-            $debtorId,
-            $merchant->getId(),
-            $paymentDebtor->getPaymentDebtorId(),
-            $this->merchantSettings->getDebtorFinancingLimit()
-        );
-
-        $this->merchantDebtorRepository->insert($merchantDebtor);
-
         return $merchantDebtor;
     }
 
-    private function identifyDebtor(OrderContainer $orderContainer)
+    private function checkLimit(OrderContainer $orderContainer): bool
     {
-        return $this->alfred->identifyDebtor([
-            'name' => $orderContainer->getDebtorExternalData()->getName(),
-            'address_house' => $orderContainer->getDebtorExternalDataAddress()->getHouseNumber(),
-            'address_street' => $orderContainer->getDebtorExternalDataAddress()->getStreet(),
-            'address_postal_code' => $orderContainer->getDebtorExternalDataAddress()->getPostalCode(),
-            'address_city' => $orderContainer->getDebtorExternalDataAddress()->getCity(),
-            'address_country' => $orderContainer->getDebtorExternalDataAddress()->getCountry(),
-            'tax_id' => $orderContainer->getDebtorExternalData()->getTaxId(),
-            'tax_number' => $orderContainer->getDebtorExternalData()->getTaxNumber(),
-            'registration_number' => $orderContainer->getDebtorExternalData()->getRegistrationNumber(),
-            'registration_court' => $orderContainer->getDebtorExternalData()->getRegistrationCourt(),
-            'legal_form' => $orderContainer->getDebtorExternalData()->getLegalForm(),
-            'first_name' => $orderContainer->getDebtorPerson()->getFirstName(),
-            'last_name' => $orderContainer->getDebtorPerson()->getLastName(),
-        ]);
+        $this->logWaypoint('limit check');
+
+        $limitsLocked = $this->limitsService->lock(
+            $orderContainer->getMerchantDebtor(),
+            $orderContainer->getOrder()->getAmountGross()
+        );
+
+        $this->orderChecksRunnerService->publishCheckResult(
+            new CheckResult($limitsLocked, 'limit', []),
+            $orderContainer
+        );
+
+        return $limitsLocked;
     }
 
     private function reject(OrderContainer $orderContainer, string $message)
@@ -260,19 +187,17 @@ class CreateOrderUseCase implements LoggingInterface
         $this->logInfo("Order approved!");
     }
 
-    private function triggerV2DebtorIdentification(OrderEntity $order, ?DebtorDTO $identifiedDebtorDTO): void
+    private function triggerV2DebtorIdentification(OrderEntity $order, ?DebtorCompany $identifiedDebtorCompany): void
     {
         $data = [
             'order_id' => $order->getId(),
-            'v1_company_id' => $identifiedDebtorDTO ? $identifiedDebtorDTO->getId() : null,
+            'v1_company_id' => $identifiedDebtorCompany ? $identifiedDebtorCompany->getId() : null,
         ];
 
         try {
             $this->producer->publish(json_encode($data), 'order_debtor_identification_v2_paella');
         } catch (\Exception $exception) {
             $this->logSuppressedException($exception, 'Rabbit producer exception', ['data' => $data]);
-
-            $this->sentry->captureException($exception);
         }
     }
 }

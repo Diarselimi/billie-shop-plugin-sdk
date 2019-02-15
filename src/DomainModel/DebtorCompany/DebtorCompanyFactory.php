@@ -1,12 +1,12 @@
 <?php
 
-namespace App\DomainModel\Alfred;
+namespace App\DomainModel\DebtorCompany;
 
-class DebtorFactory
+class DebtorCompanyFactory
 {
-    public function createFromAlfredResponse(array $data)
+    public function createFromAlfredResponse(array $data): DebtorCompany
     {
-        return (new DebtorDTO())
+        return (new DebtorCompany())
             ->setId($data['id'])
             ->setName($data['name'])
             ->setAddressHouse($data['address_house'])

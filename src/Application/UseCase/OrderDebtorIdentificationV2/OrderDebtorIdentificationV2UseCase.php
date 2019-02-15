@@ -3,7 +3,7 @@
 namespace App\Application\UseCase\OrderDebtorIdentificationV2;
 
 use App\DomainModel\Address\AddressRepositoryInterface;
-use App\DomainModel\Alfred\AlfredInterface;
+use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderIdentification\OrderIdentificationEntity;
@@ -31,7 +31,7 @@ class OrderDebtorIdentificationV2UseCase
         AddressRepositoryInterface $addressRepository,
         PersonRepositoryInterface $personRepository,
         OrderIdentificationRepositoryInterface $orderIdentificationRepository,
-        AlfredInterface $companiesService
+        CompaniesServiceInterface $companiesService
     ) {
         $this->orderRepository = $orderRepository;
         $this->debtorExternalDataRepository = $debtorExternalDataRepository;

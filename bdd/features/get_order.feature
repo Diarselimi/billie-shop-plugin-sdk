@@ -2,11 +2,15 @@ Feature:
     In order to retrieve the order details
     I want to call the get order endpoint
 
-    Scenario: Unsuccessful order retrieve
+    Background:
         Given I add "Content-type" header equal to "application/json"
         And I add "X-Test" header equal to 1
         And I add "X-Api-User" header equal to 1
-        And I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
+        And I start alfred
+        And I start borscht
+
+    Scenario: Unsuccessful order retrieve
+        Given I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
         When I send a GET request to "/order/ABC"
         Then the response status code should be 404
         And print last JSON response
@@ -19,11 +23,7 @@ Feature:
         """
 
     Scenario: Successful order retrieve
-        Given I add "Content-type" header equal to "application/json"
-        And I add "X-Test" header equal to 1
-        And I add "X-Api-User" header equal to 1
-        And I start alfred
-        And I get from alfred "/debtor/1" endpoint response with status 200 and body
+        Given I get from alfred "/debtor/1" endpoint response with status 200 and body
         """
         {
             "id": 1,
@@ -41,7 +41,6 @@ Feature:
             "payment_id": 1
         }
         """
-        And I start borscht
         And I get from borscht "/debtor/1.json" endpoint response with status 200 and body
         """
         {

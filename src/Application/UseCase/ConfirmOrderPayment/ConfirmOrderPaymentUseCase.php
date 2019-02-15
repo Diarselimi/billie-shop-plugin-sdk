@@ -4,7 +4,6 @@ namespace App\Application\UseCase\ConfirmOrderPayment;
 
 use App\Application\Exception\FraudOrderException;
 use App\Application\PaellaCoreCriticalException;
-use App\DomainModel\Alfred\AlfredInterface;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;

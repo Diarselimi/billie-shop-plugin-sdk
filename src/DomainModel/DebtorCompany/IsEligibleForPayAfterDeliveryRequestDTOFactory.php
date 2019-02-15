@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infrastructure\Alfred;
+namespace App\DomainModel\DebtorCompany;
 
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntity;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationService;

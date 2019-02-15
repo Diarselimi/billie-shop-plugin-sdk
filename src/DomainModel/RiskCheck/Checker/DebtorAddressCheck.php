@@ -20,7 +20,7 @@ class DebtorAddressCheck implements CheckInterface, LoggingInterface
 
     public function check(OrderContainer $order): CheckResult
     {
-        $addressFromRegistry = $order->getDebtorCompany();
+        $addressFromRegistry = $order->getMerchantDebtor()->getDebtorCompany();
         $addressFromOrder = $order->getDebtorExternalDataAddress();
 
         $streetMatch = $this->isStreetMatch($addressFromRegistry->getAddressStreet(), $addressFromOrder->getStreet());

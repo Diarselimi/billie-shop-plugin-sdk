@@ -2,7 +2,8 @@
 
 namespace App\DomainModel\Order;
 
-use App\DomainModel\Alfred\AlfredInterface;
+use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
+use App\DomainModel\DebtorCompany\IsEligibleForPayAfterDeliveryRequestDTOFactory;
 use App\DomainModel\Monitoring\LoggingInterface;
 use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\RiskCheck\Checker\CheckInterface;
@@ -10,7 +11,6 @@ use App\DomainModel\RiskCheck\Checker\CheckResult;
 use App\DomainModel\RiskCheck\RiskCheckEntityFactory;
 use App\DomainModel\RiskCheck\RiskCheckRepositoryInterface;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
-use App\Infrastructure\Alfred\IsEligibleForPayAfterDeliveryRequestDTOFactory;
 use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
@@ -24,7 +24,7 @@ class OrderChecksRunnerService implements LoggingInterface
 
     private $riskCheckFactory;
 
-    private $alfred;
+    private $companiesService;
 
     private $checkLoader;
 
@@ -40,7 +40,7 @@ class OrderChecksRunnerService implements LoggingInterface
         ProducerInterface $producer,
         RiskCheckRepositoryInterface $riskCheckRepository,
         RiskCheckEntityFactory $riskCheckFactory,
-        AlfredInterface $alfred,
+        CompaniesServiceInterface $companiesService,
         ServiceLocator $checkLoader,
         \Raven_Client $sentry,
         OrderRepositoryInterface $orderRepository,
@@ -50,7 +50,7 @@ class OrderChecksRunnerService implements LoggingInterface
         $this->producer = $producer;
         $this->riskCheckRepository = $riskCheckRepository;
         $this->riskCheckFactory = $riskCheckFactory;
-        $this->alfred = $alfred;
+        $this->companiesService = $companiesService;
         $this->checkLoader = $checkLoader;
         $this->sentry = $sentry;
         $this->orderRepository = $orderRepository;
@@ -60,11 +60,17 @@ class OrderChecksRunnerService implements LoggingInterface
 
     public function runPreconditionChecks(OrderContainer $order): bool
     {
+        $availableFinancingLimitCheckResult = $this->check($order, 'available_financing_limit');
         $amountCheckResult = $this->check($order, 'amount');
         $debtorCountryCheckResult = $this->check($order, 'debtor_country');
         $debtorIndustrySectorCheckResult = $this->check($order, 'debtor_industry_sector');
 
-        return $amountCheckResult && $debtorCountryCheckResult && $debtorIndustrySectorCheckResult;
+        return
+            $availableFinancingLimitCheckResult &&
+            $amountCheckResult &&
+            $debtorCountryCheckResult &&
+            $debtorIndustrySectorCheckResult
+        ;
     }
 
     public function runChecks(OrderContainer $order): bool
@@ -161,7 +167,7 @@ class OrderChecksRunnerService implements LoggingInterface
             $debtorScoreThresholds
         );
 
-        $passed = $this->alfred->isEligibleForPayAfterDelivery($IsEligibleForPayAfterDeliveryRequestDTO);
+        $passed = $this->companiesService->isEligibleForPayAfterDelivery($IsEligibleForPayAfterDeliveryRequestDTO);
 
         $checkResult = new CheckResult($passed, 'company_b2b_score', []);
         $riskCheckEntity = $this->riskCheckFactory->createFromCheckResult($checkResult, $order->getOrder()->getId());
