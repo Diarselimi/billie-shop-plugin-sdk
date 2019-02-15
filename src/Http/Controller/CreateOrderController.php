@@ -76,7 +76,7 @@ class CreateOrderController
             $useCaseRequest->getDebtorCompany()->setRegistrationNumber(
                 $this->registrationNumberConverter->convert(
                     $request->request->get('debtor_company')['registration_number'],
-                    $request->request->get('debtor_company')['registration_court']
+                    $request->request->get('debtor_company')['registration_court'] ?? ''
                 )
             );
         }

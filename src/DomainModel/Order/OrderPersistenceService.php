@@ -10,6 +10,7 @@ use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntityFactory;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
 use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonEntityFactory;
 use App\DomainModel\Person\PersonRepositoryInterface;
@@ -17,13 +18,23 @@ use App\DomainModel\Person\PersonRepositoryInterface;
 class OrderPersistenceService
 {
     private $orderRepository;
+
     private $personRepository;
+
     private $addressRepository;
+
     private $debtorExternalDataRepository;
+
     private $merchantRepository;
+
+    private $merchantSettingsRepository;
+
     private $orderFactory;
+
     private $personFactory;
+
     private $addressFactory;
+
     private $debtorExternalDataFactory;
 
     public function __construct(
@@ -32,6 +43,7 @@ class OrderPersistenceService
         AddressRepositoryInterface $addressRepository,
         DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
         MerchantRepositoryInterface $merchantRepository,
+        MerchantSettingsRepositoryInterface $merchantSettingsRepository,
         OrderEntityFactory $orderFactory,
         PersonEntityFactory $personFactory,
         AddressEntityFactory $addressFactory,
@@ -42,6 +54,7 @@ class OrderPersistenceService
         $this->addressRepository = $addressRepository;
         $this->debtorExternalDataRepository = $debtorExternalDataRepository;
         $this->merchantRepository = $merchantRepository;
+        $this->merchantSettingsRepository = $merchantSettingsRepository;
         $this->orderFactory = $orderFactory;
         $this->personFactory = $personFactory;
         $this->addressFactory = $addressFactory;
@@ -71,6 +84,7 @@ class OrderPersistenceService
             ->setDebtorExternalDataAddress($debtorAddress)
             ->setDeliveryAddress($deliveryAddress)
             ->setMerchant($this->merchantRepository->getOneById($order->getMerchantId()))
+            ->setMerchantSettings($this->merchantSettingsRepository->getOneByMerchant($order->getMerchantId()))
         ;
     }
 

@@ -112,7 +112,7 @@ Feature:
             "address_country":"DE",
             "tax_id":"VA222",
             "tax_number":"3333",
-            "registration_court":"some court",
+            "registration_court":"",
             "registration_number":" some number",
             "industry_sector":"some sector",
             "subindustry_sector":"some sub",
