@@ -7,8 +7,11 @@ use App\DomainModel\RiskCheck\RiskCheckRepositoryInterface;
 class OrderDeclinedReasonsMapper
 {
     private const REASON_RISK_POLICY = 'risk_policy';
+
     private const REASON_DEBTOR_NOT_IDENTIFIED = 'debtor_not_identified';
+
     private const REASON_DEBTOR_LIMIT_EXCEEDED = 'debtor_limit_exceeded';
+
     private const REASON_ADDRESS_MISMATCH = 'debtor_address';
 
     private $riskCheckRepository;
@@ -24,7 +27,9 @@ class OrderDeclinedReasonsMapper
             'debtor_identified' => self::REASON_DEBTOR_NOT_IDENTIFIED,
             'limit' => self::REASON_DEBTOR_LIMIT_EXCEEDED,
             'debtor_name' => self::REASON_ADDRESS_MISMATCH,
-            'debtor_address' => self::REASON_ADDRESS_MISMATCH,
+            'debtor_address_street_match' => self::REASON_ADDRESS_MISMATCH,
+            'debtor_address_house_match' => self::REASON_ADDRESS_MISMATCH,
+            'debtor_address_postal_code_match' => self::REASON_ADDRESS_MISMATCH,
         ];
         $mappedChecks = array_keys($riskChecksToReasons);
 
