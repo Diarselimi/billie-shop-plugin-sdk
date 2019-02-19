@@ -18,16 +18,6 @@ services:
     App\Infrastructure\Repository\AbstractRepository:
       tags: ['paella_core.repository']
 
-    App\DomainModel\Monitoring\LoggingInterface:
-      tags: ['paella_core.logging']
-      calls:
-      - method: setLogger
-        arguments:
-        - '@Psr\Log\LoggerInterface'
-      - method: setSentry
-        arguments:
-        - '@Raven_Client'
-
   App\:
     resource: '../src/*'
     exclude: '../src/{Entity,Migrations,Tests,Test,Kernel.php}'
@@ -78,34 +68,6 @@ services:
             debtor_blacklisted: '@App\DomainModel\RiskCheck\Checker\DebtorBlacklistedCheck'
             available_financing_limit: '@App\DomainModel\RiskCheck\Checker\AvailableFinancingLimitCheck'
             company_b2b_score: '@App\DomainModel\RiskCheck\Checker\DebtorScoreCheck'
-
-  # monitoring
-  App\Infrastructure\Monitoring\Sentry\SentrySubscriber:
-    arguments:
-      $env: '%env(INSTANCE_SUFFIX)%'
-
-  Raven_Client:
-    class: Raven_Client
-    arguments:
-      - '%env(SENTRY_DSN)%'
-
-  App\Infrastructure\Monitoring\StackdriverLogHandler:
-    arguments:
-      $loggingClient: !service
-        class: Google\Cloud\Logging\LoggingClient
-        arguments:
-          -
-            projectId: '%google_cloud_project_id%'
-            keyFilePath: '%google_cloud_credentials_file_path%'
-      $env: '%env(INSTANCE_SUFFIX)%'
-      $channel: '%project_name%'
-
-  App\Infrastructure\Monitoring\Controller\:
-    resource: '../src/Infrastructure/Monitoring/Controller'
-    tags: ['controller.service_arguments']
-    bind:
-      $projectName: '%project_name%'
-  # end of monitoring
 
   App\Infrastructure\Sns\InvoiceDownloadEventPublisher:
     arguments:

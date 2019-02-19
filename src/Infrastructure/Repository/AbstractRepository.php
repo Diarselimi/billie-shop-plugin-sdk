@@ -2,10 +2,10 @@
 
 namespace App\Infrastructure\Repository;
 
-use App\DomainModel\Monitoring\LoggingInterface;
-use App\DomainModel\Monitoring\LoggingTrait;
 use App\Infrastructure\PDO\PDO;
 use App\Infrastructure\PDO\PDOStatementExecutor;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
 abstract class AbstractRepository implements LoggingInterface
 {

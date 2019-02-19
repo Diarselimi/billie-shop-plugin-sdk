@@ -4,8 +4,8 @@ namespace App\Http\EventSubscriber;
 
 use App\Application\Exception\RequestValidationException;
 use App\Application\PaellaCoreCriticalException;
-use App\DomainModel\Monitoring\LoggingInterface;
-use App\DomainModel\Monitoring\LoggingTrait;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use GuzzleHttp\Exception\RequestException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,14 +18,14 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 
 class ExceptionSubscriber implements EventSubscriberInterface, LoggingInterface
 {
+    use LoggingTrait;
+
     private $camelCaseToSnakeCaseNameConverter;
 
     public function __construct(CamelCaseToSnakeCaseNameConverter $camelCaseToSnakeCaseNameConverter)
     {
         $this->camelCaseToSnakeCaseNameConverter = $camelCaseToSnakeCaseNameConverter;
     }
-
-    use LoggingTrait;
 
     public static function getSubscribedEvents()
     {

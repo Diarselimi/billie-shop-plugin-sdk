@@ -2,10 +2,10 @@
 
 namespace App\Infrastructure\Sns;
 
-use App\DomainModel\Monitoring\LoggingInterface;
-use App\DomainModel\Monitoring\LoggingTrait;
 use Aws\Sns\Exception\SnsException;
 use Aws\Sns\SnsClient;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
 class InvoiceDownloadEventPublisher implements LoggingInterface, InvoiceDownloadEventPublisherInterface
 {

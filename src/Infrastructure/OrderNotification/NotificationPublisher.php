@@ -2,9 +2,9 @@
 
 namespace App\Infrastructure\OrderNotification;
 
-use App\DomainModel\Monitoring\LoggingInterface;
-use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\OrderNotification\NotificationPublisherInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 
 class NotificationPublisher implements NotificationPublisherInterface, LoggingInterface

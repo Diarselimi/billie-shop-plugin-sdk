@@ -2,8 +2,8 @@
 
 namespace App\Infrastructure\PDO;
 
-use App\DomainModel\Monitoring\LoggingInterface;
-use App\DomainModel\Monitoring\LoggingTrait;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use PDOException;
 
 class PDOStatementExecutor implements LoggingInterface

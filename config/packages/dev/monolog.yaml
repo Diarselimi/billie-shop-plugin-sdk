@@ -1,8 +1,8 @@
 monolog:
   handlers:
     main:
-      type: "service"
-      path: "%kernel.logs_dir%/%kernel.environment%.log"
-      id: App\Infrastructure\Monitoring\StackdriverLogHandler
+      type: "stream"
+      path: "php://stdout"
       level: info
       channels: ["!translation", "!request"]
+      formatter: Monolog\Formatter\JsonFormatter

@@ -2,8 +2,6 @@
 
 namespace App\DomainModel\Order;
 
-use App\DomainModel\Monitoring\LoggingInterface;
-use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\RiskCheck\Checker\CheckInterface;
 use App\DomainModel\RiskCheck\Checker\CheckResult;
 use App\DomainModel\RiskCheck\Checker\DebtorAddressHouseMatchCheck;
@@ -12,6 +10,8 @@ use App\DomainModel\RiskCheck\Checker\DebtorAddressStreetMatchCheck;
 use App\DomainModel\RiskCheck\Checker\DebtorScoreCheck;
 use App\DomainModel\RiskCheck\RiskCheckEntityFactory;
 use App\DomainModel\RiskCheck\RiskCheckRepositoryInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class OrderChecksRunnerService implements LoggingInterface

@@ -2,11 +2,11 @@
 
 namespace App\DomainModel\OrderTransition;
 
-use App\DomainModel\Monitoring\LoggingInterface;
-use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderLifecycleEvent;
 use App\DomainModel\Order\OrderStateManager;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Workflow\Event\Event;
 
@@ -15,6 +15,7 @@ class OrderTransitionSubscriber implements EventSubscriberInterface, LoggingInte
     use LoggingTrait;
 
     private $transitionFactory;
+
     private $transitionManager;
 
     public function __construct(

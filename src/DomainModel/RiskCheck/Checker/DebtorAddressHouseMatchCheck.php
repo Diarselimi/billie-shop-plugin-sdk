@@ -2,9 +2,9 @@
 
 namespace App\DomainModel\RiskCheck\Checker;
 
-use App\DomainModel\Monitoring\LoggingInterface;
-use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\Order\OrderContainer;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
 class DebtorAddressHouseMatchCheck implements CheckInterface, LoggingInterface
 {

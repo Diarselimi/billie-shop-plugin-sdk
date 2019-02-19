@@ -83,29 +83,11 @@
     "fesor/json_matcher": {
         "version": "0.2.3"
     },
-    "firebase/php-jwt": {
-        "version": "v5.0.0"
-    },
     "gnugat/redaktilo": {
         "version": "v1.7.3"
     },
-    "google/auth": {
-        "version": "v1.3.0"
-    },
-    "google/cloud-core": {
-        "version": "v1.20.0"
-    },
-    "google/cloud-logging": {
-        "version": "v1.10.4"
-    },
-    "google/gax": {
-        "version": "0.31.3"
-    },
     "google/proto-client": {
         "version": "0.37.0"
-    },
-    "google/protobuf": {
-        "version": "v3.5.2"
     },
     "grpc/grpc": {
         "version": "1.10.0"
@@ -154,9 +136,6 @@
     },
     "ocramius/proxy-manager": {
         "version": "2.2.0"
-    },
-    "ozean12/sentry": {
-        "version": "1.9.x-dev"
     },
     "paragonie/random_compat": {
         "version": "v2.0.12"
@@ -289,9 +268,6 @@
     },
     "symfony/inflector": {
         "version": "v4.0.7"
-    },
-    "symfony/lts": {
-        "version": "4-dev"
     },
     "symfony/monolog-bridge": {
         "version": "v4.0.9"

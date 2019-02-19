@@ -2,8 +2,8 @@
 
 namespace App\Test;
 
-use App\DomainModel\Monitoring\LoggingInterface;
-use App\DomainModel\Monitoring\LoggingTrait;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use EightPoints\Bundle\GuzzleBundle\Events\GuzzleEvents;
 use EightPoints\Bundle\GuzzleBundle\Events\PreTransactionEvent;
 use GuzzleHttp\Psr7\Uri;
@@ -17,8 +17,11 @@ class TestGuzzleSubscriber implements EventSubscriberInterface, LoggingInterface
     private const HEADER_NAME = 'X-Test-Id';
 
     private $request;
+
     private $mockServerUrl;
+
     private $servicesToMock;
+
     private $servicesToProxyHeader;
 
     public function __construct(

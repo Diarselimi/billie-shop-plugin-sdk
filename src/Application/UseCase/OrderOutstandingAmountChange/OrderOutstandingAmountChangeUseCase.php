@@ -6,11 +6,11 @@ use App\Application\PaellaCoreCriticalException;
 use App\DomainModel\Merchant\MerchantNotFoundException;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
-use App\DomainModel\Monitoring\LoggingInterface;
-use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\LimitsService;
 use App\DomainModel\OrderNotification\NotificationScheduler;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Raven_Client;
 
 class OrderOutstandingAmountChangeUseCase implements LoggingInterface

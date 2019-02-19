@@ -3,10 +3,10 @@
 namespace App\Application\UseCase\OrderTriggerInvoiceDownload;
 
 use App\Application\PaellaCoreCriticalException;
-use App\DomainModel\Monitoring\LoggingInterface;
-use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\Infrastructure\Sns\InvoiceDownloadEventPublisherInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
 class OrderTriggerInvoiceDownloadUseCase implements LoggingInterface
 {

@@ -3,10 +3,10 @@
 namespace App\Application\UseCase\OrderPaymentStateChange;
 
 use App\Application\PaellaCoreCriticalException;
-use App\DomainModel\Monitoring\LoggingInterface;
-use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\Workflow\Exception\NotEnabledTransitionException;
 use Symfony\Component\Workflow\Workflow;
 
@@ -15,8 +15,11 @@ class OrderPaymentStateChangeUseCase implements LoggingInterface
     use LoggingTrait;
 
     private $orderRepository;
+
     private $workflow;
+
     private $orderStateManager;
+
     private $sentry;
 
     public function __construct(
