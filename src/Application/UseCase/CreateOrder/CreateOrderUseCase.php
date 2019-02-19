@@ -126,7 +126,7 @@ class CreateOrderUseCase implements LoggingInterface
         );
 
         if ($merchantDebtor === null) {
-            $this->orderChecksRunnerService->publishCheckResult(
+            $this->orderChecksRunnerService->persistCheckResult(
                 new CheckResult(false, 'debtor_identified', ['debtor_found' => 0]),
                 $orderContainer
             );
@@ -134,7 +134,7 @@ class CreateOrderUseCase implements LoggingInterface
             return null;
         }
 
-        $this->orderChecksRunnerService->publishCheckResult(
+        $this->orderChecksRunnerService->persistCheckResult(
             new CheckResult(true, 'debtor_identified', [
                 'debtor_found' => 1,
                 'debor_company_id' => $merchantDebtor->getDebtorCompany()->getId(),
@@ -159,7 +159,7 @@ class CreateOrderUseCase implements LoggingInterface
             $orderContainer->getOrder()->getAmountGross()
         );
 
-        $this->orderChecksRunnerService->publishCheckResult(
+        $this->orderChecksRunnerService->persistCheckResult(
             new CheckResult($limitsLocked, 'limit', []),
             $orderContainer
         );

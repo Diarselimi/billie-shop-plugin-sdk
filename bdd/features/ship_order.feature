@@ -47,7 +47,6 @@ Feature:
             "proof_of_delivery_url": "http://example.com/proove/is/here"
         }
         """
-        Then print last response
         Then the response status code should be 204
         And the response should be empty
-        And the order "CO123" is shipped
+        And the order "CO123" is in state shipped

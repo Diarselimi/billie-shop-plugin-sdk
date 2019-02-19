@@ -58,7 +58,7 @@ Feature:
          "order_id":"A1"
       }
       """
-    Then the order A1 is declined
+    Then the order A1 is in state declined
     And the response should be empty
 
   Scenario: Successful order creation
@@ -103,12 +103,12 @@ Feature:
          },
          "debtor_company":{
             "merchant_customer_id":"12",
-            "name":"billie GmbH",
+            "name":"Test User Company",
             "address_addition":"left door",
-            "address_house_number":"33",
-            "address_street":"c/Velarus",
+            "address_house_number":"10",
+            "address_street":"Heinrich-Heine-Platz",
             "address_city":"Berlin",
-            "address_postal_code":"12345",
+            "address_postal_code":"10179",
             "address_country":"DE",
             "tax_id":"VA222",
             "tax_number":"3333",
@@ -139,6 +139,7 @@ Feature:
       """
     Then the response status code should be 201
     And the response should be empty
+    And the order A1 is in state created
 
   Scenario: Debtor overdue check failed
     Given I get from alfred "/debtor/identify" endpoint response with status 200 and body
@@ -220,7 +221,7 @@ Feature:
       """
     Then the response status code should be 201
     And the response should be empty
-    Then the order A1 is declined
+    Then the order A1 is in state declined
 
   Scenario: Debtor is not eligible for Point Of Sale
     Given I get from alfred "/debtor/identify" endpoint response with status 200 and body
@@ -300,7 +301,7 @@ Feature:
       """
     Then the response status code should be 201
     And the response should be empty
-    And the order A1 is declined
+    And the order A1 is in state declined
 
   Scenario: Missing required fields
     When I send a POST request to "/order" with body:
@@ -566,12 +567,12 @@ Feature:
          },
          "debtor_company":{
             "merchant_customer_id":"12",
-            "name":"billie GmbH",
+            "name":"Test User Company",
             "address_addition":"left door",
-            "address_house_number":"33",
-            "address_street":"c/Velarus",
+            "address_house_number":"10",
+            "address_street":"Heinrich-Heine-Platz",
             "address_city":"Berlin",
-            "address_postal_code":"12345",
+            "address_postal_code":"10179",
             "address_country":"DE",
             "tax_id":"VA222",
             "tax_number":"3333",
@@ -595,6 +596,7 @@ Feature:
       """
 	Then the response status code should be 201
 	And the response should be empty
+    And the order A1 is in state created
 
   Scenario: Order exceeds the merchant available financing limit
     Given I get from alfred "/debtor/identify" endpoint response with status 200 and body
@@ -660,5 +662,6 @@ Feature:
          "order_id":"A1"
       }
       """
-    Then the order A1 is declined
+    Then the response status code should be 201
     And the response should be empty
+    And the order A1 is in state declined

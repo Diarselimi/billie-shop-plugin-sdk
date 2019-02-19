@@ -226,7 +226,7 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
-     * @Given the order :orderId is :state
+     * @Given the order :orderId is in state :state
      */
     public function orderIsInState($orderId, $state)
     {

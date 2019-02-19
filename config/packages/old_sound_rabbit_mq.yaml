@@ -25,12 +25,6 @@ old_sound_rabbit_mq:
       queue_options:    { name: 'order_payment_amount_change_paella%env(INSTANCE_SUFFIX)%', routing_keys: ['amount_change'] }
       callback:         App\Amqp\Consumer\OrderOutstandingAmountChangeConsumer
       qos_options:      {prefetch_size: 0, prefetch_count: 1, global: false}
-    risk_check_result:
-      connection:       default
-      exchange_options: { name: 'risky_events%env(INSTANCE_SUFFIX)%', type: direct }
-      queue_options:    { name: 'risk_check_result_paella%env(INSTANCE_SUFFIX)%', routing_keys: ['risk_check_result_paella'] }
-      callback:         App\Amqp\Consumer\RiskCheckResultConsumer
-      qos_options:      {prefetch_size: 0, prefetch_count: 1, global: false}
     notification_delivery:
       connection:       default
       exchange_options: { name: 'paella_delayed_events%env(INSTANCE_SUFFIX)%', type: 'x-delayed-message', arguments: {x-delayed-type: ['S', 'direct']} }

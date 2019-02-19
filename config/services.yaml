@@ -72,9 +72,12 @@ services:
             debtor_not_customer: '@App\DomainModel\RiskCheck\Checker\DebtorNotCustomerCheck'
             debtor_overdue: '@App\DomainModel\RiskCheck\Checker\DebtorOverdueCheck'
             debtor_name: '@App\DomainModel\RiskCheck\Checker\DebtorNameCheck'
-            debtor_address: '@App\DomainModel\RiskCheck\Checker\DebtorAddressCheck'
+            debtor_address_street_match: '@App\DomainModel\RiskCheck\Checker\DebtorAddressStreetMatchCheck'
+            debtor_address_house_match: '@App\DomainModel\RiskCheck\Checker\DebtorAddressHouseMatchCheck'
+            debtor_address_postal_code_match: '@App\DomainModel\RiskCheck\Checker\DebtorAddressPostalCodeMatchCheck'
             debtor_blacklisted: '@App\DomainModel\RiskCheck\Checker\DebtorBlacklistedCheck'
             available_financing_limit: '@App\DomainModel\RiskCheck\Checker\AvailableFinancingLimitCheck'
+            company_b2b_score: '@App\DomainModel\RiskCheck\Checker\DebtorScoreCheck'
 
   # monitoring
   App\Infrastructure\Monitoring\Sentry\SentrySubscriber:
