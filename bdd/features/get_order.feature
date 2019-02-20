@@ -23,7 +23,7 @@ Feature:
         """
 
     Scenario: Successful order retrieve
-        Given I get from alfred "/debtor/1" endpoint response with status 200 and body
+        Given I get from alfred "/debtor/2" endpoint response with status 200 and body
         """
         {
             "id": 1,
