@@ -147,12 +147,12 @@
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/MonitoringBundle.git",
-                "reference": "c1f9203c84f9a6c8e9d4830ebd3a8774d98f915e"
+                "reference": "79b2fde6ff662033495550d5e6a0424f17915384"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/MonitoringBundle/zipball/c1f9203c84f9a6c8e9d4830ebd3a8774d98f915e",
-                "reference": "c1f9203c84f9a6c8e9d4830ebd3a8774d98f915e",
+                "url": "https://api.github.com/repos/ozean12/MonitoringBundle/zipball/79b2fde6ff662033495550d5e6a0424f17915384",
+                "reference": "79b2fde6ff662033495550d5e6a0424f17915384",
                 "shasum": ""
             },
             "require": {
@@ -175,7 +175,7 @@
                 "source": "https://github.com/ozean12/MonitoringBundle/tree/master",
                 "issues": "https://github.com/ozean12/MonitoringBundle/issues"
             },
-            "time": "2019-02-21T09:06:12+00:00"
+            "time": "2019-02-21T10:03:40+00:00"
         },
         {
             "name": "doctrine/annotations",
