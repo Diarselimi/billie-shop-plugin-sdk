@@ -8,7 +8,7 @@ use App\DomainModel\Order\OrderContainer;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
-class DebtorFinderService implements LoggingInterface
+class DebtorFinder implements LoggingInterface
 {
     use LoggingTrait;
 
@@ -28,7 +28,7 @@ class DebtorFinderService implements LoggingInterface
         $this->merchantDebtorRegistrationService = $merchantDebtorRegistrationService;
     }
 
-    public function findDebtor(OrderContainer $orderContainer, int $merchantId): ? MerchantDebtorEntity
+    public function findDebtor(OrderContainer $orderContainer, int $merchantId): ?MerchantDebtorEntity
     {
         $this->logInfo('Check if the merchant customer already known');
         $merchantDebtor = $this->merchantDebtorRepository->getOneByMerchantExternalId(

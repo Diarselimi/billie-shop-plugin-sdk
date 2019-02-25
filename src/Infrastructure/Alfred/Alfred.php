@@ -2,11 +2,12 @@
 
 namespace App\Infrastructure\Alfred;
 
+use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorCompany\DebtorCompanyFactory;
-use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\IdentifyDebtorRequestDTO;
 use App\DomainModel\DebtorCompany\IsEligibleForPayAfterDeliveryRequestDTO;
+use App\DomainModel\MerchantDebtor\MerchantDebtorDuplicateDTO;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
 use Psr\Http\Message\ResponseInterface;
@@ -24,7 +25,7 @@ class Alfred implements CompaniesServiceInterface
         $this->factory = $debtorFactory;
     }
 
-    public function getDebtor(int $debtorId): ? DebtorCompany
+    public function getDebtor(int $debtorId): ?DebtorCompany
     {
         try {
             $response = $this->client->get("/debtor/$debtorId");
@@ -41,7 +42,7 @@ class Alfred implements CompaniesServiceInterface
         return $this->factory->createFromAlfredResponse($decodedResponse);
     }
 
-    public function identifyDebtor(IdentifyDebtorRequestDTO $requestDTO): ? DebtorCompany
+    public function identifyDebtor(IdentifyDebtorRequestDTO $requestDTO): ?DebtorCompany
     {
         try {
             $response = $this->client->post(
@@ -77,7 +78,7 @@ class Alfred implements CompaniesServiceInterface
         return $this->factory->createFromAlfredResponse($decodedResponse);
     }
 
-    public function identifyDebtorV2(array $debtorData): ? DebtorCompany
+    public function identifyDebtorV2(array $debtorData): ?DebtorCompany
     {
         try {
             $response = $this->client->post("/debtor/identify/v2", [
@@ -160,6 +161,27 @@ class Alfred implements CompaniesServiceInterface
             $decodedResponse = $this->decodeResponse($response);
 
             return $decodedResponse['is_eligible'];
+        } catch (TransferException $exception) {
+            throw new AlfredRequestException($exception->getCode(), $exception);
+        }
+    }
+
+    public function markDuplicates(array $duplicates): void
+    {
+        $payload = ['duplicates' => []];
+
+        foreach ($duplicates as $duplicate) {
+            /** @var MerchantDebtorDuplicateDTO $duplicate */
+            $payload['duplicates'][] = [
+                'debtor_id' => $duplicate->getDebtorId(),
+                'is_duplicate_of' => $duplicate->getParentDebtorId(),
+            ];
+        }
+
+        try {
+            $this->client->post("/debtor/mark-duplicates", [
+                'json' => $payload,
+            ]);
         } catch (TransferException $exception) {
             throw new AlfredRequestException($exception->getCode(), $exception);
         }

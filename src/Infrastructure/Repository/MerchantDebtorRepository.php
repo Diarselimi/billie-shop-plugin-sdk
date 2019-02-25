@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\Repository;
 
+use App\DomainModel\MerchantDebtor\MerchantDebtorIdentifierDTO;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntityFactory;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
@@ -100,5 +101,30 @@ class MerchantDebtorRepository extends AbstractRepository implements MerchantDeb
         ]);
 
         return $row ? $this->factory->createFromDatabaseRow($row) : null;
+    }
+
+    public function getDebtorsWithExternalId(string $where = ''): \Generator
+    {
+        $where = $where ? "WHERE {$where}" : '';
+        $sql = <<<SQL
+    SELECT debtor_id, 
+           merchants_debtors.merchant_id,
+           merchant_external_id,
+           merchant_debtor_id
+    FROM orders
+        INNER JOIN debtor_external_data ON (debtor_external_data_id = debtor_external_data.id)
+        INNER JOIN merchants_debtors ON (merchant_debtor_id = merchants_debtors.id)
+    {$where}
+    GROUP BY debtor_id, merchant_id, merchant_external_id, merchant_debtor_id
+    ORDER BY merchant_id, merchant_external_id, debtor_id
+SQL;
+        $stmt = $this->exec($sql);
+        while ($stmt && $row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            yield (new MerchantDebtorIdentifierDTO())
+                ->setMerchantDebtorId($row['merchant_debtor_id'])
+                ->setMerchantId($row['merchant_id'])
+                ->setDebtorId((int) $row['debtor_id'])
+                ->setMerchantExternalId($row['merchant_external_id']);
+        }
     }
 }

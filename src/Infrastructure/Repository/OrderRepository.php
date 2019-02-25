@@ -6,6 +6,7 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderEntityFactory;
 use App\DomainModel\Order\OrderLifecycleEvent;
 use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderStateCounterDTO;
 use App\DomainModel\Order\OrderStateManager;
 use App\Infrastructure\PDO\PDO;
 use Generator;
@@ -274,5 +275,60 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
         }
 
         return $result['total'] > 0;
+    }
+
+    public function countOrdersByState(int $merchantDebtorId): OrderStateCounterDTO
+    {
+        $counters = [
+            'total_new' => 0,
+            'total_declined' => 0,
+            'total_created' => 0,
+            'total_canceled' => 0,
+            'total_shipped' => 0,
+            'total_late' => 0,
+            'total_paid_out' => 0,
+            'total_complete' => 0,
+            'total' => 0,
+            'total_active' => 0,
+            'total_inactive' => 0,
+            'total_new_or_declined' => 0,
+        ];
+
+        $active_states = ['created', 'shipped', 'late', 'paid_out'];
+        $inactive_states = ['canceled', 'complete'];
+        $failed_states = ['new', 'declined'];
+
+        $sql = <<<SQL
+    SELECT state FROM orders
+    WHERE merchant_debtor_id = {$merchantDebtorId} AND marked_as_fraud_at IS NULL
+SQL;
+        $stmt = $this->exec($sql);
+        while ($stmt && $row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $counters['total_' . $row['state']]++;
+            $counters['total']++;
+
+            if (in_array($row['state'], $active_states)) {
+                $counters['total_active']++;
+            } elseif (in_array($row['state'], $inactive_states)) {
+                $counters['total_inactive']++;
+            } elseif (in_array($row['state'], $failed_states)) {
+                $counters['total_new_or_declined']++;
+            } else {
+                throw new \RuntimeException("Unknown order state: {$row['state']}");
+            }
+        }
+
+        return (new OrderStateCounterDTO())
+            ->setTotal($counters['total'])
+            ->setTotalActive($counters['total_active'])
+            ->setTotalInactive($counters['total_inactive'])
+            ->setTotalNew($counters['total_new'])
+            ->setTotalDeclined($counters['total_declined'])
+            ->setTotalCreated($counters['total_created'])
+            ->setTotalCanceled($counters['total_canceled'])
+            ->setTotalShipped($counters['total_shipped'])
+            ->setTotalLate($counters['total_late'])
+            ->setTotalPaidOut($counters['total_paid_out'])
+            ->setTotalComplete($counters['total_complete']);
     }
 }

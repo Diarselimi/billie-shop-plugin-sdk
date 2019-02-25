@@ -5,7 +5,7 @@ namespace App\Application\UseCase\CreateOrder;
 use App\Application\Exception\RequestValidationException;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
-use App\DomainModel\MerchantDebtor\DebtorFinderService;
+use App\DomainModel\MerchantDebtor\DebtorFinder;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\Order\LimitsService;
 use App\DomainModel\Order\OrderChecksRunnerService;
@@ -50,7 +50,7 @@ class CreateOrderUseCase implements LoggingInterface
         OrderRepositoryInterface $orderRepository,
         Workflow $workflow,
         LimitsService $limitsService,
-        DebtorFinderService $debtorFinderService,
+        DebtorFinder $debtorFinderService,
         ValidatorInterface $validator,
         ProducerInterface $producer
     ) {

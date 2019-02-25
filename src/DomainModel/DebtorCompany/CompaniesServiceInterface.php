@@ -2,6 +2,8 @@
 
 namespace App\DomainModel\DebtorCompany;
 
+use App\DomainModel\MerchantDebtor\MerchantDebtorDuplicateDTO;
+
 interface CompaniesServiceInterface
 {
     public function getDebtor(int $debtorId): ? DebtorCompany;
@@ -17,4 +19,9 @@ interface CompaniesServiceInterface
     public function isDebtorBlacklisted(string $debtorId): bool;
 
     public function isEligibleForPayAfterDelivery(IsEligibleForPayAfterDeliveryRequestDTO $requestDTO): bool;
+
+    /**
+     * @param MerchantDebtorDuplicateDTO[] $duplicates
+     */
+    public function markDuplicates(array $duplicates): void;
 }
