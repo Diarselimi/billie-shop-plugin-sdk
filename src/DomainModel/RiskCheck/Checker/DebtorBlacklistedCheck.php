@@ -10,6 +10,6 @@ class DebtorBlacklistedCheck implements CheckInterface
 
     public function check(OrderContainer $order): CheckResult
     {
-        return new CheckResult(!$order->getDebtorCompany()->isBlacklisted(), self::NAME, []);
+        return new CheckResult(!$order->getMerchantDebtor()->getDebtorCompany()->isBlacklisted(), self::NAME, []);
     }
 }

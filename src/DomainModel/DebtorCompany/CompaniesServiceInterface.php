@@ -1,16 +1,14 @@
 <?php
 
-namespace App\DomainModel\Alfred;
+namespace App\DomainModel\DebtorCompany;
 
-use App\Infrastructure\Alfred\IsEligibleForPayAfterDeliveryRequestDTO;
-
-interface AlfredInterface
+interface CompaniesServiceInterface
 {
-    public function getDebtor(int $debtorId): ?DebtorDTO;
+    public function getDebtor(int $debtorId): ? DebtorCompany;
 
-    public function identifyDebtor(array $debtorData): ?DebtorDTO;
+    public function identifyDebtor(IdentifyDebtorRequestDTO $requestDTO): ? DebtorCompany;
 
-    public function identifyDebtorV2(array $debtorData): ?DebtorDTO;
+    public function identifyDebtorV2(array $debtorData): ? DebtorCompany;
 
     public function lockDebtorLimit(string $debtorId, float $amount): bool;
 

@@ -9,11 +9,11 @@ class PersonEntityFactory
     public function createFromRequest(CreateOrderRequest $request): PersonEntity
     {
         return (new PersonEntity())
-            ->setGender($request->getDebtorPersonGender())
-            ->setFirstName($request->getDebtorPersonFirstName())
-            ->setLastName($request->getDebtorPersonLastName())
-            ->setPhoneNumber($request->getDebtorPersonPhoneNumber())
-            ->setEmail($request->getDebtorPersonEmail())
+            ->setGender($request->getDebtorPerson()->getGender())
+            ->setFirstName($request->getDebtorPerson()->getFirstName())
+            ->setLastName($request->getDebtorPerson()->getLastName())
+            ->setPhoneNumber($request->getDebtorPerson()->getPhoneNumber())
+            ->setEmail($request->getDebtorPerson()->getEmail())
         ;
     }
 }

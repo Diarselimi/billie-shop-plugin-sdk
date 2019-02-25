@@ -2,11 +2,11 @@
 
 namespace App\Infrastructure\OrderNotification;
 
-use App\DomainModel\Monitoring\LoggingInterface;
-use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\OrderNotification\Exception\NotificationSenderException;
 use App\DomainModel\OrderNotification\NotificationDeliveryResultDTO;
 use App\DomainModel\OrderNotification\NotificationSenderInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 

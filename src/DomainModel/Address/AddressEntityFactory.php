@@ -9,24 +9,24 @@ class AddressEntityFactory
     public function createFromRequestDelivery(CreateOrderRequest $request): AddressEntity
     {
         return (new AddressEntity())
-            ->setAddition($request->getDeliveryAddressAddition())
-            ->setHouseNumber($request->getDeliveryAddressHouseNumber())
-            ->setStreet($request->getDeliveryAddressStreet())
-            ->setPostalCode($request->getDeliveryAddressPostalCode())
-            ->setCity($request->getDeliveryAddressCity())
-            ->setCountry($request->getDeliveryAddressCountry())
+            ->setAddition($request->getDeliveryAddress()->getAddition())
+            ->setHouseNumber($request->getDeliveryAddress()->getHouseNumber())
+            ->setStreet($request->getDeliveryAddress()->getStreet())
+            ->setPostalCode($request->getDeliveryAddress()->getPostalCode())
+            ->setCity($request->getDeliveryAddress()->getCity())
+            ->setCountry($request->getDeliveryAddress()->getCountry())
         ;
     }
 
     public function createFromRequestDebtor(CreateOrderRequest $request): AddressEntity
     {
         return (new AddressEntity())
-            ->setAddition($request->getDebtorCompanyAddressAddition())
-            ->setHouseNumber($request->getDebtorCompanyAddressHouseNumber())
-            ->setStreet($request->getDebtorCompanyAddressStreet())
-            ->setPostalCode($request->getDebtorCompanyAddressPostalCode())
-            ->setCity($request->getDebtorCompanyAddressCity())
-            ->setCountry($request->getDebtorCompanyAddressCountry())
+            ->setAddition($request->getDebtorCompany()->getAddressAddition())
+            ->setHouseNumber($request->getDebtorCompany()->getAddressHouseNumber())
+            ->setStreet($request->getDebtorCompany()->getAddressStreet())
+            ->setPostalCode($request->getDebtorCompany()->getAddressPostalCode())
+            ->setCity($request->getDebtorCompany()->getAddressCity())
+            ->setCountry($request->getDebtorCompany()->getAddressCountry())
         ;
     }
 

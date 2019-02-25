@@ -4,7 +4,7 @@ namespace App\DomainModel\Order;
 
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
-use App\DomainModel\Alfred\AlfredInterface;
+use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 
 class LimitsService
 {
@@ -13,7 +13,7 @@ class LimitsService
     private $merchantDebtorRepository;
 
     public function __construct(
-        AlfredInterface $companyService,
+        CompaniesServiceInterface $companyService,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository
     ) {
         $this->companyService = $companyService;

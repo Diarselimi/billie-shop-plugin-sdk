@@ -1,3 +1,0 @@
-check process risk_check_result with pidfile /var/run/billie/risk_check_result.pid
-        start program = "/usr/local/bin/start-stop-script start /var/run/billie/risk_check_result.pid '/var/www/paella-core/bin/console rabbitmq:consumer -m 10 risk_check_result'"
-                as uid www-data and with gid www-data

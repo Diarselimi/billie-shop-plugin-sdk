@@ -1,8 +1,8 @@
 <?php
 
-namespace App\DomainModel\Alfred;
+namespace App\DomainModel\DebtorCompany;
 
-class DebtorDTO
+class DebtorCompany
 {
     private $id;
 
@@ -29,7 +29,7 @@ class DebtorDTO
         return $this->id;
     }
 
-    public function setId(int $id): DebtorDTO
+    public function setId(int $id): DebtorCompany
     {
         $this->id = $id;
 
@@ -41,7 +41,7 @@ class DebtorDTO
         return $this->name;
     }
 
-    public function setName(string $name): DebtorDTO
+    public function setName(string $name): DebtorCompany
     {
         $this->name = $name;
 
@@ -53,7 +53,7 @@ class DebtorDTO
         return $this->addressHouse;
     }
 
-    public function setAddressHouse(?string $addressHouse): DebtorDTO
+    public function setAddressHouse(?string $addressHouse): DebtorCompany
     {
         $this->addressHouse = $addressHouse;
 
@@ -65,7 +65,7 @@ class DebtorDTO
         return $this->addressStreet;
     }
 
-    public function setAddressStreet(string $addressStreet): DebtorDTO
+    public function setAddressStreet(string $addressStreet): DebtorCompany
     {
         $this->addressStreet = $addressStreet;
 
@@ -77,7 +77,7 @@ class DebtorDTO
         return $this->addressPostalCode;
     }
 
-    public function setAddressPostalCode(string $addressPostalCode): DebtorDTO
+    public function setAddressPostalCode(string $addressPostalCode): DebtorCompany
     {
         $this->addressPostalCode = $addressPostalCode;
 
@@ -89,7 +89,7 @@ class DebtorDTO
         return $this->addressCity;
     }
 
-    public function setAddressCity(string $addressCity): DebtorDTO
+    public function setAddressCity(string $addressCity): DebtorCompany
     {
         $this->addressCity = $addressCity;
 
@@ -101,7 +101,7 @@ class DebtorDTO
         return $this->addressCountry;
     }
 
-    public function setAddressCountry(string $addressCountry): DebtorDTO
+    public function setAddressCountry(string $addressCountry): DebtorCompany
     {
         $this->addressCountry = $addressCountry;
 
@@ -113,7 +113,7 @@ class DebtorDTO
         return $this->crefoId;
     }
 
-    public function setCrefoId(?string $crefoId): DebtorDTO
+    public function setCrefoId(?string $crefoId): DebtorCompany
     {
         $this->crefoId = $crefoId;
 
@@ -125,7 +125,7 @@ class DebtorDTO
         return $this->schufaId;
     }
 
-    public function setSchufaId(?string $schufaId): DebtorDTO
+    public function setSchufaId(?string $schufaId): DebtorCompany
     {
         $this->schufaId = $schufaId;
 
@@ -137,7 +137,7 @@ class DebtorDTO
         return $this->isBlacklisted;
     }
 
-    public function setIsBlacklisted(?bool $isBlacklisted): DebtorDTO
+    public function setIsBlacklisted(?bool $isBlacklisted): DebtorCompany
     {
         $this->isBlacklisted = $isBlacklisted;
 

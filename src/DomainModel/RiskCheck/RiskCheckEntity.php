@@ -6,24 +6,13 @@ use App\DomainModel\AbstractEntity;
 
 class RiskCheckEntity extends AbstractEntity
 {
-    private $checkId;
     private $orderId;
+
     private $name;
+
     private $isPassed;
 
-    public function getCheckId():? int
-    {
-        return $this->checkId;
-    }
-
-    public function setCheckId(?int $checkId): RiskCheckEntity
-    {
-        $this->checkId = $checkId;
-
-        return $this;
-    }
-
-    public function getOrderId():int
+    public function getOrderId(): int
     {
         return $this->orderId;
     }

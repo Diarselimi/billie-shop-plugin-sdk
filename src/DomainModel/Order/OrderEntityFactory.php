@@ -9,9 +9,9 @@ class OrderEntityFactory
     public function createFromRequest(CreateOrderRequest $request): OrderEntity
     {
         return (new OrderEntity())
-            ->setAmountNet($request->getAmountNet())
-            ->setAmountGross($request->getAmountGross())
-            ->setAmountTax($request->getAmountTax())
+            ->setAmountNet($request->getAmount()->getNet())
+            ->setAmountGross($request->getAmount()->getGross())
+            ->setAmountTax($request->getAmount()->getTax())
             ->setDuration($request->getDuration())
             ->setExternalComment($request->getComment())
             ->setExternalCode($request->getExternalCode())

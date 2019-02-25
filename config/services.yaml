@@ -18,16 +18,6 @@ services:
     App\Infrastructure\Repository\AbstractRepository:
       tags: ['paella_core.repository']
 
-    App\DomainModel\Monitoring\LoggingInterface:
-      tags: ['paella_core.logging']
-      calls:
-      - method: setLogger
-        arguments:
-        - '@Psr\Log\LoggerInterface'
-      - method: setSentry
-        arguments:
-        - '@Raven_Client'
-
   App\:
     resource: '../src/*'
     exclude: '../src/{Entity,Migrations,Tests,Test,Kernel.php}'
@@ -55,19 +45,9 @@ services:
     arguments:
       $client: '@eight_points_guzzle.client.webhook'
 
-  App\DomainModel\Order\OrderRepositoryInterface: '@App\Infrastructure\Repository\OrderRepository'
-  App\DomainModel\Address\AddressRepositoryInterface: '@App\Infrastructure\Repository\AddressRepository'
-  App\DomainModel\Person\PersonRepositoryInterface: '@App\Infrastructure\Repository\PersonRepository'
-  App\DomainModel\DebtorExternalData\DebtorExternalDataInterface: '@App\Infrastructure\Repository\DebtorExternalData'
-  App\DomainModel\Customer\MerchantRepositoryInterface: '@App\Infrastructure\Repository\MerchantRepository'
-  App\DomainModel\Customer\MerchantDebtorRepositoryInterface: '@App\Infrastructure\Repository\MerchantDebtorRepository'
-  App\DomainModel\Customer\RiskCheckRepositoryInterface: '@App\Infrastructure\Repository\RiskCheckRepository'
-  App\DomainModel\OrderTransition\OrderTransitionRepositoryInterface: '@App\Infrastructure\Repository\OrderTransitionRepository'
-
-  App\DomainModel\Alfred\AlfredInterface: '@App\Infrastructure\Alfred\Alfred'
-  App\DomainModel\Borscht\BorschtInterface: '@App\Infrastructure\Borscht\Borscht'
-
   Symfony\Component\Workflow\Workflow: '@state_machine.order'
+
+  Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter: '@serializer.name_converter.camel_case_to_snake_case'
 
   App\DomainModel\Order\OrderChecksRunnerService:
     arguments:
@@ -82,36 +62,12 @@ services:
             debtor_not_customer: '@App\DomainModel\RiskCheck\Checker\DebtorNotCustomerCheck'
             debtor_overdue: '@App\DomainModel\RiskCheck\Checker\DebtorOverdueCheck'
             debtor_name: '@App\DomainModel\RiskCheck\Checker\DebtorNameCheck'
-            debtor_address: '@App\DomainModel\RiskCheck\Checker\DebtorAddressCheck'
+            debtor_address_street_match: '@App\DomainModel\RiskCheck\Checker\DebtorAddressStreetMatchCheck'
+            debtor_address_house_match: '@App\DomainModel\RiskCheck\Checker\DebtorAddressHouseMatchCheck'
+            debtor_address_postal_code_match: '@App\DomainModel\RiskCheck\Checker\DebtorAddressPostalCodeMatchCheck'
             debtor_blacklisted: '@App\DomainModel\RiskCheck\Checker\DebtorBlacklistedCheck'
-
-  # monitoring
-  App\Infrastructure\Monitoring\Sentry\SentrySubscriber:
-    arguments:
-      $env: '%env(INSTANCE_SUFFIX)%'
-
-  Raven_Client:
-    class: Raven_Client
-    arguments:
-      - '%env(SENTRY_DSN)%'
-
-  App\Infrastructure\Monitoring\StackdriverLogHandler:
-    arguments:
-      $loggingClient: !service
-        class: Google\Cloud\Logging\LoggingClient
-        arguments:
-          -
-            projectId: '%google_cloud_project_id%'
-            keyFilePath: '%google_cloud_credentials_file_path%'
-      $env: '%env(INSTANCE_SUFFIX)%'
-      $channel: '%project_name%'
-
-  App\Infrastructure\Monitoring\Controller\:
-    resource: '../src/Infrastructure/Monitoring/Controller'
-    tags: ['controller.service_arguments']
-    bind:
-      $projectName: '%project_name%'
-  # end of monitoring
+            available_financing_limit: '@App\DomainModel\RiskCheck\Checker\AvailableFinancingLimitCheck'
+            company_b2b_score: '@App\DomainModel\RiskCheck\Checker\DebtorScoreCheck'
 
   App\Infrastructure\Sns\InvoiceDownloadEventPublisher:
     arguments:

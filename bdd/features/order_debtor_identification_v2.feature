@@ -6,6 +6,7 @@ Feature: In order to test the new identification flow and compare it to the curr
     And I add "X-Test" header equal to 1
     And I add "X-Api-User" header equal to 1
     And I start alfred
+    And consumer order_debtor_identification_v2 is empty
 
   Scenario: V1 identified the debtor - v2 identified the same debtor
     Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"

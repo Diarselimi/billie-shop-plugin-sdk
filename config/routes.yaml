@@ -1,3 +1,6 @@
+billie_monitoring:
+  resource: '@BillieMonitoringBundle/Resources/config/routes.yaml'
+
 get_order:
   path: /order/{externalCode}
   controller: App\Http\Controller\GetOrderController::execute
@@ -47,8 +50,3 @@ update_merchant_with_order_dunning_step:
   path: /order/{uuid}/update-dunning-step
   controller: App\Http\Controller\UpdateMerchantWithOrderDunningStepController::execute
   methods: [POST]
-
-health_check:
-  path: /healthcheck
-  controller:  App\Infrastructure\Monitoring\Controller\HealthCheckController::execute
-  methods: [GET]

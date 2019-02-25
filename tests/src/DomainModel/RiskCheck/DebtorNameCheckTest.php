@@ -2,8 +2,9 @@
 
 namespace App\Tests\src\DomainModel\RiskCheck;
 
-use App\DomainModel\Alfred\DebtorDTO;
+use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
+use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\Order\OrderContainer;
 use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\RiskCheck\Checker\DebtorNameCheck;
@@ -49,7 +50,7 @@ class DebtorNameCheckTest extends TestCase
         ;
 
         $order = (new OrderContainer())
-            ->setDebtorCompany((new DebtorDTO())->setName($nameFromRegistry))
+            ->setMerchantDebtor((new MerchantDebtorEntity())->setDebtorCompany((new DebtorCompany())->setName($nameFromRegistry)))
             ->setDebtorExternalData((new DebtorExternalDataEntity())->setName($nameFromOrder)->setLegalForm($legalForm))
         ;
         $result = $this->check->check($order);
@@ -87,7 +88,7 @@ class DebtorNameCheckTest extends TestCase
         $this->comparator->expects($this->once())->method('compareWithCompanyName')->willReturn(false);
 
         $order = (new OrderContainer())
-            ->setDebtorCompany((new DebtorDTO())->setName($nameFromRegistry))
+            ->setMerchantDebtor((new MerchantDebtorEntity())->setDebtorCompany((new DebtorCompany())->setName($nameFromRegistry)))
             ->setDebtorExternalData((new DebtorExternalDataEntity())->setName($nameFromOrder)->setLegalForm($legalForm))
             ->setDebtorPerson((new PersonEntity())->setFirstName($personFirstName)->setLastName($personLastName))
         ;

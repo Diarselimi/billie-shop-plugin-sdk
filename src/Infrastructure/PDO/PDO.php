@@ -2,19 +2,23 @@
 
 namespace App\Infrastructure\PDO;
 
-use App\DomainModel\Monitoring\LoggingInterface;
-use App\DomainModel\Monitoring\LoggingTrait;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
 class PDO extends \PDO implements LoggingInterface
 {
     use LoggingTrait;
 
     public const ERROR_GONE_AWAY = 2006;
+
     public const ERROR_LOST_CONNECTION = 2013;
 
     private $dsn;
+
     private $username;
+
     private $passwd;
+
     private $options;
 
     public function __construct(string $dsn, string $username = null, string $passwd = null, array $options = [])

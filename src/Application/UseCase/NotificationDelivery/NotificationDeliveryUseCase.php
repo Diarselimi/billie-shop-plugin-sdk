@@ -3,14 +3,14 @@
 namespace App\Application\UseCase\NotificationDelivery;
 
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
-use App\DomainModel\Monitoring\LoggingInterface;
-use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderNotification\Exception\NotificationSenderException;
 use App\DomainModel\OrderNotification\NotificationScheduler;
 use App\DomainModel\OrderNotification\NotificationSenderInterface;
 use App\DomainModel\OrderNotification\OrderNotificationDeliveryFactory;
 use App\DomainModel\OrderNotification\OrderNotificationRepositoryInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
 class NotificationDeliveryUseCase implements LoggingInterface
 {

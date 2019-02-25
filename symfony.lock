@@ -47,11 +47,26 @@
     "container-interop/container-interop": {
         "version": "1.2.0"
     },
+    "doctrine/annotations": {
+        "version": "1.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "1.0",
+            "ref": "cb4152ebcadbe620ea2261da1a1c5a9b8cea7672"
+        }
+    },
+    "doctrine/lexer": {
+        "version": "v1.0.1"
+    },
     "donatj/mock-webserver": {
         "version": "v2.0.0"
     },
     "duxet/json_spec": {
         "version": "1.1.0"
+    },
+    "egulias/email-validator": {
+        "version": "2.1.7"
     },
     "eightpoints/guzzle-bundle": {
         "version": "7.0",
@@ -68,29 +83,11 @@
     "fesor/json_matcher": {
         "version": "0.2.3"
     },
-    "firebase/php-jwt": {
-        "version": "v5.0.0"
-    },
     "gnugat/redaktilo": {
         "version": "v1.7.3"
     },
-    "google/auth": {
-        "version": "v1.3.0"
-    },
-    "google/cloud-core": {
-        "version": "v1.20.0"
-    },
-    "google/cloud-logging": {
-        "version": "v1.10.4"
-    },
-    "google/gax": {
-        "version": "0.31.3"
-    },
     "google/proto-client": {
         "version": "0.37.0"
-    },
-    "google/protobuf": {
-        "version": "v3.5.2"
     },
     "grpc/grpc": {
         "version": "1.10.0"
@@ -139,9 +136,6 @@
     },
     "ocramius/proxy-manager": {
         "version": "2.2.0"
-    },
-    "ozean12/sentry": {
-        "version": "1.9.x-dev"
     },
     "paragonie/random_compat": {
         "version": "v2.0.12"
@@ -275,9 +269,6 @@
     "symfony/inflector": {
         "version": "v4.0.7"
     },
-    "symfony/lts": {
-        "version": "4-dev"
-    },
     "symfony/monolog-bridge": {
         "version": "v4.0.9"
     },
@@ -320,6 +311,9 @@
             "ref": "cda8b550123383d25827705d05a42acf6819fe4e"
         }
     },
+    "symfony/serializer": {
+        "version": "v4.2.2"
+    },
     "symfony/stopwatch": {
         "version": "v4.1.6"
     },
@@ -333,6 +327,15 @@
             "branch": "master",
             "version": "3.3",
             "ref": "6bcd6c570c017ea6ae5a7a6a027c929fd3542cd8"
+        }
+    },
+    "symfony/validator": {
+        "version": "4.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "4.1",
+            "ref": "0cdc982334f45d554957a6167e030482795bf9d7"
         }
     },
     "symfony/workflow": {

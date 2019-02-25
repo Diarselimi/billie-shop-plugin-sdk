@@ -19,7 +19,7 @@ class DebtorNameCheck implements CheckInterface
 
     public function check(OrderContainer $order): CheckResult
     {
-        $nameFromRegistry = $order->getDebtorCompany()->getName();
+        $nameFromRegistry = $order->getMerchantDebtor()->getDebtorCompany()->getName();
         $nameFromOrder = $order->getDebtorExternalData()->getName();
 
         $attributes = [

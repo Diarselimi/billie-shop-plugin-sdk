@@ -2,26 +2,29 @@
 
 namespace App\Infrastructure\Alfred;
 
-use App\DomainModel\Alfred\AlfredInterface;
-use App\DomainModel\Alfred\DebtorDTO;
-use App\DomainModel\Alfred\DebtorFactory;
+use App\DomainModel\DebtorCompany\DebtorCompany;
+use App\DomainModel\DebtorCompany\DebtorCompanyFactory;
+use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
+use App\DomainModel\DebtorCompany\IdentifyDebtorRequestDTO;
+use App\DomainModel\DebtorCompany\IsEligibleForPayAfterDeliveryRequestDTO;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Response;
 
-class Alfred implements AlfredInterface
+class Alfred implements CompaniesServiceInterface
 {
     private $client;
 
     private $factory;
 
-    public function __construct(Client $client, DebtorFactory $debtorFactory)
+    public function __construct(Client $client, DebtorCompanyFactory $debtorFactory)
     {
         $this->client = $client;
         $this->factory = $debtorFactory;
     }
 
-    public function getDebtor(int $debtorId): ?DebtorDTO
+    public function getDebtor(int $debtorId): ? DebtorCompany
     {
         try {
             $response = $this->client->get("/debtor/$debtorId");
@@ -33,20 +36,34 @@ class Alfred implements AlfredInterface
             throw new AlfredRequestException($exception->getCode(), $exception);
         }
 
-        $response = json_decode((string) $response->getBody(), true);
-        if (!$response) {
-            throw new AlfredResponseDecodeException();
-        }
+        $decodedResponse = $this->decodeResponse($response);
 
-        return $this->factory->createFromAlfredResponse($response);
+        return $this->factory->createFromAlfredResponse($decodedResponse);
     }
 
-    public function identifyDebtor(array $debtorData): ?DebtorDTO
+    public function identifyDebtor(IdentifyDebtorRequestDTO $requestDTO): ? DebtorCompany
     {
         try {
-            $response = $this->client->post("/debtor/identify", [
-                'json' => $debtorData,
-            ]);
+            $response = $this->client->post(
+                "/debtor/identify",
+                [
+                    'json' => [
+                        'name' => $requestDTO->getName(),
+                        'address_house' => $requestDTO->getHouseNumber(),
+                        'address_street' => $requestDTO->getStreet(),
+                        'address_postal_code' => $requestDTO->getPostalCode(),
+                        'address_city' => $requestDTO->getCity(),
+                        'address_country' => $requestDTO->getCountry(),
+                        'tax_id' => $requestDTO->getTaxId(),
+                        'tax_number' => $requestDTO->getTaxNumber(),
+                        'registration_number' => $requestDTO->getRegistrationNumber(),
+                        'registration_court' => $requestDTO->getRegistrationCourt(),
+                        'legal_form' => $requestDTO->getLegalForm(),
+                        'first_name' => $requestDTO->getFirstName(),
+                        'last_name' => $requestDTO->getLastName(),
+                    ],
+                ]
+            );
         } catch (TransferException $exception) {
             if ($exception->getCode() === Response::HTTP_NOT_FOUND) {
                 return null;
@@ -55,15 +72,12 @@ class Alfred implements AlfredInterface
             throw new AlfredRequestException($exception->getCode(), $exception);
         }
 
-        $response = json_decode((string) $response->getBody(), true);
-        if (!$response) {
-            throw new AlfredResponseDecodeException();
-        }
+        $decodedResponse = $this->decodeResponse($response);
 
-        return $this->factory->createFromAlfredResponse($response);
+        return $this->factory->createFromAlfredResponse($decodedResponse);
     }
 
-    public function identifyDebtorV2(array $debtorData): ?DebtorDTO
+    public function identifyDebtorV2(array $debtorData): ? DebtorCompany
     {
         try {
             $response = $this->client->post("/debtor/identify/v2", [
@@ -77,12 +91,9 @@ class Alfred implements AlfredInterface
             throw new AlfredRequestException($exception->getCode(), $exception);
         }
 
-        $response = json_decode((string) $response->getBody(), true);
-        if (!$response) {
-            throw new AlfredResponseDecodeException();
-        }
+        $decodedResponse = $this->decodeResponse($response);
 
-        return $this->factory->createFromAlfredResponse($response);
+        return $this->factory->createFromAlfredResponse($decodedResponse);
     }
 
     public function lockDebtorLimit(string $debtorId, float $amount): bool
@@ -121,12 +132,10 @@ class Alfred implements AlfredInterface
     {
         try {
             $response = $this->client->get("/debtor/$debtorId/is-blacklisted");
-            $response = json_decode((string) $response->getBody(), true);
-            if (!$response) {
-                throw new AlfredResponseDecodeException();
-            }
 
-            return $response['is_debtor_blacklisted'];
+            $decodedResponse = $this->decodeResponse($response);
+
+            return $decodedResponse['is_debtor_blacklisted'];
         } catch (TransferException $exception) {
             throw new AlfredRequestException($exception->getCode(), $exception);
         }
@@ -147,15 +156,23 @@ class Alfred implements AlfredInterface
                     'schufa_sole_trader_score_threshold' => $requestDTO->getSchufaSoleTraderScoreThreshold(),
                 ],
             ]);
-            $response = json_decode((string) $response->getBody(), true);
 
-            if (!$response) {
-                throw new AlfredResponseDecodeException();
-            }
+            $decodedResponse = $this->decodeResponse($response);
 
-            return $response['is_eligible'];
+            return $decodedResponse['is_eligible'];
         } catch (TransferException $exception) {
             throw new AlfredRequestException($exception->getCode(), $exception);
         }
+    }
+
+    private function decodeResponse(ResponseInterface $response): array
+    {
+        $decodedResponse = json_decode((string) $response->getBody(), true);
+
+        if (!$decodedResponse) {
+            throw new AlfredResponseDecodeException();
+        }
+
+        return $decodedResponse;
     }
 }

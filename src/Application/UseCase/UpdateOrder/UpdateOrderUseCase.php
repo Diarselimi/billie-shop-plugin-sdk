@@ -7,12 +7,12 @@ use App\Application\PaellaCoreCriticalException;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
-use App\DomainModel\Monitoring\LoggingInterface;
-use App\DomainModel\Monitoring\LoggingTrait;
 use App\DomainModel\Order\LimitsService;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\HttpFoundation\Response;
 
 class UpdateOrderUseCase implements LoggingInterface

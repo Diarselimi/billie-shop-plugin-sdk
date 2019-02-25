@@ -18,7 +18,6 @@ use App\DomainModel\Person\PersonRepositoryInterface;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntity;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
 use App\Infrastructure\PDO\PDO;
-use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\MinkExtension\Context\MinkContext;
@@ -94,6 +93,7 @@ class PaellaCoreContext extends MinkContext
         $this->borscht->stop();
 
         $this->getConnection()->exec('
+            SET FOREIGN_KEY_CHECKS = 0;
             DELETE FROM order_transitions;
             DELETE FROM order_invoices;
             DELETE FROM order_identifications;
@@ -109,6 +109,7 @@ class PaellaCoreContext extends MinkContext
             DELETE FROM score_thresholds_configuration;
             ALTER TABLE merchants AUTO_INCREMENT = 1;
             ALTER TABLE orders AUTO_INCREMENT = 1;
+            SET FOREIGN_KEY_CHECKS = 1;
         ');
     }
 
@@ -225,7 +226,7 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
-     * @Given the order :orderId is :state
+     * @Given the order :orderId is in state :state
      */
     public function orderIsInState($orderId, $state)
     {
@@ -304,6 +305,21 @@ class PaellaCoreContext extends MinkContext
     public function iStartOrder_debtor_identification_vconsumerToConsumerMessage($consumerName, $messagesCount)
     {
         $command = __DIR__ . "/../../../bin/console --env=test rabbitmq:consumer -m {$messagesCount} {$consumerName}";
+
+        $process = new Process($command);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new ProcessFailedException($process);
+        }
+    }
+
+    /**
+     * @Given consumer :consumerName is empty
+     */
+    public function consumerOrder_debtor_identification_visEmpty(string $consumerName)
+    {
+        $command = __DIR__ . "/../../../bin/console rabbitmq:purge --no-confirmation {$consumerName}";
 
         $process = new Process($command);
         $process->run();

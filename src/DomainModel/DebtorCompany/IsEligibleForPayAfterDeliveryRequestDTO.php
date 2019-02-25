@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infrastructure\Alfred;
+namespace App\DomainModel\DebtorCompany;
 
 class IsEligibleForPayAfterDeliveryRequestDTO
 {
