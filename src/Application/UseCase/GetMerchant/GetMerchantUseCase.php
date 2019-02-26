@@ -18,7 +18,7 @@ class GetMerchantUseCase
     public function execute(GetMerchantRequest $request): GetMerchantResponse
     {
         $apiKey = $request->getApiKey();
-        $merchant = $this->merchantRepository->getOneByApiKeyRaw($apiKey);
+        $merchant = $this->merchantRepository->getOneByApiKey($apiKey);
 
         if (!$merchant) {
             throw new PaellaCoreCriticalException(

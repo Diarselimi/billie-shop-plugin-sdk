@@ -10,8 +10,8 @@ use App\Application\UseCase\CreateOrder\Request\CreateOrderDebtorPersonRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderDeliveryAddressRequest;
 use App\DomainModel\Order\OrderRegistrationNumberConverter;
 use App\Http\HttpConstantsInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class CreateOrderController
 {
@@ -27,7 +27,7 @@ class CreateOrderController
         $this->registrationNumberConverter = $registrationNumberConverter;
     }
 
-    public function execute(Request $request)
+    public function execute(Request $request): JsonResponse
     {
         $useCaseRequest = (new CreateOrderRequest())
             ->setMerchantId($request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER))
@@ -103,6 +103,6 @@ class CreateOrderController
 
         $this->useCase->execute($useCaseRequest);
 
-        return new Response(null, Response::HTTP_CREATED);
+        return new JsonResponse(null, JsonResponse::HTTP_CREATED);
     }
 }

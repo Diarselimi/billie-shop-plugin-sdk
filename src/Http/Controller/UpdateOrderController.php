@@ -6,9 +6,7 @@ use App\Application\Exception\FraudOrderException;
 use App\Application\UseCase\UpdateOrder\UpdateOrderRequest;
 use App\Application\UseCase\UpdateOrder\UpdateOrderUseCase;
 use App\Http\HttpConstantsInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class UpdateOrderController
@@ -20,7 +18,7 @@ class UpdateOrderController
         $this->useCase = $useCase;
     }
 
-    public function execute(string $externalCode, Request $request): JsonResponse
+    public function execute(string $externalCode, Request $request): void
     {
         try {
             $orderRequest = (new UpdateOrderRequest($externalCode))
@@ -37,7 +35,5 @@ class UpdateOrderController
         } catch (FraudOrderException $e) {
             throw new AccessDeniedHttpException($e->getMessage());
         }
-
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 }

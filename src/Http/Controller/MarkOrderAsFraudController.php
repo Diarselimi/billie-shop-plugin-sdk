@@ -7,7 +7,6 @@ use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\MarkOrderAsFraud\FraudReclaimActionException;
 use App\Application\UseCase\MarkOrderAsFraud\MarkOrderAsFraudRequest;
 use App\Application\UseCase\MarkOrderAsFraud\MarkOrderAsFraudUseCase;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -20,7 +19,7 @@ class MarkOrderAsFraudController
         $this->useCase = $markOrderAsFraudUseCase;
     }
 
-    public function execute(string $uuid): Response
+    public function execute(string $uuid): void
     {
         try {
             $useCaseRequest = new MarkOrderAsFraudRequest($uuid);
@@ -30,7 +29,5 @@ class MarkOrderAsFraudController
         } catch (OrderNotFoundException $e) {
             throw new NotFoundHttpException($e->getMessage());
         }
-
-        return new Response();
     }
 }

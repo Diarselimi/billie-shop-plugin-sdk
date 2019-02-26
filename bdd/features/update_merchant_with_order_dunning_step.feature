@@ -32,5 +32,5 @@ Feature:
             "step": "DCA Handover"
         }
         """
-    Then the response status code should be 200
+    Then the response status code should be 204
     And the response should be empty

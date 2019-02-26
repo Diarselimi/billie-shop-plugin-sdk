@@ -9,4 +9,6 @@ interface HttpConstantsInterface
     const ROUTE_HEALTH_CHECK = 'health_check';
 
     const ROUTE_MARK_ORDER_AS_FRAUD = 'mark_order_as_fraud';
+
+    const CREATE_MERCHANT = 'create_merchant';
 }

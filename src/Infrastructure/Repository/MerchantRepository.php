@@ -21,21 +21,21 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
     {
         $id = $this->doInsert('
             INSERT INTO merchants
-            (name, api_key, roles, is_active, available_financing_limit, created_at, updated_at, company_id, payment_merchant_id, webhook_url, webhook_authorization)
+            (name, api_key, roles, is_active, available_financing_limit, company_id, payment_merchant_id, webhook_url, webhook_authorization, created_at, updated_at)
             VALUES
-            (:name, :api_key, :roles, :is_active, :available_financing_limit, :created_at, :updated_at, :company_id, :payment_merchant_id, :webhook_url, :webhook_authorization)
+            (:name, :api_key, :roles, :is_active, :available_financing_limit, :company_id, :payment_merchant_id, :webhook_url, :webhook_authorization, :created_at, :updated_at)
         ', [
             'name' => $merchant->getName(),
             'api_key' => $merchant->getApiKey(),
             'roles' => $merchant->getRoles(),
             'is_active' => $merchant->isActive(),
             'available_financing_limit' => $merchant->getAvailableFinancingLimit(),
-            'created_at' => $merchant->getCreatedAt()->format('Y-m-d H:i:s'),
-            'updated_at' => $merchant->getUpdatedAt()->format('Y-m-d H:i:s'),
             'company_id' => $merchant->getCompanyId(),
             'payment_merchant_id' => $merchant->getPaymentMerchantId(),
             'webhook_url' => $merchant->getWebhookUrl(),
             'webhook_authorization' => $merchant->getWebhookAuthorization(),
+            'created_at' => $merchant->getCreatedAt()->format(self::DATE_FORMAT),
+            'updated_at' => $merchant->getUpdatedAt()->format(self::DATE_FORMAT),
         ]);
 
         $merchant->setId($id);
@@ -46,12 +46,14 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
         $merchant->setUpdatedAt(new \DateTime());
         $this->doUpdate('
             UPDATE merchants
-            SET available_financing_limit = :available_financing_limit, updated_at = :updated_at
+            SET 
+              available_financing_limit = :available_financing_limit, 
+              updated_at = :updated_at
             WHERE id = :id
         ', [
             'id' => $merchant->getId(),
             'available_financing_limit' => $merchant->getAvailableFinancingLimit(),
-            'updated_at' => $merchant->getUpdatedAt()->format('Y-m-d H:i:s'),
+            'updated_at' => $merchant->getUpdatedAt()->format(self::DATE_FORMAT),
         ]);
     }
 
@@ -66,14 +68,25 @@ class MerchantRepository extends AbstractRepository implements MerchantRepositor
         return $row ? $this->factory->createFromDatabaseRow($row) : null;
     }
 
-    public function getOneByApiKeyRaw(string $apiKey): ?array
+    public function getOneByCompanyId(int $companyId): ?MerchantEntity
     {
-        $customer = $this->doFetchOne('
+        $row = $this->doFetchOne('
+          SELECT ' . self::SELECT_FIELDS . '
+          FROM merchants
+          WHERE company_id = :company_id
+        ', ['company_id' => $companyId]);
+
+        return $row ? $this->factory->createFromDatabaseRow($row) : null;
+    }
+
+    public function getOneByApiKey(string $apiKey): ?MerchantEntity
+    {
+        $row = $this->doFetchOne('
           SELECT ' . self::SELECT_FIELDS . '
           FROM merchants
           WHERE api_key = :api_key
         ', ['api_key' => $apiKey]);
 
-        return $customer ?: null;
+        return $row ? $this->factory->createFromDatabaseRow($row) : null;
     }
 }

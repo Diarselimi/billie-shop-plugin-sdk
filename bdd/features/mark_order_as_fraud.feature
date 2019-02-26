@@ -52,5 +52,5 @@ Feature:
     And The order "XF43Y" has UUID "test-uuid"
     When I send a POST request to "/order/test-uuid/mark-as-fraud"
     Then The order "XF43Y" is marked as fraud
-    And the response status code should be 200
+    And the response status code should be 204
     And the response should be empty

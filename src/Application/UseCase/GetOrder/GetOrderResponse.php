@@ -2,7 +2,9 @@
 
 namespace App\Application\UseCase\GetOrder;
 
-class GetOrderResponse
+use App\DomainModel\ArrayableInterface;
+
+class GetOrderResponse implements ArrayableInterface
 {
     private $externalCode;
 
@@ -324,5 +326,42 @@ class GetOrderResponse
         $this->dueDate = $dueDate;
 
         return $this;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'external_code' => $this->getExternalCode(),
+            'state' => $this->getState(),
+            'reasons' => $this->getReasons() ?: [],
+            'amount' => $this->getOriginalAmount(),
+            'debtor_company' => [
+                'name' => $this->getCompanyName(),
+                'house_number' => $this->getCompanyAddressHouseNumber(),
+                'street' => $this->getCompanyAddressStreet(),
+                'postal_code' => $this->getCompanyAddressPostalCode(),
+                'city' => $this->getCompanyAddressCity(),
+                'country' => $this->getCompanyAddressCountry(),
+            ],
+            'bank_account' => [
+                'iban' => $this->getBankAccountIban(),
+                'bic' => $this->getBankAccountBic(),
+            ],
+            'invoice' => [
+                'number' => $this->getInvoiceNumber(),
+                'payout_amount' => $this->getPayoutAmount(),
+                'fee_amount' => $this->getFeeAmount(),
+                'fee_rate' => $this->getFeeRate(),
+                'due_date' => $this->getDueDate() ? $this->getDueDate()->format('Y-m-d') : null,
+            ],
+            'debtor_external_data' => [
+                'name' => $this->getDebtorExternalDataCompanyName(),
+                'address_country' => $this->getDebtorExternalDataAddressCountry(),
+                'address_postal_code' => $this->getDebtorExternalDataAddressPostalCode(),
+                'address_street' => $this->getDebtorExternalDataAddressStreet(),
+                'address_house' => $this->getDebtorExternalDataAddressHouse(),
+                'industry_sector' => $this->getDebtorExternalDataIndustrySector(),
+            ],
+        ];
     }
 }

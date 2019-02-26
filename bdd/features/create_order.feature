@@ -59,7 +59,10 @@ Feature:
       }
       """
     Then the order A1 is in state declined
-    And the response should be empty
+    And the JSON response should be:
+    """
+    {}
+    """
 
   Scenario: Successful order creation
     Given I get from alfred "/debtor/identify" endpoint response with status 200 and body
@@ -138,7 +141,10 @@ Feature:
       }
       """
     Then the response status code should be 201
-    And the response should be empty
+    And the JSON response should be:
+    """
+    {}
+    """
     And the order A1 is in state created
 
   Scenario: Debtor overdue check failed
@@ -220,7 +226,10 @@ Feature:
       }
       """
     Then the response status code should be 201
-    And the response should be empty
+    And the JSON response should be:
+    """
+    {}
+    """
     Then the order A1 is in state declined
 
   Scenario: Debtor is not eligible for Point Of Sale
@@ -300,7 +309,10 @@ Feature:
       }
       """
     Then the response status code should be 201
-    And the response should be empty
+    And the JSON response should be:
+    """
+    {}
+    """
     And the order A1 is in state declined
 
   Scenario: Missing required fields
@@ -595,7 +607,10 @@ Feature:
       }
       """
 	Then the response status code should be 201
-	And the response should be empty
+    And the JSON response should be:
+    """
+    {}
+    """
     And the order A1 is in state created
 
   Scenario: Order exceeds the merchant available financing limit
@@ -663,5 +678,8 @@ Feature:
       }
       """
     Then the response status code should be 201
-    And the response should be empty
+    And the JSON response should be:
+    """
+    {}
+    """
     And the order A1 is in state declined

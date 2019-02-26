@@ -3,8 +3,9 @@
 namespace App\DomainModel\Merchant;
 
 use App\DomainModel\AbstractEntity;
+use App\DomainModel\ArrayableInterface;
 
-class MerchantEntity extends AbstractEntity
+class MerchantEntity extends AbstractEntity implements ArrayableInterface
 {
     private $name;
 
@@ -140,5 +141,23 @@ class MerchantEntity extends AbstractEntity
         $this->paymentMerchantId = $paymentMerchantId;
 
         return $this;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'available_financing_limit' => $this->getAvailableFinancingLimit(),
+            'api_key' => $this->getApiKey(),
+            'company_id' => $this->getCompanyId(),
+            'payment_merchant_id' => $this->getPaymentMerchantId(),
+            'roles' => $this->getRoles(),
+            'is_active' => $this->isActive(),
+            'webhook_url' => $this->getWebhookUrl(),
+            'webhook_authorization' => $this->getWebhookAuthorization(),
+            'created_at' => $this->getCreatedAt()->format('Y-m-d H:i:s'), // TODO: constant somewhere?
+            'updated_at' => $this->getUpdatedAt()->format('Y-m-d H:i:s'),
+        ];
     }
 }

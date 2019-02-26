@@ -6,9 +6,7 @@ use App\Application\Exception\FraudOrderException;
 use App\Application\UseCase\CancelOrder\CancelOrderRequest;
 use App\Application\UseCase\CancelOrder\CancelOrderUseCase;
 use App\Http\HttpConstantsInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class CancelOrderController
@@ -20,7 +18,7 @@ class CancelOrderController
         $this->useCase = $useCase;
     }
 
-    public function execute(string $externalCode, Request $request): JsonResponse
+    public function execute(string $externalCode, Request $request): void
     {
         try {
             $orderRequest = new CancelOrderRequest(
@@ -31,7 +29,5 @@ class CancelOrderController
         } catch (FraudOrderException $e) {
             throw new AccessDeniedHttpException($e->getMessage());
         }
-
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 }

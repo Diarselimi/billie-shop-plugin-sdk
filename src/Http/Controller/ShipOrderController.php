@@ -5,9 +5,7 @@ namespace App\Http\Controller;
 use App\Application\UseCase\ShipOrder\ShipOrderRequest;
 use App\Application\UseCase\ShipOrder\ShipOrderUseCase;
 use App\Http\HttpConstantsInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class ShipOrderController
 {
@@ -18,7 +16,7 @@ class ShipOrderController
         $this->useCase = $useCase;
     }
 
-    public function execute(string $externalCode, Request $request): JsonResponse
+    public function execute(string $externalCode, Request $request): void
     {
         $orderRequest = (new ShipOrderRequest())
             ->setExternalCode($externalCode)
@@ -27,8 +25,7 @@ class ShipOrderController
             ->setInvoiceUrl($request->request->get('invoice_url'))
             ->setProofOfDeliveryUrl($request->request->get('proof_of_delivery_url'))
         ;
-        $this->useCase->execute($orderRequest);
 
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        $this->useCase->execute($orderRequest);
     }
 }

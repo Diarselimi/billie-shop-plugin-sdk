@@ -59,8 +59,8 @@ class ScoreThresholdsConfigurationRepository extends AbstractRepository implemen
             'schufa_average_score_threshold' => $entity->getSchufaAverageScoreThreshold(),
             'schufa_high_score_threshold' => $entity->getSchufaHighScoreThreshold(),
             'schufa_sole_trader_score_threshold' => $entity->getSchufaSoleTraderScoreThreshold(),
-            'created_at' => $entity->getCreatedAt()->format('Y-m-d H:i:s'),
-            'updated_at' => $entity->getUpdatedAt()->format('Y-m-d H:i:s'),
+            'created_at' => $entity->getCreatedAt()->format(self::DATE_FORMAT),
+            'updated_at' => $entity->getUpdatedAt()->format(self::DATE_FORMAT),
         ]);
 
         $entity->setId($id);
