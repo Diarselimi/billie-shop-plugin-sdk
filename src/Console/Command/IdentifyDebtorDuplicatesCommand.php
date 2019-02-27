@@ -71,6 +71,10 @@ class IdentifyDebtorDuplicatesCommand extends Command
      */
     private function process(\Generator $data, $file): array
     {
+        if (!$data->valid()) {
+            return [];
+        }
+
         if (file_exists($file)) {
             @unlink($file);
         }
@@ -79,11 +83,9 @@ class IdentifyDebtorDuplicatesCommand extends Command
 
         $newDuplicates = [];
 
-        if ($data->valid()) {
-            $csvColumns = array_keys($this->flattenDuplicateDto($data->current()));
-            $csvColumns[] = 'isNewDuplicate';
-            fputcsv($output, $csvColumns);
-        }
+        $csvColumns = array_keys($this->flattenDuplicateDto($data->current()));
+        $csvColumns[] = 'isNewDuplicate';
+        fputcsv($output, $csvColumns);
 
         foreach ($data as $i => $duplicateDto) {
             $duplicateArr = $this->flattenDuplicateDto($duplicateDto);
