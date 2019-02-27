@@ -4,6 +4,7 @@ namespace App\Application\UseCase\OrderDebtorIdentificationV2;
 
 use App\DomainModel\Address\AddressRepositoryInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
+use App\DomainModel\DebtorCompany\IdentifyDebtorRequestDTO;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderIdentification\OrderIdentificationEntity;
@@ -50,27 +51,26 @@ class OrderDebtorIdentificationV2UseCase
         }
 
         $debtorExternalData = $this->debtorExternalDataRepository->getOneById($order->getDebtorExternalDataId());
-
         $debtorExternalAddress = $this->addressRepository->getOneById($debtorExternalData->getAddressId());
-
         $debtorPerson = $this->personRepository->getOneById($order->getDebtorPersonId());
 
         try {
-            $identifiedDebtor = $this->companiesService->identifyDebtorV2([
-                'name' => $debtorExternalData->getName(),
-                'address_house' => $debtorExternalAddress->getHouseNumber(),
-                'address_street' => $debtorExternalAddress->getStreet(),
-                'address_postal_code' => $debtorExternalAddress->getPostalCode(),
-                'address_city' => $debtorExternalAddress->getCity(),
-                'address_country' => $debtorExternalAddress->getCountry(),
-                'tax_id' => $debtorExternalData->getTaxId(),
-                'tax_number' => $debtorExternalData->getTaxNumber(),
-                'registration_number' => $debtorExternalData->getRegistrationNumber(),
-                'registration_court' => $debtorExternalData->getRegistrationCourt(),
-                'legal_form' => $debtorExternalData->getLegalForm(),
-                'first_name' => $debtorPerson->getFirstName(),
-                'last_name' => $debtorPerson->getLastName(),
-            ]);
+            $identifiedDebtor = $this->companiesService->identifyDebtorV2(
+                (new IdentifyDebtorRequestDTO())
+                ->setName($debtorExternalData->getName())
+                ->setHouseNumber($debtorExternalAddress->getHouseNumber())
+                ->setStreet($debtorExternalAddress->getStreet())
+                ->setPostalCode($debtorExternalAddress->getPostalCode())
+                ->setCity($debtorExternalAddress->getCity())
+                ->setCountry($debtorExternalAddress->getCountry())
+                ->setTaxId($debtorExternalData->getTaxId())
+                ->setTaxNumber($debtorExternalData->getTaxNumber())
+                ->setRegistrationNumber($debtorExternalData->getRegistrationNumber())
+                ->setRegistrationCourt($debtorExternalData->getRegistrationCourt())
+                ->setLegalForm($debtorExternalData->getLegalForm())
+                ->setFirstName($debtorPerson->getFirstName())
+                ->setLastName($debtorPerson->getLastName())
+            );
 
             $this->orderIdentificationRepository->insert(
                 (new OrderIdentificationEntity())
