@@ -30,8 +30,8 @@ class MerchantSettingsRepository extends AbstractRepository implements MerchantS
             'debtor_financing_limit' => $merchantSettingsEntity->getDebtorFinancingLimit(),
             'min_order_amount' => $merchantSettingsEntity->getMinOrderAmount(),
             'score_thresholds_configuration_id' => $merchantSettingsEntity->getScoreThresholdsConfigurationId(),
-            'created_at' => $merchantSettingsEntity->getCreatedAt()->format('Y-m-d H:i:s'),
-            'updated_at' => $merchantSettingsEntity->getUpdatedAt()->format('Y-m-d H:i:s'),
+            'created_at' => $merchantSettingsEntity->getCreatedAt()->format(self::DATE_FORMAT),
+            'updated_at' => $merchantSettingsEntity->getUpdatedAt()->format(self::DATE_FORMAT),
         ]);
 
         $merchantSettingsEntity->setId($id);

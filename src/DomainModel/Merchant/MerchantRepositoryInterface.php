@@ -10,5 +10,7 @@ interface MerchantRepositoryInterface
 
     public function getOneById(int $id): ?MerchantEntity;
 
-    public function getOneByApiKeyRaw(string $apiKey): ?array;
+    public function getOneByCompanyId(int $id): ?MerchantEntity;
+
+    public function getOneByApiKey(string $apiKey): ?MerchantEntity;
 }

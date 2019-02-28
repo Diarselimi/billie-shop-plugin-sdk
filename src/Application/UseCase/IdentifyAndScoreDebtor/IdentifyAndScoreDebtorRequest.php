@@ -6,6 +6,10 @@ class IdentifyAndScoreDebtorRequest
 {
     private $merchantId;
 
+    private $algorithm;
+
+    private $doScoring;
+
     private $name;
 
     private $addressHouse;
@@ -40,6 +44,30 @@ class IdentifyAndScoreDebtorRequest
     public function setMerchantId(int $merchantId): IdentifyAndScoreDebtorRequest
     {
         $this->merchantId = $merchantId;
+
+        return $this;
+    }
+
+    public function getAlgorithm(): string
+    {
+        return $this->algorithm;
+    }
+
+    public function setAlgorithm(string $algorithm): IdentifyAndScoreDebtorRequest
+    {
+        $this->algorithm = $algorithm;
+
+        return $this;
+    }
+
+    public function isDoScoring(): bool
+    {
+        return $this->doScoring;
+    }
+
+    public function setDoScoring(bool $doScoring): IdentifyAndScoreDebtorRequest
+    {
+        $this->doScoring = $doScoring;
 
         return $this;
     }

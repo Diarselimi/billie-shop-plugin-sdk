@@ -1,5 +1,6 @@
 <?php
 
+use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntityFactory;
 use Phinx\Migration\AbstractMigration;
 
 class TestMerchant extends AbstractMigration
@@ -21,12 +22,12 @@ class TestMerchant extends AbstractMigration
         ])->saveData();
 
         $this->table('score_thresholds_configuration')->insert([
-            'crefo_low_score_threshold' => 300,
-            'crefo_high_score_threshold' => 360,
-            'schufa_low_score_threshold' => 270,
-            'schufa_average_score_threshold' => 293,
-            'schufa_high_score_threshold' => 360,
-            'schufa_sole_trader_score_threshold' => 317,
+            'crefo_low_score_threshold' => ScoreThresholdsConfigurationEntityFactory::DEFAULT_CREFO_LOW,
+            'crefo_high_score_threshold' => ScoreThresholdsConfigurationEntityFactory::DEFAULT_CREFO_HIGH,
+            'schufa_low_score_threshold' => ScoreThresholdsConfigurationEntityFactory::DEFAULT_SCHUFA_LOW,
+            'schufa_average_score_threshold' => ScoreThresholdsConfigurationEntityFactory::DEFAULT_SCHUFA_AVERAGE,
+            'schufa_high_score_threshold' => ScoreThresholdsConfigurationEntityFactory::DEFAULT_SCHUFA_HIGH,
+            'schufa_sole_trader_score_threshold' => ScoreThresholdsConfigurationEntityFactory::DEFAULT_SCHUFA_SOLE_TRADER,
             'created_at' => $now,
             'updated_at' => $now,
         ])->saveData();

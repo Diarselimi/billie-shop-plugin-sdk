@@ -2,7 +2,9 @@
 
 namespace App\DomainModel\DebtorCompany;
 
-class IdentifyDebtorRequestDTO
+use App\DomainModel\ArrayableInterface;
+
+class IdentifyDebtorRequestDTO implements ArrayableInterface
 {
     private $name;
 
@@ -184,5 +186,24 @@ class IdentifyDebtorRequestDTO
         $this->lastName = $lastName;
 
         return $this;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'name' => $this->getName(),
+            'address_house' => $this->getHouseNumber(),
+            'address_street' => $this->getStreet(),
+            'address_postal_code' => $this->getPostalCode(),
+            'address_city' => $this->getCity(),
+            'address_country' => $this->getCountry(),
+            'tax_id' => $this->getTaxId(),
+            'tax_number' => $this->getTaxNumber(),
+            'registration_number' => $this->getRegistrationNumber(),
+            'registration_court' => $this->getRegistrationCourt(),
+            'legal_form' => $this->getLegalForm(),
+            'first_name' => $this->getFirstName(),
+            'last_name' => $this->getLastName(),
+        ];
     }
 }

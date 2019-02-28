@@ -6,7 +6,6 @@ use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\UpdateMerchantWithOrderDunningStep\UpdateMerchantWithOrderDunningStepRequest;
 use App\Application\UseCase\UpdateMerchantWithOrderDunningStep\UpdateMerchantWithOrderDunningStepUseCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UpdateMerchantWithOrderDunningStepController
@@ -18,7 +17,7 @@ class UpdateMerchantWithOrderDunningStepController
         $this->useCase = $useCase;
     }
 
-    public function execute(Request $request, string $uuid): Response
+    public function execute(Request $request, string $uuid): void
     {
         try {
             $useCaseRequest = new UpdateMerchantWithOrderDunningStepRequest($uuid, $request->request->get('step'));
@@ -26,7 +25,5 @@ class UpdateMerchantWithOrderDunningStepController
         } catch (OrderNotFoundException $e) {
             throw new NotFoundHttpException($e->getMessage());
         }
-
-        return new Response();
     }
 }

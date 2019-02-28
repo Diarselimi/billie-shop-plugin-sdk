@@ -23,4 +23,6 @@ interface OrderRepositoryInterface
     public function getWithInvoiceNumber(int $limit, int $lastId = 0): Generator;
 
     public function debtorHasAtLeastOneFullyPaidOrder(int $debtorId): bool;
+
+    public function countOrdersByState(int $merchantDebtorId): OrderStateCounterDTO;
 }

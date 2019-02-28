@@ -100,7 +100,7 @@ class MerchantDebtorEntity extends AbstractEntity
         return $this;
     }
 
-    public function getScoreThresholdsConfigurationId(): ? int
+    public function getScoreThresholdsConfigurationId(): ?int
     {
         return $this->scoreThresholdsConfigurationId;
     }

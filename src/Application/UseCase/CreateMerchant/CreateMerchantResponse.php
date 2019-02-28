@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Application\UseCase\GetMerchant;
+namespace App\Application\UseCase\CreateMerchant;
 
 use App\DomainModel\ArrayableInterface;
 use App\DomainModel\Merchant\MerchantEntity;
 
-class GetMerchantResponse implements ArrayableInterface
+class CreateMerchantResponse implements ArrayableInterface
 {
     private $merchant;
 

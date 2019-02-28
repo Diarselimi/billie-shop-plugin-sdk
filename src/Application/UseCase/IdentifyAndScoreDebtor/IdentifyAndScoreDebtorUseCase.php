@@ -4,6 +4,7 @@ namespace App\Application\UseCase\IdentifyAndScoreDebtor;
 
 use App\Application\UseCase\IdentifyAndScoreDebtor\Exception\DebtorNotIdentifiedException;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
+use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorCompany\IdentifyDebtorRequestDTO;
 use App\DomainModel\DebtorCompany\IsEligibleForPayAfterDeliveryRequestDTOFactory;
 use App\DomainModel\Merchant\MerchantNotFoundException;
@@ -31,6 +32,11 @@ class IdentifyAndScoreDebtorUseCase
 
     private $merchantDebtorRegistrationService;
 
+    private const SCORING_ALGORITHMS = [
+        'v1' => 'identifyDebtor',
+        'v2' => 'identifyDebtorV2',
+    ];
+
     public function __construct(
         MerchantRepositoryInterface $merchantRepository,
         MerchantSettingsRepositoryInterface $merchantSettingsRepository,
@@ -49,31 +55,34 @@ class IdentifyAndScoreDebtorUseCase
         $this->merchantDebtorRegistrationService = $merchantDebtorRegistrationService;
     }
 
-    public function execute(IdentifyAndScoreDebtorRequest $request, bool $doScoring): IdentifyAndScoreDebtorResponse
+    public function execute(IdentifyAndScoreDebtorRequest $request): IdentifyAndScoreDebtorResponse
     {
         $merchant = $this->merchantRepository->getOneById($request->getMerchantId());
+        $doScoring = $request->isDoScoring();
+        $algorithm = $request->getAlgorithm();
 
         if (!$merchant) {
             throw new MerchantNotFoundException();
         }
 
-        $identifiedDebtor = $this->companiesService->identifyDebtor(
-            (new IdentifyDebtorRequestDTO())
-                ->setName($request->getName())
-                ->setHouseNumber($request->getAddressHouse())
-                ->setStreet($request->getAddressStreet())
-                ->setPostalCode($request->getAddressPostalCode())
-                ->setCity($request->getAddressCity())
-                ->setCountry($request->getAddressCountry())
-                ->setTaxId($request->getTaxId())
-                ->setTaxNumber($request->getTaxNumber())
-                ->setRegistrationNumber($request->getRegistrationNumber())
-                ->setRegistrationCourt($request->getRegistrationCourt())
-                ->setLegalForm($request->getLegalForm())
-                ->setFirstName($request->getFirstName())
-                ->setLastName($request->getLastName())
-        );
+        $identifyRequest = (new IdentifyDebtorRequestDTO())
+            ->setName($request->getName())
+            ->setHouseNumber($request->getAddressHouse())
+            ->setStreet($request->getAddressStreet())
+            ->setPostalCode($request->getAddressPostalCode())
+            ->setCity($request->getAddressCity())
+            ->setCountry($request->getAddressCountry())
+            ->setTaxId($request->getTaxId())
+            ->setTaxNumber($request->getTaxNumber())
+            ->setRegistrationNumber($request->getRegistrationNumber())
+            ->setRegistrationCourt($request->getRegistrationCourt())
+            ->setLegalForm($request->getLegalForm())
+            ->setFirstName($request->getFirstName())
+            ->setLastName($request->getLastName())
+        ;
 
+        /** @var DebtorCompany|null $identifiedDebtor */
+        $identifiedDebtor = $this->companiesService->{self::SCORING_ALGORITHMS[$algorithm]}($identifyRequest);
         if (!$identifiedDebtor) {
             throw new DebtorNotIdentifiedException();
         }
@@ -93,7 +102,6 @@ class IdentifyAndScoreDebtorUseCase
         }
 
         $isEligible = null;
-
         if ($doScoring) {
             $isEligible = $this->isEligible($merchantSettings, $merchantDebtor);
         }

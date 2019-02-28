@@ -8,30 +8,34 @@ Feature: Attach invoice file to an order.
 
   Scenario: Successfully create order invoice file
     When I send a POST request to "/order/CO123/invoice" with body:
-        """
-        {
-            "file_id": "1299",
-            "invoice_number": "BI1515"
-        }
-        """
+      """
+      {
+          "file_id": "1299",
+          "invoice_number": "BI1515"
+      }
+      """
     Then print last response
     Then the response status code should be 201
-    And the response should be empty
+    And the JSON response should be:
+      """
+      {
+      }
+      """
 
   Scenario: Order not found
     When I send a POST request to "/order/CO123wrong/invoice" with body:
-        """
-        {
-            "file_id": "1299",
-            "invoice_number": "BI1515"
-        }
-        """
+      """
+      {
+          "file_id": "1299",
+          "invoice_number": "BI1515"
+      }
+      """
     Then print last response
     Then the response status code should be 404
     And the JSON response should be:
-        """
-        {
-            "code": "not_found",
-            "error": "Order #CO123wrong not found"
-        }
-        """
+      """
+      {
+          "code": "not_found",
+          "error": "Order #CO123wrong not found"
+      }
+      """
