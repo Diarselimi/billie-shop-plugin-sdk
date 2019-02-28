@@ -2,14 +2,11 @@
 
 namespace App\DomainModel\Order;
 
-use App\DomainModel\RiskCheck\Checker\CheckInterface;
-use App\DomainModel\RiskCheck\Checker\CheckResult;
-use App\DomainModel\RiskCheck\Checker\DebtorAddressHouseMatchCheck;
-use App\DomainModel\RiskCheck\Checker\DebtorAddressPostalCodeMatchCheck;
-use App\DomainModel\RiskCheck\Checker\DebtorAddressStreetMatchCheck;
-use App\DomainModel\RiskCheck\Checker\DebtorScoreCheck;
-use App\DomainModel\RiskCheck\RiskCheckEntityFactory;
-use App\DomainModel\RiskCheck\RiskCheckRepositoryInterface;
+use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
+use App\DomainModel\OrderRiskCheck\Checker\CheckInterface;
+use App\DomainModel\OrderRiskCheck\Checker\CheckResult;
+use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntityFactory;
+use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\DependencyInjection\ServiceLocator;
@@ -18,108 +15,109 @@ class OrderChecksRunnerService implements LoggingInterface
 {
     use LoggingTrait;
 
-    private $riskCheckRepository;
+    private $orderRiskCheckRepository;
 
     private $riskCheckFactory;
 
     private $checkLoader;
 
+    private $merchantRiskCheckSettingsRepository;
+
+    private $preIdentificationChecks;
+
+    private $postIdentificationChecks;
+
     public function __construct(
-        RiskCheckRepositoryInterface $riskCheckRepository,
-        RiskCheckEntityFactory $riskCheckFactory,
-        ServiceLocator $checkLoader
+        OrderRiskCheckRepositoryInterface $orderRiskCheckRepository,
+        OrderRiskCheckEntityFactory $riskCheckFactory,
+        ServiceLocator $checkLoader,
+        MerchantRiskCheckSettingsRepositoryInterface $merchantRiskCheckSettingsRepository,
+        array $preIdentificationChecks,
+        array $postIdentificationChecks
     ) {
-        $this->riskCheckRepository = $riskCheckRepository;
+        $this->orderRiskCheckRepository = $orderRiskCheckRepository;
         $this->riskCheckFactory = $riskCheckFactory;
         $this->checkLoader = $checkLoader;
+        $this->merchantRiskCheckSettingsRepository = $merchantRiskCheckSettingsRepository;
+        $this->preIdentificationChecks = $preIdentificationChecks;
+        $this->postIdentificationChecks = $postIdentificationChecks;
     }
 
-    public function runPreconditionChecks(OrderContainer $order): bool
+    public function runPreIdentificationChecks(OrderContainer $order): bool
     {
-        $availableFinancingLimitCheckResult = $this->check($order, 'available_financing_limit');
-        $amountCheckResult = $this->check($order, 'amount');
-        $debtorCountryCheckResult = $this->check($order, 'debtor_country');
-        $debtorIndustrySectorCheckResult = $this->check($order, 'debtor_industry_sector');
-
-        return
-            $availableFinancingLimitCheckResult &&
-            $amountCheckResult &&
-            $debtorCountryCheckResult &&
-            $debtorIndustrySectorCheckResult
-        ;
+        return $this->runChecks($order, $this->preIdentificationChecks);
     }
 
-    public function runChecks(OrderContainer $order): bool
+    public function runPostIdentificationChecks(OrderContainer $order): bool
     {
-        $this->logWaypoint('debtor != merchant check');
-        $debtorNotCustomerCheckResult = $this->check($order, 'debtor_not_customer');
-        if (!$debtorNotCustomerCheckResult) {
-            return false;
+        return $this->runChecks($order, $this->postIdentificationChecks);
+    }
+
+    public function checkForFailedSoftDeclinableCheckResults(OrderContainer $orderContainer): bool
+    {
+        $riskCheckResults = $this->orderRiskCheckRepository->findByOrder($orderContainer->getOrder()->getId());
+
+        foreach ($riskCheckResults as $riskCheckResult) {
+            $merchantRiskCheckSetting = $this->merchantRiskCheckSettingsRepository->getOneByMerchantIdAndRiskCheckName(
+                $orderContainer->getMerchant()->getId(),
+                $riskCheckResult->getRiskCheckDefinition()->getName()
+            );
+
+            if (!$riskCheckResult->isPassed() && !$merchantRiskCheckSetting->isDeclineOnFailure()) {
+                return true;
+            }
         }
 
-        $this->logWaypoint('company name check');
-        $nameCheckResult = $this->check($order, 'debtor_name');
-        if (!$nameCheckResult) {
-            $this->logInfo('Company name check failed');
+        return false;
+    }
 
-            return false;
+    private function runChecks(OrderContainer $order, array $checkNames): bool
+    {
+        foreach ($checkNames as $checkName) {
+            $checkResult = $this->check($order, $checkName);
+
+            if (!$checkResult) {
+                return false;
+            }
         }
-
-        $this->logWaypoint('address check');
-        $streetMatchCheckResult = $this->check($order, DebtorAddressStreetMatchCheck::NAME);
-        $houseMatchCheckResult = $this->check($order, DebtorAddressHouseMatchCheck::NAME);
-        $postalCodeMatchCheckResult = $this->check($order, DebtorAddressPostalCodeMatchCheck::NAME);
-        if (!$streetMatchCheckResult || !$houseMatchCheckResult || !$postalCodeMatchCheckResult) {
-            $this->logInfo('Address check failed');
-
-            return false;
-        }
-
-        $this->logWaypoint('blacklist check');
-        $debtorBlacklistedCheckResult = $this->check($order, 'debtor_blacklisted');
-        if (!$debtorBlacklistedCheckResult) {
-            return false;
-        }
-
-        $this->logWaypoint('overdue check');
-        $debtorOverDueCheckResult = $this->check($order, 'debtor_overdue');
-        if (!$debtorOverDueCheckResult) {
-            return false;
-        }
-
-        $this->logWaypoint('debtor score check');
-        $debtorScoreCheckResult = $this->check($order, DebtorScoreCheck::NAME);
-        if (!$debtorScoreCheckResult) {
-            $this->logInfo('debtor score check did not pass');
-
-            return false;
-        }
-
-        $this->logInfo('Main checks passed');
 
         return true;
     }
 
-    public function persistCheckResult(CheckResult $checkResult, OrderContainer $order)
+    private function check(OrderContainer $order, string $riskCheckName): bool
     {
-        $riskCheckEntity = $this->riskCheckFactory->createFromCheckResult($checkResult, $order->getOrder()->getId());
-        $this->riskCheckRepository->insert($riskCheckEntity);
-    }
+        $this->logWaypoint(str_replace('_', ' ', $riskCheckName) . ' check');
 
-    private function check(OrderContainer $order, string $name): bool
-    {
-        $check = $this->getCheck($name);
+        $merchantRiskCheckSetting = $this->merchantRiskCheckSettingsRepository->getOneByMerchantIdAndRiskCheckName(
+            $order->getMerchant()->getId(),
+            $riskCheckName
+        );
+
+        if (!$merchantRiskCheckSetting || !$merchantRiskCheckSetting->isEnabled()) {
+            return true;
+        }
+
+        $check = $this->getCheck($riskCheckName);
         $result = $check->check($order);
 
         $this->logInfo('Check result: {check} -> {result}', [
-            'check' => $name,
+            'check' => $riskCheckName,
             'result' => (int) $result->isPassed(),
-            'attributes' => $result->getAttributes(),
         ]);
 
         $this->persistCheckResult($result, $order);
 
+        if (!$merchantRiskCheckSetting->isDeclineOnFailure() && !$result->isPassed()) {
+            return true;
+        }
+
         return $result->isPassed();
+    }
+
+    private function persistCheckResult(CheckResult $checkResult, OrderContainer $order): void
+    {
+        $riskCheckEntity = $this->riskCheckFactory->createFromCheckResult($checkResult, $order->getOrder()->getId());
+        $this->orderRiskCheckRepository->insert($riskCheckEntity);
     }
 
     private function getCheck($name): CheckInterface

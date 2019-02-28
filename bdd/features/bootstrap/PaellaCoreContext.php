@@ -8,11 +8,15 @@ use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
+use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsEntity;
+use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderIdentification\OrderIdentificationRepositoryInterface;
+use App\DomainModel\OrderRiskCheck\RiskCheckDefinitionEntity;
+use App\DomainModel\OrderRiskCheck\RiskCheckDefinitionRepositoryInterface;
 use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonRepositoryInterface;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntity;
@@ -20,6 +24,7 @@ use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRep
 use App\Infrastructure\PDO\PDO;
 use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
+use Behat\Gherkin\Node\TableNode;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use donatj\MockWebServer\MockWebServer;
@@ -97,16 +102,18 @@ class PaellaCoreContext extends MinkContext
             DELETE FROM order_transitions;
             DELETE FROM order_invoices;
             DELETE FROM order_identifications;
-            DELETE FROM risk_checks;
+            DELETE FROM order_risk_checks;
             DELETE FROM orders;
             DELETE FROM persons;
             DELETE FROM debtor_external_data;
             DELETE FROM addresses;
             DELETE FROM merchants_debtors;
             DELETE FROM merchant_settings;
+            DELETE FROM merchant_risk_check_settings;
             DELETE FROM merchants;
             DELETE FROM merchants_debtors;
             DELETE FROM score_thresholds_configuration;
+            DELETE FROM risk_check_definitions;
             ALTER TABLE merchants AUTO_INCREMENT = 1;
             ALTER TABLE orders AUTO_INCREMENT = 1;
             SET FOREIGN_KEY_CHECKS = 1;
@@ -361,6 +368,36 @@ class PaellaCoreContext extends MinkContext
         }
     }
 
+    /**
+     * @Given /^The following risk check definitions exist:$/
+     */
+    public function theFollowingRiskCheckDefinitionsExist1(TableNode $table)
+    {
+        foreach ($table as $row) {
+            $riskCheckDefinition = (new RiskCheckDefinitionEntity())->setName($row['name']);
+
+            $this->getRiskCheckDefinitionRepository()->insert($riskCheckDefinition);
+        }
+    }
+
+    /**
+     * @Given The following merchant risk check settings exist for merchant :merchantId:
+     */
+    public function theFollowingRiskCheckDefinitionsExist(TableNode $table, $merchantId)
+    {
+        foreach ($table as $row) {
+            $riskCheckDefinition = $this->getRiskCheckDefinitionRepository()->getByName($row['risk_check_name']);
+
+            $this->getMerchantRiskCheckSettingsRepository()->insert(
+                (new MerchantRiskCheckSettingsEntity())
+                    ->setMerchantId($merchantId)
+                    ->setRiskCheckDefinition($riskCheckDefinition)
+                    ->setEnabled($row['enabled'] === '1' ? true : false)
+                    ->setDeclineOnFailure($row['decline_on_failure'] === '1' ? true : false)
+            );
+        }
+    }
+
     private function getOrder($orderExternalCode, $customerId = self::MERCHANT_ID): OrderEntity
     {
         $order = $this->getOrderRepository()->getOneByExternalCode($orderExternalCode, $customerId);
@@ -415,6 +452,16 @@ class PaellaCoreContext extends MinkContext
     private function getOrderIdentificationRepository(): OrderIdentificationRepositoryInterface
     {
         return $this->get(OrderIdentificationRepositoryInterface::class);
+    }
+
+    private function getRiskCheckDefinitionRepository(): RiskCheckDefinitionRepositoryInterface
+    {
+        return $this->get(RiskCheckDefinitionRepositoryInterface::class);
+    }
+
+    private function getMerchantRiskCheckSettingsRepository(): MerchantRiskCheckSettingsRepositoryInterface
+    {
+        return $this->get(MerchantRiskCheckSettingsRepositoryInterface::class);
     }
 
     private function getConnection(): \PDO

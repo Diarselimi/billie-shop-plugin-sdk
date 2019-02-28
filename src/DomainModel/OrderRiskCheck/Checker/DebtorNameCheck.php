@@ -1,10 +1,10 @@
 <?php
 
-namespace App\DomainModel\RiskCheck\Checker;
+namespace App\DomainModel\OrderRiskCheck\Checker;
 
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\Order\OrderContainer;
-use App\DomainModel\RiskCheck\CompanyNameComparator;
+use App\DomainModel\OrderRiskCheck\CompanyNameComparator;
 
 class DebtorNameCheck implements CheckInterface
 {
@@ -22,11 +22,6 @@ class DebtorNameCheck implements CheckInterface
         $nameFromRegistry = $order->getMerchantDebtor()->getDebtorCompany()->getName();
         $nameFromOrder = $order->getDebtorExternalData()->getName();
 
-        $attributes = [
-            'name_registry' => $nameFromRegistry,
-            'name_order' => $nameFromOrder,
-        ];
-
         $result = $this->nameComparator->compareWithCompanyName($nameFromOrder, $nameFromRegistry);
         if (!$result && $this->canCompareWithPerson($order)) {
             $debtorPerson = $order->getDebtorPerson();
@@ -36,12 +31,9 @@ class DebtorNameCheck implements CheckInterface
                 $debtorPerson->getFirstName(),
                 $debtorPerson->getLastName()
             );
-
-            $attributes['person_first_name'] = $debtorPerson->getFirstName();
-            $attributes['person_last_name'] = $debtorPerson->getLastName();
         }
 
-        return new CheckResult($result, self::NAME, $attributes);
+        return new CheckResult($result, self::NAME);
     }
 
     private function canCompareWithPerson(OrderContainer $order): bool

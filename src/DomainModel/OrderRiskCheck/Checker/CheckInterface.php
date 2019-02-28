@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DomainModel\RiskCheck\Checker;
+namespace App\DomainModel\OrderRiskCheck\Checker;
 
 use App\DomainModel\Order\OrderContainer;
 

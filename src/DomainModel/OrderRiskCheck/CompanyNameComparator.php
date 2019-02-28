@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DomainModel\RiskCheck;
+namespace App\DomainModel\OrderRiskCheck;
 
 use VRia\Utils\NoDiacritic;
 
@@ -10,7 +10,8 @@ class CompanyNameComparator
 
     const LEGAL_FORMS_JOINED = ['gesellschaft mit beschränkter haftung', 'gesellschaft mbh', 'gesellschaft'];
 
-    const LEVENSTHEIN_DISTANCE_ALLOWED_PERCENTAGE = 1/5;
+    const LEVENSTHEIN_DISTANCE_ALLOWED_PERCENTAGE = 1 / 5;
+
     const LEVENSTHEIN_DISTANCE_MAX = 3;
 
     const PERCENTAGE_OF_SIMILAR_NAME = 66;
@@ -50,13 +51,13 @@ class CompanyNameComparator
 
     private function normalizeText(string $text): string
     {
-      return strtolower(NoDiacritic::filter($text, self::LOCALE));
+        return strtolower(NoDiacritic::filter($text, self::LOCALE));
     }
 
     private function normalizePersonName(string $text): string
     {
-      // Replace all non-letters with spaces
-      return preg_replace("/[^A-Za-z ]/", ' ', $this->normalizeText($text));
+        // Replace all non-letters with spaces
+        return preg_replace("/[^A-Za-z ]/", ' ', $this->normalizeText($text));
     }
 
     private function getMeaningfulWords(string $name): array
@@ -104,6 +105,7 @@ class CompanyNameComparator
     private function areWordsSimilar(string $word1, string $word2): bool
     {
         $levenshtein_distance = levenshtein($this->normalizeText($word1), $this->normalizeText($word2));
+
         return $levenshtein_distance <= min(self::LEVENSTHEIN_DISTANCE_MAX, min(strlen($word1), strlen($word2)) * self::LEVENSTHEIN_DISTANCE_ALLOWED_PERCENTAGE);
     }
 

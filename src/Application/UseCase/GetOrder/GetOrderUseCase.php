@@ -89,7 +89,7 @@ class GetOrderUseCase
             $this->addInvoiceToOrder($order, $response);
         }
 
-        if ($this->orderStateManager->isDeclined($order)) {
+        if ($this->orderStateManager->isDeclined($order) || $this->orderStateManager->isWaiting($order)) {
             $response->setReasons($this->declinedReasonsMapper->mapReasons($order));
         }
 

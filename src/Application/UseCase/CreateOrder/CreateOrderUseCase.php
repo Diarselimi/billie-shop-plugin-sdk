@@ -14,7 +14,6 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
-use App\DomainModel\RiskCheck\Checker\CheckResult;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -71,33 +70,24 @@ class CreateOrderUseCase implements LoggingInterface
 
         $orderContainer = $this->orderPersistenceService->persistFromRequest($request);
 
-        if (!$this->orderChecksRunnerService->runPreconditionChecks($orderContainer)) {
+        if (!$this->orderChecksRunnerService->runPreIdentificationChecks($orderContainer)) {
             $this->reject($orderContainer, 'preconditions checks failed');
 
             return;
         }
 
-        if ($this->identifyDebtor($orderContainer, $request->getMerchantId()) === null) {
-            $this->reject($orderContainer, "debtor couldn't be identified");
-
-            return;
+        if ($this->identifyDebtor($orderContainer, $request->getMerchantId()) !== null) {
+            $this->orderRepository->update($orderContainer->getOrder());
         }
 
-        $this->orderRepository->update($orderContainer->getOrder());
-
-        if (!$this->checkLimit($orderContainer)) {
-            $this->reject($orderContainer, "debtor limit exceeded");
-
-            return;
-        }
-
-        if (!$this->orderChecksRunnerService->runChecks($orderContainer)) {
-            $this->limitsService->unlock(
-                $orderContainer->getMerchantDebtor(),
-                $orderContainer->getOrder()->getAmountGross()
-            );
-
+        if (!$this->orderChecksRunnerService->runPostIdentificationChecks($orderContainer)) {
             $this->reject($orderContainer, 'checks failed');
+
+            return;
+        }
+
+        if ($this->orderChecksRunnerService->checkForFailedSoftDeclinableCheckResults($orderContainer)) {
+            $this->moveToWaiting($orderContainer);
 
             return;
         }
@@ -126,21 +116,8 @@ class CreateOrderUseCase implements LoggingInterface
         );
 
         if ($merchantDebtor === null) {
-            $this->orderChecksRunnerService->persistCheckResult(
-                new CheckResult(false, 'debtor_identified', ['debtor_found' => 0]),
-                $orderContainer
-            );
-
             return null;
         }
-
-        $this->orderChecksRunnerService->persistCheckResult(
-            new CheckResult(true, 'debtor_identified', [
-                'debtor_found' => 1,
-                'debor_company_id' => $merchantDebtor->getDebtorCompany()->getId(),
-            ]),
-            $orderContainer
-        );
 
         $orderContainer
             ->setMerchantDebtor($merchantDebtor)
@@ -150,25 +127,23 @@ class CreateOrderUseCase implements LoggingInterface
         return $merchantDebtor;
     }
 
-    private function checkLimit(OrderContainer $orderContainer): bool
+    private function moveToWaiting(OrderContainer $orderContainer)
     {
-        $this->logWaypoint('limit check');
+        $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_WAITING);
+        $this->orderRepository->update($orderContainer->getOrder());
 
-        $limitsLocked = $this->limitsService->lock(
-            $orderContainer->getMerchantDebtor(),
-            $orderContainer->getOrder()->getAmountGross()
-        );
-
-        $this->orderChecksRunnerService->persistCheckResult(
-            new CheckResult($limitsLocked, 'limit', []),
-            $orderContainer
-        );
-
-        return $limitsLocked;
+        $this->logInfo("Order was moved to waiting state");
     }
 
     private function reject(OrderContainer $orderContainer, string $message)
     {
+        if ($orderContainer->isDebtorLimitLocked()) {
+            $this->limitsService->unlock(
+                $orderContainer->getMerchantDebtor(),
+                $orderContainer->getOrder()->getAmountGross()
+            );
+        }
+
         $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_DECLINE);
         $this->orderRepository->update($orderContainer->getOrder());
 

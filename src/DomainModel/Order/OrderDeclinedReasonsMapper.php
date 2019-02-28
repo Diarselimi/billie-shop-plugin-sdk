@@ -2,7 +2,13 @@
 
 namespace App\DomainModel\Order;
 
-use App\DomainModel\RiskCheck\RiskCheckRepositoryInterface;
+use App\DomainModel\OrderRiskCheck\Checker\DebtorAddressHouseMatchCheck;
+use App\DomainModel\OrderRiskCheck\Checker\DebtorAddressPostalCodeMatchCheck;
+use App\DomainModel\OrderRiskCheck\Checker\DebtorAddressStreetMatchCheck;
+use App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedCheck;
+use App\DomainModel\OrderRiskCheck\Checker\DebtorNameCheck;
+use App\DomainModel\OrderRiskCheck\Checker\LimitCheck;
+use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
 
 class OrderDeclinedReasonsMapper
 {
@@ -16,7 +22,7 @@ class OrderDeclinedReasonsMapper
 
     private $riskCheckRepository;
 
-    public function __construct(RiskCheckRepositoryInterface $riskCheckRepository)
+    public function __construct(OrderRiskCheckRepositoryInterface $riskCheckRepository)
     {
         $this->riskCheckRepository = $riskCheckRepository;
     }
@@ -24,19 +30,19 @@ class OrderDeclinedReasonsMapper
     public function mapReasons(OrderEntity $order): array
     {
         $riskChecksToReasons = [
-            'debtor_identified' => self::REASON_DEBTOR_NOT_IDENTIFIED,
-            'limit' => self::REASON_DEBTOR_LIMIT_EXCEEDED,
-            'debtor_name' => self::REASON_ADDRESS_MISMATCH,
-            'debtor_address_street_match' => self::REASON_ADDRESS_MISMATCH,
-            'debtor_address_house_match' => self::REASON_ADDRESS_MISMATCH,
-            'debtor_address_postal_code_match' => self::REASON_ADDRESS_MISMATCH,
+            DebtorIdentifiedCheck::NAME => self::REASON_DEBTOR_NOT_IDENTIFIED,
+            LimitCheck::NAME => self::REASON_DEBTOR_LIMIT_EXCEEDED,
+            DebtorNameCheck::NAME => self::REASON_ADDRESS_MISMATCH,
+            DebtorAddressStreetMatchCheck::NAME => self::REASON_ADDRESS_MISMATCH,
+            DebtorAddressHouseMatchCheck::NAME => self::REASON_ADDRESS_MISMATCH,
+            DebtorAddressPostalCodeMatchCheck::NAME => self::REASON_ADDRESS_MISMATCH,
         ];
         $mappedChecks = array_keys($riskChecksToReasons);
 
         $checks = $this->riskCheckRepository->findByOrder($order->getId());
         foreach ($checks as $check) {
-            if (!$check->isPassed() && \in_array($check->getName(), $mappedChecks)) {
-                return [$riskChecksToReasons[$check->getName()]];
+            if (!$check->isPassed() && \in_array($check->getRiskCheckDefinition()->getName(), $mappedChecks)) {
+                return [$riskChecksToReasons[$check->getRiskCheckDefinition()->getName()]];
             }
         }
 

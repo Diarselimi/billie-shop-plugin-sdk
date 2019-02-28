@@ -51,23 +51,41 @@ services:
 
   App\DomainModel\Order\OrderChecksRunnerService:
     arguments:
+      $preIdentificationChecks:
+        - 'available_financing_limit'
+        - 'amount'
+        - 'debtor_country'
+        - 'debtor_industry_sector'
+      $postIdentificationChecks:
+        - 'debtor_identified'
+        - 'limit'
+        - 'debtor_not_customer'
+        - 'debtor_name'
+        - 'debtor_address_street_match'
+        - 'debtor_address_house_match'
+        - 'debtor_address_postal_code_match'
+        - 'debtor_blacklisted'
+        - 'debtor_overdue'
+        - 'company_b2b_score'
       $checkLoader: !service
         class: Symfony\Component\DependencyInjection\ServiceLocator
         tags: ['container.service_locator']
         arguments:
           -
-            amount: '@App\DomainModel\RiskCheck\Checker\AmountCheck'
-            debtor_country: '@App\DomainModel\RiskCheck\Checker\DebtorCountryCheck'
-            debtor_industry_sector: '@App\DomainModel\RiskCheck\Checker\DebtorIndustrySectorCheck'
-            debtor_not_customer: '@App\DomainModel\RiskCheck\Checker\DebtorNotCustomerCheck'
-            debtor_overdue: '@App\DomainModel\RiskCheck\Checker\DebtorOverdueCheck'
-            debtor_name: '@App\DomainModel\RiskCheck\Checker\DebtorNameCheck'
-            debtor_address_street_match: '@App\DomainModel\RiskCheck\Checker\DebtorAddressStreetMatchCheck'
-            debtor_address_house_match: '@App\DomainModel\RiskCheck\Checker\DebtorAddressHouseMatchCheck'
-            debtor_address_postal_code_match: '@App\DomainModel\RiskCheck\Checker\DebtorAddressPostalCodeMatchCheck'
-            debtor_blacklisted: '@App\DomainModel\RiskCheck\Checker\DebtorBlacklistedCheck'
-            available_financing_limit: '@App\DomainModel\RiskCheck\Checker\AvailableFinancingLimitCheck'
-            company_b2b_score: '@App\DomainModel\RiskCheck\Checker\DebtorScoreCheck'
+            amount: '@App\DomainModel\OrderRiskCheck\Checker\AmountCheck'
+            debtor_country: '@App\DomainModel\OrderRiskCheck\Checker\DebtorCountryCheck'
+            debtor_industry_sector: '@App\DomainModel\OrderRiskCheck\Checker\DebtorIndustrySectorCheck'
+            debtor_not_customer: '@App\DomainModel\OrderRiskCheck\Checker\DebtorNotCustomerCheck'
+            debtor_overdue: '@App\DomainModel\OrderRiskCheck\Checker\DebtorOverdueCheck'
+            debtor_name: '@App\DomainModel\OrderRiskCheck\Checker\DebtorNameCheck'
+            debtor_address_street_match: '@App\DomainModel\OrderRiskCheck\Checker\DebtorAddressStreetMatchCheck'
+            debtor_address_house_match: '@App\DomainModel\OrderRiskCheck\Checker\DebtorAddressHouseMatchCheck'
+            debtor_address_postal_code_match: '@App\DomainModel\OrderRiskCheck\Checker\DebtorAddressPostalCodeMatchCheck'
+            debtor_blacklisted: '@App\DomainModel\OrderRiskCheck\Checker\DebtorBlacklistedCheck'
+            available_financing_limit: '@App\DomainModel\OrderRiskCheck\Checker\AvailableFinancingLimitCheck'
+            company_b2b_score: '@App\DomainModel\OrderRiskCheck\Checker\DebtorScoreCheck'
+            limit: '@App\DomainModel\OrderRiskCheck\Checker\LimitCheck'
+            debtor_identified: '@App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedCheck'
 
   App\Infrastructure\Sns\InvoiceDownloadEventPublisher:
     arguments:

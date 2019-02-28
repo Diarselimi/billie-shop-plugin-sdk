@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DomainModel\RiskCheck\Checker;
+namespace App\DomainModel\OrderRiskCheck\Checker;
 
 use App\DomainModel\Order\OrderContainer;
 
@@ -10,6 +10,6 @@ class DebtorBlacklistedCheck implements CheckInterface
 
     public function check(OrderContainer $order): CheckResult
     {
-        return new CheckResult(!$order->getMerchantDebtor()->getDebtorCompany()->isBlacklisted(), self::NAME, []);
+        return new CheckResult(!$order->getMerchantDebtor()->getDebtorCompany()->isBlacklisted(), self::NAME);
     }
 }

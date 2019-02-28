@@ -9,6 +9,7 @@ framework:
       supports: App\DomainModel\Order\OrderEntity
       places:
         - new
+        - waiting
         - created
         - declined
         - shipped
@@ -17,6 +18,9 @@ framework:
         - complete
         - canceled
       transitions:
+        waiting:
+          from: new
+          to: waiting
         create:
           from: new
           to: created

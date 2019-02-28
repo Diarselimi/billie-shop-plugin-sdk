@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DomainModel\RiskCheck\Checker;
+namespace App\DomainModel\OrderRiskCheck\Checker;
 
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\IsEligibleForPayAfterDeliveryRequestDTOFactory;
@@ -56,6 +56,6 @@ class DebtorScoreCheck implements CheckInterface
 
         $passed = $this->companiesService->isEligibleForPayAfterDelivery($IsEligibleForPayAfterDeliveryRequestDTO);
 
-        return new CheckResult($passed, self::NAME, []);
+        return new CheckResult($passed, self::NAME);
     }
 }

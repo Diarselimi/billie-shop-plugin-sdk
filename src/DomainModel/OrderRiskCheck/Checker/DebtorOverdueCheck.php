@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DomainModel\RiskCheck\Checker;
+namespace App\DomainModel\OrderRiskCheck\Checker;
 
 use App\DomainModel\Order\OrderContainer;
 use App\DomainModel\Order\OrderRepositoryInterface;
@@ -8,7 +8,8 @@ use App\DomainModel\Order\OrderRepositoryInterface;
 class DebtorOverdueCheck implements CheckInterface
 {
     private const OVERDUE_MAX_DAYS = 30;
-    private const NAME = 'debtor_overdue';
+
+    const NAME = 'debtor_overdue';
 
     private $orderRepository;
 
@@ -21,7 +22,7 @@ class DebtorOverdueCheck implements CheckInterface
     {
         $result = $this->hasOverdues($order);
 
-        return new CheckResult($result, self::NAME, []);
+        return new CheckResult($result, self::NAME);
     }
 
     private function hasOverdues(OrderContainer $order)

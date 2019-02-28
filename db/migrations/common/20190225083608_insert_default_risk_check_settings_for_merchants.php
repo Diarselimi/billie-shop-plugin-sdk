@@ -1,0 +1,76 @@
+<?php
+
+use App\DomainModel\OrderRiskCheck\Checker\AmountCheck;
+use App\DomainModel\OrderRiskCheck\Checker\AvailableFinancingLimitCheck;
+use App\DomainModel\OrderRiskCheck\Checker\DebtorAddressHouseMatchCheck;
+use App\DomainModel\OrderRiskCheck\Checker\DebtorAddressPostalCodeMatchCheck;
+use App\DomainModel\OrderRiskCheck\Checker\DebtorAddressStreetMatchCheck;
+use App\DomainModel\OrderRiskCheck\Checker\DebtorBlacklistedCheck;
+use App\DomainModel\OrderRiskCheck\Checker\DebtorCountryCheck;
+use App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedCheck;
+use App\DomainModel\OrderRiskCheck\Checker\DebtorIndustrySectorCheck;
+use App\DomainModel\OrderRiskCheck\Checker\DebtorNameCheck;
+use App\DomainModel\OrderRiskCheck\Checker\DebtorNotCustomerCheck;
+use App\DomainModel\OrderRiskCheck\Checker\DebtorOverdueCheck;
+use App\DomainModel\OrderRiskCheck\Checker\DebtorScoreCheck;
+use App\DomainModel\OrderRiskCheck\Checker\LimitCheck;
+use Phinx\Migration\AbstractMigration;
+
+class InsertDefaultRiskCheckSettingsForMerchants extends AbstractMigration
+{
+    public function up()
+    {
+        $riskCheckDefinitions = [
+            AvailableFinancingLimitCheck::NAME,
+            AmountCheck::NAME,
+            DebtorCountryCheck::NAME,
+            DebtorIndustrySectorCheck::NAME,
+            DebtorIdentifiedCheck::NAME,
+            LimitCheck::NAME,
+            DebtorNotCustomerCheck::NAME,
+            DebtorNameCheck::NAME,
+            'debtor_address', // Not relevant anymore, only for backward compatibility with current risk checks.
+            DebtorAddressStreetMatchCheck::NAME,
+            DebtorAddressHouseMatchCheck::NAME,
+            DebtorAddressPostalCodeMatchCheck::NAME,
+            DebtorBlacklistedCheck::NAME,
+            DebtorOverdueCheck::NAME,
+            DebtorScoreCheck::NAME,
+        ];
+
+        foreach ($riskCheckDefinitions as $riskCheckDefinitionName) {
+            $this
+                ->table('risk_check_definitions')
+                ->insert(
+                    [
+                        'name' => $riskCheckDefinitionName,
+                        'created_at' => (new DateTime())->format('Y-m-d H:i:s'),
+                        'updated_at' => (new DateTime())->format('Y-m-d H:i:s'),
+                    ]
+                )
+                ->save()
+            ;
+        }
+
+        $merchants = $this->fetchAll('SELECT * FROM merchants');
+
+        foreach ($merchants as $merchant) {
+            $merchantId = $merchant['id'];
+
+            $this->execute("
+                INSERT INTO `merchant_risk_check_settings`
+                (`merchant_id`,`risk_check_definition_id`,`enabled`,`decline_on_failure`,`created_at`,`updated_at`)
+                SELECT 
+                  $merchantId AS merchant_id,
+                  id AS risk_check_definition_id,
+                  1 AS enabled,
+                  1 AS decline_on_failure,
+                  NOW() AS created_at,
+                  NOW() AS updated_at
+                FROM `risk_check_definitions`
+                WHERE name <> 'debtor_address'
+                ORDER BY id
+            ");
+        }
+    }
+}

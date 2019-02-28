@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DomainModel\RiskCheck\Checker;
+namespace App\DomainModel\OrderRiskCheck\Checker;
 
 use App\DomainModel\Order\OrderContainer;
 
@@ -12,11 +12,7 @@ class AvailableFinancingLimitCheck implements CheckInterface
     {
         return new CheckResult(
             $order->getMerchant()->getAvailableFinancingLimit() > $order->getOrder()->getAmountGross(),
-            self::NAME,
-            [
-                'available_financing_limit' => $order->getMerchant()->getAvailableFinancingLimit(),
-                'order_amount_gross' => $order->getOrder()->getAmountGross(),
-            ]
+            self::NAME
         );
     }
 }

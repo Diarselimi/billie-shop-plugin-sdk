@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DomainModel\RiskCheck\Checker;
+namespace App\DomainModel\OrderRiskCheck\Checker;
 
 use App\DomainModel\Order\OrderContainer;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
@@ -24,7 +24,7 @@ class DebtorAddressHouseMatchCheck implements CheckInterface, LoggingInterface
         $houseFromOrder = $order->getDebtorExternalDataAddress()->getHouseNumber();
 
         if (!$houseFromRegistry) {
-            return new CheckResult(true, self::NAME, []);
+            return new CheckResult(true, self::NAME);
         }
 
         if (
@@ -33,12 +33,12 @@ class DebtorAddressHouseMatchCheck implements CheckInterface, LoggingInterface
         ) {
             $result = $this->isHouseRangesMatch($houseFromRegistry, $houseFromOrder);
 
-            return new CheckResult($result, self::NAME, []);
+            return new CheckResult($result, self::NAME);
         }
 
         $result = $this->isHouseNumbersMatch($houseFromRegistry, $houseFromOrder);
 
-        return new CheckResult($result, self::NAME, []);
+        return new CheckResult($result, self::NAME);
     }
 
     private function isHouseRangesMatch(string $houseFromRegistry, string $houseFromOrder): bool

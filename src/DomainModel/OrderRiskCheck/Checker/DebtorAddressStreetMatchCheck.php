@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DomainModel\RiskCheck\Checker;
+namespace App\DomainModel\OrderRiskCheck\Checker;
 
 use App\DomainModel\Order\OrderContainer;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
@@ -23,10 +23,7 @@ class DebtorAddressStreetMatchCheck implements CheckInterface, LoggingInterface
 
         $result = levenshtein($this->sanitize($streetFromRegistry), $this->sanitize($streetFromOrder)) <= self::MAX_DISTANCE;
 
-        return new CheckResult($result, self::NAME, [
-            'registry' => $streetFromRegistry,
-            'order' => $streetFromOrder,
-        ]);
+        return new CheckResult($result, self::NAME);
     }
 
     private function sanitize(string $address): string

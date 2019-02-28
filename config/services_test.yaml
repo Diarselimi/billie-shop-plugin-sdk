@@ -33,3 +33,9 @@ services:
   App\DomainModel\OrderIdentification\OrderIdentificationRepositoryInterface:
     alias: 'App\Infrastructure\Repository\OrderIdentificationRepository'
     public: true
+  App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\MerchantRiskCheckSettingsRepository'
+    public: true
+  App\DomainModel\OrderRiskCheck\RiskCheckDefinitionRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\RiskCheckDefinitionRepository'
+    public: true

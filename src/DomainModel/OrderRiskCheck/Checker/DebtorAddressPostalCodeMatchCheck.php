@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DomainModel\RiskCheck\Checker;
+namespace App\DomainModel\OrderRiskCheck\Checker;
 
 use App\DomainModel\Order\OrderContainer;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
@@ -20,20 +20,14 @@ class DebtorAddressPostalCodeMatchCheck implements CheckInterface, LoggingInterf
         $postalCodeFromOrder = $order->getDebtorExternalDataAddress()->getPostalCode();
 
         if ($postalCodeFromRegistry === $postalCodeFromOrder) {
-            return new CheckResult(true, self::NAME, [
-                'registry' => $postalCodeFromRegistry,
-                'order' => $postalCodeFromOrder,
-            ]);
+            return new CheckResult(true, self::NAME);
         }
 
         preg_match("/^(\d{1})(\d*)(\d{1})$/", $postalCodeFromRegistry, $registrySlices);
         preg_match("/^(\d{1})(\d*)(\d{1})$/", $postalCodeFromOrder, $orderSlices);
 
         if ($registrySlices[1] !== $orderSlices[1] || $registrySlices[3] !== $orderSlices[3]) {
-            return new CheckResult(false, self::NAME, [
-                'registry' => $postalCodeFromRegistry,
-                'order' => $postalCodeFromOrder,
-            ]);
+            return new CheckResult(false, self::NAME);
         }
 
         $registryDigits = str_split($registrySlices[2]);
@@ -51,9 +45,6 @@ class DebtorAddressPostalCodeMatchCheck implements CheckInterface, LoggingInterf
 
         $result = $registryDigits === $orderDigits;
 
-        return new CheckResult($result, self::NAME, [
-            'registry' => $postalCodeFromRegistry,
-            'order' => $postalCodeFromOrder,
-        ]);
+        return new CheckResult($result, self::NAME);
     }
 }
