@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraints\RegexValidator;
 /**
  * @Annotation
  */
-class OrderAmount extends Regex
+class Number extends Regex
 {
     public $pattern = '/^[0-9]+(\.[0-9]{1,2})?$/';
 

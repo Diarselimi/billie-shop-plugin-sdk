@@ -27,18 +27,15 @@ class OrderIdentificationRepository extends AbstractRepository implements OrderI
 
     public function findOneByOrderAndCompanyIds(int $orderId, int $v1CompanyId, int $v2CompanyId): ? array
     {
-        $row = $this->doFetchOne(
-            '
+        $row = $this->doFetchOne('
           SELECT *
           FROM order_identifications
           WHERE order_id = :order_id And v1_company_id = :v1_company_id And v2_company_id = :v2_company_id
-        ',
-            [
-                'order_id' => $orderId,
-                'v1_company_id' => $v1CompanyId,
-                'v2_company_id' => $v2CompanyId,
-            ]
-        );
+        ', [
+            'order_id' => $orderId,
+            'v1_company_id' => $v1CompanyId,
+            'v2_company_id' => $v2CompanyId,
+        ]);
 
         return $row ? $row : null;
     }

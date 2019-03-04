@@ -5,6 +5,7 @@ namespace App\DomainModel\MerchantDebtor;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\IdentifyDebtorRequestDTO;
 use App\DomainModel\Order\OrderContainer;
+use App\DomainModel\Order\OrderStateManager;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
@@ -33,7 +34,8 @@ class DebtorFinder implements LoggingInterface
         $this->logInfo('Check if the merchant customer already known');
         $merchantDebtor = $this->merchantDebtorRepository->getOneByMerchantExternalId(
             $orderContainer->getDebtorExternalData()->getMerchantExternalId(),
-            $merchantId
+            $merchantId,
+            [OrderStateManager::STATE_NEW, OrderStateManager::STATE_CANCELED]
         );
 
         if ($merchantDebtor) {

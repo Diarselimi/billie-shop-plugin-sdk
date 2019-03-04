@@ -18,6 +18,10 @@ services:
     App\Infrastructure\Repository\AbstractRepository:
       tags: ['paella_core.repository']
 
+    App\Application\UseCase\ValidatedUseCaseInterface:
+      calls:
+        - [setValidator, ['@Symfony\Component\Validator\Validator\ValidatorInterface']]
+
   App\:
     resource: '../src/*'
     exclude: '../src/{Entity,Migrations,Tests,Test,Kernel.php}'

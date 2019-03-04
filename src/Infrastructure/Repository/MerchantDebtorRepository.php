@@ -41,7 +41,7 @@ class MerchantDebtorRepository extends AbstractRepository implements MerchantDeb
     {
         $merchantDebtor->setUpdatedAt(new \DateTime());
 
-        $id = $this->doUpdate('
+        $this->doUpdate('
             UPDATE merchants_debtors
             SET financing_limit = :financing_limit, updated_at = :updated_at
             WHERE id = :id
@@ -79,26 +79,27 @@ class MerchantDebtorRepository extends AbstractRepository implements MerchantDeb
         return $row ? $this->factory->createFromDatabaseRow($row) : null;
     }
 
-    public function getOneByMerchantExternalId(string $merchantExternalId, string $merchantId): ?MerchantDebtorEntity
+    public function getOneByMerchantExternalId(string $merchantExternalId, string $merchantId, array $excludedOrderStates): ?MerchantDebtorEntity
     {
-        $row = $this->doFetchOne('
+        $row = $this->doFetchOne(
+            '
             SELECT * FROM merchants_debtors
             WHERE merchants_debtors.id = (
                 SELECT merchant_debtor_id
                 FROM orders
                 INNER JOIN debtor_external_data ON orders.debtor_external_data_id = debtor_external_data.id
-                WHERE orders.state NOT IN (:state_new, :state_declined)
-                AND orders.merchant_id = :merchant_id
+                WHERE orders.merchant_id = :merchant_id
                 AND debtor_external_data.merchant_external_id = :merchant_external_id
+                '.($excludedOrderStates ? 'AND orders.state NOT IN ("'.implode(', ', $excludedOrderStates).'")' : '').'
                 ORDER BY orders.id DESC
                 LIMIT 1
             )
-        ', [
-            'state_new' => OrderStateManager::STATE_NEW,
-            'state_declined' => OrderStateManager::STATE_DECLINED,
-            'merchant_external_id' => $merchantExternalId,
-            'merchant_id' => $merchantId,
-        ]);
+        ',
+            [
+                'merchant_external_id' => $merchantExternalId,
+                'merchant_id' => $merchantId,
+            ]
+        );
 
         return $row ? $this->factory->createFromDatabaseRow($row) : null;
     }

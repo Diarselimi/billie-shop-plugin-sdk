@@ -33,7 +33,7 @@ if ($trustedHosts = $_SERVER['TRUSTED_HOSTS'] ?? false) {
 }
 
 $request = Request::createFromGlobals();
-$kernel = new Kernel($request->headers->has('X-Test') ? 'test' : $env, $debug);
+$kernel = new Kernel($env !== 'prod' && $request->headers->has('X-Test') ? 'test' : $env, $debug);
 $response = $kernel->handle($request);
 $response->send();
 $kernel->terminate($request, $response);

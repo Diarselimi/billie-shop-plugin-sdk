@@ -3,6 +3,8 @@
 namespace App\Application\UseCase\CreateOrder;
 
 use App\Application\Exception\RequestValidationException;
+use App\Application\UseCase\ValidatedUseCaseInterface;
+use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\DebtorFinder;
@@ -20,9 +22,9 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 use Symfony\Component\Workflow\Workflow;
 
-class CreateOrderUseCase implements LoggingInterface
+class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 {
-    use LoggingTrait;
+    use LoggingTrait, ValidatedUseCaseTrait;
 
     private $orderPersistenceService;
 
@@ -93,17 +95,6 @@ class CreateOrderUseCase implements LoggingInterface
         }
 
         $this->approve($orderContainer);
-    }
-
-    private function validateRequest(CreateOrderRequest $request): void
-    {
-        $validationErrors = $this->validator->validate($request);
-
-        if ($validationErrors->count() === 0) {
-            return;
-        }
-
-        throw new RequestValidationException($validationErrors);
     }
 
     private function identifyDebtor(OrderContainer $orderContainer, int $merchantId): ? MerchantDebtorEntity

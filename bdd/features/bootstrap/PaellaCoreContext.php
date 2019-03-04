@@ -27,8 +27,6 @@ use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
-use donatj\MockWebServer\MockWebServer;
-use donatj\MockWebServer\Response;
 use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
@@ -37,23 +35,14 @@ use Webmozart\Assert\Assert;
 
 class PaellaCoreContext extends MinkContext
 {
-    use KernelDictionary;
+    use KernelDictionary, MockServerTrait;
 
     const MERCHANT_ID = 1;
-
-    private $alfred;
-
-    private $borscht;
-
-    private static $countAlfred = 1;
-
-    private static $countBorscht = 1;
 
     public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;
-        $this->alfred = new MockWebServer(8024);
-        $this->borscht = new MockWebServer(8025);
+        $this->setServer($kernel);
 
         $this->getMerchantRepository()->insert(
             (new MerchantEntity())
@@ -94,64 +83,28 @@ class PaellaCoreContext extends MinkContext
      */
     public function cleanUpScenario(AfterScenarioScope $afterScenarioScope)
     {
-        $this->alfred->stop();
-        $this->borscht->stop();
-
+        $this->stopServer();
         $this->getConnection()->exec('
             SET FOREIGN_KEY_CHECKS = 0;
-            DELETE FROM order_transitions;
-            DELETE FROM order_invoices;
-            DELETE FROM order_identifications;
-            DELETE FROM order_risk_checks;
-            DELETE FROM orders;
-            DELETE FROM persons;
-            DELETE FROM debtor_external_data;
-            DELETE FROM addresses;
-            DELETE FROM merchants_debtors;
-            DELETE FROM merchant_settings;
-            DELETE FROM merchant_risk_check_settings;
-            DELETE FROM merchants;
-            DELETE FROM merchants_debtors;
-            DELETE FROM score_thresholds_configuration;
-            DELETE FROM risk_check_definitions;
+            TRUNCATE order_transitions;
+            TRUNCATE order_invoices;
+            TRUNCATE order_identifications;
+            TRUNCATE order_risk_checks;
+            TRUNCATE orders;
+            TRUNCATE persons;
+            TRUNCATE debtor_external_data;
+            TRUNCATE addresses;
+            TRUNCATE merchants_debtors;
+            TRUNCATE merchant_settings;
+            TRUNCATE merchant_risk_check_settings;
+            TRUNCATE merchants;
+            TRUNCATE merchants_debtors;
+            TRUNCATE score_thresholds_configuration;
+            TRUNCATE risk_check_definitions;
             ALTER TABLE merchants AUTO_INCREMENT = 1;
             ALTER TABLE orders AUTO_INCREMENT = 1;
             SET FOREIGN_KEY_CHECKS = 1;
         ');
-    }
-
-    /**
-     * @Given I start alfred
-     */
-    public function iStartAlfred()
-    {
-        $this->alfred->start();
-    }
-
-    /**
-     * @Given I start borscht
-     */
-    public function iStartBorscht()
-    {
-        $this->borscht->start();
-    }
-
-    /**
-     * @Given I get from alfred :url endpoint response with status :status and body
-     */
-    public function iGetFromAlfredEndpointResponse(string $url, int $status, PyStringNode $body)
-    {
-        $this->alfred->start();
-        $this->alfred->setResponseOfPath($url, new Response($body, ['X-Count' => self::$countAlfred++], $status));
-    }
-
-    /**
-     * @Given I get from borscht :url endpoint response with status :status and body
-     */
-    public function iGetFromBorschtEndpointResponse(string $url, int $status, PyStringNode $body)
-    {
-        $this->borscht->start();
-        $this->borscht->setResponseOfPath($url, new Response($body, ['X-Count' => self::$countBorscht++], $status));
     }
 
     /**
@@ -191,13 +144,14 @@ class PaellaCoreContext extends MinkContext
             ->setIndustrySector('test')
             ->setSubindustrySector('test')
             ->setEstablishedCustomer(true)
+            ->setMerchantExternalId('ext_id')
             ->setAddressId($debtorAddress->getId());
         $this->getDebtorExternalDataRepository()->insert($debtor);
 
         $merchantDebtor = (new MerchantDebtorEntity())
             ->setMerchantId(self::MERCHANT_ID)
-            ->setDebtorId('2')
-            ->setPaymentDebtorId(1)
+            ->setDebtorId('1')
+            ->setPaymentDebtorId('test')
             ->setFinancingLimit(1000)
         ;
 
@@ -339,7 +293,7 @@ class PaellaCoreContext extends MinkContext
     /**
      * @When I push message to :queueName queue and routing key :routingKey with the following content:
      */
-    public function iPushMessageToOrder_debtor_identification_v2_paellaQueueWithTheFollowingContent(
+    public function iPushMessageMessageToQueueAndRoutingKeyWithTheFollowingContent(
         $queueName,
         $routingKey,
         PyStringNode $string
@@ -353,7 +307,7 @@ class PaellaCoreContext extends MinkContext
     /**
      * @Given order_identifications table should have a new record with:
      */
-    public function order_identificationsTablShouldHaveANewRecordWith(\Behat\Gherkin\Node\TableNode $table)
+    public function orderIdentificationsTableShouldHaveANewRecordWith(\Behat\Gherkin\Node\TableNode $table)
     {
         $repo = $this->getOrderIdentificationRepository();
 

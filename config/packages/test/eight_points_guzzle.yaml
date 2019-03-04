@@ -1,6 +1,12 @@
 eight_points_guzzle:
   clients:
     alfred:
-      base_url: "http://localhost:8024"
+      base_url: "%behat_mock_server_url%"
+      options:
+        query:
+          app: alfred
     borscht:
-      base_url: "http://localhost:8025"
+      base_url: "%behat_mock_server_url%"
+      options:
+        query:
+          app: borscht

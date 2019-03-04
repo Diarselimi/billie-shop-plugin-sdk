@@ -10,7 +10,6 @@ Feature:
 
     Scenario: Successful new order cancellation
         Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-        And I start alfred
         When I send a POST request to "/order/CO123/cancel"
         Then the response status code should be 204
         And the response should be empty
@@ -18,7 +17,6 @@ Feature:
 
     Scenario: Successful created order cancellation
         Given I have a created order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-        And I start alfred
         When I send a POST request to "/order/CO123/cancel"
         Then the response status code should be 204
         And the response should be empty
@@ -26,8 +24,6 @@ Feature:
 
     Scenario: Successful shipped order cancellation
         Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-        And I start alfred
-        And I start borscht
         When I send a POST request to "/order/CO123/cancel"
         Then the response status code should be 204
         And the response should be empty

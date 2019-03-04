@@ -7,8 +7,6 @@ Feature:
     Given I add "Content-type" header equal to "application/json"
     And I add "X-Test" header equal to 1
     And I add "X-Api-User" header equal to 1
-    And I start alfred
-    And I start borscht
 
   Scenario: Case 1: Order exists, not yet shipped, due date provided, amount unchanged
     Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
@@ -194,7 +192,6 @@ Feature:
         }
         """
     Then the response status code should be 412
-    And print last JSON response
     And the JSON response should be:
     """
     {"code":"order_invoice_update_not_possible","error":"Update invoice is not possible"}

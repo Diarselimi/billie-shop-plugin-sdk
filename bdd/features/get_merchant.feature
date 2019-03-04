@@ -3,13 +3,14 @@ Feature:
     I want to call the get merchant endpoint
     and retrieve the merchant data
 
-    Scenario: Unsuccessful merchant retrieve
+    Background:
         Given I add "Content-type" header equal to "application/json"
         And I add "X-Test" header equal to 1
         And I add "X-Api-User" header equal to 1
+
+    Scenario: Unsuccessful merchant retrieve
         When I send a GET request to "/merchant/1"
         Then the response status code should be 404
-        And print last JSON response
         And the JSON response should be:
         """
         {
@@ -19,11 +20,7 @@ Feature:
         """
 
     Scenario: Successful merchant retrieve
-        Given I add "Content-type" header equal to "application/json"
-        And I add "X-Test" header equal to 1
-        And I add "X-Api-User" header equal to test
         When I send a GET request to "/merchant/test"
-        And print last JSON response
         Then the JSON response should include:
         """
         {

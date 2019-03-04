@@ -7,7 +7,6 @@ Feature:
     Given I add "Content-type" header equal to "application/json"
     And I add "X-Test" header equal to 1
     And I add "X-Api-User" header equal to 1
-    And I start borscht
 
   Scenario: Try to mark a non-existent order as fraud
     Given I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"

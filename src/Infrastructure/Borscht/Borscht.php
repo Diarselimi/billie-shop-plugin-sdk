@@ -50,7 +50,9 @@ class Borscht implements BorschtInterface, LoggingInterface
 
         return (new DebtorPaymentDetailsDTO())
             ->setBankAccountBic($decodedResponse['bic'])
-            ->setBankAccountIban($decodedResponse['iban']);
+            ->setBankAccountIban($decodedResponse['iban'])
+            ->setOutstandingAmount($decodedResponse['outstanding_amount'])
+        ;
     }
 
     public function getOrderPaymentDetails(string $orderPaymentId): OrderPaymentDetailsDTO
