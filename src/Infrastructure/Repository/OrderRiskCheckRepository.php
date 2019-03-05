@@ -54,6 +54,6 @@ class OrderRiskCheckRepository extends AbstractRepository implements OrderRiskCh
             ['order_id' => $orderId]
         );
 
-        return $rows ? $this->factory->createFromMultipleDatabaseRows($rows) : null;
+        return $rows ? $this->factory->createFromMultipleDatabaseRows($rows) : [];
     }
 }
