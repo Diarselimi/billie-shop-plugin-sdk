@@ -18,6 +18,10 @@ class IdentifyDebtorDuplicatesCommand extends Command
 
     private const ARGUMENT_OUTPUT_FILE = 'output';
 
+    private const ARGUMENT_BROADCAST_BATCH_SIZE = 'batch';
+
+    private const ARGUMENT_BROADCAST_SLEEP = 'sleep';
+
     private $duplicateFinder;
 
     private $duplicateHandler;
@@ -36,12 +40,11 @@ class IdentifyDebtorDuplicatesCommand extends Command
         $this
             ->setName(self::NAME)
             ->setDescription(self::DESCRIPTION)
-            ->addArgument(
-                self::ARGUMENT_OUTPUT_FILE,
-                InputArgument::OPTIONAL,
-                'File or handle where to output the results in CSV format.',
-                'php://stdout'
-            );
+            ->addArgument(self::ARGUMENT_OUTPUT_FILE, InputArgument::OPTIONAL, 'File or handle where to output the results in CSV format', 'php://stdout')
+            ->addArgument(self::ARGUMENT_BROADCAST_BATCH_SIZE, InputArgument::OPTIONAL, 'Broadcast batch size', 50)
+            ->addArgument(self::ARGUMENT_BROADCAST_SLEEP, InputArgument::OPTIONAL, 'Broadcast sleep time between batches, in seconds', 5)
+
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -54,7 +57,13 @@ class IdentifyDebtorDuplicatesCommand extends Command
 
         if (!empty($newDuplicates)) {
             $output->writeln('Communicating duplicates to other services...');
-            $this->duplicateHandler->broadcast($newDuplicates, 100);
+
+            $this->duplicateHandler->broadcast(
+                $newDuplicates,
+                (int) $input->getArgument(self::ARGUMENT_BROADCAST_BATCH_SIZE),
+                (int) $input->getArgument(self::ARGUMENT_BROADCAST_SLEEP)
+            );
+
             $output->writeln('Found ' . count($newDuplicates) . ' new duplicates.');
         } else {
             $output->writeln('No new duplicates found.');
