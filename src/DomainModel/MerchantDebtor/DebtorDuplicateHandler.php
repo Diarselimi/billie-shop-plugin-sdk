@@ -49,9 +49,9 @@ class DebtorDuplicateHandler
 
     public function broadcast(array $duplicates, int $batchSize, int $sleep): void
     {
-        $currentBatch = [];
-
         while (!empty($duplicates)) {
+            $currentBatch = [];
+
             for ($i = 0; ($i < $batchSize) || ($i < (count($duplicates) - 1)); $i++) {
                 $duplicate = array_shift($duplicates);
                 if ($duplicate instanceof MerchantDebtorDuplicateDTO) {

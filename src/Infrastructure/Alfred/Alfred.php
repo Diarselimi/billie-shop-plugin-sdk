@@ -8,13 +8,17 @@ use App\DomainModel\DebtorCompany\DebtorCompanyFactory;
 use App\DomainModel\DebtorCompany\IdentifyDebtorRequestDTO;
 use App\DomainModel\DebtorCompany\IsEligibleForPayAfterDeliveryRequestDTO;
 use App\DomainModel\MerchantDebtor\MerchantDebtorDuplicateDTO;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Response;
 
-class Alfred implements CompaniesServiceInterface
+class Alfred implements CompaniesServiceInterface, LoggingInterface
 {
+    use LoggingTrait;
+
     private $client;
 
     private $factory;
@@ -165,6 +169,8 @@ class Alfred implements CompaniesServiceInterface
                 'is_duplicate_of' => $duplicate->getParentDebtorId(),
             ];
         }
+
+        $this->logInfo('Broadcasting batch to Alfred', ['batch' => $payload]);
 
         try {
             $this->client->post("/debtor/mark-duplicates", [

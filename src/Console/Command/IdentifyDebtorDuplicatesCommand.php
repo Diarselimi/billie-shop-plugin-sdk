@@ -6,8 +6,8 @@ use App\DomainModel\MerchantDebtor\DebtorDuplicateFinder;
 use App\DomainModel\MerchantDebtor\DebtorDuplicateHandler;
 use App\DomainModel\MerchantDebtor\MerchantDebtorDuplicateDTO;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class IdentifyDebtorDuplicatesCommand extends Command
@@ -40,16 +40,15 @@ class IdentifyDebtorDuplicatesCommand extends Command
         $this
             ->setName(self::NAME)
             ->setDescription(self::DESCRIPTION)
-            ->addArgument(self::ARGUMENT_OUTPUT_FILE, InputArgument::OPTIONAL, 'File or handle where to output the results in CSV format', 'php://stdout')
-            ->addArgument(self::ARGUMENT_BROADCAST_BATCH_SIZE, InputArgument::OPTIONAL, 'Broadcast batch size', 50)
-            ->addArgument(self::ARGUMENT_BROADCAST_SLEEP, InputArgument::OPTIONAL, 'Broadcast sleep time between batches, in seconds', 5)
-
+            ->addOption(self::ARGUMENT_OUTPUT_FILE, null, InputOption::VALUE_REQUIRED, 'File or handle where to output the results in CSV format', 'php://stdout')
+            ->addOption(self::ARGUMENT_BROADCAST_BATCH_SIZE, null, InputOption::VALUE_REQUIRED, 'Broadcast batch size', 50)
+            ->addOption(self::ARGUMENT_BROADCAST_SLEEP, null, InputOption::VALUE_REQUIRED, 'Broadcast sleep time between batches, in seconds', 5)
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $filename = $input->getArgument(self::ARGUMENT_OUTPUT_FILE);
+        $filename = $input->getOption(self::ARGUMENT_OUTPUT_FILE);
 
         $output->writeln('Identifying duplicates...');
 
@@ -60,8 +59,8 @@ class IdentifyDebtorDuplicatesCommand extends Command
 
             $this->duplicateHandler->broadcast(
                 $newDuplicates,
-                (int) $input->getArgument(self::ARGUMENT_BROADCAST_BATCH_SIZE),
-                (int) $input->getArgument(self::ARGUMENT_BROADCAST_SLEEP)
+                (int) $input->getOption(self::ARGUMENT_BROADCAST_BATCH_SIZE),
+                (int) $input->getOption(self::ARGUMENT_BROADCAST_SLEEP)
             );
 
             $output->writeln('Found ' . count($newDuplicates) . ' new duplicates.');
