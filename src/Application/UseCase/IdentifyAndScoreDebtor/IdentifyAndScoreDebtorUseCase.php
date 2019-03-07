@@ -106,7 +106,12 @@ class IdentifyAndScoreDebtorUseCase
             $isEligible = $this->isEligible($merchantSettings, $merchantDebtor);
         }
 
-        return new IdentifyAndScoreDebtorResponse($merchantDebtor->getDebtorId(), $isEligible);
+        return (new IdentifyAndScoreDebtorResponse())
+            ->setCompanyId($merchantDebtor->getDebtorId())
+            ->setCompanyName($identifiedDebtor->getName())
+            ->setIsEligible($isEligible)
+            ->setCrefoId($identifiedDebtor->getCrefoId())
+        ;
     }
 
     private function isEligible(MerchantSettingsEntity $merchantSettings, MerchantDebtorEntity $merchantDebtor)

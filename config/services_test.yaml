@@ -1,4 +1,12 @@
+parameters:
+  behat_mock_server_port: 8021
+  behat_mock_server_url: "http://localhost:%behat_mock_server_port%"
+
 services:
+  _defaults:
+    autowire: true
+    public: true
+
   App\Infrastructure\PDO\PDO:
     arguments:
       - 'mysql:dbname=%env(DATABASE_NAME)%;host=%env(DATABASE_HOST)%'
@@ -33,3 +41,13 @@ services:
   App\DomainModel\OrderIdentification\OrderIdentificationRepositoryInterface:
     alias: 'App\Infrastructure\Repository\OrderIdentificationRepository'
     public: true
+  App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\MerchantRiskCheckSettingsRepository'
+    public: true
+  App\DomainModel\OrderRiskCheck\RiskCheckDefinitionRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\RiskCheckDefinitionRepository'
+    public: true
+
+  donatj\MockWebServer\MockWebServer:
+    arguments:
+      $port: "%behat_mock_server_port%"

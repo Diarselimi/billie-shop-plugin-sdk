@@ -47,13 +47,7 @@ class DebtorDuplicateHandler
         return false;
     }
 
-    /**
-     * Communicate duplicates to other services
-     *
-     * @param MerchantDebtorDuplicateDTO[] $duplicates
-     * @param int                          $batchSize
-     */
-    public function broadcast(array $duplicates, int $batchSize = 100): void
+    public function broadcast(array $duplicates, int $batchSize, int $sleep): void
     {
         $currentBatch = [];
 
@@ -64,6 +58,9 @@ class DebtorDuplicateHandler
                     $currentBatch[] = $duplicate;
                 }
             }
+
+            sleep($sleep);
+
             if (!empty($currentBatch)) {
                 $this->companiesService->markDuplicates($currentBatch);
             }

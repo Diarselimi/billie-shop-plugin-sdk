@@ -6,10 +6,11 @@ use App\DomainModel\MerchantDebtor\MerchantDebtorIdentifierDTO;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntityFactory;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
-use App\DomainModel\Order\OrderStateManager;
 
 class MerchantDebtorRepository extends AbstractRepository implements MerchantDebtorRepositoryInterface
 {
+    private const SELECT_FIELDS = 'id, merchant_id, debtor_id, payment_debtor_id, financing_limit, score_thresholds_configuration_id, created_at, updated_at';
+
     private $factory;
 
     public function __construct(MerchantDebtorEntityFactory $factory)
@@ -41,7 +42,7 @@ class MerchantDebtorRepository extends AbstractRepository implements MerchantDeb
     {
         $merchantDebtor->setUpdatedAt(new \DateTime());
 
-        $id = $this->doUpdate('
+        $this->doUpdate('
             UPDATE merchants_debtors
             SET financing_limit = :financing_limit, updated_at = :updated_at
             WHERE id = :id
@@ -55,7 +56,7 @@ class MerchantDebtorRepository extends AbstractRepository implements MerchantDeb
     public function getOneById(int $id): ?MerchantDebtorEntity
     {
         $row = $this->doFetchOne('
-          SELECT id, merchant_id, debtor_id, payment_debtor_id, financing_limit, score_thresholds_configuration_id, created_at, updated_at 
+          SELECT ' . self::SELECT_FIELDS . '
           FROM merchants_debtors
           WHERE id = :id
         ', [
@@ -68,7 +69,7 @@ class MerchantDebtorRepository extends AbstractRepository implements MerchantDeb
     public function getOneByMerchantAndDebtorId(string $merchantId, string $debtorId): ?MerchantDebtorEntity
     {
         $row = $this->doFetchOne('
-          SELECT id, merchant_id, debtor_id, payment_debtor_id, financing_limit, score_thresholds_configuration_id, created_at, updated_at
+          SELECT ' . self::SELECT_FIELDS . '
           FROM merchants_debtors
           WHERE merchant_id = :merchant_id
           AND debtor_id = :debtor_id', [
@@ -79,23 +80,23 @@ class MerchantDebtorRepository extends AbstractRepository implements MerchantDeb
         return $row ? $this->factory->createFromDatabaseRow($row) : null;
     }
 
-    public function getOneByMerchantExternalId(string $merchantExternalId, string $merchantId): ?MerchantDebtorEntity
+    public function getOneByMerchantExternalId(string $merchantExternalId, string $merchantId, array $excludedOrderStates): ?MerchantDebtorEntity
     {
         $row = $this->doFetchOne('
-            SELECT * FROM merchants_debtors
+            SELECT ' . self::SELECT_FIELDS . '
+            FROM merchants_debtors
             WHERE merchants_debtors.id = (
                 SELECT merchant_debtor_id
                 FROM orders
                 INNER JOIN debtor_external_data ON orders.debtor_external_data_id = debtor_external_data.id
-                WHERE orders.state NOT IN (:state_new, :state_declined)
-                AND orders.merchant_id = :merchant_id
+                WHERE orders.merchant_id = :merchant_id
                 AND debtor_external_data.merchant_external_id = :merchant_external_id
+                AND merchant_debtor_id IS NOT NULL
+                '.($excludedOrderStates ? 'AND orders.state NOT IN ("'.implode(', ', $excludedOrderStates).'")' : '').'
                 ORDER BY orders.id DESC
                 LIMIT 1
             )
         ', [
-            'state_new' => OrderStateManager::STATE_NEW,
-            'state_declined' => OrderStateManager::STATE_DECLINED,
             'merchant_external_id' => $merchantExternalId,
             'merchant_id' => $merchantId,
         ]);

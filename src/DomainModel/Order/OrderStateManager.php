@@ -6,6 +6,8 @@ class OrderStateManager
 {
     const STATE_NEW = 'new';
 
+    const STATE_WAITING = 'waiting';
+
     const STATE_CREATED = 'created';
 
     const STATE_DECLINED = 'declined';
@@ -21,6 +23,8 @@ class OrderStateManager
     const STATE_CANCELED = 'canceled';
 
     const TRANSITION_NEW = 'new';
+
+    const TRANSITION_WAITING = 'waiting';
 
     const TRANSITION_CREATE = 'create';
 
@@ -84,5 +88,10 @@ class OrderStateManager
     public function isPaidOut(OrderEntity $order): bool
     {
         return $order->getState() === self::STATE_PAID_OUT;
+    }
+
+    public function isWaiting(OrderEntity $order): bool
+    {
+        return $order->getState() === self::STATE_WAITING;
     }
 }

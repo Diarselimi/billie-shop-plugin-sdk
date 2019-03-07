@@ -2,7 +2,7 @@
 
 namespace Tests\src\DomainModel\RiskCheck;
 
-use App\DomainModel\RiskCheck\CompanyNameComparator;
+use App\DomainModel\OrderRiskCheck\CompanyNameComparator;
 use PHPUnit\Framework\TestCase;
 
 class CompanyNameComparatorTest extends TestCase
@@ -163,7 +163,7 @@ class CompanyNameComparatorTest extends TestCase
             ['FIRST LASST', 'First', 'Laßt'],
             // Compount name with dash
             ['First-Middle Last Suffix', 'First Middle', 'Last'],
-            ['First Middle Last Suffix', 'First-Middle', 'Last']
+            ['First Middle Last Suffix', 'First-Middle', 'Last'],
         ];
     }
 }

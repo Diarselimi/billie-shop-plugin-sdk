@@ -44,5 +44,19 @@ class TestMerchant extends AbstractMigration
                    '{$now}' as updated_at
             FROM merchants WHERE merchants.id NOT IN (SELECT merchant_id FROM merchant_settings);
         ");
+
+        $this->execute("
+                INSERT INTO `merchant_risk_check_settings`
+                (`merchant_id`,`risk_check_definition_id`,`enabled`,`decline_on_failure`,`created_at`,`updated_at`)
+                SELECT 
+                  1 AS merchant_id,
+                  id AS risk_check_definition_id,
+                  1 AS enabled,
+                  1 AS decline_on_failure,
+                  NOW() AS created_at,
+                  NOW() AS updated_at
+                FROM `risk_check_definitions`
+                WHERE name <> 'debtor_address'
+        ");
     }
 }

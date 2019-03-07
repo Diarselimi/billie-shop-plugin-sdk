@@ -55,3 +55,19 @@ create_merchant:
   path: /merchant
   controller: App\Http\Controller\CreateMerchantController::execute
   methods: [POST]
+
+update_merchant_debtor_limit:
+  path: /merchant-debtor/{merchantDebtorExternalId}/limit
+  controller: App\Http\Controller\UpdateMerchantDebtorLimitController::execute
+  methods: [PUT]
+
+update_merchant_debtor_company:
+  path: /merchant-debtor/{merchantDebtorExternalId}/company
+  controller: App\Http\Controller\UpdateMerchantDebtorCompanyController::execute
+  methods: [PUT]
+
+get_merchant_debtor:
+  path: /merchant-debtor/{merchantDebtorExternalId}
+  controller: App\Http\Controller\GetMerchantDebtorController::execute
+  methods: [GET]
+

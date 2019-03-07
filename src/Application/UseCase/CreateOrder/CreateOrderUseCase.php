@@ -3,6 +3,8 @@
 namespace App\Application\UseCase\CreateOrder;
 
 use App\Application\Exception\RequestValidationException;
+use App\Application\UseCase\ValidatedUseCaseInterface;
+use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\DebtorFinder;
@@ -14,16 +16,15 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
-use App\DomainModel\RiskCheck\Checker\CheckResult;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 use Symfony\Component\Workflow\Workflow;
 
-class CreateOrderUseCase implements LoggingInterface
+class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 {
-    use LoggingTrait;
+    use LoggingTrait, ValidatedUseCaseTrait;
 
     private $orderPersistenceService;
 
@@ -71,49 +72,29 @@ class CreateOrderUseCase implements LoggingInterface
 
         $orderContainer = $this->orderPersistenceService->persistFromRequest($request);
 
-        if (!$this->orderChecksRunnerService->runPreconditionChecks($orderContainer)) {
+        if (!$this->orderChecksRunnerService->runPreIdentificationChecks($orderContainer)) {
             $this->reject($orderContainer, 'preconditions checks failed');
 
             return;
         }
 
-        if ($this->identifyDebtor($orderContainer, $request->getMerchantId()) === null) {
-            $this->reject($orderContainer, "debtor couldn't be identified");
-
-            return;
+        if ($this->identifyDebtor($orderContainer, $request->getMerchantId()) !== null) {
+            $this->orderRepository->update($orderContainer->getOrder());
         }
 
-        $this->orderRepository->update($orderContainer->getOrder());
-
-        if (!$this->checkLimit($orderContainer)) {
-            $this->reject($orderContainer, "debtor limit exceeded");
-
-            return;
-        }
-
-        if (!$this->orderChecksRunnerService->runChecks($orderContainer)) {
-            $this->limitsService->unlock(
-                $orderContainer->getMerchantDebtor(),
-                $orderContainer->getOrder()->getAmountGross()
-            );
-
+        if (!$this->orderChecksRunnerService->runPostIdentificationChecks($orderContainer)) {
             $this->reject($orderContainer, 'checks failed');
 
             return;
         }
 
-        $this->approve($orderContainer);
-    }
+        if ($this->orderChecksRunnerService->checkForFailedSoftDeclinableCheckResults($orderContainer)) {
+            $this->moveToWaiting($orderContainer);
 
-    private function validateRequest(CreateOrderRequest $request): void
-    {
-        $validationErrors = $this->validator->validate($request);
-
-        if ($validationErrors->count() === 0) {
             return;
         }
 
-        throw new RequestValidationException($validationErrors);
+        $this->approve($orderContainer);
     }
 
     private function identifyDebtor(OrderContainer $orderContainer, int $merchantId): ? MerchantDebtorEntity
@@ -126,21 +107,8 @@ class CreateOrderUseCase implements LoggingInterface
         );
 
         if ($merchantDebtor === null) {
-            $this->orderChecksRunnerService->persistCheckResult(
-                new CheckResult(false, 'debtor_identified', ['debtor_found' => 0]),
-                $orderContainer
-            );
-
             return null;
         }
-
-        $this->orderChecksRunnerService->persistCheckResult(
-            new CheckResult(true, 'debtor_identified', [
-                'debtor_found' => 1,
-                'debor_company_id' => $merchantDebtor->getDebtorCompany()->getId(),
-            ]),
-            $orderContainer
-        );
 
         $orderContainer
             ->setMerchantDebtor($merchantDebtor)
@@ -150,25 +118,23 @@ class CreateOrderUseCase implements LoggingInterface
         return $merchantDebtor;
     }
 
-    private function checkLimit(OrderContainer $orderContainer): bool
+    private function moveToWaiting(OrderContainer $orderContainer)
     {
-        $this->logWaypoint('limit check');
+        $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_WAITING);
+        $this->orderRepository->update($orderContainer->getOrder());
 
-        $limitsLocked = $this->limitsService->lock(
-            $orderContainer->getMerchantDebtor(),
-            $orderContainer->getOrder()->getAmountGross()
-        );
-
-        $this->orderChecksRunnerService->persistCheckResult(
-            new CheckResult($limitsLocked, 'limit', []),
-            $orderContainer
-        );
-
-        return $limitsLocked;
+        $this->logInfo("Order was moved to waiting state");
     }
 
     private function reject(OrderContainer $orderContainer, string $message)
     {
+        if ($orderContainer->isDebtorLimitLocked()) {
+            $this->limitsService->unlock(
+                $orderContainer->getMerchantDebtor(),
+                $orderContainer->getOrder()->getAmountGross()
+            );
+        }
+
         $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_DECLINE);
         $this->orderRepository->update($orderContainer->getOrder());
 

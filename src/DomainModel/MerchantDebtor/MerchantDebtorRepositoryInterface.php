@@ -12,10 +12,9 @@ interface MerchantDebtorRepositoryInterface
 
     public function getOneByMerchantAndDebtorId(string $merchantId, string $debtorId): ?MerchantDebtorEntity;
 
-    public function getOneByMerchantExternalId(string $externalMerchantId, string $merchantId): ?MerchantDebtorEntity;
+    public function getOneByMerchantExternalId(string $externalMerchantId, string $merchantId, array $excludedOrderStates): ?MerchantDebtorEntity;
 
     /**
-     * @param  string                                   $where
      * @return MerchantDebtorIdentifierDTO[]|\Generator
      */
     public function getDebtorsWithExternalId(string $where = ''): \Generator;

@@ -3,28 +3,28 @@
 namespace App\Application\UseCase\CreateOrder\Request;
 
 use Symfony\Component\Validator\Constraints as Assert;
-use App\Application\Validator\Constraint as CreateOrderUseCaseConstraints;
+use App\Application\Validator\Constraint as PaellaAssert;
 
 class CreateOrderAmountRequest
 {
     /**
      * @Assert\NotBlank()
      * @Assert\GreaterThan(value=0)
-     * @CreateOrderUseCaseConstraints\OrderAmount()
+     * @PaellaAssert\Number()
      */
     private $net;
 
     /**
      * @Assert\NotBlank()
      * @Assert\GreaterThan(value=0)
-     * @CreateOrderUseCaseConstraints\OrderAmount()
+     * @PaellaAssert\Number()
      */
     private $gross;
 
     /**
      * @Assert\NotBlank()
      * @Assert\GreaterThanOrEqual(value=0)
-     * @CreateOrderUseCaseConstraints\OrderAmount()
+     * @PaellaAssert\Number()
      */
     private $tax;
 

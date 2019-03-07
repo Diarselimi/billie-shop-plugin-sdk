@@ -1,0 +1,14 @@
+{
+    "id": 1,
+    "payment_id": "test",
+    "name": "Test User Company",
+    "address_house": "10",
+    "address_street": "Heinrich-Heine-Platz",
+    "address_city": "Berlin",
+    "address_postal_code": "10179",
+    "address_country": "DE",
+    "address_addition": null,
+    "crefo_id": "123",
+    "schufa_id": "123",
+    "is_blacklisted": 0
+}

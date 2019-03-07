@@ -16,7 +16,7 @@ class JsonConverterSubscriber implements EventSubscriberInterface
     public function onRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        if (!in_array($request->getMethod(), [Request::METHOD_POST, Request::METHOD_PATCH])
+        if (!in_array($request->getMethod(), [Request::METHOD_POST, Request::METHOD_PATCH, Request::METHOD_PUT])
             || !$request->headers->has('Content-Type')
             || !$request->headers->get('Content-Type') === 'application/json'
             || !$request->getContent()

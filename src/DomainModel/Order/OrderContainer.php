@@ -27,6 +27,8 @@ class OrderContainer
 
     private $merchantSettings;
 
+    private $isDebtorLimitLocked;
+
     public function getOrder(): OrderEntity
     {
         return $this->order;
@@ -39,7 +41,7 @@ class OrderContainer
         return $this;
     }
 
-    public function getMerchantDebtor(): MerchantDebtorEntity
+    public function getMerchantDebtor(): ? MerchantDebtorEntity
     {
         return $this->merchantDebtor;
     }
@@ -119,6 +121,18 @@ class OrderContainer
     public function setMerchantSettings(MerchantSettingsEntity $merchantSettings): OrderContainer
     {
         $this->merchantSettings = $merchantSettings;
+
+        return $this;
+    }
+
+    public function isDebtorLimitLocked(): ? bool
+    {
+        return $this->isDebtorLimitLocked;
+    }
+
+    public function setIsDebtorLimitLocked(?bool $isDebtorLimitLocked): OrderContainer
+    {
+        $this->isDebtorLimitLocked = $isDebtorLimitLocked;
 
         return $this;
     }

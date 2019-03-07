@@ -7,14 +7,45 @@ Feature:
     Given I add "Content-type" header equal to "application/json"
     And I add "X-Test" header equal to 1
     And I add "X-Api-User" header equal to 1
+    And The following risk check definitions exist:
+      | name                              |
+      | available_financing_limit         |
+      | amount                            |
+      | debtor_country                    |
+      | debtor_industry_sector            |
+      | debtor_identified                 |
+      | limit                             |
+      | debtor_not_customer               |
+      | debtor_name                       |
+      | debtor_address_street_match       |
+      | debtor_address_house_match        |
+      | debtor_address_postal_code_match  |
+      | debtor_blacklisted                |
+      | debtor_overdue                    |
+      | company_b2b_score                 |
+    And The following merchant risk check settings exist for merchant 1:
+      | risk_check_name                   |	enabled	|	decline_on_failure	|
+      | available_financing_limit         |	1		|	1					|
+      | amount                            |	1		| 	1					|
+      | debtor_country                    |	1		| 	1					|
+      | debtor_industry_sector            |	1		| 	1					|
+      | debtor_identified                 |	1		| 	1					|
+      | limit                             |	1		| 	1					|
+      | debtor_not_customer               |	1		| 	1					|
+      | debtor_name                       |	1		| 	1					|
+      | debtor_address_street_match       |	1		| 	1					|
+      | debtor_address_house_match        |	1		| 	1					|
+      | debtor_address_postal_code_match  |	1		| 	1					|
+      | debtor_blacklisted                |	1		| 	1					|
+      | debtor_overdue                    |	1		| 	1					|
+      | company_b2b_score                 |	1		| 	1					|
+
 
   Scenario: Debtor identification failed
-    Given I get from alfred "/debtor/identify" endpoint response with status 404 and body
-      """
-      """
+    Given I get from companies service identify no match response
     When I send a POST request to "/order" with body:
-      """
-       {
+    """
+    {
          "debtor_person":{
             "salutation":"m",
             "first_name":"",
@@ -56,8 +87,8 @@ Feature:
          "comment":"Some comment",
          "duration":30,
          "order_id":"A1"
-      }
-      """
+    }
+    """
     Then the order A1 is in state declined
     And the JSON response should be:
     """
@@ -65,38 +96,11 @@ Feature:
     """
 
   Scenario: Successful order creation
-    Given I get from alfred "/debtor/identify" endpoint response with status 200 and body
-      """
-      {
-        "id": 1,
-        "payment_id": "test",
-        "name": "Test User Company",
-        "address_house": "10",
-        "address_street": "Heinrich-Heine-Platz",
-        "address_city": "Berlin",
-        "address_postal_code": "10179",
-        "address_country": "DE",
-        "address_addition": null,
-        "crefo_id": "123",
-        "schufa_id": "123",
-        "is_blacklisted": 0
-      }
-      """
-    And I get from alfred "/debtor/1/is-eligible-for-pay-after-delivery" endpoint response with status 200 and body
-      """
-      {
-        "is_eligible": true
-      }
-      """
-    And I get from borscht "/debtor.json" endpoint response with status 200 and body
-      """
-      {
-        "debtor_id": 1
-      }
-      """
+    Given I get from companies service identify match and good decision response
+    And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
-      """
-      {
+    """
+    {
          "debtor_person":{
             "salutation":"m",
             "first_name":"",
@@ -138,9 +142,9 @@ Feature:
          "comment":"Some comment",
          "duration":30,
          "order_id":"A1"
-      }
-      """
-    Then the response status code should be 201
+    }
+    """
+    And the response status code should be 201
     And the JSON response should be:
     """
     {}
@@ -148,40 +152,13 @@ Feature:
     And the order A1 is in state created
 
   Scenario: Debtor overdue check failed
-    Given I get from alfred "/debtor/identify" endpoint response with status 200 and body
-      """
-      {
-        "id": 1,
-        "payment_id": "test",
-        "name": "Test User Company",
-        "address_house": "10",
-        "address_street": "Heinrich-Heine-Platz",
-        "address_city": "Berlin",
-        "address_postal_code": "10179",
-        "address_country": "DE",
-        "address_addition": null,
-        "crefo_id": "123",
-        "schufa_id": "123",
-        "is_blacklisted": 0
-      }
-      """
-    And I get from alfred "/debtor/1/is-eligible-for-pay-after-delivery" endpoint response with status 200 and body
-      """
-      {
-        "is_eligible": true
-      }
-      """
-    And I get from borscht "/debtor.json" endpoint response with status 200 and body
-      """
-      {
-        "debtor_id": 2
-      }
-      """
+    Given I get from companies service identify match and good decision response
+    And I get from payments service register debtor positive response
     And I have a late order XLO123 with amounts 1002/901/101, duration 30 and comment "test order"
     And Order XLO123 was shipped at "2018-01-01 00:00:00"
     When I send a POST request to "/order" with body:
-      """
-      {
+    """
+    {
          "debtor_person":{
             "salutation":"m",
             "first_name":"",
@@ -223,9 +200,9 @@ Feature:
          "comment":"Some comment",
          "duration":30,
          "order_id":"A1"
-      }
-      """
-    Then the response status code should be 201
+    }
+    """
+    And the response status code should be 201
     And the JSON response should be:
     """
     {}
@@ -233,38 +210,11 @@ Feature:
     Then the order A1 is in state declined
 
   Scenario: Debtor is not eligible for Point Of Sale
-    Given I get from alfred "/debtor/identify" endpoint response with status 200 and body
-      """
-      {
-        "id": 1,
-        "payment_id": "test",
-        "name": "Test User Company",
-        "address_house": "10",
-        "address_street": "Heinrich-Heine-Platz",
-        "address_city": "Berlin",
-        "address_postal_code": "10179",
-        "address_country": "DE",
-        "address_addition": null,
-        "crefo_id": "123",
-        "schufa_id": "123",
-        "is_blacklisted": 0
-      }
-      """
-    And I get from alfred "/debtor/1/is-eligible-for-pay-after-delivery" endpoint response with status 200 and body
-      """
-      {
-        "passed": is_eligible
-      }
-      """
-    And I get from borscht "/debtor.json" endpoint response with status 200 and body
-      """
-      {
-        "debtor_id": 1
-      }
-      """
+    Given I get from companies service identify match and bad decision response
+    And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
-      """
-      {
+    """
+    {
          "debtor_person":{
             "salutation":"m",
             "first_name":"",
@@ -306,9 +256,9 @@ Feature:
          "comment":"Some comment",
          "duration":30,
          "order_id":"A1"
-      }
-      """
-    Then the response status code should be 201
+    }
+    """
+    And the response status code should be 201
     And the JSON response should be:
     """
     {}
@@ -538,36 +488,9 @@ Feature:
     """
 
   Scenario: Use debtor company address as delivery address if no delivery address was provided
-	Given I get from alfred "/debtor/identify" endpoint response with status 200 and body
-      """
-      {
-        "id": 1,
-        "payment_id": "test",
-        "name": "Test User Company",
-        "address_house": "10",
-        "address_street": "Heinrich-Heine-Platz",
-        "address_city": "Berlin",
-        "address_postal_code": "10179",
-        "address_country": "DE",
-        "address_addition": null,
-        "crefo_id": "123",
-        "schufa_id": "123",
-        "is_blacklisted": 0
-      }
-      """
-	And I get from alfred "/debtor/1/is-eligible-for-pay-after-delivery" endpoint response with status 200 and body
-      """
-      {
-        "is_eligible": true
-      }
-      """
-	And I get from borscht "/debtor.json" endpoint response with status 200 and body
-      """
-      {
-        "debtor_id": 1
-      }
-      """
-	When I send a POST request to "/order" with body:
+    Given I get from companies service identify match and good decision response
+    And I get from payments service register debtor positive response
+    When I send a POST request to "/order" with body:
       """
       {
          "debtor_person":{
@@ -606,7 +529,7 @@ Feature:
          "order_id":"A1"
       }
       """
-	Then the response status code should be 201
+    Then the response status code should be 201
     And the JSON response should be:
     """
     {}
@@ -614,23 +537,7 @@ Feature:
     And the order A1 is in state created
 
   Scenario: Order exceeds the merchant available financing limit
-    Given I get from alfred "/debtor/identify" endpoint response with status 200 and body
-      """
-      {
-        "id": 1,
-        "payment_id": "test",
-        "name": "Test User Company",
-        "address_house": "10",
-        "address_street": "Heinrich-Heine-Platz",
-        "address_city": "Berlin",
-        "address_postal_code": "10179",
-        "address_country": "DE",
-        "address_addition": null,
-        "crefo_id": "123",
-        "schufa_id": "123",
-        "is_blacklisted": 0
-      }
-      """
+    Given I get from companies service identify match response
     When I send a POST request to "/order" with body:
       """
       {

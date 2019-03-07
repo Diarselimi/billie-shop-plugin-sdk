@@ -6,10 +6,11 @@ use App\Application\UseCase\CreateOrder\Request\CreateOrderAmountRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderDebtorCompanyRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderDebtorPersonRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderDeliveryAddressRequest;
+use App\Application\UseCase\ValidatedRequestInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Application\Validator\Constraint as CreateOrderUseCaseConstraints;
 
-class CreateOrderRequest
+class CreateOrderRequest implements ValidatedRequestInterface
 {
     /**
      * @Assert\NotBlank()

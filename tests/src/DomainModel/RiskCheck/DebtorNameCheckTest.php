@@ -7,8 +7,8 @@ use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\Order\OrderContainer;
 use App\DomainModel\Person\PersonEntity;
-use App\DomainModel\RiskCheck\Checker\DebtorNameCheck;
-use App\DomainModel\RiskCheck\CompanyNameComparator;
+use App\DomainModel\OrderRiskCheck\Checker\DebtorNameCheck;
+use App\DomainModel\OrderRiskCheck\CompanyNameComparator;
 use PHPUnit\Framework\TestCase;
 
 class DebtorNameCheckTest extends TestCase

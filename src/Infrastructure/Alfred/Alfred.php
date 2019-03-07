@@ -37,9 +37,20 @@ class Alfred implements CompaniesServiceInterface
             throw new AlfredRequestException($exception->getCode(), $exception);
         }
 
-        $decodedResponse = $this->decodeResponse($response);
+        return $this->factory->createFromAlfredResponse($this->decodeResponse($response));
+    }
 
-        return $this->factory->createFromAlfredResponse($decodedResponse);
+    public function updateDebtor(int $debtorId, array $updateData): DebtorCompany
+    {
+        try {
+            $response = $this->client->put("/debtor/$debtorId", [
+                'json' => $updateData,
+            ]);
+        } catch (TransferException $exception) {
+            throw new AlfredRequestException($exception->getCode(), $exception);
+        }
+
+        return $this->factory->createFromAlfredResponse($this->decodeResponse($response));
     }
 
     public function identifyDebtor(IdentifyDebtorRequestDTO $requestDTO): ?DebtorCompany
@@ -56,9 +67,7 @@ class Alfred implements CompaniesServiceInterface
             throw new AlfredRequestException($exception->getCode(), $exception);
         }
 
-        $decodedResponse = $this->decodeResponse($response);
-
-        return $this->factory->createFromAlfredResponse($decodedResponse);
+        return $this->factory->createFromAlfredResponse($this->decodeResponse($response));
     }
 
     public function identifyDebtorV2(IdentifyDebtorRequestDTO $requestDTO): ?DebtorCompany
@@ -117,9 +126,7 @@ class Alfred implements CompaniesServiceInterface
         try {
             $response = $this->client->get("/debtor/$debtorId/is-blacklisted");
 
-            $decodedResponse = $this->decodeResponse($response);
-
-            return $decodedResponse['is_debtor_blacklisted'];
+            return $this->decodeResponse($response)['is_debtor_blacklisted'];
         } catch (TransferException $exception) {
             throw new AlfredRequestException($exception->getCode(), $exception);
         }
@@ -141,9 +148,7 @@ class Alfred implements CompaniesServiceInterface
                 ],
             ]);
 
-            $decodedResponse = $this->decodeResponse($response);
-
-            return $decodedResponse['is_eligible'];
+            return $this->decodeResponse($response)['is_eligible'];
         } catch (TransferException $exception) {
             throw new AlfredRequestException($exception->getCode(), $exception);
         }

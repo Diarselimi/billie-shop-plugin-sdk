@@ -6,17 +6,53 @@ class IdentifyAndScoreDebtorResponse
 {
     private $companyId;
 
-    private $isEligible;
+    private $companyName;
 
-    public function __construct(int $companyId, ?bool $isEligible)
-    {
-        $this->companyId = $companyId;
-        $this->isEligible = $isEligible;
-    }
+    private $crefoId;
+
+    private $isEligible;
 
     public function getCompanyId(): int
     {
         return $this->companyId;
+    }
+
+    public function setCompanyId(int $companyId): IdentifyAndScoreDebtorResponse
+    {
+        $this->companyId = $companyId;
+
+        return $this;
+    }
+
+    public function getCompanyName(): string
+    {
+        return $this->companyName;
+    }
+
+    public function setCompanyName(string $companyName): IdentifyAndScoreDebtorResponse
+    {
+        $this->companyName = $companyName;
+
+        return $this;
+    }
+
+    public function getCrefoId(): ? string
+    {
+        return $this->crefoId;
+    }
+
+    public function setCrefoId(?string $crefoId): IdentifyAndScoreDebtorResponse
+    {
+        $this->crefoId = $crefoId;
+
+        return $this;
+    }
+
+    public function setIsEligible(?bool $isEligible): IdentifyAndScoreDebtorResponse
+    {
+        $this->isEligible = $isEligible;
+
+        return $this;
     }
 
     public function isEligible(): ? bool

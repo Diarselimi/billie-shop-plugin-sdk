@@ -1,0 +1,9 @@
+{
+    "id": 1,
+    "state": "new",
+    "payout_amount": 1000,
+    "outstanding_amount": 1000,
+    "fee_amount": 10,
+    "fee_rate": 1,
+    "due_date": "20-11-1978"
+}

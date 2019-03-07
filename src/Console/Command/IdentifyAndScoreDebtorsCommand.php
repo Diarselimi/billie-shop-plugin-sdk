@@ -29,7 +29,7 @@ class IdentifyAndScoreDebtorsCommand extends Command
 
     private const OPTION_LIMIT = 'limit';
 
-    private const REPORT_FILE_HEADERS = ['external_id', 'company_id', 'is_eligible'];
+    private const REPORT_FILE_HEADERS = ['external_id', 'original_crefo_id', 'new_crefo_id', 'company_id', 'is_eligible'];
 
     private $useCase;
 
@@ -108,7 +108,7 @@ class IdentifyAndScoreDebtorsCommand extends Command
 
             try {
                 $useCaseRequest = $this->createUseCaseRequest($debtorExternalData, $merchantId, $algorithm, $doScoring);
-                $result = $this->useCase->execute($useCaseRequest, $doScoring);
+                $result = $this->useCase->execute($useCaseRequest);
 
                 if ($result->isEligible() === false) {
                     $ineligibleCompanies[] = $result->getCompanyId();
@@ -116,7 +116,10 @@ class IdentifyAndScoreDebtorsCommand extends Command
 
                 $outputReportData[] = [
                     $debtorExternalData['external_id'],
-                    $result->getCompanyId(),
+                    $debtorExternalData['crefo_id'] ?? null,
+                    $debtorExternalData['name'],
+                    $result->getCompanyName(),
+                    $result->getCrefoId(),
                     ($result->isEligible() === true) ? 1 : 0,
                 ];
             } catch (MerchantNotFoundException $e) {
@@ -124,7 +127,14 @@ class IdentifyAndScoreDebtorsCommand extends Command
 
                 return 1;
             } catch (DebtorNotIdentifiedException $e) {
-                $outputReportData[] = [$debtorExternalData['external_id'], null, null];
+                $outputReportData[] = [
+                    $debtorExternalData['external_id'],
+                    $debtorExternalData['crefo_id'] ?? null,
+                    $debtorExternalData['name'],
+                    null,
+                    null,
+                    null,
+                ];
             }
 
             $i++;
