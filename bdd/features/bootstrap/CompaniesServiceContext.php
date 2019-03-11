@@ -1,6 +1,7 @@
 <?php
 
 use Behat\Behat\Context\Context;
+use Behat\Gherkin\Node\PyStringNode;
 use donatj\MockWebServer\Response as MockResponse;
 use donatj\MockWebServer\ResponseStack;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -88,6 +89,16 @@ class CompaniesServiceContext implements Context
     {
         $this->setMock('/debtor/identify/v2', new ResponseStack(
             new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match_v2.json'))
+        ));
+    }
+
+    /**
+     * @Given I get from companies service :url endpoint response with status :statusCode and body
+     */
+    public function iGetFromCompaniesServiceEndpointResponseWithStatusAndBody($url, $statusCode, PyStringNode $response)
+    {
+        $this->setMock($url, new ResponseStack(
+            new MockResponse($response, [], (int) $statusCode)
         ));
     }
 }

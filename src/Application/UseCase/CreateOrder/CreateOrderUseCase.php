@@ -2,9 +2,9 @@
 
 namespace App\Application\UseCase\CreateOrder;
 
-use App\Application\Exception\RequestValidationException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
+use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\DebtorFinder;
@@ -101,10 +101,14 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
     {
         $merchantDebtor = $this->debtorFinderService->findDebtor($orderContainer, $merchantId);
 
-        $this->triggerV2DebtorIdentification(
-            $orderContainer->getOrder(),
-            $merchantDebtor ? $merchantDebtor->getDebtorCompany() : null
-        );
+        if ($orderContainer->getMerchantSettings()->getDebtorIdentificationAlgorithm() ===
+            CompaniesServiceInterface::DEBTOR_IDENTIFICATION_ALGORITHM_V1
+        ) {
+            $this->triggerV2DebtorIdentificationAsync(
+                $orderContainer->getOrder(),
+                $merchantDebtor ? $merchantDebtor->getDebtorCompany() : null
+            );
+        }
 
         if ($merchantDebtor === null) {
             return null;
@@ -153,7 +157,7 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         $this->logInfo("Order approved!");
     }
 
-    private function triggerV2DebtorIdentification(OrderEntity $order, ?DebtorCompany $identifiedDebtorCompany): void
+    private function triggerV2DebtorIdentificationAsync(OrderEntity $order, ?DebtorCompany $identifiedDebtorCompany): void
     {
         $data = [
             'order_id' => $order->getId(),

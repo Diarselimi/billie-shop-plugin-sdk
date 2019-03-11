@@ -14,6 +14,8 @@ class MerchantSettingsEntity extends AbstractEntity
 
     private $scoreThresholdsConfigurationId;
 
+    private $debtorIdentificationAlgorithm;
+
     public function getMerchantId(): int
     {
         return $this->merchantId;
@@ -58,6 +60,18 @@ class MerchantSettingsEntity extends AbstractEntity
     public function setScoreThresholdsConfigurationId(int $scoreThresholdsConfigurationId): MerchantSettingsEntity
     {
         $this->scoreThresholdsConfigurationId = $scoreThresholdsConfigurationId;
+
+        return $this;
+    }
+
+    public function getDebtorIdentificationAlgorithm(): string
+    {
+        return $this->debtorIdentificationAlgorithm;
+    }
+
+    public function setDebtorIdentificationAlgorithm(string $debtorIdentificationAlgorithm): MerchantSettingsEntity
+    {
+        $this->debtorIdentificationAlgorithm = $debtorIdentificationAlgorithm;
 
         return $this;
     }

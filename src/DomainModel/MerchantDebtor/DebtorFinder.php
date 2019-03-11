@@ -13,6 +13,11 @@ class DebtorFinder implements LoggingInterface
 {
     use LoggingTrait;
 
+    private const IDENTIFICATION_ALGORITHMS = [
+        CompaniesServiceInterface::DEBTOR_IDENTIFICATION_ALGORITHM_V1 => 'identifyDebtor',
+        CompaniesServiceInterface::DEBTOR_IDENTIFICATION_ALGORITHM_V2 => 'identifyDebtorV2',
+    ];
+
     private $merchantDebtorRepository;
 
     private $companiesService;
@@ -32,6 +37,7 @@ class DebtorFinder implements LoggingInterface
     public function findDebtor(OrderContainer $orderContainer, int $merchantId): ?MerchantDebtorEntity
     {
         $this->logInfo('Check if the merchant customer already known');
+
         $merchantDebtor = $this->merchantDebtorRepository->getOneByMerchantExternalId(
             $orderContainer->getDebtorExternalData()->getMerchantExternalId(),
             $merchantId,
@@ -43,9 +49,14 @@ class DebtorFinder implements LoggingInterface
 
             $debtorCompany = $this->companiesService->getDebtor($merchantDebtor->getDebtorId());
         } else {
-            $this->logInfo('Start the debtor identification');
+            $identificationAlgorithmVersion = $orderContainer->getMerchantSettings()->getDebtorIdentificationAlgorithm();
 
-            $debtorCompany = $this->companiesService->identifyDebtor(
+            $this->logInfo('Starting debtor identification using {debtor_identification_algorithm_version} for order {order_external_code}', [
+                'debtor_identification_algorithm_version' => $identificationAlgorithmVersion,
+                'order_external_code' => $orderContainer->getOrder()->getExternalCode(),
+            ]);
+
+            $debtorCompany = $this->companiesService->{self::IDENTIFICATION_ALGORITHMS[$identificationAlgorithmVersion]}(
                 (new IdentifyDebtorRequestDTO())
                     ->setName($orderContainer->getDebtorExternalData()->getName())
                     ->setHouseNumber($orderContainer->getDebtorExternalDataAddress()->getHouseNumber())
