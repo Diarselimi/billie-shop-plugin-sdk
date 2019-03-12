@@ -11,6 +11,7 @@ use App\DomainModel\MerchantDebtor\MerchantDebtorDuplicateDTO;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\TransferException;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -80,11 +81,19 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
             $response = $this->client->post("/debtor/identify/v2", [
                 'json' => $requestDTO->toArray(),
             ]);
-        } catch (TransferException $exception) {
+        } catch (ClientException $exception) {
             if ($exception->getCode() === Response::HTTP_NOT_FOUND) {
+                $decodedResponse = $this->decodeResponse($exception->getResponse());
+
+                if (isset($decodedResponse['suggestions']) && !empty($decodedResponse['suggestions'])) {
+                    return $this->factory->createFromAlfredResponse(reset($decodedResponse['suggestions']));
+                }
+
                 return null;
             }
 
+            throw new AlfredRequestException($exception->getCode(), $exception);
+        } catch (TransferException $exception) {
             throw new AlfredRequestException($exception->getCode(), $exception);
         }
 

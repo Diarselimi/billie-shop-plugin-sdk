@@ -26,8 +26,6 @@ class PDOStatementExecutor implements LoggingInterface
         try {
             $stmt = $this->pdo->prepare($query, []);
             $stmt->execute($parameters);
-
-            $this->logInfo('[pdo] Query succeeded');
         } catch (PDOException $exception) {
             if (
                 !isset($exception->errorInfo[1])

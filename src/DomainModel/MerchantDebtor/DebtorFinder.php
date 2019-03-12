@@ -3,6 +3,7 @@
 namespace App\DomainModel\MerchantDebtor;
 
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
+use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorCompany\IdentifyDebtorRequestDTO;
 use App\DomainModel\Order\OrderContainer;
 use App\DomainModel\Order\OrderStateManager;
@@ -36,8 +37,23 @@ class DebtorFinder implements LoggingInterface
 
     public function findDebtor(OrderContainer $orderContainer, int $merchantId): ?MerchantDebtorEntity
     {
-        $this->logInfo('Check if the merchant customer already known');
+        $identifyRequest = (new IdentifyDebtorRequestDTO())
+            ->setName($orderContainer->getDebtorExternalData()->getName())
+            ->setHouseNumber($orderContainer->getDebtorExternalDataAddress()->getHouseNumber())
+            ->setStreet($orderContainer->getDebtorExternalDataAddress()->getStreet())
+            ->setPostalCode($orderContainer->getDebtorExternalDataAddress()->getPostalCode())
+            ->setCity($orderContainer->getDebtorExternalDataAddress()->getCity())
+            ->setCountry($orderContainer->getDebtorExternalDataAddress()->getCountry())
+            ->setTaxId($orderContainer->getDebtorExternalData()->getTaxId())
+            ->setTaxNumber($orderContainer->getDebtorExternalData()->getTaxNumber())
+            ->setRegistrationNumber($orderContainer->getDebtorExternalData()->getRegistrationNumber())
+            ->setRegistrationCourt($orderContainer->getDebtorExternalData()->getRegistrationCourt())
+            ->setLegalForm($orderContainer->getDebtorExternalData()->getLegalForm())
+            ->setFirstName($orderContainer->getDebtorPerson()->getFirstName())
+            ->setLastName($orderContainer->getDebtorPerson()->getLastName())
+        ;
 
+        $this->logInfo('Check if the merchant debtor already known');
         $merchantDebtor = $this->merchantDebtorRepository->getOneByMerchantExternalId(
             $orderContainer->getDebtorExternalData()->getMerchantExternalId(),
             $merchantId,
@@ -45,42 +61,21 @@ class DebtorFinder implements LoggingInterface
         );
 
         if ($merchantDebtor) {
-            $this->logInfo('Found the existing merchant customer');
-
-            $debtorCompany = $this->companiesService->getDebtor($merchantDebtor->getDebtorId());
+            $this->logInfo('Found the existing merchant debtor', ['id' => $merchantDebtor->getId()]);
+            $identifyRequest->setCompanyId((int) $merchantDebtor->getDebtorId());
         } else {
-            $identificationAlgorithmVersion = $orderContainer->getMerchantSettings()->getDebtorIdentificationAlgorithm();
-
-            $this->logInfo('Starting debtor identification using {debtor_identification_algorithm_version} for order {order_external_code}', [
-                'debtor_identification_algorithm_version' => $identificationAlgorithmVersion,
-                'order_external_code' => $orderContainer->getOrder()->getExternalCode(),
-            ]);
-
-            $debtorCompany = $this->companiesService->{self::IDENTIFICATION_ALGORITHMS[$identificationAlgorithmVersion]}(
-                (new IdentifyDebtorRequestDTO())
-                    ->setName($orderContainer->getDebtorExternalData()->getName())
-                    ->setHouseNumber($orderContainer->getDebtorExternalDataAddress()->getHouseNumber())
-                    ->setStreet($orderContainer->getDebtorExternalDataAddress()->getStreet())
-                    ->setPostalCode($orderContainer->getDebtorExternalDataAddress()->getPostalCode())
-                    ->setCity($orderContainer->getDebtorExternalDataAddress()->getCity())
-                    ->setCountry($orderContainer->getDebtorExternalDataAddress()->getCountry())
-                    ->setTaxId($orderContainer->getDebtorExternalData()->getTaxId())
-                    ->setTaxNumber($orderContainer->getDebtorExternalData()->getTaxNumber())
-                    ->setRegistrationNumber($orderContainer->getDebtorExternalData()->getRegistrationNumber())
-                    ->setRegistrationCourt($orderContainer->getDebtorExternalData()->getRegistrationCourt())
-                    ->setLegalForm($orderContainer->getDebtorExternalData()->getLegalForm())
-                    ->setFirstName($orderContainer->getDebtorPerson()->getFirstName())
-                    ->setLastName($orderContainer->getDebtorPerson()->getLastName())
-            );
-
-            if ($debtorCompany) {
-                $merchantDebtor = $this->merchantDebtorRepository->getOneByMerchantAndDebtorId(
-                    $merchantId,
-                    $debtorCompany->getId()
-                );
-            }
+            $this->logInfo('Try to identify new debtor');
         }
 
+        $identificationAlgorithmVersion = $orderContainer->getMerchantSettings()->getDebtorIdentificationAlgorithm();
+
+        $this->logInfo('Starting debtor identification using {debtor_identification_algorithm_version} for order {order_external_code}', [
+            'debtor_identification_algorithm_version' => $identificationAlgorithmVersion,
+            'order_external_code' => $orderContainer->getOrder()->getExternalCode(),
+        ]);
+
+        /** @var DebtorCompany $debtorCompany */
+        $debtorCompany = $this->companiesService->{self::IDENTIFICATION_ALGORITHMS[$identificationAlgorithmVersion]}($identifyRequest);
         if (!$debtorCompany) {
             $this->logInfo('Debtor could not be identified');
 
@@ -88,6 +83,11 @@ class DebtorFinder implements LoggingInterface
         }
 
         $this->logInfo('Debtor identified');
+
+        $merchantDebtor = $this->merchantDebtorRepository->getOneByMerchantAndDebtorId(
+            $merchantId,
+            $debtorCompany->getId()
+        );
 
         if ($merchantDebtor) {
             $this->logInfo('Debtor already in the system');
