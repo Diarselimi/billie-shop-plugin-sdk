@@ -27,14 +27,31 @@ class JsonConverterSubscriber implements EventSubscriberInterface
         $json = $request->getContent();
         $requestData = json_decode($json, true);
 
-        if (!$requestData) {
+        if (!is_array($requestData)) {
             throw new PaellaCoreCriticalException(
                 "Request couldn't be decoded",
                 PaellaCoreCriticalException::CODE_REQUEST_DECODE_EXCEPTION
             );
         }
 
+        $requestData = $this->sanitizeRecursive($requestData);
+
         $request->request->add($requestData);
+    }
+
+    private function sanitizeRecursive(array $data): array
+    {
+        foreach ($data as $k => $value) {
+            if (is_array($value)) {
+                $data[$k] = $this->sanitizeRecursive($value);
+
+                continue;
+            }
+
+            $data[$k] = is_string($value) ? trim($value) : $value;
+        }
+
+        return $data;
     }
 
     public function onView(GetResponseForControllerResultEvent $event)
