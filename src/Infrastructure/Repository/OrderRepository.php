@@ -277,6 +277,27 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
         return $result['total'] > 0;
     }
 
+    public function merchantDebtorHasAtLeastOneApprovedOrder(int $merchantDebtorId): bool
+    {
+        $result = $this->doFetchOne(
+            'SELECT COUNT(id) as total
+              FROM orders
+              WHERE state NOT IN (:state_new, :state_declined)
+              AND orders.merchant_debtor_id = :merchant_debtor_id',
+            [
+                'state_new' => OrderStateManager::STATE_NEW,
+                'state_declined' => OrderStateManager::STATE_DECLINED,
+                'merchant_debtor_id' => $merchantDebtorId,
+            ]
+        );
+
+        if (!$result) {
+            return false;
+        }
+
+        return $result['total'] > 0;
+    }
+
     public function countOrdersByState(int $merchantDebtorId): OrderStateCounterDTO
     {
         $counters = [

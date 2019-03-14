@@ -90,9 +90,9 @@ class DebtorFinder implements LoggingInterface
         );
 
         if ($merchantDebtor) {
-            $this->logInfo('Debtor already in the system');
+            $this->logInfo('Merchant debtor already exists');
         } else {
-            $this->logInfo('Add new debtor to the system');
+            $this->logInfo('New merchant debtor created');
 
             $merchantDebtor = $this->merchantDebtorRegistrationService->registerMerchantDebtor(
                 $debtorCompany->getId(),
