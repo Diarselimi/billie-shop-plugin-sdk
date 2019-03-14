@@ -2,6 +2,8 @@
 
 namespace App\DomainModel\MerchantSettings;
 
+use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
+
 class MerchantSettingsEntityFactory
 {
     private const DEFAULT_MIN_ORDER_AMOUNT = 0;
@@ -16,6 +18,7 @@ class MerchantSettingsEntityFactory
             ->setDebtorFinancingLimit((float) $data['debtor_financing_limit'])
             ->setMinOrderAmount((float) $data['min_order_amount'])
             ->setScoreThresholdsConfigurationId($data['score_thresholds_configuration_id'])
+            ->setDebtorIdentificationAlgorithm($data['debtor_identification_algorithm'])
         ;
     }
 
@@ -29,6 +32,7 @@ class MerchantSettingsEntityFactory
             ->setDebtorFinancingLimit($financingLimit)
             ->setMinOrderAmount(self::DEFAULT_MIN_ORDER_AMOUNT)
             ->setScoreThresholdsConfigurationId($scoreThresholdsConfigurationId)
+            ->setDebtorIdentificationAlgorithm(CompaniesServiceInterface::DEBTOR_IDENTIFICATION_ALGORITHM_V1)
         ;
     }
 }

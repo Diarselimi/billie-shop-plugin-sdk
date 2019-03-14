@@ -2,9 +2,9 @@
 
 namespace App\Application\UseCase\CreateOrder;
 
-use App\Application\Exception\RequestValidationException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
+use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\DebtorFinder;
@@ -101,10 +101,14 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
     {
         $merchantDebtor = $this->debtorFinderService->findDebtor($orderContainer, $merchantId);
 
-        $this->triggerV2DebtorIdentification(
-            $orderContainer->getOrder(),
-            $merchantDebtor ? $merchantDebtor->getDebtorCompany() : null
-        );
+        if ($orderContainer->getMerchantSettings()->getDebtorIdentificationAlgorithm() ===
+            CompaniesServiceInterface::DEBTOR_IDENTIFICATION_ALGORITHM_V1
+        ) {
+            $this->triggerV2DebtorIdentificationAsync(
+                $orderContainer->getOrder(),
+                $merchantDebtor ? $merchantDebtor->getDebtorCompany() : null
+            );
+        }
 
         if ($merchantDebtor === null) {
             return null;
@@ -143,17 +147,24 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 
     private function approve(OrderContainer $orderContainer)
     {
+        $merchant = $orderContainer->getMerchant();
+        $merchantDebtor = $orderContainer->getMerchantDebtor();
+        $firstApprovedOrder = !$this->orderRepository->merchantDebtorHasAtLeastOneApprovedOrder($merchantDebtor->getId());
+
         $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_CREATE);
         $this->orderRepository->update($orderContainer->getOrder());
 
-        $customer = $orderContainer->getMerchant();
-        $customer->reduceAvailableFinancingLimit($orderContainer->getOrder()->getAmountGross());
-        $this->merchantRepository->update($customer);
+        $merchant->reduceAvailableFinancingLimit($orderContainer->getOrder()->getAmountGross());
+        $this->merchantRepository->update($merchant);
 
-        $this->logInfo("Order approved!");
+        $this->logInfo("Order approved!", [
+            'debtor_is_new' => $firstApprovedOrder,
+            'debtor_created_in_this_hour' => $merchantDebtor->getCreatedAt() > new \Datetime(date('Y-m-d H:00:00')),
+            'debtor_created_today' => $merchantDebtor->getCreatedAt() > new \Datetime(date('Y-m-d 00:00:00')),
+        ]);
     }
 
-    private function triggerV2DebtorIdentification(OrderEntity $order, ?DebtorCompany $identifiedDebtorCompany): void
+    private function triggerV2DebtorIdentificationAsync(OrderEntity $order, ?DebtorCompany $identifiedDebtorCompany): void
     {
         $data = [
             'order_id' => $order->getId(),

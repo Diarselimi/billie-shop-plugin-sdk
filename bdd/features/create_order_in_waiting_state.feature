@@ -39,35 +39,8 @@ Feature:
 	  | debtor_blacklisted                |	1		|	1					|
 	  | debtor_overdue                    |	1		|	1					|
 	  | company_b2b_score                 |	1		|	1					|
-	And I get from alfred "/debtor/identify" endpoint response with status 200 and body
-      """
-      {
-        "id": 1,
-        "payment_id": "test",
-        "name": "Test User Company",
-        "address_house": "10",
-        "address_street": "Heinrich-Heine-Platz",
-        "address_city": "Berlin",
-        "address_postal_code": "10179",
-        "address_country": "DE",
-        "address_addition": null,
-        "crefo_id": "123",
-        "schufa_id": "123",
-        "is_blacklisted": 0
-      }
-      """
-	And I get from alfred "/debtor/1/is-eligible-for-pay-after-delivery" endpoint response with status 200 and body
-      """
-      {
-        "is_eligible": true
-      }
-      """
-	And I get from borscht "/debtor.json" endpoint response with status 200 and body
-      """
-      {
-        "debtor_id": 1
-      }
-      """
+	And I get from companies service identify match and good decision response
+	And I get from payments service register debtor positive response
 	When I send a POST request to "/order" with body:
       """
       {
@@ -134,35 +107,8 @@ Feature:
 	  | debtor_blacklisted                |	1		|	1					|
 	  | debtor_overdue                    |	1		|	1					|
 	  | company_b2b_score                 |	1		|	1					|
-	And I get from alfred "/debtor/identify" endpoint response with status 200 and body
-      """
-      {
-        "id": 1,
-        "payment_id": "test",
-        "name": "Different Name",
-        "address_house": "10",
-        "address_street": "Heinrich-Heine-Platz",
-        "address_city": "Berlin",
-        "address_postal_code": "10179",
-        "address_country": "DE",
-        "address_addition": null,
-        "crefo_id": "123",
-        "schufa_id": "123",
-        "is_blacklisted": 0
-      }
-      """
-	And I get from alfred "/debtor/1/is-eligible-for-pay-after-delivery" endpoint response with status 200 and body
-      """
-      {
-        "is_eligible": true
-      }
-      """
-	And I get from borscht "/debtor.json" endpoint response with status 200 and body
-      """
-      {
-        "debtor_id": 1
-      }
-      """
+    And I get from companies service identify match and good decision response
+    And I get from payments service register debtor positive response
 	When I send a POST request to "/order" with body:
       """
       {
@@ -175,7 +121,7 @@ Feature:
          },
          "debtor_company":{
             "merchant_customer_id":"12",
-            "name":"Test User Company",
+            "name":"Test Wrong",
             "address_addition":"left door",
             "address_house_number":"10",
             "address_street":"Heinrich-Heine-Platz",
@@ -229,39 +175,12 @@ Feature:
 	  | debtor_blacklisted                |	1		|	1					|
 	  | debtor_overdue                    |	1		|	1					|
 	  | company_b2b_score                 |	1		|	1					|
-	And I get from alfred "/debtor/identify" endpoint response with status 200 and body
-      """
-      {
-        "id": 1,
-        "payment_id": "test",
-        "name": "Test User Company",
-        "address_house": "10",
-        "address_street": "Heinrich-Heine-Platz",
-        "address_city": "Berlin",
-        "address_postal_code": "10179",
-        "address_country": "DE",
-        "address_addition": null,
-        "crefo_id": "123",
-        "schufa_id": "123",
-        "is_blacklisted": 0
-      }
-      """
-	And I get from alfred "/debtor/1/lock" endpoint response with status 412 and body
+    And I get from companies service identify match and good decision response
+    And I get from companies service "/debtor/1/lock" endpoint response with status 412 and body
       """
       {}
       """
-	And I get from alfred "/debtor/1/is-eligible-for-pay-after-delivery" endpoint response with status 200 and body
-      """
-      {
-        "is_eligible": true
-      }
-      """
-	And I get from borscht "/debtor.json" endpoint response with status 200 and body
-      """
-      {
-        "debtor_id": 1
-      }
-      """
+    And I get from payments service register debtor positive response
 	When I send a POST request to "/order" with body:
       """
       {

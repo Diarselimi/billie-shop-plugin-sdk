@@ -6,6 +6,8 @@ use App\DomainModel\ArrayableInterface;
 
 class IdentifyDebtorRequestDTO implements ArrayableInterface
 {
+    private $companyId;
+
     private $name;
 
     private $houseNumber;
@@ -32,12 +34,24 @@ class IdentifyDebtorRequestDTO implements ArrayableInterface
 
     private $lastName;
 
+    public function getCompanyId(): ?int
+    {
+        return $this->companyId;
+    }
+
+    public function setCompanyId(int $companyId): IdentifyDebtorRequestDTO
+    {
+        $this->companyId = $companyId;
+
+        return $this;
+    }
+
     public function getName(): ? string
     {
         return $this->name;
     }
 
-    public function setName(? string $name): IdentifyDebtorRequestDTO
+    public function setName(?string $name): IdentifyDebtorRequestDTO
     {
         $this->name = $name;
 
@@ -61,7 +75,7 @@ class IdentifyDebtorRequestDTO implements ArrayableInterface
         return $this->street;
     }
 
-    public function setStreet(? string $street): IdentifyDebtorRequestDTO
+    public function setStreet(?string $street): IdentifyDebtorRequestDTO
     {
         $this->street = $street;
 
@@ -73,7 +87,7 @@ class IdentifyDebtorRequestDTO implements ArrayableInterface
         return $this->postalCode;
     }
 
-    public function setPostalCode(? string $postalCode): IdentifyDebtorRequestDTO
+    public function setPostalCode(?string $postalCode): IdentifyDebtorRequestDTO
     {
         $this->postalCode = $postalCode;
 
@@ -85,7 +99,7 @@ class IdentifyDebtorRequestDTO implements ArrayableInterface
         return $this->city;
     }
 
-    public function setCity(? string $city): IdentifyDebtorRequestDTO
+    public function setCity(?string $city): IdentifyDebtorRequestDTO
     {
         $this->city = $city;
 
@@ -97,7 +111,7 @@ class IdentifyDebtorRequestDTO implements ArrayableInterface
         return $this->country;
     }
 
-    public function setCountry(? string $country): IdentifyDebtorRequestDTO
+    public function setCountry(?string $country): IdentifyDebtorRequestDTO
     {
         $this->country = $country;
 
@@ -109,7 +123,7 @@ class IdentifyDebtorRequestDTO implements ArrayableInterface
         return $this->taxId;
     }
 
-    public function setTaxId(? string $taxId): IdentifyDebtorRequestDTO
+    public function setTaxId(?string $taxId): IdentifyDebtorRequestDTO
     {
         $this->taxId = $taxId;
 
@@ -121,7 +135,7 @@ class IdentifyDebtorRequestDTO implements ArrayableInterface
         return $this->taxNumber;
     }
 
-    public function setTaxNumber(? string $taxNumber): IdentifyDebtorRequestDTO
+    public function setTaxNumber(?string $taxNumber): IdentifyDebtorRequestDTO
     {
         $this->taxNumber = $taxNumber;
 
@@ -133,7 +147,7 @@ class IdentifyDebtorRequestDTO implements ArrayableInterface
         return $this->registrationNumber;
     }
 
-    public function setRegistrationNumber(? string $registrationNumber): IdentifyDebtorRequestDTO
+    public function setRegistrationNumber(?string $registrationNumber): IdentifyDebtorRequestDTO
     {
         $this->registrationNumber = $registrationNumber;
 
@@ -145,7 +159,7 @@ class IdentifyDebtorRequestDTO implements ArrayableInterface
         return $this->registrationCourt;
     }
 
-    public function setRegistrationCourt(? string $registrationCourt): IdentifyDebtorRequestDTO
+    public function setRegistrationCourt(?string $registrationCourt): IdentifyDebtorRequestDTO
     {
         $this->registrationCourt = $registrationCourt;
 
@@ -157,7 +171,7 @@ class IdentifyDebtorRequestDTO implements ArrayableInterface
         return $this->legalForm;
     }
 
-    public function setLegalForm(? string $legalForm): IdentifyDebtorRequestDTO
+    public function setLegalForm(?string $legalForm): IdentifyDebtorRequestDTO
     {
         $this->legalForm = $legalForm;
 
@@ -169,7 +183,7 @@ class IdentifyDebtorRequestDTO implements ArrayableInterface
         return $this->firstName;
     }
 
-    public function setFirstName(? string $firstName): IdentifyDebtorRequestDTO
+    public function setFirstName(?string $firstName): IdentifyDebtorRequestDTO
     {
         $this->firstName = $firstName;
 
@@ -181,7 +195,7 @@ class IdentifyDebtorRequestDTO implements ArrayableInterface
         return $this->lastName;
     }
 
-    public function setLastName(? string $lastName): IdentifyDebtorRequestDTO
+    public function setLastName(?string $lastName): IdentifyDebtorRequestDTO
     {
         $this->lastName = $lastName;
 
@@ -191,6 +205,7 @@ class IdentifyDebtorRequestDTO implements ArrayableInterface
     public function toArray(): array
     {
         return [
+            'company_id' => $this->getCompanyId(),
             'name' => $this->getName(),
             'address_house' => $this->getHouseNumber(),
             'address_street' => $this->getStreet(),

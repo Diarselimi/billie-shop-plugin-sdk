@@ -24,5 +24,7 @@ interface OrderRepositoryInterface
 
     public function debtorHasAtLeastOneFullyPaidOrder(int $debtorId): bool;
 
+    public function merchantDebtorHasAtLeastOneApprovedOrder(int $debtorId): bool;
+
     public function countOrdersByState(int $merchantDebtorId): OrderStateCounterDTO;
 }
