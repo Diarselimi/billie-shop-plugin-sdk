@@ -5,8 +5,9 @@ namespace App\Infrastructure\Repository;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntity;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntityFactory;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
+use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
-class OrderRiskCheckRepository extends AbstractRepository implements OrderRiskCheckRepositoryInterface
+class OrderRiskCheckRepository extends AbstractPdoRepository implements OrderRiskCheckRepositoryInterface
 {
     private $factory;
 
@@ -35,7 +36,7 @@ class OrderRiskCheckRepository extends AbstractRepository implements OrderRiskCh
 
     public function findByOrder(int $orderId): array
     {
-        $rows = $this->doFetchMultiple(
+        $rows = $this->doFetchAll(
             '
             SELECT
             order_risk_checks.id AS  risk_check_id,

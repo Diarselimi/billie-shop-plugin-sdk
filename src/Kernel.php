@@ -2,18 +2,14 @@
 
 namespace App;
 
-use App\Infrastructure\PDO\PDO;
-use App\Infrastructure\PDO\PDOStatementExecutor;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 
-class Kernel extends BaseKernel implements CompilerPassInterface
+class Kernel extends BaseKernel
 {
     use MicroKernelTrait;
 
@@ -61,17 +57,5 @@ class Kernel extends BaseKernel implements CompilerPassInterface
         $routes->import($confDir.'/{routes}/*'.self::CONFIG_EXTS, '/', 'glob');
         $routes->import($confDir.'/{routes}/'.$this->environment.'/**/*'.self::CONFIG_EXTS, '/', 'glob');
         $routes->import($confDir.'/{routes}'.self::CONFIG_EXTS, '/', 'glob');
-    }
-
-    public function process(ContainerBuilder $container)
-    {
-        $connection = new Reference(PDO::class);
-        $statementExecutor = new Reference(PDOStatementExecutor::class);
-        foreach ($container->findTaggedServiceIds('paella_core.repository') as $id => $tags) {
-            $container->findDefinition($id)
-                ->addMethodCall('setConnection', [$connection])
-                ->addMethodCall('setStatementExecutor', [$statementExecutor])
-            ;
-        }
     }
 }

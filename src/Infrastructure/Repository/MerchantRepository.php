@@ -5,8 +5,9 @@ namespace App\Infrastructure\Repository;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantEntityFactory;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
-class MerchantRepository extends AbstractRepository implements MerchantRepositoryInterface
+class MerchantRepository extends AbstractPdoRepository implements MerchantRepositoryInterface
 {
     const SELECT_FIELDS = 'id, name, api_key, company_id, payment_merchant_id, roles, is_active, available_financing_limit, webhook_url, webhook_authorization, created_at, updated_at';
 

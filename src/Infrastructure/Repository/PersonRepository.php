@@ -4,8 +4,9 @@ namespace App\Infrastructure\Repository;
 
 use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonRepositoryInterface;
+use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
-class PersonRepository extends AbstractRepository implements PersonRepositoryInterface
+class PersonRepository extends AbstractPdoRepository implements PersonRepositoryInterface
 {
     public function insert(PersonEntity $person): void
     {
@@ -27,14 +28,14 @@ class PersonRepository extends AbstractRepository implements PersonRepositoryInt
         $person->setId($id);
     }
 
-    public function getOneById(int $id):? PersonEntity
+    public function getOneById(int $id): ? PersonEntity
     {
         return (new PersonEntity())
             ->setId(43)
         ;
     }
 
-    public function getOneByIdRaw(int $id):? array
+    public function getOneByIdRaw(int $id): ? array
     {
         $address = $this->doFetchOne('SELECT * FROM addresses WHERE id = :id', [
             'id' => $id,

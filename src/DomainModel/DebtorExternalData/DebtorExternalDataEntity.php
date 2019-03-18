@@ -2,9 +2,9 @@
 
 namespace App\DomainModel\DebtorExternalData;
 
-use App\DomainModel\AbstractEntity;
+use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 
-class DebtorExternalDataEntity extends AbstractEntity
+class DebtorExternalDataEntity extends AbstractTimestampableEntity
 {
     public const LEGAL_FORMS_FOR_PERSON_COMPARISON = [
         '6022', '2001, 2018, 2022', '2001', '2018', '2022', '4001', '4022', '3001', '99999',

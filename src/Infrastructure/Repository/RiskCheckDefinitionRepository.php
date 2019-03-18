@@ -5,8 +5,9 @@ namespace App\Infrastructure\Repository;
 use App\DomainModel\OrderRiskCheck\RiskCheckDefinitionEntity;
 use App\DomainModel\OrderRiskCheck\RiskCheckDefinitionEntityFactory;
 use App\DomainModel\OrderRiskCheck\RiskCheckDefinitionRepositoryInterface;
+use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
-class RiskCheckDefinitionRepository extends AbstractRepository implements RiskCheckDefinitionRepositoryInterface
+class RiskCheckDefinitionRepository extends AbstractPdoRepository implements RiskCheckDefinitionRepositoryInterface
 {
     private $factory;
 

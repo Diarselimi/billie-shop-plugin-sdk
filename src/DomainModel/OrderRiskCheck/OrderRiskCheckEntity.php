@@ -2,9 +2,9 @@
 
 namespace App\DomainModel\OrderRiskCheck;
 
-use App\DomainModel\AbstractEntity;
+use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 
-class OrderRiskCheckEntity extends AbstractEntity
+class OrderRiskCheckEntity extends AbstractTimestampableEntity
 {
     private $orderId;
 

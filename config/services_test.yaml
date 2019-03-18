@@ -7,13 +7,6 @@ services:
     autowire: true
     public: true
 
-  App\Infrastructure\PDO\PDO:
-    arguments:
-      - 'mysql:dbname=%env(DATABASE_NAME)%;host=%env(DATABASE_HOST)%'
-      - '%env(DATABASE_USERNAME)%'
-      - '%env(DATABASE_PASSWORD)%'
-    public: true
-
   App\DomainModel\Order\OrderRepositoryInterface:
     alias: 'App\Infrastructure\Repository\OrderRepository'
     public: true

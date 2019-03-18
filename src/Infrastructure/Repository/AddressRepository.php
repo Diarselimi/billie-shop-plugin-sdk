@@ -5,8 +5,9 @@ namespace App\Infrastructure\Repository;
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\Address\AddressEntityFactory;
 use App\DomainModel\Address\AddressRepositoryInterface;
+use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
-class AddressRepository extends AbstractRepository implements AddressRepositoryInterface
+class AddressRepository extends AbstractPdoRepository implements AddressRepositoryInterface
 {
     private $addressEntityFactory;
 

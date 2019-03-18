@@ -6,8 +6,9 @@ use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntityFactory;
 use App\DomainModel\MerchantSettings\MerchantSettingsNotFoundException;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
+use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
-class MerchantSettingsRepository extends AbstractRepository implements MerchantSettingsRepositoryInterface
+class MerchantSettingsRepository extends AbstractPdoRepository implements MerchantSettingsRepositoryInterface
 {
     const SELECT_FIELDS = 'id, merchant_id, debtor_financing_limit, min_order_amount, score_thresholds_configuration_id, debtor_identification_algorithm, created_at, updated_at';
 

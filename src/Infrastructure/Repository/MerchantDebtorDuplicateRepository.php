@@ -4,8 +4,9 @@ namespace App\Infrastructure\Repository;
 
 use App\DomainModel\MerchantDebtor\MerchantDebtorDuplicateEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorDuplicateRepositoryInterface;
+use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
-class MerchantDebtorDuplicateRepository extends AbstractRepository implements MerchantDebtorDuplicateRepositoryInterface
+class MerchantDebtorDuplicateRepository extends AbstractPdoRepository implements MerchantDebtorDuplicateRepositoryInterface
 {
     public function upsert(MerchantDebtorDuplicateEntity $merchantDebtorDuplicate): MerchantDebtorDuplicateEntity
     {

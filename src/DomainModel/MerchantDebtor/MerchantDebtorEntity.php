@@ -2,10 +2,10 @@
 
 namespace App\DomainModel\MerchantDebtor;
 
-use App\DomainModel\AbstractEntity;
 use App\DomainModel\DebtorCompany\DebtorCompany;
+use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 
-class MerchantDebtorEntity extends AbstractEntity
+class MerchantDebtorEntity extends AbstractTimestampableEntity
 {
     private $merchantId;
 

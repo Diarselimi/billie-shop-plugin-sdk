@@ -2,14 +2,18 @@
 
 namespace App\DomainModel\Person;
 
-use App\DomainModel\AbstractEntity;
+use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 
-class PersonEntity extends AbstractEntity
+class PersonEntity extends AbstractTimestampableEntity
 {
     private $gender;
+
     private $firstName;
+
     private $lastName;
+
     private $phoneNumber;
+
     private $email;
 
     public function getGender(): ?string

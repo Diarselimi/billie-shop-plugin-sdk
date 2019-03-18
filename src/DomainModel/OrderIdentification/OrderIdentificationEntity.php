@@ -2,9 +2,9 @@
 
 namespace App\DomainModel\OrderIdentification;
 
-use App\DomainModel\AbstractEntity;
+use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 
-class OrderIdentificationEntity extends AbstractEntity
+class OrderIdentificationEntity extends AbstractTimestampableEntity
 {
     private $orderId;
 

@@ -4,8 +4,9 @@ namespace App\Infrastructure\Repository;
 
 use App\DomainModel\OrderIdentification\OrderIdentificationEntity;
 use App\DomainModel\OrderIdentification\OrderIdentificationRepositoryInterface;
+use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
-class OrderIdentificationRepository extends AbstractRepository implements OrderIdentificationRepositoryInterface
+class OrderIdentificationRepository extends AbstractPdoRepository implements OrderIdentificationRepositoryInterface
 {
     public function insert(OrderIdentificationEntity $orderIdentificationEntity): void
     {

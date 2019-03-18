@@ -15,9 +15,6 @@ services:
       $delayedProducer: '@old_sound_rabbit_mq.paella_delayed_events_producer'
 
   _instanceof:
-    App\Infrastructure\Repository\AbstractRepository:
-      tags: ['paella_core.repository']
-
     App\Application\UseCase\ValidatedUseCaseInterface:
       calls:
         - [setValidator, ['@Symfony\Component\Validator\Validator\ValidatorInterface']]
@@ -29,13 +26,6 @@ services:
   App\Http\Controller\:
     resource: '../src/Http/Controller'
     tags: ['controller.service_arguments']
-
-  App\Infrastructure\PDO\PDO:
-    lazy: true
-    arguments:
-      - 'mysql:dbname=%env(DATABASE_NAME)%;host=%env(DATABASE_HOST)%;charset=UTF8'
-      - '%env(DATABASE_USERNAME)%'
-      - '%env(DATABASE_PASSWORD)%'
 
   App\Infrastructure\Alfred\Alfred:
     arguments:

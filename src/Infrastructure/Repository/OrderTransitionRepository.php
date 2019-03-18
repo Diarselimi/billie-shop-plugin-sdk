@@ -4,8 +4,9 @@ namespace App\Infrastructure\Repository;
 
 use App\DomainModel\OrderTransition\OrderTransitionEntity;
 use App\DomainModel\OrderTransition\OrderTransitionRepositoryInterface;
+use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
-class OrderTransitionRepository extends AbstractRepository implements OrderTransitionRepositoryInterface
+class OrderTransitionRepository extends AbstractPdoRepository implements OrderTransitionRepositoryInterface
 {
     public function insert(OrderTransitionEntity $transition): void
     {

@@ -2,10 +2,10 @@
 
 namespace App\DomainModel\Merchant;
 
-use App\DomainModel\AbstractEntity;
 use App\DomainModel\ArrayableInterface;
+use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 
-class MerchantEntity extends AbstractEntity implements ArrayableInterface
+class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInterface
 {
     private $name;
 

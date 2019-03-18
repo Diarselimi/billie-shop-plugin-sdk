@@ -7,8 +7,9 @@ use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntityFactory;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
+use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
-class MerchantDebtorRepository extends AbstractRepository implements MerchantDebtorRepositoryInterface
+class MerchantDebtorRepository extends AbstractPdoRepository implements MerchantDebtorRepositoryInterface
 {
     private const SELECT_FIELDS = 'id, merchant_id, debtor_id, payment_debtor_id, financing_limit, score_thresholds_configuration_id, created_at, updated_at';
 
@@ -134,7 +135,7 @@ class MerchantDebtorRepository extends AbstractRepository implements MerchantDeb
     GROUP BY debtor_id, merchant_id, merchant_external_id, merchant_debtor_id
     ORDER BY merchant_id, merchant_external_id, debtor_id
 SQL;
-        $stmt = $this->exec($sql);
+        $stmt = $this->doExecute($sql);
         while ($stmt && $row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
             yield (new MerchantDebtorIdentifierDTO())
                 ->setMerchantDebtorId($row['merchant_debtor_id'])

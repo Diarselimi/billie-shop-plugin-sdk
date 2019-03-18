@@ -2,9 +2,9 @@
 
 namespace App\DomainModel\MerchantSettings;
 
-use App\DomainModel\AbstractEntity;
+use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 
-class MerchantSettingsEntity extends AbstractEntity
+class MerchantSettingsEntity extends AbstractTimestampableEntity
 {
     private $merchantId;
 
