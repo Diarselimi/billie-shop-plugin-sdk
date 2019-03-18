@@ -88,9 +88,11 @@ class UpdateMerchantDebtorLimitUseCaseSpec extends ObjectBehavior
         $validator->validate($request)->shouldBeCalledOnce()->willReturn(new ConstraintViolationList());
 
         $merchantDebtorRepository->getOneByMerchantExternalId(self::MERCHANT_DEBTOR_EXTERNAL_ID, self::MERCHANT_ID, [])->shouldBeCalledOnce()->willReturn($merchantDebtor);
+        $merchantDebtorRepository->getMerchantDebtorCreatedOrdersAmount(self::MERCHANT_DEBTOR_ID)->shouldBeCalledOnce()->willReturn(150.55);
+
         $paymentsService->getDebtorPaymentDetails(self::MERCHANT_DEBTOR_PAYMENT_ID)->shouldBeCalledOnce()->willReturn($debtorPaymentDetails);
 
-        $merchantDebtor->setFinancingLimit(400)->shouldBeCalledOnce();
+        $merchantDebtor->setFinancingLimit(249.45)->shouldBeCalledOnce();
         $merchantDebtorRepository->update($merchantDebtor)->shouldBeCalledOnce();
 
         $this->execute($request);

@@ -117,7 +117,7 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
             'state_created' => OrderStateManager::STATE_CREATED,
         ]);
 
-        return $row['created_amount'];
+        return $row['created_amount'] ?? 0;
     }
 
     public function getDebtorsWithExternalId(string $where = ''): \Generator

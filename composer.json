@@ -11,6 +11,7 @@
         "donatj/mock-webserver": "^2.0",
         "egulias/email-validator": "^2.1",
         "eightpoints/guzzle-bundle": "^7.3",
+        "ocramius/proxy-manager": "2.2.0",
         "ozean12/sentry": "dev-master",
         "php-amqplib/rabbitmq-bundle": "^1.14",
         "pusher/pusher-php-server": "^3.0",
