@@ -6,6 +6,7 @@ use App\DomainModel\MerchantDebtor\MerchantDebtorIdentifierDTO;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntityFactory;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
+use App\DomainModel\Order\OrderStateManager;
 
 class MerchantDebtorRepository extends AbstractRepository implements MerchantDebtorRepositoryInterface
 {
@@ -102,6 +103,20 @@ class MerchantDebtorRepository extends AbstractRepository implements MerchantDeb
         ]);
 
         return $row ? $this->factory->createFromDatabaseRow($row) : null;
+    }
+
+    public function getMerchantDebtorCreatedOrdersAmount(int $merchantDebtorId): float
+    {
+        $row = $this->doFetchOne('
+            SELECT SUM(amount_gross) AS created_amount
+            FROM orders
+            WHERE orders.merchant_debtor_id = :id AND orders.state = :state_created
+        ', [
+            'id' => $merchantDebtorId,
+            'state_created' => OrderStateManager::STATE_CREATED,
+        ]);
+
+        return $row['created_amount'];
     }
 
     public function getDebtorsWithExternalId(string $where = ''): \Generator

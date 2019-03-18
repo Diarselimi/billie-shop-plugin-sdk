@@ -68,6 +68,7 @@ class GetMerchantDebtorUseCaseSpec extends ObjectBehavior
         $request->getMerchantDebtorExternalId()->willReturn(self::MERCHANT_DEBTOR_EXTERNAL_ID);
 
         $merchantDebtorRepository->getOneByMerchantExternalId(self::MERCHANT_DEBTOR_EXTERNAL_ID, self::MERCHANT_ID, [])->shouldBeCalledOnce()->willReturn($merchantDebtor);
+        $merchantDebtorRepository->getMerchantDebtorCreatedOrdersAmount(self::MERCHANT_DEBTOR_ID)->shouldBeCalledOnce()->willReturn(150.55);
         $paymentsService->getDebtorPaymentDetails(self::MERCHANT_DEBTOR_PAYMENT_ID)->shouldBeCalledOnce()->willReturn($debtorPaymentDetails);
         $companiesService->getDebtor(self::DEBTOR_ID)->shouldBeCalledOnce()->willReturn($debtorDTO);
 
@@ -79,7 +80,9 @@ class GetMerchantDebtorUseCaseSpec extends ObjectBehavior
         $merchantDebtorData->shouldHaveKeyWithValue('payment_id', self::MERCHANT_DEBTOR_PAYMENT_ID);
         $merchantDebtorData->shouldHaveKeyWithValue('external_id', self::MERCHANT_DEBTOR_EXTERNAL_ID);
         $merchantDebtorData->shouldHaveKeyWithValue('available_limit', 5000.);
+        $merchantDebtorData->shouldHaveKeyWithValue('created_amount', 150.55);
         $merchantDebtorData->shouldHaveKeyWithValue('outstanding_amount', 600.);
+        $merchantDebtorData->shouldHaveKeyWithValue('total_limit', 5750.55);
         $merchantDebtorData->shouldHaveKeyWithValue('company', [
             'crefo_id' => 'crefo_id',
             'schufa_id' => 'schufa_id',

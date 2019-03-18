@@ -14,6 +14,8 @@ interface MerchantDebtorRepositoryInterface
 
     public function getOneByMerchantExternalId(string $externalMerchantId, string $merchantId, array $excludedOrderStates): ?MerchantDebtorEntity;
 
+    public function getMerchantDebtorCreatedOrdersAmount(int $merchantDebtorId): float;
+
     /**
      * @return MerchantDebtorIdentifierDTO[]|\Generator
      */
