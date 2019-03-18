@@ -4,6 +4,7 @@ parameters:
   google_cloud_credentials_file_path: '%kernel.root_dir%/../config/secrets/gcloud.json'
   project_name: paella_core
   receive_invoices_sns_topic_arn: '%env(RECEIVE_INVOICES_SNS_TOPIC_ARN)%'
+  billie_monitoring_slack_webhook_url: 'https://hooks.slack.com/services/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'
 
 services:
   _defaults:

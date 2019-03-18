@@ -5,6 +5,10 @@ namespace App\Console\Command;
 use App\DomainModel\MerchantDebtor\DebtorDuplicateFinder;
 use App\DomainModel\MerchantDebtor\DebtorDuplicateHandler;
 use App\DomainModel\MerchantDebtor\MerchantDebtorDuplicateDTO;
+use Billie\MonitoringBundle\Service\Alerting\Slack\SlackClient;
+use Billie\MonitoringBundle\Service\Alerting\Slack\SlackMessage;
+use Billie\MonitoringBundle\Service\Alerting\Slack\SlackMessageAttachment;
+use Billie\MonitoringBundle\Service\Alerting\Slack\SlackMessageAttachmentField;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -26,13 +30,17 @@ class IdentifyDebtorDuplicatesCommand extends Command
 
     private $duplicateHandler;
 
+    private $slackClient;
+
     public function __construct(
         DebtorDuplicateFinder $duplicateFinder,
-        DebtorDuplicateHandler $duplicateHandler
+        DebtorDuplicateHandler $duplicateHandler,
+        SlackClient $slackClient
     ) {
         parent::__construct();
         $this->duplicateFinder = $duplicateFinder;
         $this->duplicateHandler = $duplicateHandler;
+        $this->slackClient = $slackClient;
     }
 
     protected function configure()
@@ -42,8 +50,7 @@ class IdentifyDebtorDuplicatesCommand extends Command
             ->setDescription(self::DESCRIPTION)
             ->addOption(self::ARGUMENT_OUTPUT_FILE, null, InputOption::VALUE_REQUIRED, 'File or handle where to output the results in CSV format', 'php://stdout')
             ->addOption(self::ARGUMENT_BROADCAST_BATCH_SIZE, null, InputOption::VALUE_REQUIRED, 'Broadcast batch size', 50)
-            ->addOption(self::ARGUMENT_BROADCAST_SLEEP, null, InputOption::VALUE_REQUIRED, 'Broadcast sleep time between batches, in seconds', 5)
-        ;
+            ->addOption(self::ARGUMENT_BROADCAST_SLEEP, null, InputOption::VALUE_REQUIRED, 'Broadcast sleep time between batches, in seconds', 5);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -68,7 +75,31 @@ class IdentifyDebtorDuplicatesCommand extends Command
             $output->writeln('No new duplicates found.');
         }
 
+        $this->sendSlackMessage(count($newDuplicates));
+
         $output->writeln('DONE.');
+    }
+
+    private function sendSlackMessage(int $duplicateCount)
+    {
+        if ($duplicateCount > 0) {
+            $text = "Hey, <!here>, I've found *{$duplicateCount} new* company duplicates since the last time.";
+            $color = SlackMessageAttachment::COLOR_YELLOW;
+        } else {
+            $text = 'No company duplicates found. Cool!';
+            $color = SlackMessageAttachment::COLOR_GREEN;
+        }
+
+        $message = (new SlackMessage())->addAttachment(
+            (new SlackMessageAttachment($text))
+                ->setTitle('Company Duplicates Finder Report')
+                ->setText($text)
+                ->setColor($color)
+                ->addField((new SlackMessageAttachmentField('Environment', getenv('APP_ENV') ?: '-')))
+                ->addField((new SlackMessageAttachmentField('Instance', getenv('INSTANCE_SUFFIX') ?: '-')))
+        );
+
+        $this->slackClient->sendMessage($message);
     }
 
     /**
