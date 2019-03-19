@@ -55,7 +55,7 @@ class OrderIdentificationEntity extends AbstractTimestampableEntity
         return $this->v2StrictMatch;
     }
 
-    public function setV2StrictMatch(bool $v2StrictMatch): OrderIdentificationEntity
+    public function setV2StrictMatch(?bool $v2StrictMatch): OrderIdentificationEntity
     {
         $this->v2StrictMatch = $v2StrictMatch;
 
