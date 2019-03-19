@@ -86,7 +86,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
                 $decodedResponse = $this->decodeResponse($exception->getResponse());
 
                 if (isset($decodedResponse['suggestions']) && !empty($decodedResponse['suggestions'])) {
-                    return $this->factory->createFromAlfredResponse(reset($decodedResponse['suggestions']));
+                    return $this->factory->createFromAlfredResponse(reset($decodedResponse['suggestions']), false);
                 }
 
                 return null;

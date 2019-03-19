@@ -12,13 +12,14 @@ class OrderIdentificationRepository extends AbstractPdoRepository implements Ord
     {
         $id = $this->doInsert('
             INSERT INTO order_identifications
-            (order_id, v1_company_id, v2_company_id, created_at, updated_at)
+            (order_id, v1_company_id, v2_company_id, v2_strict_match, created_at, updated_at)
             VALUES
-            (:order_id, :v1_company_id, :v2_company_id, :created_at, :updated_at)
+            (:order_id, :v1_company_id, :v2_company_id, :v2_strict_match, :created_at, :updated_at)
         ', [
             'order_id' => $orderIdentificationEntity->getOrderId(),
             'v1_company_id' => $orderIdentificationEntity->getV1CompanyId(),
             'v2_company_id' => $orderIdentificationEntity->getV2CompanyId(),
+            'v2_strict_match' => (int) $orderIdentificationEntity->isV2StrictMatch(),
             'created_at' => $orderIdentificationEntity->getCreatedAt()->format(self::DATE_FORMAT),
             'updated_at' => $orderIdentificationEntity->getUpdatedAt()->format(self::DATE_FORMAT),
         ]);

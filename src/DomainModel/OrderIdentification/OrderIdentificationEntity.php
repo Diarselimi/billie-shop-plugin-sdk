@@ -12,6 +12,8 @@ class OrderIdentificationEntity extends AbstractTimestampableEntity
 
     private $v2CompanyId;
 
+    private $v2StrictMatch;
+
     public function getOrderId(): int
     {
         return $this->orderId;
@@ -44,6 +46,18 @@ class OrderIdentificationEntity extends AbstractTimestampableEntity
     public function setV2CompanyId(?int $v2CompanyId): OrderIdentificationEntity
     {
         $this->v2CompanyId = $v2CompanyId;
+
+        return $this;
+    }
+
+    public function isV2StrictMatch(): ? bool
+    {
+        return $this->v2StrictMatch;
+    }
+
+    public function setV2StrictMatch(bool $v2StrictMatch): OrderIdentificationEntity
+    {
+        $this->v2StrictMatch = $v2StrictMatch;
 
         return $this;
     }

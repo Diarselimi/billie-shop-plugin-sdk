@@ -4,7 +4,7 @@ namespace App\DomainModel\DebtorCompany;
 
 class DebtorCompanyFactory
 {
-    public function createFromAlfredResponse(array $data): DebtorCompany
+    public function createFromAlfredResponse(array $data, bool $isStrictMatch = true): DebtorCompany
     {
         return (new DebtorCompany())
             ->setId($data['id'])
@@ -17,6 +17,7 @@ class DebtorCompanyFactory
             ->setCrefoId($data['crefo_id'])
             ->setSchufaId($data['schufa_id'])
             ->setIsBlacklisted($data['is_blacklisted'])
+            ->setIsStrictMatch($isStrictMatch)
         ;
     }
 }
