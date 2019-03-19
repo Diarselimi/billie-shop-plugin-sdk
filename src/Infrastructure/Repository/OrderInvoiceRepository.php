@@ -4,8 +4,9 @@ namespace App\Infrastructure\Repository;
 
 use App\DomainModel\OrderInvoice\OrderInvoiceEntity;
 use App\DomainModel\OrderInvoice\OrderInvoiceRepositoryInterface;
+use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
-class OrderInvoiceRepository extends AbstractRepository implements OrderInvoiceRepositoryInterface
+class OrderInvoiceRepository extends AbstractPdoRepository implements OrderInvoiceRepositoryInterface
 {
     public function insert(OrderInvoiceEntity $orderInvoiceEntity): OrderInvoiceEntity
     {

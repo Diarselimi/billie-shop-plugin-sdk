@@ -5,8 +5,9 @@ namespace App\Infrastructure\Repository;
 use App\DomainModel\OrderNotification\OrderNotificationDeliveryEntity;
 use App\DomainModel\OrderNotification\OrderNotificationDeliveryFactory;
 use App\DomainModel\OrderNotification\OrderNotificationDeliveryRepositoryInterface;
+use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
-class OrderNotificationDeliveryRepository extends AbstractRepository implements OrderNotificationDeliveryRepositoryInterface
+class OrderNotificationDeliveryRepository extends AbstractPdoRepository implements OrderNotificationDeliveryRepositoryInterface
 {
     const SELECT_FIELDS = 'id, order_notification_id, url, response_code, response_body, created_at, updated_at';
 
@@ -38,7 +39,7 @@ class OrderNotificationDeliveryRepository extends AbstractRepository implements 
 
     public function getAllByNotificationId(int $notificationId): array
     {
-        $rows = $this->doFetchMultiple('
+        $rows = $this->doFetchAll('
           SELECT ' . self::SELECT_FIELDS . '
           FROM order_notification_deliveries
           WHERE order_notification_id = :notification_id

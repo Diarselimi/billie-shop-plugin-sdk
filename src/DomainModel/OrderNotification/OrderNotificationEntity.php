@@ -2,9 +2,9 @@
 
 namespace App\DomainModel\OrderNotification;
 
-use App\DomainModel\AbstractEntity;
+use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 
-class OrderNotificationEntity extends AbstractEntity
+class OrderNotificationEntity extends AbstractTimestampableEntity
 {
     private $orderId;
 

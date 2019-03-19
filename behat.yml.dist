@@ -10,6 +10,7 @@ default:
         - json_spec
         - PaellaCoreContext:
             kernel: '@kernel'
+            connection: '@billie_pdo.default_connection'
         - PaymentsServiceContext:
             kernel: '@kernel'
         - CompaniesServiceContext:

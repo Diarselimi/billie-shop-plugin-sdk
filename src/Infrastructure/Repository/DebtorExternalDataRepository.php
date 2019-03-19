@@ -5,8 +5,9 @@ namespace App\Infrastructure\Repository;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntityFactory;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
+use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
-class DebtorExternalDataRepository extends AbstractRepository implements DebtorExternalDataRepositoryInterface
+class DebtorExternalDataRepository extends AbstractPdoRepository implements DebtorExternalDataRepositoryInterface
 {
     private $debtorExternalDataEntityFactory;
 

@@ -24,6 +24,8 @@ class DebtorCompany
 
     private $isBlacklisted;
 
+    private $isStrictMatch;
+
     public function getId(): int
     {
         return $this->id;
@@ -140,6 +142,18 @@ class DebtorCompany
     public function setIsBlacklisted(?bool $isBlacklisted): DebtorCompany
     {
         $this->isBlacklisted = $isBlacklisted;
+
+        return $this;
+    }
+
+    public function isStrictMatch(): bool
+    {
+        return $this->isStrictMatch;
+    }
+
+    public function setIsStrictMatch(bool $isStrictMatch): DebtorCompany
+    {
+        $this->isStrictMatch = $isStrictMatch;
 
         return $this;
     }

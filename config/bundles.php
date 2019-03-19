@@ -7,4 +7,5 @@ return [
     OldSound\RabbitMqBundle\OldSoundRabbitMqBundle::class => ['all' => true],
     Aws\Symfony\AwsBundle::class => ['all' => true], // TODO: change it to 'dev',
     Billie\MonitoringBundle\BillieMonitoringBundle::class => ['all' => true],
+    Billie\PdoBundle\BilliePdoBundle::class => ['all' => true],
 ];

@@ -77,6 +77,7 @@ class OrderDebtorIdentificationV2UseCase
                     ->setOrderId($request->getOrderId())
                     ->setV1CompanyId($request->getV1CompanyId())
                     ->setV2CompanyId($identifiedDebtor ? $identifiedDebtor->getId() : null)
+                    ->setV2StrictMatch($identifiedDebtor ? $identifiedDebtor->isStrictMatch() : null)
             );
         } catch (AlfredRequestException $e) {
             $this->orderIdentificationRepository->insert(

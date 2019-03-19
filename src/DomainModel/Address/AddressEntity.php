@@ -2,15 +2,20 @@
 
 namespace App\DomainModel\Address;
 
-use App\DomainModel\AbstractEntity;
+use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 
-class AddressEntity extends AbstractEntity
+class AddressEntity extends AbstractTimestampableEntity
 {
     private $country;
+
     private $city;
+
     private $postalCode;
+
     private $street;
+
     private $houseNumber;
+
     private $addition;
 
     public function getCountry(): string
@@ -73,7 +78,7 @@ class AddressEntity extends AbstractEntity
         return $this;
     }
 
-    public function getAddition():? string
+    public function getAddition(): ? string
     {
         return $this->addition;
     }

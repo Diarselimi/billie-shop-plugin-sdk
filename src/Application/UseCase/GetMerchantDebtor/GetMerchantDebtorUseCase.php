@@ -39,6 +39,7 @@ class GetMerchantDebtorUseCase
 
         $company = $this->companiesService->getDebtor($merchantDebtor->getDebtorId());
         $paymentsDetails = $this->paymentsService->getDebtorPaymentDetails($merchantDebtor->getPaymentDebtorId());
+        $createdAmount = $this->merchantDebtorRepository->getMerchantDebtorCreatedOrdersAmount($merchantDebtor->getId());
 
         return new GetMerchantDebtorResponse([
             'id' => $merchantDebtor->getId(),
@@ -46,6 +47,8 @@ class GetMerchantDebtorUseCase
             'payment_id' => $merchantDebtor->getPaymentDebtorId(),
             'external_id' => $request->getMerchantDebtorExternalId(),
             'available_limit' => $merchantDebtor->getFinancingLimit(),
+            'total_limit' => $merchantDebtor->getFinancingLimit() + $createdAmount + $paymentsDetails->getOutstandingAmount(),
+            'created_amount' => $createdAmount,
             'outstanding_amount' => $paymentsDetails->getOutstandingAmount(),
             'company' => [
                 'crefo_id' => $company->getCrefoId(),

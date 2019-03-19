@@ -2,9 +2,9 @@
 
 namespace App\DomainModel\ScoreThresholdsConfiguration;
 
-use App\DomainModel\AbstractEntity;
+use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 
-class ScoreThresholdsConfigurationEntity extends AbstractEntity
+class ScoreThresholdsConfigurationEntity extends AbstractTimestampableEntity
 {
     private $crefoLowScoreThreshold;
 

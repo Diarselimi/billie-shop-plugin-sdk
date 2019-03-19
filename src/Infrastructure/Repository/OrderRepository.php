@@ -8,12 +8,13 @@ use App\DomainModel\Order\OrderLifecycleEvent;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateCounterDTO;
 use App\DomainModel\Order\OrderStateManager;
-use App\Infrastructure\PDO\PDO;
+use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
+use Billie\PdoBundle\Infrastructure\Pdo\PdoConnection;
 use Generator;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class OrderRepository extends AbstractRepository implements OrderRepositoryInterface
+class OrderRepository extends AbstractPdoRepository implements OrderRepositoryInterface
 {
     const SELECT_FIELDS = 'id, amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, proof_of_delivery_url, delivery_address_id, merchant_debtor_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, created_at, updated_at, shipped_at, marked_as_fraud_at';
 
@@ -229,8 +230,8 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             'state' => OrderStateManager::STATE_LATE,
         ];
 
-        $stmt = $this->exec($query, $params);
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $stmt = $this->doExecute($query, $params);
+        while ($row = $stmt->fetch(PdoConnection::FETCH_ASSOC)) {
             if ($row['overdue'] > 0) {
                 yield (int) $row['overdue'];
             }
@@ -239,7 +240,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
 
     public function getWithInvoiceNumber(int $limit, int $lastId = 0): Generator
     {
-        $stmt = $this->exec(
+        $stmt = $this->doExecute(
             'SELECT id, external_code, merchant_id, invoice_number
               FROM orders
               WHERE invoice_number IS NOT NULL
@@ -252,7 +253,7 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
             ]
         );
 
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        while ($row = $stmt->fetch(PdoConnection::FETCH_ASSOC)) {
             yield $row;
         }
     }
@@ -323,8 +324,8 @@ class OrderRepository extends AbstractRepository implements OrderRepositoryInter
     SELECT state FROM orders
     WHERE merchant_debtor_id = {$merchantDebtorId} AND marked_as_fraud_at IS NULL
 SQL;
-        $stmt = $this->exec($sql);
-        while ($stmt && $row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $stmt = $this->doExecute($sql);
+        while ($stmt && $row = $stmt->fetch(PdoConnection::FETCH_ASSOC)) {
             $counters['total_' . $row['state']]++;
             $counters['total']++;
 

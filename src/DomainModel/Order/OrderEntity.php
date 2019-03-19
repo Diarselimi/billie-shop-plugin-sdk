@@ -2,9 +2,9 @@
 
 namespace App\DomainModel\Order;
 
-use App\DomainModel\AbstractEntity;
+use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 
-class OrderEntity extends AbstractEntity
+class OrderEntity extends AbstractTimestampableEntity
 {
     private const STATE_LATE = 'late';
 

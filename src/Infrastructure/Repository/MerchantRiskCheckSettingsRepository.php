@@ -5,8 +5,9 @@ namespace App\Infrastructure\Repository;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsEntity;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsFactory;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
+use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
-class MerchantRiskCheckSettingsRepository extends AbstractRepository implements MerchantRiskCheckSettingsRepositoryInterface
+class MerchantRiskCheckSettingsRepository extends AbstractPdoRepository implements MerchantRiskCheckSettingsRepositoryInterface
 {
     private $factory;
 

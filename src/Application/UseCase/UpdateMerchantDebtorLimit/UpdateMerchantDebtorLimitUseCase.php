@@ -41,7 +41,8 @@ class UpdateMerchantDebtorLimitUseCase implements LoggingInterface, ValidatedUse
         }
 
         $paymentsDebtor = $this->paymentsService->getDebtorPaymentDetails($merchantDebtor->getPaymentDebtorId());
-        $newAvailableLimit = $request->getLimit() - $paymentsDebtor->getOutstandingAmount();
+        $createdAmount = $this->merchantDebtorRepository->getMerchantDebtorCreatedOrdersAmount($merchantDebtor->getId());
+        $newAvailableLimit = $request->getLimit() - $paymentsDebtor->getOutstandingAmount() - $createdAmount;
 
         $this->logInfo('Merchant debtor {external_id} (id:{id}) limit updated to {new_limit}', [
             'external_id' => $request->getMerchantDebtorExternalId(),
@@ -51,6 +52,7 @@ class UpdateMerchantDebtorLimitUseCase implements LoggingInterface, ValidatedUse
             'old_limit' => $merchantDebtor->getFinancingLimit(),
             'new_limit' => $newAvailableLimit,
             'outstanding_amount' => $paymentsDebtor->getOutstandingAmount(),
+            'created_amount' => $createdAmount,
         ]);
 
         $merchantDebtor->setFinancingLimit($newAvailableLimit);

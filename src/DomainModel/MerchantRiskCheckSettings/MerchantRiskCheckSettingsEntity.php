@@ -2,10 +2,10 @@
 
 namespace App\DomainModel\MerchantRiskCheckSettings;
 
-use App\DomainModel\AbstractEntity;
 use App\DomainModel\OrderRiskCheck\RiskCheckDefinitionEntity;
+use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 
-class MerchantRiskCheckSettingsEntity extends AbstractEntity
+class MerchantRiskCheckSettingsEntity extends AbstractTimestampableEntity
 {
     private $merchantId;
 

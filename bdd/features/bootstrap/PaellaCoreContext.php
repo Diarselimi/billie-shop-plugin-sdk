@@ -22,12 +22,12 @@ use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonRepositoryInterface;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntity;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
-use App\Infrastructure\PDO\PDO;
 use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
+use Billie\PdoBundle\Infrastructure\Pdo\PdoConnection;
 use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
@@ -38,11 +38,15 @@ class PaellaCoreContext extends MinkContext
 {
     use KernelDictionary, MockServerTrait;
 
-    const MERCHANT_ID = 1;
+    private const MERCHANT_ID = 1;
 
-    public function __construct(KernelInterface $kernel)
+    private $connection;
+
+    public function __construct(KernelInterface $kernel, PdoConnection $connection)
     {
         $this->kernel = $kernel;
+        $this->connection = $connection;
+
         $this->setServer($kernel);
 
         $this->getMerchantRepository()->insert(
@@ -248,7 +252,7 @@ class PaellaCoreContext extends MinkContext
     public function theOrderHasUUID($orderExternalCode, $uuid)
     {
         $this->getConnection()
-             ->prepare("UPDATE orders SET uuid = :uuid WHERE external_code = :orderExternalCode")
+             ->prepare("UPDATE orders SET uuid = :uuid WHERE external_code = :orderExternalCode", [])
              ->execute([':uuid' => $uuid, ':orderExternalCode' => $orderExternalCode]);
     }
 
@@ -420,9 +424,9 @@ class PaellaCoreContext extends MinkContext
         return $this->get(MerchantRiskCheckSettingsRepositoryInterface::class);
     }
 
-    private function getConnection(): \PDO
+    private function getConnection(): PdoConnection
     {
-        return $this->get(PDO::class);
+        return $this->connection;
     }
 
     private function get(string $service)

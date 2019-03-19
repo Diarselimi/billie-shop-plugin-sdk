@@ -1,0 +1,186 @@
+{
+	"info": {
+		"_postman_id": "82c36b1a-8d03-4a04-a98d-7a89110ea089",
+		"name": "Paella SUP",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Debtor",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "santosh",
+						"username": "cool"
+					}
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "X-Api-User",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "X-Api-Key",
+						"value": "{{PAELLA_API_KEY}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": "{{PAELLA_URL}}/merchant-debtor/DE2003993374"
+			},
+			"response": []
+		},
+		{
+			"name": "Update Debtor Limit",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "santosh",
+						"username": "cool"
+					}
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "X-Api-User",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "X-Api-Key",
+						"value": "{{PAELLA_API_KEY}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"limit\": 20000\n}"
+				},
+				"url": "{{PAELLA_URL}}/merchant-debtor/DE2008729287/limit"
+			},
+			"response": []
+		},
+		{
+			"name": "Update Debtor Company",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "santosh",
+						"username": "cool"
+					}
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "X-Api-User",
+						"type": "text",
+						"value": "1"
+					},
+					{
+						"key": "X-Api-Key",
+						"value": "{{PAELLA_API_KEY}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"address_house\": \"2\",\n\t\"address_street\": \"Adalbert-Stifter-Strasse\",\n\t\"address_postal_code\": \"89278\",\n\t\"address_city\": \"Nersingen\"\n}"
+				},
+				"url": "{{PAELLA_URL}}/merchant-debtor/DE2003993374/company"
+			},
+			"response": []
+		},
+		{
+			"name": "Create Merchant",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"company_id\": \"6\",\n\t\"merchant_financing_limit\": 5000.44,\n\t\"debtor_financing_limit\": 700.77,\n\t\"webhook_url\": \"http://billie.md\",\n\t\"webhook_authorization\": \"X-Api-Key: Hola\"\n}"
+				},
+				"url": "{{PAELLA_URL}}/merchant"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "d5b4abe6-3181-4fec-9833-efed71de695c",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "02f1953c-5934-4753-8e63-91e8357db803",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "c6fd3827-4906-4fe0-aeeb-f5728469eb36",
+			"key": "PAELLA_URL",
+			"value": "https://api-paella.billie.io",
+			"type": "string"
+		},
+		{
+			"id": "ceb8e250-07d3-4bd7-af6c-a4f7bfa6354f",
+			"key": "PAELLA_URL",
+			"value": "http://paella-core.dev.ozean12.com",
+			"type": "string",
+			"disabled": true
+		},
+		{
+			"id": "07301629-3cde-4f42-995a-0f03df68b727",
+			"key": "PAELLA_API_KEY",
+			"value": "check-1password",
+			"type": "string"
+		}
+	]
+}

@@ -5,8 +5,9 @@ namespace App\Infrastructure\Repository;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntity;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntityFactory;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
+use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
-class ScoreThresholdsConfigurationRepository extends AbstractRepository implements ScoreThresholdsConfigurationRepositoryInterface
+class ScoreThresholdsConfigurationRepository extends AbstractPdoRepository implements ScoreThresholdsConfigurationRepositoryInterface
 {
     const SELECT_FIELDS = '
         id,

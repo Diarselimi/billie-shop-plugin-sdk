@@ -6,8 +6,9 @@ use App\DomainModel\OrderNotification\OrderNotificationDeliveryRepositoryInterfa
 use App\DomainModel\OrderNotification\OrderNotificationEntity;
 use App\DomainModel\OrderNotification\OrderNotificationFactory;
 use App\DomainModel\OrderNotification\OrderNotificationRepositoryInterface;
+use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
-class OrderNotificationRepository extends AbstractRepository implements OrderNotificationRepositoryInterface
+class OrderNotificationRepository extends AbstractPdoRepository implements OrderNotificationRepositoryInterface
 {
     const SELECT_FIELDS = 'id, order_id, payload, is_delivered, created_at, updated_at';
 

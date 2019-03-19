@@ -34,7 +34,7 @@ Feature:
         Then the response status code should be 204
 
     Scenario: Get merchant debtor
-        And I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
+        And I have a created order "XF43Y" with amounts 800/800/0, duration 30 and comment "test order"
         And I get from payments service get debtor response
         And I get from companies service get debtor response
         When I send a GET request to "/merchant-debtor/ext_id"
@@ -47,6 +47,8 @@ Feature:
             "payment_id":"test",
             "external_id":"ext_id",
             "available_limit":1000,
+            "total_limit":2300,
+            "created_amount":800,
             "outstanding_amount":500,
             "company":
             {
