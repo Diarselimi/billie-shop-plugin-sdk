@@ -22,10 +22,10 @@ framework:
           from: new
           to: waiting
         create:
-          from: new
+          from: [new, waiting]
           to: created
         decline:
-          from: new
+          from: [new, waiting]
           to: declined
         ship:
           from: created

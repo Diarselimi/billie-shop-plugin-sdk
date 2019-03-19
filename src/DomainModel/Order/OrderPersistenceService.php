@@ -10,6 +10,7 @@ use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntityFactory;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
 use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonEntityFactory;
@@ -37,6 +38,8 @@ class OrderPersistenceService
 
     private $debtorExternalDataFactory;
 
+    private $merchantDebtorRepository;
+
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         PersonRepositoryInterface $personRepository,
@@ -47,7 +50,8 @@ class OrderPersistenceService
         OrderEntityFactory $orderFactory,
         PersonEntityFactory $personFactory,
         AddressEntityFactory $addressFactory,
-        DebtorExternalDataEntityFactory $debtorExternalDataFactory
+        DebtorExternalDataEntityFactory $debtorExternalDataFactory,
+        MerchantDebtorRepositoryInterface $merchantDebtorRepository
     ) {
         $this->orderRepository = $orderRepository;
         $this->personRepository = $personRepository;
@@ -59,6 +63,7 @@ class OrderPersistenceService
         $this->personFactory = $personFactory;
         $this->addressFactory = $addressFactory;
         $this->debtorExternalDataFactory = $debtorExternalDataFactory;
+        $this->merchantDebtorRepository = $merchantDebtorRepository;
     }
 
     public function persistFromRequest(CreateOrderRequest $request): OrderContainer
@@ -85,6 +90,23 @@ class OrderPersistenceService
             ->setDeliveryAddress($deliveryAddress)
             ->setMerchant($this->merchantRepository->getOneById($order->getMerchantId()))
             ->setMerchantSettings($this->merchantSettingsRepository->getOneByMerchant($order->getMerchantId()))
+        ;
+    }
+
+    public function createFromOrderEntity(OrderEntity $order): OrderContainer
+    {
+        $debtorExternalData = $this->debtorExternalDataRepository->getOneById($order->getDebtorExternalDataId());
+        $debtorExternalAddress = $this->addressRepository->getOneById($debtorExternalData->getAddressId());
+
+        return (new OrderContainer())
+            ->setOrder($order)
+            ->setDebtorPerson($this->personRepository->getOneById($order->getDebtorPersonId()))
+            ->setDebtorExternalData($debtorExternalData)
+            ->setDebtorExternalDataAddress($debtorExternalAddress)
+            ->setDeliveryAddress($this->addressRepository->getOneById($order->getDeliveryAddressId()))
+            ->setMerchant($this->merchantRepository->getOneById($order->getMerchantId()))
+            ->setMerchantSettings($this->merchantSettingsRepository->getOneByMerchant($order->getMerchantId()))
+            ->setMerchantDebtor($this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId()))
         ;
     }
 
