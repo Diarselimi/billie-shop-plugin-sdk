@@ -19,8 +19,8 @@ class MerchantDebtorDuplicateRepository extends AbstractPdoRepository implements
         ', [
             'main_merchant_debtor_id' => $merchantDebtorDuplicate->getMainMerchantDebtorId(),
             'duplicated_merchant_debtor_id' => $merchantDebtorDuplicate->getDuplicatedMerchantDebtorId(),
-            'created_at' => $merchantDebtorDuplicate->getCreatedAt()->format('Y-m-d H:i:s'),
-            'updated_at' => $merchantDebtorDuplicate->getUpdatedAt()->format('Y-m-d H:i:s'),
+            'created_at' => $merchantDebtorDuplicate->getCreatedAt()->format(self::DATE_FORMAT),
+            'updated_at' => $merchantDebtorDuplicate->getUpdatedAt()->format(self::DATE_FORMAT),
         ]);
 
         // get actual data

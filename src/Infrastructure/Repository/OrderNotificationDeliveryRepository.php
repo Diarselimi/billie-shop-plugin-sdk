@@ -9,7 +9,7 @@ use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class OrderNotificationDeliveryRepository extends AbstractPdoRepository implements OrderNotificationDeliveryRepositoryInterface
 {
-    const SELECT_FIELDS = 'id, order_notification_id, url, response_code, response_body, created_at, updated_at';
+    private const SELECT_FIELDS = 'id, order_notification_id, url, response_code, response_body, created_at, updated_at';
 
     private $factory;
 
@@ -30,8 +30,8 @@ class OrderNotificationDeliveryRepository extends AbstractPdoRepository implemen
             'url' => $delivery->getUrl(),
             'response_code' => $delivery->getResponseCode(),
             'response_body' => $delivery->getResponseBody(),
-            'created_at' => $delivery->getCreatedAt()->format('Y-m-d H:i:s'),
-            'updated_at' => $delivery->getUpdatedAt()->format('Y-m-d H:i:s'),
+            'created_at' => $delivery->getCreatedAt()->format(self::DATE_FORMAT),
+            'updated_at' => $delivery->getUpdatedAt()->format(self::DATE_FORMAT),
         ]);
 
         $delivery->setId($id);

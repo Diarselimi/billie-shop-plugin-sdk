@@ -9,6 +9,8 @@ use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class DebtorExternalDataRepository extends AbstractPdoRepository implements DebtorExternalDataRepositoryInterface
 {
+    private const SELECT_FIELDS = 'id, name, tax_id, tax_number, registration_number, registration_court, legal_form, industry_sector, subindustry_sector, employees_number, address_id, is_established_customer, merchant_external_id, created_at, updated_at';
+
     private $debtorExternalDataEntityFactory;
 
     public function __construct(DebtorExternalDataEntityFactory $debtorExternalDataEntityFactory)
@@ -36,8 +38,8 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
             'address_id' => $debtor->getAddressId(),
             'is_established_customer' => $debtor->isEstablishedCustomer(),
             'merchant_external_id' => $debtor->getMerchantExternalId(),
-            'created_at' => $debtor->getCreatedAt()->format('Y-m-d H:i:s'),
-            'updated_at' => $debtor->getUpdatedAt()->format('Y-m-d H:i:s'),
+            'created_at' => $debtor->getCreatedAt()->format(self::DATE_FORMAT),
+            'updated_at' => $debtor->getUpdatedAt()->format(self::DATE_FORMAT),
         ]);
 
         $debtor->setId($id);
@@ -45,7 +47,7 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
 
     public function getOneByIdRaw(int $id): ?array
     {
-        $address = $this->doFetchOne('SELECT * FROM debtor_external_data WHERE id = :id', [
+        $address = $this->doFetchOne('SELECT ' . self::SELECT_FIELDS . ' FROM debtor_external_data WHERE id = :id', [
             'id' => $id,
         ]);
 
@@ -56,6 +58,6 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
     {
         $debtorRowData = $this->getOneByIdRaw($id);
 
-        return ($debtorRowData) ? $this->debtorExternalDataEntityFactory->createFromDatabaseRow($debtorRowData) : null;
+        return $debtorRowData ? $this->debtorExternalDataEntityFactory->createFromDatabaseRow($debtorRowData) : null;
     }
 }

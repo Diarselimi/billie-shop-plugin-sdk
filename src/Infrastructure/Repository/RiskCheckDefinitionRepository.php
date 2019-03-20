@@ -9,6 +9,8 @@ use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class RiskCheckDefinitionRepository extends AbstractPdoRepository implements RiskCheckDefinitionRepositoryInterface
 {
+    private const SELECT_FIELDS = 'id, name, created_at, updated_at';
+
     private $factory;
 
     public function __construct(RiskCheckDefinitionEntityFactory $factory)
@@ -33,7 +35,7 @@ class RiskCheckDefinitionRepository extends AbstractPdoRepository implements Ris
     public function getByName(string $name): ?RiskCheckDefinitionEntity
     {
         $row = $this->doFetchOne(
-            'SELECT * FROM risk_check_definitions WHERE name = :name',
+            'SELECT ' . self::SELECT_FIELDS . ' FROM risk_check_definitions WHERE name = :name',
             ['name' => $name]
         );
 
