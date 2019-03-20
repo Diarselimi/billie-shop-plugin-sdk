@@ -9,6 +9,8 @@ use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class AddressRepository extends AbstractPdoRepository implements AddressRepositoryInterface
 {
+    private const SELECT_FIELDS = 'id, house, street, postal_code, city, country, addition, created_at, updated_at';
+
     private $addressEntityFactory;
 
     public function __construct(AddressEntityFactory $addressEntityFactory)
@@ -31,8 +33,8 @@ class AddressRepository extends AbstractPdoRepository implements AddressReposito
             'city' => $address->getCity(),
             'country' => $address->getCountry(),
             'addition' => $address->getAddition(),
-            'created_at' => $address->getCreatedAt()->format('Y-m-d H:i:s'),
-            'updated_at' => $address->getUpdatedAt()->format('Y-m-d H:i:s'),
+            'created_at' => $address->getCreatedAt()->format(self::DATE_FORMAT),
+            'updated_at' => $address->getUpdatedAt()->format(self::DATE_FORMAT),
         ]);
 
         $address->setId($id);
@@ -40,7 +42,7 @@ class AddressRepository extends AbstractPdoRepository implements AddressReposito
 
     public function getOneByIdRaw(int $id): ? array
     {
-        $address = $this->doFetchOne('SELECT * FROM addresses WHERE id = :id', [
+        $address = $this->doFetchOne('SELECT ' . self::SELECT_FIELDS . ' FROM addresses WHERE id = :id', [
             'id' => $id,
         ]);
 
@@ -51,6 +53,6 @@ class AddressRepository extends AbstractPdoRepository implements AddressReposito
     {
         $rawAddress = $this->getOneByIdRaw($id);
 
-        return ($rawAddress) ? $this->addressEntityFactory->createFromDatabaseRow($rawAddress) : null;
+        return $rawAddress ? $this->addressEntityFactory->createFromDatabaseRow($rawAddress) : null;
     }
 }

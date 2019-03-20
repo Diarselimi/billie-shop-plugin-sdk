@@ -35,8 +35,8 @@ class OrderNotificationRepository extends AbstractPdoRepository implements Order
             'order_id' => $orderNotification->getOrderId(),
             'payload' => json_encode($orderNotification->getPayload()),
             'is_delivered' => (int) $orderNotification->isDelivered(),
-            'created_at' => $orderNotification->getCreatedAt()->format('Y-m-d H:i:s'),
-            'updated_at' => $orderNotification->getUpdatedAt()->format('Y-m-d H:i:s'),
+            'created_at' => $orderNotification->getCreatedAt()->format(self::DATE_FORMAT),
+            'updated_at' => $orderNotification->getUpdatedAt()->format(self::DATE_FORMAT),
         ]);
 
         $orderNotification->setId($id);
@@ -54,7 +54,7 @@ class OrderNotificationRepository extends AbstractPdoRepository implements Order
         ', [
             'id' => $orderNotification->getId(),
             'is_delivered' => (int) $orderNotification->isDelivered(),
-            'updated_at' => $orderNotification->getUpdatedAt()->format('Y-m-d H:i:s'),
+            'updated_at' => $orderNotification->getUpdatedAt()->format(self::DATE_FORMAT),
         ]);
 
         foreach ($orderNotification->getDeliveries() as $delivery) {

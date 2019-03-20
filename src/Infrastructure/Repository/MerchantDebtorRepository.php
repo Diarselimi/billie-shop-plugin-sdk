@@ -33,8 +33,8 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
             'payment_debtor_id' => $merchantDebtor->getPaymentDebtorId(),
             'financing_limit' => $merchantDebtor->getFinancingLimit(),
             'score_thresholds_configuration_id' => $merchantDebtor->getScoreThresholdsConfigurationId(),
-            'created_at' => $merchantDebtor->getCreatedAt()->format('Y-m-d H:i:s'),
-            'updated_at' => $merchantDebtor->getUpdatedAt()->format('Y-m-d H:i:s'),
+            'created_at' => $merchantDebtor->getCreatedAt()->format(self::DATE_FORMAT),
+            'updated_at' => $merchantDebtor->getUpdatedAt()->format(self::DATE_FORMAT),
         ]);
 
         $merchantDebtor->setId($id);
@@ -51,7 +51,7 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
         ', [
             'id' => $merchantDebtor->getId(),
             'financing_limit' => $merchantDebtor->getFinancingLimit(),
-            'updated_at' => $merchantDebtor->getUpdatedAt()->format('Y-m-d H:i:s'),
+            'updated_at' => $merchantDebtor->getUpdatedAt()->format(self::DATE_FORMAT),
         ]);
     }
 

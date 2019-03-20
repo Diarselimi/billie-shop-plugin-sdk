@@ -10,7 +10,7 @@ use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class MerchantSettingsRepository extends AbstractPdoRepository implements MerchantSettingsRepositoryInterface
 {
-    const SELECT_FIELDS = 'id, merchant_id, debtor_financing_limit, min_order_amount, score_thresholds_configuration_id, debtor_identification_algorithm, created_at, updated_at';
+    private const SELECT_FIELDS = 'id, merchant_id, debtor_financing_limit, min_order_amount, score_thresholds_configuration_id, debtor_identification_algorithm, created_at, updated_at';
 
     private $factory;
 

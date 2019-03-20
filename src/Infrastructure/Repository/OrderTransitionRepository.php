@@ -21,7 +21,7 @@ class OrderTransitionRepository extends AbstractPdoRepository implements OrderTr
             'from' => $transition->getFrom(),
             'to' => $transition->getTo(),
             'transition' => $transition->getTransition(),
-            'transited_at' => $transition->getTransitedAt()->format('Y-m-d H:i:s'),
+            'transited_at' => $transition->getTransitedAt()->format(self::DATE_FORMAT),
         ]);
 
         $transition->setId($id);

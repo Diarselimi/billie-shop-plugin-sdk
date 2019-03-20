@@ -16,7 +16,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OrderRepository extends AbstractPdoRepository implements OrderRepositoryInterface
 {
-    const SELECT_FIELDS = 'id, amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, proof_of_delivery_url, delivery_address_id, merchant_debtor_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, created_at, updated_at, shipped_at, marked_as_fraud_at';
+    private const SELECT_FIELDS = 'id, amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, proof_of_delivery_url, delivery_address_id, merchant_debtor_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, created_at, updated_at, shipped_at, marked_as_fraud_at';
 
     private $eventDispatcher;
 
@@ -93,8 +93,8 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
             'debtor_external_data_id' => $order->getDebtorExternalDataId(),
             'payment_id' => $order->getPaymentId(),
             'uuid' => Uuid::uuid4()->toString(),
-            'created_at' => $order->getCreatedAt()->format('Y-m-d H:i:s'),
-            'updated_at' => $order->getUpdatedAt()->format('Y-m-d H:i:s'),
+            'created_at' => $order->getCreatedAt()->format(self::DATE_FORMAT),
+            'updated_at' => $order->getUpdatedAt()->format(self::DATE_FORMAT),
             'merchant_debtor_id' => $order->getMerchantDebtorId(),
         ]);
 
@@ -196,12 +196,12 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
             'duration' => $order->getDuration(),
             'state' => $order->getState(),
             'merchant_debtor_id' => $order->getMerchantDebtorId(),
-            'shipped_at' => $order->getShippedAt() ? $order->getShippedAt()->format('Y-m-d H:i:s') : null,
+            'shipped_at' => $order->getShippedAt() ? $order->getShippedAt()->format(self::DATE_FORMAT) : null,
             'payment_id' => $order->getPaymentId(),
             'invoice_number' => $order->getInvoiceNumber(),
             'invoice_url' => $order->getInvoiceUrl(),
             'proof_of_delivery_url' => $order->getProofOfDeliveryUrl(),
-            'marked_as_fraud_at' => $order->getMarkedAsFraudAt() ? $order->getMarkedAsFraudAt()->format('Y-m-d H:i:s')
+            'marked_as_fraud_at' => $order->getMarkedAsFraudAt() ? $order->getMarkedAsFraudAt()->format(self::DATE_FORMAT)
                 : null,
             'id' => $order->getId(),
         ]);

@@ -20,7 +20,7 @@ class OrderInvoiceRepository extends AbstractPdoRepository implements OrderInvoi
             'order_id' => $orderInvoiceEntity->getOrderId(),
             'file_id' => $orderInvoiceEntity->getFileId(),
             'invoice_number' => $orderInvoiceEntity->getInvoiceNumber(),
-            'created_at' => $orderInvoiceEntity->getCreatedAt()->format('Y-m-d H:i:s'),
+            'created_at' => $orderInvoiceEntity->getCreatedAt()->format(self::DATE_FORMAT),
         ]);
 
         $orderInvoiceEntity->setId($id);
