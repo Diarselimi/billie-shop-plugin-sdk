@@ -189,12 +189,12 @@
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/PdoBundle.git",
-                "reference": "6471a97d0690ab4c0bb4e88f948d284c016630b3"
+                "reference": "8abf2dcd5f76e78c40b83ad8c0b9b2b8f10e99ec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/PdoBundle/zipball/6471a97d0690ab4c0bb4e88f948d284c016630b3",
-                "reference": "6471a97d0690ab4c0bb4e88f948d284c016630b3",
+                "url": "https://api.github.com/repos/ozean12/PdoBundle/zipball/8abf2dcd5f76e78c40b83ad8c0b9b2b8f10e99ec",
+                "reference": "8abf2dcd5f76e78c40b83ad8c0b9b2b8f10e99ec",
                 "shasum": ""
             },
             "require": {
@@ -234,7 +234,7 @@
             "support": {
                 "source": "https://github.com/ozean12/PdoBundle/tree/master"
             },
-            "time": "2019-03-15T15:11:23+00:00"
+            "time": "2019-03-20T10:31:23+00:00"
         },
         {
             "name": "doctrine/annotations",
