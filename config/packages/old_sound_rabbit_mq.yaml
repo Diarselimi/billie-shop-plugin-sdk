@@ -36,6 +36,11 @@ old_sound_rabbit_mq:
       queue_options:    { name: 'order_debtor_identification_v2_paella%env(INSTANCE_SUFFIX)%', routing_keys: ['order_debtor_identification_v2_paella'] }
       callback:         App\Amqp\Consumer\OrderDebtorIdentificationV2Consumer
       qos_options:      {prefetch_size: 0, prefetch_count: 1, global: false}
+    order_in_waiting_state:
+      connection:       default
+      exchange_options: { name: 'paella_delayed_events%env(INSTANCE_SUFFIX)%', type: 'x-delayed-message', arguments: {x-delayed-type: ['S', 'direct']} }
+      queue_options:    { name: 'order_in_waiting_state_paella%env(INSTANCE_SUFFIX)%', routing_keys: ['order_in_waiting_state_paella'] }
+      callback:         App\Amqp\Consumer\OrderInWaitingStateConsumer
   producers:
     paella_events:
       connection:       default

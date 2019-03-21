@@ -144,7 +144,7 @@ Feature:
          "order_id":"A1"
     }
     """
-    And the response status code should be 201
+    Then the response status code should be 201
     And the JSON response should be:
     """
     {}
@@ -258,7 +258,7 @@ Feature:
          "order_id":"A1"
     }
     """
-    And the response status code should be 201
+    Then the response status code should be 201
     And the JSON response should be:
     """
     {}
@@ -314,7 +314,7 @@ Feature:
          "order_id":"A1"
     }
     """
-    And the response status code should be 201
+    Then the response status code should be 201
     And the JSON response should be:
     """
     {}

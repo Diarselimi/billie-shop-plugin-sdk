@@ -4,13 +4,13 @@ namespace App\Application\UseCase\ApproveOrder;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\OrderWorkflowException;
-use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
+use App\DomainEvent\Order\OrderApprovedEvent;
 use App\DomainModel\Order\OrderChecksRunnerService;
 use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
-use App\DomainModel\OrderNotification\NotificationScheduler;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Workflow\Workflow;
 
 class ApproveOrderUseCase
@@ -19,11 +19,7 @@ class ApproveOrderUseCase
 
     private $orderRepository;
 
-    private $merchantDebtorRepository;
-
     private $orderPersistenceService;
-
-    private $notificationScheduler;
 
     private $workflow;
 
@@ -33,24 +29,24 @@ class ApproveOrderUseCase
 
     private $declinedReasonsMapper;
 
+    private $eventDispatcher;
+
     public function __construct(
         OrderRepositoryInterface $orderRepository,
-        MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         OrderPersistenceService $orderPersistenceService,
-        notificationScheduler $notificationScheduler,
         Workflow $workflow,
         OrderStateManager $orderStateManager,
         OrderChecksRunnerService $orderChecksRunnerService,
-        OrderDeclinedReasonsMapper $declinedReasonsMapper
+        OrderDeclinedReasonsMapper $declinedReasonsMapper,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->orderRepository = $orderRepository;
-        $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->orderPersistenceService = $orderPersistenceService;
-        $this->notificationScheduler = $notificationScheduler;
         $this->workflow = $workflow;
         $this->orderStateManager = $orderStateManager;
         $this->orderChecksRunnerService = $orderChecksRunnerService;
         $this->declinedReasonsMapper = $declinedReasonsMapper;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function execute(ApproveOrderRequest $request): void
@@ -79,9 +75,6 @@ class ApproveOrderUseCase
         $this->workflow->apply($order, OrderStateManager::TRANSITION_CREATE);
         $this->orderRepository->update($order);
 
-        $this->notificationScheduler->createAndSchedule($order, [
-            'event' => self::NOTIFICATION_EVENT,
-            'order_id' => $order->getExternalCode(),
-        ]);
+        $this->eventDispatcher->dispatch(OrderApprovedEvent::NAME, new OrderApprovedEvent($orderContainer, true));
     }
 }

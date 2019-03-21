@@ -45,18 +45,12 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
         $debtor->setId($id);
     }
 
-    public function getOneByIdRaw(int $id): ?array
-    {
-        $address = $this->doFetchOne('SELECT ' . self::SELECT_FIELDS . ' FROM debtor_external_data WHERE id = :id', [
-            'id' => $id,
-        ]);
-
-        return $address ?: null;
-    }
-
     public function getOneById(int $id): ?DebtorExternalDataEntity
     {
-        $debtorRowData = $this->getOneByIdRaw($id);
+        $debtorRowData = $this->doFetchOne(
+            'SELECT ' . self::SELECT_FIELDS . ' FROM debtor_external_data WHERE id = :id',
+            ['id' => $id]
+        );
 
         return $debtorRowData ? $this->debtorExternalDataEntityFactory->createFromDatabaseRow($debtorRowData) : null;
     }

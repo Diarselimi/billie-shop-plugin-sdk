@@ -6,7 +6,7 @@ use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\OrderWorkflowException;
 use App\Application\UseCase\ApproveOrder\ApproveOrderRequest;
 use App\Application\UseCase\ApproveOrder\ApproveOrderUseCase;
-use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
+use App\DomainEvent\Order\OrderApprovedEvent;
 use App\DomainModel\Order\OrderChecksRunnerService;
 use App\DomainModel\Order\OrderContainer;
 use App\DomainModel\Order\OrderDeclinedReasonsMapper;
@@ -14,8 +14,8 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
-use App\DomainModel\OrderNotification\NotificationScheduler;
 use PhpSpec\ObjectBehavior;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Workflow\Workflow;
 
 class ApproveOrderUseCaseSpec extends ObjectBehavior
@@ -32,23 +32,21 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
 
     public function let(
         OrderRepositoryInterface $orderRepository,
-        MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         OrderPersistenceService $orderPersistenceService,
-        notificationScheduler $notificationScheduler,
         Workflow $workflow,
         OrderStateManager $orderStateManager,
         OrderChecksRunnerService $orderChecksRunnerService,
-        OrderDeclinedReasonsMapper $declinedReasonsMapper
+        OrderDeclinedReasonsMapper $declinedReasonsMapper,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->beConstructedWith(
             $orderRepository,
-            $merchantDebtorRepository,
             $orderPersistenceService,
-            $notificationScheduler,
             $workflow,
             $orderStateManager,
             $orderChecksRunnerService,
-            $declinedReasonsMapper
+            $declinedReasonsMapper,
+            $eventDispatcher
         );
     }
 
@@ -96,10 +94,10 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
     public function it_successfully_approved_the_order(
         OrderRepositoryInterface $orderRepository,
         OrderPersistenceService $orderPersistenceService,
-        notificationScheduler $notificationScheduler,
         Workflow $workflow,
         OrderStateManager $orderStateManager,
-        OrderChecksRunnerService $orderChecksRunnerService
+        OrderChecksRunnerService $orderChecksRunnerService,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $request = new ApproveOrderRequest(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID);
 
@@ -141,10 +139,7 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
 
         $orderRepository->update($order)->shouldBeCalled();
 
-        $notificationScheduler
-            ->createAndSchedule($order, ['event' => ApproveOrderUseCase::NOTIFICATION_EVENT, 'order_id' => $order->getExternalCode()])
-            ->shouldBeCalled()
-        ;
+        $eventDispatcher->dispatch(OrderApprovedEvent::NAME, new OrderApprovedEvent($orderContainer));
 
         $this->execute($request);
     }

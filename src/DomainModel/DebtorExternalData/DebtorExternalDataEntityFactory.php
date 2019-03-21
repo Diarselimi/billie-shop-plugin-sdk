@@ -38,6 +38,7 @@ class DebtorExternalDataEntityFactory
             ->setLegalForm($row['legal_form'])
             ->setEstablishedCustomer($row['is_established_customer'])
             ->setAddressId($row['address_id'])
+            ->setMerchantExternalId($row['merchant_external_id'])
             ->setCreatedAt(new \DateTime($row['created_at']))
             ->setUpdatedAt(new \DateTime($row['updated_at']))
         ;

@@ -69,6 +69,7 @@ Feature: Endpoint to approve an order in waiting state
 	  | debtor_blacklisted                |	1		|
 	  | debtor_overdue                    |	1		|
 	  | company_b2b_score                 |	1		|
+	And I get from companies service identify match and good decision response
 	And I get from companies service "/debtor/1/lock" endpoint response with status 412 and body
       """
       {}
@@ -81,24 +82,48 @@ Feature: Endpoint to approve an order in waiting state
 	"""
 	And the order CO123 is in state waiting
 
-  Scenario: Successfully approve order in waiting state
+  Scenario: Order in waiting state because of limit check - rerun limit check and successfully approve the order
 	Given I have a waiting order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
 	And The following risk check results exist for order CO123:
-	  | check_name 						| is_passed |
-	  | available_financing_limit         |	1		|
-	  | amount                            |	1		|
-	  | debtor_country                    |	1		|
-	  | debtor_industry_sector            |	1		|
-	  | debtor_identified                 |	1		|
-	  | limit                             |	0		|
-	  | debtor_not_customer               |	1		|
-	  | debtor_name                       |	1		|
-	  | debtor_address_street_match       |	1		|
-	  | debtor_address_house_match        |	1		|
-	  | debtor_address_postal_code_match  |	1		|
-	  | debtor_blacklisted                |	1		|
-	  | debtor_overdue                    |	1		|
-	  | company_b2b_score                 |	1		|
+	  |	check_name							| is_passed	|
+	  | available_financing_limit			|	1		|
+	  | amount								|	1		|
+	  | debtor_country						|	1		|
+	  | debtor_industry_sector				|	1		|
+	  | debtor_identified					|	1		|
+	  | limit								|	0		|
+	  | debtor_not_customer					|	1		|
+	  | debtor_name							|	1		|
+	  | debtor_address_street_match			|	1		|
+	  | debtor_address_house_match			|	1		|
+	  | debtor_address_postal_code_match	|	1		|
+	  | debtor_blacklisted					|	1		|
+	  | debtor_overdue						|	1		|
+	  | company_b2b_score					|	1		|
+	And I get from companies service identify match and good decision response
+	When I send a POST request to "/order/CO123/approve"
+	Then the response status code should be 200
+	And the order CO123 is in state created
+
+  Scenario: Order in waiting state because of blacklisted check - rerun blacklisted check and successfully approve the order
+	Given I have a waiting order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+	And The following risk check results exist for order CO123:
+	  |	check_name							| is_passed	|
+	  | available_financing_limit			|	1		|
+	  | amount								|	1		|
+	  | debtor_country						|	1		|
+	  | debtor_industry_sector				|	1		|
+	  | debtor_identified					|	1		|
+	  | limit								|	1		|
+	  | debtor_not_customer					|	1		|
+	  | debtor_name							|	1		|
+	  | debtor_address_street_match			|	1		|
+	  | debtor_address_house_match			|	1		|
+	  | debtor_address_postal_code_match	|	1		|
+	  | debtor_blacklisted					|	0		|
+	  | debtor_overdue						|	1		|
+	  | company_b2b_score					|	1		|
+	And I get from companies service identify match and good decision response
 	When I send a POST request to "/order/CO123/approve"
 	Then the response status code should be 200
 	And the order CO123 is in state created

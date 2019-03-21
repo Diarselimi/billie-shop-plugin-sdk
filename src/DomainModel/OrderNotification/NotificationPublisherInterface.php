@@ -4,5 +4,5 @@ namespace App\DomainModel\OrderNotification;
 
 interface NotificationPublisherInterface
 {
-    public function publish(string $payload, \DateInterval $delay): bool;
+    public function publish(array $payload, string $interval): bool;
 }
