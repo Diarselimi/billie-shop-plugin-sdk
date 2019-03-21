@@ -61,7 +61,7 @@ class CreateOrderController
             )
             ->setDebtorPerson(
                 (new CreateOrderDebtorPersonRequest())
-                    ->setGender($request->request->get('debtor_person')['gender'] ?? null)
+                    ->setGender($request->request->get('debtor_person')['salutation'] ?? null)
                     ->setFirstName($request->request->get('debtor_person')['first_name'] ?? null)
                     ->setLastName($request->request->get('debtor_person')['last_name'] ?? null)
                     ->setPhoneNumber($request->request->get('debtor_person')['phone_number'] ?? null)

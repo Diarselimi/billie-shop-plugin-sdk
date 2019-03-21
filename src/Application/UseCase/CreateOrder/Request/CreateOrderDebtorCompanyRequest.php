@@ -179,7 +179,7 @@ class CreateOrderDebtorCompanyRequest
 
     public function setIndustrySector(?string $industrySector): CreateOrderDebtorCompanyRequest
     {
-        $this->industrySector = $industrySector;
+        $this->industrySector = $industrySector ? strtoupper($industrySector) : null;
 
         return $this;
     }
@@ -287,7 +287,7 @@ class CreateOrderDebtorCompanyRequest
 
     public function setAddressPostalCode(?string $addressPostalCode): CreateOrderDebtorCompanyRequest
     {
-        $this->addressPostalCode = $addressPostalCode;
+        $this->addressPostalCode = $addressPostalCode ? strtoupper($addressPostalCode) : null;
 
         return $this;
     }
@@ -299,7 +299,7 @@ class CreateOrderDebtorCompanyRequest
 
     public function setAddressCountry(?string $addressCountry): CreateOrderDebtorCompanyRequest
     {
-        $this->addressCountry = $addressCountry;
+        $this->addressCountry = $addressCountry ? strtoupper($addressCountry) : null;
 
         return $this;
     }

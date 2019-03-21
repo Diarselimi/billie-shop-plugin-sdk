@@ -44,6 +44,9 @@
     "behatch/contexts": {
         "version": "3.1.0"
     },
+    "billie/pdo-bundle": {
+        "version": "dev-master"
+    },
     "container-interop/container-interop": {
         "version": "1.2.0"
     },
