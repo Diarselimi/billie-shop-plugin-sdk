@@ -151,6 +151,62 @@ Feature:
     """
     And the order A1 is in state created
 
+  Scenario: Successful order creation using lowercase country
+    Given I get from companies service identify match and good decision response
+    And I get from payments service register debtor positive response
+    When I send a POST request to "/order" with body:
+    """
+    {
+         "debtor_person":{
+            "salutation":"m",
+            "first_name":"something",
+            "last_name":"else",
+            "phone_number":"+491234567",
+            "email":"someone@billie.io"
+         },
+         "debtor_company":{
+            "merchant_customer_id":"12",
+            "name":"Test User Company",
+            "address_addition":"left door",
+            "address_house_number":"10",
+            "address_street":"Heinrich-Heine-Platz",
+            "address_city":"Berlin",
+            "address_postal_code":"10179",
+            "address_country":"DE",
+            "tax_id":"VA222",
+            "tax_number":"3333",
+            "registration_court":"",
+            "registration_number":" some number",
+            "industry_sector":"some sector",
+            "subindustry_sector":"some sub",
+            "employees_number":"33",
+            "legal_form":"some legal",
+            "established_customer":1
+         },
+         "delivery_address":{
+            "house_number":"22",
+            "street":"Charlot strasse",
+            "city":"Paris",
+            "postal_code":"98765",
+            "country":"de"
+         },
+         "amount":{
+            "net":33.2,
+            "gross":43.30,
+            "tax":10.10
+         },
+         "comment":"Some comment",
+         "duration":30,
+         "order_id":"A1"
+    }
+    """
+    Then the response status code should be 201
+    And the JSON response should be:
+    """
+    {}
+    """
+    And the order A1 is in state created
+
   Scenario: Debtor overdue check failed
     Given I get from companies service identify match and good decision response
     And I get from payments service register debtor positive response
@@ -160,7 +216,7 @@ Feature:
     """
     {
          "debtor_person":{
-            "salutation":"m",
+            "salutation":"f",
             "first_name":"",
             "last_name":"else",
             "phone_number":"+491234567",
@@ -270,7 +326,7 @@ Feature:
       """
         {
            "debtor_person":{
-              "salutation":"m",
+              "salutation":"f",
               "first_name":"",
               "last_name":"else",
               "phone_number":"+491234567"

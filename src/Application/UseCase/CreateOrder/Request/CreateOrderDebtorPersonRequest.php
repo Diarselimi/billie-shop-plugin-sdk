@@ -42,7 +42,7 @@ class CreateOrderDebtorPersonRequest
 
     public function setGender(?string $gender): CreateOrderDebtorPersonRequest
     {
-        $this->gender = $gender;
+        $this->gender = $gender ? strtolower($gender) : null;
 
         return $this;
     }
@@ -90,7 +90,7 @@ class CreateOrderDebtorPersonRequest
 
     public function setEmail(?string $email): CreateOrderDebtorPersonRequest
     {
-        $this->email = $email;
+        $this->email = $email ? strtolower($email) : null;
 
         return $this;
     }
