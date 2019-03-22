@@ -33,8 +33,6 @@ class IdentifyDebtorDuplicatesCommand extends Command implements SlackClientAwar
 
     private $duplicateHandler;
 
-    private $slackClient;
-
     private $slackMessageFactory;
 
     public function __construct(
