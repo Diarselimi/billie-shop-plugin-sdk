@@ -51,6 +51,7 @@ class DebtorFinder implements LoggingInterface
             ->setLegalForm($orderContainer->getDebtorExternalData()->getLegalForm())
             ->setFirstName($orderContainer->getDebtorPerson()->getFirstName())
             ->setLastName($orderContainer->getDebtorPerson()->getLastName())
+            ->setIsExperimental(false)
         ;
 
         $this->logInfo('Check if the merchant debtor already known');

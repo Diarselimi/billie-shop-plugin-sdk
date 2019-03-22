@@ -34,6 +34,8 @@ class IdentifyDebtorRequestDTO implements ArrayableInterface
 
     private $lastName;
 
+    private $isExperimental;
+
     public function getCompanyId(): ?int
     {
         return $this->companyId;
@@ -202,6 +204,18 @@ class IdentifyDebtorRequestDTO implements ArrayableInterface
         return $this;
     }
 
+    public function isExperimental(): bool
+    {
+        return $this->isExperimental;
+    }
+
+    public function setIsExperimental(bool $isExperimental): IdentifyDebtorRequestDTO
+    {
+        $this->isExperimental = $isExperimental;
+
+        return $this;
+    }
+
     public function toArray(): array
     {
         return [
@@ -219,6 +233,7 @@ class IdentifyDebtorRequestDTO implements ArrayableInterface
             'legal_form' => $this->getLegalForm(),
             'first_name' => $this->getFirstName(),
             'last_name' => $this->getLastName(),
+            'is_experimental' => $this->isExperimental(),
         ];
     }
 }
