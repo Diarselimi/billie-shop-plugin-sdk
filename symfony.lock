@@ -44,6 +44,9 @@
     "behatch/contexts": {
         "version": "3.1.0"
     },
+    "billie/monitoring-bundle": {
+        "version": "dev-master"
+    },
     "billie/pdo-bundle": {
         "version": "dev-master"
     },
