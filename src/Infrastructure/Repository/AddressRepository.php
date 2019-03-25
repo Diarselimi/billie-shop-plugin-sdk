@@ -40,18 +40,12 @@ class AddressRepository extends AbstractPdoRepository implements AddressReposito
         $address->setId($id);
     }
 
-    public function getOneByIdRaw(int $id): ? array
-    {
-        $address = $this->doFetchOne('SELECT ' . self::SELECT_FIELDS . ' FROM addresses WHERE id = :id', [
-            'id' => $id,
-        ]);
-
-        return $address ?: null;
-    }
-
     public function getOneById(int $id): ?AddressEntity
     {
-        $rawAddress = $this->getOneByIdRaw($id);
+        $rawAddress = $this->doFetchOne(
+            'SELECT ' . self::SELECT_FIELDS . ' FROM addresses WHERE id = :id',
+            ['id' => $id]
+        );
 
         return $rawAddress ? $this->addressEntityFactory->createFromDatabaseRow($rawAddress) : null;
     }

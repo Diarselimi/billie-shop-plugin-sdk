@@ -5,6 +5,7 @@ namespace App\DomainModel\Order;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
 use App\DomainModel\OrderRiskCheck\Checker\CheckInterface;
 use App\DomainModel\OrderRiskCheck\Checker\CheckResult;
+use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntity;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntityFactory;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
@@ -69,6 +70,31 @@ class OrderChecksRunnerService implements LoggingInterface
         }
 
         return false;
+    }
+
+    public function rerunFailedChecks(OrderContainer $orderContainer): bool
+    {
+        /** @var OrderRiskCheckEntity[] $failedRiskChecks */
+        $failedRiskChecks = array_filter(
+            $this->orderRiskCheckRepository->findByOrder($orderContainer->getOrder()->getId()),
+            function (OrderRiskCheckEntity $orderRiskCheck) {
+                return !$orderRiskCheck->isPassed();
+            }
+        );
+
+        foreach ($failedRiskChecks as $orderCheckResult) {
+            $check = $this->getCheck($orderCheckResult->getRiskCheckDefinition()->getName());
+            $result = $check->check($orderContainer);
+
+            if (!$result->isPassed()) {
+                return false;
+            }
+
+            $orderCheckResult->setIsPassed(true);
+            $this->orderRiskCheckRepository->update($orderCheckResult);
+        }
+
+        return true;
     }
 
     private function runChecks(OrderContainer $order, array $checkNames): bool

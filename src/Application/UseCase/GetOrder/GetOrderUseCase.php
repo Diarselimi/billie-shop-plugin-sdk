@@ -66,19 +66,19 @@ class GetOrderUseCase
             );
         }
 
-        $debtorData = $this->debtorExternalDataRepository->getOneByIdRaw($order->getDebtorExternalDataId());
-        $debtorAddress = $this->addressRepository->getOneByIdRaw($debtorData['address_id']);
+        $debtorData = $this->debtorExternalDataRepository->getOneById($order->getDebtorExternalDataId());
+        $debtorAddress = $this->addressRepository->getOneById($debtorData->getAddressId());
 
         $response = (new GetOrderResponse())
             ->setExternalCode($order->getExternalCode())
             ->setState($order->getState())
             ->setOriginalAmount($order->getAmountGross())
-            ->setDebtorExternalDataAddressCountry($debtorAddress['country'])
-            ->setDebtorExternalDataAddressPostalCode($debtorAddress['postal_code'])
-            ->setDebtorExternalDataAddressStreet($debtorAddress['street'])
-            ->setDebtorExternalDataAddressHouse($debtorAddress['house'])
-            ->setDebtorExternalDataCompanyName($debtorData['name'])
-            ->setDebtorExternalDataIndustrySector($debtorData['industry_sector'])
+            ->setDebtorExternalDataAddressCountry($debtorAddress->getCountry())
+            ->setDebtorExternalDataAddressPostalCode($debtorAddress->getPostalCode())
+            ->setDebtorExternalDataAddressStreet($debtorAddress->getStreet())
+            ->setDebtorExternalDataAddressHouse($debtorAddress->getHouseNumber())
+            ->setDebtorExternalDataCompanyName($debtorData->getName())
+            ->setDebtorExternalDataIndustrySector($debtorData->getIndustrySector())
         ;
 
         if ($order->getMerchantDebtorId()) {

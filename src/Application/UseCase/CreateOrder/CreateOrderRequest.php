@@ -62,7 +62,7 @@ class CreateOrderRequest implements ValidatedRequestInterface
         return $this->merchantId;
     }
 
-    public function setMerchantId($merchantId)
+    public function setMerchantId($merchantId): CreateOrderRequest
     {
         $this->merchantId = $merchantId;
 
@@ -86,7 +86,7 @@ class CreateOrderRequest implements ValidatedRequestInterface
         return $this->comment;
     }
 
-    public function setComment($comment)
+    public function setComment($comment): CreateOrderRequest
     {
         $this->comment = $comment;
 
@@ -98,7 +98,7 @@ class CreateOrderRequest implements ValidatedRequestInterface
         return $this->duration;
     }
 
-    public function setDuration($duration)
+    public function setDuration($duration): CreateOrderRequest
     {
         $this->duration = $duration;
 
@@ -110,7 +110,7 @@ class CreateOrderRequest implements ValidatedRequestInterface
         return $this->externalCode;
     }
 
-    public function setExternalCode($externalCode)
+    public function setExternalCode($externalCode): CreateOrderRequest
     {
         $this->externalCode = $externalCode;
 

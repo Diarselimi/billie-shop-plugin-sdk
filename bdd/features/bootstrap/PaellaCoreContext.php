@@ -16,6 +16,8 @@ use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderIdentification\OrderIdentificationRepositoryInterface;
+use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntity;
+use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
 use App\DomainModel\OrderRiskCheck\RiskCheckDefinitionEntity;
 use App\DomainModel\OrderRiskCheck\RiskCheckDefinitionRepositoryInterface;
 use App\DomainModel\Person\PersonEntity;
@@ -358,6 +360,25 @@ class PaellaCoreContext extends MinkContext
         }
     }
 
+    /**
+     * @Given The following risk check results exist for order :orderExternalCode:
+     */
+    public function theFollowingRiskCheckResultsExistForOrderCO123(string $orderExternalCode, TableNode $table)
+    {
+        $order = $this->getOrder($orderExternalCode);
+
+        foreach ($table as $row) {
+            $riskCheckDefinition = $this->getRiskCheckDefinitionRepository()->getByName($row['check_name']);
+
+            $this->getOrderRiskCheckRepositoryInterface()->insert(
+                (new OrderRiskCheckEntity())
+                    ->setOrderId($order->getId())
+                    ->setRiskCheckDefinition($riskCheckDefinition)
+                    ->setIsPassed($row['is_passed'] === '1' ? true : false)
+            );
+        }
+    }
+
     private function getOrder($orderExternalCode, $customerId = self::MERCHANT_ID): OrderEntity
     {
         $order = $this->getOrderRepository()->getOneByExternalCode($orderExternalCode, $customerId);
@@ -422,6 +443,11 @@ class PaellaCoreContext extends MinkContext
     private function getMerchantRiskCheckSettingsRepository(): MerchantRiskCheckSettingsRepositoryInterface
     {
         return $this->get(MerchantRiskCheckSettingsRepositoryInterface::class);
+    }
+
+    private function getOrderRiskCheckRepositoryInterface(): OrderRiskCheckRepositoryInterface
+    {
+        return $this->get(OrderRiskCheckRepositoryInterface::class);
     }
 
     private function getConnection(): PdoConnection

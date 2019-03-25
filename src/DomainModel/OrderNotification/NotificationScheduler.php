@@ -12,13 +12,11 @@ class NotificationScheduler implements LoggingInterface
     use LoggingTrait;
 
     private const DELAY_MATRIX = [
-        0 => 'PT1S',
-//        1 => 'PT5M',
-//        2 => 'PT1H',
-//        3 => 'PT3H',
-//        4 => 'PT6H',
-//        5 => 'PT6H',
-//        6 => 'PT6H',
+        0 => '1 second',
+//        1 => '5 minutes',
+//        2 => 'q hour',
+//        3 => '3 hours',
+//        4 => '6 hours',
     ];
 
     private $orderNotificationFactoryPublisher;
@@ -63,17 +61,16 @@ class NotificationScheduler implements LoggingInterface
             return false;
         }
 
-        $delay = new \DateInterval(self::DELAY_MATRIX[$attemptNumber]);
-        $payload = json_encode(['notification_id' => $orderNotification->getId()]);
+        $payload = ['notification_id' => $orderNotification->getId()];
 
         $this->logInfo('Scheduling notification {notification_id} for execution at {datetime}', [
             'notification_id' => $orderNotification->getId(),
-            'datetime' => (new \DateTime())->add($delay)->format('Y-m-d H:i:d'),
+            'datetime' => (new \DateTime(self::DELAY_MATRIX[$attemptNumber]))->format('Y-m-d H:i:d'),
             'attempt' => $attemptNumber,
-            'payload' => $payload,
+            'payload' => json_encode($payload),
         ]);
 
-        $result = $this->orderNotificationFactoryPublisher->publish($payload, $delay);
+        $result = $this->orderNotificationFactoryPublisher->publish($payload, self::DELAY_MATRIX[$attemptNumber]);
 
         $this->logInfo('Scheduling '.($result ? 'successful' : 'unsuccessful'), [
             'notification_id' => $orderNotification->getId(),

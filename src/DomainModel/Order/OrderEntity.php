@@ -8,6 +8,8 @@ class OrderEntity extends AbstractTimestampableEntity
 {
     private const STATE_LATE = 'late';
 
+    const MAX_DURATION_IN_WAITING_STATE = '9 days';
+
     private $amountNet;
 
     private $amountGross;

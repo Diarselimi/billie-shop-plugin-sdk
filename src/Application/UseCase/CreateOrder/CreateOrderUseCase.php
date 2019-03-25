@@ -4,9 +4,10 @@ namespace App\Application\UseCase\CreateOrder;
 
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
+use App\DomainEvent\Order\OrderApprovedEvent;
+use App\DomainEvent\Order\OrderInWaitingStateEvent;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\DebtorCompany;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\DebtorFinder;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\Order\LimitsService;
@@ -18,6 +19,7 @@ use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 use Symfony\Component\Workflow\Workflow;
@@ -29,8 +31,6 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
     private $orderPersistenceService;
 
     private $orderChecksRunnerService;
-
-    private $merchantRepository;
 
     private $orderRepository;
 
@@ -44,26 +44,28 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 
     private $producer;
 
+    private $eventDispatcher;
+
     public function __construct(
         OrderPersistenceService $orderPersistenceService,
         OrderChecksRunnerService $orderChecksRunnerService,
-        MerchantRepositoryInterface $merchantRepository,
         OrderRepositoryInterface $orderRepository,
         Workflow $workflow,
         LimitsService $limitsService,
         DebtorFinder $debtorFinderService,
         ValidatorInterface $validator,
-        ProducerInterface $producer
+        ProducerInterface $producer,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->orderPersistenceService = $orderPersistenceService;
         $this->orderChecksRunnerService = $orderChecksRunnerService;
-        $this->merchantRepository = $merchantRepository;
         $this->orderRepository = $orderRepository;
         $this->workflow = $workflow;
         $this->limitsService = $limitsService;
         $this->debtorFinderService = $debtorFinderService;
         $this->validator = $validator;
         $this->producer = $producer;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function execute(CreateOrderRequest $request): void
@@ -127,6 +129,11 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_WAITING);
         $this->orderRepository->update($orderContainer->getOrder());
 
+        $this->eventDispatcher->dispatch(
+            OrderInWaitingStateEvent::NAME,
+            new OrderInWaitingStateEvent($orderContainer->getOrder())
+        );
+
         $this->logInfo("Order was moved to waiting state");
     }
 
@@ -147,21 +154,10 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 
     private function approve(OrderContainer $orderContainer)
     {
-        $merchant = $orderContainer->getMerchant();
-        $merchantDebtor = $orderContainer->getMerchantDebtor();
-        $firstApprovedOrder = !$this->orderRepository->merchantDebtorHasAtLeastOneApprovedOrder($merchantDebtor->getId());
-
         $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_CREATE);
         $this->orderRepository->update($orderContainer->getOrder());
 
-        $merchant->reduceAvailableFinancingLimit($orderContainer->getOrder()->getAmountGross());
-        $this->merchantRepository->update($merchant);
-
-        $this->logInfo("Order approved!", [
-            'debtor_is_new' => $firstApprovedOrder,
-            'debtor_created_in_this_hour' => $merchantDebtor->getCreatedAt() > new \Datetime(date('Y-m-d H:00:00')),
-            'debtor_created_today' => $merchantDebtor->getCreatedAt() > new \Datetime(date('Y-m-d 00:00:00')),
-        ]);
+        $this->eventDispatcher->dispatch(OrderApprovedEvent::NAME, new OrderApprovedEvent($orderContainer));
     }
 
     private function triggerV2DebtorIdentificationAsync(OrderEntity $order, ?DebtorCompany $identifiedDebtorCompany): void

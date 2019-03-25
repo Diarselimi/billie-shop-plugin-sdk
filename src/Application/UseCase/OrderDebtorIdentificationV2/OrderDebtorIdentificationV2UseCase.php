@@ -70,6 +70,7 @@ class OrderDebtorIdentificationV2UseCase
                 ->setLegalForm($debtorExternalData->getLegalForm())
                 ->setFirstName($debtorPerson->getFirstName())
                 ->setLastName($debtorPerson->getLastName())
+                ->setIsExperimental(true)
             );
 
             $this->orderIdentificationRepository->insert(

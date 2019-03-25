@@ -2,10 +2,10 @@
 
 namespace App\Infrastructure\OrderNotification;
 
+use App\Amqp\Producer\DelayedMessageProducer;
 use App\DomainModel\OrderNotification\NotificationPublisherInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
-use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 
 class NotificationPublisher implements NotificationPublisherInterface, LoggingInterface
 {
@@ -13,31 +13,19 @@ class NotificationPublisher implements NotificationPublisherInterface, LoggingIn
 
     private const ROUTING_KEY = 'notification_delivery_paella';
 
-    private $delayedProducer;
+    private $delayedMessageProducer;
 
-    public function __construct(ProducerInterface $delayedProducer)
+    public function __construct(DelayedMessageProducer $delayedMessageProducer)
     {
-        $this->delayedProducer = $delayedProducer;
+        $this->delayedMessageProducer = $delayedMessageProducer;
     }
 
-    public function publish(string $payload, \DateInterval $delay): bool
+    public function publish(array $payload, string $interval): bool
     {
-        try {
-            $this->delayedProducer->publish(
-                $payload,
-                self::ROUTING_KEY,
-                [],
-                ['x-delay' => $delay->format('f')]
-            );
-        } catch (\ErrorException $exception) {
-            $this->logSuppressedException($exception, '[suppressed] Rabbit producer exception', [
-                'exception' => $exception,
-                'data' => $payload,
-            ]);
-
-            return false;
-        }
-
-        return true;
+        return $this->delayedMessageProducer->produce(
+            self::ROUTING_KEY,
+            $payload,
+            $interval
+        );
     }
 }

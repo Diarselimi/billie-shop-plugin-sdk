@@ -41,6 +41,16 @@ create_order_invoice:
   controller: App\Http\Controller\CreateOrderInvoiceController::execute
   methods: [POST]
 
+decline_order:
+  path: /order/{externalCode}/decline
+  controller: App\Http\Controller\DeclineOrderController::execute
+  methods: [POST]
+
+approve_order:
+  path: /order/{externalCode}/approve
+  controller: App\Http\Controller\ApproveOrderController::execute
+  methods: [POST]
+
 mark_order_as_fraud:
   path: /order/{uuid}/mark-as-fraud
   controller: App\Http\Controller\MarkOrderAsFraudController::execute
