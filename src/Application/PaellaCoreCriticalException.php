@@ -6,8 +6,6 @@ class PaellaCoreCriticalException extends \RuntimeException
 {
     const CODE_NOT_FOUND = 'not_found';
 
-    const CODE_RISKY_EXCEPTION = 'risky_exception';
-
     const CODE_ALFRED_EXCEPTION = 'alfred_exception';
 
     const CODE_BORSCHT_EXCEPTION = 'borscht_exception';
