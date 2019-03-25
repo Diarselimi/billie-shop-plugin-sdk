@@ -168,12 +168,12 @@ class IdentifyDebtorRequestDTO implements ArrayableInterface
         return $this;
     }
 
-    public function getLegalForm(): ? string
+    public function getLegalForm(): string
     {
         return $this->legalForm;
     }
 
-    public function setLegalForm(?string $legalForm): IdentifyDebtorRequestDTO
+    public function setLegalForm(string $legalForm): IdentifyDebtorRequestDTO
     {
         $this->legalForm = $legalForm;
 
