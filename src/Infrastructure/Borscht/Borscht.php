@@ -13,6 +13,7 @@ use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
+use GuzzleHttp\TransferStats;
 use Psr\Http\Message\ResponseInterface;
 
 class Borscht implements BorschtInterface, LoggingInterface
@@ -165,6 +166,9 @@ class Borscht implements BorschtInterface, LoggingInterface
         try {
             $response = $this->client->post('/order.json', [
                 'json' => $json,
+                'on_stats' => function (TransferStats $stats) {
+                    $this->logServiceRequestStats($stats, 'create_borscht_ticket');
+                },
             ]);
         } catch (TransferException $exception) {
             throw new PaellaCoreCriticalException(
@@ -187,6 +191,9 @@ class Borscht implements BorschtInterface, LoggingInterface
                 'headers' => [
                     'x-merchant-id' => $paymentMerchantId,
                 ],
+                'on_stats' => function (TransferStats $stats) {
+                    $this->logServiceRequestStats($stats, 'create_borscht_debtor');
+                },
             ]);
         } catch (TransferException $exception) {
             throw new PaellaCoreCriticalException(

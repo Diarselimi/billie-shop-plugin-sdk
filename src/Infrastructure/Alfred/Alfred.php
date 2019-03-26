@@ -13,6 +13,7 @@ use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\TransferException;
+use GuzzleHttp\TransferStats;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -63,6 +64,9 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         try {
             $response = $this->client->post("/debtor/identify", [
                 'json' => $requestDTO->toArray(),
+                'on_stats' => function (TransferStats $stats) {
+                    $this->logServiceRequestStats($stats, 'identify_debtor_v1');
+                },
             ]);
         } catch (TransferException $exception) {
             if ($exception->getCode() === Response::HTTP_NOT_FOUND) {
@@ -80,6 +84,9 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         try {
             $response = $this->client->post("/debtor/identify/v2", [
                 'json' => $requestDTO->toArray(),
+                'on_stats' => function (TransferStats $stats) {
+                    $this->logServiceRequestStats($stats, 'identify_debtor');
+                },
             ]);
         } catch (ClientException $exception) {
             if ($exception->getCode() === Response::HTTP_NOT_FOUND) {
@@ -109,6 +116,9 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
                 'json' => [
                     'amount' => $amount,
                 ],
+                'on_stats' => function (TransferStats $stats) {
+                    $this->logServiceRequestStats($stats, 'debtor_lock_limit');
+                },
             ]);
         } catch (TransferException $exception) {
             if ($exception->getCode() === Response::HTTP_PRECONDITION_FAILED) {
@@ -159,6 +169,9 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
                     'schufa_high_score_threshold' => $requestDTO->getSchufaHighScoreThreshold(),
                     'schufa_sole_trader_score_threshold' => $requestDTO->getSchufaSoleTraderScoreThreshold(),
                 ],
+                'on_stats' => function (TransferStats $stats) {
+                    $this->logServiceRequestStats($stats, 'score_debtor');
+                },
             ]);
 
             return $this->decodeResponse($response)['is_eligible'];
