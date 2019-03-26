@@ -51,11 +51,6 @@ class TestGuzzleSubscriber implements EventSubscriberInterface, LoggingInterface
             return;
         }
 
-        $testHeader = $this->request->headers->get(self::HEADER_NAME);
-        if (!$testHeader) {
-            return;
-        }
-
         $service = $event->getServiceName();
         $this->log("Service $service check");
         if (!\in_array($service, $this->servicesToMock) && !\in_array($service, $this->servicesToProxyHeader)) {
@@ -65,7 +60,7 @@ class TestGuzzleSubscriber implements EventSubscriberInterface, LoggingInterface
         }
 
         $transaction = $event->getTransaction();
-        $transaction = $transaction->withAddedHeader(self::HEADER_NAME, $testHeader);
+        $transaction = $transaction->withAddedHeader(self::HEADER_NAME, $testId);
         $this->log("Service $service test header added");
 
         if (\in_array($service, $this->servicesToMock)) {
