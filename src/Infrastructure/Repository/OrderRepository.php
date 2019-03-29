@@ -8,6 +8,7 @@ use App\DomainModel\Order\OrderLifecycleEvent;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateCounterDTO;
 use App\DomainModel\Order\OrderStateManager;
+use Billie\MonitoringBundle\Service\RidProvider;
 use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 use Billie\PdoBundle\Infrastructure\Pdo\PdoConnection;
 use Generator;
@@ -22,10 +23,13 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
 
     private $orderFactory;
 
-    public function __construct(EventDispatcherInterface $eventDispatcher, OrderEntityFactory $orderFactory)
+    private $ridProvider;
+
+    public function __construct(EventDispatcherInterface $eventDispatcher, OrderEntityFactory $orderFactory, RidProvider $ridProvider)
     {
         $this->eventDispatcher = $eventDispatcher;
         $this->orderFactory = $orderFactory;
+        $this->ridProvider = $ridProvider;
     }
 
     public function insert(OrderEntity $order): void
@@ -51,6 +55,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
               merchant_debtor_id,
               payment_id, 
               uuid, 
+              rid, 
               created_at, 
               updated_at
             ) VALUES (
@@ -72,6 +77,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
               :merchant_debtor_id,
               :payment_id, 
               :uuid, 
+              :rid, 
               :created_at, 
               :updated_at
             )
@@ -93,6 +99,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
             'debtor_external_data_id' => $order->getDebtorExternalDataId(),
             'payment_id' => $order->getPaymentId(),
             'uuid' => Uuid::uuid4()->toString(),
+            'rid' => $this->ridProvider->getRid(),
             'created_at' => $order->getCreatedAt()->format(self::DATE_FORMAT),
             'updated_at' => $order->getUpdatedAt()->format(self::DATE_FORMAT),
             'merchant_debtor_id' => $order->getMerchantDebtorId(),

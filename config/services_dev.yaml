@@ -1,3 +1,7 @@
+parameters:
+  env(X_TEST_ID): ~
+  x_test_id: '%env(string:X_TEST_ID)%'
+
 services:
   _defaults:
     autowire: true
@@ -9,12 +13,4 @@ services:
       $mockServerUrl: ''
       $servicesToMock: []
       $servicesToProxyHeader: [alfred]
-    tags: ['paella_core.logging']
-    calls:
-    - method: setLogger
-      arguments:
-      - '@Psr\Log\LoggerInterface'
-    - method: setSentry
-      arguments:
-      - '@Raven_Client'
-
+      $cliTestId: '%x_test_id%'

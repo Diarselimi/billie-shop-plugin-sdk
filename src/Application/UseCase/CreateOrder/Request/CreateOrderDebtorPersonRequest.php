@@ -9,6 +9,7 @@ class CreateOrderDebtorPersonRequest
     /**
      * @Assert\Type(type="string")
      * @Assert\Choice({"m", "f"})
+     * @Assert\NotBlank()
      */
     private $gender;
 

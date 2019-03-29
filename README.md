@@ -1,2 +1,3 @@
 # Paella Core
-Coming in 2018
+
+The heart of Billie Pay-After-Delivery (PaD).

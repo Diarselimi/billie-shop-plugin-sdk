@@ -24,27 +24,30 @@ class TestGuzzleSubscriber implements EventSubscriberInterface, LoggingInterface
 
     private $servicesToProxyHeader;
 
+    private $cliTestId;
+
     public function __construct(
         RequestStack $request,
         string $mockServerUrl,
         array $servicesToMock,
-        array $servicesToProxyHeader
+        array $servicesToProxyHeader,
+        ?string $cliTestId
     ) {
         $this->request = $request->getCurrentRequest();
         $this->mockServerUrl = $mockServerUrl;
         $this->servicesToMock = $servicesToMock;
         $this->servicesToProxyHeader = $servicesToProxyHeader;
+        $this->cliTestId = $cliTestId;
     }
 
     public function onPreTransaction(PreTransactionEvent $event)
     {
-        //@TODO: add support for cli and amqp at some point in time
-        if (!$this->request) {
-            return;
-        }
+        $testId = $this->request
+            ? $this->request->headers->get(self::HEADER_NAME)
+            : $this->cliTestId
+        ;
 
-        $testHeader = $this->request->headers->get(self::HEADER_NAME);
-        if (!$testHeader) {
+        if (!$testId) {
             return;
         }
 
@@ -57,7 +60,7 @@ class TestGuzzleSubscriber implements EventSubscriberInterface, LoggingInterface
         }
 
         $transaction = $event->getTransaction();
-        $transaction = $transaction->withAddedHeader(self::HEADER_NAME, $testHeader);
+        $transaction = $transaction->withAddedHeader(self::HEADER_NAME, $testId);
         $this->log("Service $service test header added");
 
         if (\in_array($service, $this->servicesToMock)) {
