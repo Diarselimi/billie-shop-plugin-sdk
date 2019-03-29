@@ -94,7 +94,7 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
                 WHERE orders.merchant_id = :merchant_id
                 AND debtor_external_data.merchant_external_id = :merchant_external_id
                 AND merchant_debtor_id IS NOT NULL
-                '.($excludedOrderStates ? 'AND orders.state NOT IN ("'.implode(', ', $excludedOrderStates).'")' : '').'
+                '.($excludedOrderStates ? 'AND orders.state NOT IN ("'.implode('", "', $excludedOrderStates).'")' : '').'
                 ORDER BY orders.id DESC
                 LIMIT 1
             )
