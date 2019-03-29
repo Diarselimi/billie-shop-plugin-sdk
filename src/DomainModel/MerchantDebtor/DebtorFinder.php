@@ -58,7 +58,7 @@ class DebtorFinder implements LoggingInterface
         $merchantDebtor = $this->merchantDebtorRepository->getOneByMerchantExternalId(
             $orderContainer->getDebtorExternalData()->getMerchantExternalId(),
             $merchantId,
-            [OrderStateManager::STATE_NEW, OrderStateManager::STATE_CANCELED]
+            [OrderStateManager::STATE_NEW, OrderStateManager::STATE_DECLINED]
         );
 
         if ($merchantDebtor) {
