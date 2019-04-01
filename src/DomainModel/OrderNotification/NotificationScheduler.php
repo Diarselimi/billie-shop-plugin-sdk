@@ -3,21 +3,44 @@
 namespace App\DomainModel\OrderNotification;
 
 use App\DomainModel\Order\OrderEntity;
+use Billie\MonitoringBundle\Service\Alerting\Slack\SlackClientAwareInterface;
+use Billie\MonitoringBundle\Service\Alerting\Slack\SlackClientAwareTrait;
+use Billie\MonitoringBundle\Service\Alerting\Slack\SlackMessageAttachmentField;
+use Billie\MonitoringBundle\Service\Alerting\Slack\SlackMessageFactory;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
-// TODO: cover with tests
-class NotificationScheduler implements LoggingInterface
+class NotificationScheduler implements LoggingInterface, SlackClientAwareInterface
 {
-    use LoggingTrait;
+    use LoggingTrait, SlackClientAwareTrait;
 
-    private const DELAY_MATRIX = [
+    /*const DELAY_MATRIX = [
         0 => '1 second',
-//        1 => '5 minutes',
-//        2 => 'q hour',
-//        3 => '3 hours',
-//        4 => '6 hours',
+        1 => '1 second',
+        2 => '5 seconds',
+        3 => '1 hour',
+        4 => '3 hours',
+        5 => '6 hours',
+        6 => '6 hours',
+        7 => '6 hours',
+    ];*/
+
+    // Temp for cool QA guys
+    const DELAY_MATRIX = [
+        0 => '1 second',
+        1 => '1 second',
+        2 => '6 seconds',
+        3 => '30 seconds',
+        4 => '60 seconds',
+        5 => '90 seconds',
+        6 => '2 minutes',
+        7 => '150 seconds',
+        8 => '15 minutes',
     ];
+
+    const SLACK_NOTIFICATION_TITLE = 'Webhook Notification Scheduler';
+
+    const SLACK_NOTIFICATION_MESSAGE = 'Order notification reached maximum delivery attempts';
 
     private $orderNotificationFactoryPublisher;
 
@@ -25,14 +48,18 @@ class NotificationScheduler implements LoggingInterface
 
     private $orderNotificationRepository;
 
+    private $slackMessageFactory;
+
     public function __construct(
         NotificationPublisherInterface $orderNotificationFactoryPublisher,
         OrderNotificationFactory $orderNotificationFactory,
-        OrderNotificationRepositoryInterface $orderNotificationRepository
+        OrderNotificationRepositoryInterface $orderNotificationRepository,
+        SlackMessageFactory $slackMessageFactory
     ) {
         $this->orderNotificationFactoryPublisher = $orderNotificationFactoryPublisher;
         $this->orderNotificationFactory = $orderNotificationFactory;
         $this->orderNotificationRepository = $orderNotificationRepository;
+        $this->slackMessageFactory = $slackMessageFactory;
     }
 
     public function createAndSchedule(OrderEntity $order, array $payload): bool
@@ -58,6 +85,8 @@ class NotificationScheduler implements LoggingInterface
                 'attempt' => $attemptNumber,
             ]);
 
+            $this->sendSlackMessage($orderNotification);
+
             return false;
         }
 
@@ -77,5 +106,18 @@ class NotificationScheduler implements LoggingInterface
         ]);
 
         return $result;
+    }
+
+    private function sendSlackMessage(OrderNotificationEntity $orderNotification): void
+    {
+        $message = $this->slackMessageFactory->createSimpleWithServiceInfo(
+            self::SLACK_NOTIFICATION_TITLE,
+            self::SLACK_NOTIFICATION_MESSAGE,
+            null,
+            new SlackMessageAttachmentField('Order ID', $orderNotification->getOrderId(), true),
+            new SlackMessageAttachmentField('Notification ID', $orderNotification->getId(), true)
+        );
+
+        $this->getSlackClient()->sendMessage($message);
     }
 }

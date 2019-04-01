@@ -51,6 +51,11 @@ approve_order:
   controller: App\Http\Controller\ApproveOrderController::execute
   methods: [POST]
 
+trigger_failed_order_notifications:
+  path: /order/{externalCode}/trigger-failed-notifications
+  controller: App\Http\Controller\TriggerFailedOrderNotificationsController::execute
+  methods: [POST]
+
 mark_order_as_fraud:
   path: /order/{uuid}/mark-as-fraud
   controller: App\Http\Controller\MarkOrderAsFraudController::execute

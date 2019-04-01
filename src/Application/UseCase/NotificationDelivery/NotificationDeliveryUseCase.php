@@ -8,6 +8,7 @@ use App\DomainModel\OrderNotification\Exception\NotificationSenderException;
 use App\DomainModel\OrderNotification\NotificationScheduler;
 use App\DomainModel\OrderNotification\NotificationSenderInterface;
 use App\DomainModel\OrderNotification\OrderNotificationDeliveryFactory;
+use App\DomainModel\OrderNotification\OrderNotificationEntity;
 use App\DomainModel\OrderNotification\OrderNotificationRepositoryInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -61,6 +62,15 @@ class NotificationDeliveryUseCase implements LoggingInterface
             return;
         }
 
+        if ($notification->isDelivered()) {
+            $this->logSuppressedException(
+                new NotificationDeliveryException('Notification has already been delivered'),
+                'Notification has already been delivered'
+            );
+
+            return;
+        }
+
         $order = $this->orderRepository->getOneById($notification->getOrderId());
         if (!$order) {
             $this->logSuppressedException(
@@ -76,9 +86,15 @@ class NotificationDeliveryUseCase implements LoggingInterface
 
         if (!$url) {
             $this->logSuppressedException(
-                new NotificationDeliveryException('Notification url not set for merchant '.$merchant->getId()),
+                new NotificationDeliveryException("Notification url not set for merchant {$merchant->getId()}"),
                 'Exception while delivering notification, url not set'
             );
+
+            return;
+        }
+
+        if (!$this->isFirstOnOrderPendingNotificationsList($notification)) {
+            $this->notificationScheduler->schedule($notification);
 
             return;
         }
@@ -118,15 +134,13 @@ class NotificationDeliveryUseCase implements LoggingInterface
             return;
         }
 
-        if ($this->notificationScheduler->schedule($notification)) {
-            $this->logInfo('Notification successfully scheduled for retry');
+        $this->notificationScheduler->schedule($notification);
+    }
 
-            return;
-        }
+    private function isFirstOnOrderPendingNotificationsList(OrderNotificationEntity $orderNotification): bool
+    {
+        $pendingNotifications = $this->notificationRepository->getFailedByOrderId($orderNotification->getOrderId());
 
-        $this->logSuppressedException(
-            new NotificationDeliveryException('Notification delivery reschedule failed'),
-            "Can't reschedule notification delivery"
-        );
+        return $pendingNotifications[0]->getId() === $orderNotification->getId();
     }
 }
