@@ -14,7 +14,7 @@ class NotificationScheduler implements LoggingInterface, SlackClientAwareInterfa
 {
     use LoggingTrait, SlackClientAwareTrait;
 
-    /*const DELAY_MATRIX = [
+    const DELAY_MATRIX = [
         0 => '1 second',
         1 => '1 second',
         2 => '5 seconds',
@@ -23,19 +23,6 @@ class NotificationScheduler implements LoggingInterface, SlackClientAwareInterfa
         5 => '6 hours',
         6 => '6 hours',
         7 => '6 hours',
-    ];*/
-
-    // Temp for cool QA guys
-    const DELAY_MATRIX = [
-        0 => '1 second',
-        1 => '1 second',
-        2 => '6 seconds',
-        3 => '30 seconds',
-        4 => '60 seconds',
-        5 => '90 seconds',
-        6 => '2 minutes',
-        7 => '150 seconds',
-        8 => '15 minutes',
     ];
 
     const SLACK_NOTIFICATION_TITLE = 'Webhook Notification Scheduler';
