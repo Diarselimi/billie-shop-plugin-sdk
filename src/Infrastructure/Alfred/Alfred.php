@@ -180,7 +180,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         }
     }
 
-    public function markDuplicates(array $duplicates): void
+    public function markDuplicates(MerchantDebtorDuplicateDTO ...$duplicates): void
     {
         $payload = ['duplicates' => []];
 
@@ -191,8 +191,6 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
                 'is_duplicate_of' => $duplicate->getParentDebtorId(),
             ];
         }
-
-        $this->logInfo('Broadcasting batch to Alfred', ['batch' => $payload]);
 
         try {
             $this->client->post("/debtor/mark-duplicates", [

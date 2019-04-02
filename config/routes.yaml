@@ -86,3 +86,8 @@ get_merchant_debtor:
   controller: App\Http\Controller\GetMerchantDebtorController::execute
   methods: [GET]
 
+mark_duplicate_debtors:
+  path: /merchant-debtor/mark-duplicates
+  controller: App\Http\Controller\MarkDuplicateDebtorsController::execute
+  methods: [POST]
+

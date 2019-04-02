@@ -26,8 +26,5 @@ interface CompaniesServiceInterface
 
     public function isEligibleForPayAfterDelivery(IsEligibleForPayAfterDeliveryRequestDTO $requestDTO): bool;
 
-    /**
-     * @param MerchantDebtorDuplicateDTO[] $duplicates
-     */
-    public function markDuplicates(array $duplicates): void;
+    public function markDuplicates(MerchantDebtorDuplicateDTO ...$duplicates): void;
 }
