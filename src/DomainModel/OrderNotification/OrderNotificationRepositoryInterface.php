@@ -9,4 +9,9 @@ interface OrderNotificationRepositoryInterface
     public function update(OrderNotificationEntity $orderNotification): void;
 
     public function getOneById(int $id): ? OrderNotificationEntity;
+
+    /**
+     * @return OrderNotificationEntity[]
+     */
+    public function getFailedByOrderId(int $orderId): array;
 }

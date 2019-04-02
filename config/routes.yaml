@@ -51,6 +51,11 @@ approve_order:
   controller: App\Http\Controller\ApproveOrderController::execute
   methods: [POST]
 
+trigger_failed_order_notifications:
+  path: /order/{externalCode}/trigger-failed-notifications
+  controller: App\Http\Controller\TriggerFailedOrderNotificationsController::execute
+  methods: [POST]
+
 mark_order_as_fraud:
   path: /order/{uuid}/mark-as-fraud
   controller: App\Http\Controller\MarkOrderAsFraudController::execute
@@ -80,4 +85,9 @@ get_merchant_debtor:
   path: /merchant-debtor/{merchantDebtorExternalId}
   controller: App\Http\Controller\GetMerchantDebtorController::execute
   methods: [GET]
+
+mark_duplicate_debtors:
+  path: /merchant-debtor/mark-duplicates
+  controller: App\Http\Controller\MarkDuplicateDebtorsController::execute
+  methods: [POST]
 

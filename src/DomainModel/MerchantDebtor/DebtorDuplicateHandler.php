@@ -62,7 +62,7 @@ class DebtorDuplicateHandler
             sleep($sleep);
 
             if (!empty($currentBatch)) {
-                $this->companiesService->markDuplicates($currentBatch);
+                $this->companiesService->markDuplicates(...$currentBatch);
             }
         }
     }

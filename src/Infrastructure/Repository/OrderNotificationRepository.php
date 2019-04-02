@@ -83,4 +83,19 @@ class OrderNotificationRepository extends AbstractPdoRepository implements Order
             ->setDeliveries($deliveries)
         ;
     }
+
+    /**
+     * @return OrderNotificationEntity[]
+     */
+    public function getFailedByOrderId(int $orderId): array
+    {
+        $notifications = $this->doFetchAll(
+            'SELECT ' . self::SELECT_FIELDS . ' FROM order_notifications 
+            WHERE order_id = :order_id AND is_delivered = 0 
+            ORDER BY created_at ASC',
+            ['order_id' => $orderId]
+        );
+
+        return $this->factory->createMultipleFromDatabaseRows($notifications);
+    }
 }
