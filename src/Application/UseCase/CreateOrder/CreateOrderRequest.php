@@ -31,7 +31,7 @@ class CreateOrderRequest implements ValidatedRequestInterface
     /**
      * @Assert\NotBlank()
      * @Assert\Type(type="int")
-     * @Assert\Range(min=1, max=120)
+     * @CreateOrderUseCaseConstraints\OrderAmountConstraint
      */
     private $duration;
 

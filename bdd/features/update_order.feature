@@ -73,6 +73,31 @@ Feature:
     And the order "CO123" duration is 50
     And the order "CO123" amountGross is 1000
 
+  Scenario: Case 3.1: Order exists, is shipped but not paid back, valid new due date*, amount unchanged
+    Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+    When I send a PATCH request to "/order/CO123" with body:
+        """
+        {
+          "duration": 121,
+          "amount_gross": 1000,
+          "amount_net": 900,
+          "amount_tax": 100
+        }
+        """
+    Then the response status code should be 400
+    And the JSON response should be:
+    """
+      {
+       "errors":[
+          {
+            "source":"duration",
+            "title":"This value should be 120 or less.",
+            "code":"request_validation_error"
+          }
+       ]
+      }
+    """
+
   Scenario: Case 4: Order exists, is shipped but not paid back, due date unchanged, new valid amount
     Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
     When I send a PATCH request to "/order/CO123" with body:

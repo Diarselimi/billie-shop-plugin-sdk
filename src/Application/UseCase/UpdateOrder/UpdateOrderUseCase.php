@@ -4,6 +4,8 @@ namespace App\Application\UseCase\UpdateOrder;
 
 use App\Application\Exception\FraudOrderException;
 use App\Application\PaellaCoreCriticalException;
+use App\Application\UseCase\ValidatedUseCaseInterface;
+use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
@@ -15,9 +17,9 @@ use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\HttpFoundation\Response;
 
-class UpdateOrderUseCase implements LoggingInterface
+class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 {
-    use LoggingTrait;
+    use LoggingTrait, ValidatedUseCaseTrait;
 
     private $borscht;
 
@@ -49,6 +51,8 @@ class UpdateOrderUseCase implements LoggingInterface
 
     public function execute(UpdateOrderRequest $request): void
     {
+        $this->validateRequest($request);
+
         $externalCode = $request->getExternalCode();
         $merchantId = $request->getMerchantId();
         $order = $this->orderRepository->getOneByExternalCode($externalCode, $merchantId);

@@ -2,7 +2,10 @@
 
 namespace App\Application\UseCase\UpdateOrder;
 
-class UpdateOrderRequest
+use App\Application\UseCase\ValidatedRequestInterface;
+use App\Application\Validator\Constraint as OrderConstraint;
+
+class UpdateOrderRequest implements ValidatedRequestInterface
 {
     private $externalCode;
 
@@ -18,6 +21,9 @@ class UpdateOrderRequest
 
     private $amountTax;
 
+    /**
+     * @OrderConstraint\OrderAmountConstraint
+     */
     private $duration;
 
     public function __construct(string $externalCode)
