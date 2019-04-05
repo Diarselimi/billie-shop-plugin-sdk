@@ -79,7 +79,7 @@ class IdentifyAndScoreDebtorUseCase
             ->setLegalForm($request->getLegalForm())
             ->setFirstName($request->getFirstName())
             ->setLastName($request->getLastName())
-            ->setIsExperimental(false)
+            ->setIsExperimental(true)
         ;
 
         /** @var DebtorCompany|null $identifiedDebtor */

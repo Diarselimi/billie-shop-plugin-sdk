@@ -60,7 +60,7 @@ class IdentifyAndScoreDebtorsCommand extends Command
             || $input->getOption(self::OPTION_FILE) === null
             || $input->getOption(self::OPTION_ALGORITHM) === null
         ) {
-            $output->writeln('<error>Some of the required paramerters are missing.</error>');
+            $output->writeln('<error>Some of the required parameters are missing.</error>');
 
             return 1;
         }
