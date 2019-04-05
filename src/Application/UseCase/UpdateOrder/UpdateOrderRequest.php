@@ -7,7 +7,7 @@ use App\Application\Validator\Constraint as OrderConstraint;
 
 class UpdateOrderRequest implements ValidatedRequestInterface
 {
-    private $externalCode;
+    private $orderId;
 
     private $invoiceNumber;
 
@@ -26,14 +26,14 @@ class UpdateOrderRequest implements ValidatedRequestInterface
      */
     private $duration;
 
-    public function __construct(string $externalCode)
+    public function __construct(string $orderId)
     {
-        $this->externalCode = $externalCode;
+        $this->orderId = $orderId;
     }
 
-    public function getExternalCode(): string
+    public function getOrderId(): string
     {
-        return $this->externalCode;
+        return $this->orderId;
     }
 
     public function getInvoiceNumber(): ?string

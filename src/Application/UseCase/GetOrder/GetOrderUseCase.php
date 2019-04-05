@@ -54,13 +54,11 @@ class GetOrderUseCase
 
     public function execute(GetOrderRequest $request): GetOrderResponse
     {
-        $externalCode = $request->getExternalCode();
-        $customerId = $request->getCustomerId();
-        $order = $this->orderRepository->getOneByExternalCode($externalCode, $customerId);
+        $order = $this->orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($request->getOrderId(), $request->getMerchantId());
 
         if (!$order) {
             throw new PaellaCoreCriticalException(
-                "Order #$externalCode not found",
+                "Order #{$request->getOrderId()} not found",
                 PaellaCoreCriticalException::CODE_NOT_FOUND,
                 Response::HTTP_NOT_FOUND
             );
@@ -71,6 +69,7 @@ class GetOrderUseCase
 
         $response = (new GetOrderResponse())
             ->setExternalCode($order->getExternalCode())
+            ->setUuid($order->getUuid())
             ->setState($order->getState())
             ->setOriginalAmount($order->getAmountGross())
             ->setDebtorExternalDataAddressCountry($debtorAddress->getCountry())

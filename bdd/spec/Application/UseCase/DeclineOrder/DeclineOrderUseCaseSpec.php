@@ -61,7 +61,7 @@ class DeclineOrderUseCaseSpec extends ObjectBehavior
         $request = new DeclineOrderRequest(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID);
 
         $orderRepository
-            ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID)
+            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID)
             ->shouldBeCalled()
             ->willReturn(null)
         ;
@@ -78,7 +78,7 @@ class DeclineOrderUseCaseSpec extends ObjectBehavior
         $order = new OrderEntity();
 
         $orderRepository
-            ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID)
+            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID)
             ->shouldBeCalled()
             ->willReturn($order)
         ;
@@ -112,7 +112,7 @@ class DeclineOrderUseCaseSpec extends ObjectBehavior
         ;
 
         $orderRepository
-            ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID)
+            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID)
             ->shouldBeCalled()
             ->willReturn($order)
         ;

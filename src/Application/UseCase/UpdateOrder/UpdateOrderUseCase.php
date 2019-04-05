@@ -21,7 +21,7 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 {
     use LoggingTrait, ValidatedUseCaseTrait;
 
-    private $borscht;
+    private $paymentsService;
 
     private $limitsService;
 
@@ -34,14 +34,14 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
     private $orderStateManager;
 
     public function __construct(
-        BorschtInterface $borscht,
+        BorschtInterface $paymentsService,
         LimitsService $limitsService,
         OrderRepositoryInterface $orderRepository,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         MerchantRepositoryInterface $merchantRepository,
         OrderStateManager $orderStateManager
     ) {
-        $this->borscht = $borscht;
+        $this->paymentsService = $paymentsService;
         $this->limitsService = $limitsService;
         $this->orderRepository = $orderRepository;
         $this->merchantDebtorRepository = $merchantDebtorRepository;
@@ -53,13 +53,11 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
     {
         $this->validateRequest($request);
 
-        $externalCode = $request->getExternalCode();
-        $merchantId = $request->getMerchantId();
-        $order = $this->orderRepository->getOneByExternalCode($externalCode, $merchantId);
+        $order = $this->orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($request->getOrderId(), $request->getMerchantId());
 
         if (!$order) {
             throw new PaellaCoreCriticalException(
-                "Order #$externalCode not found",
+                "Order #{$request->getOrderId()} not found",
                 PaellaCoreCriticalException::CODE_NOT_FOUND,
                 Response::HTTP_NOT_FOUND
             );
@@ -206,7 +204,7 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
     private function applyUpdate(OrderEntity $order)
     {
         try {
-            $this->borscht->modifyOrder($order);
+            $this->paymentsService->modifyOrder($order);
         } catch (PaellaCoreCriticalException $e) {
             $this->logError(
                 'Borscht responded with an error when updating the order.',

@@ -18,10 +18,10 @@ class UpdateOrderController
         $this->useCase = $useCase;
     }
 
-    public function execute(string $externalCode, Request $request): void
+    public function execute(string $id, Request $request): void
     {
         try {
-            $orderRequest = (new UpdateOrderRequest($externalCode))
+            $orderRequest = (new UpdateOrderRequest($id))
                 ->setMerchantId($request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER))
                 ->setAmountGross($request->request->get('amount_gross'))
                 ->setAmountNet($request->request->get('amount_net'))

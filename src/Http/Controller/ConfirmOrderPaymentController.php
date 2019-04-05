@@ -18,11 +18,11 @@ class ConfirmOrderPaymentController
         $this->useCase = $useCase;
     }
 
-    public function execute(string $externalCode, Request $request): void
+    public function execute(string $id, Request $request): void
     {
         try {
             $orderRequest = new ConfirmOrderPaymentRequest(
-                $externalCode,
+                $id,
                 $request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER),
                 $request->request->get('amount')
             );

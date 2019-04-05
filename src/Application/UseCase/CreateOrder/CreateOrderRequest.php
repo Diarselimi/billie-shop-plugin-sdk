@@ -37,7 +37,6 @@ class CreateOrderRequest implements ValidatedRequestInterface
 
     /**
      * @CreateOrderUseCaseConstraints\OrderExternalCode()
-     * @Assert\NotBlank()
      * @Assert\Length(max=255)
      */
     private $externalCode;

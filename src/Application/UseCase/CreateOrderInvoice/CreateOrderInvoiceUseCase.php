@@ -24,12 +24,11 @@ class CreateOrderInvoiceUseCase
 
     public function execute(CreateOrderInvoiceRequest $request): void
     {
-        $orderExternalCode = $request->getOrderExternalCode();
-        $order = $this->orderRepository->getOneByExternalCode($orderExternalCode, $request->getMerchantId());
+        $order = $this->orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($request->getOrderId(), $request->getMerchantId());
 
         if (!$order) {
             throw new PaellaCoreCriticalException(
-                "Order #$orderExternalCode not found",
+                "Order #{$request->getOrderId()} not found",
                 PaellaCoreCriticalException::CODE_NOT_FOUND,
                 Response::HTTP_NOT_FOUND
             );

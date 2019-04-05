@@ -28,10 +28,10 @@ class TriggerFailedOrderNotificationsUseCase
 
     public function execute(TriggerFailedOrderNotificationsRequest $request): void
     {
-        $order = $this->orderRepository->getOneByExternalCode($request->getOrderExternalCode(), $request->getMerchantId());
+        $order = $this->orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($request->getOrderId(), $request->getMerchantId());
 
         if (!$order) {
-            throw new OrderNotFoundException("Order #{$request->getOrderExternalCode()} does't exist");
+            throw new OrderNotFoundException("Order #{$request->getOrderId()} does't exist");
         }
 
         $failedNotifications = $this->orderNotificationRepository->getFailedByOrderId($order->getId());

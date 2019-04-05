@@ -13,28 +13,27 @@ class ConfirmOrderPaymentUseCase
 {
     private $orderRepository;
 
-    private $borscht;
+    private $paymentService;
 
     private $orderStateManager;
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
-        BorschtInterface $borscht,
+        BorschtInterface $paymentService,
         OrderStateManager $orderStateManager
     ) {
         $this->orderRepository = $orderRepository;
-        $this->borscht = $borscht;
+        $this->paymentService = $paymentService;
         $this->orderStateManager = $orderStateManager;
     }
 
     public function execute(ConfirmOrderPaymentRequest $request): void
     {
-        $externalCode = $request->getExternalCode();
-        $customerId = $request->getCustomerId();
-        $order = $this->orderRepository->getOneByExternalCode($externalCode, $customerId);
+        $order = $this->orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($request->getOrderId(), $request->getMerchantId());
+
         if (!$order) {
             throw new PaellaCoreCriticalException(
-                "Order #$externalCode not found",
+                "Order #{$request->getOrderId()} not found",
                 PaellaCoreCriticalException::CODE_NOT_FOUND,
                 Response::HTTP_NOT_FOUND
             );
@@ -44,12 +43,11 @@ class ConfirmOrderPaymentUseCase
             throw new FraudOrderException();
         }
 
-        $amount = $request->getAmount();
         if ($this->orderStateManager->canConfirmPayment($order)) {
-            $this->borscht->confirmPayment($order, $amount);
+            $this->paymentService->confirmPayment($order, $request->getAmount());
         } else {
             throw new PaellaCoreCriticalException(
-                "Order #$externalCode payment can not be confirmed",
+                "Order #{$request->getOrderId()} payment can not be confirmed",
                 PaellaCoreCriticalException::CODE_ORDER_PAYMENT_CANT_BE_CONFIRMED,
                 Response::HTTP_FORBIDDEN
             );

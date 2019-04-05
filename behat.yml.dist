@@ -18,7 +18,8 @@ default:
 
   extensions:
     Behatch\Extension: ~
-    JsonSpec\Behat\Extension: ~
+    JsonSpec\Behat\Extension:
+      excluded_keys: [id, uuid, created_at, updated_at]
     Behat\MinkExtension:
       base_url: 'http://paella-core.dev.ozean12.com'
       goutte: ~

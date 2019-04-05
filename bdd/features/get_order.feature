@@ -7,7 +7,7 @@ Feature:
     And I add "X-Test" header equal to 1
     And I add "X-Api-User" header equal to 1
 
-    Scenario: Unsuccessful order retrieve
+    Scenario: Unsuccessful order retrieve - order doesn't exist
       When I send a GET request to "/order/ABC"
       Then the response status code should be 404
       And the JSON response should be:

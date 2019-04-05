@@ -51,7 +51,7 @@ class ApproveOrderUseCase
 
     public function execute(ApproveOrderRequest $request): void
     {
-        $order = $this->orderRepository->getOneByExternalCode($request->getOrderExternalCode(), $request->getMerchantId());
+        $order = $this->orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($request->getOrderId(), $request->getMerchantId());
 
         if (!$order) {
             throw new OrderNotFoundException();

@@ -14,7 +14,6 @@ Feature: Attach invoice file to an order.
           "invoice_number": "BI1515"
       }
       """
-    Then print last response
     Then the response status code should be 201
     And the JSON response should be:
       """
@@ -30,7 +29,6 @@ Feature: Attach invoice file to an order.
           "invoice_number": "BI1515"
       }
       """
-    Then print last response
     Then the response status code should be 404
     And the JSON response should be:
       """

@@ -17,7 +17,10 @@ use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use DateTime;
 use PhpSpec\ObjectBehavior;
+use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class UpdateOrderUseCaseSpec extends ObjectBehavior
 {
@@ -50,7 +53,8 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         OrderStateManager $orderStateManager,
         LoggerInterface $logger,
         OrderEntity $order,
-        UpdateOrderRequest $request
+        UpdateOrderRequest $request,
+        ValidatorInterface $validator
     ) {
         $order->getExternalCode()->willReturn(self::ORDER_EXTERNAL_CODE);
         $order->getInvoiceNumber()->willReturn(self::ORDER_INVOICE_NUMBER);
@@ -65,7 +69,9 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $order->getMerchantDebtorId()->willReturn(self::ORDER_MERCHANT_DEBTOR_ID);
 
         $request->getMerchantId()->willReturn(self::ORDER_MERCHANT_ID);
-        $request->getExternalCode()->willReturn(self::ORDER_EXTERNAL_CODE);
+        $request->getOrderId()->willReturn(self::ORDER_EXTERNAL_CODE);
+
+        $validator->validate(Argument::any())->willReturn(new ConstraintViolationList());
 
         $this->beConstructedWith(
             $borscht,
@@ -77,6 +83,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         );
 
         $this->setLogger($logger);
+        $this->setValidator($validator);
     }
 
     public function it_is_initializable()
@@ -92,9 +99,9 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $orderExtId = 'notExistingOrderId';
 
         $request->getMerchantId()->willReturn($merchantId);
-        $request->getExternalCode()->willReturn($orderExtId);
+        $request->getOrderId()->willReturn($orderExtId);
 
-        $orderRepository->getOneByExternalCode($orderExtId, $merchantId)->shouldBeCalled()->willReturn(null);
+        $orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($orderExtId, $merchantId)->shouldBeCalled()->willReturn(null);
 
         $this->shouldThrow(PaellaCoreCriticalException::class)->during('execute', [$request]);
     }
@@ -107,7 +114,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $order->getMarkedAsFraudAt()->willReturn(new DateTime());
 
         $orderRepository
-            ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
+            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
             ->shouldBeCalled()
             ->willReturn($order);
 
@@ -125,7 +132,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $request->getInvoiceUrl()->willReturn(null);
 
         $orderRepository
-            ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
+            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
             ->shouldBeCalled()
             ->willReturn($order);
 
@@ -149,7 +156,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $orderStateManager->isLate($order)->willReturn(true);
 
         $orderRepository
-            ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
+            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
             ->shouldBeCalled()
             ->willReturn($order);
 
@@ -177,7 +184,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $orderStateManager->isLate($order)->willReturn(false);
 
         $orderRepository
-            ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
+            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
             ->shouldBeCalled()
             ->willReturn($order);
 
@@ -200,7 +207,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $request->getInvoiceUrl()->willReturn(null);
 
         $orderRepository
-            ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
+            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
             ->shouldBeCalled()
             ->willReturn($order);
 
@@ -225,7 +232,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $orderStateManager->isComplete($order)->willReturn(true);
 
         $orderRepository
-            ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
+            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
             ->shouldBeCalled()
             ->willReturn($order);
 
@@ -257,7 +264,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $orderStateManager->isComplete($order)->willReturn(false);
 
         $orderRepository
-            ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
+            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
             ->shouldBeCalled()
             ->willReturn($order);
 
@@ -302,7 +309,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $orderStateManager->isComplete($order)->willReturn(false);
 
         $orderRepository
-            ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
+            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
             ->shouldBeCalled()
             ->willReturn($order);
 
@@ -346,7 +353,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $orderStateManager->isComplete($order)->willReturn(true);
 
         $orderRepository
-            ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
+            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
             ->shouldBeCalled()
             ->willReturn($order);
 
@@ -374,7 +381,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $orderStateManager->isComplete($order)->willReturn(false);
 
         $orderRepository
-            ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
+            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
             ->shouldBeCalled()
             ->willReturn($order);
 
@@ -403,7 +410,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $orderStateManager->isComplete($order)->willReturn(false);
 
         $orderRepository
-            ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
+            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
             ->shouldBeCalled()
             ->willReturn($order);
 

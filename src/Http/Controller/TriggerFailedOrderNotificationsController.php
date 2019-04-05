@@ -19,11 +19,11 @@ class TriggerFailedOrderNotificationsController
         $this->useCase = $useCase;
     }
 
-    public function execute(string $externalCode, Request $request): Response
+    public function execute(string $id, Request $request): Response
     {
         try {
             $useCaseRequest = new TriggerFailedOrderNotificationsRequest(
-                $externalCode,
+                $id,
                 $request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER)
             );
 

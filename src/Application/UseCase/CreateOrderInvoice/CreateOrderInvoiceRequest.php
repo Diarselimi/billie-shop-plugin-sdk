@@ -6,16 +6,16 @@ class CreateOrderInvoiceRequest
 {
     private $merchantId;
 
-    private $orderExternalCode;
+    private $orderId;
 
     private $fileId;
 
     private $invoiceNumber;
 
-    public function __construct(int $merchantId, string $orderExternalCode, int $fileId, string $invoiceNumber)
+    public function __construct(int $merchantId, string $orderId, int $fileId, string $invoiceNumber)
     {
         $this->merchantId = $merchantId;
-        $this->orderExternalCode = $orderExternalCode;
+        $this->orderId = $orderId;
         $this->fileId = $fileId;
         $this->invoiceNumber = $invoiceNumber;
     }
@@ -25,9 +25,9 @@ class CreateOrderInvoiceRequest
         return $this->merchantId;
     }
 
-    public function getOrderExternalCode(): string
+    public function getOrderId(): string
     {
-        return $this->orderExternalCode;
+        return $this->orderId;
     }
 
     public function getFileId(): int

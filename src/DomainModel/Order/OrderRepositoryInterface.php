@@ -10,7 +10,9 @@ interface OrderRepositoryInterface
 
     public function update(OrderEntity $order): void;
 
-    public function getOneByExternalCode(string $externalCode, int $customerId): ?OrderEntity;
+    public function getOneByExternalCode(string $externalCode, int $merchantId): ?OrderEntity;
+
+    public function getOneByMerchantIdAndExternalCodeOrUUID(string $id, int $merchantId): ? OrderEntity;
 
     public function getOneByPaymentId(string $paymentId): ?OrderEntity;
 
