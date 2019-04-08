@@ -14,6 +14,7 @@ use App\DomainModel\MerchantDebtor\MerchantDebtorRegistrationService;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
+use App\DomainModel\OrderRiskCheck\CompanyNameComparator;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
 
 class IdentifyAndScoreDebtorUseCase
@@ -32,6 +33,8 @@ class IdentifyAndScoreDebtorUseCase
 
     private $merchantDebtorRegistrationService;
 
+    private $nameComparator;
+
     private const SCORING_ALGORITHMS = [
         'v1' => 'identifyDebtor',
         'v2' => 'identifyDebtorV2',
@@ -44,7 +47,8 @@ class IdentifyAndScoreDebtorUseCase
         ScoreThresholdsConfigurationRepositoryInterface $scoreThresholdsConfigurationRepository,
         IsEligibleForPayAfterDeliveryRequestDTOFactory $eligibleForPayAfterDeliveryRequestDTOFactory,
         CompaniesServiceInterface $companiesService,
-        MerchantDebtorRegistrationService $merchantDebtorRegistrationService
+        MerchantDebtorRegistrationService $merchantDebtorRegistrationService,
+        CompanyNameComparator $nameComparator
     ) {
         $this->merchantRepository = $merchantRepository;
         $this->merchantSettingsRepository = $merchantSettingsRepository;
@@ -53,6 +57,7 @@ class IdentifyAndScoreDebtorUseCase
         $this->eligibleForPayAfterDeliveryRequestDTOFactory = $eligibleForPayAfterDeliveryRequestDTOFactory;
         $this->companiesService = $companiesService;
         $this->merchantDebtorRegistrationService = $merchantDebtorRegistrationService;
+        $this->nameComparator = $nameComparator;
     }
 
     public function execute(IdentifyAndScoreDebtorRequest $request): IdentifyAndScoreDebtorResponse
@@ -84,7 +89,7 @@ class IdentifyAndScoreDebtorUseCase
 
         /** @var DebtorCompany|null $identifiedDebtor */
         $identifiedDebtor = $this->companiesService->{self::SCORING_ALGORITHMS[$algorithm]}($identifyRequest);
-        if (!$identifiedDebtor) {
+        if (!$identifiedDebtor || !$identifiedDebtor->isStrictMatch()) {
             throw new DebtorNotIdentifiedException();
         }
 
@@ -107,10 +112,13 @@ class IdentifyAndScoreDebtorUseCase
             $isEligible = $this->isEligible($merchantSettings, $merchantDebtor);
         }
 
+        $isNameAccepted = $this->nameComparator->compareWithCompanyName($request->getName(), $identifiedDebtor->getName());
+
         return (new IdentifyAndScoreDebtorResponse())
             ->setCompanyId($merchantDebtor->getDebtorId())
             ->setCompanyName($identifiedDebtor->getName())
             ->setIsEligible($isEligible)
+            ->setIsNameAccepted($isNameAccepted)
             ->setCrefoId($identifiedDebtor->getCrefoId())
         ;
     }

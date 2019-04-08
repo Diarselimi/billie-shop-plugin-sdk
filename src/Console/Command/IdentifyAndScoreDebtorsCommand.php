@@ -4,6 +4,7 @@ namespace App\Console\Command;
 
 use App\Application\UseCase\IdentifyAndScoreDebtor\Exception\DebtorNotIdentifiedException;
 use App\Application\UseCase\IdentifyAndScoreDebtor\IdentifyAndScoreDebtorRequest;
+use App\Application\UseCase\IdentifyAndScoreDebtor\IdentifyAndScoreDebtorResponse;
 use App\Application\UseCase\IdentifyAndScoreDebtor\IdentifyAndScoreDebtorUseCase;
 use App\DomainModel\Merchant\MerchantNotFoundException;
 use Symfony\Component\Console\Command\Command;
@@ -29,7 +30,11 @@ class IdentifyAndScoreDebtorsCommand extends Command
 
     private const OPTION_LIMIT = 'limit';
 
-    private const REPORT_FILE_HEADERS = ['external_id', 'original_crefo_id', 'new_crefo_id', 'company_id', 'is_eligible'];
+    private const REPORT_FILE_HEADERS = ['external_id', 'input_name', 'identified_name', 'crefo_id', 'company_id', 'is_name_accepted', 'is_eligible'];
+
+    private const BATCH_SIZE = 5;
+
+    private const BATCH_TIMEOUT = 2;
 
     private $useCase;
 
@@ -77,11 +82,10 @@ class IdentifyAndScoreDebtorsCommand extends Command
         $offset = $input->getOption(self::OPTION_OFFSET);
         $limit = $input->getOption(self::OPTION_LIMIT);
 
-        $outputReportData = [];
-        $ineligibleCompanies = [];
-
+        $results = [];
         $headers = [];
         $i = -1; // start with header row
+        $processedCount = 0;
 
         while (($data = fgetcsv($handle)) !== false) {
             $data = array_map('trim', $data);
@@ -109,44 +113,39 @@ class IdentifyAndScoreDebtorsCommand extends Command
             try {
                 $useCaseRequest = $this->createUseCaseRequest($debtorExternalData, $merchantId, $algorithm, $doScoring);
                 $result = $this->useCase->execute($useCaseRequest);
-
-                if ($result->isEligible() === false) {
-                    $ineligibleCompanies[] = $result->getCompanyId();
-                }
-
-                $outputReportData[] = [
-                    $debtorExternalData['external_id'],
-                    $debtorExternalData['crefo_id'] ?? null,
-                    $debtorExternalData['name'],
-                    $result->getCompanyName(),
-                    $result->getCrefoId(),
-                    ($result->isEligible() === true) ? 1 : 0,
-                ];
+                $this->addResult($results, $debtorExternalData, $result);
             } catch (MerchantNotFoundException $e) {
                 $output->writeln('<error>Merchant was not found.</error>');
 
                 return 1;
             } catch (DebtorNotIdentifiedException $e) {
-                $outputReportData[] = [
-                    $debtorExternalData['external_id'],
-                    $debtorExternalData['crefo_id'] ?? null,
-                    $debtorExternalData['name'],
-                    null,
-                    null,
-                    null,
-                ];
+                $this->addResult($results, $debtorExternalData, null);
             }
 
             $i++;
+            $processedCount++;
+
+            if ($processedCount == self::BATCH_SIZE) {
+                sleep(self::BATCH_TIMEOUT);
+                $processedCount = 0;
+            }
         }
 
         fclose($handle);
+        $output->writeln($this->createCSVReport($results));
+    }
 
-        if (count($ineligibleCompanies)) {
-            $output->writeln(sprintf('<info>Declined companies: %s</info>', implode(', ', $ineligibleCompanies)));
-        }
-
-        $output->writeln($this->createCSVReport($outputReportData));
+    private function addResult(array &$results, array $debtorExternalData, ?IdentifyAndScoreDebtorResponse $response)
+    {
+        $results[] = [
+            $debtorExternalData['external_id'],
+            $debtorExternalData['name'],
+            $response ? $response->getCompanyName() : null,
+            $response ? $response->getCrefoId() : null,
+            $response ? $response->getCompanyId() : null,
+            ($response && $response->isNameAccepted()) ? 1 : 0,
+            ($response && $response->isEligible() === true) ? 1 : 0,
+        ];
     }
 
     private function createUseCaseRequest(array $debtorExternalData, int $merchantId, string $algorithm, bool $doScoring): IdentifyAndScoreDebtorRequest
@@ -162,9 +161,9 @@ class IdentifyAndScoreDebtorsCommand extends Command
             ->setAddressCity($debtorExternalData['city'])
             ->setAddressCountry($debtorExternalData['country'])
             ->setTaxId($debtorExternalData['tax_id'])
-            ->setTaxNumber($debtorExternalData['tax_number'])
-            ->setRegistrationNumber($debtorExternalData['registration_number'])
-            ->setRegistrationCourt($debtorExternalData['registration_court'])
+            ->setTaxNumber($debtorExternalData['tax_number'] ?? null)
+            ->setRegistrationNumber($debtorExternalData['registration_number'] ?? null)
+            ->setRegistrationCourt($debtorExternalData['registration_court'] ?? null)
             ->setLegalForm($debtorExternalData['legal_form'])
             ->setFirstName($debtorExternalData['first_name'] ?? null)
             ->setLastName($debtorExternalData['last_name'] ?? null)

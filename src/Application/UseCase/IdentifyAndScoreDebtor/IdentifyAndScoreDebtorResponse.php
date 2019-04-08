@@ -12,6 +12,8 @@ class IdentifyAndScoreDebtorResponse
 
     private $isEligible;
 
+    private $isNameAccepted;
+
     public function getCompanyId(): int
     {
         return $this->companyId;
@@ -58,5 +60,17 @@ class IdentifyAndScoreDebtorResponse
     public function isEligible(): ? bool
     {
         return $this->isEligible;
+    }
+
+    public function isNameAccepted(): bool
+    {
+        return $this->isNameAccepted;
+    }
+
+    public function setIsNameAccepted(bool $isNameAccepted): IdentifyAndScoreDebtorResponse
+    {
+        $this->isNameAccepted = $isNameAccepted;
+
+        return $this;
     }
 }
