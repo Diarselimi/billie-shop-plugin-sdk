@@ -25,7 +25,7 @@ class OrderInWaitingStateConsumer implements ConsumerInterface, LoggingInterface
         $data = $msg->getBody();
         $data = json_decode($data, true);
 
-        $request = new DeclineOrderRequest($data['order_external_code'], $data['merchant_id']);
+        $request = new DeclineOrderRequest($data['order_id'], $data['merchant_id']);
 
         try {
             $this->useCase->execute($request);

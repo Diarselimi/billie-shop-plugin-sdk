@@ -2,6 +2,8 @@
 
 namespace App\Application\UseCase\CreateOrder;
 
+use App\Application\UseCase\Response\OrderResponse;
+use App\Application\UseCase\Response\OrderResponseFactory;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainEvent\Order\OrderApprovedEvent;
@@ -46,6 +48,8 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 
     private $eventDispatcher;
 
+    private $orderResponseFactory;
+
     public function __construct(
         OrderPersistenceService $orderPersistenceService,
         OrderChecksRunnerService $orderChecksRunnerService,
@@ -55,7 +59,8 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         DebtorFinder $debtorFinderService,
         ValidatorInterface $validator,
         ProducerInterface $producer,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        OrderResponseFactory $orderResponseFactory
     ) {
         $this->orderPersistenceService = $orderPersistenceService;
         $this->orderChecksRunnerService = $orderChecksRunnerService;
@@ -66,9 +71,10 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         $this->validator = $validator;
         $this->producer = $producer;
         $this->eventDispatcher = $eventDispatcher;
+        $this->orderResponseFactory = $orderResponseFactory;
     }
 
-    public function execute(CreateOrderRequest $request): void
+    public function execute(CreateOrderRequest $request): OrderResponse
     {
         $this->validateRequest($request);
 
@@ -77,7 +83,7 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         if (!$this->orderChecksRunnerService->runPreIdentificationChecks($orderContainer)) {
             $this->reject($orderContainer, 'preconditions checks failed');
 
-            return;
+            return $this->orderResponseFactory->create($orderContainer);
         }
 
         if ($this->identifyDebtor($orderContainer, $request->getMerchantId()) !== null) {
@@ -87,16 +93,18 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         if (!$this->orderChecksRunnerService->runPostIdentificationChecks($orderContainer)) {
             $this->reject($orderContainer, 'checks failed');
 
-            return;
+            return $this->orderResponseFactory->create($orderContainer);
         }
 
         if ($this->orderChecksRunnerService->checkForFailedSoftDeclinableCheckResults($orderContainer)) {
             $this->moveToWaiting($orderContainer);
 
-            return;
+            return $this->orderResponseFactory->create($orderContainer);
         }
 
         $this->approve($orderContainer);
+
+        return $this->orderResponseFactory->create($orderContainer);
     }
 
     private function identifyDebtor(OrderContainer $orderContainer, int $merchantId): ? MerchantDebtorEntity

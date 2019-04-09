@@ -15,15 +15,15 @@ use Symfony\Component\HttpFoundation\Request;
 
 class CreateOrderController
 {
-    private $useCase;
+    private $createOrderUseCase;
 
     private $registrationNumberConverter;
 
     public function __construct(
-        CreateOrderUseCase $useCase,
+        CreateOrderUseCase $createOrderUseCase,
         OrderRegistrationNumberConverter $registrationNumberConverter
     ) {
-        $this->useCase = $useCase;
+        $this->createOrderUseCase = $createOrderUseCase;
         $this->registrationNumberConverter = $registrationNumberConverter;
     }
 
@@ -101,8 +101,8 @@ class CreateOrderController
             );
         }
 
-        $this->useCase->execute($useCaseRequest);
+        $response = $this->createOrderUseCase->execute($useCaseRequest);
 
-        return new JsonResponse(null, JsonResponse::HTTP_CREATED);
+        return new JsonResponse($response->toArray(), JsonResponse::HTTP_CREATED);
     }
 }
