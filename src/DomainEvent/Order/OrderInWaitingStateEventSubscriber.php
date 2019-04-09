@@ -52,32 +52,36 @@ class OrderInWaitingStateEventSubscriber implements EventSubscriberInterface, Lo
     {
         $this->delayedMessageProducer->produce(
             self::ROUTING_KEY,
-            ['order_external_code' => $order->getExternalCode(), 'merchant_id' => $order->getMerchantId()],
+            ['order_id' => $order->getUuid(), 'merchant_id' => $order->getMerchantId()],
             OrderEntity::MAX_DURATION_IN_WAITING_STATE
         );
     }
 
     private function sendSlackMessage(OrderEntity $order): void
     {
-        $text = "Order *{$order->getExternalCode()}* was created in waiting state because of failed risk checks";
-
-        $message = (new SlackMessage())->addAttachment(
-            (new SlackMessageAttachment($text))
-                ->setTitle('Order was created in waiting state')
-                ->setText($text)
-                ->addField((new SlackMessageAttachmentField('Merchant ID', $order->getMerchantId())))
-                ->addField((new SlackMessageAttachmentField('Order Code', $order->getExternalCode())))
-                ->addField(new SlackMessageAttachmentField(
-                    'Failed Risk Checks',
-                    implode(', ', $this->orderDeclinedReasonsMapper->mapReasons($order))
-                ))
-                ->addField(new SlackMessageAttachmentField(
-                    'Environment',
-                    str_replace('_', '', getenv('INSTANCE_SUFFIX'))
-                ))
-        );
-
         try {
+            $text = "Order *{$order->getExternalCode()}* was created in waiting state because of failed risk checks";
+
+            $message = (new SlackMessage())->addAttachment(
+                (new SlackMessageAttachment($text))
+                    ->setTitle('Order was created in waiting state')
+                    ->setText($text)
+                    ->addField((new SlackMessageAttachmentField('Merchant ID', $order->getMerchantId())))
+                    ->addField((new SlackMessageAttachmentField(
+                        'Order Code / UUID',
+                        $order->getExternalCode() ?: $order->getUuid()
+                    )
+                    ))
+                    ->addField(new SlackMessageAttachmentField(
+                        'Failed Risk Checks',
+                        implode(', ', $this->orderDeclinedReasonsMapper->mapReasons($order))
+                    ))
+                    ->addField(new SlackMessageAttachmentField(
+                        'Environment',
+                        str_replace('_', '', getenv('INSTANCE_SUFFIX'))
+                    ))
+            );
+
             $this->slackClient->sendMessage($message);
         } catch (\Exception $e) {
             $this->logSuppressedException($e, 'Failed to notify slack with order in waiting state notification', [
