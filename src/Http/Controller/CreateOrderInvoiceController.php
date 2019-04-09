@@ -17,11 +17,11 @@ class CreateOrderInvoiceController
         $this->createOrderInvoiceUseCase = $createOrderInvoiceUseCase;
     }
 
-    public function execute(string $externalCode, Request $request): JsonResponse
+    public function execute(string $id, Request $request): JsonResponse
     {
         $useCaseRequest = new CreateOrderInvoiceRequest(
             $request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER),
-            $externalCode,
+            $id,
             $request->request->get('file_id'),
             $request->request->get('invoice_number')
         );

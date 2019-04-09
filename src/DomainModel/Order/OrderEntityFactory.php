@@ -24,6 +24,7 @@ class OrderEntityFactory
     {
         return (new OrderEntity())
             ->setId($row['id'])
+            ->setUuid($row['uuid'])
             ->setDuration($row['duration'])
             ->setAmountNet($row['amount_net'])
             ->setAmountGross($row['amount_gross'])

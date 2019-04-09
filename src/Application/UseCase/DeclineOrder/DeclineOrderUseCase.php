@@ -52,7 +52,7 @@ class DeclineOrderUseCase
 
     public function execute(DeclineOrderRequest $request): void
     {
-        $order = $this->orderRepository->getOneByExternalCode($request->getOrderExternalCode(), $request->getMerchantId());
+        $order = $this->orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($request->getOrderId(), $request->getMerchantId());
 
         if (!$order) {
             throw new OrderNotFoundException();

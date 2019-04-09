@@ -19,7 +19,7 @@ class CancelOrderUseCase
 
     private $limitsService;
 
-    private $borscht;
+    private $paymentsService;
 
     private $workflow;
 
@@ -31,27 +31,26 @@ class CancelOrderUseCase
         Workflow $workflow,
         OrderRepositoryInterface $orderRepository,
         LimitsService $limitsService,
-        BorschtInterface $borscht,
+        BorschtInterface $paymentsService,
         MerchantDebtorRepository $merchantDebtorRepository,
         MerchantRepositoryInterface $merchantRepository
     ) {
         $this->workflow = $workflow;
         $this->orderRepository = $orderRepository;
         $this->limitsService = $limitsService;
-        $this->borscht = $borscht;
+        $this->paymentsService = $paymentsService;
         $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->merchantRepository = $merchantRepository;
     }
 
     public function execute(CancelOrderRequest $request): void
     {
-        $externalCode = $request->getExternalCode();
         $merchantId = $request->getMerchantId();
-        $order = $this->orderRepository->getOneByExternalCode($externalCode, $merchantId);
+        $order = $this->orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($request->getOrderId(), $merchantId);
 
         if (!$order) {
             throw new PaellaCoreCriticalException(
-                "Order #$externalCode not found",
+                "Order #{$request->getOrderId()} not found",
                 PaellaCoreCriticalException::CODE_NOT_FOUND,
                 Response::HTTP_NOT_FOUND
             );
@@ -71,11 +70,11 @@ class CancelOrderUseCase
 
             $this->workflow->apply($order, OrderStateManager::TRANSITION_CANCEL);
         } elseif ($this->workflow->can($order, OrderStateManager::TRANSITION_CANCEL_SHIPPED)) {
-            $this->borscht->cancelOrder($order);
+            $this->paymentsService->cancelOrder($order);
             $this->workflow->apply($order, OrderStateManager::TRANSITION_CANCEL_SHIPPED);
         } else {
             throw new PaellaCoreCriticalException(
-                "Order #$externalCode can not be cancelled",
+                "Order #{$request->getOrderId()} can not be cancelled",
                 PaellaCoreCriticalException::CODE_ORDER_CANT_BE_CANCELLED,
                 Response::HTTP_BAD_REQUEST
             );

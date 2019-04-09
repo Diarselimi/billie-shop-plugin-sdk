@@ -18,11 +18,11 @@ class CancelOrderController
         $this->useCase = $useCase;
     }
 
-    public function execute(string $externalCode, Request $request): void
+    public function execute(string $id, Request $request): void
     {
         try {
             $orderRequest = new CancelOrderRequest(
-                $externalCode,
+                $id,
                 $request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER)
             );
             $this->useCase->execute($orderRequest);

@@ -4,19 +4,19 @@ namespace App\Application\UseCase\TriggerFailedOrderNotifications;
 
 class TriggerFailedOrderNotificationsRequest
 {
-    private $orderExternalCode;
+    private $orderId;
 
     private $merchantId;
 
-    public function __construct(string $orderExternalCode, int $merchantId)
+    public function __construct(string $orderId, int $merchantId)
     {
-        $this->orderExternalCode = $orderExternalCode;
+        $this->orderId = $orderId;
         $this->merchantId = $merchantId;
     }
 
-    public function getOrderExternalCode(): string
+    public function getOrderId(): string
     {
-        return $this->orderExternalCode;
+        return $this->orderId;
     }
 
     public function getMerchantId(): int

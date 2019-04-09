@@ -60,7 +60,7 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
         $request = new ApproveOrderRequest(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID);
 
         $orderRepository
-            ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID)
+            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID)
             ->shouldBeCalled()
             ->willReturn(null)
         ;
@@ -77,7 +77,7 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
         $order = new OrderEntity();
 
         $orderRepository
-            ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID)
+            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID)
             ->shouldBeCalled()
             ->willReturn($order)
         ;
@@ -110,7 +110,7 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
         ;
 
         $orderRepository
-            ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID)
+            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID)
             ->shouldBeCalled()
             ->willReturn($order)
         ;
@@ -162,7 +162,7 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
         ;
 
         $orderRepository
-            ->getOneByExternalCode(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID)
+            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID)
             ->shouldBeCalled()
             ->willReturn($order)
         ;

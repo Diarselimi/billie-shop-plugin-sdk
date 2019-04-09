@@ -4,6 +4,8 @@ namespace App\Application\UseCase\UpdateOrder;
 
 use App\Application\Exception\FraudOrderException;
 use App\Application\PaellaCoreCriticalException;
+use App\Application\UseCase\ValidatedUseCaseInterface;
+use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
@@ -15,11 +17,11 @@ use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\HttpFoundation\Response;
 
-class UpdateOrderUseCase implements LoggingInterface
+class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 {
-    use LoggingTrait;
+    use LoggingTrait, ValidatedUseCaseTrait;
 
-    private $borscht;
+    private $paymentsService;
 
     private $limitsService;
 
@@ -32,14 +34,14 @@ class UpdateOrderUseCase implements LoggingInterface
     private $orderStateManager;
 
     public function __construct(
-        BorschtInterface $borscht,
+        BorschtInterface $paymentsService,
         LimitsService $limitsService,
         OrderRepositoryInterface $orderRepository,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         MerchantRepositoryInterface $merchantRepository,
         OrderStateManager $orderStateManager
     ) {
-        $this->borscht = $borscht;
+        $this->paymentsService = $paymentsService;
         $this->limitsService = $limitsService;
         $this->orderRepository = $orderRepository;
         $this->merchantDebtorRepository = $merchantDebtorRepository;
@@ -49,13 +51,13 @@ class UpdateOrderUseCase implements LoggingInterface
 
     public function execute(UpdateOrderRequest $request): void
     {
-        $externalCode = $request->getExternalCode();
-        $merchantId = $request->getMerchantId();
-        $order = $this->orderRepository->getOneByExternalCode($externalCode, $merchantId);
+        $this->validateRequest($request);
+
+        $order = $this->orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($request->getOrderId(), $request->getMerchantId());
 
         if (!$order) {
             throw new PaellaCoreCriticalException(
-                "Order #$externalCode not found",
+                "Order #{$request->getOrderId()} not found",
                 PaellaCoreCriticalException::CODE_NOT_FOUND,
                 Response::HTTP_NOT_FOUND
             );
@@ -202,7 +204,7 @@ class UpdateOrderUseCase implements LoggingInterface
     private function applyUpdate(OrderEntity $order)
     {
         try {
-            $this->borscht->modifyOrder($order);
+            $this->paymentsService->modifyOrder($order);
         } catch (PaellaCoreCriticalException $e) {
             $this->logError(
                 'Borscht responded with an error when updating the order.',

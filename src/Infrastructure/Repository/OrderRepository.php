@@ -17,7 +17,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OrderRepository extends AbstractPdoRepository implements OrderRepositoryInterface
 {
-    private const SELECT_FIELDS = 'id, amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, proof_of_delivery_url, delivery_address_id, merchant_debtor_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, created_at, updated_at, shipped_at, marked_as_fraud_at';
+    private const SELECT_FIELDS = 'id, uuid, amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, proof_of_delivery_url, delivery_address_id, merchant_debtor_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, created_at, updated_at, shipped_at, marked_as_fraud_at';
 
     private $eventDispatcher;
 
@@ -120,11 +120,22 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
             'merchant_id' => $merchantId,
         ]);
 
-        if (!$order) {
-            return null;
-        }
+        return $order ? $this->orderFactory->createFromDatabaseRow($order) : null;
+    }
 
-        return $this->orderFactory->createFromDatabaseRow($order);
+    public function getOneByMerchantIdAndExternalCodeOrUUID(string $id, int $merchantId): ? OrderEntity
+    {
+        $order = $this->doFetchOne('
+          SELECT ' . self::SELECT_FIELDS . '
+          FROM orders
+          WHERE merchant_id = :merchant_id AND (external_code = :external_code OR uuid = :uuid)
+        ', [
+            'merchant_id' => $merchantId,
+            'external_code' => $id,
+            'uuid' => $id,
+        ]);
+
+        return $order ? $this->orderFactory->createFromDatabaseRow($order) : null;
     }
 
     public function getOneByPaymentId(string $paymentId): ?OrderEntity
@@ -137,11 +148,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
             'payment_id' => $paymentId,
         ]);
 
-        if (!$order) {
-            return null;
-        }
-
-        return $this->orderFactory->createFromDatabaseRow($order);
+        return $order ? $this->orderFactory->createFromDatabaseRow($order) : null;
     }
 
     public function getOneById(int $id): ?OrderEntity
@@ -154,11 +161,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
             'id' => $id,
         ]);
 
-        if (!$order) {
-            return null;
-        }
-
-        return $this->orderFactory->createFromDatabaseRow($order);
+        return $order ? $this->orderFactory->createFromDatabaseRow($order) : null;
     }
 
     public function getOneByUuid(string $uuid): ?OrderEntity
@@ -171,11 +174,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
             'uuid' => $uuid,
         ]);
 
-        if (!$order) {
-            return null;
-        }
-
-        return $this->orderFactory->createFromDatabaseRow($order);
+        return $order ? $this->orderFactory->createFromDatabaseRow($order) : null;
     }
 
     public function update(OrderEntity $order): void
@@ -183,6 +182,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
         $this->doUpdate('
             UPDATE orders
             SET
+              external_code = :external_code,
               state = :state,
               merchant_debtor_id = :merchant_debtor_id,
               amount_gross = :amount_gross,
@@ -197,6 +197,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
               marked_as_fraud_at = :marked_as_fraud_at
             WHERE id = :id
         ', [
+            'external_code' => $order->getExternalCode(),
             'amount_gross' => $order->getAmountGross(),
             'amount_net' => $order->getAmountNet(),
             'amount_tax' => $order->getAmountTax(),

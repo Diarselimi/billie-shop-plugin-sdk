@@ -20,7 +20,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
 {
     private const EXTERNAL_CODE = 'test-code';
 
-    private const CUSTOMER_ID = 1;
+    private const MERCHANT_ID = 1;
 
     private const INVOICE_NUMBER = 'DE156893';
 
@@ -53,7 +53,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
         $request = $this->mockRequest();
 
         $orderRepository
-            ->getOneByExternalCode(self::EXTERNAL_CODE, self::CUSTOMER_ID)
+            ->getOneByMerchantIdAndExternalCodeOrUUID(self::EXTERNAL_CODE, self::MERCHANT_ID)
             ->shouldBeCalled()
             ->willReturn(null)
         ;
@@ -69,7 +69,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
         $request = $this->mockRequest();
 
         $orderRepository
-            ->getOneByExternalCode(self::EXTERNAL_CODE, self::CUSTOMER_ID)
+            ->getOneByMerchantIdAndExternalCodeOrUUID(self::EXTERNAL_CODE, self::MERCHANT_ID)
             ->shouldBeCalled()
             ->willReturn($order)
         ;
@@ -95,7 +95,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
         $order->getMerchantDebtorId()->willReturn(self::MERCHANT_DEBTOR_ID);
 
         $orderRepository
-            ->getOneByExternalCode(self::EXTERNAL_CODE, self::CUSTOMER_ID)
+            ->getOneByMerchantIdAndExternalCodeOrUUID(self::EXTERNAL_CODE, self::MERCHANT_ID)
             ->shouldBeCalled()
             ->willReturn($order)
         ;
@@ -141,8 +141,8 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
     private function mockRequest(): ShipOrderRequest
     {
         return (new ShipOrderRequest())
-            ->setExternalCode(self::EXTERNAL_CODE)
-            ->setCustomerId(self::CUSTOMER_ID)
+            ->setOrderId(self::EXTERNAL_CODE)
+            ->setMerchantId(self::MERCHANT_ID)
             ->setInvoiceNumber(self::INVOICE_NUMBER)
             ->setInvoiceUrl(self::INVOICE_URL)
             ->setProofOfDeliveryUrl(self::PROOF_OF_DELIVERY_URL)

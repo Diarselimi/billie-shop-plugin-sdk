@@ -10,6 +10,8 @@ class OrderEntity extends AbstractTimestampableEntity
 
     const MAX_DURATION_IN_WAITING_STATE = '9 days';
 
+    private $uuid;
+
     private $amountNet;
 
     private $amountGross;
@@ -47,6 +49,18 @@ class OrderEntity extends AbstractTimestampableEntity
     private $shippedAt;
 
     private $markedAsFraudAt;
+
+    public function getUuid(): string
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid(string $uuid): OrderEntity
+    {
+        $this->uuid = $uuid;
+
+        return $this;
+    }
 
     public function getAmountNet(): float
     {
@@ -96,12 +110,12 @@ class OrderEntity extends AbstractTimestampableEntity
         return $this;
     }
 
-    public function getExternalCode(): string
+    public function getExternalCode(): ? string
     {
         return $this->externalCode;
     }
 
-    public function setExternalCode(string $externalCode): OrderEntity
+    public function setExternalCode(?string $externalCode): OrderEntity
     {
         $this->externalCode = $externalCode;
 

@@ -26,7 +26,7 @@ class GetOrderUseCase
 
     private $companiesService;
 
-    private $borscht;
+    private $paymentsService;
 
     private $orderStateManager;
 
@@ -38,7 +38,7 @@ class GetOrderUseCase
         AddressRepositoryInterface $addressRepository,
         DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
         CompaniesServiceInterface $companiesService,
-        BorschtInterface $borscht,
+        BorschtInterface $paymentsService,
         OrderStateManager $orderStateManager,
         OrderDeclinedReasonsMapper $declinedReasonsMapper
     ) {
@@ -47,20 +47,18 @@ class GetOrderUseCase
         $this->addressRepository = $addressRepository;
         $this->debtorExternalDataRepository = $debtorExternalDataRepository;
         $this->companiesService = $companiesService;
-        $this->borscht = $borscht;
+        $this->paymentsService = $paymentsService;
         $this->orderStateManager = $orderStateManager;
         $this->declinedReasonsMapper = $declinedReasonsMapper;
     }
 
     public function execute(GetOrderRequest $request): GetOrderResponse
     {
-        $externalCode = $request->getExternalCode();
-        $customerId = $request->getCustomerId();
-        $order = $this->orderRepository->getOneByExternalCode($externalCode, $customerId);
+        $order = $this->orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($request->getOrderId(), $request->getMerchantId());
 
         if (!$order) {
             throw new PaellaCoreCriticalException(
-                "Order #$externalCode not found",
+                "Order #{$request->getOrderId()} not found",
                 PaellaCoreCriticalException::CODE_NOT_FOUND,
                 Response::HTTP_NOT_FOUND
             );
@@ -71,6 +69,7 @@ class GetOrderUseCase
 
         $response = (new GetOrderResponse())
             ->setExternalCode($order->getExternalCode())
+            ->setUuid($order->getUuid())
             ->setState($order->getState())
             ->setOriginalAmount($order->getAmountGross())
             ->setDebtorExternalDataAddressCountry($debtorAddress->getCountry())
@@ -100,7 +99,15 @@ class GetOrderUseCase
     {
         $company = $this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId());
         $debtor = $this->companiesService->getDebtor($company->getDebtorId());
-        $debtorPaymentDetails = $this->borscht->getDebtorPaymentDetails($company->getPaymentDebtorId());
+
+        if (!$this->orderStateManager->isDeclined($order)) {
+            $debtorPaymentDetails = $this->paymentsService->getDebtorPaymentDetails($company->getPaymentDebtorId());
+
+            $response
+                ->setBankAccountIban($debtorPaymentDetails->getBankAccountIban())
+                ->setBankAccountBic($debtorPaymentDetails->getBankAccountBic())
+            ;
+        }
 
         $response
             ->setCompanyName($debtor->getName())
@@ -109,14 +116,12 @@ class GetOrderUseCase
             ->setCompanyAddressPostalCode($debtor->getAddressPostalCode())
             ->setCompanyAddressCity($debtor->getAddressCity())
             ->setCompanyAddressCountry($debtor->getAddressCountry())
-            ->setBankAccountIban($debtorPaymentDetails->getBankAccountIban())
-            ->setBankAccountBic($debtorPaymentDetails->getBankAccountBic())
         ;
     }
 
     private function addInvoiceToOrder(OrderEntity $order, GetOrderResponse $response)
     {
-        $orderPaymentDetails = $this->borscht->getOrderPaymentDetails($order->getPaymentId());
+        $orderPaymentDetails = $this->paymentsService->getOrderPaymentDetails($order->getPaymentId());
         $response
             ->setInvoiceNumber($order->getInvoiceNumber())
             ->setPayoutAmount($orderPaymentDetails->getPayoutAmount())

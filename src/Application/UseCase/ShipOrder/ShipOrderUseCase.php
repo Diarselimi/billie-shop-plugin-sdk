@@ -34,20 +34,19 @@ class ShipOrderUseCase
 
     public function execute(ShipOrderRequest $request): void
     {
-        $externalCode = $request->getExternalCode();
-        $customerId = $request->getCustomerId();
-        $order = $this->orderRepository->getOneByExternalCode($externalCode, $customerId);
+        $order = $this->orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($request->getOrderId(), $request->getMerchantId());
 
         if (!$order) {
             throw new PaellaCoreCriticalException(
-                "Order #$externalCode not found",
+                "Order #{$request->getOrderId()} not found",
                 PaellaCoreCriticalException::CODE_NOT_FOUND,
                 Response::HTTP_NOT_FOUND
             );
         }
+
         if (!$this->workflow->can($order, OrderStateManager::TRANSITION_SHIP)) {
             throw new PaellaCoreCriticalException(
-                "Order #$externalCode can not be shipped",
+                "Order #{$request->getOrderId()} can not be shipped",
                 PaellaCoreCriticalException::CODE_ORDER_CANT_BE_SHIPPED
             );
         }
@@ -58,6 +57,10 @@ class ShipOrderUseCase
             ->setProofOfDeliveryUrl($request->getProofOfDeliveryUrl())
             ->setShippedAt(new \DateTime())
         ;
+
+        if ($request->getExternalCode() && !$order->getExternalCode()) {
+            $order->setExternalCode($request->getExternalCode());
+        }
 
         $company = $this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId());
         $paymentDetails = $this->paymentsService->createOrder($order, $company->getPaymentDebtorId());

@@ -382,11 +382,6 @@ Feature:
                "code":"request_validation_error"
             },
             {
-               "source":"external_code",
-               "title":"This value should not be blank.",
-               "code":"request_validation_error"
-            },
-            {
                "source":"debtor_company.address_city",
                "title":"This value should not be blank.",
                "code":"request_validation_error"
@@ -646,3 +641,57 @@ Feature:
     {}
     """
     And the order A1 is in state declined
+
+  Scenario: Successful order creation without providing external code
+    Given I get from companies service identify match and good decision response
+    And I get from payments service register debtor positive response
+    When I send a POST request to "/order" with body:
+    """
+    {
+         "debtor_person":{
+            "salutation":"m",
+            "first_name":"",
+            "last_name":"else",
+            "phone_number":"+491234567",
+            "email":"someone@billie.io"
+         },
+         "debtor_company":{
+            "merchant_customer_id":"12",
+            "name":"Test User Company",
+            "address_addition":"left door",
+            "address_house_number":"10",
+            "address_street":"Heinrich-Heine-Platz",
+            "address_city":"Berlin",
+            "address_postal_code":"10179",
+            "address_country":"DE",
+            "tax_id":"VA222",
+            "tax_number":"3333",
+            "registration_court":"",
+            "registration_number":" some number",
+            "industry_sector":"some sector",
+            "subindustry_sector":"some sub",
+            "employees_number":"33",
+            "legal_form":"some legal",
+            "established_customer":1
+         },
+         "delivery_address":{
+            "house_number":"22",
+            "street":"Charlot strasse",
+            "city":"Paris",
+            "postal_code":"98765",
+            "country":"DE"
+         },
+         "amount":{
+            "net":33.2,
+            "gross":43.30,
+            "tax":10.10
+         },
+         "comment":"Some comment",
+         "duration":30
+    }
+    """
+    Then the response status code should be 201
+    And the JSON response should be:
+    """
+    {}
+    """

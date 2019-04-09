@@ -1,8 +1,13 @@
 billie_monitoring:
   resource: '@BillieMonitoringBundle/Resources/config/routes.yaml'
 
+get_merchant:
+  path: /merchant/{apiKey}
+  controller: App\Http\Controller\GetMerchantController::execute
+  methods: [GET]
+
 get_order:
-  path: /order/{externalCode}
+  path: /order/{id}
   controller: App\Http\Controller\GetOrderController::execute
   methods: [GET]
 
@@ -11,48 +16,43 @@ create_order:
   controller: App\Http\Controller\CreateOrderController::execute
   methods: [POST]
 
-get_merchant:
-  path: /merchant/{apiKey}
-  controller: App\Http\Controller\GetMerchantController::execute
-  methods: [GET]
-
 cancel_order:
-  path: /order/{externalCode}/cancel
+  path: /order/{id}/cancel
   controller: App\Http\Controller\CancelOrderController::execute
   methods: [POST]
 
 update_order:
-  path: /order/{externalCode}
+  path: /order/{id}
   controller: App\Http\Controller\UpdateOrderController::execute
   methods: [PATCH]
 
 confirm_order_payment:
-  path: /order/{externalCode}/confirm-payment
+  path: /order/{id}/confirm-payment
   controller: App\Http\Controller\ConfirmOrderPaymentController::execute
   methods: [POST]
 
 ship_order:
-  path: /order/{externalCode}/ship
+  path: /order/{id}/ship
   controller: App\Http\Controller\ShipOrderController::execute
   methods: [POST]
 
 create_order_invoice:
-  path: /order/{externalCode}/invoice
+  path: /order/{id}/invoice
   controller: App\Http\Controller\CreateOrderInvoiceController::execute
   methods: [POST]
 
 decline_order:
-  path: /order/{externalCode}/decline
+  path: /order/{id}/decline
   controller: App\Http\Controller\DeclineOrderController::execute
   methods: [POST]
 
 approve_order:
-  path: /order/{externalCode}/approve
+  path: /order/{id}/approve
   controller: App\Http\Controller\ApproveOrderController::execute
   methods: [POST]
 
 trigger_failed_order_notifications:
-  path: /order/{externalCode}/trigger-failed-notifications
+  path: /order/{id}/trigger-failed-notifications
   controller: App\Http\Controller\TriggerFailedOrderNotificationsController::execute
   methods: [POST]
 

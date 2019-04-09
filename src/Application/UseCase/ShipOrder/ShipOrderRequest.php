@@ -4,20 +4,38 @@ namespace App\Application\UseCase\ShipOrder;
 
 class ShipOrderRequest
 {
+    private $orderId;
+
     private $externalCode;
-    private $customerId;
+
+    private $merchantId;
+
     private $invoiceNumber;
+
     private $invoiceUrl;
+
     private $proofOfDeliveryUrl;
 
-    public function getExternalCode(): string
+    public function getOrderId(): string
+    {
+        return $this->orderId;
+    }
+
+    public function setOrderId(string $orderId): ShipOrderRequest
+    {
+        $this->orderId = $orderId;
+
+        return $this;
+    }
+
+    public function getExternalCode(): ? string
     {
         return $this->externalCode;
     }
 
-    public function getCustomerId(): int
+    public function getMerchantId(): int
     {
-        return $this->customerId;
+        return $this->merchantId;
     }
 
     public function getInvoiceNumber(): string
@@ -35,16 +53,16 @@ class ShipOrderRequest
         return $this->proofOfDeliveryUrl;
     }
 
-    public function setExternalCode(string $externalCode): ShipOrderRequest
+    public function setExternalCode(?string $externalCode): ShipOrderRequest
     {
         $this->externalCode = $externalCode;
 
         return $this;
     }
 
-    public function setCustomerId(int $customerId): ShipOrderRequest
+    public function setMerchantId(int $merchantId): ShipOrderRequest
     {
-        $this->customerId = $customerId;
+        $this->merchantId = $merchantId;
 
         return $this;
     }

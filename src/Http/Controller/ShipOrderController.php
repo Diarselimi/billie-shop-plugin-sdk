@@ -16,11 +16,12 @@ class ShipOrderController
         $this->useCase = $useCase;
     }
 
-    public function execute(string $externalCode, Request $request): void
+    public function execute(string $id, Request $request): void
     {
         $orderRequest = (new ShipOrderRequest())
-            ->setExternalCode($externalCode)
-            ->setCustomerId($request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER))
+            ->setOrderId($id)
+            ->setExternalCode($request->request->get('external_order_id'))
+            ->setMerchantId($request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER))
             ->setInvoiceNumber($request->request->get('invoice_number'))
             ->setInvoiceUrl($request->request->get('invoice_url'))
             ->setProofOfDeliveryUrl($request->request->get('proof_of_delivery_url'))

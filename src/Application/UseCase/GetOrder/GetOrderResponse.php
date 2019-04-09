@@ -8,6 +8,8 @@ class GetOrderResponse implements ArrayableInterface
 {
     private $externalCode;
 
+    private $uuid;
+
     private $state;
 
     private $bankAccountIban;
@@ -60,6 +62,18 @@ class GetOrderResponse implements ArrayableInterface
     public function setExternalCode(string $externalCode): GetOrderResponse
     {
         $this->externalCode = $externalCode;
+
+        return $this;
+    }
+
+    public function getUuid(): string
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid(string $uuid): GetOrderResponse
+    {
+        $this->uuid = $uuid;
 
         return $this;
     }
@@ -332,6 +346,7 @@ class GetOrderResponse implements ArrayableInterface
     {
         return [
             'external_code' => $this->getExternalCode(),
+            'uuid' => $this->getUuid(),
             'state' => $this->getState(),
             'reasons' => $this->getReasons() ?: [],
             'amount' => $this->getOriginalAmount(),

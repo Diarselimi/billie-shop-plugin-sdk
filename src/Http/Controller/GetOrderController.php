@@ -17,9 +17,9 @@ class GetOrderController
         $this->useCase = $useCase;
     }
 
-    public function execute(string $externalCode, Request $request): GetOrderResponse
+    public function execute(string $id, Request $request): GetOrderResponse
     {
-        $request = new GetOrderRequest($externalCode, $request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER));
+        $request = new GetOrderRequest($id, $request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER));
         $response = $this->useCase->execute($request);
 
         return $response;
