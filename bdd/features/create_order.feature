@@ -39,6 +39,24 @@ Feature:
       | debtor_blacklisted                |	1		| 	1					|
       | debtor_overdue                    |	1		| 	1					|
       | company_b2b_score                 |	1		| 	1					|
+    And I get from companies service "/debtor/1" endpoint response with status 200 and body
+      """
+      {
+        "id": 1,
+        "payment_id": "test",
+        "name": "Test User Company",
+        "address_house": "10",
+        "address_street": "Heinrich-Heine-Platz",
+        "address_city": "Berlin",
+        "address_postal_code": "10179",
+        "address_country": "DE",
+        "address_addition": null,
+        "crefo_id": "123",
+        "schufa_id": "123",
+        "is_blacklisted": 0
+      }
+      """
+    And I get from payments service get debtor response
 
 
   Scenario: Debtor identification failed
@@ -90,9 +108,44 @@ Feature:
     }
     """
     Then the order A1 is in state declined
+    And the response status code should be 201
     And the JSON response should be:
     """
-    {}
+    {
+       "external_code":"A1",
+       "state":"declined",
+       "reasons":[
+          "debtor_not_identified"
+       ],
+       "amount":43.3,
+       "debtor_company":{
+          "name":null,
+          "house_number":null,
+          "street":null,
+          "postal_code":null,
+          "city":null,
+          "country":null
+       },
+       "bank_account":{
+          "iban":null,
+          "bic":null
+       },
+       "invoice":{
+          "number":null,
+          "payout_amount":null,
+          "fee_amount":null,
+          "fee_rate":null,
+          "due_date":null
+       },
+       "debtor_external_data":{
+          "name":"billie GmbH",
+          "address_country":"DE",
+          "address_postal_code":"12345",
+          "address_street":"c\/Velarus",
+          "address_house":"33",
+          "industry_sector":"SOME SECTOR"
+       }
+    }
     """
 
   Scenario: Successful order creation
@@ -101,55 +154,87 @@ Feature:
     When I send a POST request to "/order" with body:
     """
     {
-         "debtor_person":{
-            "salutation":"m",
-            "first_name":"",
-            "last_name":"else",
-            "phone_number":"+491234567",
-            "email":"someone@billie.io"
-         },
-         "debtor_company":{
-            "merchant_customer_id":"12",
-            "name":"Test User Company",
-            "address_addition":"left door",
-            "address_house_number":"10",
-            "address_street":"Heinrich-Heine-Platz",
-            "address_city":"Berlin",
-            "address_postal_code":"10179",
-            "address_country":"DE",
-            "tax_id":"VA222",
-            "tax_number":"3333",
-            "registration_court":"",
-            "registration_number":" some number",
-            "industry_sector":"some sector",
-            "subindustry_sector":"some sub",
-            "employees_number":"33",
-            "legal_form":"some legal",
-            "established_customer":1
-         },
-         "delivery_address":{
-            "house_number":"22",
-            "street":"Charlot strasse",
-            "city":"Paris",
-            "postal_code":"98765",
-            "country":"DE"
-         },
-         "amount":{
-            "net":33.2,
-            "gross":43.30,
-            "tax":10.10
-         },
-         "comment":"Some comment",
-         "duration":30,
-         "order_id":"A1"
+       "debtor_person":{
+          "salutation":"m",
+          "first_name":"",
+          "last_name":"else",
+          "phone_number":"+491234567",
+          "email":"someone@billie.io"
+       },
+       "debtor_company":{
+          "merchant_customer_id":"12",
+          "name":"Test User Company",
+          "address_addition":"left door",
+          "address_house_number":"10",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_city":"Berlin",
+          "address_postal_code":"10179",
+          "address_country":"DE",
+          "tax_id":"VA222",
+          "tax_number":"3333",
+          "registration_court":"",
+          "registration_number":" some number",
+          "industry_sector":"some sector",
+          "subindustry_sector":"some sub",
+          "employees_number":"33",
+          "legal_form":"some legal",
+          "established_customer":1
+       },
+       "delivery_address":{
+          "house_number":"22",
+          "street":"Charlot strasse",
+          "city":"Paris",
+          "postal_code":"98765",
+          "country":"DE"
+       },
+       "amount":{
+          "net":33.2,
+          "gross":43.30,
+          "tax":10.10
+       },
+       "comment":"Some comment",
+       "duration":30,
+       "order_id":"A1"
     }
     """
-    Then the response status code should be 201
+    Then the order A1 is in state created
+    And the response status code should be 201
     And the JSON response should be:
     """
-    {}
+    {
+      "external_code":"A1",
+      "state":"created",
+      "reasons":[],
+      "amount":43.3,
+      "debtor_company":{
+        "name":"Test User Company",
+        "house_number":"10",
+        "street":"Heinrich-Heine-Platz",
+        "postal_code":"10179",
+        "city":"Berlin",
+        "country":"DE"
+      },
+      "bank_account":{
+        "iban":"DE1234",
+        "bic":"BICISHERE"
+      },
+      "invoice":{
+        "number":null,
+        "payout_amount":null,
+        "fee_amount":null,
+        "fee_rate":null,
+        "due_date":null
+      },
+      "debtor_external_data":{
+        "name":"Test User Company",
+        "address_country":"DE",
+        "address_postal_code":"10179",
+        "address_street":"Heinrich-Heine-Platz",
+        "address_house":"10",
+        "industry_sector":"SOME SECTOR"
+      }
+    }
     """
-    And the order A1 is in state created
 
   Scenario: Successful order creation using lowercase country
     Given I get from companies service identify match and good decision response
@@ -200,70 +285,44 @@ Feature:
          "order_id":"A1"
     }
     """
-    Then the response status code should be 201
+    Then the order A1 is in state created
+    And the response status code should be 201
     And the JSON response should be:
-    """
-    {}
-    """
-    And the order A1 is in state created
-
-  Scenario: Debtor overdue check failed
-    Given I get from companies service identify match and good decision response
-    And I get from payments service register debtor positive response
-    And I have a late order XLO123 with amounts 1002/901/101, duration 30 and comment "test order"
-    And Order XLO123 was shipped at "2018-01-01 00:00:00"
-    When I send a POST request to "/order" with body:
     """
     {
-         "debtor_person":{
-            "salutation":"f",
-            "first_name":"",
-            "last_name":"else",
-            "phone_number":"+491234567",
-            "email":"someone@billie.io"
-         },
-         "debtor_company":{
-            "merchant_customer_id":"12",
-            "name":"billie GmbH",
-            "address_addition":"left door",
-            "address_house_number":"33",
-            "address_street":"c/Velarus",
-            "address_city":"Berlin",
-            "address_postal_code":"12345",
-            "address_country":"DE",
-            "tax_id":"VA222",
-            "tax_number":"3333",
-            "registration_court":"some court",
-            "registration_number":" some number",
-            "industry_sector":"some sector",
-            "subindustry_sector":"some sub",
-            "employees_number":"33",
-            "legal_form":"some legal",
-            "established_customer":1
-         },
-         "delivery_address":{
-            "house_number":"22",
-            "street":"Charlot strasse",
-            "city":"Paris",
-            "postal_code":"98765",
-            "country":"DE"
-         },
-         "amount":{
-            "net":33.2,
-            "gross":43.30,
-            "tax":10.10
-         },
-         "comment":"Some comment",
-         "duration":30,
-         "order_id":"A1"
+      "external_code":"A1",
+      "state":"created",
+      "reasons":[],
+      "amount":43.3,
+      "debtor_company":{
+        "name":"Test User Company",
+        "house_number":"10",
+        "street":"Heinrich-Heine-Platz",
+        "postal_code":"10179",
+        "city":"Berlin",
+        "country":"DE"
+      },
+      "bank_account":{
+        "iban":"DE1234",
+        "bic":"BICISHERE"
+      },
+      "invoice":{
+        "number":null,
+        "payout_amount":null,
+        "fee_amount":null,
+        "fee_rate":null,
+        "due_date":null
+      },
+      "debtor_external_data":{
+        "name":"Test User Company",
+        "address_country":"DE",
+        "address_postal_code":"10179",
+        "address_street":"Heinrich-Heine-Platz",
+        "address_house":"10",
+        "industry_sector":"SOME SECTOR"
+      }
     }
     """
-    Then the response status code should be 201
-    And the JSON response should be:
-    """
-    {}
-    """
-    Then the order A1 is in state declined
 
   Scenario: Debtor is not eligible for Point Of Sale
     Given I get from companies service identify match and bad decision response
@@ -280,12 +339,12 @@ Feature:
          },
          "debtor_company":{
             "merchant_customer_id":"12",
-            "name":"billie GmbH",
+            "name":"Test User Company",
             "address_addition":"left door",
-            "address_house_number":"33",
-            "address_street":"c/Velarus",
+            "address_house_number":"10",
+            "address_street":"Heinrich-Heine-Platz",
             "address_city":"Berlin",
-            "address_postal_code":"12345",
+            "address_postal_code":"10179",
             "address_country":"DE",
             "tax_id":"VA222",
             "tax_number":"3333",
@@ -314,12 +373,46 @@ Feature:
          "order_id":"A1"
     }
     """
-    Then the response status code should be 201
+    Then the order A1 is in state declined
+    And the response status code should be 201
     And the JSON response should be:
     """
-    {}
+    {
+       "external_code":"A1",
+       "state":"declined",
+       "reasons":[
+          "risk_policy"
+       ],
+       "amount":43.3,
+       "debtor_company":{
+          "name":"Test User Company",
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "postal_code":"10179",
+          "city":"Berlin",
+          "country":"DE"
+       },
+       "bank_account":{
+          "iban":null,
+          "bic":null
+       },
+       "invoice":{
+          "number":null,
+          "payout_amount":null,
+          "fee_amount":null,
+          "fee_rate":null,
+          "due_date":null
+       },
+       "debtor_external_data":{
+          "name":"Test User Company",
+          "address_country":"DE",
+          "address_postal_code":"10179",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_house":"10",
+          "industry_sector":"SOME SECTOR"
+       }
+    }
     """
-    And the order A1 is in state declined
 
   Scenario: Missing required fields
     When I send a POST request to "/order" with body:
@@ -581,10 +674,6 @@ Feature:
       }
       """
     Then the response status code should be 201
-    And the JSON response should be:
-    """
-    {}
-    """
     And the order A1 is in state created
 
   Scenario: Order exceeds the merchant available financing limit
@@ -636,10 +725,6 @@ Feature:
       }
       """
     Then the response status code should be 201
-    And the JSON response should be:
-    """
-    {}
-    """
     And the order A1 is in state declined
 
   Scenario: Successful order creation without providing external code
@@ -691,7 +776,3 @@ Feature:
     }
     """
     Then the response status code should be 201
-    And the JSON response should be:
-    """
-    {}
-    """

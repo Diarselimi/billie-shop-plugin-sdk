@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Application\UseCase\GetOrder;
+namespace App\Application\UseCase\Response;
 
 use App\DomainModel\ArrayableInterface;
 
-class GetOrderResponse implements ArrayableInterface
+class OrderResponse implements ArrayableInterface
 {
     private $externalCode;
 
@@ -54,12 +54,12 @@ class GetOrderResponse implements ArrayableInterface
 
     private $reasons;
 
-    public function getExternalCode(): string
+    public function getExternalCode(): ? string
     {
         return $this->externalCode;
     }
 
-    public function setExternalCode(string $externalCode): GetOrderResponse
+    public function setExternalCode(?string $externalCode): OrderResponse
     {
         $this->externalCode = $externalCode;
 
@@ -71,7 +71,7 @@ class GetOrderResponse implements ArrayableInterface
         return $this->uuid;
     }
 
-    public function setUuid(string $uuid): GetOrderResponse
+    public function setUuid(string $uuid): OrderResponse
     {
         $this->uuid = $uuid;
 
@@ -83,7 +83,7 @@ class GetOrderResponse implements ArrayableInterface
         return $this->state;
     }
 
-    public function setState(string $state): GetOrderResponse
+    public function setState(string $state): OrderResponse
     {
         $this->state = $state;
 
@@ -95,7 +95,7 @@ class GetOrderResponse implements ArrayableInterface
         return $this->bankAccountIban;
     }
 
-    public function setBankAccountIban(string $bankAccountIban): GetOrderResponse
+    public function setBankAccountIban(string $bankAccountIban): OrderResponse
     {
         $this->bankAccountIban = $bankAccountIban;
 
@@ -107,7 +107,7 @@ class GetOrderResponse implements ArrayableInterface
         return $this->bankAccountBic;
     }
 
-    public function setBankAccountBic(string $bankAccountBic): GetOrderResponse
+    public function setBankAccountBic(string $bankAccountBic): OrderResponse
     {
         $this->bankAccountBic = $bankAccountBic;
 
@@ -119,7 +119,7 @@ class GetOrderResponse implements ArrayableInterface
         return $this->companyName;
     }
 
-    public function setCompanyName(string $companyName): GetOrderResponse
+    public function setCompanyName(string $companyName): OrderResponse
     {
         $this->companyName = $companyName;
 
@@ -131,7 +131,7 @@ class GetOrderResponse implements ArrayableInterface
         return $this->companyAddressHouseNumber;
     }
 
-    public function setCompanyAddressHouseNumber(?string $companyAddressHouseNumber): GetOrderResponse
+    public function setCompanyAddressHouseNumber(?string $companyAddressHouseNumber): OrderResponse
     {
         $this->companyAddressHouseNumber = $companyAddressHouseNumber;
 
@@ -143,7 +143,7 @@ class GetOrderResponse implements ArrayableInterface
         return $this->companyAddressStreet;
     }
 
-    public function setCompanyAddressStreet(string $companyAddressStreet): GetOrderResponse
+    public function setCompanyAddressStreet(string $companyAddressStreet): OrderResponse
     {
         $this->companyAddressStreet = $companyAddressStreet;
 
@@ -155,7 +155,7 @@ class GetOrderResponse implements ArrayableInterface
         return $this->companyAddressCity;
     }
 
-    public function setCompanyAddressCity(string $companyAddressCity): GetOrderResponse
+    public function setCompanyAddressCity(string $companyAddressCity): OrderResponse
     {
         $this->companyAddressCity = $companyAddressCity;
 
@@ -167,7 +167,7 @@ class GetOrderResponse implements ArrayableInterface
         return $this->companyAddressPostalCode;
     }
 
-    public function setCompanyAddressPostalCode(string $companyAddressPostalCode): GetOrderResponse
+    public function setCompanyAddressPostalCode(string $companyAddressPostalCode): OrderResponse
     {
         $this->companyAddressPostalCode = $companyAddressPostalCode;
 
@@ -179,7 +179,7 @@ class GetOrderResponse implements ArrayableInterface
         return $this->companyAddressCountry;
     }
 
-    public function setCompanyAddressCountry(string $companyAddressCountry): GetOrderResponse
+    public function setCompanyAddressCountry(string $companyAddressCountry): OrderResponse
     {
         $this->companyAddressCountry = $companyAddressCountry;
 
@@ -191,7 +191,7 @@ class GetOrderResponse implements ArrayableInterface
         return $this->debtorExternalDataCompanyName;
     }
 
-    public function setDebtorExternalDataCompanyName(string $debtorExternalDataCompanyName): GetOrderResponse
+    public function setDebtorExternalDataCompanyName(string $debtorExternalDataCompanyName): OrderResponse
     {
         $this->debtorExternalDataCompanyName = $debtorExternalDataCompanyName;
 
@@ -203,7 +203,7 @@ class GetOrderResponse implements ArrayableInterface
         return $this->debtorExternalDataAddressCountry;
     }
 
-    public function setDebtorExternalDataAddressCountry(string $debtorExternalDataAddressCountry): GetOrderResponse
+    public function setDebtorExternalDataAddressCountry(string $debtorExternalDataAddressCountry): OrderResponse
     {
         $this->debtorExternalDataAddressCountry = $debtorExternalDataAddressCountry;
 
@@ -215,7 +215,7 @@ class GetOrderResponse implements ArrayableInterface
         return $this->debtorExternalDataAddressPostalCode;
     }
 
-    public function setDebtorExternalDataAddressPostalCode(string $debtorExternalDataAddressPostalCode): GetOrderResponse
+    public function setDebtorExternalDataAddressPostalCode(string $debtorExternalDataAddressPostalCode): OrderResponse
     {
         $this->debtorExternalDataAddressPostalCode = $debtorExternalDataAddressPostalCode;
 
@@ -227,7 +227,7 @@ class GetOrderResponse implements ArrayableInterface
         return $this->debtorExternalDataAddressStreet;
     }
 
-    public function setDebtorExternalDataAddressStreet(string $debtorExternalDataAddressStreet): GetOrderResponse
+    public function setDebtorExternalDataAddressStreet(string $debtorExternalDataAddressStreet): OrderResponse
     {
         $this->debtorExternalDataAddressStreet = $debtorExternalDataAddressStreet;
 
@@ -239,7 +239,7 @@ class GetOrderResponse implements ArrayableInterface
         return $this->debtorExternalDataAddressHouse;
     }
 
-    public function setDebtorExternalDataAddressHouse(string $debtorExternalDataAddressHouse): GetOrderResponse
+    public function setDebtorExternalDataAddressHouse(string $debtorExternalDataAddressHouse): OrderResponse
     {
         $this->debtorExternalDataAddressHouse = $debtorExternalDataAddressHouse;
 
@@ -251,7 +251,7 @@ class GetOrderResponse implements ArrayableInterface
         return $this->debtorExternalDataIndustrySector;
     }
 
-    public function setDebtorExternalDataIndustrySector(string $debtorExternalDataIndustrySector): GetOrderResponse
+    public function setDebtorExternalDataIndustrySector(string $debtorExternalDataIndustrySector): OrderResponse
     {
         $this->debtorExternalDataIndustrySector = $debtorExternalDataIndustrySector;
 
@@ -263,7 +263,7 @@ class GetOrderResponse implements ArrayableInterface
         return $this->reasons;
     }
 
-    public function setReasons(array $reasons): GetOrderResponse
+    public function setReasons(array $reasons): OrderResponse
     {
         $this->reasons = $reasons;
 
@@ -275,7 +275,7 @@ class GetOrderResponse implements ArrayableInterface
         return $this->invoiceNumber;
     }
 
-    public function setInvoiceNumber(?string $invoiceNumber): GetOrderResponse
+    public function setInvoiceNumber(?string $invoiceNumber): OrderResponse
     {
         $this->invoiceNumber = $invoiceNumber;
 
@@ -287,7 +287,7 @@ class GetOrderResponse implements ArrayableInterface
         return $this->payoutAmount;
     }
 
-    public function setPayoutAmount(float $payoutAmount): GetOrderResponse
+    public function setPayoutAmount(float $payoutAmount): OrderResponse
     {
         $this->payoutAmount = $payoutAmount;
 
@@ -299,7 +299,7 @@ class GetOrderResponse implements ArrayableInterface
         return $this->originalAmount;
     }
 
-    public function setOriginalAmount(float $originalAmount): GetOrderResponse
+    public function setOriginalAmount(float $originalAmount): OrderResponse
     {
         $this->originalAmount = $originalAmount;
 
@@ -311,7 +311,7 @@ class GetOrderResponse implements ArrayableInterface
         return $this->feeAmount;
     }
 
-    public function setFeeAmount(float $feeAmount): GetOrderResponse
+    public function setFeeAmount(float $feeAmount): OrderResponse
     {
         $this->feeAmount = $feeAmount;
 
@@ -323,7 +323,7 @@ class GetOrderResponse implements ArrayableInterface
         return $this->feeRate;
     }
 
-    public function setFeeRate(float $feeRate): GetOrderResponse
+    public function setFeeRate(float $feeRate): OrderResponse
     {
         $this->feeRate = $feeRate;
 
@@ -335,7 +335,7 @@ class GetOrderResponse implements ArrayableInterface
         return $this->dueDate;
     }
 
-    public function setDueDate(\DateTime $dueDate): GetOrderResponse
+    public function setDueDate(\DateTime $dueDate): OrderResponse
     {
         $this->dueDate = $dueDate;
 
