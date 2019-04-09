@@ -111,15 +111,18 @@ class OrderPersistenceService
             ->setDeliveryAddress($this->addressRepository->getOneById($order->getDeliveryAddressId()))
             ->setMerchant($this->merchantRepository->getOneById($order->getMerchantId()))
             ->setMerchantSettings($this->merchantSettingsRepository->getOneByMerchant($order->getMerchantId()))
-            ->setMerchantDebtor($this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId()))
         ;
 
-        $merchantDebtor = $this->debtorFinder->findDebtor($orderContainer, $order->getMerchantId());
+        if ($order->getMerchantDebtorId()) {
+            $orderContainer->setMerchantDebtor($this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId()));
 
-        $orderContainer
-            ->setMerchantDebtor($merchantDebtor)
-            ->getOrder()->setMerchantDebtorId($merchantDebtor->getId())
-        ;
+            $merchantDebtor = $this->debtorFinder->findDebtor($orderContainer, $order->getMerchantId());
+
+            $orderContainer
+                ->setMerchantDebtor($merchantDebtor)
+                ->getOrder()->setMerchantDebtorId($merchantDebtor->getId())
+            ;
+        }
 
         return $orderContainer;
     }
