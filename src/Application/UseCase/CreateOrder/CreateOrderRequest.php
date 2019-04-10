@@ -7,10 +7,11 @@ use App\Application\UseCase\CreateOrder\Request\CreateOrderDebtorCompanyRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderDebtorPersonRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderDeliveryAddressRequest;
 use App\Application\UseCase\ValidatedRequestInterface;
+use App\DomainModel\ArrayableInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Application\Validator\Constraint as CreateOrderUseCaseConstraints;
 
-class CreateOrderRequest implements ValidatedRequestInterface
+class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterface
 {
     /**
      * @Assert\NotBlank()
@@ -150,5 +151,22 @@ class CreateOrderRequest implements ValidatedRequestInterface
         $this->debtorCompany = $debtorCompany;
 
         return $this;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'company_name' => $this->getDebtorCompany()->getName(),
+            'tax_id' => $this->getDebtorCompany()->getTaxId(),
+            'tax_number' => $this->getDebtorCompany()->getTaxNumber(),
+            'registration_court' => $this->getDebtorCompany()->getRegistrationCourt(),
+            'registration_number' => $this->getDebtorCompany()->getRegistrationNumber(),
+            'legal_form' => $this->getDebtorCompany()->getLegalForm(),
+            'address_city' => $this->getDebtorCompany()->getAddressCity(),
+            'address_postal_code' => $this->getDebtorCompany()->getAddressPostalCode(),
+            'address_street' => $this->getDebtorCompany()->getAddressStreet(),
+            'address_house_number' => $this->getDebtorCompany()->getAddressHouseNumber(),
+            'address_house_country' => $this->getDebtorCompany()->getAddressCountry(),
+        ];
     }
 }

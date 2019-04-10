@@ -6,6 +6,8 @@ use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 
 class DebtorExternalDataEntity extends AbstractTimestampableEntity
 {
+    const TABLE_NAME = "debtor_external_data";
+
     public const LEGAL_FORMS_FOR_PERSON_COMPARISON = [
         '6022', '2001, 2018, 2022', '2001', '2018', '2022', '4001', '4022', '3001', '99999',
     ];
@@ -37,6 +39,8 @@ class DebtorExternalDataEntity extends AbstractTimestampableEntity
     private $merchantExternalId;
 
     private $addressId;
+
+    private $dataHash;
 
     public function getName(): string
     {
@@ -183,6 +187,18 @@ class DebtorExternalDataEntity extends AbstractTimestampableEntity
     public function setAddressId(int $addressId): DebtorExternalDataEntity
     {
         $this->addressId = $addressId;
+
+        return $this;
+    }
+
+    public function getDataHash(): string
+    {
+        return $this->dataHash;
+    }
+
+    public function setDataHash(string $hash): DebtorExternalDataEntity
+    {
+        $this->dataHash = $hash;
 
         return $this;
     }

@@ -4,7 +4,8 @@ namespace App\DomainModel\MerchantDebtor;
 
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\DebtorCompany;
-use App\DomainModel\DebtorCompany\IdentifyDebtorRequestDTO;
+use App\DomainModel\DebtorCompany\IdentifyDebtorRequestFactory;
+use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\Order\OrderContainer;
 use App\DomainModel\Order\OrderStateManager;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
@@ -25,34 +26,26 @@ class DebtorFinder implements LoggingInterface
 
     private $merchantDebtorRegistrationService;
 
+    /**
+     * @var DebtorExternalDataRepositoryInterface
+     */
+    private $debtorExternalDataRepository;
+
     public function __construct(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         CompaniesServiceInterface $companiesService,
-        MerchantDebtorRegistrationService $merchantDebtorRegistrationService
+        MerchantDebtorRegistrationService $merchantDebtorRegistrationService,
+        DebtorExternalDataRepositoryInterface $debtorExternalDataRepository
     ) {
         $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->companiesService = $companiesService;
         $this->merchantDebtorRegistrationService = $merchantDebtorRegistrationService;
+        $this->debtorExternalDataRepository = $debtorExternalDataRepository;
     }
 
     public function findDebtor(OrderContainer $orderContainer, int $merchantId): ?MerchantDebtorEntity
     {
-        $identifyRequest = (new IdentifyDebtorRequestDTO())
-            ->setName($orderContainer->getDebtorExternalData()->getName())
-            ->setHouseNumber($orderContainer->getDebtorExternalDataAddress()->getHouseNumber())
-            ->setStreet($orderContainer->getDebtorExternalDataAddress()->getStreet())
-            ->setPostalCode($orderContainer->getDebtorExternalDataAddress()->getPostalCode())
-            ->setCity($orderContainer->getDebtorExternalDataAddress()->getCity())
-            ->setCountry($orderContainer->getDebtorExternalDataAddress()->getCountry())
-            ->setTaxId($orderContainer->getDebtorExternalData()->getTaxId())
-            ->setTaxNumber($orderContainer->getDebtorExternalData()->getTaxNumber())
-            ->setRegistrationNumber($orderContainer->getDebtorExternalData()->getRegistrationNumber())
-            ->setRegistrationCourt($orderContainer->getDebtorExternalData()->getRegistrationCourt())
-            ->setLegalForm($orderContainer->getDebtorExternalData()->getLegalForm())
-            ->setFirstName($orderContainer->getDebtorPerson()->getFirstName())
-            ->setLastName($orderContainer->getDebtorPerson()->getLastName())
-            ->setIsExperimental(false)
-        ;
+        $identifyRequest = (new IdentifyDebtorRequestFactory())->createDebtorRequestDTO($orderContainer);
 
         $this->logInfo('Check if the merchant debtor already known');
         $merchantDebtor = $this->merchantDebtorRepository->getOneByMerchantExternalId(
@@ -65,7 +58,17 @@ class DebtorFinder implements LoggingInterface
             $this->logInfo('Found the existing merchant debtor', ['id' => $merchantDebtor->getId()]);
             $identifyRequest->setCompanyId((int) $merchantDebtor->getDebtorId());
         } else {
-            $this->logInfo('Try to identify new debtor');
+            $hash = $orderContainer->getDebtorExternalData()->getDataHash();
+
+            $debtorExternalData = $this->debtorExternalDataRepository->getOneByHashAndNotOlderThanDays($hash, $orderContainer->getDebtorExternalData()->getId());
+
+            if ($debtorExternalData) {
+                $this->logInfo('The debtor is with the same data and not older than 30 days, identification process stopped...');
+
+                return null;
+            } else {
+                $this->logInfo('Try to identify new debtor');
+            }
         }
 
         $identificationAlgorithmVersion = $orderContainer->getMerchantSettings()->getDebtorIdentificationAlgorithm();

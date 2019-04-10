@@ -153,6 +153,7 @@ class PaellaCoreContext extends MinkContext
             ->setSubindustrySector('test')
             ->setEstablishedCustomer(true)
             ->setMerchantExternalId('ext_id')
+            ->setDataHash('test')
             ->setAddressId($debtorAddress->getId());
         $this->getDebtorExternalDataRepository()->insert($debtor);
 
@@ -213,6 +214,32 @@ class PaellaCoreContext extends MinkContext
                 $order->getState(),
                 $state
             ));
+        }
+    }
+
+    /**
+     * @param $orderId
+     * @param $hash
+     * @Given the order :orderId has the same hash :hash
+     */
+    public function orderHasTheSameHash($orderId, $hash)
+    {
+        $order = $this->getOrderRepository()->getOneByExternalCode($orderId, 1);
+        if ($order === null) {
+            throw new RuntimeException('Order not found');
+        }
+
+        $debtorExternalData = $this->getDebtorExternalDataRepository()->getOneById($order->getDebtorExternalDataId());
+        if ($debtorExternalData === null) {
+            throw new RuntimeException('Debtor External Data not found');
+        }
+
+        if ($debtorExternalData->getDataHash() == '') {
+            throw new RuntimeException('The hash is not generated!');
+        }
+
+        if ($debtorExternalData->getDataHash() !== md5($hash)) {
+            throw new RuntimeException(sprintf("The generated hash is: %s, but %s was expected.", $debtorExternalData->getDataHash(), md5($hash)));
         }
     }
 
