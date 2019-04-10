@@ -60,7 +60,11 @@ class DebtorFinder implements LoggingInterface
         } else {
             $hash = $orderContainer->getDebtorExternalData()->getDataHash();
 
-            $debtorExternalData = $this->debtorExternalDataRepository->getOneByHashAndNotOlderThanDays($hash, $orderContainer->getDebtorExternalData()->getId());
+            $debtorExternalData = $this->debtorExternalDataRepository->getOneByHashAndStateNotOlderThanDays(
+                $hash,
+                $orderContainer->getDebtorExternalData()->getId(),
+                OrderStateManager::STATE_DECLINED
+            );
 
             if ($debtorExternalData) {
                 $this->logInfo('The debtor is with the same data and not older than 30 days, identification process stopped...');

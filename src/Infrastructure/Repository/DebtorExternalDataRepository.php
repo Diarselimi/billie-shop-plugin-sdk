@@ -9,7 +9,24 @@ use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class DebtorExternalDataRepository extends AbstractPdoRepository implements DebtorExternalDataRepositoryInterface
 {
-    private const SELECT_FIELDS = 'id, name, tax_id, tax_number, registration_number, registration_court, legal_form, industry_sector, subindustry_sector, employees_number, address_id, is_established_customer, merchant_external_id, debtor_data_hash, created_at, updated_at';
+    private const SELECT_FIELDS =
+        DebtorExternalDataEntity::TABLE_NAME.'.id as id, 
+        name, 
+        tax_id, 
+        tax_number, 
+        registration_number, 
+        registration_court, 
+        legal_form, 
+        industry_sector, 
+        subindustry_sector, 
+        employees_number, 
+        address_id, 
+        is_established_customer,
+        merchant_external_id, 
+        debtor_data_hash,
+        '.DebtorExternalDataEntity::TABLE_NAME.'.created_at as created_at, 
+        '.DebtorExternalDataEntity::TABLE_NAME.'.updated_at as updated_at'
+    ;
 
     private $debtorExternalDataEntityFactory;
 
@@ -56,15 +73,19 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
         return $debtorRowData ? $this->debtorExternalDataEntityFactory->createFromDatabaseRow($debtorRowData) : null;
     }
 
-    public function getOneByHashAndNotOlderThanDays(string $hash, int $ignoreId, int $days = 30): ?DebtorExternalDataEntity
+    public function getOneByHashAndStateNotOlderThanDays(string $hash, int $ignoreId, string $state, int $days = 30): ?DebtorExternalDataEntity
     {
         $debtorExternalData = $this->doFetchOne(
-            'SELECT '. self::SELECT_FIELDS .' FROM '. DebtorExternalDataEntity::TABLE_NAME .
-            '   WHERE debtor_data_hash = :hash 
-                AND id != :id
-                AND DATE_ADD(created_at, INTERVAL :days DAY) > NOW()
-                ORDER BY created_at DESC LIMIT 1',
-            ['hash' => $hash, 'days' => $days, 'id' => $ignoreId]
+            '
+            SELECT '. self::SELECT_FIELDS .' FROM '. DebtorExternalDataEntity::TABLE_NAME . '
+            INNER JOIN orders ON orders.debtor_external_data_id = '. DebtorExternalDataEntity::TABLE_NAME . '.id
+            WHERE 
+                orders.state = :state
+                AND debtor_data_hash = :hash 
+                AND '. DebtorExternalDataEntity::TABLE_NAME . '.id != :id
+                AND DATE_ADD( '. DebtorExternalDataEntity::TABLE_NAME . '.created_at, INTERVAL :days DAY) > NOW()
+                ORDER BY  '. DebtorExternalDataEntity::TABLE_NAME . '.created_at DESC LIMIT 1',
+            ['hash' => $hash, 'days' => $days, 'id' => $ignoreId, 'state' => $state]
         );
 
         return $debtorExternalData ? $this->debtorExternalDataEntityFactory->createFromDatabaseRow($debtorExternalData) : null;
