@@ -16,6 +16,7 @@ use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
 use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonEntityFactory;
 use App\DomainModel\Person\PersonRepositoryInterface;
+use App\Helper\Hasher\ArrayHasherInterface;
 
 class OrderPersistenceService
 {
@@ -55,7 +56,8 @@ class OrderPersistenceService
         AddressEntityFactory $addressFactory,
         DebtorExternalDataEntityFactory $debtorExternalDataFactory,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
-        DebtorFinder $debtorFinder
+        DebtorFinder $debtorFinder,
+        ArrayHasherInterface $arrayHasher
     ) {
         $this->orderRepository = $orderRepository;
         $this->personRepository = $personRepository;
@@ -69,6 +71,7 @@ class OrderPersistenceService
         $this->debtorExternalDataFactory = $debtorExternalDataFactory;
         $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->debtorFinder = $debtorFinder;
+        $this->arrayHasher = $arrayHasher;
     }
 
     public function persistFromRequest(CreateOrderRequest $request): OrderContainer
@@ -157,6 +160,9 @@ class OrderPersistenceService
             ->createFromRequest($request)
             ->setAddressId($addressId)
         ;
+
+        $debtorExternalData->setDataHash($this->arrayHasher->generateHash($request));
+
         $this->debtorExternalDataRepository->insert($debtorExternalData);
 
         return $debtorExternalData;

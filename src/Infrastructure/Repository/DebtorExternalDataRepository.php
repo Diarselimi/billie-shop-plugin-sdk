@@ -9,7 +9,24 @@ use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class DebtorExternalDataRepository extends AbstractPdoRepository implements DebtorExternalDataRepositoryInterface
 {
-    private const SELECT_FIELDS = 'id, name, tax_id, tax_number, registration_number, registration_court, legal_form, industry_sector, subindustry_sector, employees_number, address_id, is_established_customer, merchant_external_id, created_at, updated_at';
+    private const SELECT_FIELDS =
+        DebtorExternalDataEntity::TABLE_NAME.'.id as id, 
+        name, 
+        tax_id, 
+        tax_number, 
+        registration_number, 
+        registration_court, 
+        legal_form, 
+        industry_sector, 
+        subindustry_sector, 
+        employees_number, 
+        address_id, 
+        is_established_customer,
+        merchant_external_id, 
+        debtor_data_hash,
+        '.DebtorExternalDataEntity::TABLE_NAME.'.created_at as created_at, 
+        '.DebtorExternalDataEntity::TABLE_NAME.'.updated_at as updated_at'
+    ;
 
     private $debtorExternalDataEntityFactory;
 
@@ -22,9 +39,9 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
     {
         $id = $this->doInsert('
             INSERT INTO debtor_external_data
-            (name, tax_id, tax_number, registration_number, registration_court, legal_form, industry_sector, subindustry_sector, employees_number, address_id, is_established_customer, merchant_external_id, created_at, updated_at)
+            (name, tax_id, tax_number, registration_number, registration_court, legal_form, industry_sector, subindustry_sector, employees_number, address_id, is_established_customer, merchant_external_id, created_at, updated_at, debtor_data_hash)
             VALUES
-            (:name, :tax_id, :tax_number, :registration_number, :registration_court, :legal_form, :industry_sector, :subindustry_sector, :employees_number, :address_id, :is_established_customer, :merchant_external_id, :created_at, :updated_at)
+            (:name, :tax_id, :tax_number, :registration_number, :registration_court, :legal_form, :industry_sector, :subindustry_sector, :employees_number, :address_id, :is_established_customer, :merchant_external_id, :created_at, :updated_at, :debtor_data_hash)
         ', [
             'name' => $debtor->getName(),
             'tax_id' => $debtor->getTaxId(),
@@ -40,6 +57,7 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
             'merchant_external_id' => $debtor->getMerchantExternalId(),
             'created_at' => $debtor->getCreatedAt()->format(self::DATE_FORMAT),
             'updated_at' => $debtor->getUpdatedAt()->format(self::DATE_FORMAT),
+            'debtor_data_hash' => $debtor->getDataHash(),
         ]);
 
         $debtor->setId($id);
@@ -48,10 +66,28 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
     public function getOneById(int $id): ?DebtorExternalDataEntity
     {
         $debtorRowData = $this->doFetchOne(
-            'SELECT ' . self::SELECT_FIELDS . ' FROM debtor_external_data WHERE id = :id',
+            'SELECT ' . self::SELECT_FIELDS . ' FROM '. DebtorExternalDataEntity::TABLE_NAME .' WHERE id = :id',
             ['id' => $id]
         );
 
         return $debtorRowData ? $this->debtorExternalDataEntityFactory->createFromDatabaseRow($debtorRowData) : null;
+    }
+
+    public function getOneByHashAndStateNotOlderThanDays(string $hash, int $ignoreId, string $state, int $days = 30): ?DebtorExternalDataEntity
+    {
+        $debtorExternalData = $this->doFetchOne(
+            '
+            SELECT '. self::SELECT_FIELDS .' FROM '. DebtorExternalDataEntity::TABLE_NAME . '
+            INNER JOIN orders ON orders.debtor_external_data_id = '. DebtorExternalDataEntity::TABLE_NAME . '.id
+            WHERE 
+                orders.state = :state
+                AND debtor_data_hash = :hash 
+                AND '. DebtorExternalDataEntity::TABLE_NAME . '.id != :id
+                AND DATE_ADD( '. DebtorExternalDataEntity::TABLE_NAME . '.created_at, INTERVAL :days DAY) > NOW()
+                ORDER BY  '. DebtorExternalDataEntity::TABLE_NAME . '.created_at DESC LIMIT 1',
+            ['hash' => $hash, 'days' => $days, 'id' => $ignoreId, 'state' => $state]
+        );
+
+        return $debtorExternalData ? $this->debtorExternalDataEntityFactory->createFromDatabaseRow($debtorExternalData) : null;
     }
 }

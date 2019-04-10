@@ -3,6 +3,7 @@
 namespace App\DomainModel\DebtorCompany;
 
 use App\DomainModel\ArrayableInterface;
+use App\DomainModel\Order\OrderContainer;
 
 class IdentifyDebtorRequestDTO implements ArrayableInterface
 {

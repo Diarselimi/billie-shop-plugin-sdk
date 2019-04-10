@@ -41,6 +41,7 @@ class DebtorExternalDataEntityFactory
             ->setMerchantExternalId($row['merchant_external_id'])
             ->setCreatedAt(new \DateTime($row['created_at']))
             ->setUpdatedAt(new \DateTime($row['updated_at']))
+            ->setDataHash($row['debtor_data_hash'])
         ;
     }
 }

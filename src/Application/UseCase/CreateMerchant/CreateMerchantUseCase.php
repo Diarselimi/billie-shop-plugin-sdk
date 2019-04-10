@@ -6,12 +6,14 @@ use App\Application\PaellaCoreCriticalException;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\Merchant\MerchantEntityFactory;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntityFactory;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntityFactory;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
 use App\Infrastructure\Alfred\AlfredRequestException;
 use App\Infrastructure\Alfred\AlfredResponseDecodeException;
+use App\Infrastructure\Repository\MerchantRiskCheckSettingsRepository;
 use Symfony\Component\HttpFoundation\Response;
 
 class CreateMerchantUseCase
@@ -30,6 +32,8 @@ class CreateMerchantUseCase
 
     private $scoreThresholdsConfigurationRepository;
 
+    private $merchantRiskCheckSettingsRepository;
+
     public function __construct(
         MerchantRepositoryInterface $merchantRepository,
         CompaniesServiceInterface $companiesService,
@@ -37,7 +41,8 @@ class CreateMerchantUseCase
         MerchantSettingsEntityFactory $merchantSettingsFactory,
         MerchantSettingsRepositoryInterface $merchantSettingsRepository,
         ScoreThresholdsConfigurationEntityFactory $scoreThresholdsConfigurationFactory,
-        ScoreThresholdsConfigurationRepositoryInterface $scoreThresholdsConfigurationRepository
+        ScoreThresholdsConfigurationRepositoryInterface $scoreThresholdsConfigurationRepository,
+        MerchantRiskCheckSettingsRepositoryInterface $merchantRiskCheckSettingsRepository
     ) {
         $this->merchantRepository = $merchantRepository;
         $this->companiesService = $companiesService;
@@ -46,6 +51,7 @@ class CreateMerchantUseCase
         $this->merchantSettingsRepository = $merchantSettingsRepository;
         $this->scoreThresholdsConfigurationFactory = $scoreThresholdsConfigurationFactory;
         $this->scoreThresholdsConfigurationRepository = $scoreThresholdsConfigurationRepository;
+        $this->merchantRiskCheckSettingsRepository = $merchantRiskCheckSettingsRepository;
     }
 
     public function execute(CreateMerchantRequest $request): CreateMerchantResponse
@@ -83,6 +89,8 @@ class CreateMerchantUseCase
 
         $merchantSettings = $this->merchantSettingsFactory->create($merchant->getId(), $request->getDebtorFinancingLimit(), $scoreThresholds->getId());
         $this->merchantSettingsRepository->insert($merchantSettings);
+
+        $this->merchantRiskCheckSettingsRepository->insertMerchantDefaultRiskCheckSettings($merchant->getId());
 
         return new CreateMerchantResponse($merchant);
     }

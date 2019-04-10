@@ -10,4 +10,6 @@ interface MerchantRiskCheckSettingsRepositoryInterface
         int $merchantId,
         string $riskCheckName
     ): ?MerchantRiskCheckSettingsEntity;
+
+    public function insertMerchantDefaultRiskCheckSettings(int $merchantId): void;
 }

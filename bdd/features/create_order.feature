@@ -235,6 +235,7 @@ Feature:
       }
     }
     """
+    And the order "A1" has the same hash "testusercompanyva2223333somenumbersomelegalberlin10179heinrichheineplatz10de"
 
   Scenario: Successful order creation using lowercase country
     Given I get from companies service identify match and good decision response
