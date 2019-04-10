@@ -326,6 +326,22 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
+     * @Given the default risk check setting should be created with :jsonResponseFromMerchant
+     * @param string $jsonResponseFromMerchant
+     */
+    public function checkMerchantHashTheDefaultRiskCheckSettingsCreated(string $jsonResponseFromMerchant)
+    {
+        $merchantResponse = json_decode($jsonResponseFromMerchant);
+
+        $pdoQuery = $this->getConnection()
+            ->prepare('select (select count(*) from merchant_risk_check_settings where merchant_id = :merchant_id) = (select count(*) from risk_check_definitions) as merchant_has_risk_settings', []);
+        $pdoQuery->execute(['merchant_id' => $merchantResponse['id']]);
+        $results = $pdoQuery->fetch(PDO::FETCH_ASSOC);
+
+        Assert::eq($results['merchant_has_risk_settings'], 0, 'The default merchant risk settings did not match with the number of risk definitions');
+    }
+
+    /**
      * @When I push message to :queueName queue and routing key :routingKey with the following content:
      */
     public function iPushMessageMessageToQueueAndRoutingKeyWithTheFollowingContent(
