@@ -66,7 +66,7 @@ class MerchantRiskCheckSettingsRepository extends AbstractPdoRepository implemen
 
     public function insertMerchantDefaultRiskCheckSettings(int $merchantId): void
     {
-        $sql = 'INSERT INTO 
+        $sql = "INSERT INTO 
                     merchant_risk_check_settings (merchant_id, risk_check_definition_id, enabled, decline_on_failure, created_at, updated_at)
                 SELECT 
                     :merchant_id,
@@ -76,7 +76,11 @@ class MerchantRiskCheckSettingsRepository extends AbstractPdoRepository implemen
                     now(),
                     now()
                 FROM
-	                risk_check_definitions';
+	                risk_check_definitions
+	            WHERE
+	               name <> 'debtor_address'"
+        ;
+
         $this->doExecute($sql, ['merchant_id' => $merchantId]);
     }
 }
