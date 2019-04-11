@@ -87,7 +87,12 @@ class CreateMerchantUseCase
         $scoreThresholds = $this->scoreThresholdsConfigurationFactory->createDefault();
         $this->scoreThresholdsConfigurationRepository->insert($scoreThresholds);
 
-        $merchantSettings = $this->merchantSettingsFactory->create($merchant->getId(), $request->getDebtorFinancingLimit(), $scoreThresholds->getId());
+        $merchantSettings = $this->merchantSettingsFactory->create(
+            $merchant->getId(),
+            $request->getDebtorFinancingLimit(),
+            $scoreThresholds->getId(),
+            false
+        );
         $this->merchantSettingsRepository->insert($merchantSettings);
 
         $this->merchantRiskCheckSettingsRepository->insertMerchantDefaultRiskCheckSettings($merchant->getId());

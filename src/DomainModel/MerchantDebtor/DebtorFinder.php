@@ -15,37 +15,36 @@ class DebtorFinder implements LoggingInterface
 {
     use LoggingTrait;
 
-    private const IDENTIFICATION_ALGORITHMS = [
-        CompaniesServiceInterface::DEBTOR_IDENTIFICATION_ALGORITHM_V1 => 'identifyDebtor',
-        CompaniesServiceInterface::DEBTOR_IDENTIFICATION_ALGORITHM_V2 => 'identifyDebtorV2',
-    ];
-
     private $merchantDebtorRepository;
 
     private $companiesService;
 
     private $merchantDebtorRegistrationService;
 
-    /**
-     * @var DebtorExternalDataRepositoryInterface
-     */
     private $debtorExternalDataRepository;
+
+    private $identifyDebtorRequestFactory;
 
     public function __construct(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         CompaniesServiceInterface $companiesService,
         MerchantDebtorRegistrationService $merchantDebtorRegistrationService,
-        DebtorExternalDataRepositoryInterface $debtorExternalDataRepository
+        DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
+        IdentifyDebtorRequestFactory $identifyDebtorRequestFactory
     ) {
         $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->companiesService = $companiesService;
         $this->merchantDebtorRegistrationService = $merchantDebtorRegistrationService;
         $this->debtorExternalDataRepository = $debtorExternalDataRepository;
+        $this->identifyDebtorRequestFactory = $identifyDebtorRequestFactory;
     }
 
     public function findDebtor(OrderContainer $orderContainer, int $merchantId): ?MerchantDebtorEntity
     {
-        $identifyRequest = (new IdentifyDebtorRequestFactory())->createDebtorRequestDTO($orderContainer);
+        $identifyRequest = $this->identifyDebtorRequestFactory->createDebtorRequestDTO(
+            $orderContainer,
+            $orderContainer->getMerchantSettings()->useExperimentalDebtorIdentification()
+        );
 
         $this->logInfo('Check if the merchant debtor already known');
         $merchantDebtor = $this->merchantDebtorRepository->getOneByMerchantExternalId(
@@ -75,15 +74,13 @@ class DebtorFinder implements LoggingInterface
             }
         }
 
-        $identificationAlgorithmVersion = $orderContainer->getMerchantSettings()->getDebtorIdentificationAlgorithm();
-
-        $this->logInfo('Starting debtor identification using {debtor_identification_algorithm_version} for order {order_external_code}', [
-            'debtor_identification_algorithm_version' => $identificationAlgorithmVersion,
+        $this->logInfo('Starting {algorithm} debtor identification algorithm for order {order_external_code}', [
+            'algorithm' => $identifyRequest->isExperimental() ? 'experimental' : 'normal',
             'order_external_code' => $orderContainer->getOrder()->getExternalCode(),
         ]);
 
         /** @var DebtorCompany $debtorCompany */
-        $debtorCompany = $this->companiesService->{self::IDENTIFICATION_ALGORITHMS[$identificationAlgorithmVersion]}($identifyRequest);
+        $debtorCompany = $this->companiesService->identifyDebtor($identifyRequest);
         if (!$debtorCompany) {
             $this->logInfo('Debtor could not be identified');
 

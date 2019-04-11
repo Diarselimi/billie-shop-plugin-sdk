@@ -10,7 +10,7 @@ use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class MerchantSettingsRepository extends AbstractPdoRepository implements MerchantSettingsRepositoryInterface
 {
-    private const SELECT_FIELDS = 'id, merchant_id, debtor_financing_limit, min_order_amount, score_thresholds_configuration_id, debtor_identification_algorithm, created_at, updated_at';
+    private const SELECT_FIELDS = 'id, merchant_id, debtor_financing_limit, min_order_amount, score_thresholds_configuration_id, use_experimental_identification, created_at, updated_at';
 
     private $factory;
 
@@ -28,7 +28,7 @@ class MerchantSettingsRepository extends AbstractPdoRepository implements Mercha
               debtor_financing_limit,
               min_order_amount,
               score_thresholds_configuration_id,
-              debtor_identification_algorithm,
+              use_experimental_identification,
               created_at, 
               updated_at
             )
@@ -38,7 +38,7 @@ class MerchantSettingsRepository extends AbstractPdoRepository implements Mercha
               :debtor_financing_limit,
               :min_order_amount,
               :score_thresholds_configuration_id,
-              :debtor_identification_algorithm,
+              :use_experimental_identification,
               :created_at,
               :updated_at
             )
@@ -47,7 +47,7 @@ class MerchantSettingsRepository extends AbstractPdoRepository implements Mercha
             'debtor_financing_limit' => $merchantSettingsEntity->getDebtorFinancingLimit(),
             'min_order_amount' => $merchantSettingsEntity->getMinOrderAmount(),
             'score_thresholds_configuration_id' => $merchantSettingsEntity->getScoreThresholdsConfigurationId(),
-            'debtor_identification_algorithm' => $merchantSettingsEntity->getDebtorIdentificationAlgorithm(),
+            'use_experimental_identification' => (int) $merchantSettingsEntity->useExperimentalDebtorIdentification(),
             'created_at' => $merchantSettingsEntity->getCreatedAt()->format(self::DATE_FORMAT),
             'updated_at' => $merchantSettingsEntity->getUpdatedAt()->format(self::DATE_FORMAT),
         ]);

@@ -4,7 +4,6 @@ namespace App\Application\UseCase\IdentifyAndScoreDebtor;
 
 use App\Application\UseCase\IdentifyAndScoreDebtor\Exception\DebtorNotIdentifiedException;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
-use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorCompany\IdentifyDebtorRequestDTO;
 use App\DomainModel\DebtorCompany\IsEligibleForPayAfterDeliveryRequestDTOFactory;
 use App\DomainModel\Merchant\MerchantNotFoundException;
@@ -35,11 +34,6 @@ class IdentifyAndScoreDebtorUseCase
 
     private $nameComparator;
 
-    private const SCORING_ALGORITHMS = [
-        'v1' => 'identifyDebtor',
-        'v2' => 'identifyDebtorV2',
-    ];
-
     public function __construct(
         MerchantRepositoryInterface $merchantRepository,
         MerchantSettingsRepositoryInterface $merchantSettingsRepository,
@@ -64,7 +58,6 @@ class IdentifyAndScoreDebtorUseCase
     {
         $merchant = $this->merchantRepository->getOneById($request->getMerchantId());
         $doScoring = $request->isDoScoring();
-        $algorithm = $request->getAlgorithm();
 
         if (!$merchant) {
             throw new MerchantNotFoundException();
@@ -84,11 +77,10 @@ class IdentifyAndScoreDebtorUseCase
             ->setLegalForm($request->getLegalForm())
             ->setFirstName($request->getFirstName())
             ->setLastName($request->getLastName())
-            ->setIsExperimental(true)
+            ->setIsExperimental($request->useExperimentalDebtorIdentification())
         ;
 
-        /** @var DebtorCompany|null $identifiedDebtor */
-        $identifiedDebtor = $this->companiesService->{self::SCORING_ALGORITHMS[$algorithm]}($identifyRequest);
+        $identifiedDebtor = $this->companiesService->identifyDebtor($identifyRequest);
         if (!$identifiedDebtor || !$identifiedDebtor->isStrictMatch()) {
             throw new DebtorNotIdentifiedException();
         }

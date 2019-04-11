@@ -2,7 +2,6 @@
 
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\Address\AddressRepositoryInterface;
-use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
@@ -80,7 +79,7 @@ class PaellaCoreContext extends MinkContext
                 ->setDebtorFinancingLimit(10000)
                 ->setMinOrderAmount(0)
                 ->setScoreThresholdsConfigurationId($scoreThreshold->getId())
-                ->setDebtorIdentificationAlgorithm(CompaniesServiceInterface::DEBTOR_IDENTIFICATION_ALGORITHM_V1)
+                ->setUseExperimentalDebtorIdentification(false)
                 ->setCreatedAt(new DateTime())
                 ->setUpdatedAt(new DateTime())
         );
