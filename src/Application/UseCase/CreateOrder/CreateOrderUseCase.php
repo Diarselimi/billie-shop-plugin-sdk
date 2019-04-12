@@ -110,7 +110,7 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
     {
         $merchantDebtor = $this->debtorFinderService->findDebtor($orderContainer, $merchantId);
 
-        if ($orderContainer->getMerchantSettings()->useExperimentalDebtorIdentification()) {
+        if (!$orderContainer->getMerchantSettings()->useExperimentalDebtorIdentification()) {
             $this->triggerV2DebtorIdentificationAsync(
                 $orderContainer->getOrder(),
                 $merchantDebtor ? $merchantDebtor->getDebtorCompany() : null
