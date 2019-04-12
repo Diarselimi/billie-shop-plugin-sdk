@@ -8,7 +8,6 @@ use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainEvent\Order\OrderApprovedEvent;
 use App\DomainEvent\Order\OrderInWaitingStateEvent;
-use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\MerchantDebtor\DebtorFinder;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
@@ -111,9 +110,7 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
     {
         $merchantDebtor = $this->debtorFinderService->findDebtor($orderContainer, $merchantId);
 
-        if ($orderContainer->getMerchantSettings()->getDebtorIdentificationAlgorithm() ===
-            CompaniesServiceInterface::DEBTOR_IDENTIFICATION_ALGORITHM_V1
-        ) {
+        if ($orderContainer->getMerchantSettings()->useExperimentalDebtorIdentification()) {
             $this->triggerV2DebtorIdentificationAsync(
                 $orderContainer->getOrder(),
                 $merchantDebtor ? $merchantDebtor->getDebtorCompany() : null

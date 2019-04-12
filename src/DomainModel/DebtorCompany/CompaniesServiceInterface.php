@@ -14,8 +14,6 @@ interface CompaniesServiceInterface
 
     public function identifyDebtor(IdentifyDebtorRequestDTO $requestDTO): ? DebtorCompany;
 
-    public function identifyDebtorV2(IdentifyDebtorRequestDTO $requestDTO): ? DebtorCompany;
-
     public function updateDebtor(int $debtorId, array $updateData): DebtorCompany;
 
     public function lockDebtorLimit(string $debtorId, float $amount): bool;

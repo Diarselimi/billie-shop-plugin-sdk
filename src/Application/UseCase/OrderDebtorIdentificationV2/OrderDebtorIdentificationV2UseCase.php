@@ -55,7 +55,7 @@ class OrderDebtorIdentificationV2UseCase
         $debtorPerson = $this->personRepository->getOneById($order->getDebtorPersonId());
 
         try {
-            $identifiedDebtor = $this->companiesService->identifyDebtorV2(
+            $identifiedDebtor = $this->companiesService->identifyDebtor(
                 (new IdentifyDebtorRequestDTO())
                 ->setName($debtorExternalData->getName())
                 ->setHouseNumber($debtorExternalAddress->getHouseNumber())

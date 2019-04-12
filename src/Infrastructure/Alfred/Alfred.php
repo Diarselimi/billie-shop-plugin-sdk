@@ -65,26 +65,6 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
             $response = $this->client->post("/debtor/identify", [
                 'json' => $requestDTO->toArray(),
                 'on_stats' => function (TransferStats $stats) {
-                    $this->logServiceRequestStats($stats, 'identify_debtor_v1');
-                },
-            ]);
-        } catch (TransferException $exception) {
-            if ($exception->getCode() === Response::HTTP_NOT_FOUND) {
-                return null;
-            }
-
-            throw new AlfredRequestException($exception->getCode(), $exception);
-        }
-
-        return $this->factory->createFromAlfredResponse($this->decodeResponse($response));
-    }
-
-    public function identifyDebtorV2(IdentifyDebtorRequestDTO $requestDTO): ?DebtorCompany
-    {
-        try {
-            $response = $this->client->post("/debtor/identify/v2", [
-                'json' => $requestDTO->toArray(),
-                'on_stats' => function (TransferStats $stats) {
                     $this->logServiceRequestStats($stats, 'identify_debtor');
                 },
             ]);

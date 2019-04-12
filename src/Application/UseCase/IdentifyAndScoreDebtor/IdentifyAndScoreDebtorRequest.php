@@ -6,7 +6,7 @@ class IdentifyAndScoreDebtorRequest
 {
     private $merchantId;
 
-    private $algorithm;
+    private $useExperimentalDebtorIdentification;
 
     private $doScoring;
 
@@ -48,14 +48,14 @@ class IdentifyAndScoreDebtorRequest
         return $this;
     }
 
-    public function getAlgorithm(): string
+    public function useExperimentalDebtorIdentification(): bool
     {
-        return $this->algorithm;
+        return $this->useExperimentalDebtorIdentification;
     }
 
-    public function setAlgorithm(string $algorithm): IdentifyAndScoreDebtorRequest
+    public function setUseExperimentalDebtorIdentification(bool $useExperimentalDebtorIdentification): IdentifyAndScoreDebtorRequest
     {
-        $this->algorithm = $algorithm;
+        $this->useExperimentalDebtorIdentification = $useExperimentalDebtorIdentification;
 
         return $this;
     }

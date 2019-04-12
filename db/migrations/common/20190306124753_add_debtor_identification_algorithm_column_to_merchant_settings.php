@@ -1,6 +1,5 @@
 <?php
 
-use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use Phinx\Migration\AbstractMigration;
 
 class AddDebtorIdentificationAlgorithmColumnToMerchantSettings extends AbstractMigration
@@ -15,7 +14,7 @@ class AddDebtorIdentificationAlgorithmColumnToMerchantSettings extends AbstractM
                 [
                     'null' => false,
                     'after' => 'score_thresholds_configuration_id',
-                    'default' => CompaniesServiceInterface::DEBTOR_IDENTIFICATION_ALGORITHM_V1,
+                    'default' => '0',
                 ]
             )
             ->update()

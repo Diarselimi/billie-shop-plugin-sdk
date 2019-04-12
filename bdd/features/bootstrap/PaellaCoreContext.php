@@ -2,7 +2,6 @@
 
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\Address\AddressRepositoryInterface;
-use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
@@ -80,7 +79,7 @@ class PaellaCoreContext extends MinkContext
                 ->setDebtorFinancingLimit(10000)
                 ->setMinOrderAmount(0)
                 ->setScoreThresholdsConfigurationId($scoreThreshold->getId())
-                ->setDebtorIdentificationAlgorithm(CompaniesServiceInterface::DEBTOR_IDENTIFICATION_ALGORITHM_V1)
+                ->setUseExperimentalDebtorIdentification(false)
                 ->setCreatedAt(new DateTime())
                 ->setUpdatedAt(new DateTime())
         );
@@ -334,7 +333,7 @@ class PaellaCoreContext extends MinkContext
         $merchantResponse = json_decode($jsonResponseFromMerchant);
 
         $pdoQuery = $this->getConnection()
-            ->prepare('select (select count(*) from merchant_risk_check_settings where merchant_id = :merchant_id) = (select count(*) from risk_check_definitions) as merchant_has_risk_settings', []);
+            ->prepare("select (select count(*) from merchant_risk_check_settings where merchant_id = :merchant_id) = (select count(*) from risk_check_definitions where name != 'debtor_address') as merchant_has_risk_settings", []);
         $pdoQuery->execute(['merchant_id' => $merchantResponse['id']]);
         $results = $pdoQuery->fetch(PDO::FETCH_ASSOC);
 

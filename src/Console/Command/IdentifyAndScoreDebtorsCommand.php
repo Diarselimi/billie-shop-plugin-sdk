@@ -53,7 +53,7 @@ class IdentifyAndScoreDebtorsCommand extends Command
             ->addOption(self::OPTION_MERCHANT_ID, 'm', InputOption::VALUE_REQUIRED, 'Merchant ID')
             ->addOption(self::OPTION_FILE, 'f', InputOption::VALUE_REQUIRED, 'Path to the the csv file')
             ->addOption(self::OPTION_WITH_SCORING, 's', InputOption::VALUE_REQUIRED, 'Run the scoring: 1 or 0', false)
-            ->addOption(self::OPTION_ALGORITHM, 'a', InputOption::VALUE_REQUIRED, 'Identification algorithm: v1 or v2')
+            ->addOption(self::OPTION_ALGORITHM, 'a', InputOption::VALUE_REQUIRED, '1 for experimental, 0 for normal')
             ->addOption(self::OPTION_OFFSET, 'o', InputOption::VALUE_REQUIRED, 'Offset in the cvs', 0)
             ->addOption(self::OPTION_LIMIT, 'l', InputOption::VALUE_REQUIRED, 'Limit in the csv', -1)
         ;
@@ -78,7 +78,7 @@ class IdentifyAndScoreDebtorsCommand extends Command
 
         $doScoring = $input->getOption(self::OPTION_WITH_SCORING) ? true : false;
         $merchantId = (int) $input->getOption(self::OPTION_MERCHANT_ID);
-        $algorithm = $input->getOption(self::OPTION_ALGORITHM);
+        $useExperimentalDebtorIdentification = boolval($input->getOption(self::OPTION_ALGORITHM));
         $offset = $input->getOption(self::OPTION_OFFSET);
         $limit = $input->getOption(self::OPTION_LIMIT);
 
@@ -111,7 +111,7 @@ class IdentifyAndScoreDebtorsCommand extends Command
             );
 
             try {
-                $useCaseRequest = $this->createUseCaseRequest($debtorExternalData, $merchantId, $algorithm, $doScoring);
+                $useCaseRequest = $this->createUseCaseRequest($debtorExternalData, $merchantId, $useExperimentalDebtorIdentification, $doScoring);
                 $result = $this->useCase->execute($useCaseRequest);
                 $this->addResult($results, $debtorExternalData, $result);
             } catch (MerchantNotFoundException $e) {
@@ -148,11 +148,15 @@ class IdentifyAndScoreDebtorsCommand extends Command
         ];
     }
 
-    private function createUseCaseRequest(array $debtorExternalData, int $merchantId, string $algorithm, bool $doScoring): IdentifyAndScoreDebtorRequest
-    {
+    private function createUseCaseRequest(
+        array $debtorExternalData,
+        int $merchantId,
+        bool $useExperimentalDebtorIdentification,
+        bool $doScoring
+    ): IdentifyAndScoreDebtorRequest {
         return (new IdentifyAndScoreDebtorRequest())
             ->setMerchantId($merchantId)
-            ->setAlgorithm($algorithm)
+            ->setUseExperimentalDebtorIdentification($useExperimentalDebtorIdentification)
             ->setDoScoring($doScoring)
             ->setName($debtorExternalData['name'])
             ->setAddressHouse($debtorExternalData['house'])

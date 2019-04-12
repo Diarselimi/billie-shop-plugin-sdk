@@ -20,7 +20,9 @@ class CompaniesServiceContext implements Context
      */
     public function iGetFromCompaniesServiceIdentifyNoMatchResponse()
     {
-        $this->setMock('/debtor/identify', new ResponseStack(new MockResponse('', [], 404)));
+        $this->setMock('/debtor/identify', new ResponseStack(
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_no_match.json'), [], 404)
+        ));
     }
 
     /**

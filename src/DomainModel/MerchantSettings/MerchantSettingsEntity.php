@@ -14,7 +14,7 @@ class MerchantSettingsEntity extends AbstractTimestampableEntity
 
     private $scoreThresholdsConfigurationId;
 
-    private $debtorIdentificationAlgorithm;
+    private $useExperimentalDebtorIdentification;
 
     public function getMerchantId(): int
     {
@@ -64,14 +64,14 @@ class MerchantSettingsEntity extends AbstractTimestampableEntity
         return $this;
     }
 
-    public function getDebtorIdentificationAlgorithm(): string
+    public function useExperimentalDebtorIdentification(): bool
     {
-        return $this->debtorIdentificationAlgorithm;
+        return $this->useExperimentalDebtorIdentification;
     }
 
-    public function setDebtorIdentificationAlgorithm(string $debtorIdentificationAlgorithm): MerchantSettingsEntity
+    public function setUseExperimentalDebtorIdentification(bool $useExperimentalDebtorIdentification): MerchantSettingsEntity
     {
-        $this->debtorIdentificationAlgorithm = $debtorIdentificationAlgorithm;
+        $this->useExperimentalDebtorIdentification = $useExperimentalDebtorIdentification;
 
         return $this;
     }
