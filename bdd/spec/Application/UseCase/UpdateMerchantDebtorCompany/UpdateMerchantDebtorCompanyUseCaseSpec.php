@@ -12,6 +12,7 @@ use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\Infrastructure\Alfred\AlfredRequestException;
 use PhpSpec\ObjectBehavior;
+use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -49,7 +50,7 @@ class UpdateMerchantDebtorCompanyUseCaseSpec extends ObjectBehavior
     ) {
         $this->mockRequest($request);
 
-        $validator->validate($request)->shouldBeCalledOnce()->willReturn(new ConstraintViolationList());
+        $validator->validate($request, Argument::any(), Argument::any())->shouldBeCalledOnce()->willReturn(new ConstraintViolationList());
         $merchantDebtorRepository->getOneByMerchantExternalId(self::MERCHANT_DEBTOR_EXTERNAL_ID, self::MERCHANT_ID, [])->shouldBeCalledOnce()->willReturn(null);
 
         $this->shouldThrow(MerchantDebtorNotFoundException::class)->during('execute', [$request]);
@@ -67,7 +68,7 @@ class UpdateMerchantDebtorCompanyUseCaseSpec extends ObjectBehavior
         $this->mockMerchantDebtor($merchantDebtor);
         $this->mockDebtorCompany($debtorCompany);
 
-        $validator->validate($request)->shouldBeCalledOnce()->willReturn(new ConstraintViolationList());
+        $validator->validate($request, Argument::any(), Argument::any())->shouldBeCalledOnce()->willReturn(new ConstraintViolationList());
         $merchantDebtorRepository->getOneByMerchantExternalId(self::MERCHANT_DEBTOR_EXTERNAL_ID, self::MERCHANT_ID, [])->shouldBeCalledOnce()->willReturn($merchantDebtor);
         $companiesService->getDebtor(self::DEBTOR_ID)->shouldBeCalledOnce()->willReturn($debtorCompany);
         $companiesService->updateDebtor(self::DEBTOR_ID, [
@@ -93,7 +94,7 @@ class UpdateMerchantDebtorCompanyUseCaseSpec extends ObjectBehavior
         $this->mockMerchantDebtor($merchantDebtor);
         $this->mockDebtorCompany($debtorCompany);
 
-        $validator->validate($request)->shouldBeCalledOnce()->willReturn(new ConstraintViolationList());
+        $validator->validate($request, Argument::any(), Argument::any())->shouldBeCalledOnce()->willReturn(new ConstraintViolationList());
         $merchantDebtorRepository->getOneByMerchantExternalId(self::MERCHANT_DEBTOR_EXTERNAL_ID, self::MERCHANT_ID, [])->shouldBeCalledOnce()->willReturn($merchantDebtor);
         $companiesService->getDebtor(self::DEBTOR_ID)->shouldBeCalledOnce()->willReturn($debtorCompany);
         $companiesService->updateDebtor(self::DEBTOR_ID, [

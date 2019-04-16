@@ -3,17 +3,26 @@
 namespace spec\App\Application\UseCase\ShipOrder;
 
 use App\Application\PaellaCoreCriticalException;
+use App\Application\UseCase\Response\OrderResponse;
+use App\Application\UseCase\Response\OrderResponseFactory;
 use App\Application\UseCase\ShipOrder\ShipOrderRequest;
 use App\Application\UseCase\ShipOrder\ShipOrderUseCase;
+use App\Application\UseCase\ValidatedRequestInterface;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Borscht\OrderPaymentDetailsDTO;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
+use App\DomainModel\Order\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Validator\Constraints\Collection;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Workflow\Workflow;
 
 class ShipOrderUseCaseSpec extends ObjectBehavior
@@ -38,9 +47,23 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
         Workflow $workflow,
         OrderRepositoryInterface $orderRepository,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
-        BorschtInterface $paymentsService
+        BorschtInterface $paymentsService,
+        OrderPersistenceService $orderPersistenceService,
+        OrderResponseFactory $orderResponseFactory,
+        ValidatorInterface $validator
     ) {
-        $this->beConstructedWith($workflow, $orderRepository, $merchantDebtorRepository, $paymentsService);
+        $validator->validate(Argument::any(), Argument::any(), Argument::any())->willReturn(new ConstraintViolationList());
+
+        $this->beConstructedWith(
+            $workflow,
+            $orderRepository,
+            $merchantDebtorRepository,
+            $paymentsService,
+            $orderPersistenceService,
+            $orderResponseFactory
+        );
+
+        $this->setValidator($validator);
     }
 
     public function it_is_initializable()
@@ -90,9 +113,12 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
         BorschtInterface $paymentsService,
         OrderEntity $order,
         MerchantDebtorEntity $merchantDebtor,
-        OrderPaymentDetailsDTO $paymentDetailsDTO
+        OrderPaymentDetailsDTO $paymentDetailsDTO,
+        OrderPersistenceService $orderPersistenceService,
+        OrderResponseFactory $orderResponseFactory
     ) {
         $order->getMerchantDebtorId()->willReturn(self::MERCHANT_DEBTOR_ID);
+        $order->getExternalCode()->willReturn("test");
 
         $orderRepository
             ->getOneByMerchantIdAndExternalCodeOrUUID(self::EXTERNAL_CODE, self::MERCHANT_ID)
@@ -100,6 +126,8 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
             ->willReturn($order)
         ;
 
+        $orderPersistenceService->createFromOrderEntity($order)->willReturn(new OrderContainer());
+        $orderResponseFactory->create(new OrderContainer())->willReturn(new OrderResponse());
         $workflow
             ->can($order, OrderStateManager::TRANSITION_SHIP)
             ->shouldBeCalled()

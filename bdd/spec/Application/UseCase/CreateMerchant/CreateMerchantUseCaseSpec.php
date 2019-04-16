@@ -11,6 +11,7 @@ use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantEntityFactory;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntityFactory;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
@@ -40,7 +41,8 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
         MerchantSettingsRepositoryInterface $merchantSettingsRepository,
         ScoreThresholdsConfigurationEntityFactory $scoreThresholdsConfigurationFactory,
         ScoreThresholdsConfigurationRepositoryInterface $scoreThresholdsConfigurationRepository,
-        CreateMerchantRequest $request
+        CreateMerchantRequest $request,
+        MerchantRiskCheckSettingsRepositoryInterface $merchantRiskCheckSettingsRepository
     ) {
         $request->getCompanyId()->willReturn(self::COMPANY_ID);
 
@@ -51,7 +53,8 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
             $merchantSettingsFactory,
             $merchantSettingsRepository,
             $scoreThresholdsConfigurationFactory,
-            $scoreThresholdsConfigurationRepository
+            $scoreThresholdsConfigurationRepository,
+            $merchantRiskCheckSettingsRepository
         );
     }
 

@@ -3,6 +3,7 @@
 namespace App\DomainModel\Order;
 
 use App\Application\UseCase\CreateOrder\CreateOrderRequest;
+use Ramsey\Uuid\Uuid;
 
 class OrderEntityFactory
 {
@@ -17,6 +18,7 @@ class OrderEntityFactory
             ->setExternalCode($request->getExternalCode())
             ->setMerchantId($request->getMerchantId())
             ->setState(OrderStateManager::STATE_NEW)
+            ->setUuid(Uuid::uuid4()->toString())
         ;
     }
 

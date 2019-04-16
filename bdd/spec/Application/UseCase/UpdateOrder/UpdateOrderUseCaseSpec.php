@@ -71,7 +71,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $request->getMerchantId()->willReturn(self::ORDER_MERCHANT_ID);
         $request->getOrderId()->willReturn(self::ORDER_EXTERNAL_CODE);
 
-        $validator->validate(Argument::any())->willReturn(new ConstraintViolationList());
+        $validator->validate(Argument::any(), Argument::any(), Argument::any())->willReturn(new ConstraintViolationList());
 
         $this->beConstructedWith(
             $borscht,

@@ -115,6 +115,14 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
+     * @Given I have a(n) :state order with amounts :gross/:net/:tax, duration :duration and comment :comment
+     */
+    public function iHaveAnOrderWithoutExternalCode($state, $gross, $net, $tax, $duration, $comment)
+    {
+        $this->iHaveAnOrder($state, null, $gross, $net, $tax, $duration, $comment);
+    }
+
+    /**
      * @Given I have a(n) :state order :externalCode with amounts :gross/:net/:tax, duration :duration and comment :comment
      */
     public function iHaveAnOrder($state, $externalCode, $gross, $net, $tax, $duration, $comment)
@@ -179,6 +187,7 @@ class PaellaCoreContext extends MinkContext
             ->setMerchantDebtorId($merchantDebtor->getId())
             ->setMerchantId('1')
             ->setPaymentId('test')
+            ->setUuid('test123')
         ;
 
         $this->getOrderRepository()->insert($order);

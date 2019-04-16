@@ -11,6 +11,7 @@ use App\DomainModel\Borscht\DebtorPaymentDetailsDTO;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use PhpSpec\ObjectBehavior;
+use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -53,7 +54,7 @@ class UpdateMerchantDebtorLimitUseCaseSpec extends ObjectBehavior
         $request->getMerchantDebtorExternalId()->willReturn(self::MERCHANT_DEBTOR_EXTERNAL_ID);
         $request->getLimit()->willReturn(100);
 
-        $validator->validate($request)->shouldBeCalledOnce()->willReturn(new ConstraintViolationList());
+        $validator->validate($request, Argument::any(), Argument::any())->shouldBeCalledOnce()->willReturn(new ConstraintViolationList());
         $merchantDebtorRepository->getOneByMerchantExternalId(self::MERCHANT_DEBTOR_EXTERNAL_ID, self::MERCHANT_ID, [])->shouldBeCalledOnce()->willReturn(null);
 
         $this->shouldThrow(MerchantDebtorNotFoundException::class)->during('execute', [$request]);
@@ -65,7 +66,7 @@ class UpdateMerchantDebtorLimitUseCaseSpec extends ObjectBehavior
         ConstraintViolation $violation
     ) {
         $request->getLimit()->willReturn(-500);
-        $validator->validate($request)->shouldBeCalledOnce()->willReturn(new ConstraintViolationList([$violation->getWrappedObject()]));
+        $validator->validate($request, Argument::any(), Argument::any())->shouldBeCalledOnce()->willReturn(new ConstraintViolationList([$violation->getWrappedObject()]));
 
         $this->shouldThrow(RequestValidationException::class)->during('execute', [$request]);
     }
@@ -85,7 +86,7 @@ class UpdateMerchantDebtorLimitUseCaseSpec extends ObjectBehavior
         $request->getMerchantDebtorExternalId()->willReturn(self::MERCHANT_DEBTOR_EXTERNAL_ID);
         $request->getLimit()->willReturn(1000);
 
-        $validator->validate($request)->shouldBeCalledOnce()->willReturn(new ConstraintViolationList());
+        $validator->validate($request, Argument::any(), Argument::any())->shouldBeCalledOnce()->willReturn(new ConstraintViolationList());
 
         $merchantDebtorRepository->getOneByMerchantExternalId(self::MERCHANT_DEBTOR_EXTERNAL_ID, self::MERCHANT_ID, [])->shouldBeCalledOnce()->willReturn($merchantDebtor);
         $merchantDebtorRepository->getMerchantDebtorCreatedOrdersAmount(self::MERCHANT_DEBTOR_ID)->shouldBeCalledOnce()->willReturn(150.55);
