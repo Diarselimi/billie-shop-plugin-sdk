@@ -4,11 +4,9 @@ namespace App\Http;
 
 interface HttpConstantsInterface
 {
-    const REQUEST_HEADER_API_USER = 'X-Api-User';
+    const REQUEST_HEADER_API_KEY = 'X-Api-Key';
 
-    const ROUTE_HEALTH_CHECK = 'health_check';
+    const REQUEST_HEADER_AUTHORIZATION = 'Authorization';
 
-    const ROUTE_MARK_ORDER_AS_FRAUD = 'mark_order_as_fraud';
-
-    const CREATE_MERCHANT = 'create_merchant';
+    const REQUEST_ATTRIBUTE_MERCHANT_ID = 'merchant_id';
 }

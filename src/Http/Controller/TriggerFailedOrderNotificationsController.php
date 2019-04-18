@@ -24,7 +24,7 @@ class TriggerFailedOrderNotificationsController
         try {
             $useCaseRequest = new TriggerFailedOrderNotificationsRequest(
                 $id,
-                $request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER)
+                $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID)
             );
 
             $this->useCase->execute($useCaseRequest);

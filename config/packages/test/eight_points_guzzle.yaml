@@ -10,3 +10,8 @@ eight_points_guzzle:
       options:
         query:
           app: borscht
+    smaug:
+      base_url: "%behat_mock_server_url%"
+      options:
+        query:
+          app: smaug

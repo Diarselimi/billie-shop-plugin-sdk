@@ -30,7 +30,7 @@ class CreateOrderController
     public function execute(Request $request): JsonResponse
     {
         $useCaseRequest = (new CreateOrderRequest())
-            ->setMerchantId($request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER))
+            ->setMerchantId($request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID))
             ->setAmount(
                 (new CreateOrderAmountRequest())
                     ->setNet($request->request->get('amount')['net'] ?? null)

@@ -14,6 +14,10 @@ services:
     bind:
       $producer: '@old_sound_rabbit_mq.paella_events_producer'
       $delayedProducer: '@old_sound_rabbit_mq.paella_delayed_events_producer'
+      $invoiceUploadHandlers:
+        ftp: '@App\Infrastructure\Sns\SnsInvoiceUploadHandler'
+        none: '@App\DomainModel\OrderInvoice\UselessInvoiceUploadHandler'
+      $snsInvoiceUploadTopicArn: '%receive_invoices_sns_topic_arn%'
 
   _instanceof:
     App\Application\UseCase\ValidatedUseCaseInterface:
@@ -39,6 +43,10 @@ services:
   App\Infrastructure\OrderNotification\NotificationSender:
     arguments:
       $client: '@eight_points_guzzle.client.webhook'
+
+  App\Infrastructure\Smaug\Smaug:
+    arguments:
+      $client: '@eight_points_guzzle.client.smaug'
 
   Symfony\Component\Workflow\Workflow: '@state_machine.order'
 
@@ -81,8 +89,3 @@ services:
             company_b2b_score: '@App\DomainModel\OrderRiskCheck\Checker\DebtorScoreCheck'
             limit: '@App\DomainModel\OrderRiskCheck\Checker\LimitCheck'
             debtor_identified: '@App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedCheck'
-
-  App\Infrastructure\Sns\InvoiceDownloadEventPublisher:
-    arguments:
-      - '@aws.sns'
-      - '%receive_invoices_sns_topic_arn%'

@@ -23,7 +23,7 @@ class ConfirmOrderPaymentController
         try {
             $orderRequest = new ConfirmOrderPaymentRequest(
                 $id,
-                $request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER),
+                $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID),
                 $request->request->get('amount')
             );
             $this->useCase->execute($orderRequest);

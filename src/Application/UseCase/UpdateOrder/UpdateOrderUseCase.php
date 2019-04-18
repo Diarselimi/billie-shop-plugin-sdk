@@ -13,6 +13,9 @@ use App\DomainModel\Order\LimitsService;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
+use App\DomainModel\OrderInvoice\InvoiceUploadHandlerInterface;
+use App\DomainModel\OrderInvoice\OrderInvoiceManager;
+use App\DomainModel\OrderInvoice\OrderInvoiceUploadException;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,13 +36,16 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 
     private $orderStateManager;
 
+    private $invoiceManager;
+
     public function __construct(
         BorschtInterface $paymentsService,
         LimitsService $limitsService,
         OrderRepositoryInterface $orderRepository,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         MerchantRepositoryInterface $merchantRepository,
-        OrderStateManager $orderStateManager
+        OrderStateManager $orderStateManager,
+        OrderInvoiceManager $invoiceManager
     ) {
         $this->paymentsService = $paymentsService;
         $this->limitsService = $limitsService;
@@ -47,6 +53,7 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->merchantRepository = $merchantRepository;
         $this->orderStateManager = $orderStateManager;
+        $this->invoiceManager = $invoiceManager;
     }
 
     public function execute(UpdateOrderRequest $request): void
@@ -199,6 +206,17 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         $order->setInvoiceNumber($request->getInvoiceNumber())->setInvoiceUrl($request->getInvoiceUrl());
 
         $this->applyUpdate($order);
+
+        try {
+            $this->invoiceManager->upload($order, InvoiceUploadHandlerInterface::EVENT_UPDATE);
+        } catch (OrderInvoiceUploadException $exception) {
+            throw new PaellaCoreCriticalException(
+                "Update invoice is not possible",
+                PaellaCoreCriticalException::CODE_ORDER_INVOICE_CANT_BE_UPDATED,
+                500,
+                $exception
+            );
+        }
     }
 
     private function applyUpdate(OrderEntity $order)

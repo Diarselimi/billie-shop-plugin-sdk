@@ -6,7 +6,7 @@ Feature:
     Background:
         Given I add "Content-type" header equal to "application/json"
         And I add "X-Test" header equal to 1
-        And I add "X-Api-User" header equal to 1
+        And I add "X-Api-Key" header equal to test
 
     Scenario: Order doesn't exist
         When I send a POST request to "/order/ADDDD/ship" with body:

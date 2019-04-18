@@ -20,7 +20,7 @@ class CreateOrderInvoiceController
     public function execute(string $id, Request $request): JsonResponse
     {
         $useCaseRequest = new CreateOrderInvoiceRequest(
-            $request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER),
+            $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID),
             $id,
             $request->request->get('file_id'),
             $request->request->get('invoice_number')

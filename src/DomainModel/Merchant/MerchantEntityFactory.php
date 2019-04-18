@@ -23,6 +23,7 @@ class MerchantEntityFactory
             ->setIsActive((bool) $row['is_active'])
             ->setWebhookUrl($row['webhook_url'])
             ->setWebhookAuthorization($row['webhook_authorization'])
+            ->setOauthClientId($row['oauth_client_id'])
             ->setCreatedAt(new \DateTime($row['created_at']))
             ->setUpdatedAt(new \DateTime($row['updated_at']))
         ;

@@ -43,6 +43,9 @@ services:
   App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface:
     alias: 'App\Infrastructure\Repository\OrderRiskCheckRepository'
     public: true
+  App\DomainModel\MerchantUser\MerchantUserRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\MerchantUserRepository'
+    public: true
   donatj\MockWebServer\MockWebServer:
     arguments:
       $port: "%behat_mock_server_port%"

@@ -25,6 +25,8 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
 
     private $webhookAuthorization;
 
+    private $oauthClientId;
+
     public function getName(): string
     {
         return $this->name;
@@ -139,6 +141,18 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
     public function setPaymentMerchantId(?string $paymentMerchantId): MerchantEntity
     {
         $this->paymentMerchantId = $paymentMerchantId;
+
+        return $this;
+    }
+
+    public function getOauthClientId(): ? string
+    {
+        return $this->oauthClientId;
+    }
+
+    public function setOauthClientId(?string $oauthClientId): MerchantEntity
+    {
+        $this->oauthClientId = $oauthClientId;
 
         return $this;
     }

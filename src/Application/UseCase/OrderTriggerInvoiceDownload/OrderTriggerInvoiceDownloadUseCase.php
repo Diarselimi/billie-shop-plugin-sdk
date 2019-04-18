@@ -2,9 +2,8 @@
 
 namespace App\Application\UseCase\OrderTriggerInvoiceDownload;
 
-use App\Application\PaellaCoreCriticalException;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\Infrastructure\Sns\InvoiceDownloadEventPublisherInterface;
+use App\Infrastructure\Sns\SnsInvoiceUploadHandler;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
@@ -12,19 +11,18 @@ class OrderTriggerInvoiceDownloadUseCase implements LoggingInterface
 {
     use LoggingTrait;
 
+    private const INVOICE_URL_TEMPLATE = '%sBillie_Invoice_%s.pdf';
+
     private $orderRepository;
 
-    private $eventPublisher;
+    private $invoiceHandler;
 
-    public function __construct(
-        OrderRepositoryInterface $orderRepository,
-        InvoiceDownloadEventPublisherInterface $eventPublisher
-    ) {
+    public function __construct(OrderRepositoryInterface $orderRepository, SnsInvoiceUploadHandler $invoiceHandler)
+    {
         $this->orderRepository = $orderRepository;
-        $this->eventPublisher = $eventPublisher;
+        $this->invoiceHandler = $invoiceHandler;
     }
 
-    // Returns the last processed order ID
     public function execute(int $limit, int $batchSize, int $sleepTime, int $lastId = 0, string $basePath = '/'): int
     {
         $orders = $this->orderRepository->getWithInvoiceNumber($limit, $lastId);
@@ -38,12 +36,15 @@ class OrderTriggerInvoiceDownloadUseCase implements LoggingInterface
             $merchantId = $orderRow['merchant_id'];
             $orderId = $orderRow['id'];
             $orderExternalCode = $orderRow['external_code'];
+            $invoiceNumber = $orderRow['invoice_number'];
 
-            if (!$this->eventPublisher->publish($orderExternalCode, $merchantId, $orderRow['invoice_number'], $basePath)) {
-                throw new PaellaCoreCriticalException(
-                    "Cannot publish invoice download event for order #" . $orderId . ". LastID was " . $lastId
-                );
-            }
+            $this->invoiceHandler->handleInvoice(
+                $orderExternalCode,
+                $merchantId,
+                $invoiceNumber,
+                sprintf(self::INVOICE_URL_TEMPLATE, $basePath, $invoiceNumber),
+                SnsInvoiceUploadHandler::EVENT_MIGRATION
+            );
 
             $lastId = $orderId;
         }

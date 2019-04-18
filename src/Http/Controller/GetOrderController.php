@@ -19,7 +19,7 @@ class GetOrderController
 
     public function execute(string $id, Request $request): OrderResponse
     {
-        $request = new GetOrderRequest($id, $request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER));
+        $request = new GetOrderRequest($id, $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID));
         $response = $this->useCase->execute($request);
 
         return $response;

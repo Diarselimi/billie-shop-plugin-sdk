@@ -3,7 +3,7 @@ Feature: Endpoint to approve an order in waiting state
   Background:
 	Given I add "Content-type" header equal to "application/json"
 	And I add "X-Test" header equal to 1
-	And I add "X-Api-User" header equal to 1
+	And I add "X-Api-Key" header equal to test
 	And The following risk check definitions exist:
 	  | name                              |
 	  | available_financing_limit         |

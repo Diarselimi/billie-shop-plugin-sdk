@@ -9,7 +9,7 @@ use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class MerchantRepository extends AbstractPdoRepository implements MerchantRepositoryInterface
 {
-    private const SELECT_FIELDS = 'id, name, api_key, company_id, payment_merchant_id, roles, is_active, available_financing_limit, webhook_url, webhook_authorization, created_at, updated_at';
+    private const SELECT_FIELDS = 'id, name, api_key, oauth_client_id, company_id, payment_merchant_id, roles, is_active, available_financing_limit, webhook_url, webhook_authorization, created_at, updated_at';
 
     private $factory;
 
@@ -22,12 +22,13 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
     {
         $id = $this->doInsert('
             INSERT INTO merchants
-            (name, api_key, roles, is_active, available_financing_limit, company_id, payment_merchant_id, webhook_url, webhook_authorization, created_at, updated_at)
+            (name, api_key, oauth_client_id, roles, is_active, available_financing_limit, company_id, payment_merchant_id, webhook_url, webhook_authorization, created_at, updated_at)
             VALUES
-            (:name, :api_key, :roles, :is_active, :available_financing_limit, :company_id, :payment_merchant_id, :webhook_url, :webhook_authorization, :created_at, :updated_at)
+            (:name, :api_key, :oauth_client_id, :roles, :is_active, :available_financing_limit, :company_id, :payment_merchant_id, :webhook_url, :webhook_authorization, :created_at, :updated_at)
         ', [
             'name' => $merchant->getName(),
             'api_key' => $merchant->getApiKey(),
+            'oauth_client_id' => $merchant->getOauthClientId(),
             'roles' => $merchant->getRoles(),
             'is_active' => $merchant->isActive(),
             'available_financing_limit' => $merchant->getAvailableFinancingLimit(),
@@ -87,6 +88,17 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
           FROM merchants
           WHERE api_key = :api_key
         ', ['api_key' => $apiKey]);
+
+        return $row ? $this->factory->createFromDatabaseRow($row) : null;
+    }
+
+    public function getOneByOauthClientId(string $oauthClientId): ? MerchantEntity
+    {
+        $row = $this->doFetchOne('
+          SELECT ' . self::SELECT_FIELDS . '
+          FROM merchants
+          WHERE oauth_client_id = :oauth_client_id
+        ', ['oauth_client_id' => $oauthClientId]);
 
         return $row ? $this->factory->createFromDatabaseRow($row) : null;
     }

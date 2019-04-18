@@ -23,7 +23,7 @@
 						"type": "text"
 					},
 					{
-						"key": "X-Api-User",
+						"key": "X-Api-Key",
 						"value": "1",
 						"type": "text"
 					},
@@ -38,7 +38,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{PAELLA_URL}}/merchant-debtor/DE2003993374",
+					"raw": "{{PAELLA_URL}}/merchant/{merchantId}/merchant-debtor/DE2003993374",
 					"host": [
 						"{{PAELLA_URL}}"
 					],
@@ -65,7 +65,7 @@
 						"type": "text"
 					},
 					{
-						"key": "X-Api-User",
+						"key": "X-Api-Key",
 						"value": "1",
 						"type": "text"
 					},
@@ -80,7 +80,7 @@
 					"raw": "{\n\t\"limit\": 20000\n}"
 				},
 				"url": {
-					"raw": "{{PAELLA_URL}}/merchant-debtor/DE2008729287/limit",
+					"raw": "{{PAELLA_URL}}/merchant/{merchantId}/merchant-debtor/DE2008729287/limit",
 					"host": [
 						"{{PAELLA_URL}}"
 					],
@@ -108,7 +108,7 @@
 						"value": "application/json"
 					},
 					{
-						"key": "X-Api-User",
+						"key": "X-Api-Key",
 						"type": "text",
 						"value": "1"
 					},
@@ -123,7 +123,7 @@
 					"raw": "{\n\t\"address_house\": \"2\",\n\t\"address_street\": \"Adalbert-Stifter-Strasse\",\n\t\"address_postal_code\": \"89278\",\n\t\"address_city\": \"Nersingen\"\n}"
 				},
 				"url": {
-					"raw": "{{PAELLA_URL}}/merchant-debtor/DE2003993374/company",
+					"raw": "{{PAELLA_URL}}/merchant/{merchantId}/merchant-debtor/DE2003993374/company",
 					"host": [
 						"{{PAELLA_URL}}"
 					],

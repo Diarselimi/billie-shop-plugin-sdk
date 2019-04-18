@@ -12,6 +12,8 @@ use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsEntity;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
+use App\DomainModel\MerchantUser\MerchantUserEntity;
+use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderIdentification\OrderIdentificationRepositoryInterface;
@@ -59,6 +61,7 @@ class PaellaCoreContext extends MinkContext
                 ->setAvailableFinancingLimit(10000)
                 ->setApiKey('test')
                 ->setCompanyId('10')
+                ->setOauthClientId('oauthClientId')
         );
 
         $scoreThreshold = (new ScoreThresholdsConfigurationEntity())
@@ -80,6 +83,7 @@ class PaellaCoreContext extends MinkContext
                 ->setMinOrderAmount(0)
                 ->setScoreThresholdsConfigurationId($scoreThreshold->getId())
                 ->setUseExperimentalDebtorIdentification(false)
+                ->setInvoiceHandlingStrategy('none')
                 ->setCreatedAt(new DateTime())
                 ->setUpdatedAt(new DateTime())
         );
@@ -104,6 +108,7 @@ class PaellaCoreContext extends MinkContext
             TRUNCATE merchants_debtors;
             TRUNCATE merchant_settings;
             TRUNCATE merchant_risk_check_settings;
+            TRUNCATE merchant_users;
             TRUNCATE merchants;
             TRUNCATE merchants_debtors;
             TRUNCATE score_thresholds_configuration;
@@ -441,6 +446,37 @@ class PaellaCoreContext extends MinkContext
         return $order;
     }
 
+    /**
+     * @Given /^a merchant user exists$/
+     */
+    public function aMerchantUserExists()
+    {
+        $this->getMerchantUserRepository()->create(
+            (new MerchantUserEntity())
+                ->setUserId('oauthUserId')
+                ->setMerchantId(1)
+                ->setRoles(['ROLE_USER'])
+        );
+    }
+
+    /**
+     * @Given /^a merchant exists with company ID (\d+)$/
+     */
+    public function aMerchantExistsWithCompanyID($companyId)
+    {
+        $this->getMerchantRepository()->insert(
+            (new MerchantEntity())
+                ->setName('test merchant')
+                ->setIsActive(true)
+                ->setRoles('["ROLE_NOTHING"]')
+                ->setPaymentMerchantId('any-payment-id')
+                ->setAvailableFinancingLimit(10000)
+                ->setApiKey('testMerchantApiKey')
+                ->setCompanyId($companyId)
+                ->setOauthClientId('testMerchantOauthClientId')
+        );
+    }
+
     private function getDebtorExternalDataRepository(): DebtorExternalDataRepositoryInterface
     {
         return $this->get(DebtorExternalDataRepositoryInterface::class);
@@ -499,6 +535,11 @@ class PaellaCoreContext extends MinkContext
     private function getOrderRiskCheckRepositoryInterface(): OrderRiskCheckRepositoryInterface
     {
         return $this->get(OrderRiskCheckRepositoryInterface::class);
+    }
+
+    private function getMerchantUserRepository(): MerchantUserRepositoryInterface
+    {
+        return $this->get(MerchantUserRepositoryInterface::class);
     }
 
     private function getConnection(): PdoConnection

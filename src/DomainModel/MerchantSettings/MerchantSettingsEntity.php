@@ -6,11 +6,19 @@ use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 
 class MerchantSettingsEntity extends AbstractTimestampableEntity
 {
+    public const INVOICE_HANDLING_STRATEGY_FTP = 'ftp';
+
+    public const INVOICE_HANDLING_STRATEGY_HTTP = 'http';
+
+    public const INVOICE_HANDLING_STRATEGY_NONE = 'none';
+
     private $merchantId;
 
     private $debtorFinancingLimit;
 
     private $minOrderAmount;
+
+    private $invoiceHandlingStrategy;
 
     private $scoreThresholdsConfigurationId;
 
@@ -48,6 +56,18 @@ class MerchantSettingsEntity extends AbstractTimestampableEntity
     public function setMinOrderAmount(float $minOrderAmount): MerchantSettingsEntity
     {
         $this->minOrderAmount = $minOrderAmount;
+
+        return $this;
+    }
+
+    public function getInvoiceHandlingStrategy(): string
+    {
+        return $this->invoiceHandlingStrategy;
+    }
+
+    public function setInvoiceHandlingStrategy(string $invoiceHandlingStrategy): MerchantSettingsEntity
+    {
+        $this->invoiceHandlingStrategy = $invoiceHandlingStrategy;
 
         return $this;
     }

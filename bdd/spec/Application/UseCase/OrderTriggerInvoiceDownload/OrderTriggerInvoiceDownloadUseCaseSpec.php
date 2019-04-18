@@ -2,10 +2,9 @@
 
 namespace spec\App\Application\UseCase\OrderTriggerInvoiceDownload;
 
-use App\Application\PaellaCoreCriticalException;
 use App\Application\UseCase\OrderTriggerInvoiceDownload\OrderTriggerInvoiceDownloadUseCase;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\Infrastructure\Sns\InvoiceDownloadEventPublisherInterface;
+use App\Infrastructure\Sns\SnsInvoiceUploadHandler;
 use PhpSpec\ObjectBehavior;
 
 class OrderTriggerInvoiceDownloadUseCaseSpec extends ObjectBehavior
@@ -18,8 +17,6 @@ class OrderTriggerInvoiceDownloadUseCaseSpec extends ObjectBehavior
 
     private const INVOICE_NUMBER = 'DE124087293182842194-1';
 
-    private const BASE_PATH = '/';
-
     public function it_is_initializable()
     {
         $this->shouldHaveType(OrderTriggerInvoiceDownloadUseCase::class);
@@ -27,14 +24,14 @@ class OrderTriggerInvoiceDownloadUseCaseSpec extends ObjectBehavior
 
     public function let(
         OrderRepositoryInterface $orderRepository,
-        InvoiceDownloadEventPublisherInterface $eventPublisher
+        SnsInvoiceUploadHandler $invoiceHandler
     ) {
-        $this->beConstructedWith($orderRepository, $eventPublisher);
+        $this->beConstructedWith($orderRepository, $invoiceHandler);
     }
 
     public function it_should_call_the_publisher_for_every_found_order_and_return_the_id_of_the_last_one(
         OrderRepositoryInterface $orderRepository,
-        InvoiceDownloadEventPublisherInterface $eventPublisher
+        SnsInvoiceUploadHandler $invoiceHandler
     ) {
         $orderRepository
             ->getWithInvoiceNumber(0, 0)
@@ -43,21 +40,22 @@ class OrderTriggerInvoiceDownloadUseCaseSpec extends ObjectBehavior
                 $this->getSampleGenerator()
             );
 
-        $eventPublisher->publish(
-            self::ORDER_EXTERNAL_CODE,
-            self::MERCHANT_ID,
-            self::INVOICE_NUMBER,
-            self::BASE_PATH
-        )
-            ->shouldBeCalledTimes(1)
-            ->willReturn(true);
+        $invoiceHandler
+            ->handleInvoice(
+                self::ORDER_EXTERNAL_CODE,
+                self::MERCHANT_ID,
+                self::INVOICE_NUMBER,
+                '/Billie_Invoice_DE124087293182842194-1.pdf',
+                SnsInvoiceUploadHandler::EVENT_MIGRATION
+            )->shouldBeCalledOnce()
+        ;
 
         $this->execute(0, 0, 0, 0)->shouldReturn(self::ORDER_ID);
     }
 
     public function it_should_return_same_lastId_if_no_orders_found(
         OrderRepositoryInterface $orderRepository,
-        InvoiceDownloadEventPublisherInterface $eventPublisher
+        SnsInvoiceUploadHandler $invoiceHandler
     ) {
         $orderRepository
             ->getWithInvoiceNumber(50, 10)
@@ -66,32 +64,9 @@ class OrderTriggerInvoiceDownloadUseCaseSpec extends ObjectBehavior
                 $this->getEmptyGenerator()
             );
 
-        $eventPublisher->publish()->shouldNotBeCalled();
+        $invoiceHandler->handleInvoice()->shouldNotBeCalled();
 
         $this->execute(50, 0, 0, 10)->shouldReturn(10);
-    }
-
-    public function it_should_throw_exception_if_publisher_failed(
-        OrderRepositoryInterface $orderRepository,
-        InvoiceDownloadEventPublisherInterface $eventPublisher
-    ) {
-        $orderRepository
-            ->getWithInvoiceNumber(0, 0)
-            ->shouldBeCalledOnce()
-            ->willReturn(
-                $this->getSampleGenerator()
-            );
-
-        $eventPublisher->publish(
-            self::ORDER_EXTERNAL_CODE,
-            self::MERCHANT_ID,
-            self::INVOICE_NUMBER,
-            self::BASE_PATH
-        )
-            ->shouldBeCalledTimes(1)
-            ->willReturn(false);
-
-        $this->shouldThrow(PaellaCoreCriticalException::class)->during('execute', [0, 0, 0, 0]);
     }
 
     private function getEmptyGenerator(): \Generator
