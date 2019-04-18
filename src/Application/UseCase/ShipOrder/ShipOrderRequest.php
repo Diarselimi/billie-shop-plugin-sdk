@@ -2,18 +2,43 @@
 
 namespace App\Application\UseCase\ShipOrder;
 
-class ShipOrderRequest
+use App\Application\UseCase\ValidatedRequestInterface;
+use App\Application\Validator\Constraint as CustomAssert;
+use App\DomainModel\ArrayableInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+
+class ShipOrderRequest implements ValidatedRequestInterface, ArrayableInterface
 {
     private $orderId;
 
-    private $externalCode;
+    /**
+     * @var string
+     * @Assert\NotBlank(groups={"RequiredExternalCode"})
+     * @Assert\Length(max="255")
+     * @CustomAssert\OrderExternalCode()
+     */
+    private $externalOrderId;
 
     private $merchantId;
 
+    /**
+     * @var string
+     * @Assert\NotBlank()
+     * @Assert\Length(max="255")
+     */
     private $invoiceNumber;
 
+    /**
+     * @var string
+     * @Assert\NotBlank()
+     * @Assert\Length(max="255")
+     */
     private $invoiceUrl;
 
+    /**
+     * @var string
+     * @Assert\Length(max="255")
+     */
     private $proofOfDeliveryUrl;
 
     public function getOrderId(): string
@@ -30,7 +55,7 @@ class ShipOrderRequest
 
     public function getExternalCode(): ? string
     {
-        return $this->externalCode;
+        return $this->externalOrderId;
     }
 
     public function getMerchantId(): int
@@ -55,26 +80,26 @@ class ShipOrderRequest
 
     public function setExternalCode(?string $externalCode): ShipOrderRequest
     {
-        $this->externalCode = $externalCode;
+        $this->externalOrderId = $externalCode;
 
         return $this;
     }
 
-    public function setMerchantId(int $merchantId): ShipOrderRequest
+    public function setMerchantId(?int $merchantId): ShipOrderRequest
     {
         $this->merchantId = $merchantId;
 
         return $this;
     }
 
-    public function setInvoiceNumber(string $invoiceNumber): ShipOrderRequest
+    public function setInvoiceNumber(?string $invoiceNumber): ShipOrderRequest
     {
         $this->invoiceNumber = $invoiceNumber;
 
         return $this;
     }
 
-    public function setInvoiceUrl(string $invoiceUrl): ShipOrderRequest
+    public function setInvoiceUrl(?string $invoiceUrl): ShipOrderRequest
     {
         $this->invoiceUrl = $invoiceUrl;
 
@@ -86,5 +111,17 @@ class ShipOrderRequest
         $this->proofOfDeliveryUrl = $proofOfDeliveryUrl;
 
         return $this;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'order_id' => $this->getOrderId(),
+            'external_code' => $this->getExternalCode(),
+            'merchant_id' => $this->getMerchantId(),
+            'invoice_number' => $this->getInvoiceNumber(),
+            'invoice_url' => $this->getInvoiceUrl(),
+            'proof_of_delivery' => $this->getProofOfDeliveryUrl(),
+        ];
     }
 }

@@ -14,7 +14,7 @@ Feature:
         {
             "invoice_number": "CO123",
             "invoice_url": "http://example.com/invoice/is/here",
-            "proof_of_delivery_url": "http://example.com/proove/is/here"
+            "shipping_document_url": "http://example.com/proove/is/here"
         }
         """
         Then the response status code should be 404
@@ -35,9 +35,51 @@ Feature:
         {
             "invoice_number": "CO123",
             "invoice_url": "http://example.com/invoice/is/here",
-            "proof_of_delivery_url": "http://example.com/proove/is/here"
+            "shipping_document_url": "http://example.com/proove/is/here"
         }
         """
         Then the response status code should be 204
         And the response should be empty
         And the order "CO123" is in state shipped
+
+    Scenario: Order not shipped if no external code exists nor provided
+        Given I have a created order with amounts 1000/900/100, duration 30 and comment "test order"
+        And I get from payments service create ticket response
+        And I get from companies service get debtor response
+        When I send a POST request to "/order/test123/ship" with body:
+        """
+        {
+            "invoice_number": "test",
+            "invoice_url": "http://example.com/invoice/is/here",
+            "shipping_document_url": "http://example.com/proove/is/here"
+        }
+        """
+        And the JSON response should be:
+        """
+        {
+            "errors":[
+                {
+                    "source":"external_order_id",
+                    "title":"This value should not be blank.",
+                    "code":"request_validation_error"
+                }
+            ]
+        }
+        """
+        Then the response status code should be 400
+
+    Scenario: Order shipped if external code is provided
+        Given I have a created order with amounts 1000/900/100, duration 30 and comment "test order"
+        And I get from payments service create ticket response
+        And I get from companies service get debtor response
+        When I send a POST request to "/order/test123/ship" with body:
+        """
+        {
+            "invoice_number": "test",
+            "invoice_url": "http://example.com/invoice/is/here",
+            "shipping_document_url": "http://example.com/proove/is/here",
+            "external_order_id": "DD123"
+        }
+        """
+        And the order "DD123" is in state shipped
+        Then the response status code should be 204

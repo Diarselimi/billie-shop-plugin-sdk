@@ -17,9 +17,9 @@ trait ValidatedUseCaseTrait
         $this->validator = $validator;
     }
 
-    public function validateRequest(ValidatedRequestInterface $request): void
+    public function validateRequest(ValidatedRequestInterface $request, $constrains = null, $groups = null): void
     {
-        $validationErrors = $this->validator->validate($request);
+        $validationErrors = $this->validator->validate($request, $constrains, $groups);
 
         if ($validationErrors->count() === 0) {
             return;

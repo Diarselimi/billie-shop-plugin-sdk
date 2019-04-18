@@ -12,7 +12,6 @@ use Billie\MonitoringBundle\Service\RidProvider;
 use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 use Billie\PdoBundle\Infrastructure\Pdo\PdoConnection;
 use Generator;
-use Ramsey\Uuid\Uuid;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OrderRepository extends AbstractPdoRepository implements OrderRepositoryInterface
@@ -34,8 +33,6 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
 
     public function insert(OrderEntity $order): void
     {
-        $uuid = Uuid::uuid4()->toString();
-
         $id = $this->doInsert('
             INSERT INTO orders
             (
@@ -100,7 +97,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
             'debtor_person_id' => $order->getDebtorPersonId(),
             'debtor_external_data_id' => $order->getDebtorExternalDataId(),
             'payment_id' => $order->getPaymentId(),
-            'uuid' => $uuid,
+            'uuid' => $order->getUuid(),
             'rid' => $this->ridProvider->getRid(),
             'created_at' => $order->getCreatedAt()->format(self::DATE_FORMAT),
             'updated_at' => $order->getUpdatedAt()->format(self::DATE_FORMAT),
@@ -108,7 +105,6 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
         ]);
 
         $order->setId($id);
-        $order->setUuid($uuid);
 
         $this->eventDispatcher->dispatch(OrderLifecycleEvent::CREATED, new OrderLifecycleEvent($order));
     }

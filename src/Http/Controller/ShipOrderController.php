@@ -2,6 +2,7 @@
 
 namespace App\Http\Controller;
 
+use App\Application\UseCase\Response\OrderResponse;
 use App\Application\UseCase\ShipOrder\ShipOrderRequest;
 use App\Application\UseCase\ShipOrder\ShipOrderUseCase;
 use App\Http\HttpConstantsInterface;
@@ -16,7 +17,7 @@ class ShipOrderController
         $this->useCase = $useCase;
     }
 
-    public function execute(string $id, Request $request): void
+    public function execute(string $id, Request $request): OrderResponse
     {
         $orderRequest = (new ShipOrderRequest())
             ->setOrderId($id)
@@ -24,9 +25,9 @@ class ShipOrderController
             ->setMerchantId($request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER))
             ->setInvoiceNumber($request->request->get('invoice_number'))
             ->setInvoiceUrl($request->request->get('invoice_url'))
-            ->setProofOfDeliveryUrl($request->request->get('proof_of_delivery_url'))
+            ->setProofOfDeliveryUrl($request->request->get('shipping_document_url'))
         ;
 
-        $this->useCase->execute($orderRequest);
+        return $this->useCase->execute($orderRequest);
     }
 }
