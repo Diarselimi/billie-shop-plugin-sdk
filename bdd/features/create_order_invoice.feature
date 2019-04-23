@@ -3,11 +3,10 @@ Feature: Attach invoice file to an order.
   Background:
     Given I add "Content-type" header equal to "application/json"
     And I add "X-Test" header equal to 1
-    And I add "X-Api-Key" header equal to test
     And I have a created order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
 
   Scenario: Successfully create order invoice file
-    When I send a POST request to "/order/CO123/invoice" with body:
+    When I send a POST request to "/merchant/1/order/CO123/invoice" with body:
       """
       {
           "file_id": "1299",
@@ -22,7 +21,7 @@ Feature: Attach invoice file to an order.
       """
 
   Scenario: Order not found
-    When I send a POST request to "/order/CO123wrong/invoice" with body:
+    When I send a POST request to "/merchant/1/order/CO123wrong/invoice" with body:
       """
       {
           "file_id": "1299",
@@ -32,8 +31,5 @@ Feature: Attach invoice file to an order.
     Then the response status code should be 404
     And the JSON response should be:
       """
-      {
-          "code": "not_found",
-          "error": "Order #CO123wrong not found"
-      }
+      {"error":"Order #CO123wrong does't exist"}
       """

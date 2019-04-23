@@ -37,7 +37,7 @@ ship_order:
   methods: [POST]
 
 create_order_invoice:
-  path: /order/{id}/invoice
+  path: /merchant/{merchantId}/order/{id}/invoice
   controller: App\Http\Controller\CreateOrderInvoiceController::execute
   methods: [POST]
 
