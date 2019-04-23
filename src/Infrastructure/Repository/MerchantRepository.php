@@ -29,7 +29,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
             'name' => $merchant->getName(),
             'api_key' => $merchant->getApiKey(),
             'oauth_client_id' => $merchant->getOauthClientId(),
-            'roles' => $merchant->getRoles(),
+            'roles' => json_encode($merchant->getRoles()),
             'is_active' => $merchant->isActive(),
             'available_financing_limit' => $merchant->getAvailableFinancingLimit(),
             'company_id' => $merchant->getCompanyId(),

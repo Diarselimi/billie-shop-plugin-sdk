@@ -8,8 +8,6 @@ use Ramsey\Uuid\Uuid;
 
 class MerchantEntityFactory
 {
-    private const DEFAULT_ROLES = '["ROLE_API_USER"]';
-
     public function createFromDatabaseRow(array $row): MerchantEntity
     {
         return (new MerchantEntity())
@@ -19,7 +17,7 @@ class MerchantEntityFactory
             ->setAvailableFinancingLimit($row['available_financing_limit'])
             ->setCompanyId($row['company_id'])
             ->setPaymentMerchantId($row['payment_merchant_id'])
-            ->setRoles($row['roles'])
+            ->setRoles((array) json_decode($row['roles'], true))
             ->setIsActive((bool) $row['is_active'])
             ->setWebhookUrl($row['webhook_url'])
             ->setWebhookAuthorization($row['webhook_authorization'])
@@ -38,7 +36,7 @@ class MerchantEntityFactory
             ->setWebhookAuthorization($request->getWebhookAuthorization())
             ->setName($company->getName())
             ->setApiKey(Uuid::uuid4()->toString())
-            ->setRoles(self::DEFAULT_ROLES)
+            ->setRoles(MerchantEntity::DEFAULT_ROLES)
             ->setIsActive(true)
         ;
     }

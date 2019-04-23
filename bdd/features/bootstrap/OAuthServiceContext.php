@@ -5,15 +5,24 @@ use Behat\Gherkin\Node\PyStringNode;
 use donatj\MockWebServer\Response as MockResponse;
 use donatj\MockWebServer\ResponseStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 class OAuthServiceContext implements Context
 {
+    private const MOCK_SERVER_PORT = 8023;
+
     use MockServerTrait;
 
-    public function __construct(KernelInterface $kernel)
+    public function __construct()
     {
-        $this->setServer($kernel);
+        $this->startServer(self::MOCK_SERVER_PORT);
+    }
+
+    /**
+     * @AfterScenario
+     */
+    public function afterScenario()
+    {
+        $this->stopServer();
     }
 
     /**
@@ -21,7 +30,7 @@ class OAuthServiceContext implements Context
      */
     public function iGetFromOauthServiceInvalidTokenResponse()
     {
-        $this->setMock('/oauth/authorization', new ResponseStack(
+        $this->mockRequest('/oauth/authorization', new ResponseStack(
             new MockResponse('', [], Response::HTTP_UNAUTHORIZED)
         ));
     }
@@ -31,7 +40,7 @@ class OAuthServiceContext implements Context
      */
     public function iGetFromOauthServiceValidTokenResponse()
     {
-        $this->setMock('/oauth/authorization', new ResponseStack(
+        $this->mockRequest('/oauth/authorization', new ResponseStack(
             new MockResponse(json_encode(['client_id' => 'oauthClientId', 'user_id' => 'oauthUserId']))
         ));
     }
@@ -41,7 +50,7 @@ class OAuthServiceContext implements Context
      */
     public function iGetFromOauthServiceValidTokenResponseWithClient_id()
     {
-        $this->setMock('/oauth/authorization', new ResponseStack(
+        $this->mockRequest('/oauth/authorization', new ResponseStack(
             new MockResponse(json_encode(['client_id' => 'oauthClientId', 'user_id' => null]))
         ));
     }
@@ -51,7 +60,7 @@ class OAuthServiceContext implements Context
      */
     public function iSuccessfullyCreateOAuthClientWithIdAndSecretTestSecret($id, $secret)
     {
-        $this->setMock('/clients', new ResponseStack(
+        $this->mockRequest('/clients', new ResponseStack(
             new MockResponse(json_encode(['client_id' => $id, 'client_secret' => $secret]))
         ));
     }
@@ -61,7 +70,7 @@ class OAuthServiceContext implements Context
      */
     public function iGetFromOAuthServiceEndpointResponseWithStatusAndBody($url, $statusCode, PyStringNode $response)
     {
-        $this->setMock($url, new ResponseStack(
+        $this->mockRequest($url, new ResponseStack(
             new MockResponse($response, [], (int) $statusCode)
         ));
     }

@@ -22,12 +22,16 @@ return [
             'port' => getenv('DATABASE_PORT'),
             'charset' => 'utf8',
             'adapter' => 'mysql',
-        ]
+        ],
     ],
     'paths' => [
         'migrations' => [
             '%%PHINX_CONFIG_DIR%%/db/migrations/common',
             '%%PHINX_CONFIG_DIR%%/db/migrations/'.getenv('APP_ENV'),
+        ],
+        'seeds' => [
+            '%%PHINX_CONFIG_DIR%%/db/seeds/common',
+            '%%PHINX_CONFIG_DIR%%/db/seeds/'.getenv('APP_ENV'),
         ],
     ],
 ];

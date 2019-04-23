@@ -4,15 +4,24 @@ use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
 use donatj\MockWebServer\Response as MockResponse;
 use donatj\MockWebServer\ResponseStack;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 class CompaniesServiceContext implements Context
 {
+    private const MOCK_SERVER_PORT = 8021;
+
     use MockServerTrait;
 
-    public function __construct(KernelInterface $kernel)
+    public function __construct()
     {
-        $this->setServer($kernel);
+        $this->startServer(self::MOCK_SERVER_PORT);
+    }
+
+    /**
+     * @AfterScenario
+     */
+    public function afterScenario()
+    {
+        $this->stopServer();
     }
 
     /**
@@ -20,7 +29,7 @@ class CompaniesServiceContext implements Context
      */
     public function iGetFromCompaniesServiceIdentifyNoMatchResponse()
     {
-        $this->setMock('/debtor/identify', new ResponseStack(
+        $this->mockRequest('/debtor/identify', new ResponseStack(
             new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_no_match.json'), [], 404)
         ));
     }
@@ -30,7 +39,7 @@ class CompaniesServiceContext implements Context
      */
     public function iGetFromCompaniesServiceIdentifyMatchResponse()
     {
-        $this->setMock('/debtor/identify', new ResponseStack(
+        $this->mockRequest('/debtor/identify', new ResponseStack(
             new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match.json'))
         ));
     }
@@ -40,7 +49,7 @@ class CompaniesServiceContext implements Context
      */
     public function iGetFromCompaniesServiceGetDebtorResponse()
     {
-        $this->setMock('/debtor/1', new ResponseStack(
+        $this->mockRequest('/debtor/1', new ResponseStack(
             new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match.json'))
         ));
     }
@@ -50,7 +59,7 @@ class CompaniesServiceContext implements Context
      */
     public function iGetFromCompaniesServiceUpdateDebtorPositiveResponse()
     {
-        $this->setMock('/debtor/1', new ResponseStack(
+        $this->mockRequest('/debtor/1', new ResponseStack(
             new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match.json')),
             new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match.json'))
         ));
@@ -61,11 +70,11 @@ class CompaniesServiceContext implements Context
      */
     public function iGetFromCompaniesServiceIdentifyMatchAndGoodDecisionResponse()
     {
-        $this->setMock('/debtor/identify', new ResponseStack(
+        $this->mockRequest('/debtor/identify', new ResponseStack(
             new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match.json'))
         ));
 
-        $this->setMock('/debtor/1/is-eligible-for-pay-after-delivery', new ResponseStack(
+        $this->mockRequest('/debtor/1/is-eligible-for-pay-after-delivery', new ResponseStack(
             new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_decision_good.json'))
         ));
     }
@@ -75,11 +84,11 @@ class CompaniesServiceContext implements Context
      */
     public function iGetFromCompaniesServiceIdentifyMatchAndBadDecisionResponse()
     {
-        $this->setMock('/debtor/identify', new ResponseStack(
+        $this->mockRequest('/debtor/identify', new ResponseStack(
             new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match.json'))
         ));
 
-        $this->setMock('/debtor/1/is-eligible-for-pay-after-delivery', new ResponseStack(
+        $this->mockRequest('/debtor/1/is-eligible-for-pay-after-delivery', new ResponseStack(
             new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_decision_bad.json'))
         ));
     }
@@ -89,7 +98,7 @@ class CompaniesServiceContext implements Context
      */
     public function iGetFromCompaniesServiceIdentifyV2MatchResponse()
     {
-        $this->setMock('/debtor/identify/v2', new ResponseStack(
+        $this->mockRequest('/debtor/identify/v2', new ResponseStack(
             new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match_v2.json'))
         ));
     }
@@ -99,7 +108,7 @@ class CompaniesServiceContext implements Context
      */
     public function iGetFromCompaniesServiceEndpointResponseWithStatusAndBody($url, $statusCode, PyStringNode $response)
     {
-        $this->setMock($url, new ResponseStack(
+        $this->mockRequest($url, new ResponseStack(
             new MockResponse($response, [], (int) $statusCode)
         ));
     }

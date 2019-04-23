@@ -3,15 +3,24 @@
 use Behat\Behat\Context\Context;
 use donatj\MockWebServer\Response as MockResponse;
 use donatj\MockWebServer\ResponseStack;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 class PaymentsServiceContext implements Context
 {
+    private const MOCK_SERVER_PORT = 8022;
+
     use MockServerTrait;
 
-    public function __construct(KernelInterface $kernel)
+    public function __construct()
     {
-        $this->setServer($kernel);
+        $this->startServer(self::MOCK_SERVER_PORT);
+    }
+
+    /**
+     * @AfterScenario
+     */
+    public function afterScenario()
+    {
+        $this->stopServer();
     }
 
     /**
@@ -19,7 +28,7 @@ class PaymentsServiceContext implements Context
      */
     public function iGetFromPaymentsServiceRegisterDebtorPositiveResponse()
     {
-        $this->setMock('/debtor.json', new ResponseStack(
+        $this->mockRequest('/debtor.json', new ResponseStack(
             new MockResponse(file_get_contents(__DIR__ . '/../resources/payments_service_register_debtor.json'))
         ));
     }
@@ -29,8 +38,18 @@ class PaymentsServiceContext implements Context
      */
     public function iGetFromPaymentsServiceGetDebtorResponse()
     {
-        $this->setMock('/debtor/test.json', new ResponseStack(
+        $this->mockRequest('/debtor/test.json', new ResponseStack(
             new MockResponse(file_get_contents(__DIR__ . '/../resources/payments_service_get_debtor.json'))
+        ));
+    }
+
+    /**
+     * @Given /^I get from payments service get order details response$/
+     */
+    public function iGetFromPaymentsServiceGetOrderDetailsResponse()
+    {
+        $this->mockRequest('/order/1.json', new MockResponse(
+            file_get_contents(__DIR__ . '/../resources/payments_service_order_details.json')
         ));
     }
 
@@ -39,7 +58,7 @@ class PaymentsServiceContext implements Context
      */
     public function iGetFromPaymentsServiceCreateTicketResponse()
     {
-        $this->setMock('/order.json', new ResponseStack(
+        $this->mockRequest('/order.json', new ResponseStack(
             new MockResponse(file_get_contents(__DIR__ . '/../resources/payments_service_create_order.json'))
         ));
     }

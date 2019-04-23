@@ -1,13 +1,13 @@
 <?php
 
+use App\Infrastructure\Repository\DebtorExternalDataRepository;
 use Phinx\Migration\AbstractMigration as AbstractMigrationAlias;
-use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 
 class AddHashColumn extends AbstractMigrationAlias
 {
     public function change()
     {
-        $this->table(DebtorExternalDataEntity::TABLE_NAME)
+        $this->table(DebtorExternalDataRepository::TABLE_NAME)
             ->addColumn('debtor_data_hash', 'string', [
                 'null' => true,
                 'limit' => 32,
@@ -16,7 +16,7 @@ class AddHashColumn extends AbstractMigrationAlias
             ->addIndex(['debtor_data_hash'], ['name' => 'debtor_data_hash_index'])
             ->update();
 
-        $this->execute('UPDATE '. DebtorExternalDataEntity::TABLE_NAME .' SET debtor_data_hash = MD5(id);');
-        $this->execute('ALTER TABLE '. DebtorExternalDataEntity::TABLE_NAME .' CHANGE COLUMN  debtor_data_hash debtor_data_hash varchar(32) NOT NULL;');
+        $this->execute('UPDATE '. DebtorExternalDataRepository::TABLE_NAME .' SET debtor_data_hash = MD5(id);');
+        $this->execute('ALTER TABLE '. DebtorExternalDataRepository::TABLE_NAME .' CHANGE COLUMN  debtor_data_hash debtor_data_hash varchar(32) NOT NULL;');
     }
 }
