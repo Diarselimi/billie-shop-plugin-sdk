@@ -81,12 +81,15 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
     private function updateChangedData(OrderEntity $order, UpdateOrderRequest $request)
     {
         $durationChanged = $request->getDuration() !== null && $request->getDuration() !== $order->getDuration();
+
         $amountChanged = $request->getAmountGross() !== null && (float) $request->getAmountGross() !== $order->getAmountGross()
             || $request->getAmountNet() !== null && (float) $request->getAmountNet() !== $order->getAmountNet()
             || $request->getAmountTax() !== null && (float) $request->getAmountTax() !== $order->getAmountTax();
-        $invoiceChanged = !$amountChanged
-            && $request->getInvoiceNumber() !== null && $request->getInvoiceNumber() !== $order->getInvoiceNumber()
-            || $request->getInvoiceUrl() !== null && $request->getInvoiceUrl() !== $order->getInvoiceUrl();
+
+        $invoiceChanged = !$amountChanged && (
+            $request->getInvoiceNumber() !== null && $request->getInvoiceNumber() !== $order->getInvoiceNumber()
+            || $request->getInvoiceUrl() !== null && $request->getInvoiceUrl() !== $order->getInvoiceUrl()
+        );
 
         $this->logInfo('Start order update, state {state}, duration changed: {duration}, amount changed: {amount}', [
             'state' => $order->getState(),
