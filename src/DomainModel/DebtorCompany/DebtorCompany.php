@@ -26,6 +26,8 @@ class DebtorCompany
 
     private $isStrictMatch;
 
+    private $isTrustedSource;
+
     public function getId(): int
     {
         return $this->id;
@@ -156,5 +158,17 @@ class DebtorCompany
         $this->isStrictMatch = $isStrictMatch;
 
         return $this;
+    }
+
+    public function setIsTrustedSource(bool $isTrusted): DebtorCompany
+    {
+        $this->isTrustedSource = $isTrusted;
+
+        return $this;
+    }
+
+    public function isTrustedSource(): bool
+    {
+        return $this->isTrustedSource;
     }
 }

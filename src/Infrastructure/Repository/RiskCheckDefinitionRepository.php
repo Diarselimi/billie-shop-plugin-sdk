@@ -9,6 +9,8 @@ use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class RiskCheckDefinitionRepository extends AbstractPdoRepository implements RiskCheckDefinitionRepositoryInterface
 {
+    const TABLE_NAME = "risk_check_definitions";
+
     private const SELECT_FIELDS = 'id, name, created_at, updated_at';
 
     private $factory;
@@ -21,7 +23,7 @@ class RiskCheckDefinitionRepository extends AbstractPdoRepository implements Ris
     public function insert(RiskCheckDefinitionEntity $riskCheckDefinitionEntity): void
     {
         $id = $this->doInsert(
-            'INSERT INTO risk_check_definitions (name, created_at, updated_at) VALUES (:name, :created_at, :updated_at)',
+            'INSERT INTO '.self::TABLE_NAME.' (name, created_at, updated_at) VALUES (:name, :created_at, :updated_at)',
             [
                 'name' => $riskCheckDefinitionEntity->getName(),
                 'created_at' => $riskCheckDefinitionEntity->getCreatedAt()->format(self::DATE_FORMAT),
@@ -35,7 +37,7 @@ class RiskCheckDefinitionRepository extends AbstractPdoRepository implements Ris
     public function getByName(string $name): ?RiskCheckDefinitionEntity
     {
         $row = $this->doFetchOne(
-            'SELECT ' . self::SELECT_FIELDS . ' FROM risk_check_definitions WHERE name = :name',
+            'SELECT ' . self::SELECT_FIELDS . ' FROM '.self::TABLE_NAME.' WHERE name = :name',
             ['name' => $name]
         );
 

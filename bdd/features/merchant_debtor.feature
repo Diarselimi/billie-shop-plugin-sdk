@@ -50,6 +50,7 @@ Feature:
             "total_limit":2300,
             "created_amount":800,
             "outstanding_amount":500,
+            "is_whitelisted":false,
             "company":
             {
                 "crefo_id":"123",

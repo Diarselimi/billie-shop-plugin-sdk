@@ -5,6 +5,7 @@ namespace spec\App\Application\UseCase\GetMerchantDebtor;
 use App\Application\Exception\MerchantDebtorNotFoundException;
 use App\Application\UseCase\GetMerchantDebtor\GetMerchantDebtorRequest;
 use App\Application\UseCase\GetMerchantDebtor\GetMerchantDebtorResponse;
+use App\Application\UseCase\GetMerchantDebtor\GetMerchantDebtorResponseFactory;
 use App\Application\UseCase\GetMerchantDebtor\GetMerchantDebtorUseCase;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Borscht\DebtorPaymentDetailsDTO;
@@ -13,6 +14,7 @@ use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use PhpSpec\ObjectBehavior;
+use Prophecy\Argument;
 
 class GetMerchantDebtorUseCaseSpec extends ObjectBehavior
 {
@@ -28,10 +30,9 @@ class GetMerchantDebtorUseCaseSpec extends ObjectBehavior
 
     public function let(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
-        BorschtInterface $paymentsService,
-        CompaniesServiceInterface $companiesService
+        GetMerchantDebtorResponseFactory $merchantDebtorResponseFactory
     ) {
-        $this->beConstructedWith($merchantDebtorRepository, $paymentsService, $companiesService);
+        $this->beConstructedWith($merchantDebtorRepository, $merchantDebtorResponseFactory);
     }
 
     public function it_is_initializable()
@@ -54,11 +55,10 @@ class GetMerchantDebtorUseCaseSpec extends ObjectBehavior
     public function it_returns_the_merchant_debtor(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         GetMerchantDebtorRequest $request,
-        BorschtInterface $paymentsService,
-        CompaniesServiceInterface $companiesService,
         MerchantDebtorEntity $merchantDebtor,
         DebtorPaymentDetailsDTO $debtorPaymentDetails,
-        DebtorCompany $debtorDTO
+        DebtorCompany $debtorDTO,
+        GetMerchantDebtorResponseFactory $merchantDebtorResponseFactory
     ) {
         $this->mockMerchantDebtor($merchantDebtor);
         $this->mockDebtorPaymentDetails($debtorPaymentDetails);
@@ -68,31 +68,11 @@ class GetMerchantDebtorUseCaseSpec extends ObjectBehavior
         $request->getMerchantDebtorExternalId()->willReturn(self::MERCHANT_DEBTOR_EXTERNAL_ID);
 
         $merchantDebtorRepository->getOneByMerchantExternalId(self::MERCHANT_DEBTOR_EXTERNAL_ID, self::MERCHANT_ID, [])->shouldBeCalledOnce()->willReturn($merchantDebtor);
-        $merchantDebtorRepository->getMerchantDebtorCreatedOrdersAmount(self::MERCHANT_DEBTOR_ID)->shouldBeCalledOnce()->willReturn(150.55);
-        $paymentsService->getDebtorPaymentDetails(self::MERCHANT_DEBTOR_PAYMENT_ID)->shouldBeCalledOnce()->willReturn($debtorPaymentDetails);
-        $companiesService->getDebtor(self::DEBTOR_ID)->shouldBeCalledOnce()->willReturn($debtorDTO);
+
+        $this->mockMerchantDebtorResponseFactory($merchantDebtorResponseFactory, $merchantDebtor, $request);
 
         $response = $this->execute($request);
         $response->shouldBeAnInstanceOf(GetMerchantDebtorResponse::class);
-        $merchantDebtorData = $response->getMerchantDebtorData();
-        $merchantDebtorData->shouldHaveKeyWithValue('id', self::MERCHANT_DEBTOR_ID);
-        $merchantDebtorData->shouldHaveKeyWithValue('company_id', self::DEBTOR_ID);
-        $merchantDebtorData->shouldHaveKeyWithValue('payment_id', self::MERCHANT_DEBTOR_PAYMENT_ID);
-        $merchantDebtorData->shouldHaveKeyWithValue('external_id', self::MERCHANT_DEBTOR_EXTERNAL_ID);
-        $merchantDebtorData->shouldHaveKeyWithValue('available_limit', 5000.);
-        $merchantDebtorData->shouldHaveKeyWithValue('created_amount', 150.55);
-        $merchantDebtorData->shouldHaveKeyWithValue('outstanding_amount', 600.);
-        $merchantDebtorData->shouldHaveKeyWithValue('total_limit', 5750.55);
-        $merchantDebtorData->shouldHaveKeyWithValue('company', [
-            'crefo_id' => 'crefo_id',
-            'schufa_id' => 'schufa_id',
-            'name' => 'Dummy name',
-            'address_house' => '55',
-            'address_street' => 'Street',
-            'address_city' => 'City',
-            'address_postal_code' => '00567',
-            'address_country' => 'DE',
-        ]);
     }
 
     private function mockMerchantDebtor(MerchantDebtorEntity $merchantDebtor): void
@@ -119,5 +99,29 @@ class GetMerchantDebtorUseCaseSpec extends ObjectBehavior
         $debtor->getAddressCountry()->willReturn('DE');
         $debtor->getCrefoId()->willReturn('crefo_id');
         $debtor->getSchufaId()->willReturn('schufa_id');
+    }
+
+    private function mockMerchantDebtorResponseFactory(GetMerchantDebtorResponseFactory $factory, MerchantDebtorEntity $debtorEntity, GetMerchantDebtorRequest $request)
+    {
+        $merchantDebtorData['id'] = self::MERCHANT_DEBTOR_ID;
+        $merchantDebtorData['company_id'] = self::DEBTOR_ID;
+        $merchantDebtorData['payment_id'] = self::MERCHANT_DEBTOR_PAYMENT_ID;
+        $merchantDebtorData['external_id'] = self::MERCHANT_DEBTOR_EXTERNAL_ID;
+        $merchantDebtorData['available_limit'] = 5000.;
+        $merchantDebtorData['created_amount'] = 150.55;
+        $merchantDebtorData['outstanding_amount'] = 600.;
+        $merchantDebtorData['total_limit'] = 5750.55;
+        $merchantDebtorData['company'] = [
+            'crefo_id' => 'crefo_id',
+            'schufa_id' => 'schufa_id',
+            'name' => 'Dummy name',
+            'address_house' => '55',
+            'address_street' => 'Street',
+            'address_city' => 'City',
+            'address_postal_code' => '00567',
+            'address_country' => 'DE',
+        ];
+        $merchantDebtor = new GetMerchantDebtorResponse($merchantDebtorData);
+        $factory->create(Argument::any(), Argument::any())->willReturn($merchantDebtor);
     }
 }

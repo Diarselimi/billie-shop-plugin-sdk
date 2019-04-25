@@ -91,3 +91,8 @@ mark_duplicate_debtors:
   controller: App\Http\Controller\MarkDuplicateDebtorsController::execute
   methods: [POST]
 
+whitelist_merchant_debtor:
+  path: /merchant/{merchantId}/merchant-debtor/{merchantDebtorExternalId}/whitelist
+  controller: App\Http\Controller\UpdateMerchantDebtorWhitelistController::execute
+  methods: [PUT]
+

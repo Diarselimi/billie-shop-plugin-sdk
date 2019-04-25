@@ -53,7 +53,8 @@ Feature:
         "address_addition": null,
         "crefo_id": "123",
         "schufa_id": "123",
-        "is_blacklisted": 0
+        "is_blacklisted": 0,
+        "is_from_trusted_source": 0
       }
       """
     And I get from payments service get debtor response

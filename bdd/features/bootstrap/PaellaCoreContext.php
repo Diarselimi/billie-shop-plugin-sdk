@@ -178,7 +178,9 @@ class PaellaCoreContext extends MinkContext
             ->setMerchantId($this->merchant->getId())
             ->setDebtorId('1')
             ->setPaymentDebtorId('test')
-            ->setFinancingLimit(1000);
+            ->setFinancingLimit(1000)
+            ->setIsWhitelisted(false)
+        ;
 
         $this->getMerchantDebtorRepository()->insert($merchantDebtor);
 
@@ -256,6 +258,21 @@ class PaellaCoreContext extends MinkContext
 
         if ($debtorExternalData->getDataHash() !== md5($hash)) {
             throw new RuntimeException(sprintf("The generated hash is: %s, but %s was expected.", $debtorExternalData->getDataHash(), md5($hash)));
+        }
+    }
+
+    /**
+     * @Given the merchant debtor :externalId with merchantId :merchantId should be whitelisted
+     */
+    public function checkMerchantDebtorWhitelistStatus(string $externalId, string $merchantId)
+    {
+        $merchantDebtor = $this->getMerchantDebtorRepository()->getOneByMerchantExternalId($externalId, $merchantId, []);
+
+        if (!$merchantDebtor->isWhitelisted()) {
+            throw new RuntimeException(sprintf(
+                'MerchantDebtor with id %s is not whitelisted.',
+                $merchantDebtor->getId()
+            ));
         }
     }
 

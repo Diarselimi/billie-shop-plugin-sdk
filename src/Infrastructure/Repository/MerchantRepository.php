@@ -9,6 +9,8 @@ use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class MerchantRepository extends AbstractPdoRepository implements MerchantRepositoryInterface
 {
+    const TABLE_NAME = "merchants";
+
     private const SELECT_FIELDS = 'id, name, api_key, oauth_client_id, company_id, payment_merchant_id, roles, is_active, available_financing_limit, webhook_url, webhook_authorization, created_at, updated_at';
 
     private $factory;
@@ -21,7 +23,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
     public function insert(MerchantEntity $merchant): void
     {
         $id = $this->doInsert('
-            INSERT INTO merchants
+            INSERT INTO '.self::TABLE_NAME.'
             (name, api_key, oauth_client_id, roles, is_active, available_financing_limit, company_id, payment_merchant_id, webhook_url, webhook_authorization, created_at, updated_at)
             VALUES
             (:name, :api_key, :oauth_client_id, :roles, :is_active, :available_financing_limit, :company_id, :payment_merchant_id, :webhook_url, :webhook_authorization, :created_at, :updated_at)
@@ -47,7 +49,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
     {
         $merchant->setUpdatedAt(new \DateTime());
         $this->doUpdate('
-            UPDATE merchants
+            UPDATE '.self::TABLE_NAME.'
             SET 
               available_financing_limit = :available_financing_limit, 
               updated_at = :updated_at
@@ -63,7 +65,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
     {
         $row = $this->doFetchOne('
           SELECT ' . self::SELECT_FIELDS . '
-          FROM merchants
+          FROM '.self::TABLE_NAME.'
           WHERE id = :id
         ', ['id' => $id]);
 
@@ -74,7 +76,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
     {
         $row = $this->doFetchOne('
           SELECT ' . self::SELECT_FIELDS . '
-          FROM merchants
+          FROM '.self::TABLE_NAME.'
           WHERE company_id = :company_id
         ', ['company_id' => $companyId]);
 
@@ -85,7 +87,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
     {
         $row = $this->doFetchOne('
           SELECT ' . self::SELECT_FIELDS . '
-          FROM merchants
+          FROM '.self::TABLE_NAME.'
           WHERE api_key = :api_key
         ', ['api_key' => $apiKey]);
 
