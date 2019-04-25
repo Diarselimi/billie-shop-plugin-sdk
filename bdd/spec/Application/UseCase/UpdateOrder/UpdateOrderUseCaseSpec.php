@@ -280,7 +280,6 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
 
         $orderRepository->update($order)->shouldBeCalled();
 
-        $invoiceManager->upload($order, 'order.update')->shouldBeCalledOnce();
         $borscht->modifyOrder($order)->shouldBeCalled();
 
         $this->execute($request);
