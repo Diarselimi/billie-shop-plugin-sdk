@@ -1,12 +1,20 @@
 eight_points_guzzle:
   clients:
     alfred:
-      base_url: "%behat_mock_server_url%"
+      base_url: "%behat_mock_server_url%:8021"
       options:
+        debug: false
         query:
           app: alfred
     borscht:
-      base_url: "%behat_mock_server_url%"
+      base_url: "%behat_mock_server_url%:8022"
       options:
+        debug: false
         query:
           app: borscht
+    smaug:
+      base_url: "%behat_mock_server_url%:8023"
+      options:
+        debug: false
+        query:
+          app: smaug

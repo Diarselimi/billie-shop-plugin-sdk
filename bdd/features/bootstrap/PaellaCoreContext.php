@@ -2,16 +2,18 @@
 
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\Address\AddressRepositoryInterface;
-use App\DomainModel\Merchant\MerchantEntity;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
+use App\DomainModel\Merchant\MerchantEntity;
+use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsEntity;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
+use App\DomainModel\MerchantUser\MerchantUserEntity;
+use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderIdentification\OrderIdentificationRepositoryInterface;
@@ -23,7 +25,6 @@ use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonRepositoryInterface;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntity;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
-use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\MinkExtension\Context\MinkContext;
@@ -37,29 +38,38 @@ use Webmozart\Assert\Assert;
 
 class PaellaCoreContext extends MinkContext
 {
-    use KernelDictionary, MockServerTrait;
-
-    private const MERCHANT_ID = 1;
+    use KernelDictionary;
 
     private $connection;
+
+    /**
+     * @var MerchantEntity
+     */
+    private $merchant;
 
     public function __construct(KernelInterface $kernel, PdoConnection $connection)
     {
         $this->kernel = $kernel;
         $this->connection = $connection;
 
-        $this->setServer($kernel);
+        $this->getConnection()->exec('SET SESSION wait_timeout=30; SET SESSION max_connections = 500;');
 
-        $this->getMerchantRepository()->insert(
-            (new MerchantEntity())
+        register_shutdown_function(function () {
+            $this->getConnection()->reconnect();
+            $this->cleanUpScenario();
+        });
+
+        $this->merchant = (new MerchantEntity())
                 ->setName('Behat User')
                 ->setIsActive(true)
-                ->setRoles('["ROLE_NOTHING"]')
+                ->setRoles(['ROLE_NOTHING'])
                 ->setPaymentMerchantId('f2ec4d5e-79f4-40d6-b411-31174b6519ac')
                 ->setAvailableFinancingLimit(10000)
                 ->setApiKey('test')
                 ->setCompanyId('10')
-        );
+                ->setOauthClientId('oauthClientId');
+
+        $this->getMerchantRepository()->insert($this->merchant);
 
         $scoreThreshold = (new ScoreThresholdsConfigurationEntity())
             ->setCrefoLowScoreThreshold(350)
@@ -69,17 +79,17 @@ class PaellaCoreContext extends MinkContext
             ->setSchufaHighScoreThreshold(260)
             ->setSchufaSoleTraderScoreThreshold(235)
             ->setCreatedAt(new \DateTime())
-            ->setUpdatedAt(new \DateTime())
-        ;
+            ->setUpdatedAt(new \DateTime());
         $this->getScoreThresholdsConfigurationRepository()->insert($scoreThreshold);
 
         $this->getMerchantSettingsRepository()->insert(
             (new MerchantSettingsEntity())
-                ->setMerchantId(1)
+                ->setMerchantId($this->merchant->getId())
                 ->setDebtorFinancingLimit(10000)
                 ->setMinOrderAmount(0)
                 ->setScoreThresholdsConfigurationId($scoreThreshold->getId())
                 ->setUseExperimentalDebtorIdentification(false)
+                ->setInvoiceHandlingStrategy('none')
                 ->setCreatedAt(new DateTime())
                 ->setUpdatedAt(new DateTime())
         );
@@ -88,9 +98,8 @@ class PaellaCoreContext extends MinkContext
     /**
      * @AfterScenario
      */
-    public function cleanUpScenario(AfterScenarioScope $afterScenarioScope)
+    public function cleanUpScenario()
     {
-        $this->stopServer();
         $this->getConnection()->exec('
             SET FOREIGN_KEY_CHECKS = 0;
             TRUNCATE order_transitions;
@@ -104,6 +113,7 @@ class PaellaCoreContext extends MinkContext
             TRUNCATE merchants_debtors;
             TRUNCATE merchant_settings;
             TRUNCATE merchant_risk_check_settings;
+            TRUNCATE merchant_users;
             TRUNCATE merchants;
             TRUNCATE merchants_debtors;
             TRUNCATE score_thresholds_configuration;
@@ -165,11 +175,10 @@ class PaellaCoreContext extends MinkContext
         $this->getDebtorExternalDataRepository()->insert($debtor);
 
         $merchantDebtor = (new MerchantDebtorEntity())
-            ->setMerchantId(self::MERCHANT_ID)
+            ->setMerchantId($this->merchant->getId())
             ->setDebtorId('1')
             ->setPaymentDebtorId('test')
-            ->setFinancingLimit(1000)
-        ;
+            ->setFinancingLimit(1000);
 
         $this->getMerchantDebtorRepository()->insert($merchantDebtor);
 
@@ -187,8 +196,7 @@ class PaellaCoreContext extends MinkContext
             ->setMerchantDebtorId($merchantDebtor->getId())
             ->setMerchantId('1')
             ->setPaymentId('test')
-            ->setUuid('test123')
-        ;
+            ->setUuid('test123');
 
         $this->getOrderRepository()->insert($order);
     }
@@ -289,8 +297,8 @@ class PaellaCoreContext extends MinkContext
     public function theOrderHasUUID($orderExternalCode, $uuid)
     {
         $this->getConnection()
-             ->prepare("UPDATE orders SET uuid = :uuid WHERE external_code = :orderExternalCode", [])
-             ->execute([':uuid' => $uuid, ':orderExternalCode' => $orderExternalCode]);
+            ->prepare("UPDATE orders SET uuid = :uuid WHERE external_code = :orderExternalCode", [])
+            ->execute([':uuid' => $uuid, ':orderExternalCode' => $orderExternalCode]);
     }
 
     /**
@@ -430,15 +438,46 @@ class PaellaCoreContext extends MinkContext
         }
     }
 
-    private function getOrder($orderExternalCode, $customerId = self::MERCHANT_ID): OrderEntity
+    private function getOrder($orderExternalCode): OrderEntity
     {
-        $order = $this->getOrderRepository()->getOneByExternalCode($orderExternalCode, $customerId);
+        $order = $this->getOrderRepository()->getOneByExternalCode($orderExternalCode, $this->merchant->getId());
 
         if ($order === null) {
             throw new RuntimeException('Order not found');
         }
 
         return $order;
+    }
+
+    /**
+     * @Given /^a merchant user exists$/
+     */
+    public function aMerchantUserExists()
+    {
+        $this->getMerchantUserRepository()->create(
+            (new MerchantUserEntity())
+                ->setUserId('oauthUserId')
+                ->setMerchantId(1)
+                ->setRoles(['ROLE_USER'])
+        );
+    }
+
+    /**
+     * @Given /^a merchant exists with company ID (\d+)$/
+     */
+    public function aMerchantExistsWithCompanyID($companyId)
+    {
+        $this->getMerchantRepository()->insert(
+            (new MerchantEntity())
+                ->setName('test merchant')
+                ->setIsActive(true)
+                ->setRoles(['ROLE_NOTHING'])
+                ->setPaymentMerchantId('any-payment-id')
+                ->setAvailableFinancingLimit(10000)
+                ->setApiKey('testMerchantApiKey')
+                ->setCompanyId($companyId)
+                ->setOauthClientId('testMerchantOauthClientId')
+        );
     }
 
     private function getDebtorExternalDataRepository(): DebtorExternalDataRepositoryInterface
@@ -499,6 +538,11 @@ class PaellaCoreContext extends MinkContext
     private function getOrderRiskCheckRepositoryInterface(): OrderRiskCheckRepositoryInterface
     {
         return $this->get(OrderRiskCheckRepositoryInterface::class);
+    }
+
+    private function getMerchantUserRepository(): MerchantUserRepositoryInterface
+    {
+        return $this->get(MerchantUserRepositoryInterface::class);
     }
 
     private function getConnection(): PdoConnection

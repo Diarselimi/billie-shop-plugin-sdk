@@ -2,19 +2,22 @@
 
 namespace App\Application\UseCase\CreateMerchant;
 
-use App\Application\PaellaCoreCriticalException;
+use App\Application\UseCase\CreateMerchant\Exception\CreateMerchantException;
+use App\Application\UseCase\CreateMerchant\Exception\DuplicateMerchantCompanyException;
+use App\Application\UseCase\CreateMerchant\Exception\MerchantCompanyNotFoundException;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\Merchant\MerchantEntityFactory;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
+use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntityFactory;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
+use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntityFactory;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
 use App\Infrastructure\Alfred\AlfredRequestException;
 use App\Infrastructure\Alfred\AlfredResponseDecodeException;
-use App\Infrastructure\Repository\MerchantRiskCheckSettingsRepository;
-use Symfony\Component\HttpFoundation\Response;
+use App\Infrastructure\Smaug\AuthenticationServiceException;
 
 class CreateMerchantUseCase
 {
@@ -34,6 +37,8 @@ class CreateMerchantUseCase
 
     private $merchantRiskCheckSettingsRepository;
 
+    private $authenticationService;
+
     public function __construct(
         MerchantRepositoryInterface $merchantRepository,
         CompaniesServiceInterface $companiesService,
@@ -42,7 +47,8 @@ class CreateMerchantUseCase
         MerchantSettingsRepositoryInterface $merchantSettingsRepository,
         ScoreThresholdsConfigurationEntityFactory $scoreThresholdsConfigurationFactory,
         ScoreThresholdsConfigurationRepositoryInterface $scoreThresholdsConfigurationRepository,
-        MerchantRiskCheckSettingsRepositoryInterface $merchantRiskCheckSettingsRepository
+        MerchantRiskCheckSettingsRepositoryInterface $merchantRiskCheckSettingsRepository,
+        AuthenticationServiceInterface $authenticationService
     ) {
         $this->merchantRepository = $merchantRepository;
         $this->companiesService = $companiesService;
@@ -52,6 +58,7 @@ class CreateMerchantUseCase
         $this->scoreThresholdsConfigurationFactory = $scoreThresholdsConfigurationFactory;
         $this->scoreThresholdsConfigurationRepository = $scoreThresholdsConfigurationRepository;
         $this->merchantRiskCheckSettingsRepository = $merchantRiskCheckSettingsRepository;
+        $this->authenticationService = $authenticationService;
     }
 
     public function execute(CreateMerchantRequest $request): CreateMerchantResponse
@@ -60,11 +67,7 @@ class CreateMerchantUseCase
         $merchant = $this->merchantRepository->getOneByCompanyId($companyId);
 
         if ($merchant) {
-            throw new PaellaCoreCriticalException(
-                "Merchant with company id $companyId already exists",
-                PaellaCoreCriticalException::CODE_NOT_FOUND, // TODO: shit
-                Response::HTTP_CONFLICT
-            );
+            throw new DuplicateMerchantCompanyException();
         }
 
         try {
@@ -74,14 +77,17 @@ class CreateMerchantUseCase
         }
 
         if (!$company) {
-            throw new PaellaCoreCriticalException(
-                "Company id $companyId can't be retrieved",
-                PaellaCoreCriticalException::CODE_NOT_FOUND, // TODO: shit
-                Response::HTTP_BAD_REQUEST
-            );
+            throw new MerchantCompanyNotFoundException();
+        }
+
+        try {
+            $oauthClient = $this->authenticationService->createClient($company->getName());
+        } catch (AuthenticationServiceException $exception) {
+            throw new CreateMerchantException('Failed to create OAuth client for merchant');
         }
 
         $merchant = $this->merchantFactory->createFromRequest($request, $company);
+        $merchant->setOauthClientId($oauthClient->getClientId());
         $this->merchantRepository->insert($merchant);
 
         $scoreThresholds = $this->scoreThresholdsConfigurationFactory->createDefault();
@@ -91,12 +97,13 @@ class CreateMerchantUseCase
             $merchant->getId(),
             $request->getDebtorFinancingLimit(),
             $scoreThresholds->getId(),
-            false
+            false,
+            MerchantSettingsEntity::INVOICE_HANDLING_STRATEGY_NONE
         );
         $this->merchantSettingsRepository->insert($merchantSettings);
 
         $this->merchantRiskCheckSettingsRepository->insertMerchantDefaultRiskCheckSettings($merchant->getId());
 
-        return new CreateMerchantResponse($merchant);
+        return new CreateMerchantResponse($merchant, $oauthClient->getClientId(), $oauthClient->getClientSecret());
     }
 }

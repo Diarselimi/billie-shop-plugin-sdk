@@ -1,6 +1,5 @@
 parameters:
-  behat_mock_server_port: 8021
-  behat_mock_server_url: "http://localhost:%behat_mock_server_port%"
+  behat_mock_server_url: "http://localhost"
 
 services:
   _defaults:
@@ -43,6 +42,6 @@ services:
   App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface:
     alias: 'App\Infrastructure\Repository\OrderRiskCheckRepository'
     public: true
-  donatj\MockWebServer\MockWebServer:
-    arguments:
-      $port: "%behat_mock_server_port%"
+  App\DomainModel\MerchantUser\MerchantUserRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\MerchantUserRepository'
+    public: true

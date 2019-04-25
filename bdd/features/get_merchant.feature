@@ -6,7 +6,7 @@ Feature:
     Background:
         Given I add "Content-type" header equal to "application/json"
         And I add "X-Test" header equal to 1
-        And I add "X-Api-User" header equal to 1
+        And I add "X-Api-Key" header equal to test
 
     Scenario: Unsuccessful merchant retrieve
         When I send a GET request to "/merchant/1"
@@ -30,7 +30,7 @@ Feature:
             "api_key": "test",
             "company_id": "10",
             "payment_merchant_id": "f2ec4d5e-79f4-40d6-b411-31174b6519ac",
-            "roles": "[\u0022ROLE_NOTHING\u0022]",
+            "roles": ["ROLE_NOTHING"],
             "is_active": true,
             "webhook_url": null,
             "webhook_authorization": null

@@ -60,7 +60,7 @@ class OrderInWaitingStateEventSubscriber implements EventSubscriberInterface, Lo
     private function sendSlackMessage(OrderEntity $order): void
     {
         try {
-            $text = "Order *{$order->getExternalCode()}* was created in waiting state because of failed risk checks";
+            $text = "Order *{$order->getUuid()}* was created in waiting state because of failed risk checks";
 
             $message = (new SlackMessage())->addAttachment(
                 (new SlackMessageAttachment($text))
@@ -68,8 +68,8 @@ class OrderInWaitingStateEventSubscriber implements EventSubscriberInterface, Lo
                     ->setText($text)
                     ->addField((new SlackMessageAttachmentField('Merchant ID', $order->getMerchantId())))
                     ->addField((new SlackMessageAttachmentField(
-                        'Order Code / UUID',
-                        $order->getExternalCode() ?: $order->getUuid()
+                        'Order UUID',
+                        $order->getUuid()
                     )
                     ))
                     ->addField(new SlackMessageAttachmentField(
@@ -84,9 +84,11 @@ class OrderInWaitingStateEventSubscriber implements EventSubscriberInterface, Lo
 
             $this->slackClient->sendMessage($message);
         } catch (\Exception $e) {
-            $this->logSuppressedException($e, 'Failed to notify slack with order in waiting state notification', [
-                'exception' => $e,
-            ]);
+            $this->logSuppressedException(
+                $e,
+                'Failed to notify slack with order in waiting state notification',
+                ['exception' => $e]
+            );
         }
     }
 }

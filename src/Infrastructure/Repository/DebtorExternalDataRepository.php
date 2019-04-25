@@ -9,8 +9,10 @@ use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class DebtorExternalDataRepository extends AbstractPdoRepository implements DebtorExternalDataRepositoryInterface
 {
+    public const TABLE_NAME = "debtor_external_data";
+
     private const SELECT_FIELDS =
-        DebtorExternalDataEntity::TABLE_NAME.'.id as id, 
+        self::TABLE_NAME.'.id as id, 
         name, 
         tax_id, 
         tax_number, 
@@ -24,8 +26,8 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
         is_established_customer,
         merchant_external_id, 
         debtor_data_hash,
-        '.DebtorExternalDataEntity::TABLE_NAME.'.created_at as created_at, 
-        '.DebtorExternalDataEntity::TABLE_NAME.'.updated_at as updated_at'
+        '.self::TABLE_NAME.'.created_at as created_at, 
+        '.self::TABLE_NAME.'.updated_at as updated_at'
     ;
 
     private $debtorExternalDataEntityFactory;
@@ -66,7 +68,7 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
     public function getOneById(int $id): ?DebtorExternalDataEntity
     {
         $debtorRowData = $this->doFetchOne(
-            'SELECT ' . self::SELECT_FIELDS . ' FROM '. DebtorExternalDataEntity::TABLE_NAME .' WHERE id = :id',
+            'SELECT ' . self::SELECT_FIELDS . ' FROM '. self::TABLE_NAME .' WHERE id = :id',
             ['id' => $id]
         );
 
@@ -77,14 +79,14 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
     {
         $debtorExternalData = $this->doFetchOne(
             '
-            SELECT '. self::SELECT_FIELDS .' FROM '. DebtorExternalDataEntity::TABLE_NAME . '
-            INNER JOIN orders ON orders.debtor_external_data_id = '. DebtorExternalDataEntity::TABLE_NAME . '.id
+            SELECT '. self::SELECT_FIELDS .' FROM '. self::TABLE_NAME . '
+            INNER JOIN orders ON orders.debtor_external_data_id = '. self::TABLE_NAME . '.id
             WHERE 
                 orders.state = :state
                 AND debtor_data_hash = :hash 
-                AND '. DebtorExternalDataEntity::TABLE_NAME . '.id != :id
-                AND DATE_ADD( '. DebtorExternalDataEntity::TABLE_NAME . '.created_at, INTERVAL :days DAY) > NOW()
-                ORDER BY  '. DebtorExternalDataEntity::TABLE_NAME . '.created_at DESC LIMIT 1',
+                AND '. self::TABLE_NAME . '.id != :id
+                AND DATE_ADD( '. self::TABLE_NAME . '.created_at, INTERVAL :days DAY) > NOW()
+                ORDER BY  '. self::TABLE_NAME . '.created_at DESC LIMIT 1',
             ['hash' => $hash, 'days' => $days, 'id' => $ignoreId, 'state' => $state]
         );
 

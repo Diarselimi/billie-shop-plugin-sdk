@@ -2,11 +2,10 @@
 
 namespace App\Application\UseCase\CreateOrderInvoice;
 
-use App\Application\PaellaCoreCriticalException;
+use App\Application\Exception\OrderNotFoundException;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderInvoice\OrderInvoiceEntity;
 use App\DomainModel\OrderInvoice\OrderInvoiceRepositoryInterface;
-use Symfony\Component\HttpFoundation\Response;
 
 class CreateOrderInvoiceUseCase
 {
@@ -27,11 +26,7 @@ class CreateOrderInvoiceUseCase
         $order = $this->orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($request->getOrderId(), $request->getMerchantId());
 
         if (!$order) {
-            throw new PaellaCoreCriticalException(
-                "Order #{$request->getOrderId()} not found",
-                PaellaCoreCriticalException::CODE_NOT_FOUND,
-                Response::HTTP_NOT_FOUND
-            );
+            throw new OrderNotFoundException("Order #{$request->getOrderId()} does't exist");
         }
 
         $orderInvoice = (new OrderInvoiceEntity())
@@ -39,6 +34,7 @@ class CreateOrderInvoiceUseCase
             ->setFileId($request->getFileId())
             ->setInvoiceNumber($request->getInvoiceNumber())
         ;
+
         $this->orderInvoiceRepository->insert($orderInvoice);
     }
 }

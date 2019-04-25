@@ -15,6 +15,7 @@ class MerchantSettingsEntityFactory
             ->setMinOrderAmount((float) $data['min_order_amount'])
             ->setScoreThresholdsConfigurationId($data['score_thresholds_configuration_id'])
             ->setUseExperimentalDebtorIdentification(boolval($data['use_experimental_identification']))
+            ->setInvoiceHandlingStrategy($data['invoice_handling_strategy'])
             ->setCreatedAt(new \DateTime($data['created_at']))
             ->setUpdatedAt(new \DateTime($data['updated_at']))
         ;
@@ -24,7 +25,8 @@ class MerchantSettingsEntityFactory
         int $merchantId,
         float $financingLimit,
         int $scoreThresholdsConfigurationId,
-        bool $useExperimentalDebtorIdentification
+        bool $useExperimentalDebtorIdentification,
+        string $invoiceHandlingStrategy
     ): MerchantSettingsEntity {
         return (new MerchantSettingsEntity())
             ->setMerchantId($merchantId)
@@ -32,6 +34,7 @@ class MerchantSettingsEntityFactory
             ->setMinOrderAmount(self::DEFAULT_MIN_ORDER_AMOUNT)
             ->setScoreThresholdsConfigurationId($scoreThresholdsConfigurationId)
             ->setUseExperimentalDebtorIdentification($useExperimentalDebtorIdentification)
+            ->setInvoiceHandlingStrategy($invoiceHandlingStrategy)
         ;
     }
 }

@@ -10,7 +10,7 @@ use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class MerchantSettingsRepository extends AbstractPdoRepository implements MerchantSettingsRepositoryInterface
 {
-    private const SELECT_FIELDS = 'id, merchant_id, debtor_financing_limit, min_order_amount, score_thresholds_configuration_id, use_experimental_identification, created_at, updated_at';
+    private const SELECT_FIELDS = 'id, merchant_id, debtor_financing_limit, min_order_amount, score_thresholds_configuration_id, use_experimental_identification, invoice_handling_strategy, created_at, updated_at';
 
     private $factory;
 
@@ -29,6 +29,7 @@ class MerchantSettingsRepository extends AbstractPdoRepository implements Mercha
               min_order_amount,
               score_thresholds_configuration_id,
               use_experimental_identification,
+              invoice_handling_strategy,
               created_at, 
               updated_at
             )
@@ -39,6 +40,7 @@ class MerchantSettingsRepository extends AbstractPdoRepository implements Mercha
               :min_order_amount,
               :score_thresholds_configuration_id,
               :use_experimental_identification,
+              :invoice_handling_strategy,
               :created_at,
               :updated_at
             )
@@ -48,6 +50,7 @@ class MerchantSettingsRepository extends AbstractPdoRepository implements Mercha
             'min_order_amount' => $merchantSettingsEntity->getMinOrderAmount(),
             'score_thresholds_configuration_id' => $merchantSettingsEntity->getScoreThresholdsConfigurationId(),
             'use_experimental_identification' => (int) $merchantSettingsEntity->useExperimentalDebtorIdentification(),
+            'invoice_handling_strategy' => $merchantSettingsEntity->getInvoiceHandlingStrategy(),
             'created_at' => $merchantSettingsEntity->getCreatedAt()->format(self::DATE_FORMAT),
             'updated_at' => $merchantSettingsEntity->getUpdatedAt()->format(self::DATE_FORMAT),
         ]);

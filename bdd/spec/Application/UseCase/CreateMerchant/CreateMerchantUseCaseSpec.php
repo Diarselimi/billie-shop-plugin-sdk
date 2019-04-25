@@ -2,10 +2,11 @@
 
 namespace spec\App\Application\UseCase\CreateMerchant;
 
-use App\Application\PaellaCoreCriticalException;
 use App\Application\UseCase\CreateMerchant\CreateMerchantRequest;
 use App\Application\UseCase\CreateMerchant\CreateMerchantResponse;
 use App\Application\UseCase\CreateMerchant\CreateMerchantUseCase;
+use App\Application\UseCase\CreateMerchant\Exception\DuplicateMerchantCompanyException;
+use App\Application\UseCase\CreateMerchant\Exception\MerchantCompanyNotFoundException;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\Merchant\MerchantEntity;
@@ -15,6 +16,8 @@ use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositor
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntityFactory;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
+use App\DomainModel\MerchantUser\AuthenticationServiceCreateClientResponseDTO;
+use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntity;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntityFactory;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
@@ -41,8 +44,9 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
         MerchantSettingsRepositoryInterface $merchantSettingsRepository,
         ScoreThresholdsConfigurationEntityFactory $scoreThresholdsConfigurationFactory,
         ScoreThresholdsConfigurationRepositoryInterface $scoreThresholdsConfigurationRepository,
-        CreateMerchantRequest $request,
-        MerchantRiskCheckSettingsRepositoryInterface $merchantRiskCheckSettingsRepository
+        MerchantRiskCheckSettingsRepositoryInterface $merchantRiskCheckSettingsRepository,
+        AuthenticationServiceInterface $authenticationService,
+        CreateMerchantRequest $request
     ) {
         $request->getCompanyId()->willReturn(self::COMPANY_ID);
 
@@ -54,7 +58,8 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
             $merchantSettingsRepository,
             $scoreThresholdsConfigurationFactory,
             $scoreThresholdsConfigurationRepository,
-            $merchantRiskCheckSettingsRepository
+            $merchantRiskCheckSettingsRepository,
+            $authenticationService
         );
     }
 
@@ -69,7 +74,7 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
     ) {
         $merchantRepository->getOneByCompanyId(self::COMPANY_ID)->shouldBeCalled()->willReturn(new MerchantEntity());
 
-        $this->shouldThrow(PaellaCoreCriticalException::class)->during('execute', [$request]);
+        $this->shouldThrow(DuplicateMerchantCompanyException::class)->during('execute', [$request]);
     }
 
     public function it_throws_exception_if_company_was_not_found(
@@ -80,7 +85,7 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
         $merchantRepository->getOneByCompanyId(self::COMPANY_ID)->shouldBeCalled()->willReturn(null);
         $companiesService->getDebtor(self::COMPANY_ID)->shouldBeCalled()->willThrow(AlfredRequestException::class);
 
-        $this->shouldThrow(PaellaCoreCriticalException::class)->during('execute', [$request]);
+        $this->shouldThrow(MerchantCompanyNotFoundException::class)->during('execute', [$request]);
     }
 
     public function it_creates_a_new_merchant(
@@ -91,17 +96,27 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
         MerchantSettingsRepositoryInterface $merchantSettingsRepository,
         ScoreThresholdsConfigurationEntityFactory $scoreThresholdsConfigurationFactory,
         ScoreThresholdsConfigurationRepositoryInterface $scoreThresholdsConfigurationRepository,
+        MerchantRiskCheckSettingsRepositoryInterface $merchantRiskCheckSettingsRepository,
         CreateMerchantRequest $request,
         DebtorCompany $company,
         MerchantEntity $merchant,
         ScoreThresholdsConfigurationEntity $scoreThresholdsConfiguration,
-        MerchantSettingsEntity $merchantSettings
+        MerchantSettingsEntity $merchantSettings,
+        AuthenticationServiceInterface $authenticationService
     ) {
         $company->getName()->willReturn(self::COMPANY_NAME);
         $merchant->getId()->willReturn(self::MERCHANT_ID);
         $scoreThresholdsConfiguration->getId()->willReturn(self::SCORE_CONFIGURATION_ID);
 
         $request->getDebtorFinancingLimit()->willReturn(self::DEBTOR_FINANCING_LIMIT);
+
+        $authenticationService
+            ->createClient(self::COMPANY_NAME)
+            ->shouldBeCalled()
+            ->willReturn(new AuthenticationServiceCreateClientResponseDTO('oauthClientId', 'oauthClientSecret'))
+        ;
+
+        $merchant->setOauthClientId('oauthClientId')->shouldBeCalled();
 
         $merchantRepository->getOneByCompanyId(self::COMPANY_ID)->shouldBeCalled()->willReturn(null);
         $merchantRepository->insert($merchant)->shouldBeCalled();
@@ -111,8 +126,10 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
         $scoreThresholdsConfigurationFactory->createDefault()->shouldBeCalledOnce()->willReturn($scoreThresholdsConfiguration);
         $scoreThresholdsConfigurationRepository->insert($scoreThresholdsConfiguration)->shouldBeCalledOnce();
 
-        $merchantSettingsFactory->create(self::MERCHANT_ID, self::DEBTOR_FINANCING_LIMIT, self::SCORE_CONFIGURATION_ID, false)->willReturn($merchantSettings);
+        $merchantSettingsFactory->create(self::MERCHANT_ID, self::DEBTOR_FINANCING_LIMIT, self::SCORE_CONFIGURATION_ID, false, 'none')->willReturn($merchantSettings);
         $merchantSettingsRepository->insert($merchantSettings)->shouldBeCalledOnce();
+
+        $merchantRiskCheckSettingsRepository->insertMerchantDefaultRiskCheckSettings(self::MERCHANT_ID)->shouldBeCalledOnce();
 
         $response = $this->execute($request);
         $response->shouldBeAnInstanceOf(CreateMerchantResponse::class);

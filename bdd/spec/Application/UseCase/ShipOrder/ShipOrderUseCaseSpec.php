@@ -7,7 +7,6 @@ use App\Application\UseCase\Response\OrderResponse;
 use App\Application\UseCase\Response\OrderResponseFactory;
 use App\Application\UseCase\ShipOrder\ShipOrderRequest;
 use App\Application\UseCase\ShipOrder\ShipOrderUseCase;
-use App\Application\UseCase\ValidatedRequestInterface;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Borscht\OrderPaymentDetailsDTO;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
@@ -17,10 +16,9 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
+use App\DomainModel\OrderInvoice\OrderInvoiceManager;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Workflow\Workflow;
@@ -48,6 +46,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
         OrderRepositoryInterface $orderRepository,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         BorschtInterface $paymentsService,
+        OrderInvoiceManager $invoiceManager,
         OrderPersistenceService $orderPersistenceService,
         OrderResponseFactory $orderResponseFactory,
         ValidatorInterface $validator
@@ -59,6 +58,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
             $orderRepository,
             $merchantDebtorRepository,
             $paymentsService,
+            $invoiceManager,
             $orderPersistenceService,
             $orderResponseFactory
         );
@@ -114,6 +114,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
         OrderEntity $order,
         MerchantDebtorEntity $merchantDebtor,
         OrderPaymentDetailsDTO $paymentDetailsDTO,
+        OrderInvoiceManager $invoiceManager,
         OrderPersistenceService $orderPersistenceService,
         OrderResponseFactory $orderResponseFactory
     ) {
@@ -159,6 +160,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
 
         $workflow->apply($order, OrderStateManager::TRANSITION_SHIP)->shouldBeCalled();
 
+        $invoiceManager->upload($order, 'order.shipment')->shouldBeCalledOnce();
         $orderRepository->update($order)->shouldBeCalled();
 
         $request = $this->mockRequest();

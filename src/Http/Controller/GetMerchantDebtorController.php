@@ -7,8 +7,6 @@ use App\Application\PaellaCoreCriticalException;
 use App\Application\UseCase\GetMerchantDebtor\GetMerchantDebtorRequest;
 use App\Application\UseCase\GetMerchantDebtor\GetMerchantDebtorResponse;
 use App\Application\UseCase\GetMerchantDebtor\GetMerchantDebtorUseCase;
-use App\Http\HttpConstantsInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 class GetMerchantDebtorController
 {
@@ -19,12 +17,12 @@ class GetMerchantDebtorController
         $this->useCase = $useCase;
     }
 
-    public function execute(Request $request, string $merchantDebtorExternalId): GetMerchantDebtorResponse
+    public function execute(int $merchantId, string $merchantDebtorExternalId): GetMerchantDebtorResponse
     {
         try {
             $response = $this->useCase->execute(new GetMerchantDebtorRequest(
                 $merchantDebtorExternalId,
-                $request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER)
+                $merchantId
             ));
         } catch (MerchantDebtorNotFoundException $e) {
             throw new PaellaCoreCriticalException(

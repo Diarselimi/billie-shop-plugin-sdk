@@ -6,8 +6,6 @@ use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 
 class DebtorExternalDataEntity extends AbstractTimestampableEntity
 {
-    const TABLE_NAME = "debtor_external_data";
-
     public const LEGAL_FORMS_FOR_PERSON_COMPARISON = [
         '6022', '2001, 2018, 2022', '2001', '2018', '2022', '4001', '4022', '3001', '99999',
     ];

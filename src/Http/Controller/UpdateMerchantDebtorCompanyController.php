@@ -7,7 +7,6 @@ use App\Application\PaellaCoreCriticalException;
 use App\Application\UseCase\UpdateMerchantDebtorCompany\MerchantDebtorUpdateFailedException;
 use App\Application\UseCase\UpdateMerchantDebtorCompany\UpdateMerchantDebtorCompanyRequest;
 use App\Application\UseCase\UpdateMerchantDebtorCompany\UpdateMerchantDebtorCompanyUseCase;
-use App\Http\HttpConstantsInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class UpdateMerchantDebtorCompanyController
@@ -19,12 +18,12 @@ class UpdateMerchantDebtorCompanyController
         $this->useCase = $useCase;
     }
 
-    public function execute(Request $request, string $merchantDebtorExternalId): void
+    public function execute(Request $request, int $merchantId, string $merchantDebtorExternalId): void
     {
         try {
             $request = (new UpdateMerchantDebtorCompanyRequest())
                 ->setMerchantDebtorExternalId($merchantDebtorExternalId)
-                ->setMerchantId($request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER))
+                ->setMerchantId($merchantId)
                 ->setName($request->request->get('name'))
                 ->setAddressHouse($request->request->get('address_house'))
                 ->setAddressStreet($request->request->get('address_street'))

@@ -22,7 +22,7 @@ class ShipOrderController
         $orderRequest = (new ShipOrderRequest())
             ->setOrderId($id)
             ->setExternalCode($request->request->get('external_order_id'))
-            ->setMerchantId($request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER))
+            ->setMerchantId($request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID))
             ->setInvoiceNumber($request->request->get('invoice_number'))
             ->setInvoiceUrl($request->request->get('invoice_url'))
             ->setProofOfDeliveryUrl($request->request->get('shipping_document_url'))

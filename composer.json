@@ -22,6 +22,7 @@
         "symfony/framework-bundle": "*",
         "symfony/monolog-bundle": "*",
         "symfony/proxy-manager-bridge": "*",
+        "symfony/security-bundle": "4.2.*",
         "symfony/serializer": "*",
         "symfony/stopwatch": "*",
         "symfony/validator": "*",

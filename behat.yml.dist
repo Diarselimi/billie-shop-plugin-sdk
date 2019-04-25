@@ -11,10 +11,9 @@ default:
         - PaellaCoreContext:
             kernel: '@kernel'
             connection: '@billie_pdo.default_connection'
-        - PaymentsServiceContext:
-            kernel: '@kernel'
-        - CompaniesServiceContext:
-            kernel: '@kernel'
+        - PaymentsServiceContext
+        - CompaniesServiceContext
+        - OAuthServiceContext
 
   extensions:
     Behatch\Extension: ~

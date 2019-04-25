@@ -15,6 +15,7 @@ use App\DomainModel\Order\LimitsService;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
+use App\DomainModel\OrderInvoice\OrderInvoiceManager;
 use DateTime;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -54,7 +55,8 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         LoggerInterface $logger,
         OrderEntity $order,
         UpdateOrderRequest $request,
-        ValidatorInterface $validator
+        ValidatorInterface $validator,
+        OrderInvoiceManager $invoiceManager
     ) {
         $order->getExternalCode()->willReturn(self::ORDER_EXTERNAL_CODE);
         $order->getInvoiceNumber()->willReturn(self::ORDER_INVOICE_NUMBER);
@@ -79,7 +81,8 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
             $orderRepository,
             $merchantDebtorRepository,
             $merchantRepository,
-            $orderStateManager
+            $orderStateManager,
+            $invoiceManager
         );
 
         $this->setLogger($logger);
@@ -244,7 +247,8 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         OrderStateManager $orderStateManager,
         BorschtInterface $borscht,
         UpdateOrderRequest $request,
-        OrderEntity $order
+        OrderEntity $order,
+        OrderInvoiceManager $invoiceManager
     ) {
         $newAmountGross = self::ORDER_AMOUNT_GROSS - 10;
         $newAmountNet = self::ORDER_AMOUNT_NET - 10;
@@ -276,6 +280,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
 
         $orderRepository->update($order)->shouldBeCalled();
 
+        $invoiceManager->upload($order, 'order.update')->shouldBeCalledOnce();
         $borscht->modifyOrder($order)->shouldBeCalled();
 
         $this->execute($request);

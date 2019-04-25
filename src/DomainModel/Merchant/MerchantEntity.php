@@ -7,6 +7,12 @@ use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 
 class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInterface
 {
+    public const ROLE_API_USER = 'ROLE_API_USER';
+
+    public const DEFAULT_ROLES = [
+        self::ROLE_API_USER,
+    ];
+
     private $name;
 
     private $availableFinancingLimit;
@@ -24,6 +30,8 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
     private $webhookUrl;
 
     private $webhookAuthorization;
+
+    private $oauthClientId;
 
     public function getName(): string
     {
@@ -83,12 +91,12 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
         return $this;
     }
 
-    public function getRoles(): string
+    public function getRoles(): array
     {
         return $this->roles;
     }
 
-    public function setRoles(string $roles): MerchantEntity
+    public function setRoles(array $roles): MerchantEntity
     {
         $this->roles = $roles;
 
@@ -139,6 +147,18 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
     public function setPaymentMerchantId(?string $paymentMerchantId): MerchantEntity
     {
         $this->paymentMerchantId = $paymentMerchantId;
+
+        return $this;
+    }
+
+    public function getOauthClientId(): ? string
+    {
+        return $this->oauthClientId;
+    }
+
+    public function setOauthClientId(?string $oauthClientId): MerchantEntity
+    {
+        $this->oauthClientId = $oauthClientId;
 
         return $this;
     }

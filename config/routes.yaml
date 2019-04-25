@@ -37,7 +37,7 @@ ship_order:
   methods: [POST]
 
 create_order_invoice:
-  path: /order/{id}/invoice
+  path: /merchant/{merchantId}/order/{id}/invoice
   controller: App\Http\Controller\CreateOrderInvoiceController::execute
   methods: [POST]
 
@@ -72,17 +72,17 @@ create_merchant:
   methods: [POST]
 
 update_merchant_debtor_limit:
-  path: /merchant-debtor/{merchantDebtorExternalId}/limit
+  path: /merchant/{merchantId}/merchant-debtor/{merchantDebtorExternalId}/limit
   controller: App\Http\Controller\UpdateMerchantDebtorLimitController::execute
   methods: [PUT]
 
 update_merchant_debtor_company:
-  path: /merchant-debtor/{merchantDebtorExternalId}/company
+  path: /merchant/{merchantId}/merchant-debtor/{merchantDebtorExternalId}/company
   controller: App\Http\Controller\UpdateMerchantDebtorCompanyController::execute
   methods: [PUT]
 
 get_merchant_debtor:
-  path: /merchant-debtor/{merchantDebtorExternalId}
+  path: /merchant/{merchantId}/merchant-debtor/{merchantDebtorExternalId}
   controller: App\Http\Controller\GetMerchantDebtorController::execute
   methods: [GET]
 

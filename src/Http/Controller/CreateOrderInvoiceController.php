@@ -2,11 +2,12 @@
 
 namespace App\Http\Controller;
 
+use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\CreateOrderInvoice\CreateOrderInvoiceRequest;
 use App\Application\UseCase\CreateOrderInvoice\CreateOrderInvoiceUseCase;
-use App\Http\HttpConstantsInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class CreateOrderInvoiceController
 {
@@ -17,16 +18,20 @@ class CreateOrderInvoiceController
         $this->createOrderInvoiceUseCase = $createOrderInvoiceUseCase;
     }
 
-    public function execute(string $id, Request $request): JsonResponse
+    public function execute(int $merchantId, string $id, Request $request): JsonResponse
     {
-        $useCaseRequest = new CreateOrderInvoiceRequest(
-            $request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER),
-            $id,
-            $request->request->get('file_id'),
-            $request->request->get('invoice_number')
-        );
+        try {
+            $useCaseRequest = new CreateOrderInvoiceRequest(
+                $merchantId,
+                $id,
+                $request->request->getInt('file_id'),
+                $request->request->get('invoice_number')
+            );
 
-        $this->createOrderInvoiceUseCase->execute($useCaseRequest);
+            $this->createOrderInvoiceUseCase->execute($useCaseRequest);
+        } catch (OrderNotFoundException $e) {
+            throw new NotFoundHttpException($e->getMessage());
+        }
 
         return new JsonResponse(null, JsonResponse::HTTP_CREATED);
     }

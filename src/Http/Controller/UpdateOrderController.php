@@ -22,7 +22,7 @@ class UpdateOrderController
     {
         try {
             $orderRequest = (new UpdateOrderRequest($id))
-                ->setMerchantId($request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_USER))
+                ->setMerchantId($request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID))
                 ->setAmountGross($request->request->get('amount_gross'))
                 ->setAmountNet($request->request->get('amount_net'))
                 ->setAmountTax($request->request->get('amount_tax'))
