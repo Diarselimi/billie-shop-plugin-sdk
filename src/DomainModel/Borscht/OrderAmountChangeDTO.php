@@ -4,13 +4,18 @@ namespace App\DomainModel\Borscht;
 
 class OrderAmountChangeDTO
 {
-    private const TYPE_CANCELLATION = 'cancellation';
-    private const TYPE_PAYMENT = 'payment';
+    public const TYPE_CANCELLATION = 'cancellation';
+
+    public const TYPE_PAYMENT = 'payment';
 
     private $id;
+
     private $type;
+
     private $amountChange;
+
     private $outstandingAmount;
+
     private $paidAmount;
 
     public function getId(): string

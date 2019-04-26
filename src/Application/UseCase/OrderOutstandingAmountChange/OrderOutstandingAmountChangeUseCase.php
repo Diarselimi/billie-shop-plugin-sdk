@@ -3,15 +3,16 @@
 namespace App\Application\UseCase\OrderOutstandingAmountChange;
 
 use App\Application\PaellaCoreCriticalException;
-use App\DomainModel\Merchant\MerchantNotFoundException;
+use App\DomainModel\Borscht\OrderAmountChangeDTO;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
-use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\LimitsService;
+use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderNotification\NotificationScheduler;
+use App\DomainModel\OrderPayment\OrderPaymentForgivenessService;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
-use Raven_Client;
 
 class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 {
@@ -31,77 +32,93 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 
     private $limitsService;
 
+    private $paymentForgivenessService;
+
+    private $merchantSettingsRepository;
+
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         MerchantRepositoryInterface $merchantRepository,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         NotificationScheduler $notificationScheduler,
-        Raven_Client $sentry,
-        LimitsService $limitsService
+        LimitsService $limitsService,
+        OrderPaymentForgivenessService $paymentForgivenessService
     ) {
         $this->orderRepository = $orderRepository;
         $this->merchantRepository = $merchantRepository;
         $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->notificationScheduler = $notificationScheduler;
-        $this->sentry = $sentry;
         $this->limitsService = $limitsService;
+        $this->paymentForgivenessService = $paymentForgivenessService;
     }
 
     public function execute(OrderOutstandingAmountChangeRequest $request)
     {
-        $orderAmountChangeDetails = $request->getOrderAmountChangeDetails();
-        $order = $this->orderRepository->getOneByPaymentId($orderAmountChangeDetails->getId());
+        $amountChange = $request->getOrderAmountChangeDetails();
 
+        $order = $this->orderRepository->getOneByPaymentId($amountChange->getId());
         if (!$order) {
-            $this->logError(
+            $this->logSuppressedException(
+                new PaellaCoreCriticalException('Order not found'),
                 '[suppressed] Trying to change state for non-existing order',
-                [
-                    'payment_id' => $orderAmountChangeDetails->getId(),
-                ]
+                ['payment_id' => $amountChange->getId()]
             );
-
-            $this->sentry->captureException(new PaellaCoreCriticalException('Order not found'));
 
             return;
         }
 
         $merchant = $this->merchantRepository->getOneById($order->getMerchantId());
-        if (is_null($merchant)) {
-            throw new MerchantNotFoundException();
+        if (!$merchant) {
+            $this->logSuppressedException(
+                new PaellaCoreCriticalException('Merchant not found for order #' . $order->getId()),
+                '[suppressed] Merchant not found.',
+                ['payment_id' => $order->getId(), 'merchant_id' => $order->getMerchantId()]
+            );
+
+            return;
         }
 
-        $merchant->increaseAvailableFinancingLimit($orderAmountChangeDetails->getAmountChange());
+        $merchant->increaseAvailableFinancingLimit($amountChange->getAmountChange());
 
         $merchantDebtor = $this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId());
-
         if (!$merchantDebtor) {
-            $this->logError(
+            $this->logSuppressedException(
+                new PaellaCoreCriticalException('Merchant Debtor not found for order #' . $order->getId()),
                 '[suppressed] Merchant Debtor not found.',
-                [
-                    'payment_id' => $order->getId(),
-                    'merchant_debtor_id' => $order->getMerchantDebtorId(),
-                ]
-            );
-            $this->sentry->captureException(
-                new PaellaCoreCriticalException('Merchant Debtor not found for order #' . $order->getId())
+                ['payment_id' => $order->getId(), 'merchant_debtor_id' => $order->getMerchantDebtorId()]
             );
 
             return;
         }
 
-        $this->limitsService->unlock($merchantDebtor, $orderAmountChangeDetails->getAmountChange());
-
+        $this->limitsService->unlock($merchantDebtor, $amountChange->getAmountChange());
         $this->merchantRepository->update($merchant);
 
-        if (!$orderAmountChangeDetails->isPayment()) {
+        if (!$amountChange->isPayment()) {
             return;
         }
 
+        $this->scheduleEvent($order, $amountChange);
+
+        if ($this->paymentForgivenessService->begForgiveness($order, $amountChange)) {
+            $this->logInfo(
+                "Order {id} outstanding amount of {amount} will be paid by the merchant {merchant}",
+                [
+                    'id' => $order->getId(),
+                    'amount' => $amountChange->getOutstandingAmount(),
+                    'merchantd' => $merchant->getId(),
+                ]
+            );
+        }
+    }
+
+    private function scheduleEvent(OrderEntity $order, OrderAmountChangeDTO $amountChange)
+    {
         $payload = [
             'event' => self::NOTIFICATION_EVENT,
             'order_id' => $order->getExternalCode(),
-            'amount' => $orderAmountChangeDetails->getPaidAmount(),
-            'open_amount' => $orderAmountChangeDetails->getOutstandingAmount(),
+            'amount' => $amountChange->getPaidAmount(),
+            'open_amount' => $amountChange->getOutstandingAmount(),
         ];
 
         $this->notificationScheduler->createAndSchedule($order, $payload);

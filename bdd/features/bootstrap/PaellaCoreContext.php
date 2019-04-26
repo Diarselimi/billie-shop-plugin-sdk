@@ -89,6 +89,7 @@ class PaellaCoreContext extends MinkContext
                 ->setMinOrderAmount(0)
                 ->setScoreThresholdsConfigurationId($scoreThreshold->getId())
                 ->setUseExperimentalDebtorIdentification(false)
+                ->setDebtorForgivenessThreshold(1.0)
                 ->setInvoiceHandlingStrategy('none')
                 ->setCreatedAt(new DateTime())
                 ->setUpdatedAt(new DateTime())

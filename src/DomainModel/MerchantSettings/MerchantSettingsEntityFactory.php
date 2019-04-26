@@ -16,9 +16,9 @@ class MerchantSettingsEntityFactory
             ->setScoreThresholdsConfigurationId($data['score_thresholds_configuration_id'])
             ->setUseExperimentalDebtorIdentification(boolval($data['use_experimental_identification']))
             ->setInvoiceHandlingStrategy($data['invoice_handling_strategy'])
+            ->setDebtorForgivenessThreshold((float) $data['debtor_forgiveness_threshold'])
             ->setCreatedAt(new \DateTime($data['created_at']))
-            ->setUpdatedAt(new \DateTime($data['updated_at']))
-        ;
+            ->setUpdatedAt(new \DateTime($data['updated_at']));
     }
 
     public function create(
@@ -26,7 +26,8 @@ class MerchantSettingsEntityFactory
         float $financingLimit,
         int $scoreThresholdsConfigurationId,
         bool $useExperimentalDebtorIdentification,
-        string $invoiceHandlingStrategy
+        string $invoiceHandlingStrategy,
+        float $debtorForgivenessThreshold
     ): MerchantSettingsEntity {
         return (new MerchantSettingsEntity())
             ->setMerchantId($merchantId)
@@ -35,6 +36,6 @@ class MerchantSettingsEntityFactory
             ->setScoreThresholdsConfigurationId($scoreThresholdsConfigurationId)
             ->setUseExperimentalDebtorIdentification($useExperimentalDebtorIdentification)
             ->setInvoiceHandlingStrategy($invoiceHandlingStrategy)
-        ;
+            ->setDebtorForgivenessThreshold($debtorForgivenessThreshold);
     }
 }

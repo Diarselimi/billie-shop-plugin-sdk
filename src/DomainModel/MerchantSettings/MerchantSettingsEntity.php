@@ -12,6 +12,8 @@ class MerchantSettingsEntity extends AbstractTimestampableEntity
 
     public const INVOICE_HANDLING_STRATEGY_NONE = 'none';
 
+    public const DEFAULT_DEBTOR_FORGIVENESS_THRESHOLD = 1.0;
+
     private $merchantId;
 
     private $debtorFinancingLimit;
@@ -23,6 +25,8 @@ class MerchantSettingsEntity extends AbstractTimestampableEntity
     private $scoreThresholdsConfigurationId;
 
     private $useExperimentalDebtorIdentification;
+
+    private $debtorForgivenessThreshold;
 
     public function getMerchantId(): int
     {
@@ -92,6 +96,18 @@ class MerchantSettingsEntity extends AbstractTimestampableEntity
     public function setUseExperimentalDebtorIdentification(bool $useExperimentalDebtorIdentification): MerchantSettingsEntity
     {
         $this->useExperimentalDebtorIdentification = $useExperimentalDebtorIdentification;
+
+        return $this;
+    }
+
+    public function getDebtorForgivenessThreshold(): float
+    {
+        return $this->debtorForgivenessThreshold;
+    }
+
+    public function setDebtorForgivenessThreshold(float $debtorForgivenessThreshold): MerchantSettingsEntity
+    {
+        $this->debtorForgivenessThreshold = $debtorForgivenessThreshold;
 
         return $this;
     }
