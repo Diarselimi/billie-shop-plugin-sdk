@@ -75,7 +75,7 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
         return $debtorRowData ? $this->debtorExternalDataEntityFactory->createFromDatabaseRow($debtorRowData) : null;
     }
 
-    public function getOneByHashAndStateNotOlderThanDays(string $hash, int $merchantExternalId, int $merchantId, int $ignoreId, string $state, int $days = 30): ?DebtorExternalDataEntity
+    public function getOneByHashAndStateNotOlderThanDays(string $hash, string $merchantExternalId, int $merchantId, int $ignoreId, string $state, int $days = 30): ?DebtorExternalDataEntity
     {
         $debtorExternalData = $this->doFetchOne(
             '

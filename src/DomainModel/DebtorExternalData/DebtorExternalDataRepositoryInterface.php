@@ -8,5 +8,5 @@ interface DebtorExternalDataRepositoryInterface
 
     public function getOneById(int $id): ? DebtorExternalDataEntity;
 
-    public function getOneByHashAndStateNotOlderThanDays(string $hash, int $merchantExternalId, int $merchantId, int $ignoreId, string $state, int $days = 30): ?DebtorExternalDataEntity;
+    public function getOneByHashAndStateNotOlderThanDays(string $hash, string $merchantExternalId, int $merchantId, int $ignoreId, string $state, int $days = 30): ?DebtorExternalDataEntity;
 }
