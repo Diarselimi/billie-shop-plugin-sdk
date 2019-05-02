@@ -126,7 +126,8 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
         $scoreThresholdsConfigurationFactory->createDefault()->shouldBeCalledOnce()->willReturn($scoreThresholdsConfiguration);
         $scoreThresholdsConfigurationRepository->insert($scoreThresholdsConfiguration)->shouldBeCalledOnce();
 
-        $merchantSettingsFactory->create(self::MERCHANT_ID, self::DEBTOR_FINANCING_LIMIT, self::SCORE_CONFIGURATION_ID, false, 'none')->willReturn($merchantSettings);
+        $merchantSettingsFactory->create(self::MERCHANT_ID, self::DEBTOR_FINANCING_LIMIT, self::SCORE_CONFIGURATION_ID, false, 'none', 1.0)
+            ->willReturn($merchantSettings);
         $merchantSettingsRepository->insert($merchantSettings)->shouldBeCalledOnce();
 
         $merchantRiskCheckSettingsRepository->insertMerchantDefaultRiskCheckSettings(self::MERCHANT_ID)->shouldBeCalledOnce();

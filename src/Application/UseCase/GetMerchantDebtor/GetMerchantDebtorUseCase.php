@@ -11,18 +11,14 @@ class GetMerchantDebtorUseCase
 {
     private $merchantDebtorRepository;
 
-    private $paymentsService;
-
-    private $companiesService;
+    private $merchantDebtorResponseFactory;
 
     public function __construct(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
-        BorschtInterface $paymentsService,
-        CompaniesServiceInterface $companiesService
+        GetMerchantDebtorResponseFactory $merchantDebtorResponseFactory
     ) {
         $this->merchantDebtorRepository = $merchantDebtorRepository;
-        $this->paymentsService = $paymentsService;
-        $this->companiesService = $companiesService;
+        $this->merchantDebtorResponseFactory = $merchantDebtorResponseFactory;
     }
 
     public function execute(GetMerchantDebtorRequest $request): GetMerchantDebtorResponse
@@ -37,29 +33,9 @@ class GetMerchantDebtorUseCase
             throw new MerchantDebtorNotFoundException();
         }
 
-        $company = $this->companiesService->getDebtor($merchantDebtor->getDebtorId());
-        $paymentsDetails = $this->paymentsService->getDebtorPaymentDetails($merchantDebtor->getPaymentDebtorId());
-        $createdAmount = $this->merchantDebtorRepository->getMerchantDebtorCreatedOrdersAmount($merchantDebtor->getId());
-
-        return new GetMerchantDebtorResponse([
-            'id' => $merchantDebtor->getId(),
-            'company_id' => $merchantDebtor->getDebtorId(),
-            'payment_id' => $merchantDebtor->getPaymentDebtorId(),
-            'external_id' => $request->getMerchantDebtorExternalId(),
-            'available_limit' => $merchantDebtor->getFinancingLimit(),
-            'total_limit' => $merchantDebtor->getFinancingLimit() + $createdAmount + $paymentsDetails->getOutstandingAmount(),
-            'created_amount' => $createdAmount,
-            'outstanding_amount' => $paymentsDetails->getOutstandingAmount(),
-            'company' => [
-                'crefo_id' => $company->getCrefoId(),
-                'schufa_id' => $company->getSchufaId(),
-                'name' => $company->getName(),
-                'address_house' => $company->getAddressHouse(),
-                'address_street' => $company->getAddressStreet(),
-                'address_city' => $company->getAddressCity(),
-                'address_postal_code' => $company->getAddressPostalCode(),
-                'address_country' => $company->getAddressCountry(),
-            ],
-        ]);
+        return $this->merchantDebtorResponseFactory->create(
+           $merchantDebtor,
+           $request->getMerchantDebtorExternalId()
+        );
     }
 }

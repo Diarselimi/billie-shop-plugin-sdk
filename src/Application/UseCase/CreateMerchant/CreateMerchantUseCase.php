@@ -6,6 +6,7 @@ use App\Application\UseCase\CreateMerchant\Exception\CreateMerchantException;
 use App\Application\UseCase\CreateMerchant\Exception\DuplicateMerchantCompanyException;
 use App\Application\UseCase\CreateMerchant\Exception\MerchantCompanyNotFoundException;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
+use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantEntityFactory;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
@@ -98,7 +99,8 @@ class CreateMerchantUseCase
             $request->getDebtorFinancingLimit(),
             $scoreThresholds->getId(),
             false,
-            MerchantSettingsEntity::INVOICE_HANDLING_STRATEGY_NONE
+            MerchantSettingsEntity::INVOICE_HANDLING_STRATEGY_NONE,
+            MerchantSettingsEntity::DEFAULT_DEBTOR_FORGIVENESS_THRESHOLD
         );
         $this->merchantSettingsRepository->insert($merchantSettings);
 

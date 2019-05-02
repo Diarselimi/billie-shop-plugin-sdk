@@ -38,6 +38,10 @@ class DebtorScoreCheck implements CheckInterface
         $merchantSettings = $order->getMerchantSettings();
         $merchantDebtor = $order->getMerchantDebtor();
 
+        if ($merchantDebtor->isWhitelisted()) {
+            return new CheckResult(true, self::NAME);
+        }
+
         $merchantScoreThresholds = ($merchantSettings->getScoreThresholdsConfigurationId()) ?
             $this->scoreThresholdsConfigurationRepository->getById($merchantSettings->getScoreThresholdsConfigurationId())
             : null;

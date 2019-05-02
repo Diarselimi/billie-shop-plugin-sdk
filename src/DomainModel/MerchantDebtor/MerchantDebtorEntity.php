@@ -19,6 +19,8 @@ class MerchantDebtorEntity extends AbstractTimestampableEntity
 
     private $scoreThresholdsConfigurationId;
 
+    private $isWhitelisted;
+
     public function getMerchantId(): string
     {
         return $this->merchantId;
@@ -108,6 +110,18 @@ class MerchantDebtorEntity extends AbstractTimestampableEntity
     public function setScoreThresholdsConfigurationId(?int $scoreThresholdsConfigurationId): MerchantDebtorEntity
     {
         $this->scoreThresholdsConfigurationId = $scoreThresholdsConfigurationId;
+
+        return $this;
+    }
+
+    public function isWhitelisted(): bool
+    {
+        return $this->isWhitelisted;
+    }
+
+    public function setIsWhitelisted(bool $isWhitelisted): MerchantDebtorEntity
+    {
+        $this->isWhitelisted = $isWhitelisted;
 
         return $this;
     }

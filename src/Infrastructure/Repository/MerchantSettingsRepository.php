@@ -10,7 +10,10 @@ use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class MerchantSettingsRepository extends AbstractPdoRepository implements MerchantSettingsRepositoryInterface
 {
-    private const SELECT_FIELDS = 'id, merchant_id, debtor_financing_limit, min_order_amount, score_thresholds_configuration_id, use_experimental_identification, invoice_handling_strategy, created_at, updated_at';
+    public const TABLE_NAME = "merchant_settings";
+
+    private const SELECT_FIELDS = 'id, merchant_id, debtor_financing_limit, min_order_amount, score_thresholds_configuration_id, '.
+    'use_experimental_identification, debtor_forgiveness_threshold, invoice_handling_strategy, created_at, updated_at';
 
     private $factory;
 
@@ -22,7 +25,7 @@ class MerchantSettingsRepository extends AbstractPdoRepository implements Mercha
     public function insert(MerchantSettingsEntity $merchantSettingsEntity): void
     {
         $id = $this->doInsert('
-            INSERT INTO merchant_settings
+            INSERT INTO '. self::TABLE_NAME .'
             (
               merchant_id,
               debtor_financing_limit,
@@ -30,6 +33,7 @@ class MerchantSettingsRepository extends AbstractPdoRepository implements Mercha
               score_thresholds_configuration_id,
               use_experimental_identification,
               invoice_handling_strategy,
+              debtor_forgiveness_threshold,
               created_at, 
               updated_at
             )
@@ -41,6 +45,7 @@ class MerchantSettingsRepository extends AbstractPdoRepository implements Mercha
               :score_thresholds_configuration_id,
               :use_experimental_identification,
               :invoice_handling_strategy,
+              :debtor_forgiveness_threshold,
               :created_at,
               :updated_at
             )
@@ -51,6 +56,7 @@ class MerchantSettingsRepository extends AbstractPdoRepository implements Mercha
             'score_thresholds_configuration_id' => $merchantSettingsEntity->getScoreThresholdsConfigurationId(),
             'use_experimental_identification' => (int) $merchantSettingsEntity->useExperimentalDebtorIdentification(),
             'invoice_handling_strategy' => $merchantSettingsEntity->getInvoiceHandlingStrategy(),
+            'debtor_forgiveness_threshold' => $merchantSettingsEntity->getDebtorForgivenessThreshold(),
             'created_at' => $merchantSettingsEntity->getCreatedAt()->format(self::DATE_FORMAT),
             'updated_at' => $merchantSettingsEntity->getUpdatedAt()->format(self::DATE_FORMAT),
         ]);
@@ -62,7 +68,7 @@ class MerchantSettingsRepository extends AbstractPdoRepository implements Mercha
     {
         $row = $this->doFetchOne('
           SELECT ' . self::SELECT_FIELDS . '
-          FROM merchant_settings
+          FROM '. self::TABLE_NAME .'
           WHERE merchant_id = :merchant_id
         ', ['merchant_id' => $merchantId]);
 

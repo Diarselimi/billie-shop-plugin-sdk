@@ -13,7 +13,7 @@ class ArrayHasher implements ArrayHasherInterface
         $stringifiedData = preg_replace(
             '/[^A-Za-z0-9äöüßé]/',
             '',
-            strtolower(implode("", $preparedArray))
+            mb_strtolower(implode("", $preparedArray))
         );
 
         return md5($stringifiedData);

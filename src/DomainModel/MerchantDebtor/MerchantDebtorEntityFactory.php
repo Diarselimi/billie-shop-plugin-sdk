@@ -13,6 +13,7 @@ class MerchantDebtorEntityFactory
             ->setPaymentDebtorId($row['payment_debtor_id'])
             ->setFinancingLimit($row['financing_limit'])
             ->setScoreThresholdsConfigurationId($row['score_thresholds_configuration_id'])
+            ->setIsWhitelisted(boolval($row['is_whitelisted']))
             ->setCreatedAt(new \DateTime($row['created_at']))
             ->setUpdatedAt(new \DateTime($row['updated_at']));
     }
@@ -21,7 +22,8 @@ class MerchantDebtorEntityFactory
         string $debtorId,
         string $merchantId,
         string $paymentDebtorId,
-        float $financingLimit
+        float $financingLimit,
+        bool $isWhitelisted = false
     ): MerchantDebtorEntity {
         $now = new \DateTime();
 
@@ -30,6 +32,7 @@ class MerchantDebtorEntityFactory
             ->setDebtorId($debtorId)
             ->setPaymentDebtorId($paymentDebtorId)
             ->setFinancingLimit($financingLimit)
+            ->setIsWhitelisted($isWhitelisted)
             ->setCreatedAt($now)
             ->setUpdatedAt($now);
     }

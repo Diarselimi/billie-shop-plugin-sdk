@@ -11,7 +11,9 @@ use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class MerchantDebtorRepository extends AbstractPdoRepository implements MerchantDebtorRepositoryInterface
 {
-    private const SELECT_FIELDS = 'id, merchant_id, debtor_id, payment_debtor_id, financing_limit, score_thresholds_configuration_id, created_at, updated_at';
+    const TABLE_NAME = "merchants_debtors";
+
+    private const SELECT_FIELDS = 'id, merchant_id, debtor_id, payment_debtor_id, financing_limit, score_thresholds_configuration_id, is_whitelisted, created_at, updated_at';
 
     private $factory;
 
@@ -23,10 +25,10 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
     public function insert(MerchantDebtorEntity $merchantDebtor): void
     {
         $id = $this->doInsert('
-            INSERT INTO merchants_debtors
-            (merchant_id, debtor_id, payment_debtor_id, financing_limit, score_thresholds_configuration_id, created_at, updated_at)
+            INSERT INTO '. self::TABLE_NAME .'
+            (merchant_id, debtor_id, payment_debtor_id, financing_limit, score_thresholds_configuration_id, created_at, updated_at, is_whitelisted)
             VALUES
-            (:merchant_id, :debtor_id, :payment_debtor_id, :financing_limit, :score_thresholds_configuration_id, :created_at, :updated_at)
+            (:merchant_id, :debtor_id, :payment_debtor_id, :financing_limit, :score_thresholds_configuration_id, :created_at, :updated_at, :is_whitelisted)
         ', [
             'merchant_id' => $merchantDebtor->getMerchantId(),
             'debtor_id' => $merchantDebtor->getDebtorId(),
@@ -35,6 +37,7 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
             'score_thresholds_configuration_id' => $merchantDebtor->getScoreThresholdsConfigurationId(),
             'created_at' => $merchantDebtor->getCreatedAt()->format(self::DATE_FORMAT),
             'updated_at' => $merchantDebtor->getUpdatedAt()->format(self::DATE_FORMAT),
+            'is_whitelisted' => (int) $merchantDebtor->isWhitelisted(),
         ]);
 
         $merchantDebtor->setId($id);
@@ -45,13 +48,14 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
         $merchantDebtor->setUpdatedAt(new \DateTime());
 
         $this->doUpdate('
-            UPDATE merchants_debtors
-            SET financing_limit = :financing_limit, updated_at = :updated_at
+            UPDATE '.self::TABLE_NAME.'
+            SET financing_limit = :financing_limit, updated_at = :updated_at, is_whitelisted = :whitelisted
             WHERE id = :id
         ', [
             'id' => $merchantDebtor->getId(),
             'financing_limit' => $merchantDebtor->getFinancingLimit(),
             'updated_at' => $merchantDebtor->getUpdatedAt()->format(self::DATE_FORMAT),
+            'whitelisted' => (int) $merchantDebtor->isWhitelisted(),
         ]);
     }
 
@@ -59,7 +63,7 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
     {
         $row = $this->doFetchOne('
           SELECT ' . self::SELECT_FIELDS . '
-          FROM merchants_debtors
+          FROM '.self::TABLE_NAME.'
           WHERE id = :id
         ', [
             'id' => $id,
@@ -72,7 +76,7 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
     {
         $row = $this->doFetchOne('
           SELECT ' . self::SELECT_FIELDS . '
-          FROM merchants_debtors
+          FROM '.self::TABLE_NAME.'
           WHERE merchant_id = :merchant_id
           AND debtor_id = :debtor_id', [
             'merchant_id' => $merchantId,
@@ -86,7 +90,7 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
     {
         $row = $this->doFetchOne('
             SELECT ' . self::SELECT_FIELDS . '
-            FROM merchants_debtors
+            FROM '.self::TABLE_NAME.' 
             WHERE merchants_debtors.id = (
                 SELECT merchant_debtor_id
                 FROM orders
@@ -130,7 +134,7 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
            merchant_debtor_id
     FROM orders
         INNER JOIN debtor_external_data ON (debtor_external_data_id = debtor_external_data.id)
-        INNER JOIN merchants_debtors ON (merchant_debtor_id = merchants_debtors.id)
+        INNER JOIN {self::TABLE_NAME} ON (merchant_debtor_id = merchants_debtors.id)
     {$where}
     GROUP BY debtor_id, merchant_id, merchant_external_id, merchant_debtor_id
     ORDER BY merchant_id, merchant_external_id, debtor_id
