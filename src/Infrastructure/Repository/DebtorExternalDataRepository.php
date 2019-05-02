@@ -75,7 +75,7 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
         return $debtorRowData ? $this->debtorExternalDataEntityFactory->createFromDatabaseRow($debtorRowData) : null;
     }
 
-    public function getOneByHashAndStateNotOlderThanDays(string $hash, int $ignoreId, string $state, int $days = 30): ?DebtorExternalDataEntity
+    public function getOneByHashAndStateNotOlderThanDays(string $hash, int $merchantExternalId, int $merchantId, int $ignoreId, string $state, int $days = 30): ?DebtorExternalDataEntity
     {
         $debtorExternalData = $this->doFetchOne(
             '
@@ -84,10 +84,19 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
             WHERE 
                 orders.state = :state
                 AND debtor_data_hash = :hash 
+                AND orders.merchant_id = :merchantId
+                AND merchant_external_id = :merchantExternalId
                 AND '. self::TABLE_NAME . '.id != :id
                 AND DATE_ADD( '. self::TABLE_NAME . '.created_at, INTERVAL :days DAY) > NOW()
                 ORDER BY  '. self::TABLE_NAME . '.created_at DESC LIMIT 1',
-            ['hash' => $hash, 'days' => $days, 'id' => $ignoreId, 'state' => $state]
+            [
+                'hash' => $hash,
+                'days' => $days,
+                'id' => $ignoreId,
+                'state' => $state,
+                'merchantId' => $merchantId,
+                'merchantExternalId' => $merchantExternalId,
+            ]
         );
 
         return $debtorExternalData ? $this->debtorExternalDataEntityFactory->createFromDatabaseRow($debtorExternalData) : null;
