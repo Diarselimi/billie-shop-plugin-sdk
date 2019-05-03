@@ -2,8 +2,6 @@
 
 namespace App\DomainModel\OrderInvoice;
 
-use DateTime;
-
 class OrderInvoiceEntity
 {
     private $id;
@@ -18,7 +16,7 @@ class OrderInvoiceEntity
 
     public function __construct()
     {
-        $this->createdAt = new DateTime();
+        $this->createdAt = new \DateTime();
     }
 
     public function getId(): int
@@ -62,14 +60,14 @@ class OrderInvoiceEntity
         return $this->invoiceNumber;
     }
 
-    public function setInvoiceNumber($invoiceNumber): OrderInvoiceEntity
+    public function setInvoiceNumber(string $invoiceNumber): OrderInvoiceEntity
     {
         $this->invoiceNumber = $invoiceNumber;
 
         return $this;
     }
 
-    public function getCreatedAt(): DateTime
+    public function getCreatedAt(): \DateTime
     {
         return $this->createdAt;
     }

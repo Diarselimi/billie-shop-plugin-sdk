@@ -25,12 +25,10 @@ use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonRepositoryInterface;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntity;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
-use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Billie\PdoBundle\Infrastructure\Pdo\PdoConnection;
-use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
@@ -90,7 +88,7 @@ class PaellaCoreContext extends MinkContext
                 ->setScoreThresholdsConfigurationId($scoreThreshold->getId())
                 ->setUseExperimentalDebtorIdentification(false)
                 ->setDebtorForgivenessThreshold(1.0)
-                ->setInvoiceHandlingStrategy('none')
+                ->setInvoiceHandlingStrategy('http')
                 ->setCreatedAt(new DateTime())
                 ->setUpdatedAt(new DateTime())
         );
@@ -373,20 +371,6 @@ class PaellaCoreContext extends MinkContext
         $results = $pdoQuery->fetch(PDO::FETCH_ASSOC);
 
         Assert::eq($results['merchant_has_risk_settings'], 0, 'The default merchant risk settings did not match with the number of risk definitions');
-    }
-
-    /**
-     * @When I push message to :queueName queue and routing key :routingKey with the following content:
-     */
-    public function iPushMessageMessageToQueueAndRoutingKeyWithTheFollowingContent(
-        $queueName,
-        $routingKey,
-        PyStringNode $string
-    ) {
-        /** @var ProducerInterface $producerService */
-        $producerService = $this->get(sprintf('old_sound_rabbit_mq.%s_producer', $queueName));
-
-        $producerService->publish($string, $routingKey);
     }
 
     /**

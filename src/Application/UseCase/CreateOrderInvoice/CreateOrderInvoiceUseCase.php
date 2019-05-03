@@ -4,7 +4,7 @@ namespace App\Application\UseCase\CreateOrderInvoice;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\OrderInvoice\OrderInvoiceEntity;
+use App\DomainModel\OrderInvoice\OrderInvoiceFactory;
 use App\DomainModel\OrderInvoice\OrderInvoiceRepositoryInterface;
 
 class CreateOrderInvoiceUseCase
@@ -13,12 +13,16 @@ class CreateOrderInvoiceUseCase
 
     private $orderInvoiceRepository;
 
+    private $orderInvoiceFactory;
+
     public function __construct(
         OrderRepositoryInterface $orderRepository,
-        OrderInvoiceRepositoryInterface $orderInvoiceRepository
+        OrderInvoiceRepositoryInterface $orderInvoiceRepository,
+        OrderInvoiceFactory $orderInvoiceFactory
     ) {
         $this->orderRepository = $orderRepository;
         $this->orderInvoiceRepository = $orderInvoiceRepository;
+        $this->orderInvoiceFactory = $orderInvoiceFactory;
     }
 
     public function execute(CreateOrderInvoiceRequest $request): void
@@ -29,12 +33,7 @@ class CreateOrderInvoiceUseCase
             throw new OrderNotFoundException("Order #{$request->getOrderId()} does't exist");
         }
 
-        $orderInvoice = (new OrderInvoiceEntity())
-            ->setOrderId($order->getId())
-            ->setFileId($request->getFileId())
-            ->setInvoiceNumber($request->getInvoiceNumber())
-        ;
-
+        $orderInvoice = $this->orderInvoiceFactory->create($order->getId(), $request->getFileId(), $request->getInvoiceNumber());
         $this->orderInvoiceRepository->insert($orderInvoice);
     }
 }

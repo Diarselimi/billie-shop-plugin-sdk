@@ -29,4 +29,9 @@ interface OrderRepositoryInterface
     public function merchantDebtorHasAtLeastOneApprovedOrder(int $debtorId): bool;
 
     public function countOrdersByState(int $merchantDebtorId): OrderStateCounterDTO;
+
+    /**
+     * @return Generator|array|OrderEntity[]
+     */
+    public function getOrdersByInvoiceHandlingStrategy(string $strategy): Generator;
 }

@@ -361,4 +361,23 @@ SQL;
             ->setTotalPaidOut($counters['total_paid_out'])
             ->setTotalComplete($counters['total_complete']);
     }
+
+    public function getOrdersByInvoiceHandlingStrategy(string $strategy): Generator
+    {
+        $stmt = $this->doExecute('
+            SELECT ' . self::SELECT_FIELDS . '
+            FROM orders
+            WHERE invoice_url IS NOT NULL
+            AND merchant_id IN (
+                SELECT merchant_id FROM merchant_settings
+                WHERE invoice_handling_strategy = :strategy
+            );
+        ', [
+            'strategy' => $strategy,
+        ]);
+
+        while ($row = $stmt->fetch(PdoConnection::FETCH_ASSOC)) {
+            yield $this->orderFactory->createFromDatabaseRow($row);
+        }
+    }
 }

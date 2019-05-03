@@ -17,9 +17,9 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
 
     private $client;
 
-    public function __construct(Client $client)
+    public function __construct(Client $smaugClient)
     {
-        $this->client = $client;
+        $this->client = $smaugClient;
     }
 
     public function authorizeToken(string $token): ? AuthenticationServiceAuthorizeTokenResponseDTO
