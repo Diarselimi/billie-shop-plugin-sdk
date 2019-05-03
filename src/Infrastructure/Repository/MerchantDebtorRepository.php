@@ -127,6 +127,8 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
     public function getDebtorsWithExternalId(string $where = ''): \Generator
     {
         $where = $where ? "WHERE {$where}" : '';
+        $tableName = self::TABLE_NAME;
+
         $sql = <<<SQL
     SELECT debtor_id, 
            merchants_debtors.merchant_id,
@@ -134,7 +136,7 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
            merchant_debtor_id
     FROM orders
         INNER JOIN debtor_external_data ON (debtor_external_data_id = debtor_external_data.id)
-        INNER JOIN {self::TABLE_NAME} ON (merchant_debtor_id = merchants_debtors.id)
+        INNER JOIN {$tableName} ON (merchant_debtor_id = merchants_debtors.id)
     {$where}
     GROUP BY debtor_id, merchant_id, merchant_external_id, merchant_debtor_id
     ORDER BY merchant_id, merchant_external_id, debtor_id
