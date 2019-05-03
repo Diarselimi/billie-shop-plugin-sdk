@@ -1,3 +1,0 @@
-check process order_debtor_identification_v2 with pidfile /var/run/billie/order_debtor_identification_v2.pid
-        start program = "/usr/local/bin/start-stop-script start /var/run/billie/order_debtor_identification_v2.pid '/var/www/paella-core/bin/console rabbitmq:consumer -m 10 order_debtor_identification_v2'"
-                as uid www-data and with gid www-data
