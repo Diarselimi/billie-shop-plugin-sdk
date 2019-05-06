@@ -15,10 +15,10 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderNotification\NotificationScheduler;
 use App\DomainModel\OrderPayment\OrderPaymentForgivenessService;
+use Billie\MonitoringBundle\Service\Alerting\Sentry\Raven\RavenClient;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
-use Raven_Client;
 
 class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
 {
@@ -46,7 +46,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         NotificationScheduler $notificationScheduler,
         OrderPaymentForgivenessService $paymentForgivenessService,
         LoggerInterface $logger,
-        Raven_Client $sentry
+        RavenClient $sentry
     ) {
         $this->setLogger($logger)->setSentry($sentry);
 
@@ -100,7 +100,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         NotificationScheduler $notificationScheduler,
         OrderPaymentForgivenessService $paymentForgivenessService,
         LoggerInterface $logger,
-        Raven_Client $sentry
+        RavenClient $sentry
     ) {
         $this->setLogger($logger)->setSentry($sentry);
 
@@ -132,7 +132,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         NotificationScheduler $notificationScheduler,
         OrderPaymentForgivenessService $paymentForgivenessService,
         LoggerInterface $logger,
-        Raven_Client $sentry
+        RavenClient $sentry
     ) {
         $this->setLogger($logger)->setSentry($sentry);
 
@@ -175,7 +175,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         NotificationScheduler $notificationScheduler,
         OrderPaymentForgivenessService $paymentForgivenessService,
         LoggerInterface $logger,
-        Raven_Client $sentry
+        RavenClient $sentry
     ) {
         $this->setLogger($logger)->setSentry($sentry);
 
@@ -225,7 +225,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         NotificationScheduler $notificationScheduler,
         OrderPaymentForgivenessService $paymentForgivenessService,
         LoggerInterface $logger,
-        Raven_Client $sentry
+        RavenClient $sentry
     ) {
         $this->setLogger($logger)->setSentry($sentry);
 

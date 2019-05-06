@@ -16,6 +16,7 @@ use App\DomainModel\OrderNotification\OrderNotificationDeliveryEntity;
 use App\DomainModel\OrderNotification\OrderNotificationDeliveryFactory;
 use App\DomainModel\OrderNotification\OrderNotificationEntity;
 use App\DomainModel\OrderNotification\OrderNotificationRepositoryInterface;
+use Billie\MonitoringBundle\Service\Alerting\Sentry\Raven\RavenClient;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Psr\Log\NullLogger;
@@ -45,7 +46,7 @@ class NotificationDeliveryUseCaseSpec extends ObjectBehavior
         NotificationSenderInterface $notificationSender,
         NotificationScheduler $notificationScheduler,
         OrderNotificationDeliveryFactory $notificationDeliveryFactory,
-        \Raven_Client $sentry
+        RavenClient $sentry
     ) {
         $this->beConstructedWith(
             $orderRepository,
@@ -78,7 +79,6 @@ class NotificationDeliveryUseCaseSpec extends ObjectBehavior
 
     public function it_does_nothing_if_notification_has_been_already_delivered(
         OrderNotificationRepositoryInterface $notificationRepository,
-        OrderRepositoryInterface $orderRepository,
         OrderNotificationEntity $notification
     ) {
         $this->mockNotification($notification);

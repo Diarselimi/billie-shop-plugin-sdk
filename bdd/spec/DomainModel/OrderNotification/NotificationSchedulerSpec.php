@@ -8,6 +8,7 @@ use App\DomainModel\OrderNotification\OrderNotificationDeliveryEntity;
 use App\DomainModel\OrderNotification\OrderNotificationEntity;
 use App\DomainModel\OrderNotification\OrderNotificationFactory;
 use App\DomainModel\OrderNotification\OrderNotificationRepositoryInterface;
+use Billie\MonitoringBundle\Service\Alerting\Sentry\Raven\RavenClient;
 use Billie\MonitoringBundle\Service\Alerting\Slack\SlackClient;
 use Billie\MonitoringBundle\Service\Alerting\Slack\SlackMessage;
 use Billie\MonitoringBundle\Service\Alerting\Slack\SlackMessageAttachmentField;
@@ -39,7 +40,7 @@ class NotificationSchedulerSpec extends ObjectBehavior
         OrderNotificationRepositoryInterface $orderNotificationRepository,
         SlackClient $slackClient,
         SlackMessageFactory $slackMessageFactory,
-        \Raven_Client $sentry,
+        RavenClient $sentry,
         OrderNotificationEntity $orderNotification
     ) {
         $this->beConstructedWith(
