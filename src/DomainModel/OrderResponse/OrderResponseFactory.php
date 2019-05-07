@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\UseCase\Response;
+namespace App\DomainModel\OrderResponse;
 
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;

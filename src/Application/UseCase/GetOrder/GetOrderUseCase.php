@@ -3,10 +3,10 @@
 namespace App\Application\UseCase\GetOrder;
 
 use App\Application\PaellaCoreCriticalException;
-use App\Application\UseCase\Response\OrderResponse;
-use App\Application\UseCase\Response\OrderResponseFactory;
 use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\OrderResponse\OrderResponse;
+use App\DomainModel\OrderResponse\OrderResponseFactory;
 use Symfony\Component\HttpFoundation\Response;
 
 class GetOrderUseCase

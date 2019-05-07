@@ -2,11 +2,8 @@
 
 namespace App\DomainModel\Order;
 
-use App\DomainModel\OrderRiskCheck\Checker\DebtorAddressHouseMatchCheck;
-use App\DomainModel\OrderRiskCheck\Checker\DebtorAddressPostalCodeMatchCheck;
-use App\DomainModel\OrderRiskCheck\Checker\DebtorAddressStreetMatchCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedCheck;
-use App\DomainModel\OrderRiskCheck\Checker\DebtorNameCheck;
+use App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedStrictCheck;
 use App\DomainModel\OrderRiskCheck\Checker\LimitCheck;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
 
@@ -16,9 +13,9 @@ class OrderDeclinedReasonsMapper
 
     private const REASON_DEBTOR_NOT_IDENTIFIED = 'debtor_not_identified';
 
-    private const REASON_DEBTOR_LIMIT_EXCEEDED = 'debtor_limit_exceeded';
+    private const REASON_DEBTOR_NOT_IDENTIFIED_STRICT = 'debtor_not_identified_strict';
 
-    private const REASON_ADDRESS_MISMATCH = 'debtor_address';
+    private const REASON_DEBTOR_LIMIT_EXCEEDED = 'debtor_limit_exceeded';
 
     private $riskCheckRepository;
 
@@ -31,11 +28,8 @@ class OrderDeclinedReasonsMapper
     {
         $riskChecksToReasons = [
             DebtorIdentifiedCheck::NAME => self::REASON_DEBTOR_NOT_IDENTIFIED,
+            DebtorIdentifiedStrictCheck::NAME => self::REASON_DEBTOR_NOT_IDENTIFIED_STRICT,
             LimitCheck::NAME => self::REASON_DEBTOR_LIMIT_EXCEEDED,
-            DebtorNameCheck::NAME => self::REASON_ADDRESS_MISMATCH,
-            DebtorAddressStreetMatchCheck::NAME => self::REASON_ADDRESS_MISMATCH,
-            DebtorAddressHouseMatchCheck::NAME => self::REASON_ADDRESS_MISMATCH,
-            DebtorAddressPostalCodeMatchCheck::NAME => self::REASON_ADDRESS_MISMATCH,
         ];
         $mappedChecks = array_keys($riskChecksToReasons);
 

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controller;
 
-use App\Application\UseCase\Response\OrderResponse;
 use App\Application\UseCase\ShipOrder\ShipOrderRequest;
 use App\Application\UseCase\ShipOrder\ShipOrderUseCase;
+use App\DomainModel\OrderResponse\OrderResponse;
 use App\Http\HttpConstantsInterface;
 use Symfony\Component\HttpFoundation\Request;
 

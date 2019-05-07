@@ -52,7 +52,7 @@ class DebtorScoreCheck implements CheckInterface
 
         $IsEligibleForPayAfterDeliveryRequestDTO = $this->eligibleForPayAfterDeliveryRequestDTOFactory->create(
             $debtorId,
-            $order->getDebtorExternalData()->isLegalFormSoleTrader(),
+            $order->getDebtorExternalData()->isLegalFormSoleTrader(), // TODO: refactor to pass the legalForm to this call, so alfred will decide if is sole trader or not. then remove DebtorExternalData\DebtorExternalDataEntity::LEGAL_FORMS_FOR_SOLE_TRADERS
             $this->orderRepository->debtorHasAtLeastOneFullyPaidOrder($debtorId),
             $merchantScoreThresholds,
             $debtorScoreThresholds

@@ -30,7 +30,7 @@ class IdentifyAndScoreDebtorsCommand extends Command
 
     private const OPTION_LIMIT = 'limit';
 
-    private const REPORT_FILE_HEADERS = ['external_id', 'input_name', 'identified_name', 'crefo_id', 'company_id', 'is_name_accepted', 'is_eligible'];
+    private const REPORT_FILE_HEADERS = ['external_id', 'input_name', 'identified_name', 'crefo_id', 'company_id', 'is_strict_match', 'is_eligible'];
 
     private const BATCH_SIZE = 5;
 
@@ -143,7 +143,7 @@ class IdentifyAndScoreDebtorsCommand extends Command
             $response ? $response->getCompanyName() : null,
             $response ? $response->getCrefoId() : null,
             $response ? $response->getCompanyId() : null,
-            ($response && $response->isNameAccepted()) ? 1 : 0,
+            ($response && $response->isStrictMatch() === true) ? 1 : 0,
             ($response && $response->isEligible() === true) ? 1 : 0,
         ];
     }

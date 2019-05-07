@@ -51,6 +51,7 @@ class PaellaCoreContext extends MinkContext
         $this->connection = $connection;
 
         $this->getConnection()->exec('SET SESSION wait_timeout=30; SET SESSION max_connections = 500;');
+        $this->cleanUpScenario();
 
         register_shutdown_function(function () {
             $this->getConnection()->reconnect();
