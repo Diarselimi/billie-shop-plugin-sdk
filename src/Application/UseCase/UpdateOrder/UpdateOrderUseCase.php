@@ -161,7 +161,19 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         if ($this->orderStateManager->wasShipped($order)) {
             $order
                 ->setInvoiceNumber($request->getInvoiceNumber())
-                ->setInvoiceUrl($request->getInvoiceUrl());
+                ->setInvoiceUrl($request->getInvoiceUrl())
+            ;
+
+            try {
+                $this->invoiceManager->upload($order, InvoiceUploadHandlerInterface::EVENT_UPDATE);
+            } catch (OrderInvoiceUploadException $exception) {
+                throw new PaellaCoreCriticalException(
+                    "Update invoice is not possible",
+                    PaellaCoreCriticalException::CODE_ORDER_INVOICE_CANT_BE_UPDATED,
+                    500,
+                    $exception
+                );
+            }
         }
 
         if ($amountChanged == 0.0) {
@@ -206,7 +218,10 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
             );
         }
 
-        $order->setInvoiceNumber($request->getInvoiceNumber())->setInvoiceUrl($request->getInvoiceUrl());
+        $order
+            ->setInvoiceNumber($request->getInvoiceNumber())
+            ->setInvoiceUrl($request->getInvoiceUrl())
+        ;
 
         $this->applyUpdate($order);
 

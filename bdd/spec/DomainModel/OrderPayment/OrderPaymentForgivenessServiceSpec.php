@@ -9,6 +9,7 @@ use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderPayment\OrderPaymentForgivenessService;
 use PhpSpec\ObjectBehavior;
+use Psr\Log\NullLogger;
 
 class OrderPaymentForgivenessServiceSpec extends ObjectBehavior
 {
@@ -22,6 +23,7 @@ class OrderPaymentForgivenessServiceSpec extends ObjectBehavior
         MerchantSettingsRepositoryInterface $merchantSettingsRepository
     ) {
         $this->beConstructedWith(...func_get_args());
+        $this->setLogger(new NullLogger());
     }
 
     public function it_should_trigger_merchant_payment_if_debtor_partially_paid_and_outstanding_is_less_than_forgiveness_threshold(

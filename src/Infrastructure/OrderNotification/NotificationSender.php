@@ -16,9 +16,9 @@ class NotificationSender implements NotificationSenderInterface, LoggingInterfac
 
     private $client;
 
-    public function __construct(Client $client)
+    public function __construct(Client $notificationSenderClient)
     {
-        $this->client = $client;
+        $this->client = $notificationSenderClient;
     }
 
     public function send(string $url, ?string $authorisation, array $data): NotificationDeliveryResultDTO

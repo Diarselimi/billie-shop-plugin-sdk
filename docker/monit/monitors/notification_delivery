@@ -1,3 +1,0 @@
-check process notification_delivery with pidfile /var/run/billie/notification_delivery.pid
-        start program = "/usr/local/bin/start-stop-script start /var/run/billie/notification_delivery.pid '/var/www/paella-core/bin/console rabbitmq:consumer -m 10 notification_delivery'"
-                as uid www-data and with gid www-data

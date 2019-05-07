@@ -25,9 +25,9 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
 
     private $factory;
 
-    public function __construct(Client $client, DebtorCompanyFactory $debtorFactory)
+    public function __construct(Client $alfredClient, DebtorCompanyFactory $debtorFactory)
     {
-        $this->client = $client;
+        $this->client = $alfredClient;
         $this->factory = $debtorFactory;
     }
 

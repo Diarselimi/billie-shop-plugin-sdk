@@ -16,8 +16,15 @@ services:
       $delayedProducer: '@old_sound_rabbit_mq.paella_delayed_events_producer'
       $invoiceUploadHandlers:
         ftp: '@App\Infrastructure\Sns\SnsInvoiceUploadHandler'
+        http: '@App\Infrastructure\OrderInvoice\HttpInvoiceUploadHandler'
         none: '@App\DomainModel\OrderInvoice\UselessInvoiceUploadHandler'
       $snsInvoiceUploadTopicArn: '%receive_invoices_sns_topic_arn%'
+      $invoiceDownloadClient: '@eight_points_guzzle.client.invoice_download'
+      $alfredClient: '@eight_points_guzzle.client.alfred'
+      $borschtClient: '@eight_points_guzzle.client.borscht'
+      $smaugClient: '@eight_points_guzzle.client.smaug'
+      $nachosClient: '@eight_points_guzzle.client.nachos'
+      $notificationSenderClient: '@eight_points_guzzle.client.webhook'
 
   _instanceof:
     App\Application\UseCase\ValidatedUseCaseInterface:
@@ -31,22 +38,6 @@ services:
   App\Http\Controller\:
     resource: '../src/Http/Controller'
     tags: ['controller.service_arguments']
-
-  App\Infrastructure\Alfred\Alfred:
-    arguments:
-      $client: '@eight_points_guzzle.client.alfred'
-
-  App\Infrastructure\Borscht\Borscht:
-    arguments:
-      $client: '@eight_points_guzzle.client.borscht'
-
-  App\Infrastructure\OrderNotification\NotificationSender:
-    arguments:
-      $client: '@eight_points_guzzle.client.webhook'
-
-  App\Infrastructure\Smaug\Smaug:
-    arguments:
-      $client: '@eight_points_guzzle.client.smaug'
 
   Symfony\Component\Workflow\Workflow: '@state_machine.order'
 

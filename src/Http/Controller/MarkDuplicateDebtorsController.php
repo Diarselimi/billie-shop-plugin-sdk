@@ -14,9 +14,6 @@ class MarkDuplicateDebtorsController implements LoggingInterface
 {
     use LoggingTrait;
 
-    private const BAD_REQUEST_MESSAGE = 'Missing or malformed parameter: duplicates. ' .
-    'It should be an array of objects containing debtor_id and is_duplicate_of.';
-
     private $useCase;
 
     public function __construct(MarkDuplicateDebtorUseCase $useCase)

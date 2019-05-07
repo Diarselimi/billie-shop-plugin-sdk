@@ -1,3 +1,0 @@
-check process order_in_waiting_state with pidfile /var/run/billie/order_in_waiting_state.pid
-        start program = "/usr/local/bin/start-stop-script start /var/run/billie/order_in_waiting_state.pid '/var/www/paella-core/bin/console rabbitmq:consumer -m 10 order_in_waiting_state'"
-                as uid www-data and with gid www-data

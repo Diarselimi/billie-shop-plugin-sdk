@@ -28,9 +28,9 @@ class Borscht implements BorschtInterface, LoggingInterface
 
     private $paymentDetailsFactory;
 
-    public function __construct(Client $client, OrderPaymentDetailsFactory $paymentDetailsFactory)
+    public function __construct(Client $borschtClient, OrderPaymentDetailsFactory $paymentDetailsFactory)
     {
-        $this->client = $client;
+        $this->client = $borschtClient;
         $this->paymentDetailsFactory = $paymentDetailsFactory;
     }
 

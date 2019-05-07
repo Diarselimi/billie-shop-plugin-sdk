@@ -106,7 +106,9 @@ Feature:
           "duration": 30,
           "amount_gross": 500,
           "amount_net": 400,
-          "amount_tax": 20
+          "amount_tax": 20,
+          "invoice_number": "DE12",
+          "invoice_url": "http://google.de"
         }
         """
     Then the response status code should be 204
@@ -154,7 +156,9 @@ Feature:
           "duration": 50,
           "amount_net": 400,
           "amount_gross": 500,
-          "amount_tax": 20
+          "amount_tax": 20,
+          "invoice_number": "DE12",
+          "invoice_url": "http://google.de"
         }
         """
     Then the response status code should be 204

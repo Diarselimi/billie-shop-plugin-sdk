@@ -217,33 +217,25 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
         $this->eventDispatcher->dispatch(OrderLifecycleEvent::UPDATED, new OrderLifecycleEvent($order));
     }
 
-    /**
-     * @param int $merchantDebtorId
-     *
-     * @return Generator|int[]
-     */
-    public function getCustomerOverdues(int $merchantDebtorId): Generator
+    public function getDebtorMaximumOverdue(int $debtorId): int
     {
-        $query = '
-            SELECT CEIL((:current_time - UNIX_TIMESTAMP(`shipped_at`) - (`duration` * 86400)) / 86400) as `overdue`
-            FROM `orders`
-            WHERE `merchant_debtor_id` = :merchant_debtor_id
+        $result = $this->doFetchOne(
+            '
+            SELECT MAX(CEIL((:current_time - UNIX_TIMESTAMP(`shipped_at`) - (`duration` * 86400)) / 86400)) as `max_overdue`
+            FROM `merchants_debtors`
+            INNER JOIN `orders` ON orders.`merchant_debtor_id` = `merchants_debtors`.id
+            WHERE `merchants_debtors`.debtor_id = :debtor_id
             AND `state` = :state
             AND `shipped_at` IS NOT NULL
-        ';
+        ',
+            [
+                'current_time' => time(),
+                'debtor_id' => $debtorId,
+                'state' => OrderStateManager::STATE_LATE,
+            ]
+        );
 
-        $params = [
-            'current_time' => time(),
-            'merchant_debtor_id' => $merchantDebtorId,
-            'state' => OrderStateManager::STATE_LATE,
-        ];
-
-        $stmt = $this->doExecute($query, $params);
-        while ($row = $stmt->fetch(PdoConnection::FETCH_ASSOC)) {
-            if ($row['overdue'] > 0) {
-                yield (int) $row['overdue'];
-            }
-        }
+        return $result['max_overdue'] ?: 0;
     }
 
     public function getWithInvoiceNumber(int $limit, int $lastId = 0): Generator
@@ -360,5 +352,24 @@ SQL;
             ->setTotalLate($counters['total_late'])
             ->setTotalPaidOut($counters['total_paid_out'])
             ->setTotalComplete($counters['total_complete']);
+    }
+
+    public function getOrdersByInvoiceHandlingStrategy(string $strategy): Generator
+    {
+        $stmt = $this->doExecute('
+            SELECT ' . self::SELECT_FIELDS . '
+            FROM orders
+            WHERE invoice_url IS NOT NULL
+            AND merchant_id IN (
+                SELECT merchant_id FROM merchant_settings
+                WHERE invoice_handling_strategy = :strategy
+            );
+        ', [
+            'strategy' => $strategy,
+        ]);
+
+        while ($row = $stmt->fetch(PdoConnection::FETCH_ASSOC)) {
+            yield $this->orderFactory->createFromDatabaseRow($row);
+        }
     }
 }

@@ -20,18 +20,14 @@ class OrderPaymentStateChangeUseCase implements LoggingInterface
 
     private $orderStateManager;
 
-    private $sentry;
-
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         Workflow $workflow,
-        OrderStateManager $orderStateManager,
-        \Raven_Client $sentry
+        OrderStateManager $orderStateManager
     ) {
         $this->orderRepository = $orderRepository;
         $this->workflow = $workflow;
         $this->orderStateManager = $orderStateManager;
-        $this->sentry = $sentry;
     }
 
     public function execute(OrderPaymentStateChangeRequest $request)
@@ -40,22 +36,24 @@ class OrderPaymentStateChangeUseCase implements LoggingInterface
         $order = $this->orderRepository->getOneByPaymentId($orderPaymentDetails->getId());
 
         if (!$order) {
-            $this->logError('[suppressed] Trying to change state for non-existing order', [
-                'payment_id' => $orderPaymentDetails->getId(),
-            ]);
-
-            $this->sentry->captureException(new PaellaCoreCriticalException('Order not found'));
+            $this->logSuppressedException(
+                new PaellaCoreCriticalException('Order not found'),
+                '[suppressed] Trying to change state for non-existing order',
+                ['payment_id' => $orderPaymentDetails->getId()]
+            );
 
             return;
         }
 
         if ($this->orderStateManager->isCanceled($order)) {
-            $this->logError('[suppressed] Trying to change state for canceled order', [
-                'new_state' => $orderPaymentDetails->getState(),
-                'order_id' => $order->getId(),
-            ]);
-
-            $this->sentry->captureException(new PaellaCoreCriticalException('Order state change not possible'));
+            $this->logSuppressedException(
+                new PaellaCoreCriticalException('Order state change not possible'),
+                '[suppressed] Trying to change state for canceled order',
+                [
+                    'new_state' => $orderPaymentDetails->getState(),
+                    'order_id' => $order->getId(),
+                ]
+            );
 
             return;
         }
@@ -72,12 +70,10 @@ class OrderPaymentStateChangeUseCase implements LoggingInterface
                 $this->orderRepository->update($order);
             }
         } catch (NotEnabledTransitionException $exception) {
-            $this->logError('[suppressed] State transition for order not available', [
+            $this->logSuppressedException($exception, '[suppressed] State transition for order not available', [
                 'transition' => $exception->getTransitionName(),
                 'order_id' => $order->getId(),
             ]);
-
-            $this->sentry->captureException($exception);
         }
     }
 }

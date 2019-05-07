@@ -20,7 +20,7 @@ interface OrderRepositoryInterface
 
     public function getOneByUuid(string $uuid): ?OrderEntity;
 
-    public function getCustomerOverdues(int $merchantDebtorId): Generator;
+    public function getDebtorMaximumOverdue(int $debtorId): int;
 
     public function getWithInvoiceNumber(int $limit, int $lastId = 0): Generator;
 
@@ -29,4 +29,9 @@ interface OrderRepositoryInterface
     public function merchantDebtorHasAtLeastOneApprovedOrder(int $debtorId): bool;
 
     public function countOrdersByState(int $merchantDebtorId): OrderStateCounterDTO;
+
+    /**
+     * @return Generator|array|OrderEntity[]
+     */
+    public function getOrdersByInvoiceHandlingStrategy(string $strategy): Generator;
 }
