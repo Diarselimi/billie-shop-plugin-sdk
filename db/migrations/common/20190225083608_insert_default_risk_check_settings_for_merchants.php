@@ -5,7 +5,6 @@ use App\DomainModel\OrderRiskCheck\Checker\AvailableFinancingLimitCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorBlacklistedCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorCountryCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedCheck;
-use App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedStrictCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorIndustrySectorCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorOverdueCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorScoreCheck;
@@ -22,7 +21,6 @@ class InsertDefaultRiskCheckSettingsForMerchants extends AbstractMigration
             DebtorCountryCheck::NAME,
             DebtorIndustrySectorCheck::NAME,
             DebtorIdentifiedCheck::NAME,
-            DebtorIdentifiedStrictCheck::NAME,
             LimitCheck::NAME,
             DebtorBlacklistedCheck::NAME,
             DebtorOverdueCheck::NAME,
