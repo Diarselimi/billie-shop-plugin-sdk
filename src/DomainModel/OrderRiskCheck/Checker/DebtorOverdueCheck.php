@@ -7,7 +7,7 @@ use App\DomainModel\Order\OrderRepositoryInterface;
 
 class DebtorOverdueCheck implements CheckInterface
 {
-    private const OVERDUE_MAX_DAYS = 10;
+    private const OVERDUE_MAX_DAYS = 30;
 
     const NAME = 'debtor_overdue';
 
