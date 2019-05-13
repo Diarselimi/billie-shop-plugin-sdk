@@ -31,6 +31,7 @@ class OrderEntityFactory
             ->setAmountNet($row['amount_net'])
             ->setAmountGross($row['amount_gross'])
             ->setAmountTax($row['amount_tax'])
+            ->setAmountForgiven(floatval($row['amount_forgiven']) ?: 0)
             ->setExternalCode($row['external_code'])
             ->setState($row['state'])
             ->setExternalComment($row['external_comment'])

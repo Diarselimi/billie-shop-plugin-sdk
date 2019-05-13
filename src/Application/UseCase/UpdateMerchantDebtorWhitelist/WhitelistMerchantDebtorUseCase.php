@@ -3,17 +3,13 @@
 namespace App\Application\UseCase\UpdateMerchantDebtorWhitelist;
 
 use App\Application\Exception\MerchantDebtorNotFoundException;
-use App\Application\PaellaCoreCriticalException;
 use App\Application\UseCase\GetMerchantDebtor\GetMerchantDebtorResponse;
 use App\Application\UseCase\GetMerchantDebtor\GetMerchantDebtorResponseFactory;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
-use App\DomainModel\Borscht\BorschtInterface;
-use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
-use App\Infrastructure\Repository\MerchantDebtorRepository;
+use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
-use Symfony\Component\HttpFoundation\Response;
 
 class WhitelistMerchantDebtorUseCase implements LoggingInterface, ValidatedUseCaseInterface
 {
@@ -24,7 +20,7 @@ class WhitelistMerchantDebtorUseCase implements LoggingInterface, ValidatedUseCa
     private $merchantDebtorResponseFactory;
 
     public function __construct(
-        MerchantDebtorRepository $merchantDebtorRepository,
+        MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         GetMerchantDebtorResponseFactory $merchantDebtorResponseFactory
     ) {
         $this->merchantDebtorRepository = $merchantDebtorRepository;
@@ -49,7 +45,7 @@ class WhitelistMerchantDebtorUseCase implements LoggingInterface, ValidatedUseCa
 
         $this->merchantDebtorRepository->update($merchantDebtor);
 
-        $this->logInfo("A merchant debtor whitelisted is updated with status: ".$merchantDebtor->isWhitelisted());
+        $this->logInfo("A merchant debtor whitelisted is updated with status: " . $merchantDebtor->isWhitelisted());
 
         return $this->merchantDebtorResponseFactory->create(
             $merchantDebtor,

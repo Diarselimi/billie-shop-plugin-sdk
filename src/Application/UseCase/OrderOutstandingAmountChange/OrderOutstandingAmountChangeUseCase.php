@@ -67,6 +67,19 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
             return;
         }
 
+        if ($order->getAmountForgiven() > 0 && $amountChange->getOutstandingAmount() > 0) {
+            $this->logInfo(
+                "Order {id} has been already forgiven by a total of {amount}. Current outstanding amount is {outstanding_amount}.",
+                [
+                    'id' => $order->getId(),
+                    'amount' => $order->getAmountForgiven(),
+                    'outstanding_amount' => $amountChange->getOutstandingAmount(),
+                ]
+            );
+
+            return;
+        }
+
         $merchant = $this->merchantRepository->getOneById($order->getMerchantId());
         if (!$merchant) {
             $this->logSuppressedException(
@@ -102,11 +115,11 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 
         if ($this->paymentForgivenessService->begForgiveness($order, $amountChange)) {
             $this->logInfo(
-                "Order {id} outstanding amount of {amount} will be paid by the merchant {merchant}",
+                "Order {id} outstanding amount of {amount} will be forgiven and paid by the merchant {merchant}",
                 [
                     'id' => $order->getId(),
                     'amount' => $amountChange->getOutstandingAmount(),
-                    'merchantd' => $merchant->getId(),
+                    'merchant' => $merchant->getId(),
                 ]
             );
         }

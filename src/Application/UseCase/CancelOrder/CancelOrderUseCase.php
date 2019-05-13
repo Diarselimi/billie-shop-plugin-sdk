@@ -6,10 +6,10 @@ use App\Application\Exception\FraudOrderException;
 use App\Application\PaellaCoreCriticalException;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
+use App\DomainModel\Order\LimitsService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
-use App\DomainModel\Order\LimitsService;
-use App\Infrastructure\Repository\MerchantDebtorRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Workflow\Workflow;
 
@@ -32,7 +32,7 @@ class CancelOrderUseCase
         OrderRepositoryInterface $orderRepository,
         LimitsService $limitsService,
         BorschtInterface $paymentsService,
-        MerchantDebtorRepository $merchantDebtorRepository,
+        MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         MerchantRepositoryInterface $merchantRepository
     ) {
         $this->workflow = $workflow;
