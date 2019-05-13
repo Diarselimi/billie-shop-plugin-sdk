@@ -14,6 +14,10 @@ class CompaniesServiceContext implements Context
     public function __construct()
     {
         $this->startServer(self::MOCK_SERVER_PORT);
+
+        register_shutdown_function(function () {
+            $this->stopServer();
+        });
     }
 
     /**

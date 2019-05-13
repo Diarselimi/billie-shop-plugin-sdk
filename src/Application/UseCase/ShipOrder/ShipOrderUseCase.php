@@ -3,8 +3,6 @@
 namespace App\Application\UseCase\ShipOrder;
 
 use App\Application\PaellaCoreCriticalException;
-use App\Application\UseCase\Response\OrderResponse;
-use App\Application\UseCase\Response\OrderResponseFactory;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Borscht\BorschtInterface;
@@ -15,6 +13,8 @@ use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderInvoice\InvoiceUploadHandlerInterface;
 use App\DomainModel\OrderInvoice\OrderInvoiceManager;
 use App\DomainModel\OrderInvoice\OrderInvoiceUploadException;
+use App\DomainModel\OrderResponse\OrderResponse;
+use App\DomainModel\OrderResponse\OrderResponseFactory;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Workflow\Workflow;
 

@@ -4,7 +4,7 @@ namespace App\Http\Controller;
 
 use App\Application\UseCase\GetOrder\GetOrderRequest;
 use App\Application\UseCase\GetOrder\GetOrderUseCase;
-use App\Application\UseCase\Response\OrderResponse;
+use App\DomainModel\OrderResponse\OrderResponse;
 use App\Http\HttpConstantsInterface;
 use Symfony\Component\HttpFoundation\Request;
 

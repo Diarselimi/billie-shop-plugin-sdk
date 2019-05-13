@@ -12,7 +12,7 @@ class IdentifyAndScoreDebtorResponse
 
     private $isEligible;
 
-    private $isNameAccepted;
+    private $isStrictMatch;
 
     public function getCompanyId(): int
     {
@@ -62,14 +62,14 @@ class IdentifyAndScoreDebtorResponse
         return $this->isEligible;
     }
 
-    public function isNameAccepted(): bool
+    public function isStrictMatch(): bool
     {
-        return $this->isNameAccepted;
+        return $this->isStrictMatch;
     }
 
-    public function setIsNameAccepted(bool $isNameAccepted): IdentifyAndScoreDebtorResponse
+    public function setIsStrictMatch(bool $isStrictMatch): IdentifyAndScoreDebtorResponse
     {
-        $this->isNameAccepted = $isNameAccepted;
+        $this->isStrictMatch = $isStrictMatch;
 
         return $this;
     }

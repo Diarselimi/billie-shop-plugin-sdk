@@ -3,8 +3,6 @@
 namespace spec\App\Application\UseCase\ShipOrder;
 
 use App\Application\PaellaCoreCriticalException;
-use App\Application\UseCase\Response\OrderResponse;
-use App\Application\UseCase\Response\OrderResponseFactory;
 use App\Application\UseCase\ShipOrder\ShipOrderRequest;
 use App\Application\UseCase\ShipOrder\ShipOrderUseCase;
 use App\DomainModel\Borscht\BorschtInterface;
@@ -17,6 +15,8 @@ use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderInvoice\OrderInvoiceManager;
+use App\DomainModel\OrderResponse\OrderResponse;
+use App\DomainModel\OrderResponse\OrderResponseFactory;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Symfony\Component\Validator\ConstraintViolationList;

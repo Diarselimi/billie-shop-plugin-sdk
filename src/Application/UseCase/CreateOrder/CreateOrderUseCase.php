@@ -2,8 +2,6 @@
 
 namespace App\Application\UseCase\CreateOrder;
 
-use App\Application\UseCase\Response\OrderResponse;
-use App\Application\UseCase\Response\OrderResponseFactory;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainEvent\Order\OrderApprovedEvent;
@@ -18,11 +16,13 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
+use App\DomainModel\OrderResponse\OrderResponse;
+use App\DomainModel\OrderResponse\OrderResponseFactory;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
+use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 use Symfony\Component\Workflow\Workflow;
 
 class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface

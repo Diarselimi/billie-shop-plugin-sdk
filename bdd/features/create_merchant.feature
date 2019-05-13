@@ -74,21 +74,18 @@ Feature: Create a new merchant.
   Scenario: Successfully create a merchant
     Given I get from companies service get debtor response
     And The following risk check definitions exist:
-      | name                              |
-      | available_financing_limit         |
-      | amount                            |
-      | debtor_country                    |
-      | debtor_industry_sector            |
-      | debtor_identified                 |
-      | limit                             |
-      | debtor_not_customer               |
-      | debtor_name                       |
-      | debtor_address_street_match       |
-      | debtor_address_house_match        |
-      | debtor_address_postal_code_match  |
-      | debtor_blacklisted                |
-      | debtor_overdue                    |
-      | company_b2b_score                 |
+      | name                      |
+      | available_financing_limit |
+      | amount                    |
+      | debtor_country            |
+      | debtor_industry_sector    |
+      | debtor_identified         |
+      | debtor_identified_strict  |
+      | limit                     |
+      | debtor_not_customer       |
+      | debtor_blacklisted        |
+      | debtor_overdue            |
+      | company_b2b_score         |
     And I successfully create OAuth client with id testClientId and secret testClientSecret
     When I send a POST request to "/merchant" with body:
       """

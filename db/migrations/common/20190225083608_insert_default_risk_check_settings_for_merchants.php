@@ -2,14 +2,10 @@
 
 use App\DomainModel\OrderRiskCheck\Checker\AmountCheck;
 use App\DomainModel\OrderRiskCheck\Checker\AvailableFinancingLimitCheck;
-use App\DomainModel\OrderRiskCheck\Checker\DebtorAddressHouseMatchCheck;
-use App\DomainModel\OrderRiskCheck\Checker\DebtorAddressPostalCodeMatchCheck;
-use App\DomainModel\OrderRiskCheck\Checker\DebtorAddressStreetMatchCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorBlacklistedCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorCountryCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorIndustrySectorCheck;
-use App\DomainModel\OrderRiskCheck\Checker\DebtorNameCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorNotCustomerCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorOverdueCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorScoreCheck;
@@ -28,11 +24,6 @@ class InsertDefaultRiskCheckSettingsForMerchants extends AbstractMigration
             DebtorIdentifiedCheck::NAME,
             LimitCheck::NAME,
             DebtorNotCustomerCheck::NAME,
-            DebtorNameCheck::NAME,
-            'debtor_address', // Not relevant anymore, only for backward compatibility with current risk checks.
-            DebtorAddressStreetMatchCheck::NAME,
-            DebtorAddressHouseMatchCheck::NAME,
-            DebtorAddressPostalCodeMatchCheck::NAME,
             DebtorBlacklistedCheck::NAME,
             DebtorOverdueCheck::NAME,
             DebtorScoreCheck::NAME,
@@ -48,8 +39,7 @@ class InsertDefaultRiskCheckSettingsForMerchants extends AbstractMigration
                         'updated_at' => (new DateTime())->format('Y-m-d H:i:s'),
                     ]
                 )
-                ->save()
-            ;
+                ->save();
         }
 
         $merchants = $this->fetchAll('SELECT * FROM merchants');
