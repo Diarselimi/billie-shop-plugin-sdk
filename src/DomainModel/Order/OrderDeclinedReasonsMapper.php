@@ -13,7 +13,7 @@ class OrderDeclinedReasonsMapper
 
     private const REASON_DEBTOR_NOT_IDENTIFIED = 'debtor_not_identified';
 
-    private const REASON_DEBTOR_NOT_IDENTIFIED_STRICT = 'debtor_not_identified_strict';
+    private const REASON_ADDRESS_MISMATCH = 'debtor_address';
 
     private const REASON_DEBTOR_LIMIT_EXCEEDED = 'debtor_limit_exceeded';
 
@@ -28,7 +28,7 @@ class OrderDeclinedReasonsMapper
     {
         $riskChecksToReasons = [
             DebtorIdentifiedCheck::NAME => self::REASON_DEBTOR_NOT_IDENTIFIED,
-            DebtorIdentifiedStrictCheck::NAME => self::REASON_DEBTOR_NOT_IDENTIFIED_STRICT,
+            DebtorIdentifiedStrictCheck::NAME => self::REASON_ADDRESS_MISMATCH,
             LimitCheck::NAME => self::REASON_DEBTOR_LIMIT_EXCEEDED,
         ];
         $mappedChecks = array_keys($riskChecksToReasons);
