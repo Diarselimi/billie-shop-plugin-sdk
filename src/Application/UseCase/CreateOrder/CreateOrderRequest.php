@@ -32,7 +32,7 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
     /**
      * @Assert\NotBlank()
      * @Assert\Type(type="int")
-     * @CreateOrderUseCaseConstraints\OrderAmountConstraint
+     * @CreateOrderUseCaseConstraints\OrderDuration
      */
     private $duration;
 

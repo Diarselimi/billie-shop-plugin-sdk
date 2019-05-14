@@ -90,9 +90,9 @@ Feature:
             "country":"DE"
          },
          "amount":{
-            "net":33.2,
-            "gross":43.30,
-            "tax":10.10
+            "net":43,
+            "gross":50,
+            "tax":7
          },
          "comment":"Some comment",
          "duration":30,
@@ -159,9 +159,9 @@ Feature:
             "country":"DE"
          },
          "amount":{
-            "net":33.2,
-            "gross":43.30,
-            "tax":10.10
+            "net":75,
+            "gross":100,
+            "tax":25
          },
          "comment":"Some comment",
          "duration":30,
@@ -228,9 +228,9 @@ Feature:
             "country":"DE"
          },
          "amount":{
-            "net":33.2,
-            "gross":43.30,
-            "tax":10.10
+            "net":1000,
+            "gross":1100,
+            "tax":100
          },
          "comment":"Some comment",
          "duration":30

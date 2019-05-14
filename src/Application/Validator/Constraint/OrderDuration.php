@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraints\RangeValidator;
 /**
  * @Annotation
  */
-class OrderAmountConstraint extends Range
+class OrderDuration extends Range
 {
     public $min = 1;
 
