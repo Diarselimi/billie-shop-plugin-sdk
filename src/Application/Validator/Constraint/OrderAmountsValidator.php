@@ -16,7 +16,7 @@ class OrderAmountsValidator extends ConstraintValidator
         if ($request instanceof CreateOrderRequest) {
             $amountObj = $request->getAmount();
 
-            if (!$amountObj->getGross() || !$amountObj->getNet() || !$amountObj->getTax()) {
+            if (is_null($amountObj->getGross()) || is_null($amountObj->getNet()) || is_null($amountObj->getTax())) {
                 return;
             }
 
@@ -26,7 +26,7 @@ class OrderAmountsValidator extends ConstraintValidator
         }
 
         if ($request instanceof UpdateOrderRequest) {
-            if (!$request->getAmountGross() || !$request->getAmountNet() || !$request->getAmountTax()) {
+            if (is_null($request->getAmountGross()) || is_null($request->getAmountNet()) || is_null($request->getAmountTax())) {
                 return;
             }
 

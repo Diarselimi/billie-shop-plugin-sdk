@@ -956,7 +956,7 @@ Feature:
        "amount":{
           "net":900.00,
           "gross":200.00,
-          "tax":100.00
+          "tax": 0.00
        },
        "comment":"Some comment",
        "duration":30,
