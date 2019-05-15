@@ -3,11 +3,15 @@
 namespace App\Http\Controller;
 
 use App\Application\Exception\FraudOrderException;
+use App\Application\Exception\OrderNotFoundException;
+use App\Application\PaellaCoreCriticalException;
 use App\Application\UseCase\UpdateOrder\UpdateOrderRequest;
 use App\Application\UseCase\UpdateOrder\UpdateOrderUseCase;
 use App\Http\HttpConstantsInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UpdateOrderController
 {
@@ -34,6 +38,8 @@ class UpdateOrderController
             $this->useCase->execute($orderRequest);
         } catch (FraudOrderException $e) {
             throw new AccessDeniedHttpException($e->getMessage());
+        } catch (OrderNotFoundException $exception) {
+            throw new NotFoundHttpException();
         }
     }
 }

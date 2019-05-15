@@ -9,6 +9,7 @@ use App\DomainModel\Address\AddressRepositoryInterface;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntityFactory;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
+use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\DebtorFinder;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
@@ -32,6 +33,8 @@ class OrderPersistenceService
 
     private $merchantSettingsRepository;
 
+    private $merchantDebtorFinancialDetailsRepository;
+
     private $orderFactory;
 
     private $personFactory;
@@ -51,6 +54,7 @@ class OrderPersistenceService
         DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
         MerchantRepositoryInterface $merchantRepository,
         MerchantSettingsRepositoryInterface $merchantSettingsRepository,
+        MerchantDebtorFinancialDetailsRepositoryInterface $merchantDebtorFinancialDetailsRepository,
         OrderEntityFactory $orderFactory,
         PersonEntityFactory $personFactory,
         AddressEntityFactory $addressFactory,
@@ -65,6 +69,7 @@ class OrderPersistenceService
         $this->debtorExternalDataRepository = $debtorExternalDataRepository;
         $this->merchantRepository = $merchantRepository;
         $this->merchantSettingsRepository = $merchantSettingsRepository;
+        $this->merchantDebtorFinancialDetailsRepository = $merchantDebtorFinancialDetailsRepository;
         $this->orderFactory = $orderFactory;
         $this->personFactory = $personFactory;
         $this->addressFactory = $addressFactory;
@@ -123,6 +128,7 @@ class OrderPersistenceService
 
             $orderContainer
                 ->setMerchantDebtor($merchantDebtor)
+                ->setMerchantDebtorFinancialDetails($this->merchantDebtorFinancialDetailsRepository->getCurrentByMerchantDebtorId($merchantDebtor->getId()))
                 ->getOrder()->setMerchantDebtorId($merchantDebtor->getId())
             ;
         }

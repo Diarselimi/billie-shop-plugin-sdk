@@ -2,12 +2,12 @@
 
 namespace App\Application\UseCase\OrderOutstandingAmountChange;
 
-use App\Application\PaellaCoreCriticalException;
+use App\Application\Exception\OrderNotFoundException;
 use App\DomainModel\Borscht\OrderAmountChangeDTO;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
-use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
-use App\DomainModel\Order\LimitsService;
+use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderNotification\NotificationScheduler;
 use App\DomainModel\OrderPayment\OrderPaymentForgivenessService;
@@ -24,29 +24,25 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 
     private $merchantRepository;
 
-    private $merchantDebtorRepository;
+    private $orderPersistenceService;
 
     private $notificationScheduler;
-
-    private $sentry;
 
     private $limitsService;
 
     private $paymentForgivenessService;
 
-    private $merchantSettingsRepository;
-
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         MerchantRepositoryInterface $merchantRepository,
-        MerchantDebtorRepositoryInterface $merchantDebtorRepository,
+        OrderPersistenceService $orderPersistenceService,
         NotificationScheduler $notificationScheduler,
-        LimitsService $limitsService,
+        MerchantDebtorLimitsService $limitsService,
         OrderPaymentForgivenessService $paymentForgivenessService
     ) {
         $this->orderRepository = $orderRepository;
         $this->merchantRepository = $merchantRepository;
-        $this->merchantDebtorRepository = $merchantDebtorRepository;
+        $this->orderPersistenceService = $orderPersistenceService;
         $this->notificationScheduler = $notificationScheduler;
         $this->limitsService = $limitsService;
         $this->paymentForgivenessService = $paymentForgivenessService;
@@ -59,7 +55,7 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
         $order = $this->orderRepository->getOneByPaymentId($amountChange->getId());
         if (!$order) {
             $this->logSuppressedException(
-                new PaellaCoreCriticalException('Order not found'),
+                new OrderNotFoundException(),
                 '[suppressed] Trying to change state for non-existing order',
                 ['payment_id' => $amountChange->getId()]
             );
@@ -68,43 +64,20 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
         }
 
         if ($order->getAmountForgiven() > 0 && $amountChange->getOutstandingAmount() > 0) {
-            $this->logInfo(
-                "Order {id} has been already forgiven by a total of {amount}. Current outstanding amount is {outstanding_amount}.",
-                [
-                    'id' => $order->getId(),
-                    'amount' => $order->getAmountForgiven(),
-                    'outstanding_amount' => $amountChange->getOutstandingAmount(),
-                ]
-            );
+            $this->logInfo("Order {id} has been already forgiven by a total of {amount}. Current outstanding amount is {outstanding_amount}.", [
+                'id' => $order->getId(),
+                'amount' => $order->getAmountForgiven(),
+                'outstanding_amount' => $amountChange->getOutstandingAmount(),
+            ]);
 
             return;
         }
 
-        $merchant = $this->merchantRepository->getOneById($order->getMerchantId());
-        if (!$merchant) {
-            $this->logSuppressedException(
-                new PaellaCoreCriticalException('Merchant not found for order #' . $order->getId()),
-                '[suppressed] Merchant not found.',
-                ['payment_id' => $order->getId(), 'merchant_id' => $order->getMerchantId()]
-            );
+        $orderContainer = $this->orderPersistenceService->createFromOrderEntity($order);
+        $merchant = $orderContainer->getMerchant();
 
-            return;
-        }
-
+        $this->limitsService->unlock($orderContainer, $amountChange->getAmountChange());
         $merchant->increaseAvailableFinancingLimit($amountChange->getAmountChange());
-
-        $merchantDebtor = $this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId());
-        if (!$merchantDebtor) {
-            $this->logSuppressedException(
-                new PaellaCoreCriticalException('Merchant Debtor not found for order #' . $order->getId()),
-                '[suppressed] Merchant Debtor not found.',
-                ['payment_id' => $order->getId(), 'merchant_debtor_id' => $order->getMerchantDebtorId()]
-            );
-
-            return;
-        }
-
-        $this->limitsService->unlock($merchantDebtor, $amountChange->getAmountChange());
         $this->merchantRepository->update($merchant);
 
         if (!$amountChange->isPayment()) {
@@ -115,11 +88,11 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 
         if ($this->paymentForgivenessService->begForgiveness($order, $amountChange)) {
             $this->logInfo(
-                "Order {id} outstanding amount of {amount} will be forgiven and paid by the merchant {merchant}",
+                "Order {id} outstanding amount of {amount} will be forgiven and paid by the merchant {merchant_id}",
                 [
                     'id' => $order->getId(),
                     'amount' => $amountChange->getOutstandingAmount(),
-                    'merchant' => $merchant->getId(),
+                    'merchant_id' => $merchant->getId(),
                 ]
             );
         }

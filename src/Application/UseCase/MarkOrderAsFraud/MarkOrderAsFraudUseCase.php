@@ -46,7 +46,7 @@ class MarkOrderAsFraudUseCase
         $order = $this->orderRepository->getOneByUuid($request->getUuid());
 
         if (!$order) {
-            throw new OrderNotFoundException("Order with UUID: $uuid not found");
+            throw new OrderNotFoundException();
         }
 
         if ($order->getMarkedAsFraudAt()) {

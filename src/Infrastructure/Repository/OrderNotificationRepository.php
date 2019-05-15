@@ -10,7 +10,7 @@ use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class OrderNotificationRepository extends AbstractPdoRepository implements OrderNotificationRepositoryInterface
 {
-    const SELECT_FIELDS = 'id, order_id, payload, is_delivered, created_at, updated_at';
+    private const SELECT_FIELDS = 'id, order_id, payload, is_delivered, created_at, updated_at';
 
     private $factory;
 

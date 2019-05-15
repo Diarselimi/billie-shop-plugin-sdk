@@ -6,6 +6,7 @@ use App\Application\Exception\MerchantDebtorNotFoundException;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\DomainModel\Borscht\BorschtInterface;
+use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -16,13 +17,17 @@ class UpdateMerchantDebtorLimitUseCase implements LoggingInterface, ValidatedUse
 
     private $merchantDebtorRepository;
 
+    private $merchantDebtorFinancialDetailsRepository;
+
     private $paymentsService;
 
     public function __construct(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
+        MerchantDebtorFinancialDetailsRepositoryInterface $merchantDebtorFinancialDetailsRepository,
         BorschtInterface $paymentsService
     ) {
         $this->merchantDebtorRepository = $merchantDebtorRepository;
+        $this->merchantDebtorFinancialDetailsRepository = $merchantDebtorFinancialDetailsRepository;
         $this->paymentsService = $paymentsService;
     }
 
@@ -40,22 +45,30 @@ class UpdateMerchantDebtorLimitUseCase implements LoggingInterface, ValidatedUse
             throw new MerchantDebtorNotFoundException();
         }
 
+        $merchantDebtorFinancingDetails = $this->merchantDebtorFinancialDetailsRepository->getCurrentByMerchantDebtorId(
+            $merchantDebtor->getId()
+        );
+
         $paymentsDebtor = $this->paymentsService->getDebtorPaymentDetails($merchantDebtor->getPaymentDebtorId());
         $createdAmount = $this->merchantDebtorRepository->getMerchantDebtorCreatedOrdersAmount($merchantDebtor->getId());
-        $newAvailableLimit = $request->getLimit() - $paymentsDebtor->getOutstandingAmount() - $createdAmount;
+        $newFinancingPower = $request->getLimit() - $paymentsDebtor->getOutstandingAmount() - $createdAmount;
 
         $this->logInfo('Merchant debtor {external_id} (id:{id}) limit updated to {new_limit}', [
             'external_id' => $request->getMerchantDebtorExternalId(),
             'merchant_id' => $request->getMerchantId(),
             'id' => $merchantDebtor->getId(),
             'company_id' => $merchantDebtor->getDebtorId(),
-            'old_limit' => $merchantDebtor->getFinancingLimit(),
-            'new_limit' => $newAvailableLimit,
+            'old_limit' => $merchantDebtorFinancingDetails->getFinancingLimit(),
+            'new_limit' => $request->getLimit(),
             'outstanding_amount' => $paymentsDebtor->getOutstandingAmount(),
             'created_amount' => $createdAmount,
         ]);
 
-        $merchantDebtor->setFinancingLimit($newAvailableLimit);
-        $this->merchantDebtorRepository->update($merchantDebtor);
+        $merchantDebtorFinancingDetails
+            ->setFinancingLimit($request->getLimit())
+            ->setFinancingPower($newFinancingPower)
+        ;
+
+        $this->merchantDebtorFinancialDetailsRepository->insert($merchantDebtorFinancingDetails);
     }
 }

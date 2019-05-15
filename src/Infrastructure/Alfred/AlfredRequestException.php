@@ -6,7 +6,7 @@ use App\Application\PaellaCoreCriticalException;
 
 class AlfredRequestException extends PaellaCoreCriticalException
 {
-    private const DEFAULT_ERROR_MESSAGE = 'Alfred request failed';
+    public const DEFAULT_ERROR_MESSAGE = 'Alfred request failed';
 
     public function __construct(?int $httpStatusCode = null, \Exception $previous = null)
     {

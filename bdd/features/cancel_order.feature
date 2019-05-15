@@ -10,6 +10,10 @@ Feature:
 
     Scenario: Successful new order cancellation
         Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+        And I get from companies service identify match and good decision response
+        And I get from companies service "/debtor/1/unlock" endpoint response with status 204 and body
+        """
+        """
         When I send a POST request to "/order/CO123/cancel"
         Then the response status code should be 204
         And the response should be empty
@@ -17,6 +21,7 @@ Feature:
 
     Scenario: Successful created order cancellation
         Given I have a created order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+        And I get from companies service identify match and good decision response
         When I send a POST request to "/order/CO123/cancel"
         Then the response status code should be 204
         And the response should be empty

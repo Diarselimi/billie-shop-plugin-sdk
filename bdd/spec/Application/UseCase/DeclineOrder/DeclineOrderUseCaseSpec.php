@@ -6,48 +6,28 @@ use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\OrderWorkflowException;
 use App\Application\UseCase\DeclineOrder\DeclineOrderRequest;
 use App\Application\UseCase\DeclineOrder\DeclineOrderUseCase;
-use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
-use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
-use App\DomainModel\Order\LimitsService;
+use App\DomainModel\Order\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
-use App\DomainModel\OrderNotification\NotificationScheduler;
-use App\DomainModel\OrderRiskCheck\Checker\LimitCheck;
-use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntity;
-use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
 use PhpSpec\ObjectBehavior;
-use Symfony\Component\Workflow\Workflow;
 
 class DeclineOrderUseCaseSpec extends ObjectBehavior
 {
     private const MERCHANT_ID = 1;
 
-    private const ORDER_ID = 10;
-
     private const ORDER_EXTERNAL_CODE = 'test-order';
-
-    private const ORDER_AMOUNT_GROSS = 1000;
-
-    private const ORDER_MERCHANT_DEBTOR_ID = 20;
 
     public function let(
         OrderRepositoryInterface $orderRepository,
-        OrderRiskCheckRepositoryInterface $orderRiskCheckRepository,
-        MerchantDebtorRepositoryInterface $merchantDebtorRepository,
-        LimitsService $limitsService,
-        notificationScheduler $notificationScheduler,
-        Workflow $workflow,
-        OrderStateManager $orderStateManager
+        OrderStateManager $orderStateManager,
+        OrderPersistenceService $orderPersistenceService
     ) {
         $this->beConstructedWith(
             $orderRepository,
-            $orderRiskCheckRepository,
-            $merchantDebtorRepository,
-            $limitsService,
-            $notificationScheduler,
-            $workflow,
-            $orderStateManager
+            $orderStateManager,
+            $orderPersistenceService
         );
     }
 
@@ -92,24 +72,14 @@ class DeclineOrderUseCaseSpec extends ObjectBehavior
         $this->shouldThrow(OrderWorkflowException::class)->during('execute', [$request]);
     }
 
-    public function it_declines_the_order_unlock_limit_and_notifies_merchant_webhook(
+    public function it_successfully_declines_the_order(
         OrderRepositoryInterface $orderRepository,
-        OrderRiskCheckRepositoryInterface $orderRiskCheckRepository,
-        MerchantDebtorRepositoryInterface $merchantDebtorRepository,
-        LimitsService $limitsService,
-        notificationScheduler $notificationScheduler,
-        Workflow $workflow,
-        OrderStateManager $orderStateManager
+        OrderStateManager $orderStateManager,
+        OrderPersistenceService $orderPersistenceService,
+        OrderEntity $order,
+        OrderContainer $orderContainer
     ) {
         $request = new DeclineOrderRequest(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID);
-
-        $order = (new OrderEntity())
-            ->setId(self::ORDER_ID)
-            ->setMerchantId(self::MERCHANT_ID)
-            ->setExternalCode(self::ORDER_EXTERNAL_CODE)
-            ->setAmountGross(self::ORDER_AMOUNT_GROSS)
-            ->setMerchantDebtorId(self::ORDER_MERCHANT_DEBTOR_ID)
-        ;
 
         $orderRepository
             ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID)
@@ -123,34 +93,13 @@ class DeclineOrderUseCaseSpec extends ObjectBehavior
             ->willReturn(true)
         ;
 
-        $workflow->apply($order, OrderStateManager::TRANSITION_DECLINE)->shouldBeCalled();
-
-        $orderRepository->update($order)->shouldBeCalled();
-
-        $orderRiskCheckRepository
-            ->findByOrderAndCheckName($order->getId(), LimitCheck::NAME)
+        $orderPersistenceService
+            ->createFromOrderEntity($order)
             ->shouldBeCalled()
-            ->willReturn((new OrderRiskCheckEntity())->setIsPassed(true))
+            ->willReturn($orderContainer)
         ;
 
-        $merchantDebtor = new MerchantDebtorEntity();
-
-        $merchantDebtorRepository
-            ->getOneById($order->getMerchantDebtorId())
-            ->shouldBeCalled()
-            ->willReturn($merchantDebtor)
-        ;
-
-        $limitsService
-            ->unlock($merchantDebtor, $order->getAmountGross())
-            ->shouldBeCalled()
-        ;
-
-        $notificationScheduler
-            ->createAndSchedule($order, ['event' => DeclineOrderUseCase::NOTIFICATION_EVENT, 'order_id' => $order->getExternalCode()])
-            ->shouldBeCalled()
-        ;
-
+        $orderStateManager->decline($orderContainer)->shouldBeCalledOnce();
         $this->execute($request);
     }
 }

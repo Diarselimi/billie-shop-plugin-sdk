@@ -159,17 +159,18 @@ Feature:
             "country":"DE"
          },
          "amount":{
-            "net":75,
-            "gross":100,
-            "tax":25
+            "net":1000.50,
+            "gross":1001,
+            "tax":0.50
          },
          "comment":"Some comment",
          "duration":30,
          "order_id":"A1"
       }
       """
-    Then the response status code should be 201
-    And the order A1 is in state waiting
+	Then the response status code should be 201
+	And the order A1 is in state waiting
+  	And the order A1 has risk check limit failed
 
   Scenario: [order without external code] Soft decline is enabled for limit check - limit check failed - order in waiting state
     Given The following merchant risk check settings exist for merchant 1:
@@ -186,10 +187,6 @@ Feature:
       | debtor_overdue            | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
     And I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/1/lock" endpoint response with status 412 and body
-      """
-      {}
-      """
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
       """
@@ -228,9 +225,9 @@ Feature:
             "country":"DE"
          },
          "amount":{
-            "net":1000,
-            "gross":1100,
-            "tax":100
+            "net":1000.50,
+            "gross":1101,
+            "tax":100.50
          },
          "comment":"Some comment",
          "duration":30

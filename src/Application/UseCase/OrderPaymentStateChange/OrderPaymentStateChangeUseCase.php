@@ -2,6 +2,7 @@
 
 namespace App\Application\UseCase\OrderPaymentStateChange;
 
+use App\Application\Exception\OrderNotFoundException;
 use App\Application\PaellaCoreCriticalException;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
@@ -37,7 +38,7 @@ class OrderPaymentStateChangeUseCase implements LoggingInterface
 
         if (!$order) {
             $this->logSuppressedException(
-                new PaellaCoreCriticalException('Order not found'),
+                new OrderNotFoundException(),
                 '[suppressed] Trying to change state for non-existing order',
                 ['payment_id' => $orderPaymentDetails->getId()]
             );

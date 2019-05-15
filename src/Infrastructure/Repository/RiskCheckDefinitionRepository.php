@@ -9,7 +9,7 @@ use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class RiskCheckDefinitionRepository extends AbstractPdoRepository implements RiskCheckDefinitionRepositoryInterface
 {
-    const TABLE_NAME = "risk_check_definitions";
+    public const TABLE_NAME = "risk_check_definitions";
 
     private const SELECT_FIELDS = 'id, name, created_at, updated_at';
 

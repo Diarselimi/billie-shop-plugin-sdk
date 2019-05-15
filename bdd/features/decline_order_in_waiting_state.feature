@@ -21,6 +21,7 @@ Feature: Endpoint to decline an order in waiting state
 
   Scenario: Successfully decline order in waiting state
 	Given I have a waiting order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+  	And I get from companies service identify match and good decision response
 	When I send a POST request to "/order/CO123/decline"
-	Then the response status code should be 200
+	Then the response status code should be 204
 	And the order CO123 is in state declined

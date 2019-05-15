@@ -5,6 +5,7 @@ namespace App\DomainModel\Order;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
 use App\DomainModel\OrderRiskCheck\Checker\CheckInterface;
 use App\DomainModel\OrderRiskCheck\Checker\CheckResult;
+use App\DomainModel\OrderRiskCheck\Checker\LimitCheck;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntity;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntityFactory;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
@@ -95,6 +96,19 @@ class OrderChecksRunnerService implements LoggingInterface
         }
 
         return true;
+    }
+
+    public function invalidateRiskCheck(OrderContainer $orderContainer, string $name)
+    {
+        $limitRiskCheck = $this->orderRiskCheckRepository->findByOrderAndCheckName(
+            $orderContainer->getOrder()->getId(),
+            LimitCheck::NAME
+        );
+
+        if ($limitRiskCheck && $limitRiskCheck->isPassed()) {
+            $limitRiskCheck->setIsPassed(false);
+            $this->orderRiskCheckRepository->update($limitRiskCheck);
+        }
     }
 
     private function runChecks(OrderContainer $order, array $checkNames): bool

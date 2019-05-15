@@ -1,6 +1,8 @@
 {
-    "id": 100,
-    "payment_id": "test",
+    "id": 1,
+    "crefo_id": "123",
+    "schufa_id": "123",
+    "google_places_id": "123",
     "name": "Test User Company",
     "address_house": "10",
     "address_street": "Heinrich-Heine-Platz",
@@ -8,8 +10,7 @@
     "address_postal_code": "10179",
     "address_country": "DE",
     "address_addition": null,
-    "crefo_id": "123",
-    "schufa_id": "123",
     "is_blacklisted": 0,
-    "is_from_trusted_source": 0
+    "is_from_trusted_source": 0,
+    "financing_power": 1000
 }

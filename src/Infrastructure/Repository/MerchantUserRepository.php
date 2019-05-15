@@ -9,7 +9,7 @@ use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class MerchantUserRepository extends AbstractPdoRepository implements MerchantUserRepositoryInterface
 {
-    const TABLE_NAME = 'merchant_users';
+    public const TABLE_NAME = 'merchant_users';
 
     private $factory;
 

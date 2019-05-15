@@ -25,7 +25,7 @@ class UpdateMerchantWithOrderDunningStepUseCase
         $order = $this->orderRepository->getOneByUuid($request->getOrderUuid());
 
         if (!$order) {
-            throw new OrderNotFoundException("Order with UUID: {$request->getOrderUuid()} not found");
+            throw new OrderNotFoundException();
         }
 
         $payload = [

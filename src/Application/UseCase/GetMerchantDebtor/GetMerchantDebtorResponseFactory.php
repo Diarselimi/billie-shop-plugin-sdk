@@ -4,6 +4,7 @@ namespace App\Application\UseCase\GetMerchantDebtor;
 
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
+use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 
@@ -15,20 +16,27 @@ class GetMerchantDebtorResponseFactory
 
     private $merchantDebtorRepository;
 
+    private $merchantDebtorFinancialDetailsRepository;
+
     public function __construct(
         BorschtInterface $paymentService,
         CompaniesServiceInterface $companiesService,
-        MerchantDebtorRepositoryInterface $merchantDebtorRepository
+        MerchantDebtorRepositoryInterface $merchantDebtorRepository,
+        MerchantDebtorFinancialDetailsRepositoryInterface $merchantDebtorFinancialDetailsRepository
     ) {
         $this->paymentService = $paymentService;
         $this->companiesService = $companiesService;
         $this->merchantDebtorRepository = $merchantDebtorRepository;
+        $this->merchantDebtorFinancialDetailsRepository = $merchantDebtorFinancialDetailsRepository;
     }
 
     public function create(
         MerchantDebtorEntity $merchantDebtor,
         string $merchantDebtorExternalId
     ) {
+        $merchantDebtorFinancingDetails = $this->merchantDebtorFinancialDetailsRepository->getCurrentByMerchantDebtorId(
+            $merchantDebtor->getId()
+        );
         $company = $this->companiesService->getDebtor($merchantDebtor->getDebtorId());
         $paymentsDetails = $this->paymentService->getDebtorPaymentDetails($merchantDebtor->getPaymentDebtorId());
         $createdAmount = $this->merchantDebtorRepository->getMerchantDebtorCreatedOrdersAmount($merchantDebtor->getId());
@@ -38,8 +46,8 @@ class GetMerchantDebtorResponseFactory
             'company_id' => $merchantDebtor->getDebtorId(),
             'payment_id' => $merchantDebtor->getPaymentDebtorId(),
             'external_id' => $merchantDebtorExternalId,
-            'available_limit' => $merchantDebtor->getFinancingLimit(),
-            'total_limit' => $merchantDebtor->getFinancingLimit() + $createdAmount + $paymentsDetails->getOutstandingAmount(),
+            'financing_power' => $merchantDebtorFinancingDetails->getFinancingPower(),
+            'financing_limit' => $merchantDebtorFinancingDetails->getFinancingLimit(),
             'created_amount' => $createdAmount,
             'outstanding_amount' => $paymentsDetails->getOutstandingAmount(),
             'is_whitelisted' => $merchantDebtor->isWhitelisted(),

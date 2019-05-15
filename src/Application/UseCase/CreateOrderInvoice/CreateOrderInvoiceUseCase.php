@@ -30,7 +30,7 @@ class CreateOrderInvoiceUseCase
         $order = $this->orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($request->getOrderId(), $request->getMerchantId());
 
         if (!$order) {
-            throw new OrderNotFoundException("Order #{$request->getOrderId()} does't exist");
+            throw new OrderNotFoundException();
         }
 
         $orderInvoice = $this->orderInvoiceFactory->create($order->getId(), $request->getFileId(), $request->getInvoiceNumber());

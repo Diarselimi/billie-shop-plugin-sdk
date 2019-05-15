@@ -4,14 +4,11 @@ namespace App\Application\UseCase\ApproveOrder;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\OrderWorkflowException;
-use App\DomainEvent\Order\OrderApprovedEvent;
 use App\DomainModel\Order\OrderChecksRunnerService;
 use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Workflow\Workflow;
 
 class ApproveOrderUseCase
 {
@@ -21,32 +18,24 @@ class ApproveOrderUseCase
 
     private $orderPersistenceService;
 
-    private $workflow;
-
     private $orderStateManager;
 
     private $orderChecksRunnerService;
 
     private $declinedReasonsMapper;
 
-    private $eventDispatcher;
-
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         OrderPersistenceService $orderPersistenceService,
-        Workflow $workflow,
         OrderStateManager $orderStateManager,
         OrderChecksRunnerService $orderChecksRunnerService,
-        OrderDeclinedReasonsMapper $declinedReasonsMapper,
-        EventDispatcherInterface $eventDispatcher
+        OrderDeclinedReasonsMapper $declinedReasonsMapper
     ) {
         $this->orderRepository = $orderRepository;
         $this->orderPersistenceService = $orderPersistenceService;
-        $this->workflow = $workflow;
         $this->orderStateManager = $orderStateManager;
         $this->orderChecksRunnerService = $orderChecksRunnerService;
         $this->declinedReasonsMapper = $declinedReasonsMapper;
-        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function execute(ApproveOrderRequest $request): void
@@ -72,9 +61,6 @@ class ApproveOrderUseCase
             );
         }
 
-        $this->workflow->apply($order, OrderStateManager::TRANSITION_CREATE);
-        $this->orderRepository->update($order);
-
-        $this->eventDispatcher->dispatch(OrderApprovedEvent::NAME, new OrderApprovedEvent($orderContainer, true));
+        $this->orderStateManager->approve($orderContainer);
     }
 }
