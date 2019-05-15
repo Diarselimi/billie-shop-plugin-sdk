@@ -93,9 +93,9 @@ Feature:
             "country":"DE"
          },
          "amount":{
-            "net":33.2,
-            "gross":43.30,
-            "tax":10.10
+            "net":900.00,
+            "gross":1000.00,
+            "tax":100.00
          },
          "comment":"Some comment",
          "duration":30,
@@ -112,7 +112,7 @@ Feature:
        "reasons":[
           "debtor_not_identified"
        ],
-       "amount":43.3,
+       "amount":1000.00,
        "debtor_company":{
           "name":null,
           "house_number":null,
@@ -183,9 +183,9 @@ Feature:
           "country":"DE"
        },
        "amount":{
-          "net":33.2,
-          "gross":43.30,
-          "tax":10.10
+          "net":900.00,
+          "gross":1000.00,
+          "tax":100.00
        },
        "comment":"Some comment",
        "duration":30,
@@ -198,6 +198,95 @@ Feature:
     """
     {
       "external_code":"A1",
+      "state":"created",
+      "reasons":[],
+      "amount":1000.00,
+      "debtor_company":{
+        "name":"Test User Company",
+        "house_number":"10",
+        "street":"Heinrich-Heine-Platz",
+        "postal_code":"10179",
+        "city":"Berlin",
+        "country":"DE"
+      },
+      "bank_account":{
+        "iban":"DE1234",
+        "bic":"BICISHERE"
+      },
+      "invoice":{
+        "number":null,
+        "payout_amount":null,
+        "fee_amount":null,
+        "fee_rate":null,
+        "due_date":null
+      },
+      "debtor_external_data":{
+        "name":"Test User Company",
+        "address_country":"DE",
+        "address_postal_code":"10179",
+        "address_street":"Heinrich-Heine-Platz",
+        "address_house":"10",
+        "industry_sector":"SOME SECTOR"
+      }
+    }
+    """
+    And the order "A1" has the same hash "testusercompanyva2223333somenumbersomelegalberlin10179heinrichheineplatz10de"
+
+
+  Scenario: Successful order creation without delivery_address.house_number
+    Given I get from companies service identify match and good decision response
+    And I get from payments service register debtor positive response
+    When I send a POST request to "/order" with body:
+    """
+    {
+       "debtor_person":{
+          "salutation":"m",
+          "first_name":"someone",
+          "last_name":"else",
+          "phone_number":"+491234567",
+          "email":"someone@billie.io"
+       },
+       "debtor_company":{
+          "merchant_customer_id":"12",
+          "name":"Test User Company",
+          "address_addition":"left door",
+          "address_house_number":"10",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_city":"Berlin",
+          "address_postal_code":"10179",
+          "address_country":"DE",
+          "tax_id":"VA222",
+          "tax_number":"3333",
+          "registration_court":"",
+          "registration_number":" some number",
+          "industry_sector":"some sector",
+          "subindustry_sector":"some sub",
+          "employees_number":"33",
+          "legal_form":"some legal",
+          "established_customer":1
+       },
+       "delivery_address":{
+          "street":"Moulin Rouge Str.",
+          "city":"Paris",
+          "postal_code":"98765",
+          "country":"DE"
+       },
+       "amount":{
+          "net":33.2,
+          "gross":43.30,
+          "tax":10.10
+       },
+       "comment":"Some comment",
+       "duration":30,
+       "order_id":"A123"
+    }
+    """
+    Then the order A123 is in state created
+    And the response status code should be 201
+    And the JSON response should be:
+    """
+    {
+      "external_code":"A123",
       "state":"created",
       "reasons":[],
       "amount":43.3,
@@ -230,7 +319,8 @@ Feature:
       }
     }
     """
-    And the order "A1" has the same hash "testusercompanyva2223333somenumbersomelegalberlin10179heinrichheineplatz10de"
+    And the order "A123" has the same hash "testusercompanyva2223333somenumbersomelegalberlin10179heinrichheineplatz10de"
+
 
   Scenario: Successful order creation using lowercase country
     Given I get from companies service identify match and good decision response
@@ -238,47 +328,47 @@ Feature:
     When I send a POST request to "/order" with body:
     """
     {
-         "debtor_person":{
-            "salutation":"m",
-            "first_name":"something",
-            "last_name":"else",
-            "phone_number":"+491234567",
-            "email":"someone@billie.io"
-         },
-         "debtor_company":{
-            "merchant_customer_id":"12",
-            "name":"Test User Company",
-            "address_addition":"left door",
-            "address_house_number":"10",
-            "address_street":"Heinrich-Heine-Platz",
-            "address_city":"Berlin",
-            "address_postal_code":"10179",
-            "address_country":"DE",
-            "tax_id":"VA222",
-            "tax_number":"3333",
-            "registration_court":"",
-            "registration_number":" some number",
-            "industry_sector":"some sector",
-            "subindustry_sector":"some sub",
-            "employees_number":"33",
-            "legal_form":"some legal",
-            "established_customer":1
-         },
-         "delivery_address":{
-            "house_number":"22",
-            "street":"Charlot strasse",
-            "city":"Paris",
-            "postal_code":"98765",
-            "country":"de"
-         },
-         "amount":{
-            "net":33.2,
-            "gross":43.30,
-            "tax":10.10
-         },
-         "comment":"Some comment",
-         "duration":30,
-         "order_id":"A1"
+       "debtor_person":{
+          "salutation":"m",
+          "first_name":"something",
+          "last_name":"else",
+          "phone_number":"+491234567",
+          "email":"someone@billie.io"
+       },
+       "debtor_company":{
+          "merchant_customer_id":"12",
+          "name":"Test User Company",
+          "address_addition":"left door",
+          "address_house_number":"10",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_city":"Berlin",
+          "address_postal_code":"10179",
+          "address_country":"DE",
+          "tax_id":"VA222",
+          "tax_number":"3333",
+          "registration_court":"",
+          "registration_number":" some number",
+          "industry_sector":"some sector",
+          "subindustry_sector":"some sub",
+          "employees_number":"33",
+          "legal_form":"some legal",
+          "established_customer":1
+       },
+       "delivery_address":{
+          "house_number":"22",
+          "street":"Charlot strasse",
+          "city":"Paris",
+          "postal_code":"98765",
+          "country":"de"
+       },
+       "amount":{
+          "net":900.00,
+          "gross":1000.00,
+          "tax":100.00
+       },
+       "comment":"Some comment",
+       "duration":30,
+       "order_id":"A1"
     }
     """
     Then the order A1 is in state created
@@ -289,7 +379,7 @@ Feature:
       "external_code":"A1",
       "state":"created",
       "reasons":[],
-      "amount":43.3,
+      "amount":1000.00,
       "debtor_company":{
         "name":"Test User Company",
         "house_number":"10",
@@ -360,9 +450,9 @@ Feature:
             "country":"DE"
          },
          "amount":{
-            "net":33.2,
-            "gross":43.30,
-            "tax":10.10
+            "net":900.00,
+            "gross":1000.00,
+            "tax":100.00
          },
          "comment":"Some comment",
          "duration":30,
@@ -379,7 +469,7 @@ Feature:
        "reasons":[
           "risk_policy"
        ],
-       "amount":43.3,
+       "amount":1000.00,
        "debtor_company":{
           "name":"Test User Company",
           "house_number":"10",
@@ -533,9 +623,9 @@ Feature:
               "country":"DE"
            },
            "amount":{
-              "net":33.2,
-              "gross":43.30,
-              "tax":10.10
+              "net":900.00,
+              "gross":1000.00,
+              "tax":100.00
            },
            "comment":"Some comment",
            "duration":30,
@@ -594,9 +684,9 @@ Feature:
               "country":"FR"
            },
            "amount":{
-              "net":33.2,
-              "gross":43.30,
-              "tax":10.10
+              "net":900.00,
+              "gross":1000.00,
+              "tax":100.00
            },
            "comment":"Some comment",
            "duration":1000,
@@ -660,9 +750,9 @@ Feature:
             "established_customer":1
          },
          "amount":{
-            "net":33.2,
-            "gross":43.30,
-            "tax":10.10
+            "net":900.00,
+            "gross":1000.00,
+            "tax":100.00
          },
          "comment":"Some comment",
          "duration":30,
@@ -711,9 +801,9 @@ Feature:
             "country":"DE"
          },
          "amount":{
-            "net":30000.00,
-            "gross": 30000.00,
-            "tax":0
+            "net":18000,
+            "gross":20000,
+            "tax":2000
          },
          "comment":"Some comment",
          "duration":30,
@@ -764,9 +854,9 @@ Feature:
           "country":"DE"
        },
        "amount":{
-          "net":33.2,
-          "gross":43.30,
-          "tax":10.10
+          "net":900.00,
+          "gross":1000.00,
+          "tax":100.00
        },
        "comment":"Some comment",
        "duration":30,
@@ -816,12 +906,83 @@ Feature:
             "country":"DE"
          },
          "amount":{
-            "net":33.2,
-            "gross":43.30,
-            "tax":10.10
+            "net":900.00,
+            "gross":1000.00,
+            "tax":100.00
          },
          "comment":"Some comment",
          "duration":30
     }
     """
     Then the response status code should be 201
+
+  Scenario: Invalid order amounts, gross != net + tax
+    When I send a POST request to "/order" with body:
+    """
+    {
+       "debtor_person":{
+          "salutation":"m",
+          "first_name":"something",
+          "last_name":"else",
+          "phone_number":"+491234567",
+          "email":"someone@billie.io"
+       },
+       "debtor_company":{
+          "merchant_customer_id":"12",
+          "name":"Test User Company",
+          "address_addition":"left door",
+          "address_house_number":"10",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_city":"Berlin",
+          "address_postal_code":"10179",
+          "address_country":"DE",
+          "tax_id":"VA222",
+          "tax_number":"3333",
+          "registration_court":"",
+          "registration_number":" some number",
+          "industry_sector":"some sector",
+          "subindustry_sector":"some sub",
+          "employees_number":"33",
+          "legal_form":"some legal",
+          "established_customer":1
+       },
+       "delivery_address":{
+          "house_number":"22",
+          "street":"Charlot strasse",
+          "city":"Paris",
+          "postal_code":"98765",
+          "country":"de"
+       },
+       "amount":{
+          "net":900.00,
+          "gross":200.00,
+          "tax": 0.00
+       },
+       "comment":"Some comment",
+       "duration":30,
+       "order_id":"A1"
+    }
+    """
+    Then the response status code should be 400
+    And the JSON response should be:
+    """
+    {
+       "errors":[
+          {
+             "source":"amount.net",
+             "title":"Invalid amounts",
+             "code":"request_validation_error"
+          },
+          {
+             "source":"amount.gross",
+             "title":"Invalid amounts",
+             "code":"request_validation_error"
+          },
+          {
+             "source":"amount.tax",
+             "title":"Invalid amounts",
+             "code":"request_validation_error"
+          }
+       ]
+    }
+    """

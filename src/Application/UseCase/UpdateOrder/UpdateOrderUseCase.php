@@ -259,7 +259,7 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
     {
         //TODO: does not belong here
         if (!empty($request->getAmountGross()) && (
-                $request->getAmountGross() > $order->getAmountGross()
+            $request->getAmountGross() > $order->getAmountGross()
                 || $request->getAmountNet() > $order->getAmountNet()
                 || $request->getAmountTax() > $order->getAmountTax()
             )) {

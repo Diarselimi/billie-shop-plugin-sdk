@@ -189,6 +189,7 @@ class PaellaCoreContext extends MinkContext
             ->setState($state)
             ->setAmountNet($net)
             ->setAmountGross($gross)
+            ->setAmountForgiven(0)
             ->setAmountTax($tax)
             ->setDuration($duration)
             ->setDebtorPersonId($person->getId())

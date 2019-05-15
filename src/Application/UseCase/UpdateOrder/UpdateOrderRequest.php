@@ -4,25 +4,55 @@ namespace App\Application\UseCase\UpdateOrder;
 
 use App\Application\UseCase\ValidatedRequestInterface;
 use App\Application\Validator\Constraint as OrderConstraint;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class UpdateOrderRequest implements ValidatedRequestInterface
 {
+    /**
+     * @Assert\NotBlank()
+     */
     private $orderId;
 
+    /**
+     * @Assert\Type(type="string")
+     */
     private $invoiceNumber;
 
+    /**
+     * @Assert\Type(type="string")
+     */
     private $invoiceUrl;
 
+    /**
+     * @Assert\NotBlank()
+     * @Assert\Type(type="numeric")
+     */
     private $merchantId;
 
+    /**
+     * @Assert\GreaterThan(value=0)
+     * @OrderConstraint\Number()
+     * @OrderConstraint\OrderAmounts()
+     */
     private $amountGross;
 
+    /**
+     * @Assert\GreaterThan(value=0)
+     * @OrderConstraint\Number()
+     * @OrderConstraint\OrderAmounts()
+     */
     private $amountNet;
 
+    /**
+     * @Assert\GreaterThanOrEqual(value=0)
+     * @OrderConstraint\Number()
+     * @OrderConstraint\OrderAmounts()
+     */
     private $amountTax;
 
     /**
-     * @OrderConstraint\OrderAmountConstraint
+     * @Assert\Type(type="int")
+     * @OrderConstraint\OrderDuration
      */
     private $duration;
 

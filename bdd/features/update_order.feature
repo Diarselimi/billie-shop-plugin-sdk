@@ -32,7 +32,7 @@ Feature:
         {
           "amount_gross": 500,
           "amount_net": 400,
-          "amount_tax": 20
+          "amount_tax": 100
         }
         """
     Then the response status code should be 204
@@ -47,7 +47,7 @@ Feature:
         {
           "amount_gross": 500,
           "amount_net": 400,
-          "amount_tax": 20
+          "amount_tax": 100
         }
         """
     Then the response status code should be 204
@@ -55,7 +55,7 @@ Feature:
     And the order "CO123" duration is 30
     And the order "CO123" amountGross is 500
     And the order "CO123" amountNet is 400
-    And the order "CO123" amountTax is 20
+    And the order "CO123" amountTax is 100
 
   Scenario: Case 3: Order exists, is shipped but not paid back, valid new due date*, amount unchanged
     Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
@@ -106,7 +106,7 @@ Feature:
           "duration": 30,
           "amount_gross": 500,
           "amount_net": 400,
-          "amount_tax": 20,
+          "amount_tax": 100,
           "invoice_number": "DE12",
           "invoice_url": "http://google.de"
         }
@@ -116,7 +116,7 @@ Feature:
     And the order "CO123" duration is 30
     And the order "CO123" amountGross is 500
     And the order "CO123" amountNet is 400
-    And the order "CO123" amountTax is 20
+    And the order "CO123" amountTax is 100
 
   Scenario: Case 5: Order exists, is shipped but not paid back, new duration invalid
     Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
@@ -154,9 +154,9 @@ Feature:
         """
         {
           "duration": 50,
-          "amount_net": 400,
+          "amount_net": 500,
           "amount_gross": 500,
-          "amount_tax": 20,
+          "amount_tax": 0,
           "invoice_number": "DE12",
           "invoice_url": "http://google.de"
         }
@@ -164,8 +164,8 @@ Feature:
     Then the response status code should be 204
     And the order "CO123" duration is 50
     And the order "CO123" amountGross is 500
-    And the order "CO123" amountNet is 400
-    And the order "CO123" amountTax is 20
+    And the order "CO123" amountNet is 500
+    And the order "CO123" amountTax is 0
 
   Scenario: Case 8: Order does not exist
     When I send a PATCH request to "/order/CO123" with body:
@@ -174,7 +174,7 @@ Feature:
         "duration": 50,
         "amount_net": 400,
         "amount_gross": 500,
-        "amount_tax": 20
+        "amount_tax": 100
     }
     """
     Then the response status code should be 404
@@ -188,7 +188,7 @@ Feature:
           "duration": 30,
           "amount_gross": 500,
           "amount_net": 400,
-          "amount_tax": 20
+          "amount_tax": 100
         }
         """
     Then the response status code should be 403
@@ -225,3 +225,37 @@ Feature:
     """
     {"code":"order_invoice_update_not_possible","error":"Update invoice is not possible"}
     """
+
+  Scenario: Case 12: Order exists, not yet shipped, invalid amounts provided
+    Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+    When I send a PATCH request to "/order/CO123" with body:
+        """
+        {
+          "amount_gross": 500,
+          "amount_net": 45,
+          "amount_tax": 10
+        }
+        """
+    Then the response status code should be 400
+    And the JSON response should be:
+      """
+      {
+        "errors":[
+          {
+             "source":"amount_gross",
+             "title":"Invalid amounts",
+             "code":"request_validation_error"
+          },
+          {
+             "source":"amount_net",
+             "title":"Invalid amounts",
+             "code":"request_validation_error"
+          },
+          {
+             "source":"amount_tax",
+             "title":"Invalid amounts",
+             "code":"request_validation_error"
+          }
+        ]
+      }
+      """

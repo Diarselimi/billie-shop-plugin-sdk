@@ -12,7 +12,6 @@ class CreateOrderDeliveryAddressRequest
     private $addition;
 
     /**
-     * @Assert\NotBlank()
      * @Assert\Length(max=255)
      */
     private $houseNumber;

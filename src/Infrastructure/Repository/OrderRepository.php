@@ -16,7 +16,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OrderRepository extends AbstractPdoRepository implements OrderRepositoryInterface
 {
-    private const SELECT_FIELDS = 'id, uuid, amount_net, amount_gross, amount_tax, duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, proof_of_delivery_url, delivery_address_id, merchant_debtor_id, merchant_id, debtor_person_id, debtor_external_data_id, payment_id, created_at, updated_at, shipped_at, marked_as_fraud_at';
+    private const SELECT_FIELDS = 'id, uuid, amount_net, amount_gross, amount_tax, amount_forgiven, 
+    duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, 
+    proof_of_delivery_url, delivery_address_id, merchant_debtor_id, merchant_id, debtor_person_id, 
+    debtor_external_data_id, payment_id, created_at, updated_at, shipped_at, marked_as_fraud_at';
 
     private $eventDispatcher;
 
@@ -39,6 +42,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
               amount_net, 
               amount_gross, 
               amount_tax, 
+              amount_forgiven, 
               duration, 
               external_code, 
               state, 
@@ -61,6 +65,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
               :amount_net, 
               :amount_gross, 
               :amount_tax, 
+              :amount_forgiven, 
               :duration, 
               :external_code, 
               :state, 
@@ -84,6 +89,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
             'amount_net' => $order->getAmountNet(),
             'amount_gross' => $order->getAmountGross(),
             'amount_tax' => $order->getAmountTax(),
+            'amount_forgiven' => $order->getAmountForgiven(),
             'duration' => $order->getDuration(),
             'external_code' => $order->getExternalCode(),
             'state' => $order->getState(),
@@ -188,6 +194,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
               amount_gross = :amount_gross,
               amount_net = :amount_net,
               amount_tax = :amount_tax,
+              amount_forgiven = :amount_forgiven,
               duration = :duration,
               shipped_at = :shipped_at,
               payment_id = :payment_id,
@@ -201,6 +208,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
             'amount_gross' => $order->getAmountGross(),
             'amount_net' => $order->getAmountNet(),
             'amount_tax' => $order->getAmountTax(),
+            'amount_forgiven' => $order->getAmountForgiven(),
             'duration' => $order->getDuration(),
             'state' => $order->getState(),
             'merchant_debtor_id' => $order->getMerchantDebtorId(),

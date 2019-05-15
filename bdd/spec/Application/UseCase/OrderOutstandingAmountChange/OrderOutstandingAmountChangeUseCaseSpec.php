@@ -64,6 +64,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
             ->setDuration(45)
             ->setAmountNet(100)
             ->setAmountGross(100)
+            ->setAmountForgiven(0)
             ->setAmountTax(0)
             ->setMerchantDebtorId(1)
             ->setMerchantId(1);
@@ -124,6 +125,53 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         $this->execute($request);
     }
 
+    public function it_should_not_schedule_event_if_amount_forgiven_greater_than_zero(
+        OrderRepositoryInterface $orderRepository,
+        MerchantRepositoryInterface $merchantRepository,
+        MerchantDebtorRepositoryInterface $merchantDebtorRepository,
+        LimitsService $limitsService,
+        NotificationScheduler $notificationScheduler,
+        OrderPaymentForgivenessService $paymentForgivenessService,
+        LoggerInterface $logger,
+        RavenClient $sentry
+    ) {
+        $this->setLogger($logger)->setSentry($sentry);
+
+        $amountChange = (new OrderAmountChangeDTO())
+            ->setId('test')
+            ->setOutstandingAmount(10)
+            ->setAmountChange(10)
+            ->setType(OrderAmountChangeDTO::TYPE_PAYMENT)
+            ->setPaidAmount(90);
+
+        $order = (new OrderEntity())
+            ->setId(1)
+            ->setUuid('foo')
+            ->setExternalCode('ABCD123')
+            ->setDuration(45)
+            ->setAmountNet(100)
+            ->setAmountGross(100)
+            ->setAmountTax(0)
+            ->setAmountForgiven(10)
+            ->setMerchantDebtorId(1)
+            ->setMerchantId(1);
+
+        // Should
+        $orderRepository->getOneByPaymentId($amountChange->getId())->shouldBeCalledOnce()->willReturn($order);
+        $logger->info(Argument::any(), Argument::any())->shouldBeCalledOnce();
+
+        // Should Not
+        $merchantRepository->getOneById(Argument::any())->shouldNotBeCalled();
+        $merchantDebtorRepository->getOneById(Argument::any())->shouldNotBeCalled();
+        $limitsService->unlock(Argument::any(), Argument::any())->shouldNotBeCalled();
+        $merchantRepository->update(Argument::any())->shouldNotBeCalled();
+        $notificationScheduler->createAndSchedule(Argument::any(), Argument::any())->shouldNotBeCalled();
+        $paymentForgivenessService->begForgiveness(Argument::any(), Argument::any())->shouldNotBeCalled();
+
+        $request = new OrderOutstandingAmountChangeRequest($amountChange);
+        $this->execute($request);
+    }
+
     public function it_should_not_schedule_event_if_merchant_not_found(
         OrderRepositoryInterface $orderRepository,
         MerchantRepositoryInterface $merchantRepository,
@@ -146,6 +194,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
             ->setAmountNet(100)
             ->setAmountGross(100)
             ->setAmountTax(0)
+            ->setAmountForgiven(0)
             ->setMerchantDebtorId(1)
             ->setMerchantId(1);
 
@@ -194,6 +243,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
             ->setAmountNet(100)
             ->setAmountGross(100)
             ->setAmountTax(0)
+            ->setAmountForgiven(0)
             ->setMerchantDebtorId(1)
             ->setMerchantId(1);
 
@@ -244,6 +294,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
             ->setAmountNet(100)
             ->setAmountGross(100)
             ->setAmountTax(0)
+            ->setAmountForgiven(0)
             ->setMerchantDebtorId(1)
             ->setMerchantId(1);
 

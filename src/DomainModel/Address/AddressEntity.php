@@ -66,12 +66,12 @@ class AddressEntity extends AbstractTimestampableEntity
         return $this;
     }
 
-    public function getHouseNumber(): string
+    public function getHouseNumber(): ?string
     {
         return $this->houseNumber;
     }
 
-    public function setHouseNumber(string $houseNumber): AddressEntity
+    public function setHouseNumber(?string $houseNumber): AddressEntity
     {
         $this->houseNumber = $houseNumber;
 

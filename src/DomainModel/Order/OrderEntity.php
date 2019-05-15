@@ -18,6 +18,8 @@ class OrderEntity extends AbstractTimestampableEntity
 
     private $amountTax;
 
+    private $amountForgiven;
+
     private $duration;
 
     private $externalCode;
@@ -94,6 +96,18 @@ class OrderEntity extends AbstractTimestampableEntity
     public function setAmountTax(float $amountTax): OrderEntity
     {
         $this->amountTax = $amountTax;
+
+        return $this;
+    }
+
+    public function getAmountForgiven(): float
+    {
+        return $this->amountForgiven;
+    }
+
+    public function setAmountForgiven(float $amountForgiven): OrderEntity
+    {
+        $this->amountForgiven = $amountForgiven;
 
         return $this;
     }

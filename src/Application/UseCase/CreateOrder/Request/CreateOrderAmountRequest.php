@@ -11,6 +11,7 @@ class CreateOrderAmountRequest
      * @Assert\NotBlank()
      * @Assert\GreaterThan(value=0)
      * @PaellaAssert\Number()
+     * @PaellaAssert\OrderAmounts()
      */
     private $net;
 
@@ -18,6 +19,7 @@ class CreateOrderAmountRequest
      * @Assert\NotBlank()
      * @Assert\GreaterThan(value=0)
      * @PaellaAssert\Number()
+     * @PaellaAssert\OrderAmounts()
      */
     private $gross;
 
@@ -25,6 +27,7 @@ class CreateOrderAmountRequest
      * @Assert\NotBlank()
      * @Assert\GreaterThanOrEqual(value=0)
      * @PaellaAssert\Number()
+     * @PaellaAssert\OrderAmounts()
      */
     private $tax;
 
