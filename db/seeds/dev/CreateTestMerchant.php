@@ -40,14 +40,24 @@ class CreateTestMerchant extends AbstractSeed
         $defaultStrategy = MerchantSettingsEntity::INVOICE_HANDLING_STRATEGY_NONE;
 
         $this->execute("
-            INSERT INTO merchant_settings (merchant_id, debtor_financing_limit, min_order_amount, score_thresholds_configuration_id, invoice_handling_strategy, created_at, updated_at)
-            SELECT merchants.id as merchant_id, 
-                   7500 as debtor_financing_limit,
-                   0 as min_order_amount,
-                   {$id} as score_thresholds_configuration_id,
-                   '{$defaultStrategy}' as invoice_handling_strategy,
-                   '{$now}' as created_at,
-                   '{$now}' as updated_at
+            INSERT INTO merchant_settings (
+                merchant_id, 
+                initial_debtor_financing_limit,
+                debtor_financing_limit, 
+                min_order_amount, 
+                score_thresholds_configuration_id, 
+                invoice_handling_strategy, 
+                created_at, 
+                updated_at
+            )
+            SELECT merchants.id as merchant_id,
+                7500 as initial_debtor_financing_limit, 
+                7500 as debtor_financing_limit,
+                0 as min_order_amount,
+                {$id} as score_thresholds_configuration_id,
+                '{$defaultStrategy}' as invoice_handling_strategy,
+                '{$now}' as created_at,
+                '{$now}' as updated_at
             FROM merchants WHERE merchants.id NOT IN (SELECT merchant_id FROM merchant_settings);
         ");
 

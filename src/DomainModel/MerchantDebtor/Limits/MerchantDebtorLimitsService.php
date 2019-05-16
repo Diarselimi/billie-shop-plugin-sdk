@@ -5,6 +5,7 @@ namespace App\DomainModel\MerchantDebtor\Limits;
 use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\Order\OrderContainer;
+use App\DomainModel\Order\OrderRepositoryInterface;
 use App\Infrastructure\Alfred\AlfredRequestException;
 
 class MerchantDebtorLimitsService
@@ -13,12 +14,16 @@ class MerchantDebtorLimitsService
 
     private $merchantDebtorFinancialDetailsRepository;
 
+    private $orderRepository;
+
     public function __construct(
         CompaniesServiceInterface $companyService,
-        MerchantDebtorFinancialDetailsRepositoryInterface $merchantDebtorFinancialDetailsRepository
+        MerchantDebtorFinancialDetailsRepositoryInterface $merchantDebtorFinancialDetailsRepository,
+        OrderRepositoryInterface $orderRepository
     ) {
         $this->companyService = $companyService;
         $this->merchantDebtorFinancialDetailsRepository = $merchantDebtorFinancialDetailsRepository;
+        $this->orderRepository = $orderRepository;
     }
 
     public function isEnough(OrderContainer $container): bool
@@ -60,5 +65,33 @@ class MerchantDebtorLimitsService
         } catch (AlfredRequestException | \LogicException $exception) {
             throw new MerchantDebtorLimitsException();
         }
+    }
+
+    public function recalculate(OrderContainer $orderContainer): void
+    {
+        $merchantDebtorId = $orderContainer->getMerchantDebtor()->getId();
+
+        $merchantSettingLimit = $orderContainer->getMerchantSettings()->getDebtorFinancingLimit();
+
+        $merchantDebtorFinancialDetails = $orderContainer->getMerchantDebtorFinancialDetails();
+        $currentLimit = $merchantDebtorFinancialDetails->getFinancingLimit();
+        $currentFinancingPower = $merchantDebtorFinancialDetails->getFinancingPower();
+
+        if ($currentLimit >= $merchantSettingLimit) {
+            return;
+        }
+
+        if (!$this->orderRepository->merchantDebtorHasOneCompleteOrder($merchantDebtorId)) {
+            return;
+        }
+
+        $newFinancingPower = $currentFinancingPower + ($merchantSettingLimit - $currentLimit);
+
+        $merchantDebtorFinancialDetails
+            ->setFinancingLimit($merchantSettingLimit)
+            ->setFinancingPower($newFinancingPower)
+        ;
+
+        $this->merchantDebtorFinancialDetailsRepository->insert($merchantDebtorFinancialDetails);
     }
 }

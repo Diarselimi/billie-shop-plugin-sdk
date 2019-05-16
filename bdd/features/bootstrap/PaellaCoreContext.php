@@ -86,6 +86,7 @@ class PaellaCoreContext extends MinkContext
         $this->getMerchantSettingsRepository()->insert(
             (new MerchantSettingsEntity())
                 ->setMerchantId($this->merchant->getId())
+                ->setInitialDebtorFinancingLimit(10000)
                 ->setDebtorFinancingLimit(10000)
                 ->setMinOrderAmount(0)
                 ->setScoreThresholdsConfigurationId($scoreThreshold->getId())
@@ -117,6 +118,7 @@ class PaellaCoreContext extends MinkContext
             TRUNCATE merchant_risk_check_settings;
             TRUNCATE merchant_users;
             TRUNCATE merchants;
+            TRUNCATE merchant_debtor_financial_details;
             TRUNCATE merchants_debtors;
             TRUNCATE score_thresholds_configuration;
             TRUNCATE risk_check_definitions;

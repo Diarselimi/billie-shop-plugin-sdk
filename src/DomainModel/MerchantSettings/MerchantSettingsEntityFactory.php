@@ -4,13 +4,12 @@ namespace App\DomainModel\MerchantSettings;
 
 class MerchantSettingsEntityFactory
 {
-    private const DEFAULT_MIN_ORDER_AMOUNT = 0;
-
     public function createFromArray(array $data): MerchantSettingsEntity
     {
         return (new MerchantSettingsEntity())
             ->setId((int) $data['id'])
             ->setMerchantId((int) $data['merchant_id'])
+            ->setInitialDebtorFinancingLimit((float) $data['initial_debtor_financing_limit'])
             ->setDebtorFinancingLimit((float) $data['debtor_financing_limit'])
             ->setMinOrderAmount((float) $data['min_order_amount'])
             ->setScoreThresholdsConfigurationId($data['score_thresholds_configuration_id'])
@@ -23,6 +22,7 @@ class MerchantSettingsEntityFactory
 
     public function create(
         int $merchantId,
+        float $initialDebtorFinancingLimit,
         float $financingLimit,
         int $scoreThresholdsConfigurationId,
         bool $useExperimentalDebtorIdentification,
@@ -31,8 +31,9 @@ class MerchantSettingsEntityFactory
     ): MerchantSettingsEntity {
         return (new MerchantSettingsEntity())
             ->setMerchantId($merchantId)
+            ->setInitialDebtorFinancingLimit($initialDebtorFinancingLimit)
             ->setDebtorFinancingLimit($financingLimit)
-            ->setMinOrderAmount(self::DEFAULT_MIN_ORDER_AMOUNT)
+            ->setMinOrderAmount(MerchantSettingsEntity::DEFAULT_MIN_ORDER_AMOUNT)
             ->setScoreThresholdsConfigurationId($scoreThresholdsConfigurationId)
             ->setUseExperimentalDebtorIdentification($useExperimentalDebtorIdentification)
             ->setInvoiceHandlingStrategy($invoiceHandlingStrategy)

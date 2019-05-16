@@ -8,6 +8,8 @@ class CreateMerchantRequest
 
     private $merchantFinancingLimit;
 
+    private $initialDebtorFinancingLimit;
+
     private $debtorFinancingLimit;
 
     private $webhookUrl;
@@ -34,6 +36,18 @@ class CreateMerchantRequest
     public function setMerchantFinancingLimit(float $merchantFinancingLimit): CreateMerchantRequest
     {
         $this->merchantFinancingLimit = $merchantFinancingLimit;
+
+        return $this;
+    }
+
+    public function getInitialDebtorFinancingLimit(): float
+    {
+        return $this->initialDebtorFinancingLimit;
+    }
+
+    public function setInitialDebtorFinancingLimit(float $initialDebtorFinancingLimit): CreateMerchantRequest
+    {
+        $this->initialDebtorFinancingLimit = $initialDebtorFinancingLimit;
 
         return $this;
     }

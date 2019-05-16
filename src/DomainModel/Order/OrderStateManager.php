@@ -3,6 +3,7 @@
 namespace App\DomainModel\Order;
 
 use App\Application\Exception\OrderWorkflowException;
+use App\DomainEvent\Order\OrderCompleteEvent;
 use App\DomainEvent\Order\OrderCreatedEvent;
 use App\DomainEvent\Order\OrderDeclinedEvent;
 use App\DomainEvent\Order\OrderInWaitingStateEvent;
@@ -173,5 +174,17 @@ class OrderStateManager implements LoggingInterface
 
         $this->eventDispatcher->dispatch(OrderInWaitingStateEvent::NAME, new OrderInWaitingStateEvent($order));
         $this->logInfo("Order was moved to waiting state");
+    }
+
+    public function complete(OrderContainer $orderContainer): void
+    {
+        $order = $orderContainer->getOrder();
+
+        $this->workflow->apply($order, OrderStateManager::TRANSITION_COMPLETE);
+        $this->orderRepository->update($order);
+
+        $this->eventDispatcher->dispatch(OrderCompleteEvent::NAME, new OrderCompleteEvent($orderContainer));
+
+        $this->logInfo("Order completed");
     }
 }

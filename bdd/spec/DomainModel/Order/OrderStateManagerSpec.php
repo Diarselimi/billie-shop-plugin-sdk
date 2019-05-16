@@ -4,6 +4,7 @@ namespace spec\App\DomainModel\Order;
 
 use App\DomainModel\Order\CreateOrderCrossChecksService;
 use App\DomainModel\Order\OrderChecksRunnerService;
+use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use Billie\MonitoringBundle\Service\Alerting\Sentry\Raven\RavenClient;
@@ -20,6 +21,7 @@ class OrderStateManagerSpec extends ObjectBehavior
         CreateOrderCrossChecksService $approveCrossChecksService,
         EventDispatcherInterface $eventDispatcher,
         OrderChecksRunnerService $checksRunnerService,
+        OrderPersistenceService $orderPersistenceService,
         RavenClient $sentry
     ) {
         $this->beConstructedWith(...func_get_args());

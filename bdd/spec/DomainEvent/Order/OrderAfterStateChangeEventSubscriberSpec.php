@@ -4,6 +4,7 @@ namespace spec\App\DomainEvent\Order;
 
 use App\Amqp\Producer\DelayedMessageProducer;
 use App\DomainEvent\Order\OrderAfterStateChangeEventSubscriber;
+use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderNotification\NotificationScheduler;
@@ -20,13 +21,19 @@ class OrderAfterStateChangeEventSubscriberSpec extends ObjectBehavior
         NotificationScheduler $notificationScheduler,
         DelayedMessageProducer $delayedMessageProducer,
         OrderDeclinedReasonsMapper $orderDeclinedReasonsMapper,
+        MerchantDebtorLimitsService $merchantDebtorLimitsService,
         RavenClient $sentry,
         SlackClient $slackClient,
         SlackMessageFactory $slackMessageFactory
     ) {
         $this->beConstructedWith(...func_get_args());
 
-        $this->setLogger(new NullLogger())->setSentry($sentry)->setSlackClient($slackClient)->setSlackMessageFactory($slackMessageFactory);
+        $this
+            ->setLogger(new NullLogger())
+            ->setSentry($sentry)
+            ->setSlackClient($slackClient)
+            ->setSlackMessageFactory($slackMessageFactory)
+        ;
     }
 
     public function it_is_initializable()

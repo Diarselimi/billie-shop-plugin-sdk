@@ -30,6 +30,8 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
 
     const MERCHANT_ID = 17;
 
+    const INITIAL_DEBTOR_FINANCING_LIMIT = 200.00;
+
     const DEBTOR_FINANCING_LIMIT = 500.34;
 
     const COMPANY_ID = '561';
@@ -108,6 +110,7 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
         $merchant->getId()->willReturn(self::MERCHANT_ID);
         $scoreThresholdsConfiguration->getId()->willReturn(self::SCORE_CONFIGURATION_ID);
 
+        $request->getInitialDebtorFinancingLimit()->willReturn(self::INITIAL_DEBTOR_FINANCING_LIMIT);
         $request->getDebtorFinancingLimit()->willReturn(self::DEBTOR_FINANCING_LIMIT);
 
         $authenticationService
@@ -126,7 +129,16 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
         $scoreThresholdsConfigurationFactory->createDefault()->shouldBeCalledOnce()->willReturn($scoreThresholdsConfiguration);
         $scoreThresholdsConfigurationRepository->insert($scoreThresholdsConfiguration)->shouldBeCalledOnce();
 
-        $merchantSettingsFactory->create(self::MERCHANT_ID, self::DEBTOR_FINANCING_LIMIT, self::SCORE_CONFIGURATION_ID, false, 'none', 1.0)
+        $merchantSettingsFactory
+            ->create(
+                self::MERCHANT_ID,
+                self::INITIAL_DEBTOR_FINANCING_LIMIT,
+                self::DEBTOR_FINANCING_LIMIT,
+                self::SCORE_CONFIGURATION_ID,
+                false,
+                'none',
+                1.0
+            )
             ->willReturn($merchantSettings);
         $merchantSettingsRepository->insert($merchantSettings)->shouldBeCalledOnce();
 

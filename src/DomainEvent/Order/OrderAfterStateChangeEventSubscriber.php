@@ -3,6 +3,7 @@
 namespace App\DomainEvent\Order;
 
 use App\Amqp\Producer\DelayedMessageProducer;
+use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
@@ -28,16 +29,20 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
 
     private $orderDeclinedReasonsMapper;
 
+    private $merchantDebtorLimitsService;
+
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         NotificationScheduler $notificationScheduler,
         DelayedMessageProducer $delayedMessageProducer,
-        OrderDeclinedReasonsMapper $orderDeclinedReasonsMapper
+        OrderDeclinedReasonsMapper $orderDeclinedReasonsMapper,
+        MerchantDebtorLimitsService $merchantDebtorLimitsService
     ) {
         $this->orderRepository = $orderRepository;
         $this->notificationScheduler = $notificationScheduler;
         $this->delayedMessageProducer = $delayedMessageProducer;
         $this->orderDeclinedReasonsMapper = $orderDeclinedReasonsMapper;
+        $this->merchantDebtorLimitsService = $merchantDebtorLimitsService;
     }
 
     public static function getSubscribedEvents()
@@ -46,6 +51,7 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
             OrderCreatedEvent::NAME => 'onCreated',
             OrderDeclinedEvent::NAME => 'onDeclined',
             OrderInWaitingStateEvent::NAME => 'onWaiting',
+            OrderCompleteEvent::NAME => 'onComplete',
         ];
     }
 
@@ -74,7 +80,7 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
         $this->logInfo("Order declined");
     }
 
-    public function onWaiting(OrderInWaitingStateEvent $event)
+    public function onWaiting(OrderInWaitingStateEvent $event): void
     {
         $order = $event->getOrder();
 
@@ -103,5 +109,10 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
             'event' => $event,
             'order_id' => $order->getExternalCode(),
         ]);
+    }
+
+    public function onComplete(OrderCompleteEvent $event): void
+    {
+        $this->merchantDebtorLimitsService->recalculate($event->getOrderContainer());
     }
 }

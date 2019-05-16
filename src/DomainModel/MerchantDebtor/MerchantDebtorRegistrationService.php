@@ -52,8 +52,8 @@ class MerchantDebtorRegistrationService
 
         $merchantDebtorFinancialDetails = $this->merchantDebtorFinancingDetailsEntityFactory->create(
             $merchantDebtor->getId(),
-            $merchantSettings->getDebtorFinancingLimit(),
-            $merchantSettings->getDebtorFinancingLimit()
+            $merchantSettings->getInitialDebtorFinancingLimit(),
+            $merchantSettings->getInitialDebtorFinancingLimit()
         );
         $this->merchantDebtorFinancialDetailsRepository->insert($merchantDebtorFinancialDetails);
 

@@ -380,4 +380,21 @@ SQL;
             yield $this->orderFactory->createFromDatabaseRow($row);
         }
     }
+
+    public function merchantDebtorHasOneCompleteOrder(int $merchantDebtorId): bool
+    {
+        $result = $this->doFetchOne(
+            'SELECT COUNT(*) as total FROM orders WHERE state = :state_complete AND merchant_debtor_id = :merchant_debtor_id',
+            [
+                'state_complete' => OrderStateManager::STATE_COMPLETE,
+                'merchant_debtor_id' => $merchantDebtorId,
+            ]
+        );
+
+        if (!$result) {
+            return false;
+        }
+
+        return $result['total'] == 1;
+    }
 }
