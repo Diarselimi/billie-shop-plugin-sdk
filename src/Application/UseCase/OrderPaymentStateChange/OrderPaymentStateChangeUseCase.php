@@ -71,9 +71,6 @@ class OrderPaymentStateChangeUseCase implements LoggingInterface
             } elseif ($orderPaymentDetails->isPaidOut()) {
                 $this->workflow->apply($order, OrderStateManager::TRANSITION_PAY_OUT);
                 $this->orderRepository->update($order);
-            } elseif ($orderPaymentDetails->isPaidFully()) {
-                $orderContainer = $this->orderPersistenceService->createFromOrderEntity($order);
-                $this->orderStateManager->complete($orderContainer);
             }
         } catch (NotEnabledTransitionException $exception) {
             $this->logSuppressedException($exception, '[suppressed] State transition for order not available', [

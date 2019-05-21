@@ -5,10 +5,12 @@ namespace App\Application\UseCase\OrderOutstandingAmountChange;
 use App\Application\Exception\OrderNotFoundException;
 use App\DomainModel\Borscht\OrderAmountChangeDTO;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsException;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderNotification\NotificationScheduler;
 use App\DomainModel\OrderPayment\OrderPaymentForgivenessService;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
@@ -32,13 +34,16 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 
     private $paymentForgivenessService;
 
+    private $orderStateManager;
+
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         MerchantRepositoryInterface $merchantRepository,
         OrderPersistenceService $orderPersistenceService,
         NotificationScheduler $notificationScheduler,
         MerchantDebtorLimitsService $limitsService,
-        OrderPaymentForgivenessService $paymentForgivenessService
+        OrderPaymentForgivenessService $paymentForgivenessService,
+        OrderStateManager $orderStateManager
     ) {
         $this->orderRepository = $orderRepository;
         $this->merchantRepository = $merchantRepository;
@@ -46,6 +51,7 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
         $this->notificationScheduler = $notificationScheduler;
         $this->limitsService = $limitsService;
         $this->paymentForgivenessService = $paymentForgivenessService;
+        $this->orderStateManager = $orderStateManager;
     }
 
     public function execute(OrderOutstandingAmountChangeRequest $request)
@@ -76,7 +82,12 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
         $orderContainer = $this->orderPersistenceService->createFromOrderEntity($order);
         $merchant = $orderContainer->getMerchant();
 
-        $this->limitsService->unlock($orderContainer, $amountChange->getAmountChange());
+        try {
+            $this->limitsService->unlock($orderContainer, $amountChange->getAmountChange());
+        } catch (MerchantDebtorLimitsException $exception) {
+            $this->logSuppressedException($exception, 'Amazing merchant payment borscht bug');
+        }
+
         $merchant->increaseAvailableFinancingLimit($amountChange->getAmountChange());
         $this->merchantRepository->update($merchant);
 
@@ -95,6 +106,10 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
                     'merchant_id' => $merchant->getId(),
                 ]
             );
+        }
+
+        if ($amountChange->getOutstandingAmount() <= 0) {
+            $this->orderStateManager->complete($orderContainer);
         }
     }
 

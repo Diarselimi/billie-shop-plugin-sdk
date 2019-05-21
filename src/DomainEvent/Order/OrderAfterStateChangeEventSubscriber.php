@@ -103,16 +103,16 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
         $this->getSlackClient()->sendMessage($message);
     }
 
+    public function onComplete(OrderCompleteEvent $event): void
+    {
+        $this->merchantDebtorLimitsService->recalculate($event->getOrderContainer());
+    }
+
     private function notifyMerchantWebhook(OrderEntity $order, string $event): void
     {
         $this->notificationScheduler->createAndSchedule($order, [
             'event' => $event,
             'order_id' => $order->getExternalCode(),
         ]);
-    }
-
-    public function onComplete(OrderCompleteEvent $event): void
-    {
-        $this->merchantDebtorLimitsService->recalculate($event->getOrderContainer());
     }
 }

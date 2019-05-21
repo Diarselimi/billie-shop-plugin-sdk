@@ -35,5 +35,5 @@ interface OrderRepositoryInterface
      */
     public function getOrdersByInvoiceHandlingStrategy(string $strategy): Generator;
 
-    public function merchantDebtorHasOneCompleteOrder(int $merchantDebtorId): bool;
+    public function getOrdersCountByMerchantDebtorAndState(int $merchantDebtorId, string $state): int;
 }

@@ -6,10 +6,15 @@ use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\Order\OrderContainer;
 use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderStateManager;
 use App\Infrastructure\Alfred\AlfredRequestException;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
-class MerchantDebtorLimitsService
+class MerchantDebtorLimitsService implements LoggingInterface
 {
+    use LoggingTrait;
+
     private $companyService;
 
     private $merchantDebtorFinancialDetailsRepository;
@@ -70,7 +75,6 @@ class MerchantDebtorLimitsService
     public function recalculate(OrderContainer $orderContainer): void
     {
         $merchantDebtorId = $orderContainer->getMerchantDebtor()->getId();
-
         $merchantSettingLimit = $orderContainer->getMerchantSettings()->getDebtorFinancingLimit();
 
         $merchantDebtorFinancialDetails = $orderContainer->getMerchantDebtorFinancialDetails();
@@ -81,11 +85,21 @@ class MerchantDebtorLimitsService
             return;
         }
 
-        if (!$this->orderRepository->merchantDebtorHasOneCompleteOrder($merchantDebtorId)) {
+        $completeOrdersCount = $this->orderRepository->getOrdersCountByMerchantDebtorAndState(
+            $merchantDebtorId,
+            OrderStateManager::STATE_COMPLETE
+        );
+
+        if ($completeOrdersCount !== 1) {
             return;
         }
 
         $newFinancingPower = $currentFinancingPower + ($merchantSettingLimit - $currentLimit);
+
+        $this->logInfo('Merchant debtor smart limit increased from {old} to {new}', [
+            'old' => $currentLimit,
+            'new' => $merchantSettingLimit,
+        ]);
 
         $merchantDebtorFinancialDetails
             ->setFinancingLimit($merchantSettingLimit)

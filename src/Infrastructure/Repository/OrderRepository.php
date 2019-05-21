@@ -381,12 +381,12 @@ SQL;
         }
     }
 
-    public function merchantDebtorHasOneCompleteOrder(int $merchantDebtorId): bool
+    public function getOrdersCountByMerchantDebtorAndState(int $merchantDebtorId, string $state): int
     {
         $result = $this->doFetchOne(
-            'SELECT COUNT(*) as total FROM orders WHERE state = :state_complete AND merchant_debtor_id = :merchant_debtor_id',
+            'SELECT COUNT(*) as total FROM orders WHERE state = :state AND merchant_debtor_id = :merchant_debtor_id',
             [
-                'state_complete' => OrderStateManager::STATE_COMPLETE,
+                'state' => $state,
                 'merchant_debtor_id' => $merchantDebtorId,
             ]
         );
@@ -395,6 +395,6 @@ SQL;
             return false;
         }
 
-        return $result['total'] == 1;
+        return intval($result['total']);
     }
 }

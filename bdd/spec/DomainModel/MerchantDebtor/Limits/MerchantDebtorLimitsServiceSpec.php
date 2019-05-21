@@ -30,7 +30,7 @@ class MerchantDebtorLimitsServiceSpec extends ObjectBehavior
         $this->shouldHaveType(MerchantDebtorLimitsService::class);
     }
 
-    public function it_recalculates_limit_on_order_complete(
+    public function it_recalculates_limit(
         MerchantDebtorFinancialDetailsRepositoryInterface $merchantDebtorFinancialDetailsRepository,
         OrderRepositoryInterface $orderRepository,
         MerchantDebtorEntity $merchantDebtor,
@@ -50,9 +50,9 @@ class MerchantDebtorLimitsServiceSpec extends ObjectBehavior
         $orderContainer->getMerchantDebtorFinancialDetails()->willReturn($merchantDebtorFinancialDetails);
 
         $orderRepository
-            ->merchantDebtorHasOneCompleteOrder(self::MERCHANT_DEBTOR_ID)
+            ->getOrdersCountByMerchantDebtorAndState(self::MERCHANT_DEBTOR_ID, 'complete')
             ->shouldBeCalled()
-            ->willReturn(true)
+            ->willReturn(1)
         ;
 
         $merchantDebtorFinancialDetails->setFinancingLimit(20000.00)->shouldBeCalled()->willReturn($merchantDebtorFinancialDetails);
@@ -68,7 +68,6 @@ class MerchantDebtorLimitsServiceSpec extends ObjectBehavior
 
     public function it_doesnt_change_limit_if_the_current_one_is_higher_than_the_merchant_settings_one(
         MerchantDebtorFinancialDetailsRepositoryInterface $merchantDebtorFinancialDetailsRepository,
-        OrderRepositoryInterface $orderRepository,
         MerchantDebtorEntity $merchantDebtor,
         MerchantDebtorFinancialDetailsEntity $merchantDebtorFinancialDetails,
         MerchantSettingsEntity $merchantSettings,
