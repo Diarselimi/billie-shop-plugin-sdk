@@ -29,7 +29,7 @@ Feature:
       {
           "external_code": "XF43Y",
           "state": "new",
-          "reasons": [],
+          "reasons": null,
           "amount": 1000,
           "debtor_company": {
               "name": "Test User Company",

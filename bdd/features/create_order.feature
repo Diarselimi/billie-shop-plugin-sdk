@@ -199,7 +199,7 @@ Feature:
     {
       "external_code":"A1",
       "state":"created",
-      "reasons":[],
+      "reasons":null,
       "amount":1000.00,
       "debtor_company":{
         "name":"Test User Company",
@@ -288,7 +288,7 @@ Feature:
     {
       "external_code":"A123",
       "state":"created",
-      "reasons":[],
+      "reasons":null,
       "amount":43.3,
       "debtor_company":{
         "name":"Test User Company",
@@ -378,7 +378,7 @@ Feature:
     {
       "external_code":"A1",
       "state":"created",
-      "reasons":[],
+      "reasons":null,
       "amount":1000.00,
       "debtor_company":{
         "name":"Test User Company",
