@@ -89,7 +89,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         return $this->factory->createFromAlfredResponse($decodedResponse);
     }
 
-    public function lockDebtorLimit(string $debtorId, float $amount): bool
+    public function lockDebtorLimit(string $debtorId, float $amount): void
     {
         try {
             $this->client->post("/debtor/$debtorId/lock", [
@@ -101,14 +101,8 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
                 },
             ]);
         } catch (TransferException $exception) {
-            if ($exception->getCode() === Response::HTTP_PRECONDITION_FAILED) {
-                return false;
-            }
-
             throw new AlfredRequestException($exception->getCode(), $exception);
         }
-
-        return true;
     }
 
     public function unlockDebtorLimit(string $debtorId, float $amount): void

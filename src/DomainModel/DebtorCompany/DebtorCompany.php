@@ -28,6 +28,8 @@ class DebtorCompany
 
     private $isTrustedSource;
 
+    private $financingPower;
+
     public function getId(): int
     {
         return $this->id;
@@ -170,5 +172,17 @@ class DebtorCompany
     public function isTrustedSource(): bool
     {
         return $this->isTrustedSource;
+    }
+
+    public function getFinancingPower(): float
+    {
+        return $this->financingPower;
+    }
+
+    public function setFinancingPower(float $financingPower): DebtorCompany
+    {
+        $this->financingPower = $financingPower;
+
+        return $this;
     }
 }

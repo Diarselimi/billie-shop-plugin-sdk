@@ -3,14 +3,16 @@
 namespace App\Application\UseCase\UpdateOrder;
 
 use App\Application\Exception\FraudOrderException;
+use App\Application\Exception\OrderNotFoundException;
 use App\Application\PaellaCoreCriticalException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
-use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
-use App\DomainModel\Order\LimitsService;
+use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
+use App\DomainModel\Order\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderInvoice\InvoiceUploadHandlerInterface;
@@ -24,13 +26,13 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 {
     use LoggingTrait, ValidatedUseCaseTrait;
 
+    private $orderPersistenceService;
+
     private $paymentsService;
 
     private $limitsService;
 
     private $orderRepository;
-
-    private $merchantDebtorRepository;
 
     private $merchantRepository;
 
@@ -39,18 +41,18 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
     private $invoiceManager;
 
     public function __construct(
+        OrderPersistenceService $orderPersistenceService,
         BorschtInterface $paymentsService,
-        LimitsService $limitsService,
+        MerchantDebtorLimitsService $limitsService,
         OrderRepositoryInterface $orderRepository,
-        MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         MerchantRepositoryInterface $merchantRepository,
         OrderStateManager $orderStateManager,
         OrderInvoiceManager $invoiceManager
     ) {
+        $this->orderPersistenceService = $orderPersistenceService;
         $this->paymentsService = $paymentsService;
         $this->limitsService = $limitsService;
         $this->orderRepository = $orderRepository;
-        $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->merchantRepository = $merchantRepository;
         $this->orderStateManager = $orderStateManager;
         $this->invoiceManager = $invoiceManager;
@@ -61,25 +63,23 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         $this->validateRequest($request);
 
         $order = $this->orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($request->getOrderId(), $request->getMerchantId());
-
         if (!$order) {
-            throw new PaellaCoreCriticalException(
-                "Order #{$request->getOrderId()} not found",
-                PaellaCoreCriticalException::CODE_NOT_FOUND,
-                Response::HTTP_NOT_FOUND
-            );
+            throw new OrderNotFoundException();
         }
+
+        $orderContainer = $this->orderPersistenceService->createFromOrderEntity($order);
 
         if ($order->getMarkedAsFraudAt()) {
             throw new FraudOrderException();
         }
 
         $this->validate($order, $request);
-        $this->updateChangedData($order, $request);
+        $this->updateChangedData($orderContainer, $request);
     }
 
-    private function updateChangedData(OrderEntity $order, UpdateOrderRequest $request)
+    private function updateChangedData(OrderContainer $orderContainer, UpdateOrderRequest $request)
     {
+        $order = $orderContainer->getOrder();
         $durationChanged = $request->getDuration() !== null && $request->getDuration() !== $order->getDuration();
 
         $amountChanged = $request->getAmountGross() !== null && (float) $request->getAmountGross() !== $order->getAmountGross()
@@ -98,7 +98,7 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         ]);
 
         if ($amountChanged && ($this->orderStateManager->wasShipped($order) || !$durationChanged)) {
-            $this->updateAmount($order, $request);
+            $this->updateAmount($orderContainer, $request);
         }
 
         if ($invoiceChanged) {
@@ -131,8 +131,9 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         $this->applyUpdate($order);
     }
 
-    private function updateAmount(OrderEntity $order, UpdateOrderRequest $request)
+    private function updateAmount(OrderContainer $orderContainer, UpdateOrderRequest $request)
     {
+        $order = $orderContainer->getOrder();
         if ($this->orderStateManager->isCanceled($order) || $this->orderStateManager->isComplete($order)) {
             throw new PaellaCoreCriticalException(
                 'Update amount not possible',
@@ -183,27 +184,21 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         }
 
         if ($this->orderStateManager->wasShipped($order)) {
-            $this->logInfo('Do partial cancellation in Borscht');
             $this->applyUpdate($order);
 
             return;
         }
 
-        $this->logInfo('Do update order without Borscht');
         $this->orderRepository->update($order);
-
-        $this->logInfo('Do update merchant limit without Borscht');
-        $this->updateMerchantLimit($order, $amountChanged);
+        $this->updateLimits($orderContainer, $amountChanged);
     }
 
-    private function updateMerchantLimit(OrderEntity $order, float $amountChanged)
+    private function updateLimits(OrderContainer $orderContainer, float $amountChanged)
     {
-        $merchantDebtor = $this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId());
-        $this->limitsService->unlock($merchantDebtor, $amountChanged);
+        $this->limitsService->unlock($orderContainer, $amountChanged);
 
-        $merchant = $this->merchantRepository->getOneById($order->getMerchantId());
-        $merchant->increaseAvailableFinancingLimit($amountChanged);
-        $this->merchantRepository->update($merchant);
+        $orderContainer->getMerchant()->increaseAvailableFinancingLimit($amountChanged);
+        $this->merchantRepository->update($orderContainer->getMerchant());
     }
 
     private function updateInvoiceDetails(OrderEntity $order, UpdateOrderRequest $request): void
@@ -241,17 +236,15 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
     {
         try {
             $this->paymentsService->modifyOrder($order);
-        } catch (PaellaCoreCriticalException $e) {
-            $this->logError(
-                'Borscht responded with an error when updating the order.',
-                [
-                    'order' => $order->getId(),
-                    'error' => $e,
-                ]
-            );
+        } catch (PaellaCoreCriticalException $exception) {
+            $this->logError('Borscht responded with an error when updating the order', [
+                'order' => $order->getId(),
+                'error' => $exception,
+            ]);
 
-            throw $e;
+            throw $exception;
         }
+
         $this->orderRepository->update($order);
     }
 

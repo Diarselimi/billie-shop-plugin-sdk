@@ -6,7 +6,6 @@ use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\OrderWorkflowException;
 use App\Application\UseCase\ApproveOrder\ApproveOrderRequest;
 use App\Application\UseCase\ApproveOrder\ApproveOrderUseCase;
-use App\DomainEvent\Order\OrderApprovedEvent;
 use App\DomainModel\Order\OrderChecksRunnerService;
 use App\DomainModel\Order\OrderContainer;
 use App\DomainModel\Order\OrderDeclinedReasonsMapper;
@@ -14,39 +13,28 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
+use App\DomainModel\Order\OrderVerdictIssueService;
 use PhpSpec\ObjectBehavior;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Workflow\Workflow;
 
 class ApproveOrderUseCaseSpec extends ObjectBehavior
 {
     private const MERCHANT_ID = 1;
 
-    private const ORDER_ID = 10;
-
     private const ORDER_EXTERNAL_CODE = 'test-order';
 
-    private const ORDER_AMOUNT_GROSS = 1000;
-
-    private const ORDER_MERCHANT_DEBTOR_ID = 20;
-
     public function let(
-        OrderRepositoryInterface $orderRepository,
         OrderPersistenceService $orderPersistenceService,
-        Workflow $workflow,
+        OrderRepositoryInterface $orderRepository,
         OrderStateManager $orderStateManager,
         OrderChecksRunnerService $orderChecksRunnerService,
-        OrderDeclinedReasonsMapper $declinedReasonsMapper,
-        EventDispatcherInterface $eventDispatcher
+        OrderDeclinedReasonsMapper $declinedReasonsMapper
     ) {
         $this->beConstructedWith(
             $orderRepository,
             $orderPersistenceService,
-            $workflow,
             $orderStateManager,
             $orderChecksRunnerService,
-            $declinedReasonsMapper,
-            $eventDispatcher
+            $declinedReasonsMapper
         );
     }
 
@@ -91,23 +79,15 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
         $this->shouldThrow(OrderWorkflowException::class)->during('execute', [$request]);
     }
 
-    public function it_successfully_approved_the_order(
+    public function it_successfully_approves_the_order(
         OrderRepositoryInterface $orderRepository,
         OrderPersistenceService $orderPersistenceService,
-        Workflow $workflow,
         OrderStateManager $orderStateManager,
         OrderChecksRunnerService $orderChecksRunnerService,
-        EventDispatcherInterface $eventDispatcher
+        OrderEntity $order,
+        OrderContainer $orderContainer
     ) {
         $request = new ApproveOrderRequest(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID);
-
-        $order = (new OrderEntity())
-            ->setId(self::ORDER_ID)
-            ->setMerchantId(self::MERCHANT_ID)
-            ->setExternalCode(self::ORDER_EXTERNAL_CODE)
-            ->setAmountGross(self::ORDER_AMOUNT_GROSS)
-            ->setMerchantDebtorId(self::ORDER_MERCHANT_DEBTOR_ID)
-        ;
 
         $orderRepository
             ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID)
@@ -120,8 +100,6 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn(true)
         ;
-
-        $orderContainer = (new OrderContainer())->setOrder($order);
 
         $orderPersistenceService
             ->createFromOrderEntity($order)
@@ -135,12 +113,7 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
             ->willReturn(true)
         ;
 
-        $workflow->apply($order, OrderStateManager::TRANSITION_CREATE)->shouldBeCalled();
-
-        $orderRepository->update($order)->shouldBeCalled();
-
-        $eventDispatcher->dispatch(OrderApprovedEvent::NAME, new OrderApprovedEvent($orderContainer));
-
+        $orderStateManager->approve($orderContainer)->shouldBeCalledOnce();
         $this->execute($request);
     }
 
@@ -149,17 +122,11 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
         OrderPersistenceService $orderPersistenceService,
         OrderStateManager $orderStateManager,
         OrderChecksRunnerService $orderChecksRunnerService,
-        OrderDeclinedReasonsMapper $declinedReasonsMapper
+        OrderDeclinedReasonsMapper $declinedReasonsMapper,
+        OrderEntity $order,
+        OrderContainer $orderContainer
     ) {
         $request = new ApproveOrderRequest(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID);
-
-        $order = (new OrderEntity())
-            ->setId(self::ORDER_ID)
-            ->setMerchantId(self::MERCHANT_ID)
-            ->setExternalCode(self::ORDER_EXTERNAL_CODE)
-            ->setAmountGross(self::ORDER_AMOUNT_GROSS)
-            ->setMerchantDebtorId(self::ORDER_MERCHANT_DEBTOR_ID)
-        ;
 
         $orderRepository
             ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID)
@@ -172,8 +139,6 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn(true)
         ;
-
-        $orderContainer = (new OrderContainer())->setOrder($order);
 
         $orderPersistenceService
             ->createFromOrderEntity($order)

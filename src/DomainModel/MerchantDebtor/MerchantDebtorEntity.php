@@ -13,8 +13,6 @@ class MerchantDebtorEntity extends AbstractTimestampableEntity
 
     private $paymentDebtorId;
 
-    private $financingLimit;
-
     private $debtorCompany;
 
     private $scoreThresholdsConfigurationId;
@@ -55,39 +53,6 @@ class MerchantDebtorEntity extends AbstractTimestampableEntity
         $this->paymentDebtorId = $paymentDebtorId;
 
         return $this;
-    }
-
-    public function getFinancingLimit(): ?float
-    {
-        return $this->financingLimit;
-    }
-
-    public function setFinancingLimit(float $financingLimit): MerchantDebtorEntity
-    {
-        $this->financingLimit = $financingLimit;
-
-        return $this;
-    }
-
-    public function increaseFinancingLimit(float $financingLimit): bool
-    {
-        $this->financingLimit += $financingLimit;
-
-        return true;
-    }
-
-    public function reduceFinancingLimit(float $financingLimit): bool
-    {
-        $newLimit = $this->financingLimit - $financingLimit;
-
-        //TODO: Create a Limit which can not be negative
-        if ($newLimit < 0) {
-            return false;
-        }
-
-        $this->financingLimit = $newLimit;
-
-        return true;
     }
 
     public function getDebtorCompany(): DebtorCompany

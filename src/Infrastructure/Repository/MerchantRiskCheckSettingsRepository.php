@@ -9,7 +9,7 @@ use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class MerchantRiskCheckSettingsRepository extends AbstractPdoRepository implements MerchantRiskCheckSettingsRepositoryInterface
 {
-    const TABLE_NAME = "merchant_risk_check_settings";
+    public const TABLE_NAME = "merchant_risk_check_settings";
 
     private $factory;
 

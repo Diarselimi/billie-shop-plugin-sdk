@@ -3,6 +3,7 @@
 namespace App\DomainModel\Merchant;
 
 use App\DomainModel\ArrayableInterface;
+use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsException;
 use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 
 class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInterface
@@ -57,14 +58,19 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
         return $this;
     }
 
-    public function increaseAvailableFinancingLimit(float $delta): void
+    public function increaseAvailableFinancingLimit(float $difference): void
     {
-        $this->availableFinancingLimit = $this->availableFinancingLimit + $delta;
+        $this->availableFinancingLimit = $this->availableFinancingLimit + $difference;
     }
 
-    public function reduceAvailableFinancingLimit(float $delta): void
+    public function reduceAvailableFinancingLimit(float $difference): void
     {
-        $this->availableFinancingLimit = $this->availableFinancingLimit - $delta;
+        $newLimit = $this->availableFinancingLimit - $difference;
+        if ($newLimit < 0) {
+            throw new MerchantDebtorLimitsException('Trying to set negative merchant financing limit');
+        }
+
+        $this->availableFinancingLimit = $newLimit;
     }
 
     public function getApiKey(): string

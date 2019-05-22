@@ -9,7 +9,7 @@ use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class MerchantRepository extends AbstractPdoRepository implements MerchantRepositoryInterface
 {
-    const TABLE_NAME = "merchants";
+    public const TABLE_NAME = "merchants";
 
     private const SELECT_FIELDS = 'id, name, api_key, oauth_client_id, company_id, payment_merchant_id, roles, is_active, available_financing_limit, webhook_url, webhook_authorization, created_at, updated_at';
 

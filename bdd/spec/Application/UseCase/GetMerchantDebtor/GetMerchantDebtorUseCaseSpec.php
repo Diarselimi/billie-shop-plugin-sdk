@@ -60,7 +60,6 @@ class GetMerchantDebtorUseCaseSpec extends ObjectBehavior
         DebtorCompany $debtorDTO,
         GetMerchantDebtorResponseFactory $merchantDebtorResponseFactory
     ) {
-        $this->mockMerchantDebtor($merchantDebtor);
         $this->mockDebtorPaymentDetails($debtorPaymentDetails);
         $this->mockDebtor($debtorDTO);
 
@@ -73,14 +72,6 @@ class GetMerchantDebtorUseCaseSpec extends ObjectBehavior
 
         $response = $this->execute($request);
         $response->shouldBeAnInstanceOf(GetMerchantDebtorResponse::class);
-    }
-
-    private function mockMerchantDebtor(MerchantDebtorEntity $merchantDebtor): void
-    {
-        $merchantDebtor->getId()->willReturn(self::MERCHANT_DEBTOR_ID);
-        $merchantDebtor->getPaymentDebtorId()->willReturn(self::MERCHANT_DEBTOR_PAYMENT_ID);
-        $merchantDebtor->getDebtorId()->willReturn(self::DEBTOR_ID);
-        $merchantDebtor->getFinancingLimit()->willReturn(5000.);
     }
 
     private function mockDebtorPaymentDetails(DebtorPaymentDetailsDTO $debtorPaymentDetails): void

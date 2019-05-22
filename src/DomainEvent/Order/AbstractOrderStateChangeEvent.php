@@ -5,13 +5,11 @@ namespace App\DomainEvent\Order;
 use App\DomainModel\Order\OrderContainer;
 use Symfony\Component\EventDispatcher\Event;
 
-class OrderApprovedEvent extends Event
+abstract class AbstractOrderStateChangeEvent extends Event
 {
-    const NAME = 'order_approved';
+    protected $orderContainer;
 
-    private $orderContainer;
-
-    private $notifyWebhook;
+    protected $notifyWebhook;
 
     public function __construct(OrderContainer $orderContainer, bool $notifyWebhook = false)
     {

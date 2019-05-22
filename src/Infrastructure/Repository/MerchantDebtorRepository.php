@@ -11,9 +11,9 @@ use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class MerchantDebtorRepository extends AbstractPdoRepository implements MerchantDebtorRepositoryInterface
 {
-    const TABLE_NAME = "merchants_debtors";
+    public const TABLE_NAME = "merchants_debtors";
 
-    private const SELECT_FIELDS = 'id, merchant_id, debtor_id, payment_debtor_id, financing_limit, score_thresholds_configuration_id, is_whitelisted, created_at, updated_at';
+    private const SELECT_FIELDS = 'id, merchant_id, debtor_id, payment_debtor_id, score_thresholds_configuration_id, is_whitelisted, created_at, updated_at';
 
     private $factory;
 
@@ -26,14 +26,13 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
     {
         $id = $this->doInsert('
             INSERT INTO '. self::TABLE_NAME .'
-            (merchant_id, debtor_id, payment_debtor_id, financing_limit, score_thresholds_configuration_id, created_at, updated_at, is_whitelisted)
+            (merchant_id, debtor_id, payment_debtor_id, score_thresholds_configuration_id, created_at, updated_at, is_whitelisted)
             VALUES
-            (:merchant_id, :debtor_id, :payment_debtor_id, :financing_limit, :score_thresholds_configuration_id, :created_at, :updated_at, :is_whitelisted)
+            (:merchant_id, :debtor_id, :payment_debtor_id, :score_thresholds_configuration_id, :created_at, :updated_at, :is_whitelisted)
         ', [
             'merchant_id' => $merchantDebtor->getMerchantId(),
             'debtor_id' => $merchantDebtor->getDebtorId(),
             'payment_debtor_id' => $merchantDebtor->getPaymentDebtorId(),
-            'financing_limit' => $merchantDebtor->getFinancingLimit(),
             'score_thresholds_configuration_id' => $merchantDebtor->getScoreThresholdsConfigurationId(),
             'created_at' => $merchantDebtor->getCreatedAt()->format(self::DATE_FORMAT),
             'updated_at' => $merchantDebtor->getUpdatedAt()->format(self::DATE_FORMAT),
@@ -49,13 +48,12 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
 
         $this->doUpdate('
             UPDATE '.self::TABLE_NAME.'
-            SET financing_limit = :financing_limit, updated_at = :updated_at, is_whitelisted = :whitelisted
+            SET is_whitelisted = :whitelisted, updated_at = :updated_at
             WHERE id = :id
         ', [
             'id' => $merchantDebtor->getId(),
-            'financing_limit' => $merchantDebtor->getFinancingLimit(),
-            'updated_at' => $merchantDebtor->getUpdatedAt()->format(self::DATE_FORMAT),
             'whitelisted' => (int) $merchantDebtor->isWhitelisted(),
+            'updated_at' => $merchantDebtor->getUpdatedAt()->format(self::DATE_FORMAT),
         ]);
     }
 

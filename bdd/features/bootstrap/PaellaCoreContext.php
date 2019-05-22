@@ -8,6 +8,8 @@ use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
+use App\DomainModel\MerchantDebtor\MerchantDebtorFinancialDetailsEntity;
+use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsEntity;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
@@ -84,6 +86,7 @@ class PaellaCoreContext extends MinkContext
         $this->getMerchantSettingsRepository()->insert(
             (new MerchantSettingsEntity())
                 ->setMerchantId($this->merchant->getId())
+                ->setInitialDebtorFinancingLimit(10000)
                 ->setDebtorFinancingLimit(10000)
                 ->setMinOrderAmount(0)
                 ->setScoreThresholdsConfigurationId($scoreThreshold->getId())
@@ -115,6 +118,7 @@ class PaellaCoreContext extends MinkContext
             TRUNCATE merchant_risk_check_settings;
             TRUNCATE merchant_users;
             TRUNCATE merchants;
+            TRUNCATE merchant_debtor_financial_details;
             TRUNCATE merchants_debtors;
             TRUNCATE score_thresholds_configuration;
             TRUNCATE risk_check_definitions;
@@ -178,11 +182,17 @@ class PaellaCoreContext extends MinkContext
             ->setMerchantId($this->merchant->getId())
             ->setDebtorId('1')
             ->setPaymentDebtorId('test')
-            ->setFinancingLimit(1000)
             ->setIsWhitelisted(false)
         ;
-
         $this->getMerchantDebtorRepository()->insert($merchantDebtor);
+
+        $financialDetails = (new MerchantDebtorFinancialDetailsEntity())
+            ->setMerchantDebtorId($merchantDebtor->getId())
+            ->setFinancingLimit(2000)
+            ->setFinancingPower(1000)
+            ->setCreatedAt(new \DateTime())
+        ;
+        $this->getMerchantDebtorFinancialDetailsRepository()->insert($financialDetails);
 
         $order = (new OrderEntity())
             ->setExternalCode($externalCode)
@@ -233,6 +243,22 @@ class PaellaCoreContext extends MinkContext
                 $order->getState(),
                 $state
             ));
+        }
+    }
+
+    /**
+     * @Given the order :orderId has risk check :check failed
+     */
+    public function orderRiskCheckHasFailed($orderId, $check)
+    {
+        $order = $this->getOrderRepository()->getOneByExternalCode($orderId, 1);
+        if ($order === null) {
+            throw new RuntimeException('Order not found');
+        }
+
+        $check = $this->getOrderRiskCheckRepositoryInterface()->findByOrderAndCheckName($order->getId(), $check);
+        if ($check->isPassed()) {
+            throw new RuntimeException("Risk check {$check} has not failed");
         }
     }
 
@@ -517,6 +543,11 @@ class PaellaCoreContext extends MinkContext
     private function getMerchantDebtorRepository(): MerchantDebtorRepositoryInterface
     {
         return $this->get(MerchantDebtorRepositoryInterface::class);
+    }
+
+    private function getMerchantDebtorFinancialDetailsRepository(): MerchantDebtorFinancialDetailsRepositoryInterface
+    {
+        return $this->get(MerchantDebtorFinancialDetailsRepositoryInterface::class);
     }
 
     private function getScoreThresholdsConfigurationRepository(): ScoreThresholdsConfigurationRepositoryInterface

@@ -19,6 +19,7 @@ class DebtorCompanyFactory
             ->setIsBlacklisted($data['is_blacklisted'])
             ->setIsTrustedSource(boolval($data['is_from_trusted_source']))
             ->setIsStrictMatch($isStrictMatch)
+            ->setFinancingPower(floatval($data['financing_power']))
         ;
     }
 }

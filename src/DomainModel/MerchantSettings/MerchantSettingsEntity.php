@@ -14,7 +14,11 @@ class MerchantSettingsEntity extends AbstractTimestampableEntity
 
     public const DEFAULT_DEBTOR_FORGIVENESS_THRESHOLD = 1.0;
 
+    public const DEFAULT_MIN_ORDER_AMOUNT = 0;
+
     private $merchantId;
+
+    private $initialDebtorFinancingLimit;
 
     private $debtorFinancingLimit;
 
@@ -31,6 +35,18 @@ class MerchantSettingsEntity extends AbstractTimestampableEntity
     public function getMerchantId(): int
     {
         return $this->merchantId;
+    }
+
+    public function getInitialDebtorFinancingLimit(): float
+    {
+        return $this->initialDebtorFinancingLimit;
+    }
+
+    public function setInitialDebtorFinancingLimit(float $initialDebtorFinancingLimit): MerchantSettingsEntity
+    {
+        $this->initialDebtorFinancingLimit = $initialDebtorFinancingLimit;
+
+        return $this;
     }
 
     public function getDebtorFinancingLimit(): float

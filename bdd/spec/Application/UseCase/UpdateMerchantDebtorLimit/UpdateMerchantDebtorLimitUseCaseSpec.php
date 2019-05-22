@@ -8,7 +8,9 @@ use App\Application\UseCase\UpdateMerchantDebtorLimit\UpdateMerchantDebtorLimitR
 use App\Application\UseCase\UpdateMerchantDebtorLimit\UpdateMerchantDebtorLimitUseCase;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Borscht\DebtorPaymentDetailsDTO;
+use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
+use App\DomainModel\MerchantDebtor\MerchantDebtorFinancialDetailsEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -31,11 +33,12 @@ class UpdateMerchantDebtorLimitUseCaseSpec extends ObjectBehavior
 
     public function let(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
+        MerchantDebtorFinancialDetailsRepositoryInterface $merchantDebtorFinancialDetailsRepository,
         BorschtInterface $paymentsService,
         ValidatorInterface $validator,
         LoggerInterface $logger
     ) {
-        $this->beConstructedWith($merchantDebtorRepository, $paymentsService);
+        $this->beConstructedWith($merchantDebtorRepository, $merchantDebtorFinancialDetailsRepository, $paymentsService);
         $this->setLogger($logger);
         $this->setValidator($validator);
     }
@@ -73,10 +76,12 @@ class UpdateMerchantDebtorLimitUseCaseSpec extends ObjectBehavior
 
     public function it_sets_the_new_limit(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
+        MerchantDebtorFinancialDetailsRepositoryInterface $merchantDebtorFinancialDetailsRepository,
         ValidatorInterface $validator,
         UpdateMerchantDebtorLimitRequest $request,
         BorschtInterface $paymentsService,
         MerchantDebtorEntity $merchantDebtor,
+        MerchantDebtorFinancialDetailsEntity $financialDetails,
         DebtorPaymentDetailsDTO $debtorPaymentDetails
     ) {
         $this->mockMerchantDebtor($merchantDebtor);
@@ -86,15 +91,20 @@ class UpdateMerchantDebtorLimitUseCaseSpec extends ObjectBehavior
         $request->getMerchantDebtorExternalId()->willReturn(self::MERCHANT_DEBTOR_EXTERNAL_ID);
         $request->getLimit()->willReturn(1000);
 
+        $merchantDebtor->getId()->willReturn(self::MERCHANT_DEBTOR_ID);
+        $financialDetails->getFinancingLimit()->shouldBeCalledOnce()->willReturn(500);
+        $financialDetails->setFinancingPower(249.45)->shouldBeCalledOnce();
+        $financialDetails->setFinancingLimit(1000)->shouldBeCalledOnce()->willReturn($financialDetails);
+
         $validator->validate($request, Argument::any(), Argument::any())->shouldBeCalledOnce()->willReturn(new ConstraintViolationList());
 
         $merchantDebtorRepository->getOneByMerchantExternalId(self::MERCHANT_DEBTOR_EXTERNAL_ID, self::MERCHANT_ID, [])->shouldBeCalledOnce()->willReturn($merchantDebtor);
         $merchantDebtorRepository->getMerchantDebtorCreatedOrdersAmount(self::MERCHANT_DEBTOR_ID)->shouldBeCalledOnce()->willReturn(150.55);
 
-        $paymentsService->getDebtorPaymentDetails(self::MERCHANT_DEBTOR_PAYMENT_ID)->shouldBeCalledOnce()->willReturn($debtorPaymentDetails);
+        $merchantDebtorFinancialDetailsRepository->getCurrentByMerchantDebtorId(self::MERCHANT_DEBTOR_ID)->willReturn($financialDetails);
+        $merchantDebtorFinancialDetailsRepository->insert($financialDetails)->shouldBeCalledOnce();
 
-        $merchantDebtor->setFinancingLimit(249.45)->shouldBeCalledOnce();
-        $merchantDebtorRepository->update($merchantDebtor)->shouldBeCalledOnce();
+        $paymentsService->getDebtorPaymentDetails(self::MERCHANT_DEBTOR_PAYMENT_ID)->shouldBeCalledOnce()->willReturn($debtorPaymentDetails);
 
         $this->execute($request);
     }
@@ -104,7 +114,6 @@ class UpdateMerchantDebtorLimitUseCaseSpec extends ObjectBehavior
         $merchantDebtor->getId()->willReturn(self::MERCHANT_DEBTOR_ID);
         $merchantDebtor->getPaymentDebtorId()->willReturn(self::MERCHANT_DEBTOR_PAYMENT_ID);
         $merchantDebtor->getDebtorId()->willReturn(self::DEBTOR_ID);
-        $merchantDebtor->getFinancingLimit()->willReturn(5000);
     }
 
     private function mockDebtorPaymentDetails(DebtorPaymentDetailsDTO $debtorPaymentDetails): void

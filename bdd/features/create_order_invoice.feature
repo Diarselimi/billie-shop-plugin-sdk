@@ -31,5 +31,5 @@ Feature: Attach invoice file to an order.
     Then the response status code should be 404
     And the JSON response should be:
       """
-      {"error":"Order #CO123wrong does't exist"}
+      {"error":"Order not found"}
       """

@@ -19,7 +19,7 @@ Feature:
     And the JSON response should be:
       """
       {
-          "error": "Order with UUID: test-wrong-uuid not found"
+          "error": "Order not found"
       }
       """
 

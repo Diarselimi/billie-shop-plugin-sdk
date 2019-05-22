@@ -34,4 +34,6 @@ interface OrderRepositoryInterface
      * @return Generator|array|OrderEntity[]
      */
     public function getOrdersByInvoiceHandlingStrategy(string $strategy): Generator;
+
+    public function getOrdersCountByMerchantDebtorAndState(int $merchantDebtorId, string $state): int;
 }

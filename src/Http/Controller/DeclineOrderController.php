@@ -8,7 +8,6 @@ use App\Application\UseCase\DeclineOrder\DeclineOrderRequest;
 use App\Application\UseCase\DeclineOrder\DeclineOrderUseCase;
 use App\Http\HttpConstantsInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -21,7 +20,7 @@ class DeclineOrderController
         $this->useCase = $useCase;
     }
 
-    public function execute(string $id, Request $request): Response
+    public function execute(string $id, Request $request): void
     {
         try {
             $useCaseRequest = new DeclineOrderRequest(
@@ -35,7 +34,5 @@ class DeclineOrderController
         } catch (OrderWorkflowException $e) {
             throw new AccessDeniedHttpException($e->getMessage());
         }
-
-        return new Response();
     }
 }

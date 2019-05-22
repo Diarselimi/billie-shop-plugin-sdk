@@ -380,4 +380,21 @@ SQL;
             yield $this->orderFactory->createFromDatabaseRow($row);
         }
     }
+
+    public function getOrdersCountByMerchantDebtorAndState(int $merchantDebtorId, string $state): int
+    {
+        $result = $this->doFetchOne(
+            'SELECT COUNT(*) as total FROM orders WHERE state = :state AND merchant_debtor_id = :merchant_debtor_id',
+            [
+                'state' => $state,
+                'merchant_debtor_id' => $merchantDebtorId,
+            ]
+        );
+
+        if (!$result) {
+            return false;
+        }
+
+        return intval($result['total']);
+    }
 }

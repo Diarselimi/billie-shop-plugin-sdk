@@ -6,6 +6,7 @@ use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
+use App\DomainModel\MerchantDebtor\MerchantDebtorFinancialDetailsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\Person\PersonEntity;
 
@@ -14,6 +15,8 @@ class OrderContainer
     private $order;
 
     private $merchantDebtor;
+
+    private $merchantDebtorFinancialDetails;
 
     private $debtorPerson;
 
@@ -26,8 +29,6 @@ class OrderContainer
     private $merchant;
 
     private $merchantSettings;
-
-    private $isDebtorLimitLocked;
 
     public function getOrder(): OrderEntity
     {
@@ -49,6 +50,18 @@ class OrderContainer
     public function setMerchantDebtor(MerchantDebtorEntity $merchantDebtor): OrderContainer
     {
         $this->merchantDebtor = $merchantDebtor;
+
+        return $this;
+    }
+
+    public function getMerchantDebtorFinancialDetails(): MerchantDebtorFinancialDetailsEntity
+    {
+        return $this->merchantDebtorFinancialDetails;
+    }
+
+    public function setMerchantDebtorFinancialDetails(MerchantDebtorFinancialDetailsEntity $merchantDebtorFinancialDetails): OrderContainer
+    {
+        $this->merchantDebtorFinancialDetails = $merchantDebtorFinancialDetails;
 
         return $this;
     }
@@ -121,18 +134,6 @@ class OrderContainer
     public function setMerchantSettings(MerchantSettingsEntity $merchantSettings): OrderContainer
     {
         $this->merchantSettings = $merchantSettings;
-
-        return $this;
-    }
-
-    public function isDebtorLimitLocked(): ? bool
-    {
-        return $this->isDebtorLimitLocked;
-    }
-
-    public function setIsDebtorLimitLocked(?bool $isDebtorLimitLocked): OrderContainer
-    {
-        $this->isDebtorLimitLocked = $isDebtorLimitLocked;
 
         return $this;
     }

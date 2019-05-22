@@ -46,32 +46,29 @@ Feature: Endpoint to approve an order in waiting state
 	"""
 
   Scenario: Failed to approve order in waiting state because if failed checks
-    Given I have a waiting order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-    And The following risk check results exist for order CO123:
-      | check_name                | is_passed |
-      | available_financing_limit | 1         |
-      | amount                    | 1         |
-      | debtor_country            | 1         |
-      | debtor_industry_sector    | 1         |
-      | debtor_identified         | 1         |
-      | debtor_identified_strict  | 1         |
-      | limit                     | 0         |
-      | debtor_not_customer       | 1         |
-      | debtor_blacklisted        | 1         |
-      | debtor_overdue            | 1         |
-      | company_b2b_score         | 1         |
-    And I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/1/lock" endpoint response with status 412 and body
-      """
-      {}
-      """
-    When I send a POST request to "/order/CO123/approve"
-    Then the response status code should be 403
-    And the JSON response should be:
+	Given I have a waiting order "CO123" with amounts 1001/901/100, duration 30 and comment "test order"
+	And The following risk check results exist for order CO123:
+	  | check_name 						  | is_passed |
+	  | available_financing_limit         |	1	  	  |
+	  | amount                            |	1		  |
+	  | debtor_country                    |	1		  |
+	  | debtor_industry_sector            |	1		  |
+	  | debtor_identified                 |	1		  |
+      | debtor_identified_strict          | 1         |
+	  | limit                             |	0		  |
+	  | debtor_not_customer               |	1		  |
+	  | debtor_blacklisted                |	1		  |
+	  | debtor_overdue                    |	1		  |
+	  | company_b2b_score                 |	1		  |
+	And I get from companies service identify match and good decision response
+	When I send a POST request to "/order/CO123/approve"
+	Then the response status code should be 403
+	And the JSON response should be:
 	"""
 	{"error": "Cannot approve the order. failed risk checks: debtor_limit_exceeded"}
 	"""
-    And the order CO123 is in state waiting
+	And the order CO123 is in state waiting
+  	And the order CO123 has risk check limit failed
 
   Scenario: Order in waiting state because of limit check - rerun limit check and successfully approve the order
     Given I have a waiting order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
@@ -90,8 +87,31 @@ Feature: Endpoint to approve an order in waiting state
       | company_b2b_score         | 1         |
     And I get from companies service identify match and good decision response
     When I send a POST request to "/order/CO123/approve"
-    Then the response status code should be 200
+    Then the response status code should be 204
     And the order CO123 is in state created
+
+  Scenario: Order in waiting state because of limit check - rerun limit check and fail in limit lock
+    Given I have a waiting order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+    And The following risk check results exist for order CO123:
+      |	check_name				  | is_passed |
+      | available_financing_limit |	1		  |
+      | amount					  |	1		  |
+      | debtor_country			  |	1		  |
+      | debtor_industry_sector	  |	1		  |
+      | debtor_identified		  |	1		  |
+      | debtor_identified_strict  | 1         |
+      | limit					  |	0		  |
+      | debtor_not_customer		  |	1		  |
+      | debtor_blacklisted		  |	1		  |
+      | debtor_overdue			  |	1		  |
+      | company_b2b_score		  |	1		  |
+    And I get from companies service identify match and good decision response
+    And I get from companies service "/debtor/1/lock" endpoint response with status 400 and body
+    """
+    """
+    When I send a POST request to "/order/CO123/approve"
+    Then the response status code should be 403
+    And the order CO123 is in state waiting
 
   Scenario: Order in waiting state because of blacklisted check - rerun blacklisted check and successfully approve the order
     Given I have a waiting order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
@@ -110,5 +130,5 @@ Feature: Endpoint to approve an order in waiting state
       | company_b2b_score         | 1         |
     And I get from companies service identify match and good decision response
     When I send a POST request to "/order/CO123/approve"
-    Then the response status code should be 200
+    Then the response status code should be 204
     And the order CO123 is in state created

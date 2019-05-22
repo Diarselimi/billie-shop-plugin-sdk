@@ -2,7 +2,9 @@
 
 namespace App\Application\UseCase\OrderPaymentStateChange;
 
+use App\Application\Exception\OrderNotFoundException;
 use App\Application\PaellaCoreCriticalException;
+use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
@@ -20,14 +22,18 @@ class OrderPaymentStateChangeUseCase implements LoggingInterface
 
     private $orderStateManager;
 
+    private $orderPersistenceService;
+
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         Workflow $workflow,
-        OrderStateManager $orderStateManager
+        OrderStateManager $orderStateManager,
+        OrderPersistenceService $orderPersistenceService
     ) {
         $this->orderRepository = $orderRepository;
         $this->workflow = $workflow;
         $this->orderStateManager = $orderStateManager;
+        $this->orderPersistenceService = $orderPersistenceService;
     }
 
     public function execute(OrderPaymentStateChangeRequest $request)
@@ -37,7 +43,7 @@ class OrderPaymentStateChangeUseCase implements LoggingInterface
 
         if (!$order) {
             $this->logSuppressedException(
-                new PaellaCoreCriticalException('Order not found'),
+                new OrderNotFoundException(),
                 '[suppressed] Trying to change state for non-existing order',
                 ['payment_id' => $orderPaymentDetails->getId()]
             );
@@ -64,9 +70,6 @@ class OrderPaymentStateChangeUseCase implements LoggingInterface
                 $this->orderRepository->update($order);
             } elseif ($orderPaymentDetails->isPaidOut()) {
                 $this->workflow->apply($order, OrderStateManager::TRANSITION_PAY_OUT);
-                $this->orderRepository->update($order);
-            } elseif ($orderPaymentDetails->isPaidFully()) {
-                $this->workflow->apply($order, OrderStateManager::STATE_COMPLETE);
                 $this->orderRepository->update($order);
             }
         } catch (NotEnabledTransitionException $exception) {

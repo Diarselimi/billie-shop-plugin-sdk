@@ -3,16 +3,17 @@
 namespace spec\App\Application\UseCase\UpdateOrder;
 
 use App\Application\Exception\FraudOrderException;
+use App\Application\Exception\OrderNotFoundException;
 use App\Application\PaellaCoreCriticalException;
 use App\Application\UseCase\UpdateOrder\UpdateOrderRequest;
 use App\Application\UseCase\UpdateOrder\UpdateOrderUseCase;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
-use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
-use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
-use App\DomainModel\Order\LimitsService;
+use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
+use App\DomainModel\Order\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderInvoice\OrderInvoiceManager;
@@ -43,13 +44,11 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
 
     private const ORDER_MERCHANT_DEBTOR_ID = 15;
 
-    private const ORDER_DEBTOR_ID = 1522;
-
     public function let(
+        OrderPersistenceService $orderPersistenceService,
         BorschtInterface $borscht,
-        LimitsService $limitsService,
+        MerchantDebtorLimitsService $limitsService,
         OrderRepositoryInterface $orderRepository,
-        MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         MerchantRepositoryInterface $merchantRepository,
         OrderStateManager $orderStateManager,
         LoggerInterface $logger,
@@ -76,10 +75,10 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $validator->validate(Argument::any(), Argument::any(), Argument::any())->willReturn(new ConstraintViolationList());
 
         $this->beConstructedWith(
+            $orderPersistenceService,
             $borscht,
             $limitsService,
             $orderRepository,
-            $merchantDebtorRepository,
             $merchantRepository,
             $orderStateManager,
             $invoiceManager
@@ -106,15 +105,18 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
 
         $orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($orderExtId, $merchantId)->shouldBeCalled()->willReturn(null);
 
-        $this->shouldThrow(PaellaCoreCriticalException::class)->during('execute', [$request]);
+        $this->shouldThrow(OrderNotFoundException::class)->during('execute', [$request]);
     }
 
     public function it_throws_exception_if_the_order_was_marked_as_fraud(
         OrderRepositoryInterface $orderRepository,
+        OrderPersistenceService $orderPersistenceService,
         UpdateOrderRequest $request,
-        OrderEntity $order
+        OrderEntity $order,
+        OrderContainer $orderContainer
     ) {
         $order->getMarkedAsFraudAt()->willReturn(new DateTime());
+        $orderPersistenceService->createFromOrderEntity($order)->shouldBeCalledOnce()->willReturn($orderContainer);
 
         $orderRepository
             ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
@@ -126,8 +128,10 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
 
     public function it_throws_exception_on_update_duration_if_the_new_duration_is_less_than_the_current_one(
         OrderRepositoryInterface $orderRepository,
+        OrderPersistenceService $orderPersistenceService,
         UpdateOrderRequest $request,
-        OrderEntity $order
+        OrderEntity $order,
+        OrderContainer $orderContainer
     ) {
         $request->getDuration()->willReturn(self::ORDER_DURATION - 1);
         $request->getAmountGross()->willReturn(null);
@@ -139,14 +143,18 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn($order);
 
+        $orderPersistenceService->createFromOrderEntity($order)->shouldBeCalledOnce()->willReturn($orderContainer);
+
         $this->shouldThrow(PaellaCoreCriticalException::class)->during('execute', [$request]);
     }
 
     public function it_throws_exception_on_update_duration_if_order_was_not_shipped_or_late(
         OrderRepositoryInterface $orderRepository,
+        OrderPersistenceService $orderPersistenceService,
         OrderStateManager $orderStateManager,
         UpdateOrderRequest $request,
-        OrderEntity $order
+        OrderEntity $order,
+        OrderContainer $orderContainer
     ) {
         $request->getDuration()->willReturn(self::ORDER_DURATION + 1);
         $request->getAmountGross()->willReturn(null);
@@ -163,15 +171,20 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn($order);
 
+        $orderPersistenceService->createFromOrderEntity($order)->shouldBeCalledOnce()->willReturn($orderContainer);
+        $orderContainer->getOrder()->shouldBeCalledOnce()->willReturn($order);
+
         $this->shouldThrow(PaellaCoreCriticalException::class)->during('execute', [$request]);
     }
 
     public function it_updates_order_duration_and_calls_borscht_to_modify_order(
         OrderRepositoryInterface $orderRepository,
+        OrderPersistenceService $orderPersistenceService,
         OrderStateManager $orderStateManager,
         BorschtInterface $borscht,
         UpdateOrderRequest $request,
-        OrderEntity $order
+        OrderEntity $order,
+        OrderContainer $orderContainer
     ) {
         $newDuration = self::ORDER_DURATION + 1;
 
@@ -191,6 +204,9 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn($order);
 
+        $orderPersistenceService->createFromOrderEntity($order)->shouldBeCalledOnce()->willReturn($orderContainer);
+        $orderContainer->getOrder()->shouldBeCalledOnce()->willReturn($order);
+
         $order->setDuration($newDuration)->shouldBeCalled();
         $borscht->modifyOrder($order)->shouldBeCalled();
         $orderRepository->update($order)->shouldBeCalled();
@@ -200,8 +216,10 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
 
     public function it_throws_exception_on_update_amount_if_the_new_amounts_are_greater_than_the_current_amounts(
         OrderRepositoryInterface $orderRepository,
+        OrderPersistenceService $orderPersistenceService,
         UpdateOrderRequest $request,
-        OrderEntity $order
+        OrderEntity $order,
+        OrderContainer $orderContainer
     ) {
         $request->getAmountGross()->willReturn(self::ORDER_AMOUNT_GROSS + 10);
         $request->getAmountNet()->willReturn(self::ORDER_AMOUNT_NET + 10);
@@ -214,14 +232,18 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn($order);
 
+        $orderPersistenceService->createFromOrderEntity($order)->shouldBeCalledOnce()->willReturn($orderContainer);
+
         $this->shouldThrow(PaellaCoreCriticalException::class)->during('execute', [$request]);
     }
 
-    public function it_throws_exception_on_update_amount_if_the_order_was_canceled_or_completed(
+    public function it_throws_exception_on_update_amount_if_the_order_was_canceled_or_complete(
         OrderRepositoryInterface $orderRepository,
+        OrderPersistenceService $orderPersistenceService,
         OrderStateManager $orderStateManager,
         UpdateOrderRequest $request,
-        OrderEntity $order
+        OrderEntity $order,
+        OrderContainer $orderContainer
     ) {
         $request->getAmountGross()->willReturn(self::ORDER_AMOUNT_GROSS - 10);
         $request->getAmountNet()->willReturn(self::ORDER_AMOUNT_NET - 10);
@@ -234,6 +256,9 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $orderStateManager->isCanceled($order)->willReturn(true);
         $orderStateManager->isComplete($order)->willReturn(true);
 
+        $orderPersistenceService->createFromOrderEntity($order)->shouldBeCalledOnce()->willReturn($orderContainer);
+        $orderContainer->getOrder()->shouldBeCalledTimes(2)->willReturn($order);
+
         $orderRepository
             ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
             ->shouldBeCalled()
@@ -244,11 +269,12 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
 
     public function it_updates_order_amounts_and_invoice_details_then_calls_borscht_to_modify_order(
         OrderRepositoryInterface $orderRepository,
+        OrderPersistenceService $orderPersistenceService,
         OrderStateManager $orderStateManager,
         BorschtInterface $borscht,
         UpdateOrderRequest $request,
         OrderEntity $order,
-        OrderInvoiceManager $invoiceManager
+        OrderContainer $orderContainer
     ) {
         $newAmountGross = self::ORDER_AMOUNT_GROSS - 10;
         $newAmountNet = self::ORDER_AMOUNT_NET - 10;
@@ -272,6 +298,9 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn($order);
 
+        $orderPersistenceService->createFromOrderEntity($order)->shouldBeCalledOnce()->willReturn($orderContainer);
+        $orderContainer->getOrder()->shouldBeCalled()->willReturn($order);
+
         $order->setAmountGross($newAmountGross)->shouldBeCalled()->willReturn($order);
         $order->setAmountNet($newAmountNet)->shouldBeCalled()->willReturn($order);
         $order->setAmountTax($newAmountTax)->shouldBeCalled()->willReturn($order);
@@ -287,14 +316,14 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
 
     public function it_updates_order_amounts_and_unlocks_the_debtor_limit(
         OrderRepositoryInterface $orderRepository,
+        OrderPersistenceService $orderPersistenceService,
         OrderStateManager $orderStateManager,
-        MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         MerchantRepositoryInterface $merchantRepository,
         UpdateOrderRequest $request,
         OrderEntity $order,
-        MerchantDebtorEntity $merchantDebtor,
         MerchantEntity $merchant,
-        LimitsService $limitsService
+        MerchantDebtorLimitsService $limitsService,
+        OrderContainer $orderContainer
     ) {
         $newAmountGross = self::ORDER_AMOUNT_GROSS - 10;
         $newAmountNet = self::ORDER_AMOUNT_NET - 10;
@@ -312,10 +341,15 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $orderStateManager->isCanceled($order)->willReturn(false);
         $orderStateManager->isComplete($order)->willReturn(false);
 
+        $orderContainer->getMerchant()->shouldBeCalledTimes(2)->willReturn($merchant);
+        $orderContainer->getOrder()->shouldBeCalledTimes(2)->willReturn($order);
+
         $orderRepository
             ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
             ->shouldBeCalled()
             ->willReturn($order);
+
+        $orderPersistenceService->createFromOrderEntity($order)->shouldBeCalledOnce()->willReturn($orderContainer);
 
         $order->setAmountGross($newAmountGross)->shouldBeCalled()->willReturn($order);
         $order->setAmountNet($newAmountNet)->shouldBeCalled()->willReturn($order);
@@ -323,12 +357,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
 
         $orderRepository->update($order)->shouldBeCalled();
 
-        $merchantDebtor->getDebtorId()->willReturn(self::ORDER_DEBTOR_ID);
-        $merchantDebtorRepository->getOneById(self::ORDER_MERCHANT_DEBTOR_ID)->shouldBeCalled()->willReturn($merchantDebtor);
-
-        $limitsService->unlock($merchantDebtor, $amountChanged)->shouldBeCalled()->willReturn(true);
-
-        $merchantRepository->getOneById(self::ORDER_MERCHANT_ID)->willReturn($merchant);
+        $limitsService->unlock(Argument::any(), Argument::any())->shouldBeCalled();
 
         $merchant->increaseAvailableFinancingLimit($amountChanged)->shouldBeCalled();
         $merchantRepository->update($merchant)->shouldBeCalled();
@@ -337,10 +366,12 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
     }
 
     public function it_throws_exception_on_update_invoice_details_if_the_order_was_canceled_or_completed(
+        OrderPersistenceService $orderPersistenceService,
         OrderRepositoryInterface $orderRepository,
         OrderStateManager $orderStateManager,
         UpdateOrderRequest $request,
-        OrderEntity $order
+        OrderEntity $order,
+        OrderContainer $orderContainer
     ) {
         $newInvoiceNumber = 'NewInvoiceNum';
         $newInvoiceUrl = '/NewInvoiceNum.pdf';
@@ -361,14 +392,19 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn($order);
 
+        $orderPersistenceService->createFromOrderEntity($order)->shouldBeCalledOnce()->willReturn($orderContainer);
+        $orderContainer->getOrder()->shouldBeCalledOnce()->willReturn($order);
+
         $this->shouldThrow(PaellaCoreCriticalException::class)->during('execute', [$request]);
     }
 
     public function it_throws_exception_on_update_invoice_details_if_the_order_was_not_shipped(
+        OrderPersistenceService $orderPersistenceService,
         OrderRepositoryInterface $orderRepository,
         OrderStateManager $orderStateManager,
         UpdateOrderRequest $request,
-        OrderEntity $order
+        OrderEntity $order,
+        OrderContainer $orderContainer
     ) {
         $newInvoiceNumber = 'NewInvoiceNum';
         $newInvoiceUrl = '/NewInvoiceNum.pdf';
@@ -389,15 +425,20 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn($order);
 
+        $orderPersistenceService->createFromOrderEntity($order)->shouldBeCalledOnce()->willReturn($orderContainer);
+        $orderContainer->getOrder()->shouldBeCalledOnce()->willReturn($order);
+
         $this->shouldThrow(PaellaCoreCriticalException::class)->during('execute', [$request]);
     }
 
     public function it_updates_order_invoice_details_then_calls_borscht_to_modify_order(
+        OrderPersistenceService $orderPersistenceService,
         OrderRepositoryInterface $orderRepository,
         OrderStateManager $orderStateManager,
         BorschtInterface $borscht,
         UpdateOrderRequest $request,
-        OrderEntity $order
+        OrderEntity $order,
+        OrderContainer $orderContainer
     ) {
         $newInvoiceNumber = 'NewInvoiceNum';
         $newInvoiceUrl = '/NewInvoiceNum.pdf';
@@ -417,6 +458,9 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
             ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
             ->shouldBeCalled()
             ->willReturn($order);
+
+        $orderPersistenceService->createFromOrderEntity($order)->shouldBeCalledOnce()->willReturn($orderContainer);
+        $orderContainer->getOrder()->shouldBeCalledOnce()->willReturn($order);
 
         $order->setInvoiceNumber($newInvoiceNumber)->shouldBeCalled()->willReturn($order);
         $order->setInvoiceUrl($newInvoiceUrl)->shouldBeCalled()->willReturn($order);

@@ -10,6 +10,7 @@ Feature:
 
   Scenario: Case 1: Order exists, not yet shipped, due date provided, amount unchanged
     Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+    And I get from companies service identify match and good decision response
     When I send a PATCH request to "/order/CO123" with body:
         """
         {
@@ -27,6 +28,7 @@ Feature:
 
   Scenario: Case 1.1: Order exists, not yet shipped, due date provided, valid new amount
     Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+    And I get from companies service identify match and good decision response
     When I send a PATCH request to "/order/CO123" with body:
         """
         {
@@ -42,6 +44,7 @@ Feature:
 
   Scenario: Case 2: Order exists, not yet shipped, due date unchanged/not set, valid new amount
     Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+    And I get from companies service identify match and good decision response
     When I send a PATCH request to "/order/CO123" with body:
         """
         {
@@ -59,6 +62,7 @@ Feature:
 
   Scenario: Case 3: Order exists, is shipped but not paid back, valid new due date*, amount unchanged
     Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+    And I get from companies service identify match and good decision response
     When I send a PATCH request to "/order/CO123" with body:
         """
         {
@@ -75,6 +79,7 @@ Feature:
 
   Scenario: Case 3.1: Order exists, is shipped but not paid back, valid new due date*, amount unchanged
     Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+    And I get from companies service identify match and good decision response
     When I send a PATCH request to "/order/CO123" with body:
         """
         {
@@ -100,6 +105,7 @@ Feature:
 
   Scenario: Case 4: Order exists, is shipped but not paid back, due date unchanged, new valid amount
     Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+    And I get from companies service identify match and good decision response
     When I send a PATCH request to "/order/CO123" with body:
         """
         {
@@ -120,6 +126,7 @@ Feature:
 
   Scenario: Case 5: Order exists, is shipped but not paid back, new duration invalid
     Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+    And I get from companies service identify match and good decision response
     When I send a PATCH request to "/order/CO123" with body:
         """
         {
@@ -134,6 +141,7 @@ Feature:
 
   Scenario: Case 6: Order exists, is shipped but not paid back, new amount invalid
     Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+    And I get from companies service identify match and good decision response
     When I send a PATCH request to "/order/CO123" with body:
         """
         {
@@ -150,6 +158,7 @@ Feature:
 
   Scenario: Case 7: Order exists, is shipped but not paid back, valid new due date, valid new amount
     Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+    And I get from companies service identify match and good decision response
     When I send a PATCH request to "/order/CO123" with body:
         """
         {
@@ -168,7 +177,7 @@ Feature:
     And the order "CO123" amountTax is 0
 
   Scenario: Case 8: Order does not exist
-    When I send a PATCH request to "/order/CO123" with body:
+    When I send a PATCH request to "/order/CO123XX" with body:
     """
     {
         "duration": 50,
@@ -181,6 +190,7 @@ Feature:
 
   Scenario: Case 9: Order was marked as fraud
     Given I have a created order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+    And I get from companies service identify match and good decision response
     And The order "CO123" was already marked as fraud
     When I send a PATCH request to "/order/CO123" with body:
         """
@@ -199,6 +209,7 @@ Feature:
 
   Scenario: Case 10: Order exists, is shipped, valid new invoice number and url
     Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+    And I get from companies service identify match and good decision response
     When I send a PATCH request to "/order/CO123" with body:
         """
         {
@@ -213,6 +224,7 @@ Feature:
 
   Scenario: Case 11: Order exists, not yet shipped, valid new invoice number and url
     Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+    And I get from companies service identify match and good decision response
     When I send a PATCH request to "/order/CO123" with body:
         """
         {
