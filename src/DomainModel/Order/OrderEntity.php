@@ -52,6 +52,8 @@ class OrderEntity extends AbstractTimestampableEntity
 
     private $markedAsFraudAt;
 
+    private $checkoutSessionId;
+
     public function getUuid(): string
     {
         return $this->uuid;
@@ -305,6 +307,18 @@ class OrderEntity extends AbstractTimestampableEntity
     public function setMarkedAsFraudAt(\DateTime $markedAsFraudAt = null): OrderEntity
     {
         $this->markedAsFraudAt = $markedAsFraudAt;
+
+        return $this;
+    }
+
+    public function getCheckoutSessionId(): ?int
+    {
+        return $this->checkoutSessionId;
+    }
+
+    public function setCheckoutSessionId(?int $checkoutSessionId): OrderEntity
+    {
+        $this->checkoutSessionId = $checkoutSessionId;
 
         return $this;
     }

@@ -12,6 +12,8 @@ interface OrderRepositoryInterface
 
     public function getOneByExternalCode(string $externalCode, int $merchantId): ?OrderEntity;
 
+    public function getOneByCheckoutSessionUuidAndState(string $checkoutSessionUuid, string $state): ?OrderEntity;
+
     public function getOneByMerchantIdAndExternalCodeOrUUID(string $id, int $merchantId): ? OrderEntity;
 
     public function getOneByPaymentId(string $paymentId): ?OrderEntity;

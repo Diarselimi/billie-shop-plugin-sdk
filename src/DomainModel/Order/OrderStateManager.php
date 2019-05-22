@@ -35,6 +35,8 @@ class OrderStateManager implements LoggingInterface
 
     public const STATE_CANCELED = 'canceled';
 
+    public const STATE_AUTHORIZED = 'authorized';
+
     public const TRANSITION_NEW = 'new';
 
     public const TRANSITION_WAITING = 'waiting';
@@ -54,6 +56,8 @@ class OrderStateManager implements LoggingInterface
     public const TRANSITION_CANCEL = 'cancel';
 
     public const TRANSITION_CANCEL_SHIPPED = 'cancel_shipped';
+
+    public const TRANSITION_AUTHORIZE = 'authorize';
 
     private $orderRepository;
 
@@ -132,6 +136,11 @@ class OrderStateManager implements LoggingInterface
         return $order->getState() === self::STATE_WAITING;
     }
 
+    public function isAuthorized(OrderEntity $order): bool
+    {
+        return $order->getState() === self::STATE_AUTHORIZED;
+    }
+
     public function approve(OrderContainer $orderContainer): void
     {
         $order = $orderContainer->getOrder();
@@ -174,6 +183,13 @@ class OrderStateManager implements LoggingInterface
 
         $this->eventDispatcher->dispatch(OrderInWaitingStateEvent::NAME, new OrderInWaitingStateEvent($order));
         $this->logInfo("Order was moved to waiting state");
+    }
+
+    public function authorize(OrderContainer $orderContainer)
+    {
+        $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_AUTHORIZE);
+        $this->orderRepository->update($orderContainer->getOrder());
+        $this->logInfo("Order was moved to authorized state");
     }
 
     public function complete(OrderContainer $orderContainer): void

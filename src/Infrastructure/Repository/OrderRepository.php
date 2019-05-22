@@ -16,10 +16,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OrderRepository extends AbstractPdoRepository implements OrderRepositoryInterface
 {
+    const TABLE_NAME = 'orders';
+
     private const SELECT_FIELDS = 'id, uuid, amount_net, amount_gross, amount_tax, amount_forgiven, 
     duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, 
     proof_of_delivery_url, delivery_address_id, merchant_debtor_id, merchant_id, debtor_person_id, 
-    debtor_external_data_id, payment_id, created_at, updated_at, shipped_at, marked_as_fraud_at';
+    debtor_external_data_id, payment_id, created_at, updated_at, shipped_at, marked_as_fraud_at, 
+    checkout_session_id';
 
     private $eventDispatcher;
 
@@ -37,7 +40,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
     public function insert(OrderEntity $order): void
     {
         $id = $this->doInsert('
-            INSERT INTO orders
+            INSERT INTO '.self::TABLE_NAME.'
             (
               amount_net, 
               amount_gross, 
@@ -56,7 +59,8 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
               debtor_person_id, 
               debtor_external_data_id, 
               merchant_debtor_id,
-              payment_id, 
+              payment_id,
+              checkout_session_id, 
               uuid, 
               rid, 
               created_at, 
@@ -80,8 +84,9 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
               :debtor_external_data_id, 
               :merchant_debtor_id,
               :payment_id, 
+              :checkout_session_id,
               :uuid, 
-              :rid, 
+              :rid,
               :created_at, 
               :updated_at
             )
@@ -105,6 +110,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
             'payment_id' => $order->getPaymentId(),
             'uuid' => $order->getUuid(),
             'rid' => $this->ridProvider->getRid(),
+            'checkout_session_id' => $order->getCheckoutSessionId(),
             'created_at' => $order->getCreatedAt()->format(self::DATE_FORMAT),
             'updated_at' => $order->getUpdatedAt()->format(self::DATE_FORMAT),
             'merchant_debtor_id' => $order->getMerchantDebtorId(),
@@ -119,7 +125,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
     {
         $order = $this->doFetchOne('
           SELECT ' . self::SELECT_FIELDS . '
-          FROM orders
+          FROM '.self::TABLE_NAME.'
           WHERE external_code = :external_code AND merchant_id = :merchant_id
         ', [
             'external_code' => $externalCode,
@@ -133,7 +139,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
     {
         $order = $this->doFetchOne('
           SELECT ' . self::SELECT_FIELDS . '
-          FROM orders
+          FROM '.self::TABLE_NAME.'
           WHERE merchant_id = :merchant_id AND (external_code = :external_code OR uuid = :uuid)
         ', [
             'merchant_id' => $merchantId,
@@ -161,7 +167,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
     {
         $order = $this->doFetchOne('
           SELECT ' . self::SELECT_FIELDS . '
-          FROM orders
+          FROM '.self::TABLE_NAME.' 
           WHERE id = :id
         ', [
             'id' => $id,
@@ -174,7 +180,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
     {
         $order = $this->doFetchOne('
           SELECT ' . self::SELECT_FIELDS . '
-          FROM orders
+          FROM '.self::TABLE_NAME.'
           WHERE uuid = :uuid
         ', [
             'uuid' => $uuid,
@@ -186,7 +192,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
     public function update(OrderEntity $order): void
     {
         $this->doUpdate('
-            UPDATE orders
+            UPDATE '.self::TABLE_NAME.'
             SET
               external_code = :external_code,
               state = :state,
@@ -250,7 +256,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
     {
         $stmt = $this->doExecute(
             'SELECT id, external_code, merchant_id, invoice_number
-              FROM orders
+              FROM '.self::TABLE_NAME.'
               WHERE invoice_number IS NOT NULL
               AND id > :lastId
               AND NOT EXISTS (SELECT * FROM order_invoices WHERE order_invoices.order_id = orders.id)
@@ -270,7 +276,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
     {
         $result = $this->doFetchOne(
             'SELECT COUNT(id) as total
-              FROM orders
+              FROM '.self::TABLE_NAME.'
               WHERE state = :state
               AND orders.merchant_debtor_id IN (SELECT id FROM merchants_debtors WHERE debtor_id = :debtor_id)',
             [
@@ -290,7 +296,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
     {
         $result = $this->doFetchOne(
             'SELECT COUNT(id) as total
-              FROM orders
+              FROM '.self::TABLE_NAME.'
               WHERE state NOT IN (:state_new, :state_declined)
               AND orders.merchant_debtor_id = :merchant_debtor_id',
             [
@@ -379,6 +385,21 @@ SQL;
         while ($row = $stmt->fetch(PdoConnection::FETCH_ASSOC)) {
             yield $this->orderFactory->createFromDatabaseRow($row);
         }
+    }
+
+    public function getOneByCheckoutSessionUuidAndState(string $checkoutSessionUuid, string $state): ?OrderEntity
+    {
+        $sql = ' SELECT '.self::SELECT_FIELDS.
+                ' FROM '.self::TABLE_NAME.
+                ' WHERE id IN ('.
+                ' SELECT orders.id '.
+                ' FROM '.self::TABLE_NAME.
+                ' LEFT JOIN '.CheckoutSessionRepository::TABLE_NAME.' checkoutSession ON checkoutSession.id = checkout_session_id '.
+                ' WHERE checkoutSession.uuid = :uuid AND state = :state ORDER BY orders.created_at DESC )  LIMIT 1';
+
+        $row = $this->doFetchOne($sql, ['uuid' => $checkoutSessionUuid, 'state' => $state]);
+
+        return $row ? $this->orderFactory->createFromDatabaseRow($row) : null;
     }
 
     public function getOrdersCountByMerchantDebtorAndState(int $merchantDebtorId, string $state): int

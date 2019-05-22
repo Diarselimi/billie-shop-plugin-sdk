@@ -2,8 +2,8 @@
 
 namespace App\Application\UseCase\CreateOrder\Request;
 
-use Symfony\Component\Validator\Constraints as Assert;
 use App\Application\Validator\Constraint as PaellaAssert;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class CreateOrderAmountRequest
 {

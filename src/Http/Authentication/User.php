@@ -2,6 +2,7 @@
 
 namespace App\Http\Authentication;
 
+use App\DomainModel\CheckoutSession\CheckoutSessionEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class User implements UserInterface
@@ -16,12 +17,15 @@ class User implements UserInterface
 
     private $roles;
 
-    public function __construct(int $merchantId, string $username, string $password, array $roles)
+    private $checkoutSession;
+
+    public function __construct(int $merchantId, string $username, string $password, array $roles, ?CheckoutSessionEntity $checkoutSession = null)
     {
         $this->merchantId = $merchantId;
         $this->username = $username;
         $this->password = $password;
         $this->roles = $roles;
+        $this->checkoutSession = $checkoutSession;
     }
 
     public function getMerchantId(): int
@@ -54,5 +58,10 @@ class User implements UserInterface
 
     public function eraseCredentials(): void
     {
+    }
+
+    public function getCheckoutSession(): ?CheckoutSessionEntity
+    {
+        return $this->checkoutSession;
     }
 }

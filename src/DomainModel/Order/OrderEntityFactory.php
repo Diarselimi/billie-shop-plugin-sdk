@@ -20,6 +20,7 @@ class OrderEntityFactory
             ->setMerchantId($request->getMerchantId())
             ->setState(OrderStateManager::STATE_NEW)
             ->setUuid(Uuid::uuid4()->toString())
+            ->setCheckoutSessionId($request->getCheckoutSessionId())
         ;
     }
 
@@ -50,6 +51,7 @@ class OrderEntityFactory
             ->setMarkedAsFraudAt($row['marked_as_fraud_at'] ? new \DateTime($row['marked_as_fraud_at']) : $row['marked_as_fraud_at'])
             ->setCreatedAt(new \DateTime($row['created_at']))
             ->setUpdatedAt(new \DateTime($row['updated_at']))
+            ->setCheckoutSessionId($row['checkout_session_id'])
         ;
     }
 }

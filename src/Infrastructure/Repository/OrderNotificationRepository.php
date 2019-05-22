@@ -7,6 +7,7 @@ use App\DomainModel\OrderNotification\OrderNotificationEntity;
 use App\DomainModel\OrderNotification\OrderNotificationFactory;
 use App\DomainModel\OrderNotification\OrderNotificationRepositoryInterface;
 use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
+use DateTime;
 
 class OrderNotificationRepository extends AbstractPdoRepository implements OrderNotificationRepositoryInterface
 {
@@ -44,7 +45,7 @@ class OrderNotificationRepository extends AbstractPdoRepository implements Order
 
     public function update(OrderNotificationEntity $orderNotification): void
     {
-        $orderNotification->setUpdatedAt(new \DateTime());
+        $orderNotification->setUpdatedAt(new DateTime());
         $this->doUpdate('
             UPDATE order_notifications
             SET 
