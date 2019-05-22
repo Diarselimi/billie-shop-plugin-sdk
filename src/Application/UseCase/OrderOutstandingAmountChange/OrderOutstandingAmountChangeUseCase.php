@@ -108,7 +108,7 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
             );
         }
 
-        if ($amountChange->getOutstandingAmount() <= 0) {
+        if ($amountChange->getOutstandingAmount() <= 0 && !$this->orderStateManager->isCanceled($order)) {
             $this->orderStateManager->complete($orderContainer);
         }
     }
