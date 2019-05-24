@@ -12,7 +12,6 @@ use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderResponse\OrderResponse;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
-use Symfony\Component\Workflow\Workflow;
 
 class CheckoutSessionConfirmUseCase implements ValidatedUseCaseInterface
 {
@@ -24,18 +23,18 @@ class CheckoutSessionConfirmUseCase implements ValidatedUseCaseInterface
 
     private $orderPersistenceService;
 
-    private $workflow;
+    private $stateManager;
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         OrderResponseFactory $orderResponseFactory,
         OrderPersistenceService $orderPersistenceService,
-        Workflow $workflow
+        OrderStateManager $orderStateManager
     ) {
         $this->orderRepository = $orderRepository;
         $this->orderResponseFactory = $orderResponseFactory;
         $this->orderPersistenceService = $orderPersistenceService;
-        $this->workflow = $workflow;
+        $this->stateManager = $orderStateManager;
     }
 
     /**
@@ -58,9 +57,7 @@ class CheckoutSessionConfirmUseCase implements ValidatedUseCaseInterface
             throw new CheckoutSessionConfirmException();
         }
 
-        #TODO: This should be removed and moved to the new created service
-        $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_CREATE);
-        $this->orderRepository->update($orderContainer->getOrder());
+        $this->stateManager->approve($orderContainer);
 
         return $this->orderResponseFactory->create($orderContainer);
     }
