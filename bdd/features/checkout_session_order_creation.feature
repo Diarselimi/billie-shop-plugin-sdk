@@ -19,12 +19,12 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
       | debtor_identified_strict          |
     And The following merchant risk check settings exist for merchant 1:
       | risk_check_name                   |	enabled	|	decline_on_failure	|
-      | available_financing_limit         |	1		|	1					|
-      | amount                            |	1		| 	1					|
+      | available_financing_limit         |	1		|	0					|
+      | amount                            |	1		| 	0					|
       | debtor_country                    |	1		| 	1					|
       | debtor_industry_sector            |	1		| 	1					|
       | debtor_identified                 |	1		| 	1					|
-      | limit                             |	1		| 	1					|
+      | limit                             |	1		| 	0					|
       | debtor_not_customer               |	1		| 	1					|
       | debtor_blacklisted                |	1		| 	1					|
       | debtor_overdue                    |	1		| 	1					|
@@ -102,6 +102,114 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     Then the order A1 is in state authorized
     And the response status code should be 201
     And the response should be empty
+
+  Scenario: An order goes to declined if we cannot identify the company
+    Given I get from companies service identify match and bad decision response
+    And I get from payments service register debtor positive response
+    And I have a checkout_session_id "123123"
+    And I send a PUT request to "/checkout-session/123123/authorize" with body:
+    """
+    {
+       "debtor_person":{
+          "salutation":"m",
+          "first_name":"",
+          "last_name":"else",
+          "phone_number":"+491234567",
+          "email":"someone@billie.io"
+       },
+       "debtor_company":{
+          "name":"Test User Company",
+          "address_addition":"left door",
+          "address_house_number":"10",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_city":"Berlin",
+          "address_postal_code":"10179",
+          "address_country":"DE",
+          "tax_id":"VA222",
+          "tax_number":"3333",
+          "registration_court":"",
+          "registration_number":" some number",
+          "industry_sector":"some sector",
+          "subindustry_sector":"some sub",
+          "employees_number":"33",
+          "legal_form":"some legal",
+          "established_customer":1
+       },
+       "delivery_address":{
+          "house_number":"22",
+          "street":"Charlot strasse",
+          "city":"Paris",
+          "postal_code":"98765",
+          "country":"DE"
+       },
+       "amount":{
+          "net":33.2,
+          "gross":43.30,
+          "tax":10.10
+       },
+       "comment":"Some comment",
+       "duration":30,
+       "order_id":"A1"
+    }
+    """
+    Then the order A1 is in state declined
+    And the response status code should be 400
+    And the JSON response should be:
+    """
+    {"reasons":["risk_policy"]}
+    """
+
+  Scenario: An order goes to declined if it doesn't pass all the soft checks
+    Given I get from companies service identify match and good decision response
+    And I get from payments service register debtor positive response
+    And I have a checkout_session_id "123123"
+    And I send a PUT request to "/checkout-session/123123/authorize" with body:
+    """
+    {
+       "debtor_person":{
+          "salutation":"m",
+          "first_name":"",
+          "last_name":"else",
+          "phone_number":"+491234567",
+          "email":"someone@billie.io"
+       },
+       "debtor_company":{
+          "name":"Test User Company",
+          "address_addition":"left door",
+          "address_house_number":"10",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_city":"Berlin",
+          "address_postal_code":"10179",
+          "address_country":"DE",
+          "tax_id":"VA222",
+          "tax_number":"3333",
+          "registration_court":"",
+          "registration_number":" some number",
+          "industry_sector":"some sector",
+          "subindustry_sector":"some sub",
+          "employees_number":"33",
+          "legal_form":"some legal",
+          "established_customer":1
+       },
+       "delivery_address":{
+          "house_number":"22",
+          "street":"Charlot strasse",
+          "city":"Paris",
+          "postal_code":"98765",
+          "country":"DE"
+       },
+       "amount":{
+          "net":333333.2,
+          "gross":666643.30,
+          "tax":333310.10
+       },
+       "comment":"Some comment",
+       "duration":30,
+       "order_id":"A1"
+    }
+    """
+    And the response status code should be 400
+    Then the order A1 is in state declined
 
   Scenario:
     I success if I try to create an order with a valid session_id,

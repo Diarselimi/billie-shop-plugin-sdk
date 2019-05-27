@@ -3,6 +3,7 @@
 namespace App\Http\Controller;
 
 use App\Application\UseCase\CreateOrder\CreateOrderUseCase;
+use App\DomainModel\OrderResponse\OrderResponseFactory;
 use App\Http\RequestHandler\CreateOrderRequestFactory;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,12 +14,16 @@ class CreateOrderController
 
     private $orderRequestFactory;
 
+    private $orderResponseFactory;
+
     public function __construct(
         CreateOrderUseCase $createOrderUseCase,
-        CreateOrderRequestFactory $orderRequestFactory
+        CreateOrderRequestFactory $orderRequestFactory,
+        OrderResponseFactory $orderResponseFactory
     ) {
         $this->createOrderUseCase = $createOrderUseCase;
         $this->orderRequestFactory = $orderRequestFactory;
+        $this->orderResponseFactory = $orderResponseFactory;
     }
 
     public function execute(Request $request): JsonResponse
@@ -26,8 +31,8 @@ class CreateOrderController
         $useCaseRequest = $this->orderRequestFactory
             ->createForCreateOrder($request);
 
-        $response = $this->createOrderUseCase->execute($useCaseRequest);
+        $orderContainer = $this->createOrderUseCase->execute($useCaseRequest);
 
-        return new JsonResponse($response->toArray(), JsonResponse::HTTP_CREATED);
+        return new JsonResponse($this->orderResponseFactory->create($orderContainer)->toArray(), JsonResponse::HTTP_CREATED);
     }
 }
