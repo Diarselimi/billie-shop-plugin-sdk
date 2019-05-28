@@ -76,6 +76,10 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         $orderContainer = $this->orderPersistenceService->persistFromRequest($request);
         $isOrderFromCheckout = $request->getCheckoutSessionId() !== null;
 
+        if ($isOrderFromCheckout) {
+            $this->checkoutSessionRepository->invalidateById($orderContainer->getOrder()->getCheckoutSessionId());
+        }
+
         if (!$this->orderChecksRunnerService->runPreIdentificationChecks($orderContainer)) {
             $this->orderStateManager->decline($orderContainer);
 
@@ -100,7 +104,6 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 
         if ($isOrderFromCheckout) {
             $this->orderStateManager->authorize($orderContainer);
-            $this->checkoutSessionRepository->invalidateById($orderContainer->getOrder()->getCheckoutSessionId());
 
             return $orderContainer;
         }

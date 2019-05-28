@@ -3,6 +3,7 @@
 namespace App\Application\UseCase\CheckoutSessionConfirmOrder;
 
 use App\Application\Exception\CheckoutSessionConfirmException;
+use App\Application\Exception\OrderNotAuthorizedException;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
@@ -38,17 +39,22 @@ class CheckoutSessionConfirmUseCase implements ValidatedUseCaseInterface
     }
 
     /**
-     * @throws OrderNotFoundException|CheckoutSessionConfirmException
+     * @throws OrderNotAuthorizedException|CheckoutSessionConfirmException
+     * @throws OrderNotFoundException
      */
     public function execute(CheckoutSessionConfirmOrderRequest $request, string $checkoutSessionUuid): OrderResponse
     {
         $this->validateRequest($request);
 
         $orderEntity = $this->orderRepository
-            ->getOneByCheckoutSessionUuidAndState($checkoutSessionUuid, OrderStateManager::STATE_AUTHORIZED);
+            ->getOneByCheckoutSessionUuid($checkoutSessionUuid);
 
         if (!$orderEntity) {
             throw new OrderNotFoundException();
+        }
+
+        if ($orderEntity->getState() !== OrderStateManager::STATE_AUTHORIZED) {
+            throw new OrderNotAuthorizedException();
         }
 
         $orderContainer = $this->orderPersistenceService->createFromOrderEntity($orderEntity);

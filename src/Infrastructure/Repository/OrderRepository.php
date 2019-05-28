@@ -387,7 +387,7 @@ SQL;
         }
     }
 
-    public function getOneByCheckoutSessionUuidAndState(string $checkoutSessionUuid, string $state): ?OrderEntity
+    public function getOneByCheckoutSessionUuid(string $checkoutSessionUuid): ?OrderEntity
     {
         $sql = ' SELECT '.self::SELECT_FIELDS.
                 ' FROM '.self::TABLE_NAME.
@@ -395,9 +395,9 @@ SQL;
                 ' SELECT orders.id '.
                 ' FROM '.self::TABLE_NAME.
                 ' LEFT JOIN '.CheckoutSessionRepository::TABLE_NAME.' checkoutSession ON checkoutSession.id = checkout_session_id '.
-                ' WHERE checkoutSession.uuid = :uuid AND state = :state ORDER BY orders.created_at DESC )  LIMIT 1';
+                ' WHERE checkoutSession.uuid = :uuid ORDER BY orders.created_at DESC )  LIMIT 1';
 
-        $row = $this->doFetchOne($sql, ['uuid' => $checkoutSessionUuid, 'state' => $state]);
+        $row = $this->doFetchOne($sql, ['uuid' => $checkoutSessionUuid]);
 
         return $row ? $this->orderFactory->createFromDatabaseRow($row) : null;
     }

@@ -3,6 +3,7 @@
 namespace App\Http\Controller;
 
 use App\Application\Exception\CheckoutSessionConfirmException;
+use App\Application\Exception\OrderNotAuthorizedException;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\CheckoutSessionConfirmOrder\CheckoutSessionConfirmOrderRequest;
 use App\Application\UseCase\CheckoutSessionConfirmOrder\CheckoutSessionConfirmUseCase;
@@ -42,7 +43,7 @@ class ConfirmCheckoutSessionController
             $orderResponse = $this->useCase->execute($checkoutRequest, $sessionUuid);
         } catch (OrderNotFoundException $exception) {
             throw new NotFoundHttpException($exception->getMessage());
-        } catch (CheckoutSessionConfirmException $exception) {
+        } catch (CheckoutSessionConfirmException | OrderNotAuthorizedException $exception) {
             throw new BadRequestHttpException($exception->getMessage());
         }
 
