@@ -4,6 +4,7 @@ namespace App\Application\UseCase\CreateOrder;
 
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
+use App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\MerchantDebtor\DebtorFinder;
@@ -14,8 +15,6 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
-use App\DomainModel\Order\OrderVerdictIssueService;
-use App\DomainModel\OrderResponse\OrderResponse;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -44,6 +43,8 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 
     private $orderStateManager;
 
+    private $checkoutSessionRepository;
+
     public function __construct(
         OrderPersistenceService $orderPersistenceService,
         OrderChecksRunnerService $orderChecksRunnerService,
@@ -53,7 +54,8 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         ProducerInterface $producer,
         OrderResponseFactory $orderResponseFactory,
         MerchantDebtorFinancialDetailsRepositoryInterface $merchantDebtorFinancialDetailsRepository,
-        OrderStateManager $orderStateManager
+        OrderStateManager $orderStateManager,
+        CheckoutSessionRepositoryInterface $checkoutSessionRepository
     ) {
         $this->orderPersistenceService = $orderPersistenceService;
         $this->orderChecksRunnerService = $orderChecksRunnerService;
@@ -64,18 +66,24 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         $this->orderResponseFactory = $orderResponseFactory;
         $this->merchantDebtorFinancialDetailsRepository = $merchantDebtorFinancialDetailsRepository;
         $this->orderStateManager = $orderStateManager;
+        $this->checkoutSessionRepository = $checkoutSessionRepository;
     }
 
-    public function execute(CreateOrderRequest $request): OrderResponse
+    public function execute(CreateOrderRequest $request): OrderContainer
     {
         $this->validateRequest($request);
 
         $orderContainer = $this->orderPersistenceService->persistFromRequest($request);
+        $isOrderFromCheckout = $request->getCheckoutSessionId() !== null;
+
+        if ($isOrderFromCheckout) {
+            $this->checkoutSessionRepository->invalidateById($orderContainer->getOrder()->getCheckoutSessionId());
+        }
 
         if (!$this->orderChecksRunnerService->runPreIdentificationChecks($orderContainer)) {
             $this->orderStateManager->decline($orderContainer);
 
-            return $this->orderResponseFactory->create($orderContainer);
+            return $orderContainer;
         }
 
         if ($this->identifyDebtor($orderContainer, $request->getMerchantId()) !== null) {
@@ -85,21 +93,27 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         if (!$this->orderChecksRunnerService->runPostIdentificationChecks($orderContainer)) {
             $this->orderStateManager->decline($orderContainer);
 
-            return $this->orderResponseFactory->create($orderContainer);
+            return $orderContainer;
         }
 
         if ($this->orderChecksRunnerService->checkForFailedSoftDeclinableCheckResults($orderContainer)) {
-            $this->orderStateManager->wait($orderContainer);
+            $isOrderFromCheckout ? $this->orderStateManager->decline($orderContainer) : $this->orderStateManager->wait($orderContainer);
 
-            return $this->orderResponseFactory->create($orderContainer);
+            return $orderContainer;
+        }
+
+        if ($isOrderFromCheckout) {
+            $this->orderStateManager->authorize($orderContainer);
+
+            return $orderContainer;
         }
 
         $this->orderStateManager->approve($orderContainer);
 
-        return $this->orderResponseFactory->create($orderContainer);
+        return $orderContainer;
     }
 
-    private function identifyDebtor(OrderContainer $orderContainer, int $merchantId): ? MerchantDebtorEntity
+    private function identifyDebtor(OrderContainer $orderContainer, int $merchantId): ?MerchantDebtorEntity
     {
         $merchantDebtor = $this->debtorFinderService->findDebtor($orderContainer, $merchantId);
 
@@ -117,8 +131,7 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         $orderContainer
             ->setMerchantDebtor($merchantDebtor)
             ->setMerchantDebtorFinancialDetails($this->merchantDebtorFinancialDetailsRepository->getCurrentByMerchantDebtorId($merchantDebtor->getId()))
-            ->getOrder()->setMerchantDebtorId($merchantDebtor->getId())
-        ;
+            ->getOrder()->setMerchantDebtorId($merchantDebtor->getId());
 
         return $merchantDebtor;
     }

@@ -348,7 +348,7 @@ class OrderResponse implements ArrayableInterface
             'external_code' => $this->getExternalCode(),
             'uuid' => $this->getUuid(),
             'state' => $this->getState(),
-            'reasons' => $this->getReasons() ?: [],
+            'reasons' => $this->getReasons() ?: null,
             'amount' => $this->getOriginalAmount(),
             'debtor_company' => [
                 'name' => $this->getCompanyName(),

@@ -57,9 +57,7 @@ class OrderResponseFactory
             $this->addInvoiceData($order, $response);
         }
 
-        if ($this->orderStateManager->isDeclined($order) || $this->orderStateManager->isWaiting($order)) {
-            $response->setReasons($this->declinedReasonsMapper->mapReasons($order));
-        }
+        $response = $this->addReasons($order, $response);
 
         return $response;
     }
@@ -105,5 +103,32 @@ class OrderResponseFactory
             ->setFeeAmount($orderPaymentDetails->getFeeAmount())
             ->setDueDate($orderPaymentDetails->getDueDate())
         ;
+    }
+
+    public function createAuthorizeResponse(OrderContainer $orderContainer): CheckoutSessionAuthorizeResponse
+    {
+        $order = $orderContainer->getOrder();
+        $response = new CheckoutSessionAuthorizeResponse();
+
+        $response = $this->addReasons($order, $response);
+
+        return $response;
+    }
+
+    /**
+     * @param  OrderResponse|CheckoutSessionAuthorizeResponse $response
+     * @return OrderResponse|CheckoutSessionAuthorizeResponse $response
+     */
+    private function addReasons(OrderEntity $order, $response)
+    {
+        if (!method_exists($response, 'setReasons')) {
+            return $response;
+        }
+
+        if ($this->orderStateManager->isDeclined($order) || $this->orderStateManager->isWaiting($order)) {
+            $response->setReasons($this->declinedReasonsMapper->mapReasons($order));
+        }
+
+        return $response;
     }
 }

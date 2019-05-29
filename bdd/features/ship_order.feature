@@ -48,7 +48,7 @@ Feature:
           "external_code": "CO123",
           "uuid": "test123",
           "state": "shipped",
-          "reasons": [],
+          "reasons": null,
           "amount": 1000,
           "debtor_company": {
             "name": "Test User Company",
@@ -131,7 +131,7 @@ Feature:
           "external_code": "DD123",
           "uuid": "test123",
           "state": "shipped",
-          "reasons": [],
+          "reasons": null,
           "amount": 1000,
           "debtor_company": {
             "name": "Test User Company",

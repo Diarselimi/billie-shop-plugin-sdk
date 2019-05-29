@@ -2,6 +2,11 @@
 
 namespace App\Application;
 
+/**
+ * Class PaellaCoreCriticalException
+ * @package App\Application
+ * @deprecated
+ */
 class PaellaCoreCriticalException extends \RuntimeException
 {
     const CODE_NOT_FOUND = 'not_found';
@@ -53,7 +58,7 @@ class PaellaCoreCriticalException extends \RuntimeException
         return $this->responseCode;
     }
 
-    public function getErrorCode(): ? string
+    public function getErrorCode(): ?string
     {
         return $this->errorCode;
     }

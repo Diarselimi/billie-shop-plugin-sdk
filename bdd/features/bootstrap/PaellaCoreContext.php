@@ -2,14 +2,16 @@
 
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\Address\AddressRepositoryInterface;
+use App\DomainModel\CheckoutSession\CheckoutSessionEntity;
+use App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
+use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
-use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorFinancialDetailsEntity;
-use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
+use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsEntity;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
@@ -93,8 +95,8 @@ class PaellaCoreContext extends MinkContext
                 ->setUseExperimentalDebtorIdentification(false)
                 ->setDebtorForgivenessThreshold(1.0)
                 ->setInvoiceHandlingStrategy('http')
-                ->setCreatedAt(new DateTime())
-                ->setUpdatedAt(new DateTime())
+                ->setCreatedAt(new \DateTime())
+                ->setUpdatedAt(new \DateTime())
         );
     }
 
@@ -122,6 +124,7 @@ class PaellaCoreContext extends MinkContext
             TRUNCATE merchants_debtors;
             TRUNCATE score_thresholds_configuration;
             TRUNCATE risk_check_definitions;
+            TRUNCATE checkout_sessions;
             ALTER TABLE merchants AUTO_INCREMENT = 1;
             ALTER TABLE orders AUTO_INCREMENT = 1;
             SET FOREIGN_KEY_CHECKS = 1;
@@ -190,7 +193,7 @@ class PaellaCoreContext extends MinkContext
             ->setMerchantDebtorId($merchantDebtor->getId())
             ->setFinancingLimit(2000)
             ->setFinancingPower(1000)
-            ->setCreatedAt(new \DateTime())
+            ->setCreatedAt(new DateTime())
         ;
         $this->getMerchantDebtorFinancialDetailsRepository()->insert($financialDetails);
 
@@ -209,9 +212,35 @@ class PaellaCoreContext extends MinkContext
             ->setMerchantDebtorId($merchantDebtor->getId())
             ->setMerchantId('1')
             ->setPaymentId('test')
+            ->setCheckoutSessionId(1)
             ->setUuid('test123');
 
+        $this->iHaveASessionId("123123", 0);
+
         $this->getOrderRepository()->insert($order);
+    }
+
+    /**
+     * @Given I have a invalid checkout_session_id :arg1
+     */
+    public function iHaveAInvalidSessionId($arg1)
+    {
+        $this->iHaveASessionId($arg1, false);
+    }
+
+    /**
+     * @Given I have a checkout_session_id :arg1
+     */
+    public function iHaveASessionId($arg1, $active = true)
+    {
+        $checkoutSession = new CheckoutSessionEntity();
+        $checkoutSession->setMerchantId(1)
+            ->setMerchantDebtorExternalId($arg1)
+            ->setUuid("123123")
+            ->setIsActive($active)
+            ->setCreatedAt(new DateTime('now'))
+            ->setUpdatedAt(new DateTime('now'));
+        $this->getCheckoutSessionRepository()->create($checkoutSession);
     }
 
     /**
@@ -220,7 +249,7 @@ class PaellaCoreContext extends MinkContext
     public function orderWasShipped($externalCode, $date)
     {
         $order = $this->getOrderRepository()->getOneByExternalCode($externalCode, 1);
-        $order->setShippedAt(new \DateTime($date));
+        $order->setShippedAt(new DateTime($date));
         $this->getOrderRepository()->update($order);
     }
 
@@ -404,7 +433,7 @@ class PaellaCoreContext extends MinkContext
     /**
      * @Given order_identifications table should have a new record with:
      */
-    public function orderIdentificationsTableShouldHaveANewRecordWith(\Behat\Gherkin\Node\TableNode $table)
+    public function orderIdentificationsTableShouldHaveANewRecordWith(TableNode $table)
     {
         $repo = $this->getOrderIdentificationRepository();
 
@@ -578,6 +607,11 @@ class PaellaCoreContext extends MinkContext
     private function getMerchantUserRepository(): MerchantUserRepositoryInterface
     {
         return $this->get(MerchantUserRepositoryInterface::class);
+    }
+
+    private function getCheckoutSessionRepository(): CheckoutSessionRepositoryInterface
+    {
+        return $this->get(CheckoutSessionRepositoryInterface::class);
     }
 
     private function getConnection(): PdoConnection

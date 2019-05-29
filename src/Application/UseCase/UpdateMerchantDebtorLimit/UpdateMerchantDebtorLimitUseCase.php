@@ -3,8 +3,8 @@
 namespace App\Application\UseCase\UpdateMerchantDebtorLimit;
 
 use App\Application\Exception\MerchantDebtorNotFoundException;
-use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\Application\UseCase\ValidatedUseCaseInterface;
+use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;

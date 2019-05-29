@@ -2,9 +2,9 @@
 
 namespace App\Infrastructure\Repository;
 
-use App\DomainModel\MerchantDebtor\MerchantDebtorIdentifierDTO;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntityFactory;
+use App\DomainModel\MerchantDebtor\MerchantDebtorIdentifierDTO;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;

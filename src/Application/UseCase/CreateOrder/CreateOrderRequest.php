@@ -7,9 +7,9 @@ use App\Application\UseCase\CreateOrder\Request\CreateOrderDebtorCompanyRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderDebtorPersonRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderDeliveryAddressRequest;
 use App\Application\UseCase\ValidatedRequestInterface;
+use App\Application\Validator\Constraint as CustomConstrains;
 use App\DomainModel\ArrayableInterface;
 use Symfony\Component\Validator\Constraints as Assert;
-use App\Application\Validator\Constraint as CreateOrderUseCaseConstraints;
 
 class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterface
 {
@@ -32,12 +32,12 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
     /**
      * @Assert\NotBlank()
      * @Assert\Type(type="int")
-     * @CreateOrderUseCaseConstraints\OrderDuration
+     * @CustomConstrains\OrderDuration()
      */
     private $duration;
 
     /**
-     * @CreateOrderUseCaseConstraints\OrderExternalCode()
+     * @CustomConstrains\OrderExternalCode()
      * @Assert\Length(max=255)
      */
     private $externalCode;
@@ -56,6 +56,20 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
      * @Assert\Valid()
      */
     private $debtorPerson;
+
+    private $checkoutSessionId;
+
+    public function getCheckoutSessionId(): ?int
+    {
+        return $this->checkoutSessionId;
+    }
+
+    public function setCheckoutSessionId(?int $checkoutSessionId)
+    {
+        $this->checkoutSessionId = $checkoutSessionId;
+
+        return $this;
+    }
 
     public function getMerchantId()
     {

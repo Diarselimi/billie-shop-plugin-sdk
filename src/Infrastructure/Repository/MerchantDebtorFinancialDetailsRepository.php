@@ -6,6 +6,7 @@ use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorFinancialDetailsEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorFinancingDetailsEntityFactory;
 use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
+use DateTime;
 
 class MerchantDebtorFinancialDetailsRepository extends AbstractPdoRepository implements MerchantDebtorFinancialDetailsRepositoryInterface
 {
@@ -22,7 +23,7 @@ class MerchantDebtorFinancialDetailsRepository extends AbstractPdoRepository imp
 
     public function insert(MerchantDebtorFinancialDetailsEntity $financialDetails): void
     {
-        $financialDetails->setCreatedAt(new \DateTime());
+        $financialDetails->setCreatedAt(new DateTime());
 
         $id = $this->doInsert('
             INSERT INTO '.self::TABLE_NAME.'

@@ -17,12 +17,13 @@ framework:
         - late
         - complete
         - canceled
+        - authorized
       transitions:
         waiting:
           from: new
           to: waiting
         create:
-          from: [new, waiting]
+          from: [new, waiting, authorized]
           to: created
         decline:
           from: [new, waiting]
@@ -45,3 +46,6 @@ framework:
         cancel_shipped:
           from: [shipped, paid_out, late]
           to: canceled
+        authorize:
+          from: new
+          to: authorized

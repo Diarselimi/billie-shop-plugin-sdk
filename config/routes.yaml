@@ -96,3 +96,18 @@ whitelist_merchant_debtor:
   controller: App\Http\Controller\UpdateMerchantDebtorWhitelistController::execute
   methods: [PUT]
 
+# checkout session_id auth
+create_checkout_session:
+  path: /checkout-session
+  controller: App\Http\Controller\CreateCheckoutSessionController::execute
+  methods: [POST]
+
+authorize_checkout_session:
+  path: /checkout-session/{sessionUuid}/authorize
+  controller: App\Http\Controller\AuthorizeCheckoutSessionController::execute
+  methods: [PUT]
+
+confirm_checkout_session:
+  path: /checkout-session/{sessionUuid}/confirm
+  controller: App\Http\Controller\ConfirmCheckoutSessionController::execute
+  methods: [PUT]

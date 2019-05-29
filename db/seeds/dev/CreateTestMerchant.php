@@ -1,7 +1,7 @@
 <?php
 
-use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\Merchant\MerchantEntity;
+use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntityFactory;
 use Phinx\Seed\AbstractSeed;
 

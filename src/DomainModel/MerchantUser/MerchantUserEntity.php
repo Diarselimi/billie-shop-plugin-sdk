@@ -10,6 +10,8 @@ class MerchantUserEntity extends AbstractTimestampableEntity
 
     const ROLE_MERCHANT = 'ROLE_MERCHANT';
 
+    const ROLE_CHECKOUT_USER = 'ROLE_CHECKOUT_USER';
+
     private $userId;
 
     private $merchantId;
