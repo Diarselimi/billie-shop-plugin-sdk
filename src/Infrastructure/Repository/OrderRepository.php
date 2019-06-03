@@ -452,7 +452,7 @@ SQL;
         $query = 'SELECT %s FROM orders';
 
         if ($filters && isset($filters['merchant_debtor_id'])) {
-            $query .= ' INNER JOIN merchants_debtors ON merchants_debtors.uuid = :merchant_debtor_id';
+            $query .= ' INNER JOIN merchants_debtors ON orders.merchant_debtor_id = merchants_debtors.id AND merchants_debtors.uuid = :merchant_debtor_id';
             $queryParameters['merchant_debtor_id'] = $filters['merchant_debtor_id'];
         }
 
