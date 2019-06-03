@@ -51,4 +51,9 @@ abstract class AbstractAuthenticator extends AbstractGuardAuthenticator
     {
         return false;
     }
+
+    protected function wasAlreadyAuthenticated(Request $request): bool
+    {
+        return $request->attributes->has(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID);
+    }
 }
