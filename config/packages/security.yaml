@@ -23,9 +23,9 @@ security:
             stateless: true
             guard:
                 authenticators:
-                    - App\Http\Authentication\Authenticator\ApiKeyAuthenticator
                     - App\Http\Authentication\Authenticator\OAuthTokenAuthenticator
-                entry_point: App\Http\Authentication\Authenticator\ApiKeyAuthenticator
+                    - App\Http\Authentication\Authenticator\ApiKeyAuthenticator
+                entry_point: App\Http\Authentication\Authenticator\OAuthTokenAuthenticator
 
     access_control:
          - { path: ^/, roles: [ROLE_USER, ROLE_MERCHANT] }
