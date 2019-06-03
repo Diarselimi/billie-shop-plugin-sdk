@@ -467,10 +467,7 @@ SQL;
 
         $totalCount = $this->doFetchOne(sprintf($query, 'COUNT(*) as total_count'), $queryParameters);
 
-        $query .= " ORDER BY :sort_field :sort_direction LIMIT $offset,$limit";
-
-        $queryParameters['sort_field'] = $sortBy;
-        $queryParameters['sort_direction'] = $sortDirection;
+        $query .= " ORDER BY $sortBy $sortDirection LIMIT $offset,$limit";
 
         $rows = $this->doFetchAll(
             sprintf($query, 'orders.' . implode(', orders.', self::SELECT_FIELDS)),
