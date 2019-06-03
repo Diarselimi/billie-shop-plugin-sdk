@@ -13,7 +13,7 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
 {
     public const TABLE_NAME = "merchants_debtors";
 
-    private const SELECT_FIELDS = 'id, merchant_id, debtor_id, payment_debtor_id, score_thresholds_configuration_id, is_whitelisted, created_at, updated_at';
+    private const SELECT_FIELDS = 'id, merchant_id, debtor_id, payment_debtor_id, uuid, score_thresholds_configuration_id, is_whitelisted, created_at, updated_at';
 
     private $factory;
 
@@ -25,14 +25,15 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
     public function insert(MerchantDebtorEntity $merchantDebtor): void
     {
         $id = $this->doInsert('
-            INSERT INTO '. self::TABLE_NAME .'
-            (merchant_id, debtor_id, payment_debtor_id, score_thresholds_configuration_id, created_at, updated_at, is_whitelisted)
+            INSERT INTO ' . self::TABLE_NAME . '
+            (merchant_id, debtor_id, payment_debtor_id, uuid, score_thresholds_configuration_id, created_at, updated_at, is_whitelisted)
             VALUES
-            (:merchant_id, :debtor_id, :payment_debtor_id, :score_thresholds_configuration_id, :created_at, :updated_at, :is_whitelisted)
+            (:merchant_id, :debtor_id, :payment_debtor_id, :uuid, :score_thresholds_configuration_id, :created_at, :updated_at, :is_whitelisted)
         ', [
             'merchant_id' => $merchantDebtor->getMerchantId(),
             'debtor_id' => $merchantDebtor->getDebtorId(),
             'payment_debtor_id' => $merchantDebtor->getPaymentDebtorId(),
+            'uuid' => $merchantDebtor->getUuid(),
             'score_thresholds_configuration_id' => $merchantDebtor->getScoreThresholdsConfigurationId(),
             'created_at' => $merchantDebtor->getCreatedAt()->format(self::DATE_FORMAT),
             'updated_at' => $merchantDebtor->getUpdatedAt()->format(self::DATE_FORMAT),
@@ -47,7 +48,7 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
         $merchantDebtor->setUpdatedAt(new \DateTime());
 
         $this->doUpdate('
-            UPDATE '.self::TABLE_NAME.'
+            UPDATE ' . self::TABLE_NAME . '
             SET is_whitelisted = :whitelisted, updated_at = :updated_at
             WHERE id = :id
         ', [
@@ -61,10 +62,24 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
     {
         $row = $this->doFetchOne('
           SELECT ' . self::SELECT_FIELDS . '
-          FROM '.self::TABLE_NAME.'
+          FROM ' . self::TABLE_NAME . '
           WHERE id = :id
         ', [
             'id' => $id,
+        ]);
+
+        return $row ? $this->factory->createFromDatabaseRow($row) : null;
+    }
+
+    public function getOneByUuidAndMerchantId(string $uuid, int $merchantId): ?MerchantDebtorEntity
+    {
+        $row = $this->doFetchOne('
+          SELECT ' . self::SELECT_FIELDS . '
+          FROM ' . self::TABLE_NAME . '
+          WHERE uuid = :uuid AND merchant_id = :merchant_id
+        ', [
+            'uuid' => $uuid,
+            'merchant_id' => $merchantId,
         ]);
 
         return $row ? $this->factory->createFromDatabaseRow($row) : null;
@@ -74,7 +89,7 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
     {
         $row = $this->doFetchOne('
           SELECT ' . self::SELECT_FIELDS . '
-          FROM '.self::TABLE_NAME.'
+          FROM ' . self::TABLE_NAME . '
           WHERE merchant_id = :merchant_id
           AND debtor_id = :debtor_id', [
             'merchant_id' => $merchantId,
@@ -84,11 +99,11 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
         return $row ? $this->factory->createFromDatabaseRow($row) : null;
     }
 
-    public function getOneByMerchantExternalId(string $merchantExternalId, string $merchantId, array $excludedOrderStates): ?MerchantDebtorEntity
+    public function getOneByExternalIdAndMerchantId(string $merchantExternalId, string $merchantId, array $excludedOrderStates): ?MerchantDebtorEntity
     {
         $row = $this->doFetchOne('
             SELECT ' . self::SELECT_FIELDS . '
-            FROM '.self::TABLE_NAME.' 
+            FROM ' . self::TABLE_NAME . ' 
             WHERE merchants_debtors.id = (
                 SELECT merchant_debtor_id
                 FROM orders
@@ -96,7 +111,7 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
                 WHERE orders.merchant_id = :merchant_id
                 AND debtor_external_data.merchant_external_id = :merchant_external_id
                 AND merchant_debtor_id IS NOT NULL
-                '.($excludedOrderStates ? 'AND orders.state NOT IN ("'.implode('", "', $excludedOrderStates).'")' : '').'
+                ' . ($excludedOrderStates ? 'AND orders.state NOT IN ("' . implode('", "', $excludedOrderStates) . '")' : '') . '
                 ORDER BY orders.id DESC
                 LIMIT 1
             )
@@ -110,25 +125,30 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
 
     public function getMerchantDebtorCreatedOrdersAmount(int $merchantDebtorId): float
     {
-        $row = $this->doFetchOne('
-            SELECT SUM(amount_gross) AS created_amount
-            FROM orders
-            WHERE orders.merchant_debtor_id = :id AND orders.state = :state_created
-        ', [
-            'id' => $merchantDebtorId,
-            'state_created' => OrderStateManager::STATE_CREATED,
-        ]);
-
-        return $row['created_amount'] ?? 0;
+        return $this->getMerchantDebtorOrdersAmountByState($merchantDebtorId, OrderStateManager::STATE_CREATED);
     }
 
-    public function getDebtorsWithExternalId(string $where = ''): \Generator
+    public function getMerchantDebtorOrdersAmountByState(int $merchantDebtorId, string $state): float
+    {
+        $row = $this->doFetchOne('
+            SELECT SUM(amount_gross) AS amount
+            FROM orders
+            WHERE orders.merchant_debtor_id = :id AND orders.state = :state
+        ', [
+            'id' => $merchantDebtorId,
+            'state' => $state,
+        ]);
+
+        return $row['amount'] ?? 0;
+    }
+
+    public function getMerchantDebtorIdentifierDtos(string $where = ''): ?\Generator
     {
         $where = $where ? "WHERE {$where}" : '';
         $tableName = self::TABLE_NAME;
 
         $sql = <<<SQL
-    SELECT debtor_id, 
+    SELECT {$tableName}.uuid as merchant_debtor_uuid, debtor_id, 
            merchants_debtors.merchant_id,
            merchant_external_id,
            merchant_debtor_id
@@ -140,12 +160,74 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
     ORDER BY merchant_id, merchant_external_id, debtor_id
 SQL;
         $stmt = $this->doExecute($sql);
+        $count = 0;
+
         while ($stmt && $row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
             yield (new MerchantDebtorIdentifierDTO())
+                ->setMerchantDebtorUuid($row['merchant_debtor_uuid'])
+                ->setMerchantDebtorId($row['merchant_debtor_id'])
                 ->setMerchantDebtorId($row['merchant_debtor_id'])
                 ->setMerchantId($row['merchant_id'])
                 ->setDebtorId((int) $row['debtor_id'])
                 ->setMerchantExternalId($row['merchant_external_id']);
+            $count++;
         }
+
+        if ($count === 0) {
+            yield from [];
+        }
+    }
+
+    public function getOneMerchantDebtorIdentifierDto(int $merchantDebtorId): ?MerchantDebtorIdentifierDTO
+    {
+        return $this->getMerchantDebtorIdentifierDtos(self::TABLE_NAME . ".id={$merchantDebtorId}")->current();
+    }
+
+    public function findExternalId(int $merchantDebtorId): ?string
+    {
+        $identifierDto = $this->getOneMerchantDebtorIdentifierDto($merchantDebtorId);
+
+        return $identifierDto ? $identifierDto->getMerchantExternalId() : null;
+    }
+
+    public function getByMerchantId(
+        int $merchantId,
+        int $offset,
+        int $limit,
+        string $sortBy,
+        string $sortDirection,
+        ?string $searchString
+    ): array {
+        $tableName = self::TABLE_NAME;
+        $where = $tableName . '.merchant_id = :merchant_id';
+        $queryParameters = ['merchant_id' => $merchantId];
+        $select = "merchant_debtor_id as id, merchant_external_id as external_id";
+
+        $sql = <<<SQL
+    SELECT %s
+    FROM orders
+        INNER JOIN debtor_external_data ON (debtor_external_data_id = debtor_external_data.id)
+        INNER JOIN {$tableName} ON (merchant_debtor_id = {$tableName}.id)
+    WHERE %s
+    GROUP BY $tableName.debtor_id, $tableName.merchant_id, merchant_external_id, merchant_debtor_id
+SQL;
+
+        if ($searchString) {
+            $where .= ' AND (merchant_external_id LIKE :search)';
+            $queryParameters['search'] = '%'.$searchString.'%';
+        }
+
+        $totalCount = $this->doFetchOne(sprintf($sql, 'COUNT(*) as total_count', $where), $queryParameters);
+
+        $sql .= " ORDER BY :sort_field :sort_direction LIMIT {$offset},{$limit}";
+        $queryParameters['sort_field'] = $tableName . '.' . $sortBy;
+        $queryParameters['sort_direction'] = $sortDirection;
+
+        $rows = $this->doFetchAll(sprintf($sql, $select, $where), $queryParameters);
+
+        return [
+            'total' => $totalCount['total_count'] ?? 0,
+            'rows' => $rows,
+        ];
     }
 }

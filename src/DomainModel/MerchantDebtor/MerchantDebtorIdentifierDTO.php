@@ -6,6 +6,8 @@ class MerchantDebtorIdentifierDTO
 {
     private $merchantDebtorId;
 
+    private $merchantDebtorUuid;
+
     private $merchantExternalId;
 
     private $merchantId;
@@ -20,6 +22,18 @@ class MerchantDebtorIdentifierDTO
     public function setMerchantDebtorId(int $merchantDebtorId): MerchantDebtorIdentifierDTO
     {
         $this->merchantDebtorId = $merchantDebtorId;
+
+        return $this;
+    }
+
+    public function getMerchantDebtorUuid(): string
+    {
+        return $this->merchantDebtorUuid;
+    }
+
+    public function setMerchantDebtorUuid(string $merchantDebtorUuid): MerchantDebtorIdentifierDTO
+    {
+        $this->merchantDebtorUuid = $merchantDebtorUuid;
 
         return $this;
     }

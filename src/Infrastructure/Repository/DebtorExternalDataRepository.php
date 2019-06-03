@@ -55,7 +55,7 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
             'subindustry_sector' => $debtor->getSubindustrySector(),
             'employees_number' => $debtor->getEmployeesNumber(),
             'address_id' => $debtor->getAddressId(),
-            'is_established_customer' => $debtor->isEstablishedCustomer(),
+            'is_established_customer' => intval($debtor->isEstablishedCustomer()),
             'merchant_external_id' => $debtor->getMerchantExternalId(),
             'created_at' => $debtor->getCreatedAt()->format(self::DATE_FORMAT),
             'updated_at' => $debtor->getUpdatedAt()->format(self::DATE_FORMAT),

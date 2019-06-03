@@ -8,17 +8,17 @@ security:
         healthcheck:
             pattern: ^/healthcheck
             security: false
-        checkout:
+        support_api: # TODO: move all support endpoints under the /support/ API prefix
+            pattern: ^/(merchant|merchant-debtor)/
+            security: false
+        checkout_authorize:
             pattern: ^/checkout-session/.*/authorize
             anonymous: false
             stateless: true
             guard:
                 authenticators:
                     - App\Http\Authentication\Authenticator\CheckoutSessionAuthenticator
-        support:
-            pattern: ^/merchant*
-            security: false
-        api:
+        api_default:
             anonymous: false
             stateless: true
             guard:

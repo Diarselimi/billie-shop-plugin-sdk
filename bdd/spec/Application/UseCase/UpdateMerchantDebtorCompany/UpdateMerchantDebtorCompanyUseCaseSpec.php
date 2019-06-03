@@ -51,7 +51,7 @@ class UpdateMerchantDebtorCompanyUseCaseSpec extends ObjectBehavior
         $this->mockRequest($request);
 
         $validator->validate($request, Argument::any(), Argument::any())->shouldBeCalledOnce()->willReturn(new ConstraintViolationList());
-        $merchantDebtorRepository->getOneByMerchantExternalId(self::MERCHANT_DEBTOR_EXTERNAL_ID, self::MERCHANT_ID, [])->shouldBeCalledOnce()->willReturn(null);
+        $merchantDebtorRepository->getOneByExternalIdAndMerchantId(self::MERCHANT_DEBTOR_EXTERNAL_ID, self::MERCHANT_ID, [])->shouldBeCalledOnce()->willReturn(null);
 
         $this->shouldThrow(MerchantDebtorNotFoundException::class)->during('execute', [$request]);
     }
@@ -69,7 +69,7 @@ class UpdateMerchantDebtorCompanyUseCaseSpec extends ObjectBehavior
         $this->mockDebtorCompany($debtorCompany);
 
         $validator->validate($request, Argument::any(), Argument::any())->shouldBeCalledOnce()->willReturn(new ConstraintViolationList());
-        $merchantDebtorRepository->getOneByMerchantExternalId(self::MERCHANT_DEBTOR_EXTERNAL_ID, self::MERCHANT_ID, [])->shouldBeCalledOnce()->willReturn($merchantDebtor);
+        $merchantDebtorRepository->getOneByExternalIdAndMerchantId(self::MERCHANT_DEBTOR_EXTERNAL_ID, self::MERCHANT_ID, [])->shouldBeCalledOnce()->willReturn($merchantDebtor);
         $companiesService->getDebtor(self::DEBTOR_ID)->shouldBeCalledOnce()->willReturn($debtorCompany);
         $companiesService->updateDebtor(self::DEBTOR_ID, [
             'name' => 'Billie1',
@@ -95,7 +95,7 @@ class UpdateMerchantDebtorCompanyUseCaseSpec extends ObjectBehavior
         $this->mockDebtorCompany($debtorCompany);
 
         $validator->validate($request, Argument::any(), Argument::any())->shouldBeCalledOnce()->willReturn(new ConstraintViolationList());
-        $merchantDebtorRepository->getOneByMerchantExternalId(self::MERCHANT_DEBTOR_EXTERNAL_ID, self::MERCHANT_ID, [])->shouldBeCalledOnce()->willReturn($merchantDebtor);
+        $merchantDebtorRepository->getOneByExternalIdAndMerchantId(self::MERCHANT_DEBTOR_EXTERNAL_ID, self::MERCHANT_ID, [])->shouldBeCalledOnce()->willReturn($merchantDebtor);
         $companiesService->getDebtor(self::DEBTOR_ID)->shouldBeCalledOnce()->willReturn($debtorCompany);
         $companiesService->updateDebtor(self::DEBTOR_ID, [
             'name' => 'Billie1',

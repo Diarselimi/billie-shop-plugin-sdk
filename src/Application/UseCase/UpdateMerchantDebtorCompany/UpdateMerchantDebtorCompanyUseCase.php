@@ -34,7 +34,7 @@ class UpdateMerchantDebtorCompanyUseCase implements LoggingInterface, ValidatedU
     {
         $this->validateRequest($request);
 
-        $merchantDebtor = $this->merchantDebtorRepository->getOneByMerchantExternalId(
+        $merchantDebtor = $this->merchantDebtorRepository->getOneByExternalIdAndMerchantId(
             $request->getMerchantDebtorExternalId(),
             $request->getMerchantId(),
             []

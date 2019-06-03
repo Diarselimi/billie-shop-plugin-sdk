@@ -37,5 +37,15 @@ interface OrderRepositoryInterface
      */
     public function getOrdersByInvoiceHandlingStrategy(string $strategy): Generator;
 
+    public function getByMerchantId(
+        int $merchantId,
+        int $offset,
+        int $limit,
+        string $sortBy,
+        string $sortDirection,
+        ?string $searchString,
+        ?array $filters
+    ): array;
+
     public function getOrdersCountByMerchantDebtorAndState(int $merchantDebtorId, string $state): int;
 }

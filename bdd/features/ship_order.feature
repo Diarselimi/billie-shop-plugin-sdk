@@ -65,6 +65,7 @@ Feature:
           "invoice": {
             "number": "CO123",
             "payout_amount": 1000,
+            "outstanding_amount": 1000,
             "fee_amount": 10,
             "fee_rate": 1,
             "due_date": "1978-11-20"
@@ -75,7 +76,16 @@ Feature:
             "address_postal_code": "test",
             "address_street": "test",
             "address_house": "test",
-            "industry_sector": "test"
+            "industry_sector": "test",
+            "merchant_customer_id":"ext_id"
+         },
+         "duration":30,
+         "delivery_address":{
+            "house_number":"test",
+            "street":"test",
+            "city": "test",
+            "postal_code":"test",
+            "country":"TE"
           }
         }
         """
@@ -148,6 +158,7 @@ Feature:
           "invoice": {
             "number": "test",
             "payout_amount": 1000,
+            "outstanding_amount": 1000,
             "fee_amount": 10,
             "fee_rate": 1,
             "due_date": "1978-11-20"
@@ -158,7 +169,16 @@ Feature:
             "address_postal_code": "test",
             "address_street": "test",
             "address_house": "test",
-            "industry_sector": "test"
+            "industry_sector": "test",
+            "merchant_customer_id":"ext_id"
+          },
+            "duration":30,
+            "delivery_address":{
+                "house_number":"test",
+                "street":"test",
+                "city": "test",
+                "postal_code":"test",
+                "country":"TE"
           }
         }
         """

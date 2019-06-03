@@ -35,7 +35,7 @@ class UpdateMerchantDebtorLimitUseCase implements LoggingInterface, ValidatedUse
     {
         $this->validateRequest($request);
 
-        $merchantDebtor = $this->merchantDebtorRepository->getOneByMerchantExternalId(
+        $merchantDebtor = $this->merchantDebtorRepository->getOneByExternalIdAndMerchantId(
             $request->getMerchantDebtorExternalId(),
             $request->getMerchantId(),
             []

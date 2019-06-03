@@ -5,13 +5,11 @@ namespace App\Http\Controller;
 use App\Application\Exception\MerchantDebtorNotFoundException;
 use App\Application\UseCase\GetMerchantDebtor\GetMerchantDebtorRequest;
 use App\Application\UseCase\GetMerchantDebtor\GetMerchantDebtorUseCase;
-use App\DomainModel\MerchantDebtorResponse\MerchantDebtor;
+use App\DomainModel\MerchantDebtorResponse\MerchantDebtorExtended;
 use App\DomainModel\MerchantDebtorResponse\MerchantDebtorResponseFactory;
-use App\Http\HttpConstantsInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class GetMerchantDebtorController
+class GetMerchantDebtorSupportController
 {
     private $useCase;
 
@@ -23,18 +21,14 @@ class GetMerchantDebtorController
         $this->responseFactory = $responseFactory;
     }
 
-    public function execute(string $merchantDebtorUuid, Request $request): MerchantDebtor
+    public function execute(int $merchantId, string $merchantDebtorExternalId): MerchantDebtorExtended
     {
         try {
-            $container = $this->useCase->execute(new GetMerchantDebtorRequest(
-                $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID),
-                $merchantDebtorUuid,
-                null
-            ));
+            $container = $this->useCase->execute(new GetMerchantDebtorRequest($merchantId, null, $merchantDebtorExternalId));
         } catch (MerchantDebtorNotFoundException $e) {
             throw new NotFoundHttpException('Merchant Debtor not found.');
         }
 
-        return $this->responseFactory->createFromContainer($container);
+        return $this->responseFactory->createExtendedFromContainer($container);
     }
 }

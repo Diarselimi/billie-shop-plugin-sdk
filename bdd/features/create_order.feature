@@ -128,6 +128,7 @@ Feature:
        "invoice":{
           "number":null,
           "payout_amount":null,
+          "outstanding_amount":null,
           "fee_amount":null,
           "fee_rate":null,
           "due_date":null
@@ -138,7 +139,17 @@ Feature:
           "address_postal_code":"12345",
           "address_street":"c\/Velarus",
           "address_house":"33",
-          "industry_sector":"SOME SECTOR"
+          "industry_sector":"SOME SECTOR",
+          "merchant_customer_id":"12"
+       },
+       "duration":30,
+       "shipped_at":null,
+       "delivery_address":{
+          "house_number":"22",
+          "street":"Charlot strasse",
+          "city":"Paris",
+          "postal_code":"98765",
+          "country":"DE"
        }
     }
     """
@@ -216,6 +227,7 @@ Feature:
       "invoice":{
         "number":null,
         "payout_amount":null,
+        "outstanding_amount":null,
         "fee_amount":null,
         "fee_rate":null,
         "due_date":null
@@ -226,8 +238,18 @@ Feature:
         "address_postal_code":"10179",
         "address_street":"Heinrich-Heine-Platz",
         "address_house":"10",
-        "industry_sector":"SOME SECTOR"
-      }
+        "industry_sector":"SOME SECTOR",
+        "merchant_customer_id":"12"
+     },
+     "duration":30,
+     "shipped_at":null,
+     "delivery_address":{
+        "house_number":"22",
+        "street":"Charlot strasse",
+        "city": "Paris",
+        "postal_code":"98765",
+        "country":"DE"
+     }
     }
     """
     And the order "A1" has the same hash "testusercompanyva2223333somenumbersomelegalberlin10179heinrichheineplatz10de"
@@ -305,6 +327,7 @@ Feature:
       "invoice":{
         "number":null,
         "payout_amount":null,
+        "outstanding_amount":null,
         "fee_amount":null,
         "fee_rate":null,
         "due_date":null
@@ -315,8 +338,18 @@ Feature:
         "address_postal_code":"10179",
         "address_street":"Heinrich-Heine-Platz",
         "address_house":"10",
-        "industry_sector":"SOME SECTOR"
-      }
+        "industry_sector":"SOME SECTOR",
+        "merchant_customer_id":"12"
+       },
+       "duration":30,
+       "shipped_at":null,
+       "delivery_address":{
+          "house_number":null,
+          "street":"Moulin Rouge Str.",
+          "city":"Paris",
+          "postal_code":"98765",
+          "country":"DE"
+       }
     }
     """
     And the order "A123" has the same hash "testusercompanyva2223333somenumbersomelegalberlin10179heinrichheineplatz10de"
@@ -395,6 +428,7 @@ Feature:
       "invoice":{
         "number":null,
         "payout_amount":null,
+        "outstanding_amount":null,
         "fee_amount":null,
         "fee_rate":null,
         "due_date":null
@@ -405,8 +439,18 @@ Feature:
         "address_postal_code":"10179",
         "address_street":"Heinrich-Heine-Platz",
         "address_house":"10",
-        "industry_sector":"SOME SECTOR"
-      }
+        "industry_sector":"SOME SECTOR",
+        "merchant_customer_id":"12"
+       },
+       "duration":30,
+       "shipped_at":null,
+       "delivery_address":{
+          "house_number":"22",
+          "street":"Charlot strasse",
+          "city":"Paris",
+          "postal_code":"98765",
+          "country":"de"
+       }
     }
     """
 
@@ -485,6 +529,7 @@ Feature:
        "invoice":{
           "number":null,
           "payout_amount":null,
+          "outstanding_amount":null,
           "fee_amount":null,
           "fee_rate":null,
           "due_date":null
@@ -495,7 +540,17 @@ Feature:
           "address_postal_code":"10179",
           "address_street":"Heinrich-Heine-Platz",
           "address_house":"10",
-          "industry_sector":"SOME SECTOR"
+          "industry_sector":"SOME SECTOR",
+          "merchant_customer_id":"12"
+       },
+       "duration":30,
+       "shipped_at":null,
+       "delivery_address":{
+          "house_number":"22",
+          "street":"Charlot strasse",
+          "city":"Paris",
+          "postal_code":"98765",
+          "country":"DE"
        }
     }
     """

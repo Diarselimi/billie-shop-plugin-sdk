@@ -6,6 +6,11 @@ get_merchant:
   controller: App\Http\Controller\GetMerchantController::execute
   methods: [GET]
 
+get_orders:
+  path: /orders
+  controller: App\Http\Controller\GetOrdersController::execute
+  methods: [GET]
+
 get_order:
   path: /order/{id}
   controller: App\Http\Controller\GetOrderController::execute
@@ -81,9 +86,9 @@ update_merchant_debtor_company:
   controller: App\Http\Controller\UpdateMerchantDebtorCompanyController::execute
   methods: [PUT]
 
-get_merchant_debtor:
+get_merchant_debtor_support:
   path: /merchant/{merchantId}/merchant-debtor/{merchantDebtorExternalId}
-  controller: App\Http\Controller\GetMerchantDebtorController::execute
+  controller: App\Http\Controller\GetMerchantDebtorSupportController::execute
   methods: [GET]
 
 mark_duplicate_debtors:
@@ -96,7 +101,9 @@ whitelist_merchant_debtor:
   controller: App\Http\Controller\UpdateMerchantDebtorWhitelistController::execute
   methods: [PUT]
 
-# checkout session_id auth
+########################################
+##      Checkout API (paella-api)
+########################################
 create_checkout_session:
   path: /checkout-session
   controller: App\Http\Controller\CreateCheckoutSessionController::execute
@@ -111,3 +118,16 @@ confirm_checkout_session:
   path: /checkout-session/{sessionUuid}/confirm
   controller: App\Http\Controller\ConfirmCheckoutSessionController::execute
   methods: [PUT]
+
+########################################
+##        Debtors API (paella-api)
+########################################
+get_merchant_debtor:
+  path: /debtor/{merchantDebtorUuid}
+  controller: App\Http\Controller\GetMerchantDebtorController::execute
+  methods: [GET]
+
+get_merchant_debtors_list:
+  path: /debtors
+  controller: App\Http\Controller\GetMerchantDebtorsController::execute
+  methods: [GET]

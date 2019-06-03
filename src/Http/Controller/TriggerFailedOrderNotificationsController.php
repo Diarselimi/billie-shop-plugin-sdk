@@ -7,7 +7,6 @@ use App\Application\UseCase\TriggerFailedOrderNotifications\TriggerFailedOrderNo
 use App\Application\UseCase\TriggerFailedOrderNotifications\TriggerFailedOrderNotificationsUseCase;
 use App\Http\HttpConstantsInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class TriggerFailedOrderNotificationsController
@@ -19,7 +18,7 @@ class TriggerFailedOrderNotificationsController
         $this->useCase = $useCase;
     }
 
-    public function execute(string $id, Request $request): Response
+    public function execute(string $id, Request $request): void
     {
         try {
             $useCaseRequest = new TriggerFailedOrderNotificationsRequest(
@@ -31,7 +30,5 @@ class TriggerFailedOrderNotificationsController
         } catch (OrderNotFoundException $e) {
             throw new NotFoundHttpException($e->getMessage());
         }
-
-        return new Response();
     }
 }

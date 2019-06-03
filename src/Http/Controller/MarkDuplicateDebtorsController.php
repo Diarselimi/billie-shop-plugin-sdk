@@ -6,7 +6,6 @@ use App\Application\UseCase\MarkDuplicateDebtor\MarkDuplicateDebtorRequest;
 use App\Application\UseCase\MarkDuplicateDebtor\MarkDuplicateDebtorUseCase;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -21,7 +20,7 @@ class MarkDuplicateDebtorsController implements LoggingInterface
         $this->useCase = $useCase;
     }
 
-    public function execute(Request $request): JsonResponse
+    public function execute(Request $request): void
     {
         $duplicates = $request->request->get('duplicates', []);
 
@@ -39,7 +38,5 @@ class MarkDuplicateDebtorsController implements LoggingInterface
         }
 
         $this->useCase->execute(... $requests);
-
-        return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
     }
 }

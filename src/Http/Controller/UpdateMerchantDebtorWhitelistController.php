@@ -3,7 +3,6 @@
 namespace App\Http\Controller;
 
 use App\Application\Exception\MerchantDebtorNotFoundException;
-use App\Application\UseCase\GetMerchantDebtor\GetMerchantDebtorResponse;
 use App\Application\UseCase\UpdateMerchantDebtorWhitelist\WhitelistMerchantDebtorRequest;
 use App\Application\UseCase\UpdateMerchantDebtorWhitelist\WhitelistMerchantDebtorUseCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,10 +18,10 @@ class UpdateMerchantDebtorWhitelistController
         $this->useCase = $useCase;
     }
 
-    public function execute(Request $request, int $merchantId, string $merchantDebtorExternalId): GetMerchantDebtorResponse
+    public function execute(Request $request, int $merchantId, string $merchantDebtorExternalId): void
     {
         try {
-            $response = $this->useCase->execute(
+            $this->useCase->execute(
                 new WhitelistMerchantDebtorRequest(
                     $merchantDebtorExternalId,
                     $merchantId,
@@ -32,7 +31,5 @@ class UpdateMerchantDebtorWhitelistController
         } catch (MerchantDebtorNotFoundException $exception) {
             throw new NotFoundHttpException($exception->getMessage(), null, Response::HTTP_NOT_FOUND);
         }
-
-        return $response;
     }
 }

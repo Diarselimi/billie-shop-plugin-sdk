@@ -7,6 +7,8 @@ use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 
 class MerchantDebtorEntity extends AbstractTimestampableEntity
 {
+    private $uuid;
+
     private $merchantId;
 
     private $debtorId;
@@ -18,6 +20,18 @@ class MerchantDebtorEntity extends AbstractTimestampableEntity
     private $scoreThresholdsConfigurationId;
 
     private $isWhitelisted;
+
+    public function getUuid(): string
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid(string $uuid): MerchantDebtorEntity
+    {
+        $this->uuid = $uuid;
+
+        return $this;
+    }
 
     public function getMerchantId(): string
     {

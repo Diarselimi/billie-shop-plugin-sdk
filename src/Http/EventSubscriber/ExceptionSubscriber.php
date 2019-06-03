@@ -78,7 +78,7 @@ class ExceptionSubscriber implements EventSubscriberInterface, LoggingInterface
             $error['stack_trace'] = $exception->getTraceAsString();
         }
 
-        if ($previousException instanceof RequestException) {
+        if ($previousException instanceof RequestException && $previousException->getResponse()) {
             $remoteError = json_decode($previousException->getResponse()->getBody()->__toString(), true);
             if (is_array($remoteError)) {
                 if (isset($remoteError['stack_trace'])) {
