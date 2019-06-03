@@ -76,6 +76,11 @@ create_merchant:
   controller: App\Http\Controller\CreateMerchantController::execute
   methods: [POST]
 
+register_merchant_user:
+  path: /merchant/{merchantId}/user
+  controller: App\Http\Controller\RegisterMerchantUserController::execute
+  methods: [POST]
+
 update_merchant_debtor_limit:
   path: /merchant/{merchantId}/merchant-debtor/{merchantDebtorExternalId}/limit
   controller: App\Http\Controller\UpdateMerchantDebtorLimitController::execute

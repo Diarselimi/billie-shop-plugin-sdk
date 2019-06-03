@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Smaug;
 
 use App\DomainModel\MerchantUser\AuthenticationServiceCreateClientResponseDTO;
+use App\DomainModel\MerchantUser\AuthenticationServiceCreateUserResponseDTO;
 use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
 use App\DomainModel\MerchantUser\AuthenticationServiceAuthorizeTokenResponseDTO;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
@@ -67,6 +68,32 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
             );
         } catch (TransferException $exception) {
             $this->logSuppressedException($exception, 'Failed to create OAuth client', ['exception' => $exception]);
+
+            throw new AuthenticationServiceException();
+        }
+    }
+
+    public function createUser(string $email, string $password): AuthenticationServiceCreateUserResponseDTO
+    {
+        try {
+            $response = $this->client->post(
+                '/users',
+                [
+                    'json' => ['email' => $email, 'password' => $password],
+                    'on_stats' => function (TransferStats $stats) {
+                        $this->logServiceRequestStats($stats, 'create_oauth_user');
+                    },
+                ]
+            );
+
+            $decodedResponse = json_decode((string) $response->getBody(), true);
+
+            return new AuthenticationServiceCreateUserResponseDTO(
+                $decodedResponse['user_id'],
+                $decodedResponse['user_email']
+            );
+        } catch (TransferException $exception) {
+            $this->logSuppressedException($exception, 'Failed to create OAuth user', ['exception' => $exception]);
 
             throw new AuthenticationServiceException();
         }

@@ -545,6 +545,18 @@ class PaellaCoreContext extends MinkContext
         );
     }
 
+    /**
+     * @Given merchant user with merchant id :merchantId and user id :userId should be created
+     */
+    public function merchantUserWithMerchantIdAndUserIdShouldBeCreated(string $merchantId, string $userId)
+    {
+        $user = $this->getMerchantUserRepository()->getOneByUserId($userId);
+
+        Assert::notNull($user);
+        Assert::eq($user->getMerchantId(), $merchantId);
+        Assert::eq($user->getUserId(), $userId);
+    }
+
     private function getDebtorExternalDataRepository(): DebtorExternalDataRepositoryInterface
     {
         return $this->get(DebtorExternalDataRepositoryInterface::class);
