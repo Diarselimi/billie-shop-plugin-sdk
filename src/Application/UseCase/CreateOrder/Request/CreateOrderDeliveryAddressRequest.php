@@ -30,7 +30,7 @@ class CreateOrderDeliveryAddressRequest
 
     /**
      * @Assert\NotBlank()
-     * @Assert\Regex(pattern="/^[0-9]{5}$/", match=true)
+     * @Assert\Length(max=50)
      */
     private $postalCode;
 
