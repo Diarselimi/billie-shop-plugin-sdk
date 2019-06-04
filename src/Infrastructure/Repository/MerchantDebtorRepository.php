@@ -201,23 +201,29 @@ SQL;
         $tableName = self::TABLE_NAME;
         $where = $tableName . '.merchant_id = :merchant_id';
         $queryParameters = ['merchant_id' => $merchantId];
-        $select = "merchant_debtor_id as id, merchant_external_id as external_id";
+        $select = "merchants_debtors.id AS id, debtor_id, debtor_external_data.merchant_external_id AS external_id";
 
         $sql = <<<SQL
     SELECT %s
-    FROM orders
-        INNER JOIN debtor_external_data ON (debtor_external_data_id = debtor_external_data.id)
-        INNER JOIN {$tableName} ON (merchant_debtor_id = {$tableName}.id)
+    FROM {$tableName}
+        INNER JOIN (
+	        SELECT MAX(id) AS id, merchant_debtor_id FROM orders GROUP BY merchant_debtor_id
+        ) AS last_order ON last_order.merchant_debtor_id = merchants_debtors.id
+        INNER JOIN orders ON orders.id = last_order.id
+        INNER JOIN debtor_external_data ON debtor_external_data.id = orders.debtor_external_data_id
     WHERE %s
-    GROUP BY $tableName.debtor_id, $tableName.merchant_id, merchant_external_id, merchant_debtor_id
 SQL;
 
         if ($searchString) {
-            $where .= ' AND (merchant_external_id LIKE :search)';
+            $where .= ' AND (debtor_external_data.merchant_external_id LIKE :search)';
             $queryParameters['search'] = '%'.$searchString.'%';
         }
 
-        $totalCount = $this->doFetchOne(sprintf($sql, 'COUNT(*) as total_count', $where), $queryParameters);
+        $totalCount = $this->doFetchOne('SELECT count(*) as total_count FROM (' . sprintf(
+            $sql,
+            'merchants_debtors.id',
+            $where
+        ) . ') AS md', $queryParameters);
 
         $sql .= " ORDER BY :sort_field :sort_direction LIMIT {$offset},{$limit}";
         $queryParameters['sort_field'] = $tableName . '.' . $sortBy;

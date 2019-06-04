@@ -9,6 +9,7 @@ use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\MerchantDebtorResponse\MerchantDebtorList;
+use App\DomainModel\MerchantDebtorResponse\MerchantDebtorListItem;
 use App\DomainModel\MerchantDebtorResponse\MerchantDebtorResponseFactory;
 
 class GetMerchantDebtorsUseCase implements ValidatedUseCaseInterface
@@ -49,13 +50,13 @@ class GetMerchantDebtorsUseCase implements ValidatedUseCaseInterface
         );
 
         $merchantDebtors = array_map(function (array $row) use ($request) {
-            return $this->createListItem($row['id'], $row['external_id']);
+            return $this->createListItem($row['id'], $row['external_id'], $row['debtor_id']);
         }, $result['rows']);
 
         return $this->responseFactory->createList($result['total'], $merchantDebtors);
     }
 
-    private function createListItem($id, $externalId)
+    private function createListItem(int $id, string $externalId, int $companyId): MerchantDebtorListItem
     {
         $merchantDebtor = $this->merchantDebtorRepository->getOneById($id);
 
@@ -64,7 +65,7 @@ class GetMerchantDebtorsUseCase implements ValidatedUseCaseInterface
         }
 
         $financingDetails = $this->financialDetailsRepository->getCurrentByMerchantDebtorId($id);
-        $company = $this->companiesService->getDebtor($id);
+        $company = $this->companiesService->getDebtor($companyId);
 
         return $this->responseFactory->createListItem($externalId, $merchantDebtor, $company, $financingDetails);
     }
