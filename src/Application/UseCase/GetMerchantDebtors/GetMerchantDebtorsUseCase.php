@@ -5,6 +5,7 @@ namespace App\Application\UseCase\GetMerchantDebtors;
 use App\Application\Exception\MerchantDebtorNotFoundException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
+use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
@@ -24,16 +25,20 @@ class GetMerchantDebtorsUseCase implements ValidatedUseCaseInterface
 
     private $responseFactory;
 
+    private $paymentService;
+
     public function __construct(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         CompaniesServiceInterface $companiesService,
         MerchantDebtorFinancialDetailsRepositoryInterface $financialDetailsRepository,
-        MerchantDebtorResponseFactory $responseFactory
+        MerchantDebtorResponseFactory $responseFactory,
+        BorschtInterface $paymentService
     ) {
         $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->responseFactory = $responseFactory;
         $this->companiesService = $companiesService;
         $this->financialDetailsRepository = $financialDetailsRepository;
+        $this->paymentService = $paymentService;
     }
 
     public function execute(GetMerchantDebtorsRequest $request): MerchantDebtorList
@@ -66,7 +71,8 @@ class GetMerchantDebtorsUseCase implements ValidatedUseCaseInterface
 
         $financingDetails = $this->financialDetailsRepository->getCurrentByMerchantDebtorId($id);
         $company = $this->companiesService->getDebtor($companyId);
+        $paymentsDetails = $this->paymentService->getDebtorPaymentDetails($merchantDebtor->getPaymentDebtorId());
 
-        return $this->responseFactory->createListItem($externalId, $merchantDebtor, $company, $financingDetails);
+        return $this->responseFactory->createListItem($externalId, $merchantDebtor, $company, $financingDetails, $paymentsDetails);
     }
 }

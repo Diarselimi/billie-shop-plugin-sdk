@@ -32,6 +32,16 @@ abstract class AbstractMerchantDebtor implements ArrayableInterface
     private $financingPower;
 
     /**
+     * @var string
+     */
+    private $bankAccountIban;
+
+    /**
+     * @var string
+     */
+    private $bankAccountBic;
+
+    /**
      * @var \DateTime
      */
     private $createdAt;
@@ -116,6 +126,30 @@ abstract class AbstractMerchantDebtor implements ArrayableInterface
         return $this;
     }
 
+    public function getBankAccountIban(): string
+    {
+        return $this->bankAccountIban;
+    }
+
+    public function setBankAccountIban(string $bankAccountIban): AbstractMerchantDebtor
+    {
+        $this->bankAccountIban = $bankAccountIban;
+
+        return $this;
+    }
+
+    public function getBankAccountBic(): string
+    {
+        return $this->bankAccountBic;
+    }
+
+    public function setBankAccountBic(string $bankAccountBic): AbstractMerchantDebtor
+    {
+        $this->bankAccountBic = $bankAccountBic;
+
+        return $this;
+    }
+
     public function getCreatedAt(): \DateTime
     {
         return $this->createdAt;
@@ -141,6 +175,9 @@ abstract class AbstractMerchantDebtor implements ArrayableInterface
 
             'financing_limit' => $this->financingLimit,
             'financing_power' => $this->financingPower,
+
+            'bank_account_iban' => $this->bankAccountIban,
+            'bank_account_bic' => $this->bankAccountBic,
 
             'created_at' => $this->createdAt->format(\DateTime::ISO8601),
         ];

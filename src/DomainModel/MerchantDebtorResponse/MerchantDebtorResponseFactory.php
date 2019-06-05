@@ -28,7 +28,7 @@ class MerchantDebtorResponseFactory
             ->setAddressCity($company->getAddressCity())
             ->setAddressCountry($company->getAddressCountry())
             ->setFinancingLimit($financialDetails->getFinancingLimit())
-            ->setFinancingPower($financialDetails->getFinancingPower())
+            ->setFinancingPower($this->calculateFinancingPower($company, $financialDetails))
             ->setOutstandingAmount($paymentDetails->getOutstandingAmount())
             ->setOutstandingAmountCreated($totalCreatedOrdersAmount)
             ->setOutstandingAmountLate($totalLateOrdersAmount)
@@ -70,7 +70,7 @@ class MerchantDebtorResponseFactory
             ->setAddressCity($company->getAddressCity())
             ->setAddressCountry($company->getAddressCountry())
             ->setFinancingLimit($financialDetails->getFinancingLimit())
-            ->setFinancingPower($financialDetails->getFinancingPower())
+            ->setFinancingPower($this->calculateFinancingPower($company, $financialDetails))
             ->setOutstandingAmount($paymentDetails->getOutstandingAmount())
             ->setOutstandingAmountCreated($totalCreatedOrdersAmount)
             ->setOutstandingAmountLate($totalLateOrdersAmount)
@@ -104,15 +104,19 @@ class MerchantDebtorResponseFactory
         string $merchantExternalId,
         MerchantDebtorEntity $merchantDebtor,
         DebtorCompany $company,
-        MerchantDebtorFinancialDetailsEntity $financialDetails
+        MerchantDebtorFinancialDetailsEntity $financialDetails,
+        DebtorPaymentDetailsDTO $paymentDetails
     ): MerchantDebtorListItem {
         return (new MerchantDebtorListItem())
             ->setUuid($merchantDebtor->getUuid())
             ->setExternalCode($merchantExternalId)
             ->setName($company->getName())
             ->setFinancingLimit($financialDetails->getFinancingLimit())
-            ->setFinancingPower($financialDetails->getFinancingPower())
-            ->setCreatedAt($merchantDebtor->getCreatedAt());
+            ->setFinancingPower($this->calculateFinancingPower($company, $financialDetails))
+            ->setBankAccountIban($paymentDetails->getBankAccountIban())
+            ->setBankAccountBic($paymentDetails->getBankAccountBic())
+            ->setCreatedAt($merchantDebtor->getCreatedAt())
+        ;
     }
 
     /**
@@ -125,5 +129,12 @@ class MerchantDebtorResponseFactory
         return (new MerchantDebtorList())
             ->setTotal($total)
             ->setItems(...$items);
+    }
+
+    private function calculateFinancingPower(
+        DebtorCompany $debtorCompany,
+        MerchantDebtorFinancialDetailsEntity $merchantDbtorfinancialDetails
+    ): float {
+        return min($merchantDbtorfinancialDetails->getFinancingPower(), $debtorCompany->getFinancingPower());
     }
 }

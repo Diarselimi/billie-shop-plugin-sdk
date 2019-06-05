@@ -44,16 +44,6 @@ class MerchantDebtor extends AbstractMerchantDebtor
      */
     private $outstandingAmountLate;
 
-    /**
-     * @var string
-     */
-    private $bankAccountIban;
-
-    /**
-     * @var string
-     */
-    private $bankAccountBic;
-
     public function getAddressStreet(): string
     {
         return $this->addressStreet;
@@ -182,38 +172,6 @@ class MerchantDebtor extends AbstractMerchantDebtor
         return $this;
     }
 
-    public function getBankAccountIban(): string
-    {
-        return $this->bankAccountIban;
-    }
-
-    /**
-     * @param  string                $bankAccountIban
-     * @return MerchantDebtor|static
-     */
-    public function setBankAccountIban(string $bankAccountIban): MerchantDebtor
-    {
-        $this->bankAccountIban = $bankAccountIban;
-
-        return $this;
-    }
-
-    public function getBankAccountBic(): string
-    {
-        return $this->bankAccountBic;
-    }
-
-    /**
-     * @param  string                $bankAccountBic
-     * @return MerchantDebtor|static
-     */
-    public function setBankAccountBic(string $bankAccountBic): MerchantDebtor
-    {
-        $this->bankAccountBic = $bankAccountBic;
-
-        return $this;
-    }
-
     public function toArray(): array
     {
         $data = parent::toArray();
@@ -228,9 +186,6 @@ class MerchantDebtor extends AbstractMerchantDebtor
             'outstanding_amount' => $this->outstandingAmount,
             'outstanding_amount_created' => $this->outstandingAmountCreated,
             'outstanding_amount_late' => $this->outstandingAmountLate,
-
-            'bank_account_iban' => $this->bankAccountIban,
-            'bank_account_bic' => $this->bankAccountBic,
         ]);
     }
 }

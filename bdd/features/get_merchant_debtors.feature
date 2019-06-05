@@ -24,6 +24,8 @@ Feature:
                     "name":"Test User Company",
                     "financing_limit":2000,
                     "financing_power":1000,
+                    "bank_account_iban":"DE1234",
+                    "bank_account_bic":"BICISHERE",
                     "created_at":"2019-01-01T12:00:00+0100"
                 }
             ]
@@ -47,6 +49,8 @@ Feature:
                     "name":"Test User Company",
                     "financing_limit":2000,
                     "financing_power":1000,
+                    "bank_account_iban":"DE1234",
+                    "bank_account_bic":"BICISHERE",
                     "created_at":"2019-01-01T12:00:00+0100"
                 }
             ]
