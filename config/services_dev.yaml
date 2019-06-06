@@ -10,7 +10,7 @@ services:
 
   App\Test\TestGuzzleSubscriber:
     arguments:
-      $mockServerUrl: ''
-      $servicesToMock: []
+      $mockServerUrl: '%env(MOCKSERVER_URL)%'
+      $servicesToMock: [salesforce]
       $servicesToProxyHeader: [alfred]
       $cliTestId: '%x_test_id%'
