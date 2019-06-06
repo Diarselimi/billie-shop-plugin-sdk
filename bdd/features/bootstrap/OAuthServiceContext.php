@@ -70,6 +70,16 @@ class OAuthServiceContext implements Context
     }
 
     /**
+     * @Given I successfully create OAuth client with email :email and user id :userId
+     */
+    public function iSuccessfullyCreateOAuthClientWithEmailAndUserIdTestSecret($email, $userId)
+    {
+        $this->mockRequest('/users', new ResponseStack(
+            new MockResponse(json_encode(['user_id' => $userId, 'user_email' => $email]))
+        ));
+    }
+
+    /**
      * @Given I get from OAuth service :url endpoint response with status :statusCode and body:
      */
     public function iGetFromOAuthServiceEndpointResponseWithStatusAndBody($url, $statusCode, PyStringNode $response)

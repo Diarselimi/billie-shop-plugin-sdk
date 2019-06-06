@@ -44,6 +44,8 @@ class OrderResponse implements ArrayableInterface
 
     private $payoutAmount;
 
+    private $outstandingAmount;
+
     private $originalAmount;
 
     private $feeAmount;
@@ -53,6 +55,24 @@ class OrderResponse implements ArrayableInterface
     private $dueDate;
 
     private $reasons;
+
+    private $createdAt;
+
+    private $debtorExternalDataCustomerId;
+
+    private $shippedAt;
+
+    private $deliveryAddressStreet;
+
+    private $deliveryAddressHouseNumber;
+
+    private $deliveryAddressPostalCode;
+
+    private $deliveryAddressCity;
+
+    private $deliveryAddressCountry;
+
+    private $duration;
 
     public function getExternalCode(): ? string
     {
@@ -294,6 +314,18 @@ class OrderResponse implements ArrayableInterface
         return $this;
     }
 
+    public function getOutstandingAmount(): ? float
+    {
+        return $this->outstandingAmount;
+    }
+
+    public function setOutstandingAmount(float $outstandingAmount): OrderResponse
+    {
+        $this->outstandingAmount = $outstandingAmount;
+
+        return $this;
+    }
+
     public function getOriginalAmount(): ? float
     {
         return $this->originalAmount;
@@ -342,6 +374,114 @@ class OrderResponse implements ArrayableInterface
         return $this;
     }
 
+    public function getCreatedAt(): \DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTime $createdAt): OrderResponse
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getDebtorExternalDataCustomerId(): ?string
+    {
+        return $this->debtorExternalDataCustomerId;
+    }
+
+    public function setDebtorExternalDataCustomerId(?string $debtorExternalDataCustomerId): OrderResponse
+    {
+        $this->debtorExternalDataCustomerId = $debtorExternalDataCustomerId;
+
+        return $this;
+    }
+
+    public function getShippedAt(): ?\DateTime
+    {
+        return $this->shippedAt;
+    }
+
+    public function setShippedAt(?\DateTime $shippedAt): OrderResponse
+    {
+        $this->shippedAt = $shippedAt;
+
+        return $this;
+    }
+
+    public function getDeliveryAddressStreet(): ?string
+    {
+        return $this->deliveryAddressStreet;
+    }
+
+    public function setDeliveryAddressStreet(?string $street): OrderResponse
+    {
+        $this->deliveryAddressStreet = $street;
+
+        return $this;
+    }
+
+    public function getDeliveryAddressHouseNumber(): ?string
+    {
+        return $this->deliveryAddressHouseNumber;
+    }
+
+    public function setDeliveryAddressHouseNumber(?string $deliveryAddressHouseNumber): OrderResponse
+    {
+        $this->deliveryAddressHouseNumber = $deliveryAddressHouseNumber;
+
+        return $this;
+    }
+
+    public function getDeliveryAddressPostalCode(): ?string
+    {
+        return $this->deliveryAddressPostalCode;
+    }
+
+    public function setDeliveryAddressPostalCode(?string $deliveryAddressPostalCode): OrderResponse
+    {
+        $this->deliveryAddressPostalCode = $deliveryAddressPostalCode;
+
+        return $this;
+    }
+
+    public function getDeliveryAddressCity(): ?string
+    {
+        return $this->deliveryAddressCity;
+    }
+
+    public function setDeliveryAddressCity(?string $deliveryAddressCity): OrderResponse
+    {
+        $this->deliveryAddressCity = $deliveryAddressCity;
+
+        return $this;
+    }
+
+    public function getDeliveryAddressCountry(): ?string
+    {
+        return $this->deliveryAddressCountry;
+    }
+
+    public function setDeliveryAddressCountry(?string $deliveryAddressCountry): OrderResponse
+    {
+        $this->deliveryAddressCountry = $deliveryAddressCountry;
+
+        return $this;
+    }
+
+    public function getDuration(): ?int
+    {
+        return $this->duration;
+    }
+
+    public function setDuration(int $duration): OrderResponse
+    {
+        $this->duration = $duration;
+
+        return $this;
+    }
+
     public function toArray(): array
     {
         return [
@@ -350,6 +490,7 @@ class OrderResponse implements ArrayableInterface
             'state' => $this->getState(),
             'reasons' => $this->getReasons() ?: null,
             'amount' => $this->getOriginalAmount(),
+            'created_at' => $this->getCreatedAt()->format(\DateTime::ISO8601),
             'debtor_company' => [
                 'name' => $this->getCompanyName(),
                 'house_number' => $this->getCompanyAddressHouseNumber(),
@@ -365,6 +506,7 @@ class OrderResponse implements ArrayableInterface
             'invoice' => [
                 'number' => $this->getInvoiceNumber(),
                 'payout_amount' => $this->getPayoutAmount(),
+                'outstanding_amount' => $this->getOutstandingAmount(),
                 'fee_amount' => $this->getFeeAmount(),
                 'fee_rate' => $this->getFeeRate(),
                 'due_date' => $this->getDueDate() ? $this->getDueDate()->format('Y-m-d') : null,
@@ -376,6 +518,16 @@ class OrderResponse implements ArrayableInterface
                 'address_street' => $this->getDebtorExternalDataAddressStreet(),
                 'address_house' => $this->getDebtorExternalDataAddressHouse(),
                 'industry_sector' => $this->getDebtorExternalDataIndustrySector(),
+                'merchant_customer_id' => $this->getDebtorExternalDataCustomerId(),
+            ],
+            'duration' => $this->getDuration(),
+            'shipped_at' => ($this->getShippedAt() ? $this->getShippedAt()->format(\DateTime::ISO8601) : null),
+            'delivery_address' => [
+                'house_number' => $this->getDeliveryAddressHouseNumber(),
+                'street' => $this->getDeliveryAddressStreet(),
+                'city' => $this->getDeliveryAddressCity(),
+                'postal_code' => $this->getDeliveryAddressPostalCode(),
+                'country' => $this->getDeliveryAddressCountry(),
             ],
         ];
     }

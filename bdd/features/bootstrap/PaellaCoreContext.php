@@ -49,6 +49,8 @@ class PaellaCoreContext extends MinkContext
      */
     private $merchant;
 
+    private const DEBTOR_UUID = 'ad74bbc4-509e-47d5-9b50-a0320ce3d715';
+
     public function __construct(KernelInterface $kernel, PdoConnection $connection)
     {
         $this->kernel = $kernel;
@@ -126,6 +128,7 @@ class PaellaCoreContext extends MinkContext
             TRUNCATE risk_check_definitions;
             TRUNCATE checkout_sessions;
             ALTER TABLE merchants AUTO_INCREMENT = 1;
+            ALTER TABLE merchants_debtors AUTO_INCREMENT = 1;
             ALTER TABLE orders AUTO_INCREMENT = 1;
             SET FOREIGN_KEY_CHECKS = 1;
         ');
@@ -183,8 +186,10 @@ class PaellaCoreContext extends MinkContext
 
         $merchantDebtor = (new MerchantDebtorEntity())
             ->setMerchantId($this->merchant->getId())
-            ->setDebtorId('1')
+            ->setDebtorId(1)
+            ->setUuid(self::DEBTOR_UUID)
             ->setPaymentDebtorId('test')
+            ->setCreatedAt(new \DateTime('2019-01-01 12:00:00'))
             ->setIsWhitelisted(false)
         ;
         $this->getMerchantDebtorRepository()->insert($merchantDebtor);
@@ -212,6 +217,7 @@ class PaellaCoreContext extends MinkContext
             ->setMerchantDebtorId($merchantDebtor->getId())
             ->setMerchantId('1')
             ->setPaymentId('test')
+            ->setCreatedAt(new \DateTime('2019-05-20 13:00:00'))
             ->setCheckoutSessionId(1)
             ->setUuid('test123');
 
@@ -322,7 +328,7 @@ class PaellaCoreContext extends MinkContext
      */
     public function checkMerchantDebtorWhitelistStatus(string $externalId, string $merchantId)
     {
-        $merchantDebtor = $this->getMerchantDebtorRepository()->getOneByMerchantExternalId($externalId, $merchantId, []);
+        $merchantDebtor = $this->getMerchantDebtorRepository()->getOneByExternalIdAndMerchantId($externalId, $merchantId, []);
 
         if (!$merchantDebtor->isWhitelisted()) {
             throw new RuntimeException(sprintf(
@@ -534,9 +540,21 @@ class PaellaCoreContext extends MinkContext
                 ->setPaymentMerchantId('any-payment-id')
                 ->setAvailableFinancingLimit(10000)
                 ->setApiKey('testMerchantApiKey')
-                ->setCompanyId($companyId)
+                ->setCompanyId((int) $companyId)
                 ->setOauthClientId('testMerchantOauthClientId')
         );
+    }
+
+    /**
+     * @Given merchant user with merchant id :merchantId and user id :userId should be created
+     */
+    public function merchantUserWithMerchantIdAndUserIdShouldBeCreated(string $merchantId, string $userId)
+    {
+        $user = $this->getMerchantUserRepository()->getOneByUserId($userId);
+
+        Assert::notNull($user);
+        Assert::eq($user->getMerchantId(), $merchantId);
+        Assert::eq($user->getUserId(), $userId);
     }
 
     private function getDebtorExternalDataRepository(): DebtorExternalDataRepositoryInterface

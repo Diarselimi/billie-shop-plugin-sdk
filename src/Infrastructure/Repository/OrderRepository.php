@@ -18,11 +18,33 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
 {
     const TABLE_NAME = 'orders';
 
-    private const SELECT_FIELDS = 'id, uuid, amount_net, amount_gross, amount_tax, amount_forgiven, 
-    duration, external_code, state, external_comment, internal_comment, invoice_number, invoice_url, 
-    proof_of_delivery_url, delivery_address_id, merchant_debtor_id, merchant_id, debtor_person_id, 
-    debtor_external_data_id, payment_id, created_at, updated_at, shipped_at, marked_as_fraud_at, 
-    checkout_session_id';
+    private const SELECT_FIELDS = [
+        'id',
+        'uuid',
+        'amount_net',
+        'amount_gross',
+        'amount_tax',
+        'amount_forgiven',
+        'duration',
+        'external_code',
+        'state',
+        'external_comment',
+        'internal_comment',
+        'invoice_number',
+        'invoice_url',
+        'proof_of_delivery_url',
+        'delivery_address_id',
+        'merchant_debtor_id',
+        'merchant_id',
+        'debtor_person_id',
+        'debtor_external_data_id',
+        'payment_id',
+        'created_at',
+        'updated_at',
+        'shipped_at',
+        'marked_as_fraud_at',
+        'checkout_session_id',
+    ];
 
     private $eventDispatcher;
 
@@ -124,7 +146,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
     public function getOneByExternalCode(string $externalCode, int $merchantId): ?OrderEntity
     {
         $order = $this->doFetchOne('
-          SELECT ' . self::SELECT_FIELDS . '
+          SELECT ' . implode(', ', self::SELECT_FIELDS) . '
           FROM '.self::TABLE_NAME.'
           WHERE external_code = :external_code AND merchant_id = :merchant_id
         ', [
@@ -135,10 +157,10 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
         return $order ? $this->orderFactory->createFromDatabaseRow($order) : null;
     }
 
-    public function getOneByMerchantIdAndExternalCodeOrUUID(string $id, int $merchantId): ? OrderEntity
+    public function getOneByMerchantIdAndExternalCodeOrUUID(string $id, int $merchantId): ?OrderEntity
     {
         $order = $this->doFetchOne('
-          SELECT ' . self::SELECT_FIELDS . '
+          SELECT ' . implode(', ', self::SELECT_FIELDS) . '
           FROM '.self::TABLE_NAME.'
           WHERE merchant_id = :merchant_id AND (external_code = :external_code OR uuid = :uuid)
         ', [
@@ -153,7 +175,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
     public function getOneByPaymentId(string $paymentId): ?OrderEntity
     {
         $order = $this->doFetchOne('
-          SELECT ' . self::SELECT_FIELDS . '
+          SELECT ' . implode(', ', self::SELECT_FIELDS) . '
           FROM orders
           WHERE payment_id = :payment_id
         ', [
@@ -166,7 +188,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
     public function getOneById(int $id): ?OrderEntity
     {
         $order = $this->doFetchOne('
-          SELECT ' . self::SELECT_FIELDS . '
+          SELECT ' . implode(', ', self::SELECT_FIELDS) . '
           FROM '.self::TABLE_NAME.' 
           WHERE id = :id
         ', [
@@ -179,7 +201,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
     public function getOneByUuid(string $uuid): ?OrderEntity
     {
         $order = $this->doFetchOne('
-          SELECT ' . self::SELECT_FIELDS . '
+          SELECT ' . implode(', ', self::SELECT_FIELDS) . '
           FROM '.self::TABLE_NAME.'
           WHERE uuid = :uuid
         ', [
@@ -371,7 +393,7 @@ SQL;
     public function getOrdersByInvoiceHandlingStrategy(string $strategy): Generator
     {
         $stmt = $this->doExecute('
-            SELECT ' . self::SELECT_FIELDS . '
+            SELECT ' . implode(', ', self::SELECT_FIELDS) . '
             FROM orders
             WHERE invoice_url IS NOT NULL
             AND merchant_id IN (
@@ -389,8 +411,7 @@ SQL;
 
     public function getOneByCheckoutSessionUuid(string $checkoutSessionUuid): ?OrderEntity
     {
-        $sql = ' SELECT '.self::SELECT_FIELDS.
-                ' FROM '.self::TABLE_NAME.
+        $sql = ' SELECT ' . implode(', ', self::SELECT_FIELDS) . ' FROM ' . self::TABLE_NAME .
                 ' WHERE id IN ('.
                 ' SELECT orders.id '.
                 ' FROM '.self::TABLE_NAME.
@@ -417,5 +438,45 @@ SQL;
         }
 
         return intval($result['total']);
+    }
+
+    public function getByMerchantId(
+        int $merchantId,
+        int $offset,
+        int $limit,
+        string $sortBy,
+        string $sortDirection,
+        ?string $searchString,
+        ?array $filters
+    ): array {
+        $query = 'SELECT %s FROM orders';
+
+        if ($filters && isset($filters['merchant_debtor_id'])) {
+            $query .= ' INNER JOIN merchants_debtors ON orders.merchant_debtor_id = merchants_debtors.id AND merchants_debtors.uuid = :merchant_debtor_id';
+            $queryParameters['merchant_debtor_id'] = $filters['merchant_debtor_id'];
+        }
+
+        $query .= ' WHERE orders.merchant_id = :merchant_id';
+        $queryParameters['merchant_id'] = $merchantId;
+
+        if ($searchString) {
+            $query .= ' AND (orders.external_code LIKE :search OR orders.uuid LIKE :search OR orders.invoice_number LIKE :search )';
+
+            $queryParameters['search'] = '%' . $searchString . '%';
+        }
+
+        $totalCount = $this->doFetchOne(sprintf($query, 'COUNT(*) as total_count'), $queryParameters);
+
+        $query .= " ORDER BY $sortBy $sortDirection LIMIT $offset,$limit";
+
+        $rows = $this->doFetchAll(
+            sprintf($query, 'orders.' . implode(', orders.', self::SELECT_FIELDS)),
+            $queryParameters
+        );
+
+        return [
+            'total' => $totalCount['total_count'] ?? 0,
+            'orders' => array_map([$this->orderFactory, 'createFromDatabaseRow'], $rows),
+        ];
     }
 }

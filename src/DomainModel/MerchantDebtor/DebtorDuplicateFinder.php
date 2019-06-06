@@ -80,10 +80,11 @@ class DebtorDuplicateFinder
         $grouped = [];
 
         // group by merchant ID and external code
-        foreach ($this->debtorRepository->getDebtorsWithExternalId() as $debtor) {
+        foreach ($this->debtorRepository->getMerchantDebtorIdentifierDtos() as $debtor) {
             $dto = (new MerchantDebtorDuplicateDTO())
                 ->setMerchantDebtorId($debtor->getMerchantDebtorId())
                 ->setMerchantId($debtor->getMerchantId())
+                ->setMerchantDebtorUuid($debtor->getMerchantDebtorUuid())
                 ->setDebtorId($debtor->getDebtorId())
                 ->setMerchantExternalId($debtor->getMerchantExternalId());
 

@@ -12,6 +12,7 @@ use App\DomainModel\Order\OrderContainer;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
+use Psr\Log\NullLogger;
 
 class MerchantDebtorLimitsServiceSpec extends ObjectBehavior
 {
@@ -23,6 +24,8 @@ class MerchantDebtorLimitsServiceSpec extends ObjectBehavior
         OrderRepositoryInterface $orderRepository
     ) {
         $this->beConstructedWith(...func_get_args());
+
+        $this->setLogger(new NullLogger());
     }
 
     public function it_is_initializable()

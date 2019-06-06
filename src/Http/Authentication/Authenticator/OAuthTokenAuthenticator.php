@@ -33,6 +33,10 @@ class OAuthTokenAuthenticator extends AbstractAuthenticator
 
     public function supports(Request $request)
     {
+        if ($this->wasAlreadyAuthenticated($request)) {
+            return false;
+        }
+
         return $request->headers->has(HttpConstantsInterface::REQUEST_HEADER_AUTHORIZATION);
     }
 

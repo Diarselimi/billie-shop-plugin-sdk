@@ -15,4 +15,13 @@ class MerchantUserEntityFactory
             ->setUpdatedAt(new \DateTime($row['updated_at']))
         ;
     }
+
+    public function create(int $merchantId, string $userId, array $roles): MerchantUserEntity
+    {
+        return (new MerchantUserEntity())
+            ->setUserId($userId)
+            ->setMerchantId($merchantId)
+            ->setRoles($roles)
+        ;
+    }
 }

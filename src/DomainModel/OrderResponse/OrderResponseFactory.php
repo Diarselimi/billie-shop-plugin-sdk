@@ -34,7 +34,6 @@ class OrderResponseFactory
     public function create(OrderContainer $orderContainer): OrderResponse
     {
         $order = $orderContainer->getOrder();
-
         $response = (new OrderResponse())
             ->setExternalCode($order->getExternalCode())
             ->setUuid($order->getUuid())
@@ -46,7 +45,15 @@ class OrderResponseFactory
             ->setDebtorExternalDataAddressHouse($orderContainer->getDebtorExternalDataAddress()->getHouseNumber())
             ->setDebtorExternalDataCompanyName($orderContainer->getDebtorExternalData()->getName())
             ->setDebtorExternalDataIndustrySector($orderContainer->getDebtorExternalData()->getIndustrySector())
+            ->setCreatedAt($order->getCreatedAt())
+            ->setDebtorExternalDataCustomerId($orderContainer->getDebtorExternalData()->getMerchantExternalId())
+            ->setDuration($order->getDuration())
+            ->setShippedAt($order->getShippedAt())
         ;
+
+        if ($orderContainer->getDeliveryAddress()) {
+            $this->addDeliveryData($orderContainer, $response);
+        }
 
         if ($order->getMerchantDebtorId()) {
             $this->addCompanyData($orderContainer, $response);
@@ -99,6 +106,7 @@ class OrderResponseFactory
         $response
             ->setInvoiceNumber($order->getInvoiceNumber())
             ->setPayoutAmount($orderPaymentDetails->getPayoutAmount())
+            ->setOutstandingAmount($orderPaymentDetails->getOutstandingAmount())
             ->setFeeRate($orderPaymentDetails->getFeeRate())
             ->setFeeAmount($orderPaymentDetails->getFeeAmount())
             ->setDueDate($orderPaymentDetails->getDueDate())
@@ -130,5 +138,14 @@ class OrderResponseFactory
         }
 
         return $response;
+    }
+
+    private function addDeliveryData(OrderContainer $orderContainer, OrderResponse $response): void
+    {
+        $response->setDeliveryAddressStreet($orderContainer->getDeliveryAddress()->getStreet())
+            ->setDeliveryAddressHouseNumber($orderContainer->getDeliveryAddress()->getHouseNumber())
+            ->setDeliveryAddressCity($orderContainer->getDeliveryAddress()->getCity())
+            ->setDeliveryAddressPostalCode($orderContainer->getDeliveryAddress()->getPostalCode())
+            ->setDeliveryAddressCountry($orderContainer->getDeliveryAddress()->getCountry());
     }
 }

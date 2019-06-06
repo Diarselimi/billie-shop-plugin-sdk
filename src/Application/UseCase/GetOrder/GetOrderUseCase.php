@@ -3,6 +3,7 @@
 namespace App\Application\UseCase\GetOrder;
 
 use App\Application\PaellaCoreCriticalException;
+use App\DomainModel\Order\OrderContainer;
 use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderResponse\OrderResponse;
@@ -39,8 +40,8 @@ class GetOrderUseCase
             );
         }
 
-        $orderContainer = $this->orderPersistenceService->createFromOrderEntity($order);
+        $response = $this->orderPersistenceService->createFromOrderEntity($order);
 
-        return $this->orderResponseFactory->create($orderContainer);
+        return $this->orderResponseFactory->create($response);
     }
 }

@@ -15,5 +15,5 @@ Feature:
     """
     {"is_whitelisted": "1"}
     """
-    Then the response status code should be 200
+    Then the response status code should be 204
     And the merchant debtor "ext_id" with merchantId 1 should be whitelisted

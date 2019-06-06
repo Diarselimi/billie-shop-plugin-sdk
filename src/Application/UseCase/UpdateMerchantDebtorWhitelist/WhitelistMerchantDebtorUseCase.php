@@ -3,8 +3,6 @@
 namespace App\Application\UseCase\UpdateMerchantDebtorWhitelist;
 
 use App\Application\Exception\MerchantDebtorNotFoundException;
-use App\Application\UseCase\GetMerchantDebtor\GetMerchantDebtorResponse;
-use App\Application\UseCase\GetMerchantDebtor\GetMerchantDebtorResponseFactory;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
@@ -17,19 +15,14 @@ class WhitelistMerchantDebtorUseCase implements LoggingInterface, ValidatedUseCa
 
     private $merchantDebtorRepository;
 
-    private $merchantDebtorResponseFactory;
-
-    public function __construct(
-        MerchantDebtorRepositoryInterface $merchantDebtorRepository,
-        GetMerchantDebtorResponseFactory $merchantDebtorResponseFactory
-    ) {
+    public function __construct(MerchantDebtorRepositoryInterface $merchantDebtorRepository)
+    {
         $this->merchantDebtorRepository = $merchantDebtorRepository;
-        $this->merchantDebtorResponseFactory = $merchantDebtorResponseFactory;
     }
 
-    public function execute(WhitelistMerchantDebtorRequest $request): GetMerchantDebtorResponse
+    public function execute(WhitelistMerchantDebtorRequest $request): void
     {
-        $merchantDebtor = $this->merchantDebtorRepository->getOneByMerchantExternalId(
+        $merchantDebtor = $this->merchantDebtorRepository->getOneByExternalIdAndMerchantId(
             $request->getMerchantDebtorExternalId(),
             $request->getMerchantId(),
             []
@@ -46,10 +39,5 @@ class WhitelistMerchantDebtorUseCase implements LoggingInterface, ValidatedUseCa
         $this->merchantDebtorRepository->update($merchantDebtor);
 
         $this->logInfo("A merchant debtor whitelisted is updated with status: " . $merchantDebtor->isWhitelisted());
-
-        return $this->merchantDebtorResponseFactory->create(
-            $merchantDebtor,
-            $request->getMerchantDebtorExternalId()
-        );
     }
 }

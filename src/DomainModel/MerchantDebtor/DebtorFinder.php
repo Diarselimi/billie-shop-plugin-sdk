@@ -47,7 +47,7 @@ class DebtorFinder implements LoggingInterface
         );
 
         $this->logInfo('Check if the merchant debtor already known');
-        $merchantDebtor = $this->merchantDebtorRepository->getOneByMerchantExternalId(
+        $merchantDebtor = $this->merchantDebtorRepository->getOneByExternalIdAndMerchantId(
             $orderContainer->getDebtorExternalData()->getMerchantExternalId(),
             $merchantId,
             [OrderStateManager::STATE_NEW, OrderStateManager::STATE_DECLINED]
@@ -70,7 +70,7 @@ class DebtorFinder implements LoggingInterface
             if ($debtorExternalData) {
                 $this->logInfo('The debtor is with the same data and not older than 30 days found!');
 
-                $merchantDebtor = $this->merchantDebtorRepository->getOneByMerchantExternalId(
+                $merchantDebtor = $this->merchantDebtorRepository->getOneByExternalIdAndMerchantId(
                     $debtorExternalData->getMerchantExternalId(),
                     $merchantId,
                     []
