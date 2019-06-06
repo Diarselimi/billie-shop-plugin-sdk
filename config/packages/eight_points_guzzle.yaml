@@ -17,5 +17,11 @@ eight_points_guzzle:
           Content-Type: "application/json"
     nachos:
       base_url: "%env(string:NACHOS_URL)%"
+    salesforce:
+      base_url: "%env(string:SALESFORCE_API_URL)%"
+      options:
+        headers:
+          Content-Type: "application/json"
+          X-Api-Key: "%env(string:SALESFORCE_API_KEY)%"
     webhook:
     invoice_download:
