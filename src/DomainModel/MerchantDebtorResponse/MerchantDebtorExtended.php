@@ -140,7 +140,7 @@ class MerchantDebtorExtended extends MerchantDebtor
         return $this;
     }
 
-    public function getCrefoId(): string
+    public function getCrefoId(): ?string
     {
         return $this->crefoId;
     }
@@ -149,14 +149,14 @@ class MerchantDebtorExtended extends MerchantDebtor
      * @param  string                        $crefoId
      * @return MerchantDebtorExtended|static
      */
-    public function setCrefoId(string $crefoId): MerchantDebtorExtended
+    public function setCrefoId(?string $crefoId): MerchantDebtorExtended
     {
         $this->crefoId = $crefoId;
 
         return $this;
     }
 
-    public function getSchufaId(): string
+    public function getSchufaId(): ?string
     {
         return $this->schufaId;
     }
@@ -165,7 +165,7 @@ class MerchantDebtorExtended extends MerchantDebtor
      * @param  string                        $schufaId
      * @return MerchantDebtorExtended|static
      */
-    public function setSchufaId(string $schufaId): MerchantDebtorExtended
+    public function setSchufaId(?string $schufaId): MerchantDebtorExtended
     {
         $this->schufaId = $schufaId;
 
