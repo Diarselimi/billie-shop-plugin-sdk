@@ -9,7 +9,7 @@ security:
             pattern: ^/healthcheck
             security: false
         support_api: # TODO: move all support endpoints under the /support/ API prefix
-            pattern: ^/(merchant|merchant-debtor)/
+            pattern: ^/(merchant|merchant-debtor)/*
             security: false
         checkout_authorize:
             pattern: ^/checkout-session/.*/authorize
