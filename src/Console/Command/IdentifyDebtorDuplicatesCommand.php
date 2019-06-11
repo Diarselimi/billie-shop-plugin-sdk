@@ -5,19 +5,16 @@ namespace App\Console\Command;
 use App\DomainModel\MerchantDebtor\DebtorDuplicateFinder;
 use App\DomainModel\MerchantDebtor\DebtorDuplicateHandler;
 use App\DomainModel\MerchantDebtor\MerchantDebtorDuplicateDTO;
-use Billie\MonitoringBundle\Service\Alerting\Slack\SlackClientAwareInterface;
-use Billie\MonitoringBundle\Service\Alerting\Slack\SlackClientAwareTrait;
-use Billie\MonitoringBundle\Service\Alerting\Slack\SlackMessageAttachment;
-use Billie\MonitoringBundle\Service\Alerting\Slack\SlackMessageAttachmentField;
-use Billie\MonitoringBundle\Service\Alerting\Slack\SlackMessageFactory;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class IdentifyDebtorDuplicatesCommand extends Command implements SlackClientAwareInterface
+class IdentifyDebtorDuplicatesCommand extends Command implements LoggingInterface
 {
-    use SlackClientAwareTrait;
+    use LoggingTrait;
 
     private const NAME = 'paella:identify-debtor-duplicates';
 
@@ -33,18 +30,14 @@ class IdentifyDebtorDuplicatesCommand extends Command implements SlackClientAwar
 
     private $duplicateHandler;
 
-    private $slackMessageFactory;
-
     public function __construct(
         DebtorDuplicateFinder $duplicateFinder,
-        DebtorDuplicateHandler $duplicateHandler,
-        SlackMessageFactory $slackMessageFactory
+        DebtorDuplicateHandler $duplicateHandler
     ) {
         parent::__construct();
 
         $this->duplicateFinder = $duplicateFinder;
         $this->duplicateHandler = $duplicateHandler;
-        $this->slackMessageFactory = $slackMessageFactory;
     }
 
     protected function configure()
@@ -74,25 +67,14 @@ class IdentifyDebtorDuplicatesCommand extends Command implements SlackClientAwar
                 (int) $input->getOption(self::ARGUMENT_BROADCAST_SLEEP)
             );
 
-            $output->writeln('Found ' . count($newDuplicates) . ' new duplicates.');
-            $this->sendSlackMessage(count($newDuplicates));
+            $message = sprintf('Found %s new company duplicates.', count($newDuplicates));
+            $output->writeln($message);
+            $this->logInfo($message);
         } else {
             $output->writeln('No new duplicates found.');
         }
 
         $output->writeln('DONE.');
-    }
-
-    private function sendSlackMessage(int $duplicateCount)
-    {
-        $message = $this->slackMessageFactory->createSimpleWithServiceInfo(
-            'Company Duplicates Finder Report',
-            'Hey, I\'ve found new company duplicates since the last run.',
-            SlackMessageAttachment::COLOR_YELLOW,
-            new SlackMessageAttachmentField('Total new duplicates', $duplicateCount, true)
-        );
-
-        $this->getSlackClient()->sendMessage($message);
     }
 
     /**
