@@ -25,6 +25,7 @@ services:
       $smaugClient: '@eight_points_guzzle.client.smaug'
       $nachosClient: '@eight_points_guzzle.client.nachos'
       $notificationSenderClient: '@eight_points_guzzle.client.webhook'
+      $salesforceClient: '@eight_points_guzzle.client.salesforce'
 
   _instanceof:
     App\Application\UseCase\ValidatedUseCaseInterface:

@@ -41,6 +41,11 @@ ship_order:
   controller: App\Http\Controller\ShipOrderController::execute
   methods: [POST]
 
+pause_order_dunning:
+  path: /order/{id}/pause-dunning
+  controller: App\Http\Controller\PauseOrderDunningController::execute
+  methods: [POST]
+
 create_order_invoice:
   path: /merchant/{merchantId}/order/{id}/invoice
   controller: App\Http\Controller\CreateOrderInvoiceController::execute

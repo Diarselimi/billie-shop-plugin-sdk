@@ -14,6 +14,7 @@ default:
         - PaymentsServiceContext
         - CompaniesServiceContext
         - OAuthServiceContext
+        - SalesforceContext
 
   extensions:
     Behatch\Extension: ~
