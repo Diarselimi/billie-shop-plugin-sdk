@@ -2,7 +2,7 @@
 
 namespace App\DomainModel\OrderRiskCheck\Checker;
 
-use App\DomainModel\Order\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderRepositoryInterface;
 
 class DebtorOverdueCheck implements CheckInterface
@@ -18,9 +18,9 @@ class DebtorOverdueCheck implements CheckInterface
         $this->orderRepository = $orderRepository;
     }
 
-    public function check(OrderContainer $order): CheckResult
+    public function check(OrderContainer $orderContainer): CheckResult
     {
-        $debtorMaxOverdue = $this->orderRepository->getDebtorMaximumOverdue($order->getMerchantDebtor()->getDebtorId());
+        $debtorMaxOverdue = $this->orderRepository->getDebtorMaximumOverdue($orderContainer->getMerchantDebtor()->getDebtorId());
 
         return new CheckResult($debtorMaxOverdue <= self::OVERDUE_MAX_DAYS, self::NAME);
     }

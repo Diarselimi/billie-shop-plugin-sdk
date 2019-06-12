@@ -3,48 +3,37 @@
 namespace App\DomainModel\MerchantDebtorResponse;
 
 use App\DomainModel\ArrayableInterface;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Schema(schema="AbstractMerchantDebtorResponse", type="object", properties={
+ *      @OA\Property(property="id", ref="#/components/schemas/UUID", description="Debtor UUID"),
+ *      @OA\Property(property="external_code", ref="#/components/schemas/TinyText", description="Merchant Customer ID"),
+ *      @OA\Property(property="name", ref="#/components/schemas/TinyText"),
+ *      @OA\Property(property="financing_limit", type="number", format="float", description="Full limit assigned to this debtor."),
+ *      @OA\Property(property="financing_power", type="number", format="float", description="Available limit for this debtor."),
+ *      @OA\Property(property="bank_account_iban", ref="#/components/schemas/TinyText"),
+ *      @OA\Property(property="bank_account_bic", ref="#/components/schemas/TinyText"),
+ *      @OA\Property(property="created_at", ref="#/components/schemas/DateTime"),
+ * })
+ */
 abstract class AbstractMerchantDebtor implements ArrayableInterface
 {
-    /**
-     * @var string
-     */
     private $uuid;
 
-    /**
-     * @var string
-     */
     private $externalCode;
 
-    /**
-     * @var string
-     */
     private $name;
 
-    /**
-     * @var float
-     */
     private $financingLimit;
 
-    /**
-     * @var float
-     */
     private $financingPower;
 
-    /**
-     * @var string
-     */
+    private $createdAt;
+
     private $bankAccountIban;
 
-    /**
-     * @var string
-     */
     private $bankAccountBic;
-
-    /**
-     * @var \DateTime
-     */
-    private $createdAt;
 
     public function getUuid(): string
     {

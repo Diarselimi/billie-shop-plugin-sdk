@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+
+command -v git >/dev/null 2>&1 || {
+    echo "ERROR: git is not installed. Aborting..."
+    exit 1
+}
+
+command -v tar >/dev/null 2>&1 || {
+    echo "ERROR: tar is not installed. Aborting..."
+    exit 1
+}
+
+if [[ ! -d ./.git ]]; then
+    echo "Current working dir '${PWD}' is not a git repository. Aborting..."
+    exit 1
+fi
+
+command -v redoc-cli >/dev/null 2>&1 || {
+    echo "ERROR: redoc-cli is not installed. Aborting..."
+    exit 1
+}
+
+SPEC_VERSION=$(git describe --tags --abbrev=0 || echo "dev")
+SPEC_PREV_VERSION=$(git describe --tags --abbrev=0 --exclude=$(git describe --tags --abbrev=0))
+
+if [[ $1 = "public" ]]; then
+   TITLE="Billie - PaD API Documentation"
+   SPEC_FILE=${2:-"paella-${SPEC_VERSION}-openapi.yaml"}
+else
+   TITLE="Billie - PaD-Core API Documentation"
+   SPEC_FILE=${2:-"paella-${SPEC_VERSION}-openapi-internal.yaml"}
+fi
+
+if [[ -f "docs/openapi/${SPEC_FILE}" ]]; then
+    # Do not override existing spec if same tag
+    SPEC_VERSION="${SPEC_VERSION}-dev"
+    SPEC_FILE=${SPEC_FILE/-openapi.yaml/-dev-openapi.yaml}
+    SPEC_FILE=${SPEC_FILE/-openapi-internal.yaml/-dev-openapi-internal.yaml}
+fi
+
+PRIMARY_COLOR="#ff4338"
+SECONDARY_COLOR="#1f2530"
+TEXT_COLOR=${SECONDARY_COLOR}
+LOGO_PADDING="40px"
+LOGO_MAX_HEIGHT="160px"
+MAIN_FONT="Roboto, Helvetica, sans-serif"
+HEADING_FONT="Monserrat, Helvetica, sans-serif"
+HEADING_FONT_WEIGHT="bold"
+VERTICAL_SPACING="20"
+
+
+echo "Generation YAML specification (version: ${SPEC_VERSION})..."
+
+OA_GENERATED=1
+
+if [[ $1 = "public" ]]; then
+   bin/console paella:openapi:generate ${SPEC_VERSION} --output-file="docs/openapi/${SPEC_FILE}" --title="${TITLE}" --groups=public || OA_GENERATED=0
+else
+   bin/console paella:openapi:generate ${SPEC_VERSION} --output-file="docs/openapi/${SPEC_FILE}" --title="${TITLE}" || OA_GENERATED=0
+fi
+
+echo "Generating HTML documentation (version: ${SPEC_VERSION})..."
+redoc-cli bundle "docs/openapi/${SPEC_FILE}" --options.theme.colors.primary.main="${PRIMARY_COLOR}" \
+--options.theme.rightPanel.backgroundColor="${SECONDARY_COLOR}" --options.theme.logo.gutter="${LOGO_PADDING}" \
+--options.theme.logo.maxHeight="${LOGO_MAX_HEIGHT}" --title="${TITLE}" \
+--options.theme.typography.fontFamily="${MAIN_FONT}" \
+--options.theme.typography.headings._fontFamily="${HEADING_FONT}" \
+--options.theme.typography.headings.fontWeight="${HEADING_FONT_WEIGHT}" \
+--options.theme.colors.text.primary="${TEXT_COLOR}" \
+--options.theme.colors.text.secondary="#505f7c" \
+--options.theme.colors.success.main="#6bbd5b" \
+--options.theme.colors.error.main="#ED6456" \
+--options.theme.spacing.sectionVertical="${VERTICAL_SPACING}" \
+-t docs/openapi/resources/template.hbs || exit 1
+
+mv redoc-static.html docs/openapi/${SPEC_FILE/yaml/html}
+echo "--->" docs/openapi/${SPEC_FILE/yaml/html}
+
+if [[ ${OA_GENERATED} = 1 ]]; then
+    echo "--->" docs/openapi/${SPEC_FILE}
+    # Create TAR
+    tar -C ${PWD}/docs/openapi --exclude='./*.tar' --exclude='./.gitignore' --exclude='./resources' --exclude='./markdown' -jcf docs/openapi/${SPEC_FILE/yaml/tar} ./${SPEC_FILE} ./${SPEC_FILE/yaml/html}
+    echo "--->" docs/openapi/${SPEC_FILE/yaml/tar}
+fi
+
+# Example generating code:
+# openapi-generator generate -g go-server -i docs/openapi/paella-1.10.0-openapi.yaml -o ./codegen/go
+
+echo "DONE."

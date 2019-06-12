@@ -82,7 +82,7 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
 
     public function onWaiting(OrderInWaitingStateEvent $event): void
     {
-        $order = $event->getOrder();
+        $order = $event->getOrderContainer()->getOrder();
 
         $this->delayedMessageProducer->produce(
             self::WAITING_STATE_QUEUE_ROUTING_KEY,

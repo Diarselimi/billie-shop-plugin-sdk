@@ -9,16 +9,24 @@ use App\Application\UseCase\CreateOrder\Request\CreateOrderDeliveryAddressReques
 use App\Application\UseCase\ValidatedRequestInterface;
 use App\Application\Validator\Constraint as CustomConstrains;
 use App\DomainModel\ArrayableInterface;
+use OpenApi\Annotations as OA;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * @OA\Schema(schema="CreateOrderRequest", title="Order Creation Request", required={"amount", "duration", "delivery_address", "debtor_company", "debtor_person"},
+ *     properties={
+ *          @OA\Property(property="amount", ref="#/components/schemas/CreateOrderAmountRequest"),
+ *          @OA\Property(property="comment", ref="#/components/schemas/TinyText", nullable=true),
+ *          @OA\Property(property="duration", ref="#/components/schemas/OrderDuration"),
+ *          @OA\Property(property="order_id", ref="#/components/schemas/TinyText", description="Order external code", example="DE123456-1"),
+ *          @OA\Property(property="delivery_address", ref="#/components/schemas/CreateOrderDeliveryAddressRequest"),
+ *          @OA\Property(property="debtor_company", ref="#/components/schemas/CreateOrderDebtorCompanyRequest"),
+ *          @OA\Property(property="debtor_person", ref="#/components/schemas/CreateOrderDebtorPersonRequest"),
+ *     }
+ * )
+ */
 class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterface
 {
-    /**
-     * @Assert\NotBlank()
-     * @Assert\Type(type="numeric")
-     */
-    private $merchantId;
-
     /**
      * @Assert\Valid()
      */
@@ -31,7 +39,7 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
 
     /**
      * @Assert\NotBlank()
-     * @Assert\Type(type="int")
+     * @Assert\Type(type="integer")
      * @CustomConstrains\OrderDuration()
      */
     private $duration;
@@ -43,6 +51,7 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
     private $externalCode;
 
     /**
+     *
      * @Assert\Valid()
      */
     private $deliveryAddress;
@@ -57,31 +66,13 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
      */
     private $debtorPerson;
 
+    /**
+     * @Assert\NotBlank()
+     * @Assert\Type(type="integer")
+     */
+    private $merchantId;
+
     private $checkoutSessionId;
-
-    public function getCheckoutSessionId(): ?int
-    {
-        return $this->checkoutSessionId;
-    }
-
-    public function setCheckoutSessionId(?int $checkoutSessionId)
-    {
-        $this->checkoutSessionId = $checkoutSessionId;
-
-        return $this;
-    }
-
-    public function getMerchantId()
-    {
-        return $this->merchantId;
-    }
-
-    public function setMerchantId($merchantId): CreateOrderRequest
-    {
-        $this->merchantId = $merchantId;
-
-        return $this;
-    }
 
     public function getAmount(): CreateOrderAmountRequest
     {
@@ -95,36 +86,36 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
         return $this;
     }
 
-    public function getComment()
+    public function getComment(): ?string
     {
         return $this->comment;
     }
 
-    public function setComment($comment): CreateOrderRequest
+    public function setComment(?string $comment): CreateOrderRequest
     {
         $this->comment = $comment;
 
         return $this;
     }
 
-    public function getDuration()
+    public function getDuration(): int
     {
         return $this->duration;
     }
 
-    public function setDuration($duration): CreateOrderRequest
+    public function setDuration(int $duration): CreateOrderRequest
     {
         $this->duration = $duration;
 
         return $this;
     }
 
-    public function getExternalCode()
+    public function getExternalCode(): ?string
     {
         return $this->externalCode;
     }
 
-    public function setExternalCode($externalCode): CreateOrderRequest
+    public function setExternalCode(?string $externalCode): CreateOrderRequest
     {
         $this->externalCode = $externalCode;
 
@@ -163,6 +154,30 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
     public function setDebtorCompany(CreateOrderDebtorCompanyRequest $debtorCompany): CreateOrderRequest
     {
         $this->debtorCompany = $debtorCompany;
+
+        return $this;
+    }
+
+    public function getMerchantId(): int
+    {
+        return $this->merchantId;
+    }
+
+    public function setMerchantId(int $merchantId): CreateOrderRequest
+    {
+        $this->merchantId = $merchantId;
+
+        return $this;
+    }
+
+    public function getCheckoutSessionId(): ?int
+    {
+        return $this->checkoutSessionId;
+    }
+
+    public function setCheckoutSessionId(?int $checkoutSessionId)
+    {
+        $this->checkoutSessionId = $checkoutSessionId;
 
         return $this;
     }

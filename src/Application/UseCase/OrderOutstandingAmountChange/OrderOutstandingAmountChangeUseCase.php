@@ -5,11 +5,11 @@ namespace App\Application\UseCase\OrderOutstandingAmountChange;
 use App\Application\Exception\OrderNotFoundException;
 use App\DomainModel\Borscht\OrderAmountChangeDTO;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
-use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsException;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
+use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsException;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderPersistenceService;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderNotification\NotificationScheduler;
 use App\DomainModel\OrderPayment\OrderPaymentForgivenessService;
@@ -26,7 +26,7 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 
     private $merchantRepository;
 
-    private $orderPersistenceService;
+    private $orderContainerFactory;
 
     private $notificationScheduler;
 
@@ -37,17 +37,15 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
     private $orderStateManager;
 
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
+        OrderContainerFactory $orderContainerFactory,
         MerchantRepositoryInterface $merchantRepository,
-        OrderPersistenceService $orderPersistenceService,
         NotificationScheduler $notificationScheduler,
         MerchantDebtorLimitsService $limitsService,
         OrderPaymentForgivenessService $paymentForgivenessService,
         OrderStateManager $orderStateManager
     ) {
-        $this->orderRepository = $orderRepository;
+        $this->orderContainerFactory = $orderContainerFactory;
         $this->merchantRepository = $merchantRepository;
-        $this->orderPersistenceService = $orderPersistenceService;
         $this->notificationScheduler = $notificationScheduler;
         $this->limitsService = $limitsService;
         $this->paymentForgivenessService = $paymentForgivenessService;
@@ -58,8 +56,9 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
     {
         $amountChange = $request->getOrderAmountChangeDetails();
 
-        $order = $this->orderRepository->getOneByPaymentId($amountChange->getId());
-        if (!$order) {
+        try {
+            $orderContainer = $this->orderContainerFactory->createFromPaymentId($amountChange->getId());
+        } catch (OrderContainerFactoryException $exception) {
             $this->logSuppressedException(
                 new OrderNotFoundException(),
                 '[suppressed] Trying to change state for non-existing order',
@@ -69,6 +68,7 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
             return;
         }
 
+        $order = $orderContainer->getOrder();
         if ($order->getAmountForgiven() > 0 && $amountChange->getOutstandingAmount() > 0) {
             $this->logInfo("Order {id} has been already forgiven by a total of {amount}. Current outstanding amount is {outstanding_amount}.", [
                 'id' => $order->getId(),
@@ -79,7 +79,6 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
             return;
         }
 
-        $orderContainer = $this->orderPersistenceService->createFromOrderEntity($order);
         $merchant = $orderContainer->getMerchant();
 
         try {
@@ -97,7 +96,7 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 
         $this->scheduleEvent($order, $amountChange);
 
-        if ($this->paymentForgivenessService->begForgiveness($order, $amountChange)) {
+        if ($this->paymentForgivenessService->begForgiveness($orderContainer, $amountChange)) {
             $this->logInfo(
                 "Order {id} outstanding amount of {amount} will be forgiven and paid by the merchant {merchant_id}",
                 [

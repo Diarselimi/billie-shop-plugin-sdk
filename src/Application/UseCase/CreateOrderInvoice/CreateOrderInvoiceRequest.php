@@ -2,32 +2,20 @@
 
 namespace App\Application\UseCase\CreateOrderInvoice;
 
-class CreateOrderInvoiceRequest
+use App\Application\UseCase\AbstractOrderRequest;
+
+class CreateOrderInvoiceRequest extends AbstractOrderRequest
 {
-    private $merchantId;
-
-    private $orderId;
-
     private $fileId;
 
     private $invoiceNumber;
 
-    public function __construct(int $merchantId, string $orderId, int $fileId, string $invoiceNumber)
+    public function __construct(string $orderId, int $merchantId, int $fileId, string $invoiceNumber)
     {
-        $this->merchantId = $merchantId;
-        $this->orderId = $orderId;
+        parent::__construct($orderId, $merchantId);
+
         $this->fileId = $fileId;
         $this->invoiceNumber = $invoiceNumber;
-    }
-
-    public function getMerchantId(): int
-    {
-        return $this->merchantId;
-    }
-
-    public function getOrderId(): string
-    {
-        return $this->orderId;
     }
 
     public function getFileId(): int

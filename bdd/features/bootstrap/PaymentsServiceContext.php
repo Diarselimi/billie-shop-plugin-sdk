@@ -12,19 +12,25 @@ class PaymentsServiceContext implements Context
 
     public function __construct()
     {
-        $this->startServer(self::MOCK_SERVER_PORT);
-
         register_shutdown_function(function () {
-            $this->stopServer();
+            self::stopServer();
         });
     }
 
     /**
-     * @AfterScenario
+     * @BeforeSuite
      */
-    public function afterScenario()
+    public static function beforeSuite()
     {
-        $this->stopServer();
+        self::startServer(self::MOCK_SERVER_PORT);
+    }
+
+    /**
+     * @AfterSuite
+     */
+    public static function afterSuite()
+    {
+        self::stopServer();
     }
 
     /**
@@ -64,6 +70,27 @@ class PaymentsServiceContext implements Context
     {
         $this->mockRequest('/order.json', new ResponseStack(
             new MockResponse(file_get_contents(__DIR__ . '/../resources/payments_service_create_order.json'))
+        ));
+    }
+
+    /**
+     * @Given /^I get from payments service modify ticket response$/
+     */
+    public function iGetFromPaymentsServiceModifyTicketResponse()
+    {
+        $this->mockRequest('/order.json', new ResponseStack(
+            new MockResponse('')
+        ));
+    }
+
+    /**
+     * @Given /^I get from payments service two modify ticket responses$/
+     */
+    public function iGetFromPaymentsServiceTwoModifyTicketResponses()
+    {
+        $this->mockRequest('/order.json', new ResponseStack(
+            new MockResponse(''),
+            new MockResponse('')
         ));
     }
 }

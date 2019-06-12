@@ -34,8 +34,7 @@ class MerchantDebtorResponseFactory
             ->setOutstandingAmountLate($totalLateOrdersAmount)
             ->setBankAccountIban($paymentDetails->getBankAccountIban())
             ->setBankAccountBic($paymentDetails->getBankAccountBic())
-            ->setCreatedAt(new \DateTime())
-        ;
+            ->setCreatedAt(new \DateTime());
     }
 
     public function createFromContainer(MerchantDebtorContainer $container): MerchantDebtor

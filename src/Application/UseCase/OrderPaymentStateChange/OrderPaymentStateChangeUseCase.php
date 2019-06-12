@@ -4,7 +4,6 @@ namespace App\Application\UseCase\OrderPaymentStateChange;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\PaellaCoreCriticalException;
-use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
@@ -22,18 +21,14 @@ class OrderPaymentStateChangeUseCase implements LoggingInterface
 
     private $orderStateManager;
 
-    private $orderPersistenceService;
-
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         Workflow $workflow,
-        OrderStateManager $orderStateManager,
-        OrderPersistenceService $orderPersistenceService
+        OrderStateManager $orderStateManager
     ) {
         $this->orderRepository = $orderRepository;
         $this->workflow = $workflow;
         $this->orderStateManager = $orderStateManager;
-        $this->orderPersistenceService = $orderPersistenceService;
     }
 
     public function execute(OrderPaymentStateChangeRequest $request)

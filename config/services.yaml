@@ -26,6 +26,7 @@ services:
       $nachosClient: '@eight_points_guzzle.client.nachos'
       $notificationSenderClient: '@eight_points_guzzle.client.webhook'
       $salesforceClient: '@eight_points_guzzle.client.salesforce'
+      $projectRootDir: '%kernel.root_dir%/..'
 
   _instanceof:
     App\Application\UseCase\ValidatedUseCaseInterface:
@@ -43,6 +44,30 @@ services:
   Symfony\Component\Workflow\Workflow: '@state_machine.order'
 
   Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter: '@serializer.name_converter.camel_case_to_snake_case'
+
+  openapi_file_locator:
+    class: Symfony\Component\HttpKernel\Config\FileLocator
+    arguments:
+      - '@kernel'
+      - '%kernel.root_dir%/Resources'
+      -
+        - '%kernel.root_dir%'
+        - '%kernel.root_dir%/..'
+
+  App\Infrastructure\OpenApi\Routing\OpenApiClassLoader:
+    tags: [routing.loader]
+
+  App\Infrastructure\OpenApi\Routing\OpenApiFileLoader:
+    tags: [routing.loader]
+    arguments:
+      - '@openapi_file_locator'
+      - '@App\Infrastructure\OpenApi\Routing\OpenApiClassLoader'
+
+  App\Infrastructure\OpenApi\Routing\OpenApiDirectoryLoader:
+    tags: [routing.loader]
+    arguments:
+      - '@openapi_file_locator'
+      - '@App\Infrastructure\OpenApi\Routing\OpenApiClassLoader'
 
   App\DomainModel\Order\OrderChecksRunnerService:
     arguments:

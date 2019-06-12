@@ -6,6 +6,7 @@ use App\Application\Exception\OrderWorkflowException;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsException;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
@@ -31,7 +32,7 @@ class CreateOrderCrossChecksService implements LoggingInterface
 
         try {
             $this->merchantDebtorLimitsService->lock($orderContainer);
-            $merchant->reduceAvailableFinancingLimit($orderContainer->getOrder()->getAmountGross());
+            $merchant->reduceAvailableFinancingLimit($orderContainer->getOrderFinancialDetails()->getAmountGross());
         } catch (MerchantDebtorLimitsException $exception) {
             $this->logSuppressedException($exception, 'Merchant debtor limit lock failed', [
                 'exception' => $exception,

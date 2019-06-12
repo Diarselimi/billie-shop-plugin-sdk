@@ -2,6 +2,20 @@
 
 namespace App\DomainModel\MerchantDebtorResponse;
 
+use OpenApi\Annotations as OA;
+
+/**
+ * @OA\Schema(schema="MerchantDebtorExtendedResponse", x={"groups":{"private"}}, allOf={@OA\Schema(ref="#/components/schemas/MerchantDebtorResponse")}, type="object", properties={
+ *      @OA\Property(property="merchant_debtor_id", type="integer"),
+ *      @OA\Property(property="company_id", type="integer"),
+ *      @OA\Property(property="payment_id", ref="#/components/schemas/UUID"),
+ *      @OA\Property(property="is_whitelisted", type="boolean"),
+ *      @OA\Property(property="is_blacklisted", type="boolean"),
+ *      @OA\Property(property="is_trusted_source", type="boolean"),
+ *      @OA\Property(property="crefo_id", ref="#/components/schemas/TinyText", nullable=true),
+ *      @OA\Property(property="schufa_id", ref="#/components/schemas/TinyText", nullable=true),
+ * })
+ */
 class MerchantDebtorExtended extends MerchantDebtor
 {
     /**

@@ -3,7 +3,7 @@
 namespace App\DomainModel\OrderRiskCheck\Checker;
 
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
-use App\DomainModel\Order\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
 
 class LimitCheck implements CheckInterface
 {
@@ -16,8 +16,8 @@ class LimitCheck implements CheckInterface
         $this->limitsService = $limitsService;
     }
 
-    public function check(OrderContainer $order): CheckResult
+    public function check(OrderContainer $orderContainer): CheckResult
     {
-        return new CheckResult($this->limitsService->isEnough($order), self::NAME);
+        return new CheckResult($this->limitsService->isEnough($orderContainer), self::NAME);
     }
 }

@@ -2,11 +2,11 @@
 
 namespace App\DomainModel\DebtorCompany;
 
-use App\DomainModel\Order\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
 
 class IdentifyDebtorRequestFactory
 {
-    public function createDebtorRequestDTO(OrderContainer $orderContainer, bool $isExperimental = false): IdentifyDebtorRequestDTO
+    public function createDebtorRequestDTO(OrderContainer $orderContainer): IdentifyDebtorRequestDTO
     {
         return (new IdentifyDebtorRequestDTO())
             ->setName($orderContainer->getDebtorExternalData()->getName())
@@ -22,7 +22,7 @@ class IdentifyDebtorRequestFactory
             ->setLegalForm($orderContainer->getDebtorExternalData()->getLegalForm())
             ->setFirstName($orderContainer->getDebtorPerson()->getFirstName())
             ->setLastName($orderContainer->getDebtorPerson()->getLastName())
-            ->setIsExperimental($isExperimental)
-            ;
+            ->setIsExperimental($orderContainer->getMerchantSettings()->useExperimentalDebtorIdentification())
+        ;
     }
 }

@@ -4,7 +4,6 @@ namespace App\Infrastructure\Repository;
 
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntityFactory;
-use App\DomainModel\MerchantSettings\MerchantSettingsNotFoundException;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
 use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
@@ -67,7 +66,7 @@ class MerchantSettingsRepository extends AbstractPdoRepository implements Mercha
         $merchantSettingsEntity->setId($id);
     }
 
-    public function getOneByMerchant(int $merchantId): ?MerchantSettingsEntity
+    public function getOneByMerchant(int $merchantId): MerchantSettingsEntity
     {
         $row = $this->doFetchOne('
           SELECT ' . self::SELECT_FIELDS . '
@@ -76,16 +75,5 @@ class MerchantSettingsRepository extends AbstractPdoRepository implements Mercha
         ', ['merchant_id' => $merchantId]);
 
         return $row ? $this->factory->createFromArray($row) : null;
-    }
-
-    public function getOneByMerchantOrFail(int $merchantId): MerchantSettingsEntity
-    {
-        $found = $this->getOneByMerchant($merchantId);
-
-        if (!$found) {
-            throw new MerchantSettingsNotFoundException();
-        }
-
-        return $found;
     }
 }

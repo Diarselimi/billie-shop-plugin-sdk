@@ -6,26 +6,26 @@ use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface;
 use App\DomainModel\DebtorCompany\DebtorCompany;
-use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
-use App\DomainModel\MerchantDebtor\DebtorFinder;
-use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
+use App\DomainModel\MerchantDebtor\Finder\MerchantDebtorFinder;
+use App\DomainModel\Order\NewOrder\OrderPersistenceService;
 use App\DomainModel\Order\OrderChecksRunnerService;
-use App\DomainModel\Order\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderPersistenceService;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 {
     use LoggingTrait, ValidatedUseCaseTrait;
 
-    private $orderPersistenceService;
+    private $persistNewOrderService;
+
+    private $orderContainerFactory;
 
     private $orderChecksRunnerService;
 
@@ -33,38 +33,34 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 
     private $debtorFinderService;
 
-    private $validator;
-
     private $producer;
 
     private $orderResponseFactory;
 
-    private $merchantDebtorFinancialDetailsRepository;
-
     private $orderStateManager;
+
+    private $merchantDebtorFinancialDetailsRepository;
 
     private $checkoutSessionRepository;
 
     public function __construct(
-        OrderPersistenceService $orderPersistenceService,
+        OrderPersistenceService $persistNewOrderService,
+        OrderContainerFactory $orderContainerFactory,
         OrderChecksRunnerService $orderChecksRunnerService,
         OrderRepositoryInterface $orderRepository,
-        DebtorFinder $debtorFinderService,
-        ValidatorInterface $validator,
+        MerchantDebtorFinder $debtorFinderService,
         ProducerInterface $producer,
         OrderResponseFactory $orderResponseFactory,
-        MerchantDebtorFinancialDetailsRepositoryInterface $merchantDebtorFinancialDetailsRepository,
         OrderStateManager $orderStateManager,
         CheckoutSessionRepositoryInterface $checkoutSessionRepository
     ) {
-        $this->orderPersistenceService = $orderPersistenceService;
+        $this->persistNewOrderService = $persistNewOrderService;
+        $this->orderContainerFactory = $orderContainerFactory;
         $this->orderChecksRunnerService = $orderChecksRunnerService;
         $this->orderRepository = $orderRepository;
         $this->debtorFinderService = $debtorFinderService;
-        $this->validator = $validator;
         $this->producer = $producer;
         $this->orderResponseFactory = $orderResponseFactory;
-        $this->merchantDebtorFinancialDetailsRepository = $merchantDebtorFinancialDetailsRepository;
         $this->orderStateManager = $orderStateManager;
         $this->checkoutSessionRepository = $checkoutSessionRepository;
     }
@@ -73,7 +69,8 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
     {
         $this->validateRequest($request);
 
-        $orderContainer = $this->orderPersistenceService->persistFromRequest($request);
+        $newOrder = $this->persistNewOrderService->persistFromRequest($request);
+        $orderContainer = $this->orderContainerFactory->createFromNewOrderDTO($newOrder);
         $isOrderFromCheckout = $request->getCheckoutSessionId() !== null;
 
         if ($isOrderFromCheckout) {
@@ -86,7 +83,7 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
             return $orderContainer;
         }
 
-        if ($this->identifyDebtor($orderContainer, $request->getMerchantId()) !== null) {
+        if ($this->identifyDebtor($orderContainer)) {
             $this->orderRepository->update($orderContainer->getOrder());
         }
 
@@ -113,27 +110,28 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         return $orderContainer;
     }
 
-    private function identifyDebtor(OrderContainer $orderContainer, int $merchantId): ?MerchantDebtorEntity
+    private function identifyDebtor(OrderContainer $orderContainer): bool
     {
-        $merchantDebtor = $this->debtorFinderService->findDebtor($orderContainer, $merchantId);
+        $debtorFinderResult = $this->debtorFinderService->findDebtor($orderContainer);
 
+        //TODO: event
         if (!$orderContainer->getMerchantSettings()->useExperimentalDebtorIdentification()) {
             $this->triggerV2DebtorIdentificationAsync(
                 $orderContainer->getOrder(),
-                $merchantDebtor ? $merchantDebtor->getDebtorCompany() : null
+                $debtorFinderResult->getDebtorCompany() ? $debtorFinderResult->getDebtorCompany() : null
             );
         }
 
-        if ($merchantDebtor === null) {
-            return null;
+        if ($debtorFinderResult->getMerchantDebtor() === null) {
+            return false;
         }
 
         $orderContainer
-            ->setMerchantDebtor($merchantDebtor)
-            ->setMerchantDebtorFinancialDetails($this->merchantDebtorFinancialDetailsRepository->getCurrentByMerchantDebtorId($merchantDebtor->getId()))
-            ->getOrder()->setMerchantDebtorId($merchantDebtor->getId());
+            ->setMerchantDebtor($debtorFinderResult->getMerchantDebtor())
+            ->setDebtorCompany($debtorFinderResult->getDebtorCompany())
+        ;
 
-        return $merchantDebtor;
+        return true;
     }
 
     private function triggerV2DebtorIdentificationAsync(OrderEntity $order, ?DebtorCompany $identifiedDebtorCompany): void

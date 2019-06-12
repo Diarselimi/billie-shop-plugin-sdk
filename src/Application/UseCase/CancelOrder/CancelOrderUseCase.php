@@ -3,12 +3,14 @@
 namespace App\Application\UseCase\CancelOrder;
 
 use App\Application\Exception\FraudOrderException;
+use App\Application\Exception\OrderNotFoundException;
 use App\Application\PaellaCoreCriticalException;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsException;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
-use App\DomainModel\Order\OrderPersistenceService;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,7 +26,7 @@ class CancelOrderUseCase
 
     private $workflow;
 
-    private $orderPersistenceService;
+    private $orderContainerFactory;
 
     private $merchantRepository;
 
@@ -33,38 +35,35 @@ class CancelOrderUseCase
         OrderRepositoryInterface $orderRepository,
         MerchantDebtorLimitsService $limitsService,
         BorschtInterface $paymentsService,
-        OrderPersistenceService $orderPersistenceService,
+        OrderContainerFactory $orderContainerFactory,
         MerchantRepositoryInterface $merchantRepository
     ) {
         $this->workflow = $workflow;
         $this->orderRepository = $orderRepository;
         $this->limitsService = $limitsService;
         $this->paymentsService = $paymentsService;
-        $this->orderPersistenceService = $orderPersistenceService;
+        $this->orderContainerFactory = $orderContainerFactory;
         $this->merchantRepository = $merchantRepository;
     }
 
     public function execute(CancelOrderRequest $request): void
     {
-        $merchantId = $request->getMerchantId();
-        $order = $this->orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($request->getOrderId(), $merchantId);
-
-        if (!$order) {
-            throw new PaellaCoreCriticalException(
-                "Order #{$request->getOrderId()} not found",
-                PaellaCoreCriticalException::CODE_NOT_FOUND,
-                Response::HTTP_NOT_FOUND
+        try {
+            $orderContainer = $this->orderContainerFactory->loadByMerchantIdAndExternalId(
+                $request->getMerchantId(),
+                $request->getOrderId()
             );
+        } catch (OrderContainerFactoryException $exception) {
+            throw new OrderNotFoundException($exception);
         }
 
+        $order = $orderContainer->getOrder();
         if ($order->getMarkedAsFraudAt()) {
             throw new FraudOrderException();
         }
 
         if ($this->workflow->can($order, OrderStateManager::TRANSITION_CANCEL)) {
-            $orderContainer = $this->orderPersistenceService->createFromOrderEntity($order);
-
-            $orderContainer->getMerchant()->increaseAvailableFinancingLimit($order->getAmountGross());
+            $orderContainer->getMerchant()->increaseAvailableFinancingLimit($orderContainer->getOrderFinancialDetails()->getAmountGross());
             $this->merchantRepository->update($orderContainer->getMerchant());
 
             try {

@@ -5,7 +5,26 @@ namespace App\Http\Controller;
 use App\Application\UseCase\GetMerchant\GetMerchantRequest;
 use App\Application\UseCase\GetMerchant\GetMerchantResponse;
 use App\Application\UseCase\GetMerchant\GetMerchantUseCase;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Get(
+ *     path="/merchant/{apiKey}",
+ *     operationId="merchant_get",
+ *     summary="Get Merchant",
+ *     security={{"oauth2"={}}, {"apiKey"={}}},
+ *
+ *     tags={"Internal API"},
+ *     x={"groups":{"private"}},
+ *
+ *     @OA\Parameter(in="path", name="apiKey", @OA\Schema(type="string"), required=true, description="Merchant API Key"),
+ *
+ *     @OA\Response(response=200, @OA\JsonContent(ref="#/components/schemas/MerchantEntity"), description="Merchant Entity"),
+ *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),
+ *     @OA\Response(response=404, ref="#/components/responses/NotFound"),
+ *     @OA\Response(response=500, ref="#/components/responses/ServerError")
+ * )
+ */
 class GetMerchantController
 {
     private $useCase;

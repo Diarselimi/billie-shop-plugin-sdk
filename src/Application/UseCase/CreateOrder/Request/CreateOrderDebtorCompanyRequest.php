@@ -3,7 +3,37 @@
 namespace App\Application\UseCase\CreateOrder\Request;
 
 use Symfony\Component\Validator\Constraints as Assert;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Schema(
+ *     schema="CreateOrderDebtorCompanyRequest",
+ *     title="Debtor Company",
+ *     required={
+ *          "merchant_customer_id", "name", "legal_form", "address_house_number", "address_street",
+ *          "address_city", "address_postal_code", "address_country", "industry_sector"
+ *     },
+ *     properties={
+ *          @OA\Property(property="merchant_customer_id", ref="#/components/schemas/TinyText", example="DE123456", nullable=true),
+ *          @OA\Property(property="name", ref="#/components/schemas/TinyText", example="Billie GmbH"),
+ *          @OA\Property(property="tax_id", ref="#/components/schemas/TinyText", example="DE1234556"),
+ *          @OA\Property(property="tax_number", ref="#/components/schemas/TinyText", nullable=true),
+ *          @OA\Property(property="registration_court", ref="#/components/schemas/TinyText", nullable=true),
+ *          @OA\Property(property="registration_number", ref="#/components/schemas/TinyText", example="HRB 1234556"),
+ *          @OA\Property(property="industry_sector", ref="#/components/schemas/TinyText", example="C"),
+ *          @OA\Property(property="subindustry_sector", ref="#/components/schemas/TinyText", nullable=true),
+ *          @OA\Property(property="employees_number", ref="#/components/schemas/TinyText", example="1-5"),
+ *          @OA\Property(property="legal_form", ref="#/components/schemas/TinyText", example="10122"),
+ *          @OA\Property(property="established_costumer", type="boolean"),
+ *          @OA\Property(property="address_addition", ref="#/components/schemas/TinyText", nullable=true),
+ *          @OA\Property(property="address_house_number", ref="#/components/schemas/TinyText", example="4"),
+ *          @OA\Property(property="address_street", ref="#/components/schemas/TinyText", example="Charlottenstr."),
+ *          @OA\Property(property="address_city", ref="#/components/schemas/TinyText", example="Berlin"),
+ *          @OA\Property(property="address_postal_code", ref="#/components/schemas/PostalCode"),
+ *          @OA\Property(property="address_country", ref="#/components/schemas/CountryCode"),
+ *     }
+ * )
+ */
 class CreateOrderDebtorCompanyRequest
 {
     /**

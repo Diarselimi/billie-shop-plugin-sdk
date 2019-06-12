@@ -41,7 +41,7 @@ class MerchantDebtorRegistrationService
     {
         $paymentDebtor = $this->paymentsService->registerDebtor($merchant->getPaymentMerchantId());
 
-        $merchantSettings = $this->merchantSettingsRepository->getOneByMerchantOrFail($merchant->getId());
+        $merchantSettings = $this->merchantSettingsRepository->getOneByMerchant($merchant->getId());
 
         $merchantDebtor = $this->merchantDebtorEntityFactory->create(
             $debtorCompanyId,

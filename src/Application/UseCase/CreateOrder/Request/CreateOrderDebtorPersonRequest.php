@@ -3,13 +3,28 @@
 namespace App\Application\UseCase\CreateOrder\Request;
 
 use Symfony\Component\Validator\Constraints as Assert;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Schema(
+ *     schema="CreateOrderDebtorPersonRequest",
+ *     title="Debtor Person",
+ *     required={"gender", "email"},
+ *     properties={
+ *          @OA\Property(property="gender", maxLength=1, enum={"m", "f"}, type="string"),
+ *          @OA\Property(property="first_name", ref="#/components/schemas/TinyText", example="James"),
+ *          @OA\Property(property="last_name", ref="#/components/schemas/TinyText", example="Smith"),
+ *          @OA\Property(property="phone_number", ref="#/components/schemas/PhoneNumber"),
+ *          @OA\Property(property="email", format="email", type="string", example="james.smith@example.com")
+ *     }
+ * )
+ */
 class CreateOrderDebtorPersonRequest
 {
     /**
+     * @Assert\NotBlank()
      * @Assert\Type(type="string")
      * @Assert\Choice({"m", "f"})
-     * @Assert\NotBlank()
      */
     private $gender;
 

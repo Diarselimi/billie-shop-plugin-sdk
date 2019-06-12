@@ -1,17 +1,19 @@
 <?php
 
-namespace App\DomainModel\MerchantDebtor;
+namespace App\DomainModel\MerchantDebtor\Finder;
 
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorCompany\IdentifyDebtorRequestFactory;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
-use App\DomainModel\Order\OrderContainer;
+use App\DomainModel\MerchantDebtor\MerchantDebtorRegistrationService;
+use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderStateManager;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
-class DebtorFinder implements LoggingInterface
+class MerchantDebtorFinder implements LoggingInterface
 {
     use LoggingTrait;
 
@@ -39,16 +41,15 @@ class DebtorFinder implements LoggingInterface
         $this->identifyDebtorRequestFactory = $identifyDebtorRequestFactory;
     }
 
-    public function findDebtor(OrderContainer $orderContainer, int $merchantId): ?MerchantDebtorEntity
+    public function findDebtor(OrderContainer $orderContainer): MerchantDebtorFinderResult
     {
-        $identifyRequest = $this->identifyDebtorRequestFactory->createDebtorRequestDTO(
-            $orderContainer,
-            $orderContainer->getMerchantSettings()->useExperimentalDebtorIdentification()
-        );
+        $merchantId = $orderContainer->getOrder()->getMerchantId();
+        $debtorExternalData = $orderContainer->getDebtorExternalData();
+        $identifyRequest = $this->identifyDebtorRequestFactory->createDebtorRequestDTO($orderContainer);
 
         $this->logInfo('Check if the merchant debtor already known');
         $merchantDebtor = $this->merchantDebtorRepository->getOneByExternalIdAndMerchantId(
-            $orderContainer->getDebtorExternalData()->getMerchantExternalId(),
+            $debtorExternalData->getMerchantExternalId(),
             $merchantId,
             [OrderStateManager::STATE_NEW, OrderStateManager::STATE_DECLINED]
         );
@@ -57,27 +58,27 @@ class DebtorFinder implements LoggingInterface
             $this->logInfo('Found the existing merchant debtor', ['id' => $merchantDebtor->getId()]);
             $identifyRequest->setCompanyId((int) $merchantDebtor->getDebtorId());
         } else {
-            $hash = $orderContainer->getDebtorExternalData()->getDataHash();
+            $hash = $debtorExternalData->getDataHash();
 
-            $debtorExternalData = $this->debtorExternalDataRepository->getOneByHashAndStateNotOlderThanDays(
+            $existingDebtorExternalData = $this->debtorExternalDataRepository->getOneByHashAndStateNotOlderThanDays(
                 $hash,
-                $orderContainer->getDebtorExternalData()->getMerchantExternalId(),
+                $debtorExternalData->getMerchantExternalId(),
                 $merchantId,
-                $orderContainer->getDebtorExternalData()->getId(),
+                $debtorExternalData->getId(),
                 OrderStateManager::STATE_DECLINED
             );
 
-            if ($debtorExternalData) {
+            if ($existingDebtorExternalData) {
                 $this->logInfo('The debtor is with the same data and not older than 30 days found!');
 
                 $merchantDebtor = $this->merchantDebtorRepository->getOneByExternalIdAndMerchantId(
-                    $debtorExternalData->getMerchantExternalId(),
+                    $existingDebtorExternalData->getMerchantExternalId(),
                     $merchantId,
                     []
                 );
 
                 if (!$merchantDebtor) {
-                    return null;
+                    return new MerchantDebtorFinderResult();
                 }
 
                 $identifyRequest->setCompanyId($merchantDebtor->getDebtorId());
@@ -97,7 +98,7 @@ class DebtorFinder implements LoggingInterface
         if (!$debtorCompany) {
             $this->logInfo('Debtor could not be identified');
 
-            return null;
+            return new MerchantDebtorFinderResult();
         }
 
         $this->logInfo('Debtor identified');
@@ -118,8 +119,6 @@ class DebtorFinder implements LoggingInterface
             );
         }
 
-        $merchantDebtor->setDebtorCompany($debtorCompany);
-
-        return $merchantDebtor;
+        return new MerchantDebtorFinderResult($merchantDebtor, $debtorCompany);
     }
 }

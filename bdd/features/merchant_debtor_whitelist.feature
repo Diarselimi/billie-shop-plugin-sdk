@@ -13,7 +13,7 @@ Feature:
     And I get from payments service get debtor response
     When I send a PUT request to "/merchant/1/merchant-debtor/ext_id/whitelist" with body:
     """
-    {"is_whitelisted": "1"}
+      {"is_whitelisted": "1"}
     """
     Then the response status code should be 204
     And the merchant debtor "ext_id" with merchantId 1 should be whitelisted

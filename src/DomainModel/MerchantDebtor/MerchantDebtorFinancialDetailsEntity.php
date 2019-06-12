@@ -2,6 +2,7 @@
 
 namespace App\DomainModel\MerchantDebtor;
 
+use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsException;
 use Billie\PdoBundle\DomainModel\AbstractEntity;
 
 class MerchantDebtorFinancialDetailsEntity extends AbstractEntity
@@ -66,7 +67,7 @@ class MerchantDebtorFinancialDetailsEntity extends AbstractEntity
     {
         $newPower = $this->financingPower - $difference;
         if ($newPower < 0) {
-            throw new \LogicException('Trying to set negative financing power');
+            throw new MerchantDebtorLimitsException('Trying to set negative financing power');
         }
 
         $this->financingPower = $newPower;
@@ -76,7 +77,7 @@ class MerchantDebtorFinancialDetailsEntity extends AbstractEntity
     {
         $newPower = $this->financingPower + $difference;
         if ($newPower > $this->financingLimit) {
-            throw new \LogicException('Trying to set excessive financing power');
+            throw new MerchantDebtorLimitsException('Trying to set excessive financing power');
         }
 
         $this->financingPower = $newPower;

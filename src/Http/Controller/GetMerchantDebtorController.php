@@ -8,9 +8,29 @@ use App\Application\UseCase\GetMerchantDebtor\GetMerchantDebtorUseCase;
 use App\DomainModel\MerchantDebtorResponse\MerchantDebtor;
 use App\DomainModel\MerchantDebtorResponse\MerchantDebtorResponseFactory;
 use App\Http\HttpConstantsInterface;
+use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * @OA\Get(
+ *     path="/debtor/{uuid}",
+ *     operationId="debtor_get_details",
+ *     summary="Get Debtor Details",
+ *     security={{"oauth2"={}}, {"apiKey"={}}},
+ *
+ *     tags={"Dashboard API"},
+ *     x={"groups":{"public"}},
+ *
+ *     @OA\Parameter(in="path", name="uuid", @OA\Schema(ref="#/components/schemas/UUID"), required=true),
+ *
+ *     @OA\Response(response=200, @OA\JsonContent(ref="#/components/schemas/MerchantDebtorResponse"), description="Debtor Info"),
+ *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),
+ *     @OA\Response(response=404, ref="#/components/responses/NotFound"),
+ *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+ *     @OA\Response(response=500, ref="#/components/responses/ServerError")
+ * )
+ */
 class GetMerchantDebtorController
 {
     private $useCase;
@@ -23,12 +43,12 @@ class GetMerchantDebtorController
         $this->responseFactory = $responseFactory;
     }
 
-    public function execute(string $merchantDebtorUuid, Request $request): MerchantDebtor
+    public function execute(string $uuid, Request $request): MerchantDebtor
     {
         try {
             $container = $this->useCase->execute(new GetMerchantDebtorRequest(
                 $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID),
-                $merchantDebtorUuid,
+                $uuid,
                 null
             ));
         } catch (MerchantDebtorNotFoundException $e) {

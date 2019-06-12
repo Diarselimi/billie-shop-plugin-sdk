@@ -3,7 +3,62 @@
 namespace App\DomainModel\OrderResponse;
 
 use App\DomainModel\ArrayableInterface;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Schema(schema="OrderResponse", title="Order Entity", type="object", properties={
+ *      @OA\Property(property="external_code", type="string", nullable=true, example="C-10123456789-0001"),
+ *      @OA\Property(property="uuid", ref="#/components/schemas/UUID"),
+ *      @OA\Property(property="state", ref="#/components/schemas/OrderState", example="created"),
+ *      @OA\Property(property="reasons", type="array", @OA\Items(ref="#/components/schemas/OrderDeclineReason"), nullable=true),
+ *      @OA\Property(property="amount", type="number", format="float", nullable=true, example=123.45),
+ *      @OA\Property(property="duration", ref="#/components/schemas/OrderDuration", example=30),
+ *
+ *      @OA\Property(property="debtor_company", type="object", description="Identified company", properties={
+ *          @OA\Property(property="name", ref="#/components/schemas/TinyText", nullable=true, example="Billie GmbH"),
+ *          @OA\Property(property="house_number", ref="#/components/schemas/TinyText", nullable=true, example="4"),
+ *          @OA\Property(property="street", ref="#/components/schemas/TinyText", nullable=true, example="Charlottenstr."),
+ *          @OA\Property(property="postal_code", type="string", nullable=true, maxLength=5, example="10969"),
+ *          @OA\Property(property="city", ref="#/components/schemas/TinyText", nullable=true, example="Berlin"),
+ *          @OA\Property(property="country", type="string", nullable=true, maxLength=2),
+ *      }),
+ *
+ *      @OA\Property(property="bank_account", type="object", properties={
+ *          @OA\Property(property="iban", ref="#/components/schemas/TinyText", nullable=true, description="Virtual IBAN provided by Billie"),
+ *          @OA\Property(property="bic", ref="#/components/schemas/TinyText", nullable=true),
+ *      }),
+ *
+ *      @OA\Property(property="invoice", type="object", properties={
+ *          @OA\Property(property="number", ref="#/components/schemas/TinyText", nullable=true),
+ *          @OA\Property(property="payout_amount", type="number", format="float", nullable=true),
+ *          @OA\Property(property="outstanding_amount", type="number", format="float", nullable=true),
+ *          @OA\Property(property="fee_amount", type="number", format="float", nullable=true),
+ *          @OA\Property(property="fee_rate", type="number", format="float", nullable=true),
+ *          @OA\Property(property="due_date", type="string", format="date", nullable=true, example="2019-03-20"),
+ *      }),
+ *
+ *      @OA\Property(property="debtor_external_data", description="Data provided in the order creation", type="object", properties={
+ *          @OA\Property(property="merchant_customer_id", ref="#/components/schemas/TinyText", example="C-10123456789"),
+ *          @OA\Property(property="name", ref="#/components/schemas/TinyText", example="Billie G.m.b.H."),
+ *          @OA\Property(property="address_country", type="string", maxLength=2, example="DE"),
+ *          @OA\Property(property="address_postal_code", type="string", maxLength=5, example="10969"),
+ *          @OA\Property(property="address_street", ref="#/components/schemas/TinyText", example="Charlotten Straße"),
+ *          @OA\Property(property="address_house", ref="#/components/schemas/TinyText", example="4"),
+ *          @OA\Property(property="industry_sector", ref="#/components/schemas/TinyText"),
+ *      }),
+ *
+ *      @OA\Property(property="delivery_address", type="object", properties={
+ *          @OA\Property(property="house_number", ref="#/components/schemas/TinyText", nullable=true),
+ *          @OA\Property(property="street", ref="#/components/schemas/TinyText", nullable=true),
+ *          @OA\Property(property="postal_code", type="string", nullable=true, maxLength=5),
+ *          @OA\Property(property="city", ref="#/components/schemas/TinyText", nullable=true),
+ *          @OA\Property(property="country", type="string", nullable=true, maxLength=2),
+ *      }),
+ *
+ *      @OA\Property(property="created_at", ref="#/components/schemas/DateTime"),
+ *      @OA\Property(property="shipped_at", ref="#/components/schemas/DateTime"),
+ * })
+ */
 class OrderResponse implements ArrayableInterface
 {
     private $externalCode;
@@ -490,7 +545,7 @@ class OrderResponse implements ArrayableInterface
             'state' => $this->getState(),
             'reasons' => $this->getReasons() ?: null,
             'amount' => $this->getOriginalAmount(),
-            'created_at' => $this->getCreatedAt()->format(\DateTime::ISO8601),
+            'duration' => $this->getDuration(),
             'debtor_company' => [
                 'name' => $this->getCompanyName(),
                 'house_number' => $this->getCompanyAddressHouseNumber(),
@@ -512,16 +567,14 @@ class OrderResponse implements ArrayableInterface
                 'due_date' => $this->getDueDate() ? $this->getDueDate()->format('Y-m-d') : null,
             ],
             'debtor_external_data' => [
+                'merchant_customer_id' => $this->getDebtorExternalDataCustomerId(),
                 'name' => $this->getDebtorExternalDataCompanyName(),
                 'address_country' => $this->getDebtorExternalDataAddressCountry(),
                 'address_postal_code' => $this->getDebtorExternalDataAddressPostalCode(),
                 'address_street' => $this->getDebtorExternalDataAddressStreet(),
                 'address_house' => $this->getDebtorExternalDataAddressHouse(),
                 'industry_sector' => $this->getDebtorExternalDataIndustrySector(),
-                'merchant_customer_id' => $this->getDebtorExternalDataCustomerId(),
             ],
-            'duration' => $this->getDuration(),
-            'shipped_at' => ($this->getShippedAt() ? $this->getShippedAt()->format(\DateTime::ISO8601) : null),
             'delivery_address' => [
                 'house_number' => $this->getDeliveryAddressHouseNumber(),
                 'street' => $this->getDeliveryAddressStreet(),
@@ -529,6 +582,8 @@ class OrderResponse implements ArrayableInterface
                 'postal_code' => $this->getDeliveryAddressPostalCode(),
                 'country' => $this->getDeliveryAddressCountry(),
             ],
+            'created_at' => $this->getCreatedAt()->format(\DateTime::ISO8601),
+            'shipped_at' => ($this->getShippedAt() ? $this->getShippedAt()->format(\DateTime::ISO8601) : null),
         ];
     }
 }

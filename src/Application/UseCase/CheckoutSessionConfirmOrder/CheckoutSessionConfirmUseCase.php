@@ -7,9 +7,9 @@ use App\Application\Exception\OrderNotAuthorizedException;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
-use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderPersistenceService;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderResponse\OrderResponse;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
@@ -18,23 +18,19 @@ class CheckoutSessionConfirmUseCase implements ValidatedUseCaseInterface
 {
     use ValidatedUseCaseTrait;
 
-    private $orderRepository;
-
     private $orderResponseFactory;
 
-    private $orderPersistenceService;
+    private $orderContainerFactory;
 
     private $stateManager;
 
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
         OrderResponseFactory $orderResponseFactory,
-        OrderPersistenceService $orderPersistenceService,
+        OrderContainerFactory $orderContainerFactory,
         OrderStateManager $orderStateManager
     ) {
-        $this->orderRepository = $orderRepository;
         $this->orderResponseFactory = $orderResponseFactory;
-        $this->orderPersistenceService = $orderPersistenceService;
+        $this->orderContainerFactory = $orderContainerFactory;
         $this->stateManager = $orderStateManager;
     }
 
@@ -42,24 +38,21 @@ class CheckoutSessionConfirmUseCase implements ValidatedUseCaseInterface
      * @throws OrderNotAuthorizedException|CheckoutSessionConfirmException
      * @throws OrderNotFoundException
      */
-    public function execute(CheckoutSessionConfirmOrderRequest $request, string $checkoutSessionUuid): OrderResponse
+    public function execute(CheckoutSessionConfirmOrderRequest $request): OrderResponse
     {
         $this->validateRequest($request);
 
-        $orderEntity = $this->orderRepository
-            ->getOneByCheckoutSessionUuid($checkoutSessionUuid);
-
-        if (!$orderEntity) {
-            throw new OrderNotFoundException();
+        try {
+            $orderContainer = $this->orderContainerFactory->loadByCheckoutSessionUuid($request->getSessionUuid());
+        } catch (OrderContainerFactoryException $exception) {
+            throw new OrderNotFoundException($exception);
         }
 
-        if ($orderEntity->getState() !== OrderStateManager::STATE_AUTHORIZED) {
+        if ($orderContainer->getOrder()->getState() !== OrderStateManager::STATE_AUTHORIZED) {
             throw new OrderNotAuthorizedException();
         }
 
-        $orderContainer = $this->orderPersistenceService->createFromOrderEntity($orderEntity);
-
-        if (!$this->compare($request, $orderEntity)) {
+        if (!$this->compare($request, $orderContainer)) {
             throw new CheckoutSessionConfirmException();
         }
 
@@ -68,11 +61,13 @@ class CheckoutSessionConfirmUseCase implements ValidatedUseCaseInterface
         return $this->orderResponseFactory->create($orderContainer);
     }
 
-    private function compare(CheckoutSessionConfirmOrderRequest $confirmOrderRequest, OrderEntity $orderEntity): bool
+    private function compare(CheckoutSessionConfirmOrderRequest $confirmOrderRequest, OrderContainer $orderContainer): bool
     {
-        return $confirmOrderRequest->getAmount()->getGross() === $orderEntity->getAmountGross() &&
-            $confirmOrderRequest->getAmount()->getNet() === $orderEntity->getAmountNet() &&
-            $confirmOrderRequest->getAmount()->getTax() === $orderEntity->getAmountTax() &&
-            $confirmOrderRequest->getDuration() === $orderEntity->getDuration();
+        $orderFinancialDetails = $orderContainer->getOrderFinancialDetails();
+
+        return $confirmOrderRequest->getAmount()->getGross() === $orderFinancialDetails->getAmountGross() &&
+            $confirmOrderRequest->getAmount()->getNet() === $orderFinancialDetails->getAmountNet() &&
+            $confirmOrderRequest->getAmount()->getTax() === $orderFinancialDetails->getAmountTax() &&
+            $confirmOrderRequest->getDuration() === $orderFinancialDetails->getDuration();
     }
 }

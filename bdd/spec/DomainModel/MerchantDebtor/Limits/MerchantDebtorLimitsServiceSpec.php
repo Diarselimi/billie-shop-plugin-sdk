@@ -8,11 +8,11 @@ use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorFinancialDetailsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
-use App\DomainModel\Order\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
-use Psr\Log\NullLogger;
+use Psr\Log\LoggerInterface;
 
 class MerchantDebtorLimitsServiceSpec extends ObjectBehavior
 {
@@ -21,11 +21,22 @@ class MerchantDebtorLimitsServiceSpec extends ObjectBehavior
     public function let(
         CompaniesServiceInterface $companyService,
         MerchantDebtorFinancialDetailsRepositoryInterface $merchantDebtorFinancialDetailsRepository,
-        OrderRepositoryInterface $orderRepository
+        OrderRepositoryInterface $orderRepository,
+        MerchantDebtorEntity $merchantDebtor,
+        MerchantDebtorFinancialDetailsEntity $merchantDebtorFinancialDetails,
+        MerchantSettingsEntity $merchantSettings,
+        OrderContainer $orderContainer,
+        LoggerInterface $logger
     ) {
-        $this->beConstructedWith(...func_get_args());
+        $orderContainer->getMerchantDebtor()->willReturn($merchantDebtor);
+        $orderContainer->getMerchantSettings()->willReturn($merchantSettings);
+        $orderContainer->getMerchantDebtorFinancialDetails()->willReturn($merchantDebtorFinancialDetails);
 
-        $this->setLogger(new NullLogger());
+        $merchantDebtorFinancialDetails->getFinancingLimit()->willReturn(10000.00);
+        $merchantDebtorFinancialDetails->getFinancingPower()->willReturn(8000.00);
+
+        $this->beConstructedWith(...func_get_args());
+        $this->setLogger($logger);
     }
 
     public function it_is_initializable()
@@ -45,26 +56,19 @@ class MerchantDebtorLimitsServiceSpec extends ObjectBehavior
 
         $merchantSettings->getDebtorFinancingLimit()->willReturn(20000.00);
 
-        $merchantDebtorFinancialDetails->getFinancingLimit()->willReturn(10000.00);
-        $merchantDebtorFinancialDetails->getFinancingPower()->willReturn(8000.00);
-
-        $orderContainer->getMerchantDebtor()->willReturn($merchantDebtor);
-        $orderContainer->getMerchantSettings()->willReturn($merchantSettings);
-        $orderContainer->getMerchantDebtorFinancialDetails()->willReturn($merchantDebtorFinancialDetails);
-
         $orderRepository
             ->getOrdersCountByMerchantDebtorAndState(self::MERCHANT_DEBTOR_ID, 'complete')
             ->shouldBeCalled()
             ->willReturn(1)
         ;
 
-        $merchantDebtorFinancialDetails->setFinancingLimit(20000.00)->shouldBeCalled()->willReturn($merchantDebtorFinancialDetails);
-        $merchantDebtorFinancialDetails->setFinancingPower(18000.00)->shouldBeCalled()->willReturn($merchantDebtorFinancialDetails);
-
         $merchantDebtorFinancialDetailsRepository
             ->insert($merchantDebtorFinancialDetails)
             ->shouldBeCalled()
         ;
+
+        $merchantDebtorFinancialDetails->setFinancingLimit(Argument::any())->shouldBeCalled()->willReturn($merchantDebtorFinancialDetails);
+        $merchantDebtorFinancialDetails->setFinancingPower(Argument::any())->shouldBeCalled()->willReturn($merchantDebtorFinancialDetails);
 
         $this->recalculate($orderContainer);
     }
@@ -79,13 +83,6 @@ class MerchantDebtorLimitsServiceSpec extends ObjectBehavior
         $merchantDebtor->getId()->willReturn(self::MERCHANT_DEBTOR_ID);
 
         $merchantSettings->getDebtorFinancingLimit()->willReturn(5000.00);
-
-        $merchantDebtorFinancialDetails->getFinancingLimit()->willReturn(10000.00);
-        $merchantDebtorFinancialDetails->getFinancingPower()->willReturn(8000.00);
-
-        $orderContainer->getMerchantDebtor()->willReturn($merchantDebtor);
-        $orderContainer->getMerchantSettings()->willReturn($merchantSettings);
-        $orderContainer->getMerchantDebtorFinancialDetails()->willReturn($merchantDebtorFinancialDetails);
 
         $merchantDebtorFinancialDetails->setFinancingLimit(Argument::any())->shouldNotBeCalled();
         $merchantDebtorFinancialDetails->setFinancingPower(Argument::any())->shouldNotBeCalled();

@@ -2,16 +2,16 @@
 
 namespace App\DomainModel\OrderRiskCheck\Checker;
 
-use App\DomainModel\Order\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
 
 class DebtorNotCustomerCheck implements CheckInterface
 {
     const NAME = 'debtor_not_customer';
 
-    public function check(OrderContainer $order): CheckResult
+    public function check(OrderContainer $orderContainer): CheckResult
     {
-        $debtorId = $order->getMerchantDebtor()->getDebtorId();
-        $merchantId = $order->getMerchant()->getCompanyId();
+        $debtorId = $orderContainer->getMerchantDebtor()->getDebtorId();
+        $merchantId = $orderContainer->getMerchant()->getCompanyId();
         $result = $debtorId !== $merchantId;
 
         return new CheckResult($result, self::NAME);

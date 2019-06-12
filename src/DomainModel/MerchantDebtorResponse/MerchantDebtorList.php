@@ -3,7 +3,14 @@
 namespace App\DomainModel\MerchantDebtorResponse;
 
 use App\DomainModel\ArrayableInterface;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Schema(schema="MerchantDebtorListResponse", type="object", properties={
+ *      @OA\Property(property="total", type="integer", minimum=0),
+ *      @OA\Property(property="items", type="array", @OA\Items(type="object", ref="#/components/schemas/MerchantDebtorListItem"))
+ * })
+ */
 class MerchantDebtorList implements ArrayableInterface
 {
     /**

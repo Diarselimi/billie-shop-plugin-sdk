@@ -1,65 +1,9 @@
 billie_monitoring:
   resource: '@BillieMonitoringBundle/Resources/config/routes.yaml'
 
-get_merchant:
-  path: /merchant/{apiKey}
-  controller: App\Http\Controller\GetMerchantController::execute
-  methods: [GET]
-
-get_orders:
-  path: /orders
-  controller: App\Http\Controller\GetOrdersController::execute
-  methods: [GET]
-
-get_order:
-  path: /order/{id}
-  controller: App\Http\Controller\GetOrderController::execute
-  methods: [GET]
-
-create_order:
-  path: /order
-  controller: App\Http\Controller\CreateOrderController::execute
-  methods: [POST]
-
-cancel_order:
-  path: /order/{id}/cancel
-  controller: App\Http\Controller\CancelOrderController::execute
-  methods: [POST]
-
-update_order:
-  path: /order/{id}
-  controller: App\Http\Controller\UpdateOrderController::execute
-  methods: [PATCH]
-
-confirm_order_payment:
-  path: /order/{id}/confirm-payment
-  controller: App\Http\Controller\ConfirmOrderPaymentController::execute
-  methods: [POST]
-
-ship_order:
-  path: /order/{id}/ship
-  controller: App\Http\Controller\ShipOrderController::execute
-  methods: [POST]
-
-pause_order_dunning:
-  path: /order/{id}/pause-dunning
-  controller: App\Http\Controller\PauseOrderDunningController::execute
-  methods: [POST]
-
-create_order_invoice:
-  path: /merchant/{merchantId}/order/{id}/invoice
-  controller: App\Http\Controller\CreateOrderInvoiceController::execute
-  methods: [POST]
-
-decline_order:
-  path: /order/{id}/decline
-  controller: App\Http\Controller\DeclineOrderController::execute
-  methods: [POST]
-
-approve_order:
-  path: /order/{id}/approve
-  controller: App\Http\Controller\ApproveOrderController::execute
-  methods: [POST]
+controllers:
+    resource: ../src/Http/Controller
+    type: openapi_annotation
 
 trigger_failed_order_notifications:
   path: /order/{id}/trigger-failed-notifications
@@ -74,11 +18,6 @@ mark_order_as_fraud:
 update_merchant_with_order_dunning_step:
   path: /order/{uuid}/update-dunning-step
   controller: App\Http\Controller\UpdateMerchantWithOrderDunningStepController::execute
-  methods: [POST]
-
-create_merchant:
-  path: /merchant
-  controller: App\Http\Controller\CreateMerchantController::execute
   methods: [POST]
 
 register_merchant_user:
@@ -96,11 +35,6 @@ update_merchant_debtor_company:
   controller: App\Http\Controller\UpdateMerchantDebtorCompanyController::execute
   methods: [PUT]
 
-get_merchant_debtor_support:
-  path: /merchant/{merchantId}/merchant-debtor/{merchantDebtorExternalId}
-  controller: App\Http\Controller\GetMerchantDebtorSupportController::execute
-  methods: [GET]
-
 mark_duplicate_debtors:
   path: /merchant-debtor/mark-duplicates
   controller: App\Http\Controller\MarkDuplicateDebtorsController::execute
@@ -111,33 +45,7 @@ whitelist_merchant_debtor:
   controller: App\Http\Controller\UpdateMerchantDebtorWhitelistController::execute
   methods: [PUT]
 
-########################################
-##      Checkout API (paella-api)
-########################################
-create_checkout_session:
-  path: /checkout-session
-  controller: App\Http\Controller\CreateCheckoutSessionController::execute
+pause_order_dunning:
+  path: /order/{id}/pause-dunning
+  controller: App\Http\Controller\PauseOrderDunningController::execute
   methods: [POST]
-
-authorize_checkout_session:
-  path: /checkout-session/{sessionUuid}/authorize
-  controller: App\Http\Controller\AuthorizeCheckoutSessionController::execute
-  methods: [PUT]
-
-confirm_checkout_session:
-  path: /checkout-session/{sessionUuid}/confirm
-  controller: App\Http\Controller\ConfirmCheckoutSessionController::execute
-  methods: [PUT]
-
-########################################
-##        Debtors API (paella-api)
-########################################
-get_merchant_debtor:
-  path: /debtor/{merchantDebtorUuid}
-  controller: App\Http\Controller\GetMerchantDebtorController::execute
-  methods: [GET]
-
-get_merchant_debtors_list:
-  path: /debtors
-  controller: App\Http\Controller\GetMerchantDebtorsController::execute
-  methods: [GET]

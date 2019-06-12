@@ -51,3 +51,6 @@ services:
   App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface:
     alias: 'App\Infrastructure\Repository\MerchantDebtorFinancialDetailsRepository'
     public: true
+  App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\OrderFinancialDetailsRepository'
+    public: true

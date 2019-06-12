@@ -8,8 +8,9 @@ use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsException;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\Order\CreateOrderCrossChecksService;
-use App\DomainModel\Order\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use Billie\MonitoringBundle\Service\Alerting\Sentry\Raven\RavenClient;
 use PhpSpec\ObjectBehavior;
 use Psr\Log\NullLogger;
@@ -25,13 +26,15 @@ class CreateOrderCrossChecksServiceSpec extends ObjectBehavior
         MerchantRepositoryInterface $merchantRepository,
         OrderContainer $orderContainer,
         OrderEntity $order,
+        OrderFinancialDetailsEntity $orderFinancialDetails,
         MerchantEntity $merchant,
         RavenClient $sentry
     ) {
         $orderContainer->getMerchant()->willReturn($merchant);
         $orderContainer->getOrder()->willReturn($order);
+        $orderContainer->getOrderFinancialDetails()->willReturn($orderFinancialDetails);
         $order->getId()->willReturn(self::ORDER_ID);
-        $order->getAmountGross()->willReturn(self::AMOUNT);
+        $orderFinancialDetails->getAmountGross()->willReturn(self::AMOUNT);
 
         $this->beConstructedWith(...func_get_args());
 

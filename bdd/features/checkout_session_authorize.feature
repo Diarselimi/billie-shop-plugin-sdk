@@ -154,10 +154,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     """
     Then the order A1 is in state declined
     And the response status code should be 400
-    And the JSON response should be:
-    """
-    {"reasons":["risk_policy"]}
-    """
+    And the JSON response at "reasons/0" should be "risk_policy"
 
   Scenario: An order goes to declined if it doesn't pass all the soft checks
     Given I get from companies service identify match and good decision response
@@ -316,8 +313,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     {"title":"Unauthorized","code":"unauthorized"}
     """
 
-  Scenario:
-  I success if I try to create an order with a valid session_id but gets declined,
+  Scenario: I success if I try to create an order with a valid session_id but gets declined,
   but fail for the second time because the session_id should be invalidated!
     Given I get from companies service identify match and bad decision response
     And I get from payments service register debtor positive response
@@ -369,10 +365,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     """
     Then the order A1 is in state declined
     And the response status code should be 400
-    And the JSON response should be:
-    """
-    {"reasons":["risk_policy"]}
-    """
+    And the JSON response at "reasons/0" should be "risk_policy"
     And I send a PUT request to "/checkout-session/123123/authorize" with body:
     """
     {

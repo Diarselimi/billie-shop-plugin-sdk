@@ -2,7 +2,7 @@
 
 namespace App\DomainModel\OrderRiskCheck\Checker;
 
-use App\DomainModel\Order\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
 
 class DebtorIndustrySectorCheck implements CheckInterface
 {
@@ -10,9 +10,9 @@ class DebtorIndustrySectorCheck implements CheckInterface
 
     private const BLACKLISTED_INDUSTRY_SECTORS = ['25.4', '92', 'T', 'U'];
 
-    public function check(OrderContainer $order): CheckResult
+    public function check(OrderContainer $orderContainer): CheckResult
     {
-        $industrySector = $order->getDebtorExternalData()->getIndustrySector();
+        $industrySector = $orderContainer->getDebtorExternalData()->getIndustrySector();
         $result = !in_array($industrySector, self::BLACKLISTED_INDUSTRY_SECTORS, true);
 
         return new CheckResult($result, self::NAME);

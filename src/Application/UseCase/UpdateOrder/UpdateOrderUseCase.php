@@ -10,11 +10,13 @@ use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
-use App\DomainModel\Order\OrderContainer;
-use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderPersistenceService;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
+use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsFactory;
+use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface;
 use App\DomainModel\OrderInvoice\InvoiceUploadHandlerInterface;
 use App\DomainModel\OrderInvoice\OrderInvoiceManager;
 use App\DomainModel\OrderInvoice\OrderInvoiceUploadException;
@@ -26,7 +28,7 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 {
     use LoggingTrait, ValidatedUseCaseTrait;
 
-    private $orderPersistenceService;
+    private $orderContainerFactory;
 
     private $paymentsService;
 
@@ -40,51 +42,64 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 
     private $invoiceManager;
 
+    private $orderFinancialDetailsFactory;
+
+    private $orderFinancialDetailsRepository;
+
     public function __construct(
-        OrderPersistenceService $orderPersistenceService,
+        OrderContainerFactory $orderContainerFactory,
         BorschtInterface $paymentsService,
         MerchantDebtorLimitsService $limitsService,
         OrderRepositoryInterface $orderRepository,
         MerchantRepositoryInterface $merchantRepository,
         OrderStateManager $orderStateManager,
-        OrderInvoiceManager $invoiceManager
+        OrderInvoiceManager $invoiceManager,
+        OrderFinancialDetailsFactory $orderFinancialDetailsFactory,
+        OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository
     ) {
-        $this->orderPersistenceService = $orderPersistenceService;
+        $this->orderContainerFactory = $orderContainerFactory;
         $this->paymentsService = $paymentsService;
         $this->limitsService = $limitsService;
         $this->orderRepository = $orderRepository;
         $this->merchantRepository = $merchantRepository;
         $this->orderStateManager = $orderStateManager;
         $this->invoiceManager = $invoiceManager;
+        $this->orderFinancialDetailsFactory = $orderFinancialDetailsFactory;
+        $this->orderFinancialDetailsRepository = $orderFinancialDetailsRepository;
     }
 
     public function execute(UpdateOrderRequest $request): void
     {
         $this->validateRequest($request);
 
-        $order = $this->orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($request->getOrderId(), $request->getMerchantId());
-        if (!$order) {
-            throw new OrderNotFoundException();
+        try {
+            $orderContainer = $this->orderContainerFactory->loadByMerchantIdAndExternalId(
+                $request->getMerchantId(),
+                $request->getOrderId()
+            );
+        } catch (OrderContainerFactoryException $exception) {
+            throw new OrderNotFoundException($exception);
         }
 
-        $orderContainer = $this->orderPersistenceService->createFromOrderEntity($order);
-
-        if ($order->getMarkedAsFraudAt()) {
+        if ($orderContainer->getOrder()->getMarkedAsFraudAt()) {
             throw new FraudOrderException();
         }
 
-        $this->validate($order, $request);
+        $this->validate($orderContainer, $request);
         $this->updateChangedData($orderContainer, $request);
     }
 
     private function updateChangedData(OrderContainer $orderContainer, UpdateOrderRequest $request)
     {
         $order = $orderContainer->getOrder();
-        $durationChanged = $request->getDuration() !== null && $request->getDuration() !== $order->getDuration();
+        $orderFinancialDetails = $orderContainer->getOrderFinancialDetails();
 
-        $amountChanged = $request->getAmountGross() !== null && (float) $request->getAmountGross() !== $order->getAmountGross()
-            || $request->getAmountNet() !== null && (float) $request->getAmountNet() !== $order->getAmountNet()
-            || $request->getAmountTax() !== null && (float) $request->getAmountTax() !== $order->getAmountTax();
+        $durationChanged = $request->getDuration() !== null && $request->getDuration() !== $orderFinancialDetails->getDuration();
+
+        $amountChanged = $request->getAmountGross() !== null
+            && (float) $request->getAmountGross() !== $orderFinancialDetails->getAmountGross()
+            || $request->getAmountNet() !== null && (float) $request->getAmountNet() !== $orderFinancialDetails->getAmountNet()
+            || $request->getAmountTax() !== null && (float) $request->getAmountTax() !== $orderFinancialDetails->getAmountTax();
 
         $invoiceChanged = !$amountChanged && (
             $request->getInvoiceNumber() !== null && $request->getInvoiceNumber() !== $order->getInvoiceNumber()
@@ -102,21 +117,23 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         }
 
         if ($invoiceChanged) {
-            $this->updateInvoiceDetails($order, $request);
+            $this->updateInvoiceDetails($orderContainer, $request);
         }
 
         if ($durationChanged) {
-            $this->updateDuration($order, $request);
+            $this->updateDuration($orderContainer, $request);
         }
     }
 
-    private function updateDuration(OrderEntity $order, UpdateOrderRequest $request)
+    private function updateDuration(OrderContainer $orderContainer, UpdateOrderRequest $request)
     {
-        $duration = $request->getDuration();
+        $order = $orderContainer->getOrder();
+
+        $newDuration = $request->getDuration();
 
         $this->logInfo('Update duration', [
-            'old' => $order->getDuration(),
-            'new' => $duration,
+            'old' => $orderContainer->getOrderFinancialDetails()->getDuration(),
+            'new' => $newDuration,
         ]);
 
         if (!$this->orderStateManager->wasShipped($order) || $this->orderStateManager->isLate($order)) {
@@ -127,8 +144,18 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
             );
         }
 
-        $order->setDuration($duration);
-        $this->applyUpdate($order);
+        $newOrderFinancialDetails = $this->orderFinancialDetailsFactory->create(
+            $order->getId(),
+            $orderContainer->getOrderFinancialDetails()->getAmountGross(),
+            $orderContainer->getOrderFinancialDetails()->getAmountNet(),
+            $orderContainer->getOrderFinancialDetails()->getAmountTax(),
+            $newDuration
+        );
+        $this->orderFinancialDetailsRepository->insert($newOrderFinancialDetails);
+
+        $orderContainer->setOrderFinancialDetails($newOrderFinancialDetails);
+
+        $this->applyUpdate($orderContainer);
     }
 
     private function updateAmount(OrderContainer $orderContainer, UpdateOrderRequest $request)
@@ -143,53 +170,35 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         }
 
         $this->logInfo('Update amount', [
-            'old_gross' => $order->getAmountGross(),
+            'old_gross' => $orderContainer->getOrderFinancialDetails()->getAmountGross(),
             'new_gross' => $request->getAmountGross(),
 
-            'old_net' => $order->getAmountNet(),
+            'old_net' => $orderContainer->getOrderFinancialDetails()->getAmountNet(),
             'new_net' => $request->getAmountNet(),
 
-            'old_tax' => $order->getAmountTax(),
+            'old_tax' => $orderContainer->getOrderFinancialDetails()->getAmountTax(),
             'new_tax' => $request->getAmountTax(),
         ]);
 
-        $amountChanged = $order->getAmountGross() - $request->getAmountGross();
-        $order
-            ->setAmountGross($request->getAmountGross())
-            ->setAmountNet($request->getAmountNet())
-            ->setAmountTax($request->getAmountTax());
+        $newOrderFinancialDetails = $this->orderFinancialDetailsFactory->create(
+            $order->getId(),
+            $request->getAmountGross(),
+            $request->getAmountNet(),
+            $request->getAmountTax(),
+            $orderContainer->getOrderFinancialDetails()->getDuration()
+        );
+        $this->orderFinancialDetailsRepository->insert($newOrderFinancialDetails);
+
+        $orderContainer->setOrderFinancialDetails($newOrderFinancialDetails);
 
         if ($this->orderStateManager->wasShipped($order)) {
-            $order
-                ->setInvoiceNumber($request->getInvoiceNumber())
-                ->setInvoiceUrl($request->getInvoiceUrl())
-            ;
-
-            try {
-                $this->invoiceManager->upload($order, InvoiceUploadHandlerInterface::EVENT_UPDATE);
-            } catch (OrderInvoiceUploadException $exception) {
-                throw new PaellaCoreCriticalException(
-                    "Update invoice is not possible",
-                    PaellaCoreCriticalException::CODE_ORDER_INVOICE_CANT_BE_UPDATED,
-                    500,
-                    $exception
-                );
-            }
-        }
-
-        if ($amountChanged == 0.0) {
-            $this->logInfo('Gross amount was not changed, do nothing');
+            $this->applyUpdate($orderContainer);
 
             return;
         }
 
-        if ($this->orderStateManager->wasShipped($order)) {
-            $this->applyUpdate($order);
+        $amountChanged = $orderContainer->getOrderFinancialDetails()->getAmountGross() - $request->getAmountGross();
 
-            return;
-        }
-
-        $this->orderRepository->update($order);
         $this->updateLimits($orderContainer, $amountChanged);
     }
 
@@ -201,8 +210,10 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         $this->merchantRepository->update($orderContainer->getMerchant());
     }
 
-    private function updateInvoiceDetails(OrderEntity $order, UpdateOrderRequest $request): void
+    private function updateInvoiceDetails(OrderContainer $orderContainer, UpdateOrderRequest $request): void
     {
+        $order = $orderContainer->getOrder();
+
         if ($this->orderStateManager->isCanceled($order) || $this->orderStateManager->isComplete($order)
             || !$this->orderStateManager->wasShipped($order)
         ) {
@@ -213,12 +224,12 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
             );
         }
 
-        $order
+        $orderContainer->getOrder()
             ->setInvoiceNumber($request->getInvoiceNumber())
             ->setInvoiceUrl($request->getInvoiceUrl())
         ;
 
-        $this->applyUpdate($order);
+        $this->applyUpdate($orderContainer);
 
         try {
             $this->invoiceManager->upload($order, InvoiceUploadHandlerInterface::EVENT_UPDATE);
@@ -232,10 +243,17 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         }
     }
 
-    private function applyUpdate(OrderEntity $order)
+    private function applyUpdate(OrderContainer $orderContainer)
     {
+        $order = $orderContainer->getOrder();
+
         try {
-            $this->paymentsService->modifyOrder($order);
+            $this->paymentsService->modifyOrder(
+                $order->getPaymentId(),
+                $orderContainer->getOrderFinancialDetails()->getDuration(),
+                $orderContainer->getOrderFinancialDetails()->getAmountGross(),
+                $order->getInvoiceNumber()
+            );
         } catch (PaellaCoreCriticalException $exception) {
             $this->logError('Borscht responded with an error when updating the order', [
                 'order' => $order->getId(),
@@ -248,13 +266,16 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         $this->orderRepository->update($order);
     }
 
-    private function validate(OrderEntity $order, UpdateOrderRequest $request): void
+    private function validate(OrderContainer $orderContainer, UpdateOrderRequest $request): void
     {
-        //TODO: does not belong here
+        //TODO: does not belong here (homeless validation logic)
+
+        $orderFinancialDetails = $orderContainer->getOrderFinancialDetails();
+
         if (!empty($request->getAmountGross()) && (
-            $request->getAmountGross() > $order->getAmountGross()
-                || $request->getAmountNet() > $order->getAmountNet()
-                || $request->getAmountTax() > $order->getAmountTax()
+            $request->getAmountGross() > $orderFinancialDetails->getAmountGross()
+                || $request->getAmountNet() > $orderFinancialDetails->getAmountNet()
+                || $request->getAmountTax() > $orderFinancialDetails->getAmountTax()
             )) {
             throw new PaellaCoreCriticalException(
                 'Invalid amount',
@@ -263,7 +284,7 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
             );
         }
 
-        if (!empty($request->getDuration()) && $request->getDuration() < $order->getDuration()) {
+        if (!empty($request->getDuration()) && $request->getDuration() < $orderFinancialDetails->getDuration()) {
             throw new PaellaCoreCriticalException(
                 'Invalid duration',
                 PaellaCoreCriticalException::CODE_ORDER_VALIDATION_FAILED,

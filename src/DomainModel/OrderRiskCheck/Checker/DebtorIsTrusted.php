@@ -2,7 +2,7 @@
 
 namespace App\DomainModel\OrderRiskCheck\Checker;
 
-use App\DomainModel\Order\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
 
 class DebtorIsTrusted implements CheckInterface
 {
@@ -10,7 +10,7 @@ class DebtorIsTrusted implements CheckInterface
 
     public function check(OrderContainer $orderContainer): CheckResult
     {
-        if ($orderContainer->getMerchantDebtor()->getDebtorCompany()->isTrustedSource()) {
+        if ($orderContainer->getDebtorCompany()->isTrustedSource()) {
             return new CheckResult(true, self::NAME);
         }
 

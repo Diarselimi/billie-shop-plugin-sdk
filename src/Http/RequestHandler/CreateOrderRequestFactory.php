@@ -32,7 +32,7 @@ class CreateOrderRequestFactory
             )
             ->setCheckoutSessionId($request->attributes->get('checkout_session_id', null))
             ->setMerchantId($request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID))
-            ->setDuration($request->request->get('duration'))
+            ->setDuration($request->request->getInt('duration'))
             ->setComment($request->request->get('comment'))
             ->setExternalCode($request->request->get('order_id'))
             ->setDebtorCompany(
