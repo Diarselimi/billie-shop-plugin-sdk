@@ -11,8 +11,6 @@ use App\DomainModel\Order\OrderStateManager;
 
 class DeclineOrderUseCase
 {
-    const NOTIFICATION_EVENT = 'order_declined';
-
     private $orderRepository;
 
     private $orderStateManager;

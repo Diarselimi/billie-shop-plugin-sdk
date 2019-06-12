@@ -48,14 +48,14 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
     public static function getSubscribedEvents()
     {
         return [
-            OrderCreatedEvent::NAME => 'onCreated',
+            OrderApprovedEvent::NAME => 'onApproved',
             OrderDeclinedEvent::NAME => 'onDeclined',
             OrderInWaitingStateEvent::NAME => 'onWaiting',
             OrderCompleteEvent::NAME => 'onComplete',
         ];
     }
 
-    public function onCreated(OrderCreatedEvent $event): void
+    public function onApproved(OrderApprovedEvent $event): void
     {
         if ($event->isNotifyWebhook()) {
             $this->notifyMerchantWebhook($event->getOrderContainer()->getOrder(), $event::NAME);

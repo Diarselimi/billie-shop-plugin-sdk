@@ -12,8 +12,6 @@ use App\DomainModel\Order\OrderStateManager;
 
 class ApproveOrderUseCase
 {
-    const NOTIFICATION_EVENT = 'order_approved';
-
     private $orderContainerFactory;
 
     private $orderStateManager;

@@ -4,7 +4,7 @@ namespace App\DomainModel\Order;
 
 use App\Application\Exception\OrderWorkflowException;
 use App\DomainEvent\Order\OrderCompleteEvent;
-use App\DomainEvent\Order\OrderCreatedEvent;
+use App\DomainEvent\Order\OrderApprovedEvent;
 use App\DomainEvent\Order\OrderDeclinedEvent;
 use App\DomainEvent\Order\OrderInWaitingStateEvent;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
@@ -171,7 +171,7 @@ class OrderStateManager implements LoggingInterface
         $this->workflow->apply($order, OrderStateManager::TRANSITION_CREATE);
         $this->orderRepository->update($order);
 
-        $this->eventDispatcher->dispatch(OrderCreatedEvent::NAME, new OrderCreatedEvent($orderContainer, $shouldNotifyWebhook));
+        $this->eventDispatcher->dispatch(OrderApprovedEvent::NAME, new OrderApprovedEvent($orderContainer, $shouldNotifyWebhook));
         $this->logInfo("Order approved");
     }
 
