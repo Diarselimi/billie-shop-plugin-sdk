@@ -2,17 +2,24 @@
 
 namespace App\Application\UseCase\UpdateOrder;
 
+use App\Application\UseCase\AbstractOrderRequest;
 use App\Application\UseCase\ValidatedRequestInterface;
 use App\Application\Validator\Constraint as OrderConstraint;
 use Symfony\Component\Validator\Constraints as Assert;
+use OpenApi\Annotations as OA;
 
-class UpdateOrderRequest implements ValidatedRequestInterface
+/**
+ * @OA\Schema(schema="UpdateOrderRequest", title="Order Update Object", type="object", properties={
+ *      @OA\Property(property="duration", ref="#/components/schemas/OrderDuration"),
+ *      @OA\Property(property="amount_net", minimum=1, type="number", format="float", example=119.00),
+ *      @OA\Property(property="amount_gross", minimum=1, type="number", format="float", example=100.00),
+ *      @OA\Property(property="amount_tax", minimum=1, type="number", format="float", example=19.00),
+ *      @OA\Property(property="invoice_number", ref="#/components/schemas/TinyText"),
+ *      @OA\Property(property="invoice_url", ref="#/components/schemas/TinyText")
+ * })
+ */
+class UpdateOrderRequest extends AbstractOrderRequest implements ValidatedRequestInterface
 {
-    /**
-     * @Assert\NotBlank()
-     */
-    private $orderId;
-
     /**
      * @Assert\Type(type="string")
      */
@@ -22,12 +29,6 @@ class UpdateOrderRequest implements ValidatedRequestInterface
      * @Assert\Type(type="string")
      */
     private $invoiceUrl;
-
-    /**
-     * @Assert\NotBlank()
-     * @Assert\Type(type="numeric")
-     */
-    private $merchantId;
 
     /**
      * @Assert\GreaterThan(value=0)
@@ -56,16 +57,6 @@ class UpdateOrderRequest implements ValidatedRequestInterface
      */
     private $duration;
 
-    public function __construct(string $orderId)
-    {
-        $this->orderId = $orderId;
-    }
-
-    public function getOrderId(): string
-    {
-        return $this->orderId;
-    }
-
     public function getInvoiceNumber(): ?string
     {
         return $this->invoiceNumber;
@@ -86,18 +77,6 @@ class UpdateOrderRequest implements ValidatedRequestInterface
     public function setInvoiceUrl(?string $invoiceUrl)
     {
         $this->invoiceUrl = $invoiceUrl;
-
-        return $this;
-    }
-
-    public function getMerchantId(): int
-    {
-        return $this->merchantId;
-    }
-
-    public function setMerchantId($merchantId): UpdateOrderRequest
-    {
-        $this->merchantId = $merchantId;
 
         return $this;
     }

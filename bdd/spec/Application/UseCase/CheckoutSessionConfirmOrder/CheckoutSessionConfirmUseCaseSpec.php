@@ -6,11 +6,11 @@ use App\Application\Exception\CheckoutSessionConfirmException;
 use App\Application\UseCase\CheckoutSessionConfirmOrder\CheckoutSessionConfirmOrderRequest;
 use App\Application\UseCase\CheckoutSessionConfirmOrder\CheckoutSessionConfirmUseCase;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderAmountRequest;
-use App\DomainModel\Order\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderPersistenceService;
-use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
+use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderResponse\OrderResponse;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
 use PhpSpec\ObjectBehavior;
@@ -20,25 +20,23 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class CheckoutSessionConfirmUseCaseSpec extends ObjectBehavior
 {
-    private $orderRepository;
-
-    private $orderPersistenceService;
-
-    private $orderResponseFactory;
-
     public function let(
-        OrderRepositoryInterface $orderRepository,
         OrderResponseFactory $orderResponseFactory,
-        OrderPersistenceService $orderPersistenceService,
+        OrderContainerFactory $orderContainerFactory,
         OrderStateManager $orderStateManager,
-        ValidatorInterface $validator
+        ValidatorInterface $validator,
+        OrderEntity $order,
+        OrderContainer $orderContainer
     ) {
-        $this->orderRepository = $orderRepository;
-        $this->orderPersistenceService = $orderPersistenceService;
-        $this->orderResponseFactory = $orderResponseFactory;
         $this->beConstructedWith(...func_get_args());
+
         $this->setValidator($validator);
         $validator->validate(Argument::any(), Argument::any(), Argument::any())->willReturn(new ConstraintViolationList());
+
+        $orderContainerFactory->loadByCheckoutSessionUuid('test123')->willReturn($orderContainer);
+
+        $order->getState()->willReturn(OrderStateManager::STATE_AUTHORIZED);
+        $orderContainer->getOrder()->willReturn($order);
     }
 
     public function it_is_initializable()
@@ -46,120 +44,127 @@ class CheckoutSessionConfirmUseCaseSpec extends ObjectBehavior
         $this->shouldHaveType(CheckoutSessionConfirmUseCase::class);
     }
 
-    public function it_should_throw_an_exception_if_duration_does_not_match()
-    {
-        $request = (new CheckoutSessionConfirmOrderRequest())
-            ->setDuration(123)
-            ->setAmount((new CreateOrderAmountRequest())->setGross(123.1)->setNet(123.1)->setTax(123.1))
-        ;
+    public function it_should_throw_an_exception_if_duration_does_not_match(
+        OrderContainer $orderContainer,
+        OrderEntity $order,
+        OrderFinancialDetailsEntity $orderFinancialDetails
+    ) {
         $checkoutSessionUuid = 'test123';
+        $duration = 30;
+        $amountNet = 100.0;
+        $amountTax = 10.0;
+        $amountGross = 110.0;
 
-        $orderEntity = $this->getOrderEntityMock($request);
-        $request->setDuration(111);
-        $this
-            ->orderRepository
-            ->getOneByCheckoutSessionUuid($checkoutSessionUuid)
-            ->willReturn($orderEntity);
+        $request = $this->createRequest($checkoutSessionUuid, $duration, $amountGross, $amountNet, $amountTax);
 
-        $orderContainer = new OrderContainer();
-        $this->orderPersistenceService->createFromOrderEntity($orderEntity)->willReturn($orderContainer);
+        $this->mockOrderFinancialDetails($orderFinancialDetails, $duration + 1000);
+        $orderContainer->getOrderFinancialDetails()->willReturn($orderFinancialDetails);
 
         $this->shouldThrow(CheckoutSessionConfirmException::class)->during('execute', [$request, $checkoutSessionUuid]);
     }
 
-    public function it_should_throw_an_exception_if_gross_does_not_match()
-    {
-        $request = (new CheckoutSessionConfirmOrderRequest())
-            ->setDuration(123)
-            ->setAmount((new CreateOrderAmountRequest())->setGross(123.1)->setNet(123.1)->setTax(123.1))
-        ;
+    public function it_should_throw_an_exception_if_gross_does_not_match(
+        OrderContainer $orderContainer,
+        OrderEntity $order,
+        OrderFinancialDetailsEntity $orderFinancialDetails
+    ) {
         $checkoutSessionUuid = 'test123';
+        $duration = 30;
+        $amountNet = 100.0;
+        $amountTax = 10.0;
+        $amountGross = 110.0;
 
-        $orderEntity = $this->getOrderEntityMock($request);
-        $request->getAmount()->setGross(111.1);
-        $this
-            ->orderRepository
-            ->getOneByCheckoutSessionUuid($checkoutSessionUuid)
-            ->willReturn($orderEntity);
+        $request = $this->createRequest($checkoutSessionUuid, $duration, $amountGross, $amountNet, $amountTax);
 
-        $orderContainer = new OrderContainer();
-        $this->orderPersistenceService->createFromOrderEntity($orderEntity)->willReturn($orderContainer);
+        $this->mockOrderFinancialDetails($orderFinancialDetails, $duration, $amountGross + 1, $amountNet, $amountTax);
+        $orderContainer->getOrderFinancialDetails()->willReturn($orderFinancialDetails);
+
+        $this->shouldThrow(CheckoutSessionConfirmException::class)->during('execute', [$request]);
+    }
+
+    public function it_should_throw_an_exception_if_tax_does_not_match(
+        OrderContainer $orderContainer,
+        OrderEntity $order,
+        OrderFinancialDetailsEntity $orderFinancialDetails
+    ) {
+        $checkoutSessionUuid = 'test123';
+        $duration = 30;
+        $amountNet = 100.0;
+        $amountTax = 10.0;
+        $amountGross = 110.0;
+
+        $request = $this->createRequest($checkoutSessionUuid, $duration, $amountGross, $amountNet, $amountTax);
+
+        $this->mockOrderFinancialDetails($orderFinancialDetails, $duration, $amountGross, $amountNet, $amountTax + 1);
+        $orderContainer->getOrderFinancialDetails()->willReturn($orderFinancialDetails);
+
+        $this->shouldThrow(CheckoutSessionConfirmException::class)->during('execute', [$request]);
+    }
+
+    public function it_should_throw_an_exception_if_net_does_not_match(
+        OrderContainer $orderContainer,
+        OrderEntity $order,
+        OrderFinancialDetailsEntity $orderFinancialDetails
+    ) {
+        $checkoutSessionUuid = 'test123';
+        $duration = 30;
+        $amountNet = 100.0;
+        $amountTax = 10.0;
+        $amountGross = 110.0;
+
+        $request = $this->createRequest($checkoutSessionUuid, $duration, $amountGross, $amountNet, $amountTax);
+
+        $this->mockOrderFinancialDetails($orderFinancialDetails, $duration, $amountGross, $amountNet + 1, $amountTax);
+        $orderContainer->getOrderFinancialDetails()->willReturn($orderFinancialDetails);
 
         $this->shouldThrow(CheckoutSessionConfirmException::class)->during('execute', [$request, $checkoutSessionUuid]);
     }
 
-    public function it_should_throw_an_exception_if_tax_does_not_match()
-    {
-        $request = (new CheckoutSessionConfirmOrderRequest())
-            ->setDuration(123)
-            ->setAmount((new CreateOrderAmountRequest())->setGross(123.1)->setNet(123.1)->setTax(123.1))
-        ;
+    public function it_should_create_order_if_everything_matches(
+        OrderContainer $orderContainer,
+        OrderResponseFactory $orderResponseFactory,
+        OrderEntity $order,
+        OrderFinancialDetailsEntity $orderFinancialDetails
+    ) {
         $checkoutSessionUuid = 'test123';
+        $duration = 30;
+        $amountNet = 100.0;
+        $amountTax = 10.0;
+        $amountGross = 110.0;
 
-        $orderEntity = $this->getOrderEntityMock($request);
-        $request->getAmount()->setTax(111.1);
-        $this
-            ->orderRepository
-            ->getOneByCheckoutSessionUuid($checkoutSessionUuid)
-            ->willReturn($orderEntity);
+        $request = $this->createRequest($checkoutSessionUuid, $duration, $amountGross, $amountNet, $amountTax);
 
-        $orderContainer = new OrderContainer();
-        $this->orderPersistenceService->createFromOrderEntity($orderEntity)->willReturn($orderContainer);
+        $this->mockOrderFinancialDetails($orderFinancialDetails, $duration, $amountGross, $amountNet, $amountTax);
+        $orderContainer->getOrderFinancialDetails()->willReturn($orderFinancialDetails);
 
-        $this->shouldThrow(CheckoutSessionConfirmException::class)->during('execute', [$request, $checkoutSessionUuid]);
-    }
-
-    public function it_should_throw_an_exception_if_net_does_not_match()
-    {
-        $request = (new CheckoutSessionConfirmOrderRequest())
-            ->setDuration(123)
-            ->setAmount((new CreateOrderAmountRequest())->setGross(123.1)->setNet(123.1)->setTax(123.1))
-        ;
-        $checkoutSessionUuid = 'test123';
-
-        $orderEntity = $this->getOrderEntityMock($request);
-        $request->getAmount()->setNet(111.1);
-        $this
-            ->orderRepository
-            ->getOneByCheckoutSessionUuid($checkoutSessionUuid)
-            ->willReturn($orderEntity);
-
-        $orderContainer = new OrderContainer();
-        $this->orderPersistenceService->createFromOrderEntity($orderEntity)->willReturn($orderContainer);
-
-        $this->shouldThrow(CheckoutSessionConfirmException::class)->during('execute', [$request, $checkoutSessionUuid]);
-    }
-
-    public function it_should_create_order_if_everything_matches()
-    {
-        $request = (new CheckoutSessionConfirmOrderRequest())
-            ->setDuration(123)
-            ->setAmount((new CreateOrderAmountRequest())->setGross(123.1)->setNet(123.1)->setTax(123.1))
-        ;
-        $checkoutSessionUuid = 'test123';
-
-        $orderEntity = $this->getOrderEntityMock($request);
-
-        $this
-            ->orderRepository
-            ->getOneByCheckoutSessionUuid($checkoutSessionUuid)
-            ->willReturn($orderEntity);
-
-        $orderContainer = new OrderContainer();
-        $this->orderPersistenceService->createFromOrderEntity($orderEntity)->willReturn($orderContainer);
-
-        $this->orderResponseFactory->create($orderContainer)->willReturn(new OrderResponse());
-        $this->orderResponseFactory->create($orderContainer)->shouldBeCalled();
+        $orderResponseFactory->create($orderContainer)->shouldBeCalled()->willReturn(new OrderResponse());
         $this->shouldNotThrow(\Exception::class)->during('execute', [$request, $checkoutSessionUuid]);
     }
 
-    private function getOrderEntityMock(CheckoutSessionConfirmOrderRequest $request)
-    {
-        return (new OrderEntity())
-            ->setState(OrderStateManager::STATE_AUTHORIZED)
-            ->setDuration($request->getDuration())
-            ->setAmountNet($request->getAmount()->getNet())
-            ->setAmountTax($request->getAmount()->getTax())
-            ->setAmountGross($request->getAmount()->getGross());
+    private function mockOrderFinancialDetails(
+        OrderFinancialDetailsEntity $orderFinancialDetails,
+        int $duration,
+        float $amountGross = 0.0,
+        float $amountNet = 0.0,
+        float $amountTax = 0.0
+    ) {
+        $orderFinancialDetails->getDuration()->willReturn($duration);
+        $orderFinancialDetails->getAmountNet()->willReturn($amountNet);
+        $orderFinancialDetails->getAmountTax()->willReturn($amountTax);
+        $orderFinancialDetails->getAmountGross()->willReturn($amountGross);
+    }
+
+    private function createRequest(
+        string $sessionId,
+        int $duration,
+        float $amountGross = 0.0,
+        float $amountNet = 0.0,
+        float $amountTax = 0.0
+    ): CheckoutSessionConfirmOrderRequest {
+        return (new CheckoutSessionConfirmOrderRequest())
+            ->setDuration($duration)
+            ->setAmount((new CreateOrderAmountRequest())->setGross($amountGross)->setNet($amountNet)->setTax($amountTax))
+            ->setSessionUuid($sessionId)
+        ;
     }
 }

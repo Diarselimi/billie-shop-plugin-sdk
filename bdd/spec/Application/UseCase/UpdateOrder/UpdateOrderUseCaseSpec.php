@@ -11,21 +11,27 @@ use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
-use App\DomainModel\Order\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
+use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
+use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsFactory;
+use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface;
 use App\DomainModel\OrderInvoice\OrderInvoiceManager;
 use DateTime;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
-use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class UpdateOrderUseCaseSpec extends ObjectBehavior
 {
+    private const ORDER_ID = 156;
+
     private const ORDER_EXTERNAL_CODE = "testCode";
 
     private const ORDER_INVOICE_NUMBER = "tesCode-1234";
@@ -44,48 +50,50 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
 
     private const ORDER_MERCHANT_DEBTOR_ID = 15;
 
+    private const ORDER_PAYMENT_ID = 'test-pay-id';
+
     public function let(
-        OrderPersistenceService $orderPersistenceService,
-        BorschtInterface $borscht,
+        OrderContainerFactory $orderContainerFactory,
+        BorschtInterface $paymentsService,
         MerchantDebtorLimitsService $limitsService,
         OrderRepositoryInterface $orderRepository,
         MerchantRepositoryInterface $merchantRepository,
         OrderStateManager $orderStateManager,
-        LoggerInterface $logger,
+        OrderInvoiceManager $invoiceManager,
+        OrderFinancialDetailsFactory $orderFinancialDetailsFactory,
+        OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
+        OrderContainer $orderContainer,
         OrderEntity $order,
+        OrderFinancialDetailsEntity $orderFinancialDetails,
         UpdateOrderRequest $request,
-        ValidatorInterface $validator,
-        OrderInvoiceManager $invoiceManager
+        ValidatorInterface $validator
     ) {
+        $order->getId()->willReturn(self::ORDER_ID);
         $order->getExternalCode()->willReturn(self::ORDER_EXTERNAL_CODE);
         $order->getInvoiceNumber()->willReturn(self::ORDER_INVOICE_NUMBER);
         $order->getInvoiceUrl()->willReturn(self::ORDER_INVOICE_URL);
         $order->getMerchantId()->willReturn(self::ORDER_MERCHANT_ID);
-        $order->getAmountGross()->willReturn(self::ORDER_AMOUNT_GROSS);
-        $order->getAmountNet()->willReturn(self::ORDER_AMOUNT_NET);
-        $order->getAmountTax()->willReturn(self::ORDER_AMOUNT_TAX);
-        $order->getDuration()->willReturn(self::ORDER_DURATION);
         $order->getState()->willReturn(OrderStateManager::STATE_CREATED);
         $order->getMarkedAsFraudAt()->willReturn(null);
         $order->getMerchantDebtorId()->willReturn(self::ORDER_MERCHANT_DEBTOR_ID);
+        $order->getPaymentId()->willReturn(self::ORDER_PAYMENT_ID);
+
+        $orderFinancialDetails->getAmountGross()->willReturn(self::ORDER_AMOUNT_GROSS);
+        $orderFinancialDetails->getAmountNet()->willReturn(self::ORDER_AMOUNT_NET);
+        $orderFinancialDetails->getAmountTax()->willReturn(self::ORDER_AMOUNT_TAX);
+        $orderFinancialDetails->getDuration()->willReturn(self::ORDER_DURATION);
+
+        $orderContainer->getOrder()->willReturn($order);
+        $orderContainer->getOrderFinancialDetails()->willReturn($orderFinancialDetails);
 
         $request->getMerchantId()->willReturn(self::ORDER_MERCHANT_ID);
         $request->getOrderId()->willReturn(self::ORDER_EXTERNAL_CODE);
 
         $validator->validate(Argument::any(), Argument::any(), Argument::any())->willReturn(new ConstraintViolationList());
 
-        $this->beConstructedWith(
-            $orderPersistenceService,
-            $borscht,
-            $limitsService,
-            $orderRepository,
-            $merchantRepository,
-            $orderStateManager,
-            $invoiceManager
-        );
+        $this->beConstructedWith(...func_get_args());
 
-        $this->setLogger($logger);
-        $this->setValidator($validator);
+        $this->setLogger(new NullLogger())->setValidator($validator);
     }
 
     public function it_is_initializable()
@@ -94,235 +102,239 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
     }
 
     public function it_throws_exception_if_the_order_was_not_found(
-        OrderRepositoryInterface $orderRepository,
+        OrderContainerFactory $orderContainerFactory,
         UpdateOrderRequest $request
     ) {
-        $merchantId = 1;
-        $orderExtId = 'notExistingOrderId';
-
-        $request->getMerchantId()->willReturn($merchantId);
-        $request->getOrderId()->willReturn($orderExtId);
-
-        $orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($orderExtId, $merchantId)->shouldBeCalled()->willReturn(null);
+        $orderContainerFactory
+            ->loadByMerchantIdAndExternalId(self::ORDER_MERCHANT_ID, self::ORDER_EXTERNAL_CODE)
+            ->shouldBeCalled()
+            ->willThrow(OrderContainerFactoryException::class)
+        ;
 
         $this->shouldThrow(OrderNotFoundException::class)->during('execute', [$request]);
     }
 
     public function it_throws_exception_if_the_order_was_marked_as_fraud(
-        OrderRepositoryInterface $orderRepository,
-        OrderPersistenceService $orderPersistenceService,
+        OrderContainerFactory $orderContainerFactory,
         UpdateOrderRequest $request,
         OrderEntity $order,
         OrderContainer $orderContainer
     ) {
         $order->getMarkedAsFraudAt()->willReturn(new DateTime());
-        $orderPersistenceService->createFromOrderEntity($order)->shouldBeCalledOnce()->willReturn($orderContainer);
-
-        $orderRepository
-            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
+        $orderContainerFactory
+            ->loadByMerchantIdAndExternalId(self::ORDER_MERCHANT_ID, self::ORDER_EXTERNAL_CODE)
             ->shouldBeCalled()
-            ->willReturn($order);
+            ->willReturn($orderContainer)
+        ;
 
         $this->shouldThrow(FraudOrderException::class)->during('execute', [$request]);
     }
 
     public function it_throws_exception_on_update_duration_if_the_new_duration_is_less_than_the_current_one(
-        OrderRepositoryInterface $orderRepository,
-        OrderPersistenceService $orderPersistenceService,
+        OrderContainerFactory $orderContainerFactory,
         UpdateOrderRequest $request,
-        OrderEntity $order,
         OrderContainer $orderContainer
     ) {
-        $request->getDuration()->willReturn(self::ORDER_DURATION - 1);
-        $request->getAmountGross()->willReturn(null);
-        $request->getInvoiceNumber()->willReturn(null);
-        $request->getInvoiceUrl()->willReturn(null);
+        $this->mockRequest($request, self::ORDER_DURATION - 1);
 
-        $orderRepository
-            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
+        $orderContainerFactory
+            ->loadByMerchantIdAndExternalId(self::ORDER_MERCHANT_ID, self::ORDER_EXTERNAL_CODE)
             ->shouldBeCalled()
-            ->willReturn($order);
-
-        $orderPersistenceService->createFromOrderEntity($order)->shouldBeCalledOnce()->willReturn($orderContainer);
+            ->willReturn($orderContainer)
+        ;
 
         $this->shouldThrow(PaellaCoreCriticalException::class)->during('execute', [$request]);
     }
 
     public function it_throws_exception_on_update_duration_if_order_was_not_shipped_or_late(
-        OrderRepositoryInterface $orderRepository,
-        OrderPersistenceService $orderPersistenceService,
+        OrderContainerFactory $orderContainerFactory,
         OrderStateManager $orderStateManager,
         UpdateOrderRequest $request,
         OrderEntity $order,
         OrderContainer $orderContainer
     ) {
-        $request->getDuration()->willReturn(self::ORDER_DURATION + 1);
-        $request->getAmountGross()->willReturn(null);
-        $request->getAmountNet()->willReturn(null);
-        $request->getAmountTax()->willReturn(null);
-        $request->getInvoiceNumber()->willReturn(null);
-        $request->getInvoiceUrl()->willReturn(null);
+        $this->mockRequest($request, self::ORDER_DURATION + 1);
 
         $orderStateManager->wasShipped($order)->willReturn(false);
         $orderStateManager->isLate($order)->willReturn(true);
 
-        $orderRepository
-            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
+        $orderContainerFactory
+            ->loadByMerchantIdAndExternalId(self::ORDER_MERCHANT_ID, self::ORDER_EXTERNAL_CODE)
             ->shouldBeCalled()
-            ->willReturn($order);
-
-        $orderPersistenceService->createFromOrderEntity($order)->shouldBeCalledOnce()->willReturn($orderContainer);
-        $orderContainer->getOrder()->shouldBeCalledOnce()->willReturn($order);
+            ->willReturn($orderContainer)
+        ;
 
         $this->shouldThrow(PaellaCoreCriticalException::class)->during('execute', [$request]);
     }
 
     public function it_updates_order_duration_and_calls_borscht_to_modify_order(
+        OrderContainerFactory $orderContainerFactory,
         OrderRepositoryInterface $orderRepository,
-        OrderPersistenceService $orderPersistenceService,
         OrderStateManager $orderStateManager,
-        BorschtInterface $borscht,
+        OrderFinancialDetailsFactory $orderFinancialDetailsFactory,
+        OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
+        BorschtInterface $paymentsService,
         UpdateOrderRequest $request,
         OrderEntity $order,
-        OrderContainer $orderContainer
+        OrderContainer $orderContainer,
+        OrderFinancialDetailsEntity $orderFinancialDetails
     ) {
         $newDuration = self::ORDER_DURATION + 1;
 
-        $request->getDuration()->willReturn($newDuration);
-        $request->getAmountGross()->willReturn(null);
-        $request->getAmountNet()->willReturn(null);
-        $request->getAmountTax()->willReturn(null);
-        $request->getAmountGross()->willReturn(null);
-        $request->getInvoiceNumber()->willReturn(null);
-        $request->getInvoiceUrl()->willReturn(null);
+        $this->mockRequest($request, $newDuration);
 
         $orderStateManager->wasShipped($order)->willReturn(true);
         $orderStateManager->isLate($order)->willReturn(false);
 
-        $orderRepository
-            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
+        $orderContainerFactory
+            ->loadByMerchantIdAndExternalId(self::ORDER_MERCHANT_ID, self::ORDER_EXTERNAL_CODE)
             ->shouldBeCalled()
-            ->willReturn($order);
+            ->willReturn($orderContainer)
+        ;
 
-        $orderPersistenceService->createFromOrderEntity($order)->shouldBeCalledOnce()->willReturn($orderContainer);
-        $orderContainer->getOrder()->shouldBeCalledOnce()->willReturn($order);
+        $newOrderFinancialDetails = (new OrderFinancialDetailsEntity())
+            ->setAmountGross(self::ORDER_AMOUNT_GROSS)
+            ->setAmountNet(self::ORDER_AMOUNT_NET)
+            ->setAmountTax(self::ORDER_AMOUNT_TAX)
+            ->setDuration($newDuration)
+        ;
 
-        $order->setDuration($newDuration)->shouldBeCalled();
-        $borscht->modifyOrder($order)->shouldBeCalled();
+        $orderFinancialDetailsFactory
+            ->create(
+                self::ORDER_ID,
+                self::ORDER_AMOUNT_GROSS,
+                self::ORDER_AMOUNT_NET,
+                self::ORDER_AMOUNT_TAX,
+                $newDuration
+            )
+            ->shouldBeCalled()
+            ->willReturn($newOrderFinancialDetails)
+        ;
+
+        $orderFinancialDetailsRepository->insert($newOrderFinancialDetails)->shouldBeCalled();
+
+        $orderContainer->setOrderFinancialDetails($newOrderFinancialDetails)->shouldBeCalled();
+
         $orderRepository->update($order)->shouldBeCalled();
 
         $this->execute($request);
     }
 
     public function it_throws_exception_on_update_amount_if_the_new_amounts_are_greater_than_the_current_amounts(
-        OrderRepositoryInterface $orderRepository,
-        OrderPersistenceService $orderPersistenceService,
+        OrderContainerFactory $orderContainerFactory,
         UpdateOrderRequest $request,
-        OrderEntity $order,
         OrderContainer $orderContainer
     ) {
-        $request->getAmountGross()->willReturn(self::ORDER_AMOUNT_GROSS + 10);
-        $request->getAmountNet()->willReturn(self::ORDER_AMOUNT_NET + 10);
-        $request->getAmountTax()->willReturn(self::ORDER_AMOUNT_TAX + 10);
-        $request->getInvoiceNumber()->willReturn(null);
-        $request->getInvoiceUrl()->willReturn(null);
+        $this->mockRequest($request, null, self::ORDER_AMOUNT_GROSS + 1, self::ORDER_AMOUNT_NET, self::ORDER_AMOUNT_TAX);
 
-        $orderRepository
-            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
+        $orderContainerFactory
+            ->loadByMerchantIdAndExternalId(self::ORDER_MERCHANT_ID, self::ORDER_EXTERNAL_CODE)
             ->shouldBeCalled()
-            ->willReturn($order);
-
-        $orderPersistenceService->createFromOrderEntity($order)->shouldBeCalledOnce()->willReturn($orderContainer);
+            ->willReturn($orderContainer)
+        ;
 
         $this->shouldThrow(PaellaCoreCriticalException::class)->during('execute', [$request]);
     }
 
     public function it_throws_exception_on_update_amount_if_the_order_was_canceled_or_complete(
-        OrderRepositoryInterface $orderRepository,
-        OrderPersistenceService $orderPersistenceService,
+        OrderContainerFactory $orderContainerFactory,
         OrderStateManager $orderStateManager,
         UpdateOrderRequest $request,
         OrderEntity $order,
         OrderContainer $orderContainer
     ) {
-        $request->getAmountGross()->willReturn(self::ORDER_AMOUNT_GROSS - 10);
-        $request->getAmountNet()->willReturn(self::ORDER_AMOUNT_NET - 10);
-        $request->getAmountTax()->willReturn(self::ORDER_AMOUNT_TAX - 10);
-        $request->getDuration()->willReturn(null);
-        $request->getInvoiceNumber()->willReturn(null);
-        $request->getInvoiceUrl()->willReturn(null);
+        $this->mockRequest($request, null, self::ORDER_AMOUNT_GROSS - 10, self::ORDER_AMOUNT_NET, self::ORDER_AMOUNT_TAX);
 
         $orderStateManager->wasShipped($order)->willReturn(false);
         $orderStateManager->isCanceled($order)->willReturn(true);
         $orderStateManager->isComplete($order)->willReturn(true);
 
-        $orderPersistenceService->createFromOrderEntity($order)->shouldBeCalledOnce()->willReturn($orderContainer);
-        $orderContainer->getOrder()->shouldBeCalledTimes(2)->willReturn($order);
-
-        $orderRepository
-            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
+        $orderContainerFactory
+            ->loadByMerchantIdAndExternalId(self::ORDER_MERCHANT_ID, self::ORDER_EXTERNAL_CODE)
             ->shouldBeCalled()
-            ->willReturn($order);
+            ->willReturn($orderContainer)
+        ;
 
         $this->shouldThrow(PaellaCoreCriticalException::class)->during('execute', [$request]);
     }
 
     public function it_updates_order_amounts_and_invoice_details_then_calls_borscht_to_modify_order(
         OrderRepositoryInterface $orderRepository,
-        OrderPersistenceService $orderPersistenceService,
+        OrderContainerFactory $orderContainerFactory,
         OrderStateManager $orderStateManager,
-        BorschtInterface $borscht,
+        BorschtInterface $paymentsService,
         UpdateOrderRequest $request,
         OrderEntity $order,
-        OrderContainer $orderContainer
+        OrderFinancialDetailsFactory $orderFinancialDetailsFactory,
+        OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
+        OrderContainer $orderContainer,
+        OrderFinancialDetailsEntity $orderFinancialDetails
     ) {
         $newAmountGross = self::ORDER_AMOUNT_GROSS - 10;
         $newAmountNet = self::ORDER_AMOUNT_NET - 10;
         $newAmountTax = self::ORDER_AMOUNT_TAX - 10;
-        $newInvoiceNumber = 'NewInvoiceNum';
-        $newInvoiceUrl = '/NewInvoiceNum.pdf';
 
-        $request->getAmountGross()->willReturn($newAmountGross);
-        $request->getAmountNet()->willReturn($newAmountNet);
-        $request->getAmountTax()->willReturn($newAmountTax);
-        $request->getInvoiceNumber()->willReturn($newInvoiceNumber);
-        $request->getInvoiceUrl()->willReturn($newInvoiceUrl);
-        $request->getDuration()->willReturn(null);
+        $this->mockRequest($request, null, $newAmountGross, $newAmountNet, $newAmountTax);
 
         $orderStateManager->wasShipped($order)->willReturn(true);
         $orderStateManager->isCanceled($order)->willReturn(false);
         $orderStateManager->isComplete($order)->willReturn(false);
 
-        $orderRepository
-            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
+        $orderContainerFactory
+            ->loadByMerchantIdAndExternalId(self::ORDER_MERCHANT_ID, self::ORDER_EXTERNAL_CODE)
             ->shouldBeCalled()
-            ->willReturn($order);
+            ->willReturn($orderContainer);
 
-        $orderPersistenceService->createFromOrderEntity($order)->shouldBeCalledOnce()->willReturn($orderContainer);
-        $orderContainer->getOrder()->shouldBeCalled()->willReturn($order);
+        $newOrderFinancialDetails = (new OrderFinancialDetailsEntity())
+            ->setAmountGross($newAmountGross)
+            ->setAmountNet($newAmountNet)
+            ->setAmountTax($newAmountTax)
+            ->setDuration(self::ORDER_DURATION)
+        ;
 
-        $order->setAmountGross($newAmountGross)->shouldBeCalled()->willReturn($order);
-        $order->setAmountNet($newAmountNet)->shouldBeCalled()->willReturn($order);
-        $order->setAmountTax($newAmountTax)->shouldBeCalled()->willReturn($order);
-        $order->setInvoiceNumber($newInvoiceNumber)->shouldBeCalled()->willReturn($order);
-        $order->setInvoiceUrl($newInvoiceUrl)->shouldBeCalled()->willReturn($order);
+        $orderFinancialDetailsFactory
+            ->create(
+                self::ORDER_ID,
+                $newAmountGross,
+                $newAmountNet,
+                $newAmountTax,
+                self::ORDER_DURATION
+            )
+            ->shouldBeCalled()
+            ->willReturn($newOrderFinancialDetails)
+        ;
+
+        $orderFinancialDetailsRepository->insert($newOrderFinancialDetails)->shouldBeCalled();
+
+        $orderContainer->setOrderFinancialDetails($newOrderFinancialDetails)->shouldBeCalled();
+
+        $orderFinancialDetails->getAmountGross()->willReturn($newAmountGross);
 
         $orderRepository->update($order)->shouldBeCalled();
 
-        $borscht->modifyOrder($order)->shouldBeCalled();
+        $paymentsService
+            ->modifyOrder(
+                self::ORDER_PAYMENT_ID,
+                self::ORDER_DURATION,
+                $newAmountGross,
+                self::ORDER_INVOICE_NUMBER
+            )
+            ->shouldBeCalled()
+        ;
 
         $this->execute($request);
     }
 
     public function it_updates_order_amounts_and_unlocks_the_debtor_limit(
-        OrderRepositoryInterface $orderRepository,
-        OrderPersistenceService $orderPersistenceService,
+        OrderContainerFactory $orderContainerFactory,
         OrderStateManager $orderStateManager,
         MerchantRepositoryInterface $merchantRepository,
         UpdateOrderRequest $request,
         OrderEntity $order,
         MerchantEntity $merchant,
         MerchantDebtorLimitsService $limitsService,
+        OrderFinancialDetailsFactory $orderFinancialDetailsFactory,
+        OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
         OrderContainer $orderContainer
     ) {
         $newAmountGross = self::ORDER_AMOUNT_GROSS - 10;
@@ -330,44 +342,54 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $newAmountTax = self::ORDER_AMOUNT_TAX - 10;
         $amountChanged = self::ORDER_AMOUNT_GROSS - $newAmountGross;
 
-        $request->getAmountGross()->willReturn($newAmountGross);
-        $request->getAmountNet()->willReturn($newAmountNet);
-        $request->getAmountTax()->willReturn($newAmountTax);
-        $request->getDuration()->willReturn(null);
-        $request->getInvoiceNumber()->willReturn(null);
-        $request->getInvoiceUrl()->willReturn(null);
+        $this->mockRequest($request, null, $newAmountGross, $newAmountNet, $newAmountTax);
 
         $orderStateManager->wasShipped($order)->willReturn(false);
         $orderStateManager->isCanceled($order)->willReturn(false);
         $orderStateManager->isComplete($order)->willReturn(false);
 
         $orderContainer->getMerchant()->shouldBeCalledTimes(2)->willReturn($merchant);
-        $orderContainer->getOrder()->shouldBeCalledTimes(2)->willReturn($order);
 
-        $orderRepository
-            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
+        $orderContainerFactory
+            ->loadByMerchantIdAndExternalId(self::ORDER_MERCHANT_ID, self::ORDER_EXTERNAL_CODE)
             ->shouldBeCalled()
-            ->willReturn($order);
+            ->willReturn($orderContainer)
+        ;
 
-        $orderPersistenceService->createFromOrderEntity($order)->shouldBeCalledOnce()->willReturn($orderContainer);
+        $newOrderFinancialDetails = (new OrderFinancialDetailsEntity())
+            ->setAmountGross($newAmountGross)
+            ->setAmountNet($newAmountNet)
+            ->setAmountTax($newAmountTax)
+            ->setDuration(self::ORDER_DURATION)
+        ;
 
-        $order->setAmountGross($newAmountGross)->shouldBeCalled()->willReturn($order);
-        $order->setAmountNet($newAmountNet)->shouldBeCalled()->willReturn($order);
-        $order->setAmountTax($newAmountTax)->shouldBeCalled()->willReturn($order);
+        $orderFinancialDetailsFactory
+            ->create(
+                self::ORDER_ID,
+                $newAmountGross,
+                $newAmountNet,
+                $newAmountTax,
+                self::ORDER_DURATION
+            )
+            ->shouldBeCalled()
+            ->willReturn($newOrderFinancialDetails)
+        ;
 
-        $orderRepository->update($order)->shouldBeCalled();
+        $orderFinancialDetailsRepository->insert($newOrderFinancialDetails)->shouldBeCalled();
+
+        $orderContainer->setOrderFinancialDetails($newOrderFinancialDetails)->shouldBeCalled();
 
         $limitsService->unlock(Argument::any(), Argument::any())->shouldBeCalled();
 
         $merchant->increaseAvailableFinancingLimit($amountChanged)->shouldBeCalled();
+
         $merchantRepository->update($merchant)->shouldBeCalled();
 
         $this->execute($request);
     }
 
     public function it_throws_exception_on_update_invoice_details_if_the_order_was_canceled_or_completed(
-        OrderPersistenceService $orderPersistenceService,
-        OrderRepositoryInterface $orderRepository,
+        OrderContainerFactory $orderContainerFactory,
         OrderStateManager $orderStateManager,
         UpdateOrderRequest $request,
         OrderEntity $order,
@@ -376,31 +398,23 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $newInvoiceNumber = 'NewInvoiceNum';
         $newInvoiceUrl = '/NewInvoiceNum.pdf';
 
-        $request->getInvoiceNumber()->willReturn($newInvoiceNumber);
-        $request->getInvoiceUrl()->willReturn($newInvoiceUrl);
-        $request->getDuration()->willReturn(null);
-        $request->getAmountGross()->willReturn(null);
-        $request->getAmountNet()->willReturn(null);
-        $request->getAmountTax()->willReturn(null);
+        $this->mockRequest($request, null, null, null, null, $newInvoiceNumber, $newInvoiceUrl);
 
         $orderStateManager->wasShipped($order)->willReturn(true);
         $orderStateManager->isCanceled($order)->willReturn(true);
         $orderStateManager->isComplete($order)->willReturn(true);
 
-        $orderRepository
-            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
+        $orderContainerFactory
+            ->loadByMerchantIdAndExternalId(self::ORDER_MERCHANT_ID, self::ORDER_EXTERNAL_CODE)
             ->shouldBeCalled()
-            ->willReturn($order);
-
-        $orderPersistenceService->createFromOrderEntity($order)->shouldBeCalledOnce()->willReturn($orderContainer);
-        $orderContainer->getOrder()->shouldBeCalledOnce()->willReturn($order);
+            ->willReturn($orderContainer)
+        ;
 
         $this->shouldThrow(PaellaCoreCriticalException::class)->during('execute', [$request]);
     }
 
     public function it_throws_exception_on_update_invoice_details_if_the_order_was_not_shipped(
-        OrderPersistenceService $orderPersistenceService,
-        OrderRepositoryInterface $orderRepository,
+        OrderContainerFactory $orderContainerFactory,
         OrderStateManager $orderStateManager,
         UpdateOrderRequest $request,
         OrderEntity $order,
@@ -409,66 +423,80 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $newInvoiceNumber = 'NewInvoiceNum';
         $newInvoiceUrl = '/NewInvoiceNum.pdf';
 
-        $request->getInvoiceNumber()->willReturn($newInvoiceNumber);
-        $request->getInvoiceUrl()->willReturn($newInvoiceUrl);
-        $request->getDuration()->willReturn(null);
-        $request->getAmountGross()->willReturn(null);
-        $request->getAmountNet()->willReturn(null);
-        $request->getAmountTax()->willReturn(null);
+        $this->mockRequest($request, null, null, null, null, $newInvoiceNumber, $newInvoiceUrl);
 
         $orderStateManager->wasShipped($order)->willReturn(false);
         $orderStateManager->isCanceled($order)->willReturn(false);
         $orderStateManager->isComplete($order)->willReturn(false);
 
-        $orderRepository
-            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
+        $orderContainerFactory
+            ->loadByMerchantIdAndExternalId(self::ORDER_MERCHANT_ID, self::ORDER_EXTERNAL_CODE)
             ->shouldBeCalled()
-            ->willReturn($order);
-
-        $orderPersistenceService->createFromOrderEntity($order)->shouldBeCalledOnce()->willReturn($orderContainer);
-        $orderContainer->getOrder()->shouldBeCalledOnce()->willReturn($order);
+            ->willReturn($orderContainer)
+        ;
 
         $this->shouldThrow(PaellaCoreCriticalException::class)->during('execute', [$request]);
     }
 
     public function it_updates_order_invoice_details_then_calls_borscht_to_modify_order(
-        OrderPersistenceService $orderPersistenceService,
+        OrderContainerFactory $orderContainerFactory,
         OrderRepositoryInterface $orderRepository,
         OrderStateManager $orderStateManager,
-        BorschtInterface $borscht,
+        BorschtInterface $paymentsService,
         UpdateOrderRequest $request,
         OrderEntity $order,
+        OrderFinancialDetailsEntity $orderFinancialDetails,
         OrderContainer $orderContainer
     ) {
         $newInvoiceNumber = 'NewInvoiceNum';
         $newInvoiceUrl = '/NewInvoiceNum.pdf';
 
-        $request->getInvoiceNumber()->willReturn($newInvoiceNumber);
-        $request->getInvoiceUrl()->willReturn($newInvoiceUrl);
-        $request->getDuration()->willReturn(null);
-        $request->getAmountGross()->willReturn(null);
-        $request->getAmountNet()->willReturn(null);
-        $request->getAmountTax()->willReturn(null);
+        $this->mockRequest($request, null, null, null, null, $newInvoiceNumber, $newInvoiceUrl);
 
         $orderStateManager->wasShipped($order)->willReturn(true);
         $orderStateManager->isCanceled($order)->willReturn(false);
         $orderStateManager->isComplete($order)->willReturn(false);
 
-        $orderRepository
-            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::ORDER_MERCHANT_ID)
+        $orderContainerFactory
+            ->loadByMerchantIdAndExternalId(self::ORDER_MERCHANT_ID, self::ORDER_EXTERNAL_CODE)
             ->shouldBeCalled()
-            ->willReturn($order);
-
-        $orderPersistenceService->createFromOrderEntity($order)->shouldBeCalledOnce()->willReturn($orderContainer);
-        $orderContainer->getOrder()->shouldBeCalledOnce()->willReturn($order);
+            ->willReturn($orderContainer)
+        ;
 
         $order->setInvoiceNumber($newInvoiceNumber)->shouldBeCalled()->willReturn($order);
         $order->setInvoiceUrl($newInvoiceUrl)->shouldBeCalled()->willReturn($order);
 
+        $order->getInvoiceNumber()->willReturn($newInvoiceNumber);
+
         $orderRepository->update($order)->shouldBeCalled();
 
-        $borscht->modifyOrder($order)->shouldBeCalled();
+        $paymentsService
+            ->modifyOrder(
+                self::ORDER_PAYMENT_ID,
+                self::ORDER_DURATION,
+                self::ORDER_AMOUNT_GROSS,
+                $newInvoiceNumber
+            )
+            ->shouldBeCalled()
+        ;
 
         $this->execute($request);
+    }
+
+    private function mockRequest(
+        UpdateOrderRequest $request,
+        $duration = null,
+        $amountGross = null,
+        $amountNet = null,
+        $amountTax = null,
+        $invoiceNumber = null,
+        $invoiceUrl = null
+    ) {
+        $request->getDuration()->willReturn($duration);
+        $request->getAmountGross()->willReturn($amountGross);
+        $request->getAmountNet()->willReturn($amountNet);
+        $request->getAmountTax()->willReturn($amountTax);
+        $request->getInvoiceNumber()->willReturn($invoiceNumber);
+        $request->getInvoiceUrl()->willReturn($invoiceUrl);
     }
 }

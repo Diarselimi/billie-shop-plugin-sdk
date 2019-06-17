@@ -2,46 +2,36 @@
 
 namespace App\DomainModel\MerchantDebtorResponse;
 
+use OpenApi\Annotations as OA;
+
+/**
+ * @OA\Schema(schema="MerchantDebtorResponse", allOf={@OA\Schema(ref="#/components/schemas/AbstractMerchantDebtorResponse")}, type="object", properties={
+ *      @OA\Property(property="address_street", ref="#/components/schemas/TinyText"),
+ *      @OA\Property(property="address_house", ref="#/components/schemas/TinyText", nullable=true),
+ *      @OA\Property(property="address_postal_code", ref="#/components/schemas/TinyText"),
+ *      @OA\Property(property="address_city", ref="#/components/schemas/TinyText"),
+ *      @OA\Property(property="address_country", ref="#/components/schemas/TinyText"),
+ *      @OA\Property(property="outstanding_amount", type="number", format="float"),
+ *      @OA\Property(property="outstanding_amount_created", type="number", format="float"),
+ *      @OA\Property(property="outstanding_amount_late", type="number", format="float"),
+ * })
+ */
 class MerchantDebtor extends AbstractMerchantDebtor
 {
-    /**
-     * @var string
-     */
     private $addressStreet;
 
-    /**
-     * @var string
-     */
     private $addressHouse;
 
-    /**
-     * @var string
-     */
     private $addressPostalCode;
 
-    /**
-     * @var string
-     */
     private $addressCity;
 
-    /**
-     * @var string
-     */
     private $addressCountry;
 
-    /**
-     * @var float
-     */
     private $outstandingAmount;
 
-    /**
-     * @var float
-     */
     private $outstandingAmountCreated;
 
-    /**
-     * @var float
-     */
     private $outstandingAmountLate;
 
     public function getAddressStreet(): string

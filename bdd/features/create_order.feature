@@ -33,26 +33,8 @@ Feature:
       | debtor_blacklisted        | 1       | 1                  |
       | debtor_overdue            | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
-    And I get from companies service "/debtor/1" endpoint response with status 200 and body
-      """
-      {
-        "id": 1,
-        "payment_id": "test",
-        "name": "Test User Company",
-        "address_house": "10",
-        "address_street": "Heinrich-Heine-Platz",
-        "address_city": "Berlin",
-        "address_postal_code": "10179",
-        "address_country": "DE",
-        "address_addition": null,
-        "crefo_id": "123",
-        "schufa_id": "123",
-        "is_blacklisted": 0,
-        "is_from_trusted_source": 0
-      }
-      """
+    And I get from companies service get debtor response
     And I get from payments service get debtor response
-
 
   Scenario: Debtor identification failed
     Given I get from companies service identify no match response
@@ -156,6 +138,9 @@ Feature:
 
   Scenario: Successful order creation
     Given I get from companies service identify match and good decision response
+    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    """
+    """
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
     """
@@ -256,6 +241,9 @@ Feature:
 
     Scenario: Successful order creation with a not german postal code in shipping
     Given I get from companies service identify match and good decision response
+    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    """
+    """
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
     """
@@ -327,6 +315,7 @@ Feature:
       "invoice":{
         "number":null,
         "payout_amount":null,
+        "outstanding_amount":null,
         "fee_amount":null,
         "fee_rate":null,
         "due_date":null
@@ -337,8 +326,18 @@ Feature:
         "address_postal_code":"10179",
         "address_street":"Heinrich-Heine-Platz",
         "address_house":"10",
-        "industry_sector":"SOME SECTOR"
-      }
+        "industry_sector":"SOME SECTOR",
+        "merchant_customer_id":"12"
+      },
+      "duration":30,
+      "shipped_at":null,
+      "delivery_address":{
+        "house_number":"22",
+        "street":"An der Ronne",
+        "city":"Vienna",
+        "postal_code":"AT-5130-123333",
+        "country":"AT"
+     }
     }
     """
     And the response status code should be 201
@@ -347,6 +346,9 @@ Feature:
   Scenario: Successful order creation without delivery_address.house_number
     Given I get from companies service identify match and good decision response
     And I get from payments service register debtor positive response
+    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    """
+    """
     When I send a POST request to "/order" with body:
     """
     {
@@ -446,6 +448,9 @@ Feature:
 
   Scenario: Successful order creation using lowercase country
     Given I get from companies service identify match and good decision response
+    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    """
+    """
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
     """
@@ -701,7 +706,7 @@ Feature:
             },
             {
                "source":"duration",
-               "title":"This value should not be blank.",
+               "title":"This value should be 1 or more.",
                "code":"request_validation_error"
             },
             {
@@ -859,6 +864,9 @@ Feature:
   Scenario: Use debtor company address as delivery address if no delivery address was provided
     Given I get from companies service identify match and good decision response
     And I get from payments service register debtor positive response
+    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    """
+    """
     When I send a POST request to "/order" with body:
       """
       {
@@ -955,6 +963,9 @@ Feature:
   Scenario: The order should be on a state created if the previous order was declined because of the amount exceeded
     Given I get from companies service identify match and good decision response
     And I get from payments service register debtor positive response
+    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    """
+    """
     And I have a declined order "XF43Y" with amounts 90000/92000/1900, duration 30 and comment "test order"
     When I send a POST request to "/order" with body:
     """
@@ -1009,8 +1020,8 @@ Feature:
     Given I get from companies service identify match and good decision response
     And I get from payments service register debtor positive response
     And I get from companies service "/debtor/1/lock" endpoint response with status 400 and body
-        """
-        """
+    """
+    """
     When I send a POST request to "/order" with body:
     """
     {
@@ -1062,6 +1073,9 @@ Feature:
 
   Scenario: Successful order creation without providing external code
     Given I get from companies service identify match and good decision response
+    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    """
+    """
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
     """

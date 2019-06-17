@@ -3,9 +3,9 @@
 namespace App\DomainModel\Order;
 
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\OrderRiskCheck\Checker\CheckInterface;
 use App\DomainModel\OrderRiskCheck\Checker\CheckResult;
-use App\DomainModel\OrderRiskCheck\Checker\LimitCheck;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntity;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntityFactory;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
@@ -45,14 +45,14 @@ class OrderChecksRunnerService implements LoggingInterface
         $this->postIdentificationChecks = $postIdentificationChecks;
     }
 
-    public function runPreIdentificationChecks(OrderContainer $order): bool
+    public function runPreIdentificationChecks(OrderContainer $orderContainer): bool
     {
-        return $this->runChecks($order, $this->preIdentificationChecks);
+        return $this->runChecks($orderContainer, $this->preIdentificationChecks);
     }
 
-    public function runPostIdentificationChecks(OrderContainer $order): bool
+    public function runPostIdentificationChecks(OrderContainer $orderContainer): bool
     {
-        return $this->runChecks($order, $this->postIdentificationChecks);
+        return $this->runChecks($orderContainer, $this->postIdentificationChecks);
     }
 
     public function checkForFailedSoftDeclinableCheckResults(OrderContainer $orderContainer): bool
@@ -102,7 +102,7 @@ class OrderChecksRunnerService implements LoggingInterface
     {
         $limitRiskCheck = $this->orderRiskCheckRepository->findByOrderAndCheckName(
             $orderContainer->getOrder()->getId(),
-            LimitCheck::NAME
+            $name
         );
 
         if ($limitRiskCheck && $limitRiskCheck->isPassed()) {
@@ -111,10 +111,10 @@ class OrderChecksRunnerService implements LoggingInterface
         }
     }
 
-    private function runChecks(OrderContainer $order, array $checkNames): bool
+    private function runChecks(OrderContainer $orderContainer, array $checkNames): bool
     {
         foreach ($checkNames as $checkName) {
-            $checkResult = $this->check($order, $checkName);
+            $checkResult = $this->check($orderContainer, $checkName);
 
             if (!$checkResult) {
                 return false;
@@ -124,12 +124,12 @@ class OrderChecksRunnerService implements LoggingInterface
         return true;
     }
 
-    private function check(OrderContainer $order, string $riskCheckName): bool
+    private function check(OrderContainer $orderContainer, string $riskCheckName): bool
     {
         $this->logWaypoint(str_replace('_', ' ', $riskCheckName) . ' check');
 
         $merchantRiskCheckSetting = $this->merchantRiskCheckSettingsRepository->getOneByMerchantIdAndRiskCheckName(
-            $order->getMerchant()->getId(),
+            $orderContainer->getMerchant()->getId(),
             $riskCheckName
         );
 
@@ -138,14 +138,14 @@ class OrderChecksRunnerService implements LoggingInterface
         }
 
         $check = $this->getCheck($riskCheckName);
-        $result = $check->check($order);
+        $result = $check->check($orderContainer);
 
         $this->logInfo('Check result: {check} -> {result}', [
             'check' => $riskCheckName,
             'result' => (int) $result->isPassed(),
         ]);
 
-        $this->persistCheckResult($result, $order);
+        $this->persistCheckResult($result, $orderContainer);
 
         if (!$merchantRiskCheckSetting->isDeclineOnFailure() && !$result->isPassed()) {
             return true;
@@ -154,9 +154,9 @@ class OrderChecksRunnerService implements LoggingInterface
         return $result->isPassed();
     }
 
-    private function persistCheckResult(CheckResult $checkResult, OrderContainer $order): void
+    private function persistCheckResult(CheckResult $checkResult, OrderContainer $orderContainer): void
     {
-        $riskCheckEntity = $this->riskCheckFactory->createFromCheckResult($checkResult, $order->getOrder()->getId());
+        $riskCheckEntity = $this->riskCheckFactory->createFromCheckResult($checkResult, $orderContainer->getOrder()->getId());
         $this->orderRiskCheckRepository->insert($riskCheckEntity);
     }
 

@@ -2,6 +2,20 @@
 
 namespace App\Application\UseCase\CreateMerchant;
 
+use OpenApi\Annotations as OA;
+
+/**
+ * @OA\Schema(schema="CreateMerchantRequest", title="Merchant Data", x={"groups":{"private"}}, properties={
+ *     @OA\Property(property="company_id", type="string", format="numeric"),
+ *     @OA\Property(property="merchant_financing_limit", type="number", format="float"),
+ *     @OA\Property(property="initial_debtor_financing_limit", type="number", format="float"),
+ *     @OA\Property(property="debtor_financing_limit", type="number", format="float"),
+ *     @OA\Property(property="webhook_url", type="string", format="uri", nullable=true),
+ *     @OA\Property(property="webhook_authorization", type="string", nullable=true, example="X-Api-Key: test",
+ *          description="Authorization header that will be sent with the merchant webhooks. Currently `X-Api-Key: XXX` and `Authorization: Basic XXX` are supported."
+ *     )
+ * })
+ */
 class CreateMerchantRequest
 {
     private $companyId;

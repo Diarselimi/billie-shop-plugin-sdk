@@ -60,7 +60,7 @@ Feature: Endpoint to approve an order in waiting state
 	  | debtor_blacklisted                |	1		  |
 	  | debtor_overdue                    |	1		  |
 	  | company_b2b_score                 |	1		  |
-	And I get from companies service identify match and good decision response
+	And I get from companies service get debtor response
 	When I send a POST request to "/order/CO123/approve"
 	Then the response status code should be 403
 	And the JSON response should be:
@@ -85,7 +85,7 @@ Feature: Endpoint to approve an order in waiting state
       | debtor_blacklisted        | 1         |
       | debtor_overdue            | 1         |
       | company_b2b_score         | 1         |
-    And I get from companies service identify match and good decision response
+    And I get from companies service get debtor response
     When I send a POST request to "/order/CO123/approve"
     Then the response status code should be 204
     And the order CO123 is in state created
@@ -105,7 +105,7 @@ Feature: Endpoint to approve an order in waiting state
       | debtor_blacklisted		  |	1		  |
       | debtor_overdue			  |	1		  |
       | company_b2b_score		  |	1		  |
-    And I get from companies service identify match and good decision response
+    And I get from companies service get debtor response
     And I get from companies service "/debtor/1/lock" endpoint response with status 400 and body
     """
     """
@@ -128,7 +128,10 @@ Feature: Endpoint to approve an order in waiting state
       | debtor_blacklisted        | 0         |
       | debtor_overdue            | 1         |
       | company_b2b_score         | 1         |
-    And I get from companies service identify match and good decision response
+    And I get from companies service get debtor response
+    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    """
+    """
     When I send a POST request to "/order/CO123/approve"
     Then the response status code should be 204
     And the order CO123 is in state created

@@ -5,10 +5,10 @@ namespace App\Application\UseCase\MarkOrderAsFraud;
 use App\Application\Exception\FraudOrderException;
 use App\Application\Exception\OrderNotFoundException;
 use App\DomainModel\Address\AddressEntity;
-use App\DomainModel\Address\AddressRepositoryInterface;
 use App\DomainModel\Borscht\BorschtInterface;
-use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
-use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 
@@ -20,34 +20,31 @@ class MarkOrderAsFraudUseCase
 
     private $orderStateManager;
 
-    private $addressRepository;
+    private $orderContainerFactory;
 
-    private $debtorExternalDataRepository;
-
-    private $borscht;
+    private $paymentsService;
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         OrderStateManager $orderStateManager,
-        AddressRepositoryInterface $addressRepository,
-        DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
-        BorschtInterface $borscht
+        OrderContainerFactory $orderContainerFactory,
+        BorschtInterface $paymentsService
     ) {
         $this->orderRepository = $orderRepository;
         $this->orderStateManager = $orderStateManager;
-        $this->addressRepository = $addressRepository;
-        $this->debtorExternalDataRepository = $debtorExternalDataRepository;
-        $this->borscht = $borscht;
+        $this->orderContainerFactory = $orderContainerFactory;
+        $this->paymentsService = $paymentsService;
     }
 
     public function execute(MarkOrderAsFraudRequest $request): void
     {
-        $uuid = $request->getUuid();
-        $order = $this->orderRepository->getOneByUuid($request->getUuid());
-
-        if (!$order) {
-            throw new OrderNotFoundException();
+        try {
+            $orderContainer = $this->orderContainerFactory->loadByUuid($request->getUuid());
+        } catch (OrderContainerFactoryException $exception) {
+            throw new OrderNotFoundException($exception);
         }
+
+        $order = $orderContainer->getOrder();
 
         if ($order->getMarkedAsFraudAt()) {
             throw new FraudOrderException();
@@ -56,11 +53,11 @@ class MarkOrderAsFraudUseCase
         $order->setMarkedAsFraudAt(new \DateTime());
         $this->orderRepository->update($order);
 
-        if (!$this->isEligibleForFraudReclaim($order)) {
+        if (!$this->isEligibleForFraudReclaim($orderContainer)) {
             throw new FraudReclaimActionException();
         }
 
-        $this->borscht->createFraudReclaim($order->getPaymentId());
+        $this->paymentsService->createFraudReclaim($order->getPaymentId());
     }
 
     private function isDeliveryAddressDifferentToDebtorAddress(AddressEntity $deliveryAddress, AddressEntity $debtorAddress): bool
@@ -71,16 +68,13 @@ class MarkOrderAsFraudUseCase
             $deliveryAddress->getHouseNumber() !== $debtorAddress->getHouseNumber();
     }
 
-    private function isEligibleForFraudReclaim(OrderEntity $order): bool
+    private function isEligibleForFraudReclaim(OrderContainer $orderContainer): bool
     {
-        $deliveryAddress = $this->addressRepository->getOneById($order->getDeliveryAddressId());
-
-        $debtorData = $this->debtorExternalDataRepository->getOneById($order->getDebtorExternalDataId());
-        $debtorAddress = $this->addressRepository->getOneById($debtorData->getAddressId());
+        $order = $orderContainer->getOrder();
 
         return ($this->orderStateManager->isLate($order) || $this->orderStateManager->isPaidOut($order)) &&
-            $this->isDeliveryAddressDifferentToDebtorAddress($deliveryAddress, $debtorAddress) &&
-            ($debtorData->isEstablishedCustomer() === null || $order->getAmountGross() > self::ORDER_AMOUNT_LIMIT)
+            $this->isDeliveryAddressDifferentToDebtorAddress($orderContainer->getDeliveryAddress(), $orderContainer->getDebtorExternalDataAddress()) &&
+            ($orderContainer->getDebtorExternalData()->isEstablishedCustomer() === null || $orderContainer->getOrderFinancialDetails()->getAmountGross() > self::ORDER_AMOUNT_LIMIT)
         ;
     }
 }

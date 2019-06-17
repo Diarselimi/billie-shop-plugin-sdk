@@ -14,11 +14,18 @@ interface BorschtInterface
 
     public function cancelOrder(OrderEntity $order): void;
 
-    public function modifyOrder(OrderEntity $order): void;
+    public function modifyOrder(string $paymentId, int $duration, float $amountGross, ?string $invoiceNumber): void;
 
     public function confirmPayment(OrderEntity $order, float $amount): void;
 
-    public function createOrder(OrderEntity $order, string $debtorPaymentId): OrderPaymentDetailsDTO;
+    public function createOrder(
+        string $debtorPaymentId,
+        string $invoiceNumber,
+        \DateTime $shippedAt,
+        int $duration,
+        float $amountGross,
+        string $externalCode
+    ): OrderPaymentDetailsDTO;
 
     public function createFraudReclaim(string $orderPaymentId): void;
 }

@@ -2,7 +2,6 @@
 
 namespace App\DomainModel\MerchantDebtor;
 
-use App\DomainModel\DebtorCompany\DebtorCompany;
 use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 
 class MerchantDebtorEntity extends AbstractTimestampableEntity
@@ -14,8 +13,6 @@ class MerchantDebtorEntity extends AbstractTimestampableEntity
     private $debtorId;
 
     private $paymentDebtorId;
-
-    private $debtorCompany;
 
     private $scoreThresholdsConfigurationId;
 
@@ -65,18 +62,6 @@ class MerchantDebtorEntity extends AbstractTimestampableEntity
     public function setPaymentDebtorId(?string $paymentDebtorId): MerchantDebtorEntity
     {
         $this->paymentDebtorId = $paymentDebtorId;
-
-        return $this;
-    }
-
-    public function getDebtorCompany(): DebtorCompany
-    {
-        return $this->debtorCompany;
-    }
-
-    public function setDebtorCompany(DebtorCompany $debtorCompany): MerchantDebtorEntity
-    {
-        $this->debtorCompany = $debtorCompany;
 
         return $this;
     }

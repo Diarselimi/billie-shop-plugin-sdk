@@ -6,8 +6,36 @@ use App\Application\UseCase\GetMerchantDebtors\GetMerchantDebtorsRequest;
 use App\Application\UseCase\GetMerchantDebtors\GetMerchantDebtorsUseCase;
 use App\DomainModel\MerchantDebtorResponse\MerchantDebtorList;
 use App\Http\HttpConstantsInterface;
+use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * @OA\Get(
+ *     path="/debtors",
+ *     operationId="debtors_get",
+ *     summary="Get Debtors",
+ *     security={{"oauth2"={}}, {"apiKey"={}}},
+ *
+ *     tags={"Dashboard API"},
+ *     x={"groups":{"public"}},
+ *
+ *     @OA\Parameter(in="query", name="sort_by", @OA\Schema(type="string",
+ *          enum={
+ *              "created_at", "created_at,desc", "created_at,asc",
+ *              "external_code", "external_code,desc", "external_code,asc"
+ *          }, default="created_at,desc"), required=false),
+ *
+ *     @OA\Parameter(in="query", name="offset", @OA\Schema(type="integer", minimum=0), required=false),
+ *     @OA\Parameter(in="query", name="limit", @OA\Schema(type="integer", minimum=1, maximum=100), required=false),
+ *     @OA\Parameter(in="query", name="search", description="Search text. Filters search results by: `external_code`.",
+ *          @OA\Schema(ref="#/components/schemas/TinyText"), required=false),
+ *
+ *     @OA\Response(response=200, @OA\JsonContent(ref="#/components/schemas/MerchantDebtorListResponse"), description="Debtor results"),
+ *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),
+ *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+ *     @OA\Response(response=500, ref="#/components/responses/ServerError")
+ * )
+ */
 class GetMerchantDebtorsController
 {
     private $useCase;
@@ -28,7 +56,7 @@ class GetMerchantDebtorsController
             $request->query->getInt('offset', 0),
             $request->query->getInt('limit', GetMerchantDebtorsRequest::DEFAULT_LIMIT),
             $sortField,
-            strtoupper($sortDirection),
+            strtoupper($sortDirection ?: GetMerchantDebtorsRequest::DEFAULT_SORT_DIRECTION),
             $request->query->get('search')
         );
 

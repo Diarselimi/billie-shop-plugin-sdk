@@ -12,15 +12,7 @@ class OrderEntity extends AbstractTimestampableEntity
 
     private $uuid;
 
-    private $amountNet;
-
-    private $amountGross;
-
-    private $amountTax;
-
     private $amountForgiven;
-
-    private $duration;
 
     private $externalCode;
 
@@ -66,42 +58,6 @@ class OrderEntity extends AbstractTimestampableEntity
         return $this;
     }
 
-    public function getAmountNet(): float
-    {
-        return $this->amountNet;
-    }
-
-    public function setAmountNet(float $amountNet): OrderEntity
-    {
-        $this->amountNet = $amountNet;
-
-        return $this;
-    }
-
-    public function getAmountGross(): float
-    {
-        return $this->amountGross;
-    }
-
-    public function setAmountGross(float $amountGross): OrderEntity
-    {
-        $this->amountGross = $amountGross;
-
-        return $this;
-    }
-
-    public function getAmountTax(): float
-    {
-        return $this->amountTax;
-    }
-
-    public function setAmountTax(float $amountTax): OrderEntity
-    {
-        $this->amountTax = $amountTax;
-
-        return $this;
-    }
-
     public function getAmountForgiven(): float
     {
         return $this->amountForgiven;
@@ -110,18 +66,6 @@ class OrderEntity extends AbstractTimestampableEntity
     public function setAmountForgiven(float $amountForgiven): OrderEntity
     {
         $this->amountForgiven = $amountForgiven;
-
-        return $this;
-    }
-
-    public function getDuration(): int
-    {
-        return $this->duration;
-    }
-
-    public function setDuration(int $duration): OrderEntity
-    {
-        $this->duration = $duration;
 
         return $this;
     }

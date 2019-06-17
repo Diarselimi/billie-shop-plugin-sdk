@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DomainModel\Order;
+namespace App\DomainModel\Order\NewOrder;
 
 use App\Application\UseCase\CreateOrder\CreateOrderRequest;
 use App\DomainModel\Address\AddressEntity;
@@ -9,11 +9,11 @@ use App\DomainModel\Address\AddressRepositoryInterface;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntityFactory;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
-use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
-use App\DomainModel\MerchantDebtor\DebtorFinder;
-use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
-use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
+use App\DomainModel\Order\OrderEntityFactory;
+use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
+use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsFactory;
+use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface;
 use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonEntityFactory;
 use App\DomainModel\Person\PersonRepositoryInterface;
@@ -23,17 +23,13 @@ class OrderPersistenceService
 {
     private $orderRepository;
 
+    private $orderFinancialDetailsRepository;
+
     private $personRepository;
 
     private $addressRepository;
 
     private $debtorExternalDataRepository;
-
-    private $merchantRepository;
-
-    private $merchantSettingsRepository;
-
-    private $merchantDebtorFinancialDetailsRepository;
 
     private $orderFactory;
 
@@ -43,43 +39,37 @@ class OrderPersistenceService
 
     private $debtorExternalDataFactory;
 
-    private $merchantDebtorRepository;
+    private $orderFinancialDetailsFactory;
 
-    private $debtorFinder;
+    private $arrayHasher;
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
+        OrderFinancialDetailsRepositoryInterface  $orderFinancialDetailsRepository,
         PersonRepositoryInterface $personRepository,
         AddressRepositoryInterface $addressRepository,
         DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
-        MerchantRepositoryInterface $merchantRepository,
-        MerchantSettingsRepositoryInterface $merchantSettingsRepository,
-        MerchantDebtorFinancialDetailsRepositoryInterface $merchantDebtorFinancialDetailsRepository,
         OrderEntityFactory $orderFactory,
         PersonEntityFactory $personFactory,
         AddressEntityFactory $addressFactory,
         DebtorExternalDataEntityFactory $debtorExternalDataFactory,
-        MerchantDebtorRepositoryInterface $merchantDebtorRepository,
-        DebtorFinder $debtorFinder,
+        OrderFinancialDetailsFactory $orderFinancialDetailsFactory,
         ArrayHasherInterface $arrayHasher
     ) {
         $this->orderRepository = $orderRepository;
+        $this->orderFinancialDetailsRepository = $orderFinancialDetailsRepository;
         $this->personRepository = $personRepository;
         $this->addressRepository = $addressRepository;
         $this->debtorExternalDataRepository = $debtorExternalDataRepository;
-        $this->merchantRepository = $merchantRepository;
-        $this->merchantSettingsRepository = $merchantSettingsRepository;
-        $this->merchantDebtorFinancialDetailsRepository = $merchantDebtorFinancialDetailsRepository;
         $this->orderFactory = $orderFactory;
         $this->personFactory = $personFactory;
         $this->addressFactory = $addressFactory;
         $this->debtorExternalDataFactory = $debtorExternalDataFactory;
-        $this->merchantDebtorRepository = $merchantDebtorRepository;
-        $this->debtorFinder = $debtorFinder;
+        $this->orderFinancialDetailsFactory = $orderFinancialDetailsFactory;
         $this->arrayHasher = $arrayHasher;
     }
 
-    public function persistFromRequest(CreateOrderRequest $request): OrderContainer
+    public function persistFromRequest(CreateOrderRequest $request): OrderCreationDTO
     {
         $order = $this->orderFactory->createFromRequest($request);
 
@@ -95,45 +85,9 @@ class OrderPersistenceService
         ;
         $this->orderRepository->insert($order);
 
-        return (new OrderContainer())
-            ->setOrder($order)
-            ->setDebtorPerson($debtorPerson)
-            ->setDebtorExternalData($debtorExternalData)
-            ->setDebtorExternalDataAddress($debtorAddress)
-            ->setDeliveryAddress($deliveryAddress)
-            ->setMerchant($this->merchantRepository->getOneById($order->getMerchantId()))
-            ->setMerchantSettings($this->merchantSettingsRepository->getOneByMerchant($order->getMerchantId()))
-        ;
-    }
+        $orderFinancialDetails = $this->persistOrderFinancialDetails($order->getId(), $request);
 
-    public function createFromOrderEntity(OrderEntity $order): OrderContainer
-    {
-        $debtorExternalData = $this->debtorExternalDataRepository->getOneById($order->getDebtorExternalDataId());
-        $debtorExternalAddress = $this->addressRepository->getOneById($debtorExternalData->getAddressId());
-
-        $orderContainer = (new OrderContainer())
-            ->setOrder($order)
-            ->setDebtorPerson($this->personRepository->getOneById($order->getDebtorPersonId()))
-            ->setDebtorExternalData($debtorExternalData)
-            ->setDebtorExternalDataAddress($debtorExternalAddress)
-            ->setDeliveryAddress($this->addressRepository->getOneById($order->getDeliveryAddressId()))
-            ->setMerchant($this->merchantRepository->getOneById($order->getMerchantId()))
-            ->setMerchantSettings($this->merchantSettingsRepository->getOneByMerchant($order->getMerchantId()))
-        ;
-
-        if ($order->getMerchantDebtorId()) {
-            $orderContainer->setMerchantDebtor($this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId()));
-
-            $merchantDebtor = $this->debtorFinder->findDebtor($orderContainer, $order->getMerchantId());
-
-            $orderContainer
-                ->setMerchantDebtor($merchantDebtor)
-                ->setMerchantDebtorFinancialDetails($this->merchantDebtorFinancialDetailsRepository->getCurrentByMerchantDebtorId($merchantDebtor->getId()))
-                ->getOrder()->setMerchantDebtorId($merchantDebtor->getId())
-            ;
-        }
-
-        return $orderContainer;
+        return new OrderCreationDTO($order, $orderFinancialDetails, $debtorPerson, $debtorExternalData, $debtorAddress, $deliveryAddress);
     }
 
     private function persistDebtorPerson(CreateOrderRequest $request): PersonEntity
@@ -172,5 +126,20 @@ class OrderPersistenceService
         $this->debtorExternalDataRepository->insert($debtorExternalData);
 
         return $debtorExternalData;
+    }
+
+    private function persistOrderFinancialDetails(int $orderId, CreateOrderRequest $request): OrderFinancialDetailsEntity
+    {
+        $orderFinancialDetails = $this->orderFinancialDetailsFactory->create(
+            $orderId,
+            $request->getAmount()->getGross(),
+            $request->getAmount()->getNet(),
+            $request->getAmount()->getTax(),
+            $request->getDuration()
+        );
+
+        $this->orderFinancialDetailsRepository->insert($orderFinancialDetails);
+
+        return $orderFinancialDetails;
     }
 }

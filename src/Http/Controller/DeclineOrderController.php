@@ -7,10 +7,30 @@ use App\Application\Exception\OrderWorkflowException;
 use App\Application\UseCase\DeclineOrder\DeclineOrderRequest;
 use App\Application\UseCase\DeclineOrder\DeclineOrderUseCase;
 use App\Http\HttpConstantsInterface;
+use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * @OA\Post(
+ *     path="/order/{id}/decline",
+ *     operationId="order_decline",
+ *     summary="Decline Order in Waiting State",
+ *     security={{"oauth2"={}}, {"apiKey"={}}},
+ *
+ *     tags={"Internal API"},
+ *     x={"groups":{"private"}},
+ *
+ *     @OA\Parameter(in="path", name="id", @OA\Schema(type="integer"), required=true),
+ *
+ *     @OA\Response(response=204, description="Order declined."),
+ *     @OA\Response(response=404, ref="#/components/responses/NotFound"),
+ *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+ *     @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+ *     @OA\Response(response=500, ref="#/components/responses/ServerError")
+ * )
+ */
 class DeclineOrderController
 {
     private $useCase;

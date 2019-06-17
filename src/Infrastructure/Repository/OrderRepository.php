@@ -21,11 +21,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
     private const SELECT_FIELDS = [
         'id',
         'uuid',
-        'amount_net',
-        'amount_gross',
-        'amount_tax',
         'amount_forgiven',
-        'duration',
         'external_code',
         'state',
         'external_comment',
@@ -64,11 +60,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
         $id = $this->doInsert('
             INSERT INTO '.self::TABLE_NAME.'
             (
-              amount_net, 
-              amount_gross, 
-              amount_tax, 
               amount_forgiven, 
-              duration, 
               external_code, 
               state, 
               external_comment, 
@@ -88,11 +80,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
               created_at, 
               updated_at
             ) VALUES (
-              :amount_net, 
-              :amount_gross, 
-              :amount_tax, 
               :amount_forgiven, 
-              :duration, 
               :external_code, 
               :state, 
               :external_comment, 
@@ -113,11 +101,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
               :updated_at
             )
         ', [
-            'amount_net' => $order->getAmountNet(),
-            'amount_gross' => $order->getAmountGross(),
-            'amount_tax' => $order->getAmountTax(),
             'amount_forgiven' => $order->getAmountForgiven(),
-            'duration' => $order->getDuration(),
             'external_code' => $order->getExternalCode(),
             'state' => $order->getState(),
             'external_comment' => $order->getExternalComment(),
@@ -219,11 +203,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
               external_code = :external_code,
               state = :state,
               merchant_debtor_id = :merchant_debtor_id,
-              amount_gross = :amount_gross,
-              amount_net = :amount_net,
-              amount_tax = :amount_tax,
               amount_forgiven = :amount_forgiven,
-              duration = :duration,
               shipped_at = :shipped_at,
               payment_id = :payment_id,
               invoice_number = :invoice_number,
@@ -233,11 +213,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
             WHERE id = :id
         ', [
             'external_code' => $order->getExternalCode(),
-            'amount_gross' => $order->getAmountGross(),
-            'amount_net' => $order->getAmountNet(),
-            'amount_tax' => $order->getAmountTax(),
             'amount_forgiven' => $order->getAmountForgiven(),
-            'duration' => $order->getDuration(),
             'state' => $order->getState(),
             'merchant_debtor_id' => $order->getMerchantDebtorId(),
             'shipped_at' => $order->getShippedAt() ? $order->getShippedAt()->format(self::DATE_FORMAT) : null,
@@ -257,12 +233,13 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
     {
         $result = $this->doFetchOne(
             '
-            SELECT MAX(CEIL((:current_time - UNIX_TIMESTAMP(`shipped_at`) - (`duration` * 86400)) / 86400)) as `max_overdue`
-            FROM `merchants_debtors`
-            INNER JOIN `orders` ON orders.`merchant_debtor_id` = `merchants_debtors`.id
-            WHERE `merchants_debtors`.debtor_id = :debtor_id
-            AND `state` = :state
-            AND `shipped_at` IS NOT NULL
+            SELECT MAX(CEIL((:current_time - UNIX_TIMESTAMP(shipped_at) - (order_financial_details.duration * 86400)) / 86400)) as max_overdue
+            FROM merchants_debtors
+            INNER JOIN orders ON orders.merchant_debtor_id = merchants_debtors.id
+            INNER JOIN order_financial_details ON order_financial_details.order_id = orders.id
+            WHERE merchants_debtors.debtor_id = :debtor_id
+            AND state = :state
+            AND shipped_at IS NOT NULL
         ',
             [
                 'current_time' => time(),
@@ -454,6 +431,11 @@ SQL;
         if ($filters && isset($filters['merchant_debtor_id'])) {
             $query .= ' INNER JOIN merchants_debtors ON orders.merchant_debtor_id = merchants_debtors.id AND merchants_debtors.uuid = :merchant_debtor_id';
             $queryParameters['merchant_debtor_id'] = $filters['merchant_debtor_id'];
+        }
+
+        if ($sortBy === 'amount_gross') {
+            $query .= ' INNER JOIN order_financial_details ON order_financial_details.order_id = orders.id';
+            $query .= ' INNER JOIN (SELECT MAX(id) AS maxID FROM order_financial_details GROUP BY order_id) AS of ON of.maxID = order_financial_details.id';
         }
 
         $query .= ' WHERE orders.merchant_id = :merchant_id';

@@ -2,7 +2,7 @@
 
 namespace App\DomainEvent\Order;
 
-use App\DomainModel\Order\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
 use Symfony\Component\EventDispatcher\Event;
 
 abstract class AbstractOrderStateChangeEvent extends Event

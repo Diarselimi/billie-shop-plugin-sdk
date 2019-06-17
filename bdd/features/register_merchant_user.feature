@@ -24,7 +24,6 @@ Feature: Register merchant user to access dashboard
 		"password": ""
 	}
 	"""
-	And print last JSON response
 	Then the response status code should be 400
 	And the JSON response should be:
     """

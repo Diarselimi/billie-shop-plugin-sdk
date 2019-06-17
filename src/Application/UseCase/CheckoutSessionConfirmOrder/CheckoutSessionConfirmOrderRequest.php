@@ -7,6 +7,14 @@ use App\Application\UseCase\ValidatedRequestInterface;
 use App\Application\Validator\Constraint as CustomConstrains;
 use Symfony\Component\Validator\Constraints as Assert;
 
+use OpenApi\Annotations as OA;
+
+/**
+ * @OA\Schema(schema="CheckoutSessionConfirmOrderRequest", required={"amount", "duration"}, properties={
+ *      @OA\Property(property="amount", ref="#/components/schemas/CreateOrderAmountRequest"),
+ *      @OA\Property(property="duration", ref="#/components/schemas/OrderDuration")
+ * })
+ */
 class CheckoutSessionConfirmOrderRequest implements ValidatedRequestInterface
 {
     /**
@@ -20,6 +28,8 @@ class CheckoutSessionConfirmOrderRequest implements ValidatedRequestInterface
      * @CustomConstrains\OrderDuration()
      */
     private $duration;
+
+    private $sessionUuid;
 
     public function getAmount(): ?CreateOrderAmountRequest
     {
@@ -41,6 +51,18 @@ class CheckoutSessionConfirmOrderRequest implements ValidatedRequestInterface
     public function setDuration(?int $duration): CheckoutSessionConfirmOrderRequest
     {
         $this->duration = $duration;
+
+        return $this;
+    }
+
+    public function getSessionUuid(): string
+    {
+        return $this->sessionUuid;
+    }
+
+    public function setSessionUuid(string $sessionUuid): CheckoutSessionConfirmOrderRequest
+    {
+        $this->sessionUuid = $sessionUuid;
 
         return $this;
     }

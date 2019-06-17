@@ -2,12 +2,13 @@
 
 namespace App\Application\UseCase\ShipOrder;
 
+use App\Application\Exception\OrderNotFoundException;
 use App\Application\PaellaCoreCriticalException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Borscht\BorschtInterface;
-use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
-use App\DomainModel\Order\OrderPersistenceService;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderInvoice\InvoiceUploadHandlerInterface;
@@ -15,7 +16,6 @@ use App\DomainModel\OrderInvoice\OrderInvoiceManager;
 use App\DomainModel\OrderInvoice\OrderInvoiceUploadException;
 use App\DomainModel\OrderResponse\OrderResponse;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Workflow\Workflow;
 
 class ShipOrderUseCase implements ValidatedUseCaseInterface
@@ -24,48 +24,44 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface
 
     private $orderRepository;
 
-    private $merchantDebtorRepository;
-
     private $paymentsService;
 
     private $workflow;
 
     private $invoiceManager;
 
-    private $orderPersistenceService;
+    private $orderContainerFactory;
 
     private $orderResponseFactory;
 
     public function __construct(
         Workflow $workflow,
         OrderRepositoryInterface $orderRepository,
-        MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         BorschtInterface $paymentsService,
         OrderInvoiceManager $invoiceManager,
-        OrderPersistenceService $orderPersistenceService,
+        OrderContainerFactory $orderContainerFactory,
         OrderResponseFactory $orderResponseFactory
     ) {
         $this->workflow = $workflow;
         $this->orderRepository = $orderRepository;
-        $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->paymentsService = $paymentsService;
         $this->invoiceManager = $invoiceManager;
-        $this->orderPersistenceService = $orderPersistenceService;
+        $this->orderContainerFactory = $orderContainerFactory;
         $this->orderResponseFactory = $orderResponseFactory;
     }
 
     public function execute(ShipOrderRequest $request): OrderResponse
     {
-        $order = $this->orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($request->getOrderId(), $request->getMerchantId());
-
-        if (!$order) {
-            throw new PaellaCoreCriticalException(
-                "Order #{$request->getOrderId()} not found",
-                PaellaCoreCriticalException::CODE_NOT_FOUND,
-                Response::HTTP_NOT_FOUND
+        try {
+            $orderContainer = $this->orderContainerFactory->loadByMerchantIdAndExternalId(
+                $request->getMerchantId(),
+                $request->getOrderId()
             );
+        } catch (OrderContainerFactoryException $exception) {
+            throw new OrderNotFoundException($exception);
         }
 
+        $order = $orderContainer->getOrder();
         $groups = is_null($order->getExternalCode()) ? ['Default', 'RequiredExternalCode'] : ['Default'];
 
         $this->validateRequest($request, null, $groups);
@@ -88,8 +84,14 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface
             $order->setExternalCode($request->getExternalCode());
         }
 
-        $company = $this->merchantDebtorRepository->getOneById($order->getMerchantDebtorId());
-        $paymentDetails = $this->paymentsService->createOrder($order, $company->getPaymentDebtorId());
+        $paymentDetails = $this->paymentsService->createOrder(
+            $orderContainer->getMerchantDebtor()->getPaymentDebtorId(),
+            $order->getInvoiceNumber(),
+            $order->getShippedAt(),
+            $orderContainer->getOrderFinancialDetails()->getDuration(),
+            $orderContainer->getOrderFinancialDetails()->getAmountGross(),
+            $order->getExternalCode()
+        );
         $order->setPaymentId($paymentDetails->getId());
 
         $this->workflow->apply($order, OrderStateManager::TRANSITION_SHIP);
@@ -105,8 +107,6 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface
                 $exception
             );
         }
-
-        $orderContainer = $this->orderPersistenceService->createFromOrderEntity($order);
 
         return $this->orderResponseFactory->create($orderContainer);
     }

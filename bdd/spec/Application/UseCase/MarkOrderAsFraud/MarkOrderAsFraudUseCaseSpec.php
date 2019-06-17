@@ -7,62 +7,59 @@ use App\Application\UseCase\MarkOrderAsFraud\FraudReclaimActionException;
 use App\Application\UseCase\MarkOrderAsFraud\MarkOrderAsFraudRequest;
 use App\Application\UseCase\MarkOrderAsFraud\MarkOrderAsFraudUseCase;
 use App\DomainModel\Address\AddressEntity;
-use App\DomainModel\Address\AddressRepositoryInterface;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
-use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
 use App\Application\Exception\OrderNotFoundException;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
+use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
 class MarkOrderAsFraudUseCaseSpec extends ObjectBehavior
 {
-    const ORDER_UUID = 'test';
+    private const ORDER_UUID = 'test';
 
-    const ORDER_PAYMENT_ID = 'DIDI';
+    private const ORDER_PAYMENT_ID = 'DIDI';
 
-    const DELIVERY_ADDRESS_ID = 1;
+    private const DELIVERY_ADDRESS_CITY = 'Berlin';
 
-    const DELIVERY_ADDRESS_CITY = 'Berlin';
+    private const DELIVERY_ADDRESS_POSTAL_CODE = '10999';
 
-    const DELIVERY_ADDRESS_POSTAL_CODE = '10999';
+    private const DELIVERY_ADDRESS_STREET = 'testStr';
 
-    const DELIVERY_ADDRESS_STREET = 'testStr';
+    private const DELIVERY_ADDRESS_HOUSE_NUMBER = '11';
 
-    const DELIVERY_ADDRESS_HOUSE_NUMBER = '11';
+    private const DEBTOR_ADDRESS_CITY = 'Hanover';
 
-    const DEBTOR_EXTERNAL_DATA_ID = 1;
+    private const DEBTOR_ADDRESS_POSTAL_CODE = '10999';
 
-    const DEBTOR_ADDRESS_ID = 2;
+    private const DEBTOR_ADDRESS_STREET = 'testStr';
 
-    const DEBTOR_ADDRESS_CITY = 'Hanover';
-
-    const DEBTOR_ADDRESS_POSTAL_CODE = '10999';
-
-    const DEBTOR_ADDRESS_STREET = 'testStr';
-
-    const DEBTOR_ADDRESS_HOUSE_NUMBER = '11';
+    private const DEBTOR_ADDRESS_HOUSE_NUMBER = '11';
 
     public function let(
-        MarkOrderAsFraudRequest $request,
         OrderRepositoryInterface $orderRepository,
         OrderStateManager $orderStateManager,
-        AddressRepositoryInterface $addressRepository,
-        DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
-        BorschtInterface $borscht
+        OrderContainerFactory $orderContainerFactory,
+        BorschtInterface $borscht,
+        MarkOrderAsFraudRequest $request,
+        OrderContainer $orderContainer,
+        OrderEntity $order,
+        AddressEntity $deliveryAddress,
+        AddressEntity $debtorAddress,
+        DebtorExternalDataEntity $debtorExternalData,
+        OrderFinancialDetailsEntity $orderFinancialDetails
     ) {
         $request->getUuid()->willReturn(self::ORDER_UUID);
 
-        $this->beConstructedWith(
-            $orderRepository,
-            $orderStateManager,
-            $addressRepository,
-            $debtorExternalDataRepository,
-            $borscht
-        );
+        $this->mockOrderData($orderContainer, $order, $debtorAddress, $deliveryAddress, $debtorExternalData, $orderFinancialDetails);
+
+        $this->beConstructedWith(...func_get_args());
     }
 
     public function it_is_initializable()
@@ -71,22 +68,31 @@ class MarkOrderAsFraudUseCaseSpec extends ObjectBehavior
     }
 
     public function it_throws_exception_if_order_was_not_found(
-        OrderRepositoryInterface $orderRepository,
+        OrderContainerFactory $orderContainerFactory,
         MarkOrderAsFraudRequest $request
     ) {
-        $orderRepository->getOneByUuid(self::ORDER_UUID)->shouldBeCalled()->willReturn(null);
+        $orderContainerFactory
+            ->loadByUuid(self::ORDER_UUID)
+            ->shouldBeCalled()
+            ->willThrow(OrderContainerFactoryException::class)
+        ;
 
         $this->shouldThrow(OrderNotFoundException::class)->during('execute', [$request]);
     }
 
     public function it_throws_exception_if_order_was_already_marked_as_fraud(
-        OrderRepositoryInterface $orderRepository,
+        OrderContainerFactory $orderContainerFactory,
         MarkOrderAsFraudRequest $request,
-        OrderEntity $orderEntity
+        OrderContainer $orderContainer,
+        OrderEntity $order
     ) {
-        $orderEntity->getMarkedAsFraudAt()->willReturn(new \DateTime());
+        $order->getMarkedAsFraudAt()->willReturn(new \DateTime());
 
-        $orderRepository->getOneByUuid(self::ORDER_UUID)->shouldBeCalled()->willReturn($orderEntity);
+        $orderContainerFactory
+            ->loadByUuid(self::ORDER_UUID)
+            ->shouldBeCalled()
+            ->willReturn($orderContainer)
+        ;
 
         $this->shouldThrow(FraudOrderException::class)->during('execute', [$request]);
     }
@@ -94,17 +100,18 @@ class MarkOrderAsFraudUseCaseSpec extends ObjectBehavior
     public function it_sets_marked_as_fraud_at_date_to_current_date_time_and_call_borscht_to_create_fraud_reclaim(
         MarkOrderAsFraudRequest $request,
         OrderRepositoryInterface $orderRepository,
+        OrderContainerFactory $orderContainerFactory,
         OrderStateManager $orderStateManager,
-        AddressRepositoryInterface $addressRepository,
-        DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
         BorschtInterface $borscht,
+        DebtorExternalDataEntity $debtorExternalData,
         OrderEntity $order,
-        AddressEntity $deliveryAddress,
-        AddressEntity $debtorAddress,
-        DebtorExternalDataEntity $debtorExternalData
+        OrderContainer $orderContainer
     ) {
-        $this->mockOrder($order);
-        $orderRepository->getOneByUuid(self::ORDER_UUID)->shouldBeCalled()->willReturn($order);
+        $orderContainerFactory
+            ->loadByUuid(self::ORDER_UUID)
+            ->shouldBeCalled()
+            ->willReturn($orderContainer)
+        ;
 
         $orderStateManager->isLate($order)->willReturn(true);
         $orderStateManager->isPaidOut($order)->willReturn(true);
@@ -112,15 +119,7 @@ class MarkOrderAsFraudUseCaseSpec extends ObjectBehavior
         $order->setMarkedAsFraudAt(Argument::type(\DateTime::class))->shouldBeCalled();
         $orderRepository->update($order)->shouldBeCalled();
 
-        $this->mockDeliverAddress($deliveryAddress);
-        $addressRepository->getOneById(self::DELIVERY_ADDRESS_ID)->shouldBeCalled()->willReturn($deliveryAddress);
-
-        $debtorExternalDataRepository->getOneById(self::DEBTOR_EXTERNAL_DATA_ID)->shouldBeCalled()->willReturn($debtorExternalData);
-        $debtorExternalData->getAddressId()->willReturn(self::DEBTOR_ADDRESS_ID);
         $debtorExternalData->isEstablishedCustomer()->willReturn(null);
-
-        $this->mockDebtorAddress($debtorAddress);
-        $addressRepository->getOneById(self::DEBTOR_ADDRESS_ID)->shouldBeCalled()->willReturn($debtorAddress);
 
         $borscht->createFraudReclaim(self::ORDER_PAYMENT_ID)->shouldBeCalled();
 
@@ -131,16 +130,17 @@ class MarkOrderAsFraudUseCaseSpec extends ObjectBehavior
         MarkOrderAsFraudRequest $request,
         OrderRepositoryInterface $orderRepository,
         OrderStateManager $orderStateManager,
-        AddressRepositoryInterface $addressRepository,
-        DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
+        OrderContainerFactory $orderContainerFactory,
         BorschtInterface $borscht,
+        DebtorExternalDataEntity $debtorExternalData,
         OrderEntity $order,
-        AddressEntity $deliveryAddress,
-        AddressEntity $debtorAddress,
-        DebtorExternalDataEntity $debtorExternalData
+        OrderContainer $orderContainer
     ) {
-        $this->mockOrder($order);
-        $orderRepository->getOneByUuid(self::ORDER_UUID)->shouldBeCalled()->willReturn($order);
+        $orderContainerFactory
+            ->loadByUuid(self::ORDER_UUID)
+            ->shouldBeCalled()
+            ->willReturn($orderContainer)
+        ;
 
         $orderStateManager->isLate($order)->willReturn(false);
         $orderStateManager->isPaidOut($order)->willReturn(false);
@@ -148,15 +148,7 @@ class MarkOrderAsFraudUseCaseSpec extends ObjectBehavior
         $order->setMarkedAsFraudAt(Argument::type(\DateTime::class))->shouldBeCalled();
         $orderRepository->update($order)->shouldBeCalled();
 
-        $this->mockDeliverAddress($deliveryAddress);
-        $addressRepository->getOneById(self::DELIVERY_ADDRESS_ID)->shouldBeCalled()->willReturn($deliveryAddress);
-
-        $debtorExternalDataRepository->getOneById(self::DEBTOR_EXTERNAL_DATA_ID)->shouldBeCalled()->willReturn($debtorExternalData);
-        $debtorExternalData->getAddressId()->willReturn(self::DEBTOR_ADDRESS_ID);
         $debtorExternalData->isEstablishedCustomer()->willReturn(null);
-
-        $this->mockDebtorAddress($debtorAddress);
-        $addressRepository->getOneById(self::DEBTOR_ADDRESS_ID)->shouldBeCalled()->willReturn($debtorAddress);
 
         $borscht->createFraudReclaim(self::ORDER_PAYMENT_ID)->shouldNotBeCalled();
 
@@ -167,15 +159,20 @@ class MarkOrderAsFraudUseCaseSpec extends ObjectBehavior
         MarkOrderAsFraudRequest $request,
         OrderRepositoryInterface $orderRepository,
         OrderStateManager $orderStateManager,
-        AddressRepositoryInterface $addressRepository,
-        DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
+        OrderContainerFactory $orderContainerFactory,
         BorschtInterface $borscht,
+        DebtorExternalDataEntity $debtorExternalData,
+        AddressEntity $debtorAddress,
         OrderEntity $order,
-        AddressEntity $deliveryAddress,
-        DebtorExternalDataEntity $debtorExternalData
+        OrderContainer $orderContainer
     ) {
-        $this->mockOrder($order);
-        $orderRepository->getOneByUuid(self::ORDER_UUID)->shouldBeCalled()->willReturn($order);
+        $orderContainerFactory
+            ->loadByUuid(self::ORDER_UUID)
+            ->shouldBeCalled()
+            ->willReturn($orderContainer)
+        ;
+
+        $orderContainer->getDeliveryAddress()->willReturn($debtorAddress);
 
         $orderStateManager->isLate($order)->willReturn(true);
         $orderStateManager->isPaidOut($order)->willReturn(true);
@@ -183,14 +180,7 @@ class MarkOrderAsFraudUseCaseSpec extends ObjectBehavior
         $order->setMarkedAsFraudAt(Argument::type(\DateTime::class))->shouldBeCalled();
         $orderRepository->update($order)->shouldBeCalled();
 
-        $this->mockDeliverAddress($deliveryAddress);
-        $addressRepository->getOneById(self::DELIVERY_ADDRESS_ID)->shouldBeCalled()->willReturn($deliveryAddress);
-
-        $debtorExternalDataRepository->getOneById(self::DEBTOR_EXTERNAL_DATA_ID)->shouldBeCalled()->willReturn($debtorExternalData);
-        $debtorExternalData->getAddressId()->willReturn(self::DEBTOR_ADDRESS_ID);
         $debtorExternalData->isEstablishedCustomer()->willReturn(null);
-
-        $addressRepository->getOneById(self::DEBTOR_ADDRESS_ID)->shouldBeCalled()->willReturn($deliveryAddress);
 
         $borscht->createFraudReclaim(self::ORDER_PAYMENT_ID)->shouldNotBeCalled();
 
@@ -201,17 +191,20 @@ class MarkOrderAsFraudUseCaseSpec extends ObjectBehavior
         MarkOrderAsFraudRequest $request,
         OrderRepositoryInterface $orderRepository,
         OrderStateManager $orderStateManager,
-        AddressRepositoryInterface $addressRepository,
-        DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
+        OrderContainerFactory $orderContainerFactory,
         BorschtInterface $borscht,
+        DebtorExternalDataEntity $debtorExternalData,
         OrderEntity $order,
-        AddressEntity $deliveryAddress,
-        AddressEntity $debtorAddress,
-        DebtorExternalDataEntity $debtorExternalData
+        OrderContainer $orderContainer,
+        OrderFinancialDetailsEntity $orderFinancialDetails
     ) {
-        $this->mockOrder($order);
-        $order->getAmountGross()->willReturn(MarkOrderAsFraudUseCase::ORDER_AMOUNT_LIMIT - 1000);
-        $orderRepository->getOneByUuid(self::ORDER_UUID)->shouldBeCalled()->willReturn($order);
+        $orderContainerFactory
+            ->loadByUuid(self::ORDER_UUID)
+            ->shouldBeCalled()
+            ->willReturn($orderContainer)
+        ;
+
+        $orderFinancialDetails->getAmountGross()->willReturn(MarkOrderAsFraudUseCase::ORDER_AMOUNT_LIMIT - 1000);
 
         $orderStateManager->isLate($order)->willReturn(true);
         $orderStateManager->isPaidOut($order)->willReturn(true);
@@ -219,31 +212,35 @@ class MarkOrderAsFraudUseCaseSpec extends ObjectBehavior
         $order->setMarkedAsFraudAt(Argument::type(\DateTime::class))->shouldBeCalled();
         $orderRepository->update($order)->shouldBeCalled();
 
-        $this->mockDeliverAddress($deliveryAddress);
-        $addressRepository->getOneById(self::DELIVERY_ADDRESS_ID)->shouldBeCalled()->willReturn($deliveryAddress);
-
-        $debtorExternalDataRepository->getOneById(self::DEBTOR_EXTERNAL_DATA_ID)->shouldBeCalled()->willReturn($debtorExternalData);
-        $debtorExternalData->getAddressId()->willReturn(self::DEBTOR_ADDRESS_ID);
         $debtorExternalData->isEstablishedCustomer()->willReturn(true);
-
-        $this->mockDebtorAddress($debtorAddress);
-        $addressRepository->getOneById(self::DEBTOR_ADDRESS_ID)->shouldBeCalled()->willReturn($debtorAddress);
 
         $borscht->createFraudReclaim(self::ORDER_PAYMENT_ID)->shouldNotBeCalled();
 
         $this->shouldThrow(FraudReclaimActionException::class)->during('execute', [$request]);
     }
 
-    private function mockOrder(OrderEntity $order)
-    {
+    private function mockOrderData(
+        OrderContainer $orderContainer,
+        OrderEntity $order,
+        AddressEntity $debtorAddress,
+        AddressEntity $deliveryAddress,
+        DebtorExternalDataEntity $debtorExternalData,
+        OrderFinancialDetailsEntity $orderFinancialDetails
+    ) {
         $order->getPaymentId()->willReturn(self::ORDER_PAYMENT_ID);
         $order->getMarkedAsFraudAt()->willReturn(null);
-        $order->getDeliveryAddressId()->willReturn(self::DELIVERY_ADDRESS_ID);
-        $order->getDebtorExternalDataId()->willReturn(self::DEBTOR_EXTERNAL_DATA_ID);
-        $order->getAmountGross()->willReturn(MarkOrderAsFraudUseCase::ORDER_AMOUNT_LIMIT + 10);
+
+        $orderContainer->getOrder()->willReturn($order);
+        $orderContainer->getDebtorExternalData()->willReturn($debtorExternalData);
+        $orderContainer->getDebtorExternalDataAddress()->willReturn($debtorAddress);
+        $orderContainer->getDeliveryAddress()->willReturn($deliveryAddress);
+
+        $orderContainer->getOrderFinancialDetails()->willReturn($orderFinancialDetails);
+        $this->mockDebtorAddress($debtorAddress);
+        $this->mockDeliveryAddress($deliveryAddress);
     }
 
-    private function mockDeliverAddress(AddressEntity $deliveryAddress)
+    private function mockDeliveryAddress(AddressEntity $deliveryAddress)
     {
         $deliveryAddress->getCity()->willReturn(self::DELIVERY_ADDRESS_CITY);
         $deliveryAddress->getPostalCode()->willReturn(self::DELIVERY_ADDRESS_POSTAL_CODE);

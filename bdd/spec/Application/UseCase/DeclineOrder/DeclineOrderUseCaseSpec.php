@@ -6,29 +6,29 @@ use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\OrderWorkflowException;
 use App\Application\UseCase\DeclineOrder\DeclineOrderRequest;
 use App\Application\UseCase\DeclineOrder\DeclineOrderUseCase;
-use App\DomainModel\Order\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use PhpSpec\ObjectBehavior;
 
 class DeclineOrderUseCaseSpec extends ObjectBehavior
 {
-    private const MERCHANT_ID = 1;
-
-    private const ORDER_EXTERNAL_CODE = 'test-order';
-
     public function let(
         OrderRepositoryInterface $orderRepository,
         OrderStateManager $orderStateManager,
-        OrderPersistenceService $orderPersistenceService
+        OrderContainerFactory $orderContainerFactory,
+        OrderContainer $orderContainer,
+        OrderEntity $order,
+        DeclineOrderRequest $request
     ) {
-        $this->beConstructedWith(
-            $orderRepository,
-            $orderStateManager,
-            $orderPersistenceService
-        );
+        $this->beConstructedWith(...func_get_args());
+
+        $orderContainer->getOrder()->willReturn($order);
+        $request->getOrderId()->willReturn(10);
+        $request->getMerchantId()->willReturn(50);
     }
 
     public function it_is_initializable()
@@ -36,31 +36,30 @@ class DeclineOrderUseCaseSpec extends ObjectBehavior
         $this->shouldHaveType(DeclineOrderUseCase::class);
     }
 
-    public function it_throws_exception_if_order_does_not_exist(OrderRepositoryInterface $orderRepository)
-    {
-        $request = new DeclineOrderRequest(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID);
-
-        $orderRepository
-            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID)
+    public function it_throws_exception_if_order_does_not_exist(
+        OrderContainerFactory $orderContainerFactory,
+        DeclineOrderRequest $request
+    ) {
+        $orderContainerFactory
+            ->loadByMerchantIdAndExternalId(50, 10)
             ->shouldBeCalled()
-            ->willReturn(null)
+            ->willThrow(OrderContainerFactoryException::class)
         ;
 
         $this->shouldThrow(OrderNotFoundException::class)->during('execute', [$request]);
     }
 
     public function it_throws_exception_if_order_is_not_in_waiting_state(
-        OrderRepositoryInterface $orderRepository,
-        OrderStateManager $orderStateManager
+        OrderContainerFactory $orderContainerFactory,
+        DeclineOrderRequest $request,
+        OrderStateManager $orderStateManager,
+        OrderEntity $order,
+        OrderContainer $orderContainer
     ) {
-        $request = new DeclineOrderRequest(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID);
-
-        $order = new OrderEntity();
-
-        $orderRepository
-            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID)
+        $orderContainerFactory
+            ->loadByMerchantIdAndExternalId(50, 10)
             ->shouldBeCalled()
-            ->willReturn($order)
+            ->willReturn($orderContainer)
         ;
 
         $orderStateManager
@@ -73,30 +72,22 @@ class DeclineOrderUseCaseSpec extends ObjectBehavior
     }
 
     public function it_successfully_declines_the_order(
-        OrderRepositoryInterface $orderRepository,
+        OrderContainerFactory $orderContainerFactory,
+        DeclineOrderRequest $request,
         OrderStateManager $orderStateManager,
-        OrderPersistenceService $orderPersistenceService,
         OrderEntity $order,
         OrderContainer $orderContainer
     ) {
-        $request = new DeclineOrderRequest(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID);
-
-        $orderRepository
-            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID)
+        $orderContainerFactory
+            ->loadByMerchantIdAndExternalId(50, 10)
             ->shouldBeCalled()
-            ->willReturn($order)
+            ->willReturn($orderContainer)
         ;
 
         $orderStateManager
             ->isWaiting($order)
             ->shouldBeCalled()
             ->willReturn(true)
-        ;
-
-        $orderPersistenceService
-            ->createFromOrderEntity($order)
-            ->shouldBeCalled()
-            ->willReturn($orderContainer)
         ;
 
         $orderStateManager->decline($orderContainer)->shouldBeCalledOnce();

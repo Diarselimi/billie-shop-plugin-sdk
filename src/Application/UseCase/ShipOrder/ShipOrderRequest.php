@@ -2,15 +2,23 @@
 
 namespace App\Application\UseCase\ShipOrder;
 
+use App\Application\UseCase\AbstractOrderRequest;
 use App\Application\UseCase\ValidatedRequestInterface;
 use App\Application\Validator\Constraint as CustomAssert;
 use App\DomainModel\ArrayableInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use OpenApi\Annotations as OA;
 
-class ShipOrderRequest implements ValidatedRequestInterface, ArrayableInterface
+/**
+ * @OA\Schema(schema="ShipOrderRequest", title="Order Shipping Object", type="object", properties={
+ *      @OA\Property(property="external_order_id", ref="#/components/schemas/TinyText", nullable=true),
+ *      @OA\Property(property="invoice_number", ref="#/components/schemas/TinyText"),
+ *      @OA\Property(property="invoice_url", ref="#/components/schemas/TinyText"),
+ *      @OA\Property(property="proof_of_delivery_url", ref="#/components/schemas/TinyText")
+ * })
+ */
+class ShipOrderRequest extends AbstractOrderRequest implements ValidatedRequestInterface, ArrayableInterface
 {
-    private $orderId;
-
     /**
      * @var string
      * @Assert\NotBlank(groups={"RequiredExternalCode"})
@@ -18,8 +26,6 @@ class ShipOrderRequest implements ValidatedRequestInterface, ArrayableInterface
      * @CustomAssert\OrderExternalCode()
      */
     private $externalOrderId;
-
-    private $merchantId;
 
     /**
      * @var string
@@ -41,26 +47,9 @@ class ShipOrderRequest implements ValidatedRequestInterface, ArrayableInterface
      */
     private $proofOfDeliveryUrl;
 
-    public function getOrderId(): string
-    {
-        return $this->orderId;
-    }
-
-    public function setOrderId(string $orderId): ShipOrderRequest
-    {
-        $this->orderId = $orderId;
-
-        return $this;
-    }
-
     public function getExternalCode(): ? string
     {
         return $this->externalOrderId;
-    }
-
-    public function getMerchantId(): int
-    {
-        return $this->merchantId;
     }
 
     public function getInvoiceNumber(): string
@@ -81,13 +70,6 @@ class ShipOrderRequest implements ValidatedRequestInterface, ArrayableInterface
     public function setExternalCode(?string $externalCode): ShipOrderRequest
     {
         $this->externalOrderId = $externalCode;
-
-        return $this;
-    }
-
-    public function setMerchantId(?int $merchantId): ShipOrderRequest
-    {
-        $this->merchantId = $merchantId;
 
         return $this;
     }

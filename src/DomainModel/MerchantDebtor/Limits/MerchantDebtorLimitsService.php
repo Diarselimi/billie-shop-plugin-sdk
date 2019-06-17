@@ -4,7 +4,7 @@ namespace App\DomainModel\MerchantDebtor\Limits;
 
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
-use App\DomainModel\Order\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use App\Infrastructure\Alfred\AlfredRequestException;
@@ -33,10 +33,10 @@ class MerchantDebtorLimitsService implements LoggingInterface
 
     public function isEnough(OrderContainer $container): bool
     {
-        $amount = $container->getOrder()->getAmountGross();
+        $amount = $container->getOrderFinancialDetails()->getAmountGross();
 
         return $container->getMerchantDebtorFinancialDetails()->getFinancingPower() >= $amount
-            && $container->getMerchantDebtor()->getDebtorCompany()->getFinancingPower() >= $amount
+            && $container->getDebtorCompany()->getFinancingPower() >= $amount
         ;
     }
 
@@ -44,14 +44,14 @@ class MerchantDebtorLimitsService implements LoggingInterface
     {
         $debtorId = $container->getMerchantDebtor()->getDebtorId();
         $financingDetails = $container->getMerchantDebtorFinancialDetails();
-        $amount = $container->getOrder()->getAmountGross();
+        $amount = $container->getOrderFinancialDetails()->getAmountGross();
 
         try {
             $this->companyService->lockDebtorLimit($debtorId, $amount);
 
             $financingDetails->reduceFinancingPower($amount);
             $this->merchantDebtorFinancialDetailsRepository->insert($financingDetails);
-        } catch (AlfredRequestException | \LogicException $exception) {
+        } catch (AlfredRequestException $exception) {
             throw new MerchantDebtorLimitsException();
         }
     }
@@ -60,14 +60,14 @@ class MerchantDebtorLimitsService implements LoggingInterface
     {
         $debtorId = $container->getMerchantDebtor()->getDebtorId();
         $financingDetails = $container->getMerchantDebtorFinancialDetails();
-        $amount = $amount === null ? $container->getOrder()->getAmountGross() : $amount;
+        $amount = $amount === null ? $container->getOrderFinancialDetails()->getAmountGross() : $amount;
 
         try {
             $this->companyService->unlockDebtorLimit($debtorId, $amount);
 
             $financingDetails->increaseFinancingPower($amount);
             $this->merchantDebtorFinancialDetailsRepository->insert($financingDetails);
-        } catch (AlfredRequestException | \LogicException $exception) {
+        } catch (AlfredRequestException $exception) {
             throw new MerchantDebtorLimitsException();
         }
     }

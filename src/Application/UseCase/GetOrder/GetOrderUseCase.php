@@ -2,46 +2,37 @@
 
 namespace App\Application\UseCase\GetOrder;
 
-use App\Application\PaellaCoreCriticalException;
-use App\DomainModel\Order\OrderContainer;
-use App\DomainModel\Order\OrderPersistenceService;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\Application\Exception\OrderNotFoundException;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\OrderResponse\OrderResponse;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
-use Symfony\Component\HttpFoundation\Response;
 
 class GetOrderUseCase
 {
-    private $orderRepository;
-
-    private $orderPersistenceService;
+    private $orderContainerFactory;
 
     private $orderResponseFactory;
 
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
-        OrderPersistenceService $orderPersistenceService,
+        OrderContainerFactory $orderManagerFactory,
         OrderResponseFactory $orderResponseFactory
     ) {
-        $this->orderRepository = $orderRepository;
-        $this->orderPersistenceService = $orderPersistenceService;
+        $this->orderContainerFactory = $orderManagerFactory;
         $this->orderResponseFactory = $orderResponseFactory;
     }
 
     public function execute(GetOrderRequest $request): OrderResponse
     {
-        $order = $this->orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($request->getOrderId(), $request->getMerchantId());
-
-        if (!$order) {
-            throw new PaellaCoreCriticalException(
-                "Order #{$request->getOrderId()} not found",
-                PaellaCoreCriticalException::CODE_NOT_FOUND,
-                Response::HTTP_NOT_FOUND
+        try {
+            $orderContainer = $this->orderContainerFactory->loadByMerchantIdAndExternalId(
+                $request->getMerchantId(),
+                $request->getOrderId()
             );
+        } catch (OrderContainerFactoryException $exception) {
+            throw new OrderNotFoundException($exception);
         }
 
-        $response = $this->orderPersistenceService->createFromOrderEntity($order);
-
-        return $this->orderResponseFactory->create($response);
+        return $this->orderResponseFactory->create($orderContainer);
     }
 }

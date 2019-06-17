@@ -131,8 +131,8 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
     public function getMerchantDebtorOrdersAmountByState(int $merchantDebtorId, string $state): float
     {
         $row = $this->doFetchOne('
-            SELECT SUM(amount_gross) AS amount
-            FROM orders
+            SELECT SUM(amount_gross) AS amount FROM order_financial_details
+            INNER JOIN orders ON orders.id = order_financial_details.order_id
             WHERE orders.merchant_debtor_id = :id AND orders.state = :state
         ', [
             'id' => $merchantDebtorId,

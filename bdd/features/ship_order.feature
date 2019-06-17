@@ -21,8 +21,7 @@ Feature:
         And the JSON response should be:
         """
         {
-            "code": "not_found",
-            "error": "Order #ADDDD not found"
+            "error": "Order not found"
         }
         """
 

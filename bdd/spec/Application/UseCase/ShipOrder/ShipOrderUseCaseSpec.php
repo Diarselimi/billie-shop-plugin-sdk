@@ -2,18 +2,20 @@
 
 namespace spec\App\Application\UseCase\ShipOrder;
 
+use App\Application\Exception\OrderNotFoundException;
 use App\Application\PaellaCoreCriticalException;
 use App\Application\UseCase\ShipOrder\ShipOrderRequest;
 use App\Application\UseCase\ShipOrder\ShipOrderUseCase;
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Borscht\OrderPaymentDetailsDTO;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
-use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
-use App\DomainModel\Order\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
+use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderInvoice\OrderInvoiceManager;
 use App\DomainModel\OrderResponse\OrderResponse;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
@@ -25,9 +27,11 @@ use Symfony\Component\Workflow\Workflow;
 
 class ShipOrderUseCaseSpec extends ObjectBehavior
 {
-    private const EXTERNAL_CODE = 'test-code';
+    private const ID = 'uuidAAABBB';
 
-    private const MERCHANT_ID = 1;
+    private const MERCHANT_ID = 50;
+
+    private const EXTERNAL_CODE = 'test-code';
 
     private const INVOICE_NUMBER = 'DE156893';
 
@@ -41,27 +45,35 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
 
     private const PAYMENT_DETAILS_ID = '4d5w45d4';
 
+    private const DURATION = 25;
+
+    private const AMOUNT_GROSS = 1500.25;
+
     public function let(
         Workflow $workflow,
         OrderRepositoryInterface $orderRepository,
-        MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         BorschtInterface $paymentsService,
         OrderInvoiceManager $invoiceManager,
-        OrderPersistenceService $orderPersistenceService,
+        OrderContainerFactory $orderContainerFactory,
         OrderResponseFactory $orderResponseFactory,
-        ValidatorInterface $validator
+        ValidatorInterface $validator,
+        OrderContainer $orderContainer,
+        OrderEntity $order,
+        MerchantDebtorEntity $merchantDebtor,
+        ShipOrderRequest $request
     ) {
         $validator->validate(Argument::any(), Argument::any(), Argument::any())->willReturn(new ConstraintViolationList());
+        $orderContainer->getOrder()->willReturn($order);
+        $orderContainer->getMerchantDebtor()->willReturn($merchantDebtor);
 
-        $this->beConstructedWith(
-            $workflow,
-            $orderRepository,
-            $merchantDebtorRepository,
-            $paymentsService,
-            $invoiceManager,
-            $orderPersistenceService,
-            $orderResponseFactory
-        );
+        $request->getOrderId()->willReturn(self::ID);
+        $request->getMerchantId()->willReturn(self::MERCHANT_ID);
+        $request->getExternalCode()->willReturn(self::EXTERNAL_CODE);
+        $request->getInvoiceNumber()->willReturn(self::INVOICE_NUMBER);
+        $request->getInvoiceUrl()->willReturn(self::INVOICE_URL);
+        $request->getProofOfDeliveryUrl()->willReturn(self::PROOF_OF_DELIVERY_URL);
+
+        $this->beConstructedWith(...func_get_args());
 
         $this->setValidator($validator);
     }
@@ -71,30 +83,30 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
         $this->shouldHaveType(ShipOrderUseCase::class);
     }
 
-    public function it_throws_exception_if_order_was_not_found(OrderRepositoryInterface $orderRepository)
-    {
-        $request = $this->mockRequest();
-
-        $orderRepository
-            ->getOneByMerchantIdAndExternalCodeOrUUID(self::EXTERNAL_CODE, self::MERCHANT_ID)
+    public function it_throws_exception_if_order_was_not_found(
+        OrderContainerFactory $orderContainerFactory,
+        ShipOrderRequest $request
+    ) {
+        $orderContainerFactory
+            ->loadByMerchantIdAndExternalId(self::MERCHANT_ID, self::ID)
             ->shouldBeCalled()
-            ->willReturn(null)
+            ->willThrow(OrderContainerFactoryException::class)
         ;
 
-        $this->shouldThrow(PaellaCoreCriticalException::class)->during('execute', [$request]);
+        $this->shouldThrow(OrderNotFoundException::class)->during('execute', [$request]);
     }
 
     public function it_throws_exception_if_order_was_not_in_state_for_shipping(
         Workflow $workflow,
-        OrderRepositoryInterface $orderRepository,
+        OrderContainerFactory $orderContainerFactory,
+        ShipOrderRequest $request,
+        OrderContainer $orderContainer,
         OrderEntity $order
     ) {
-        $request = $this->mockRequest();
-
-        $orderRepository
-            ->getOneByMerchantIdAndExternalCodeOrUUID(self::EXTERNAL_CODE, self::MERCHANT_ID)
+        $orderContainerFactory
+            ->loadByMerchantIdAndExternalId(self::MERCHANT_ID, self::ID)
             ->shouldBeCalled()
-            ->willReturn($order)
+            ->willReturn($orderContainer)
         ;
 
         $workflow
@@ -109,26 +121,36 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
     public function it_updates_order_and_create_borscht_order(
         Workflow $workflow,
         OrderRepositoryInterface $orderRepository,
-        MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         BorschtInterface $paymentsService,
-        OrderEntity $order,
+        OrderInvoiceManager $invoiceManager,
+        OrderContainerFactory $orderContainerFactory,
+        OrderResponseFactory $orderResponseFactory,
         MerchantDebtorEntity $merchantDebtor,
         OrderPaymentDetailsDTO $paymentDetailsDTO,
-        OrderInvoiceManager $invoiceManager,
-        OrderPersistenceService $orderPersistenceService,
-        OrderResponseFactory $orderResponseFactory
+        ShipOrderRequest $request,
+        OrderContainer $orderContainer,
+        OrderEntity $order,
+        OrderResponse $orderResponse,
+        OrderFinancialDetailsEntity $orderFinancialDetails
     ) {
         $order->getMerchantDebtorId()->willReturn(self::MERCHANT_DEBTOR_ID);
-        $order->getExternalCode()->willReturn("test");
+        $order->getExternalCode()->willReturn(self::EXTERNAL_CODE);
+        $order->getInvoiceNumber()->willReturn(self::INVOICE_NUMBER);
+        $order->getShippedAt()->willReturn(new \DateTime());
+        $orderContainer->getOrder()->willReturn($order);
 
-        $orderRepository
-            ->getOneByMerchantIdAndExternalCodeOrUUID(self::EXTERNAL_CODE, self::MERCHANT_ID)
+        $orderFinancialDetails->getDuration()->willReturn(self::DURATION);
+        $orderFinancialDetails->getAmountGross()->willReturn(self::AMOUNT_GROSS);
+        $orderContainer->getOrderFinancialDetails()->willReturn($orderFinancialDetails);
+
+        $merchantDebtor->getPaymentDebtorId()->shouldBeCalled()->willReturn(self::PAYMENT_DEBTOR_ID);
+        $orderContainerFactory
+            ->loadByMerchantIdAndExternalId(self::MERCHANT_ID, self::ID)
             ->shouldBeCalled()
-            ->willReturn($order)
+            ->willReturn($orderContainer)
         ;
 
-        $orderPersistenceService->createFromOrderEntity($order)->willReturn(new OrderContainer());
-        $orderResponseFactory->create(new OrderContainer())->willReturn(new OrderResponse());
+        $orderResponseFactory->create($orderContainer)->willReturn($orderResponse);
         $workflow
             ->can($order, OrderStateManager::TRANSITION_SHIP)
             ->shouldBeCalled()
@@ -142,16 +164,17 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
 
         $merchantDebtor->getPaymentDebtorId()->willReturn(self::PAYMENT_DEBTOR_ID);
 
-        $merchantDebtorRepository
-            ->getOneById(self::MERCHANT_DEBTOR_ID)
-            ->shouldBeCalled()
-            ->willReturn($merchantDebtor)
-        ;
-
         $paymentDetailsDTO->getId()->willReturn(self::PAYMENT_DETAILS_ID);
 
         $paymentsService
-            ->createOrder($order, self::PAYMENT_DEBTOR_ID)
+            ->createOrder(
+                self::PAYMENT_DEBTOR_ID,
+                self::INVOICE_NUMBER,
+                Argument::type(\DateTime::class),
+                self::DURATION,
+                self::AMOUNT_GROSS,
+                self::EXTERNAL_CODE
+            )
             ->shouldBeCalled()
             ->willReturn($paymentDetailsDTO)
         ;
@@ -163,19 +186,8 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
         $invoiceManager->upload($order, 'order.shipment')->shouldBeCalledOnce();
         $orderRepository->update($order)->shouldBeCalled();
 
-        $request = $this->mockRequest();
+        $orderResponseFactory->create($orderContainer)->shouldBeCalled();
 
         $this->execute($request);
-    }
-
-    private function mockRequest(): ShipOrderRequest
-    {
-        return (new ShipOrderRequest())
-            ->setOrderId(self::EXTERNAL_CODE)
-            ->setMerchantId(self::MERCHANT_ID)
-            ->setInvoiceNumber(self::INVOICE_NUMBER)
-            ->setInvoiceUrl(self::INVOICE_URL)
-            ->setProofOfDeliveryUrl(self::PROOF_OF_DELIVERY_URL)
-        ;
     }
 }

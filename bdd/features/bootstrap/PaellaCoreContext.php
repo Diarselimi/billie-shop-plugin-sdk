@@ -20,6 +20,8 @@ use App\DomainModel\MerchantUser\MerchantUserEntity;
 use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
+use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface;
 use App\DomainModel\OrderIdentification\OrderIdentificationRepositoryInterface;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntity;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
@@ -113,9 +115,11 @@ class PaellaCoreContext extends MinkContext
             TRUNCATE order_invoices;
             TRUNCATE order_identifications;
             TRUNCATE order_risk_checks;
+            TRUNCATE order_financial_details;
             TRUNCATE orders;
             TRUNCATE persons;
             TRUNCATE debtor_external_data;
+            TRUNCATE checkout_sessions;
             TRUNCATE addresses;
             TRUNCATE merchants_debtors;
             TRUNCATE merchant_settings;
@@ -205,11 +209,7 @@ class PaellaCoreContext extends MinkContext
         $order = (new OrderEntity())
             ->setExternalCode($externalCode)
             ->setState($state)
-            ->setAmountNet($net)
-            ->setAmountGross($gross)
             ->setAmountForgiven(0)
-            ->setAmountTax($tax)
-            ->setDuration($duration)
             ->setDebtorPersonId($person->getId())
             ->setDeliveryAddressId($deliveryAddress->getId())
             ->setDebtorExternalDataId($debtor->getId())
@@ -224,6 +224,17 @@ class PaellaCoreContext extends MinkContext
         $this->iHaveASessionId("123123", 0);
 
         $this->getOrderRepository()->insert($order);
+
+        $this->getOrderFinancialDetailsRepository()->insert(
+            (new OrderFinancialDetailsEntity())
+                ->setOrderId($order->getId())
+                ->setAmountGross($gross)
+                ->setAmountNet($net)
+                ->setAmountTax($tax)
+                ->setDuration($duration)
+                ->setCreatedAt(new DateTime())
+                ->setUpdatedAt(new DateTime())
+        );
     }
 
     /**
@@ -339,23 +350,22 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
-     * @Given the order :orderId :key is :value
+     * @Given the order :orderId :key is :expectedValue
      */
-    public function orderDurationIs($orderId, $key, $value)
+    public function orderDurationIs($orderId, $key, $expectedValue)
     {
         $order = $this->getOrderRepository()->getOneByExternalCode($orderId, 1);
-        if ($order === null) {
-            throw new RuntimeException('Order not found');
-        }
-        $actual = $order->{'get' . ucfirst($key)}();
-        if ($actual != $value) {
-            throw new RuntimeException(sprintf(
-                'Order %s is %s state, but %s was expected.',
-                $key,
-                $actual,
-                $value
-            ));
-        }
+
+        Assert::notNull($order);
+
+        $orderFinancialDetails = $this->getOrderFinancialDetailsRepository()->getCurrentByOrderId($order->getId());
+
+        Assert::notNull($orderFinancialDetails);
+
+        $actualValue = (in_array($key, ['amountGross', 'amountNet', 'amountTax', 'duration']))
+            ? $orderFinancialDetails->{'get' . ucfirst($key)}() : $order->{'get' . ucfirst($key)}();
+
+        Assert::eq($actualValue, $expectedValue);
     }
 
     /**
@@ -630,6 +640,11 @@ class PaellaCoreContext extends MinkContext
     private function getCheckoutSessionRepository(): CheckoutSessionRepositoryInterface
     {
         return $this->get(CheckoutSessionRepositoryInterface::class);
+    }
+
+    private function getOrderFinancialDetailsRepository(): OrderFinancialDetailsRepositoryInterface
+    {
+        return $this->get(OrderFinancialDetailsRepositoryInterface::class);
     }
 
     private function getConnection(): PdoConnection

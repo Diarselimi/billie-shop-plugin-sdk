@@ -2,57 +2,44 @@
 
 namespace App\Application\UseCase\OrderDebtorIdentificationV2;
 
-use App\DomainModel\Address\AddressRepositoryInterface;
+use App\Application\Exception\OrderNotFoundException;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\IdentifyDebtorRequestDTO;
-use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\OrderIdentification\OrderIdentificationEntity;
 use App\DomainModel\OrderIdentification\OrderIdentificationRepositoryInterface;
-use App\DomainModel\Person\PersonRepositoryInterface;
 use App\Infrastructure\Alfred\AlfredRequestException;
 
 class OrderDebtorIdentificationV2UseCase
 {
-    private $orderRepository;
-
-    private $debtorExternalDataRepository;
-
-    private $addressRepository;
-
-    private $personRepository;
+    private $orderContainerFactory;
 
     private $orderIdentificationRepository;
 
     private $companiesService;
 
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
-        DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
-        AddressRepositoryInterface $addressRepository,
-        PersonRepositoryInterface $personRepository,
+        OrderContainerFactory $orderContainerFactory,
         OrderIdentificationRepositoryInterface $orderIdentificationRepository,
         CompaniesServiceInterface $companiesService
     ) {
-        $this->orderRepository = $orderRepository;
-        $this->debtorExternalDataRepository = $debtorExternalDataRepository;
-        $this->addressRepository = $addressRepository;
-        $this->personRepository = $personRepository;
+        $this->orderContainerFactory = $orderContainerFactory;
         $this->orderIdentificationRepository = $orderIdentificationRepository;
         $this->companiesService = $companiesService;
     }
 
     public function execute(OrderDebtorIdentificationV2Request $request): void
     {
-        $order = $this->orderRepository->getOneById($request->getOrderId());
-
-        if (!$order) {
-            return;
+        try {
+            $orderContainer = $this->orderContainerFactory->loadById($request->getOrderId());
+        } catch (OrderContainerFactoryException $exception) {
+            throw new OrderNotFoundException($exception);
         }
 
-        $debtorExternalData = $this->debtorExternalDataRepository->getOneById($order->getDebtorExternalDataId());
-        $debtorExternalAddress = $this->addressRepository->getOneById($debtorExternalData->getAddressId());
-        $debtorPerson = $this->personRepository->getOneById($order->getDebtorPersonId());
+        $debtorExternalData = $orderContainer->getDebtorExternalData();
+        $debtorExternalAddress = $orderContainer->getDebtorExternalDataAddress();
+        $debtorPerson = $orderContainer->getDebtorPerson();
 
         try {
             $identifiedDebtor = $this->companiesService->identifyDebtor(

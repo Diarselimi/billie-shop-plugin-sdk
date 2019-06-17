@@ -4,9 +4,10 @@ namespace App\DomainModel\Order;
 
 use App\Application\Exception\OrderWorkflowException;
 use App\DomainEvent\Order\OrderCompleteEvent;
-use App\DomainEvent\Order\OrderCreatedEvent;
+use App\DomainEvent\Order\OrderApprovedEvent;
 use App\DomainEvent\Order\OrderDeclinedEvent;
 use App\DomainEvent\Order\OrderInWaitingStateEvent;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\OrderRiskCheck\Checker\LimitCheck;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -18,6 +19,8 @@ class OrderStateManager implements LoggingInterface
     use LoggingTrait;
 
     public const STATE_NEW = 'new';
+
+    public const STATE_AUTHORIZED = 'authorized';
 
     public const STATE_WAITING = 'waiting';
 
@@ -35,9 +38,22 @@ class OrderStateManager implements LoggingInterface
 
     public const STATE_CANCELED = 'canceled';
 
-    public const STATE_AUTHORIZED = 'authorized';
+    public const ALL_STATES = [
+        self::STATE_NEW,
+        self::STATE_AUTHORIZED,
+        self::STATE_WAITING,
+        self::STATE_CREATED,
+        self::STATE_DECLINED,
+        self::STATE_SHIPPED,
+        self::STATE_PAID_OUT,
+        self::STATE_LATE,
+        self::STATE_COMPLETE,
+        self::STATE_CANCELED,
+    ];
 
     public const TRANSITION_NEW = 'new';
+
+    public const TRANSITION_AUTHORIZE = 'authorize';
 
     public const TRANSITION_WAITING = 'waiting';
 
@@ -56,8 +72,6 @@ class OrderStateManager implements LoggingInterface
     public const TRANSITION_CANCEL = 'cancel';
 
     public const TRANSITION_CANCEL_SHIPPED = 'cancel_shipped';
-
-    public const TRANSITION_AUTHORIZE = 'authorize';
 
     private $orderRepository;
 
@@ -157,7 +171,7 @@ class OrderStateManager implements LoggingInterface
         $this->workflow->apply($order, OrderStateManager::TRANSITION_CREATE);
         $this->orderRepository->update($order);
 
-        $this->eventDispatcher->dispatch(OrderCreatedEvent::NAME, new OrderCreatedEvent($orderContainer, $shouldNotifyWebhook));
+        $this->eventDispatcher->dispatch(OrderApprovedEvent::NAME, new OrderApprovedEvent($orderContainer, $shouldNotifyWebhook));
         $this->logInfo("Order approved");
     }
 
@@ -181,7 +195,7 @@ class OrderStateManager implements LoggingInterface
         $this->workflow->apply($order, OrderStateManager::TRANSITION_WAITING);
         $this->orderRepository->update($order);
 
-        $this->eventDispatcher->dispatch(OrderInWaitingStateEvent::NAME, new OrderInWaitingStateEvent($order));
+        $this->eventDispatcher->dispatch(OrderInWaitingStateEvent::NAME, new OrderInWaitingStateEvent($orderContainer));
         $this->logInfo("Order was moved to waiting state");
     }
 

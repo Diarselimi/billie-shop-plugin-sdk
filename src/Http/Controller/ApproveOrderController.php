@@ -7,10 +7,30 @@ use App\Application\Exception\OrderWorkflowException;
 use App\Application\UseCase\ApproveOrder\ApproveOrderRequest;
 use App\Application\UseCase\ApproveOrder\ApproveOrderUseCase;
 use App\Http\HttpConstantsInterface;
+use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * @OA\Post(
+ *     path="/order/{id}/approve",
+ *     operationId="order_approve",
+ *     summary="Approve Order in Waiting State",
+ *     security={{"oauth2"={}}, {"apiKey"={}}},
+ *
+ *     tags={"Internal API"},
+ *     x={"groups":{"private"}},
+ *
+ *     @OA\Parameter(in="path", name="id", @OA\Schema(type="integer"), required=true),
+ *
+ *     @OA\Response(response=204, description="Order approved."),
+ *     @OA\Response(response=404, ref="#/components/responses/NotFound"),
+ *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+ *     @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+ *     @OA\Response(response=500, ref="#/components/responses/ServerError")
+ * )
+ */
 class ApproveOrderController
 {
     private $useCase;

@@ -8,7 +8,7 @@ use App\DomainModel\DebtorCompany\IsEligibleForPayAfterDeliveryRequestDTOFactory
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
-use App\DomainModel\Order\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderRiskCheck\Checker\CheckResult;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorScoreCheck;
@@ -19,13 +19,6 @@ use Prophecy\Argument;
 
 class DebtorScoreCheckSpec extends ObjectBehavior
 {
-    /**
-     * @var OrderContainer
-     */
-    private $orderContainer;
-
-    private $companiesService;
-
     public function it_is_initializable()
     {
         $this->shouldHaveType(DebtorScoreCheck::class);
@@ -35,37 +28,41 @@ class DebtorScoreCheckSpec extends ObjectBehavior
         OrderRepositoryInterface $orderRepository,
         ScoreThresholdsConfigurationRepositoryInterface $scoreThresholdsConfigurationRepository,
         IsEligibleForPayAfterDeliveryRequestDTOFactory $afterDeliveryRequestDTOFactory,
-        CompaniesServiceInterface $companiesService
+        CompaniesServiceInterface $companiesService,
+        OrderContainer $orderContainer,
+        MerchantDebtorEntity $merchantDebtor,
+        DebtorExternalDataEntity $debtorExternalData,
+        MerchantSettingsEntity $merchantSettings,
+        ScoreThresholdsConfigurationEntity $scoreThresholds,
+        IsEligibleForPayAfterDeliveryRequestDTO $request
     ) {
-        $this->orderContainer = new OrderContainer();
-        $this->orderContainer->setMerchantDebtor(new MerchantDebtorEntity());
-        $this->orderContainer->setDebtorExternalData(new DebtorExternalDataEntity());
-        $this->orderContainer->getMerchantDebtor()->setDebtorId(1);
-        $this->orderContainer->setMerchantSettings(new MerchantSettingsEntity());
-        $this->orderContainer->getMerchantSettings()->setScoreThresholdsConfigurationId(1);
+        $orderContainer->getMerchantDebtor()->willReturn($merchantDebtor);
+        $orderContainer->getDebtorExternalData()->willReturn($debtorExternalData);
+        $orderContainer->getMerchantSettings()->willReturn($merchantSettings);
 
-        $score = new ScoreThresholdsConfigurationEntity();
-        $score->setCrefoHighScoreThreshold(100);
-        $score->setCrefoLowScoreThreshold(20);
-        $score->setSchufaAverageScoreThreshold(50);
-        $score->setSchufaLowScoreThreshold(20);
-        $score->setSchufaHighScoreThreshold(100);
-        $score->setSchufaSoleTraderScoreThreshold(99);
+        $scoreThresholds->getCrefoHighScoreThreshold()->willReturn(100);
+        $scoreThresholds->getCrefoLowScoreThreshold()->willReturn(20);
+        $scoreThresholds->getSchufaAverageScoreThreshold()->willReturn(50);
+        $scoreThresholds->getSchufaLowScoreThreshold()->willReturn(20);
+        $scoreThresholds->getSchufaHighScoreThreshold()->willReturn(100);
+        $scoreThresholds->getSchufaSoleTraderScoreThreshold()->willReturn(99);
 
-        $isEligible = new IsEligibleForPayAfterDeliveryRequestDTO();
-        $isEligible->setCrefoHighScoreThreshold(100);
-        $isEligible->setCrefoLowScoreThreshold(20);
-        $isEligible->setSchufaAverageScoreThreshold(50);
-        $isEligible->setSchufaLowScoreThreshold(20);
-        $isEligible->setSchufaHighScoreThreshold(100);
-        $isEligible->setSchufaSoleTraderScoreThreshold(99);
+        $request->getCrefoHighScoreThreshold()->willReturn(100);
+        $request->getCrefoLowScoreThreshold()->willReturn(20);
+        $request->getSchufaAverageScoreThreshold()->willReturn(50);
+        $request->getSchufaLowScoreThreshold()->willReturn(20);
+        $request->getSchufaHighScoreThreshold()->willReturn(100);
+        $request->getSchufaSoleTraderScoreThreshold()->willReturn(99);
 
-        $this->orderContainer->getMerchantDebtor()->setIsWhitelisted(false);
+        $merchantDebtor->getDebtorId()->willReturn(1);
+        $merchantDebtor->isWhitelisted()->willReturn(false);
+        $merchantDebtor->getScoreThresholdsConfigurationId()->willReturn(1);
 
-        $scoreThresholdsConfigurationRepository->getById(Argument::any())->willReturn($score);
+        $merchantSettings->getScoreThresholdsConfigurationId()->willReturn(1);
+        $debtorExternalData->isLegalFormSoleTrader()->willReturn(false);
+
+        $scoreThresholdsConfigurationRepository->getById(Argument::any())->willReturn($scoreThresholds);
         $orderRepository->debtorHasAtLeastOneFullyPaidOrder(Argument::any())->willReturn(true);
-
-        $this->companiesService = $companiesService;
 
         $afterDeliveryRequestDTOFactory->create(
             Argument::any(),
@@ -73,37 +70,36 @@ class DebtorScoreCheckSpec extends ObjectBehavior
             Argument::any(),
             Argument::any(),
             Argument::any()
-        )->willReturn($isEligible);
+        )->willReturn($request);
 
-        $this->beConstructedWith(
-            $orderRepository,
-            $scoreThresholdsConfigurationRepository,
-            $afterDeliveryRequestDTOFactory,
-            $companiesService
-            );
+        $this->beConstructedWith(...func_get_args());
     }
 
-    public function it_returns_false_check_result_if_companies_service_returns_false()
-    {
-        $this->companiesService->isEligibleForPayAfterDelivery(Argument::any())->willReturn(false);
+    public function it_returns_false_check_result_if_companies_service_returns_false(
+        CompaniesServiceInterface $companiesService,
+        OrderContainer $orderContainer
+    ) {
+        $companiesService->isEligibleForPayAfterDelivery(Argument::any())->willReturn(false);
 
-        $this->check($this->orderContainer)
-            ->shouldBeLike(new CheckResult(false, DebtorScoreCheck::NAME));
+        $this->check($orderContainer)->shouldBeLike(new CheckResult(false, DebtorScoreCheck::NAME));
     }
 
-    public function it_returns_false_check_result_if_companies_service_returns_true()
-    {
-        $this->companiesService->isEligibleForPayAfterDelivery(Argument::any())->willReturn(true);
-        $this->check($this->orderContainer)
-            ->shouldBeLike(new CheckResult(true, DebtorScoreCheck::NAME));
+    public function it_returns_false_check_result_if_companies_service_returns_true(
+        CompaniesServiceInterface $companiesService,
+        OrderContainer $orderContainer
+    ) {
+        $companiesService->isEligibleForPayAfterDelivery(Argument::any())->willReturn(true);
+        $this->check($orderContainer)->shouldBeLike(new CheckResult(true, DebtorScoreCheck::NAME));
     }
 
-    public function it_will_return_true_if_the_debtor_is_whitelisted()
-    {
-        $this->orderContainer->getMerchantDebtor()->setIsWhitelisted(true);
-        $this->companiesService->isEligibleForPayAfterDelivery(Argument::any())->willReturn(false);
+    public function it_will_return_true_if_the_debtor_is_whitelisted(
+        CompaniesServiceInterface $companiesService,
+        MerchantDebtorEntity $merchantDebtor,
+        OrderContainer $orderContainer
+    ) {
+        $merchantDebtor->isWhitelisted()->willReturn(true);
+        $companiesService->isEligibleForPayAfterDelivery(Argument::any())->willReturn(false);
 
-        $this->check($this->orderContainer)
-            ->shouldBeLike(new CheckResult(true, DebtorScoreCheck::NAME));
+        $this->check($orderContainer)->shouldBeLike(new CheckResult(true, DebtorScoreCheck::NAME));
     }
 }

@@ -3,7 +3,25 @@
 namespace App\Application\UseCase\CreateOrder\Request;
 
 use Symfony\Component\Validator\Constraints as Assert;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Schema(
+ *     schema="CreateOrderDeliveryAddressRequest",
+ *     title="Delivery Address",
+ *     required={
+ *          "street", "city", "postal_code", "country"
+ *     },
+ *     properties={
+ *          @OA\Property(property="addition", ref="#/components/schemas/TinyText", nullable=true),
+ *          @OA\Property(property="house_number", ref="#/components/schemas/TinyText", example="4"),
+ *          @OA\Property(property="street", ref="#/components/schemas/TinyText", example="Charlotten Str."),
+ *          @OA\Property(property="city", ref="#/components/schemas/TinyText", example="Berlin"),
+ *          @OA\Property(property="postal_code", ref="#/components/schemas/PostalCode"),
+ *          @OA\Property(property="country", ref="#/components/schemas/CountryCode"),
+ *     }
+ * )
+ */
 class CreateOrderDeliveryAddressRequest
 {
     /**

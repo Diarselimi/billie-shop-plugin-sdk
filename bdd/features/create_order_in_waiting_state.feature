@@ -18,23 +18,10 @@ Feature:
       | debtor_blacklisted        |
       | debtor_overdue            |
       | company_b2b_score         |
-    And I get from companies service "/debtor/1" endpoint response with status 200 and body
-      """
-      {
-        "id": 1,
-        "payment_id": "test",
-        "name": "Test User Company",
-        "address_house": "10",
-        "address_street": "Heinrich-Heine-Platz",
-        "address_city": "Berlin",
-        "address_postal_code": "10179",
-        "address_country": "DE",
-        "address_addition": null,
-        "crefo_id": "123",
-        "schufa_id": "123",
-        "is_blacklisted": 0
-      }
-      """
+    And I get from companies service get debtor response
+    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    """
+    """
     And I get from payments service get debtor response
 
   Scenario: Soft decline is enabled for limit check - all risk checks passed - order created successfully

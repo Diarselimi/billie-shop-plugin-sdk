@@ -4,9 +4,9 @@ namespace App\DomainModel\OrderResponse;
 
 use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
-use App\DomainModel\Order\OrderContainer;
 use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderStateManager;
 
 class OrderResponseFactory
@@ -38,7 +38,7 @@ class OrderResponseFactory
             ->setExternalCode($order->getExternalCode())
             ->setUuid($order->getUuid())
             ->setState($order->getState())
-            ->setOriginalAmount($order->getAmountGross())
+            ->setOriginalAmount($orderContainer->getOrderFinancialDetails()->getAmountGross())
             ->setDebtorExternalDataAddressCountry($orderContainer->getDebtorExternalDataAddress()->getCountry())
             ->setDebtorExternalDataAddressPostalCode($orderContainer->getDebtorExternalDataAddress()->getPostalCode())
             ->setDebtorExternalDataAddressStreet($orderContainer->getDebtorExternalDataAddress()->getStreet())
@@ -47,7 +47,7 @@ class OrderResponseFactory
             ->setDebtorExternalDataIndustrySector($orderContainer->getDebtorExternalData()->getIndustrySector())
             ->setCreatedAt($order->getCreatedAt())
             ->setDebtorExternalDataCustomerId($orderContainer->getDebtorExternalData()->getMerchantExternalId())
-            ->setDuration($order->getDuration())
+            ->setDuration($orderContainer->getOrderFinancialDetails()->getDuration())
             ->setShippedAt($order->getShippedAt())
         ;
 
@@ -71,7 +71,7 @@ class OrderResponseFactory
 
     private function addCompanyData(OrderContainer $orderContainer, OrderResponse $response)
     {
-        $debtor = $orderContainer->getMerchantDebtor()->getDebtorCompany();
+        $debtor = $orderContainer->getDebtorCompany();
 
         $response
             ->setCompanyName($debtor->getName())

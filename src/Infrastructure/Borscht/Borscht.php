@@ -96,13 +96,13 @@ class Borscht implements BorschtInterface, LoggingInterface
         }
     }
 
-    public function modifyOrder(OrderEntity $order): void
+    public function modifyOrder(string $paymentId, int $duration, float $amountGross, ?string $invoiceNumber): void
     {
         $json = [
-            'ticket_id' => $order->getPaymentId(),
-            'invoice_number' => $order->getInvoiceNumber(),
-            'duration' => $order->getDuration(),
-            'amount' => $order->getAmountGross(),
+            'ticket_id' => $paymentId,
+            'invoice_number' => $invoiceNumber,
+            'duration' => $duration,
+            'amount' => $amountGross,
         ];
 
         $this->logInfo('Modify borscht ticket', [
@@ -110,9 +110,7 @@ class Borscht implements BorschtInterface, LoggingInterface
         ]);
 
         try {
-            $this->client->put('/order.json', [
-                'json' => $json,
-            ]);
+            $this->client->put('/order.json', ['json' => $json]);
         } catch (TransferException $exception) {
             throw new PaellaCoreCriticalException(
                 self::ERR_DEFAULT_MESSAGE,
@@ -148,20 +146,24 @@ class Borscht implements BorschtInterface, LoggingInterface
         }
     }
 
-    public function createOrder(OrderEntity $order, string $debtorPaymentId): OrderPaymentDetailsDTO
-    {
+    public function createOrder(
+        string $debtorPaymentId,
+        string $invoiceNumber,
+        \DateTime $shippedAt,
+        int $duration,
+        float $amountGross,
+        string $externalCode
+    ): OrderPaymentDetailsDTO {
         $json = [
             'debtor_id' => $debtorPaymentId,
-            'invoice_number' => $order->getInvoiceNumber(),
-            'billing_date' => $order->getShippedAt()->format('Y-m-d'),
-            'duration' => $order->getDuration(),
-            'amount' => $order->getAmountGross(),
-            'order_code' => $order->getExternalCode(),
+            'invoice_number' => $invoiceNumber,
+            'billing_date' => $shippedAt->format('Y-m-d'),
+            'duration' => $duration,
+            'amount' => $amountGross,
+            'order_code' => $externalCode,
         ];
 
-        $this->logInfo('Create borscht ticket', [
-            'json' => $json,
-        ]);
+        $this->logInfo('Create borscht ticket', ['json' => $json]);
 
         try {
             $response = $this->client->post('/order.json', [

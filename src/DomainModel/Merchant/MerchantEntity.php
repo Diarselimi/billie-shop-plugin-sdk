@@ -5,7 +5,24 @@ namespace App\DomainModel\Merchant;
 use App\DomainModel\ArrayableInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsException;
 use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Schema(schema="MerchantEntity", x={"groups":{"private"}}, type="object", properties={
+ *      @OA\Property(property="id", type="integer"),
+ *      @OA\Property(property="created_at", ref="#/components/schemas/DateTime"),
+ *      @OA\Property(property="updated_at", ref="#/components/schemas/DateTime"),
+ *      @OA\Property(property="name", ref="#/components/schemas/TinyText"),
+ *      @OA\Property(property="available_financing_limit", type="number", format="float"),
+ *      @OA\Property(property="api_key", ref="#/components/schemas/AbstractErrorObject"),
+ *      @OA\Property(property="company_id", ref="#/components/schemas/AbstractErrorObject"),
+ *      @OA\Property(property="payment_merchant_id", ref="#/components/schemas/UUID"),
+ *      @OA\Property(property="roles", type="array", @OA\Items(type="string", example=\App\DomainModel\Merchant\MerchantEntity::ROLE_API_USER)),
+ *      @OA\Property(property="is_active", type="boolean"),
+ *      @OA\Property(property="webhook_url", type="string", format="uri", nullable=true),
+ *      @OA\Property(property="webhook_authorization", type="string", nullable=true, example="Authorization: Basic test"),
+ * })
+ */
 class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInterface
 {
     public const ROLE_API_USER = 'ROLE_API_USER';

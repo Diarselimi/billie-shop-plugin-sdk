@@ -10,9 +10,13 @@ use Symfony\Component\Validator\Constraints\RangeValidator;
  */
 class OrderDuration extends Range
 {
-    public $min = 1;
+    public const DURATION_MIN = 1;
 
-    public $max = 120;
+    public const DURATION_MAX = 120;
+
+    public $min = self::DURATION_MIN;
+
+    public $max = self::DURATION_MAX;
 
     public function validatedBy()
     {

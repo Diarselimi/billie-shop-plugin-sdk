@@ -11,22 +11,22 @@ trait MockServerTrait
     /**
      * @var MockWebServer
      */
-    private $server;
+    private static $server;
 
-    public function startServer(int $port = 8021)
+    public static function startServer(int $port)
     {
-        $this->server = new MockWebServer($port);
-        $this->server->start();
+        self::$server = new MockWebServer($port);
+        self::$server->start();
     }
 
-    public function stopServer()
+    public static function stopServer()
     {
-        $this->server->stop();
+        self::$server->stop();
     }
 
     public function mockRequest($uri, ResponseInterface $response)
     {
-        $this->server->setResponseOfPath($uri, $response);
+        self::$server->setResponseOfPath($uri, $response);
     }
 
     /**

@@ -2,8 +2,7 @@
 
 namespace App\DomainModel\OrderRiskCheck\Checker;
 
-use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
-use App\DomainModel\Order\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
 
 class AmountCheck implements CheckInterface
 {
@@ -11,20 +10,10 @@ class AmountCheck implements CheckInterface
 
     private const MAX_AMOUNT = 50000;
 
-    private $merchantSettingsRepository;
-
-    public function __construct(MerchantSettingsRepositoryInterface $merchantSettingsRepository)
+    public function check(OrderContainer $orderContainer): CheckResult
     {
-        $this->merchantSettingsRepository = $merchantSettingsRepository;
-    }
-
-    public function check(OrderContainer $order): CheckResult
-    {
-        $amount = $order->getOrder()->getAmountGross();
-        $minAmount = $this->merchantSettingsRepository
-            ->getOneByMerchantOrFail($order->getMerchant()->getId())
-            ->getMinOrderAmount()
-        ;
+        $amount = $orderContainer->getOrderFinancialDetails()->getAmountGross();
+        $minAmount = $orderContainer->getMerchantSettings()->getMinOrderAmount();
 
         $result = ($amount >= $minAmount) && ($amount <= self::MAX_AMOUNT);
 

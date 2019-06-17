@@ -4,7 +4,7 @@ namespace App\DomainModel\OrderRiskCheck\Checker;
 
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\IsEligibleForPayAfterDeliveryRequestDTOFactory;
-use App\DomainModel\Order\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
 
@@ -32,27 +32,30 @@ class DebtorScoreCheck implements CheckInterface
         $this->companiesService = $companiesService;
     }
 
-    public function check(OrderContainer $order): CheckResult
+    public function check(OrderContainer $orderContainer): CheckResult
     {
-        $debtorId = $order->getMerchantDebtor()->getDebtorId();
-        $merchantSettings = $order->getMerchantSettings();
-        $merchantDebtor = $order->getMerchantDebtor();
+        $debtorId = $orderContainer->getMerchantDebtor()->getDebtorId();
+        $merchantSettings = $orderContainer->getMerchantSettings();
+        $merchantDebtor = $orderContainer->getMerchantDebtor();
 
         if ($merchantDebtor->isWhitelisted()) {
             return new CheckResult(true, self::NAME);
         }
 
-        $merchantScoreThresholds = ($merchantSettings->getScoreThresholdsConfigurationId()) ?
-            $this->scoreThresholdsConfigurationRepository->getById($merchantSettings->getScoreThresholdsConfigurationId())
-            : null;
+        $merchantScoreThresholds = $merchantSettings->getScoreThresholdsConfigurationId()
+            ? $this->scoreThresholdsConfigurationRepository->getById($merchantSettings->getScoreThresholdsConfigurationId())
+            : null
+        ;
 
-        $debtorScoreThresholds = ($merchantDebtor->getScoreThresholdsConfigurationId()) ?
-            $this->scoreThresholdsConfigurationRepository->getById($merchantDebtor->getScoreThresholdsConfigurationId())
-            : null;
+        $debtorScoreThresholds = $merchantDebtor->getScoreThresholdsConfigurationId()
+            ? $this->scoreThresholdsConfigurationRepository->getById($merchantDebtor->getScoreThresholdsConfigurationId())
+            : null
+        ;
 
         $IsEligibleForPayAfterDeliveryRequestDTO = $this->eligibleForPayAfterDeliveryRequestDTOFactory->create(
             $debtorId,
-            $order->getDebtorExternalData()->isLegalFormSoleTrader(), // TODO: refactor to pass the legalForm to this call, so alfred will decide if is sole trader or not. then remove DebtorExternalData\DebtorExternalDataEntity::LEGAL_FORMS_FOR_SOLE_TRADERS
+            // TODO: refactor to pass the legalForm to this call, so alfred will decide if is sole trader or not. then remove DebtorExternalData\DebtorExternalDataEntity::LEGAL_FORMS_FOR_SOLE_TRADERS
+            $orderContainer->getDebtorExternalData()->isLegalFormSoleTrader(),
             $this->orderRepository->debtorHasAtLeastOneFullyPaidOrder($debtorId),
             $merchantScoreThresholds,
             $debtorScoreThresholds

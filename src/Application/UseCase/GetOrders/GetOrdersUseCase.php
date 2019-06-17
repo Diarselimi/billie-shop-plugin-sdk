@@ -4,8 +4,8 @@ namespace App\Application\UseCase\GetOrders;
 
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderPersistenceService;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
 
@@ -15,17 +15,17 @@ class GetOrdersUseCase implements ValidatedUseCaseInterface
 
     private $orderRepository;
 
-    private $orderPersistenceService;
+    private $orderContainerFactory;
 
     private $orderResponseFactory;
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
-        OrderPersistenceService $orderPersistenceService,
+        OrderContainerFactory $orderContainerFactory,
         OrderResponseFactory $orderResponseFactory
     ) {
         $this->orderRepository = $orderRepository;
-        $this->orderPersistenceService = $orderPersistenceService;
+        $this->orderContainerFactory = $orderContainerFactory;
         $this->orderResponseFactory = $orderResponseFactory;
     }
 
@@ -44,7 +44,7 @@ class GetOrdersUseCase implements ValidatedUseCaseInterface
         );
 
         $orders = array_map(function (OrderEntity $orderEntity) {
-            $orderContainer = $this->orderPersistenceService->createFromOrderEntity($orderEntity);
+            $orderContainer = $this->orderContainerFactory->createFromOrderEntity($orderEntity);
 
             return $this->orderResponseFactory->create($orderContainer);
         }, $result['orders']);
