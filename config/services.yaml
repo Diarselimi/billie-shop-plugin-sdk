@@ -5,6 +5,8 @@ parameters:
   project_name: paella_core
   receive_invoices_sns_topic_arn: '%env(RECEIVE_INVOICES_SNS_TOPIC_ARN)%'
   billie_monitoring_slack_webhook_url: '%env(SLACK_WEBHOOK_URL)%'
+  smaug_client_id: '%env(string:SMAUG_CLIENT_ID)%'
+  smaug_client_secret: '%env(string:SMAUG_CLIENT_SECRET)%'
 
 services:
   _defaults:
@@ -27,6 +29,8 @@ services:
       $notificationSenderClient: '@eight_points_guzzle.client.webhook'
       $salesforceClient: '@eight_points_guzzle.client.salesforce'
       $projectRootDir: '%kernel.root_dir%/..'
+      $smaugClientId: '%smaug_client_id%'
+      $smaugClientSecret: '%smaug_client_secret%'
 
   _instanceof:
     App\Application\UseCase\ValidatedUseCaseInterface:

@@ -8,6 +8,16 @@ security:
         healthcheck:
             pattern: ^/healthcheck
             security: false
+        merchant_user_login:
+            pattern: ^/merchant/user/login
+            security: false
+        merchant_user_logout:
+            pattern: ^/merchant/user/logout
+            anonymous: false
+            stateless: true
+            guard:
+                authenticators:
+                    - App\Http\Authentication\Authenticator\OAuthTokenAuthenticator
         support_api: # TODO: move all support endpoints under the /private/ API prefix
             pattern: ^/(merchant|merchant-debtor)/*
             security: false

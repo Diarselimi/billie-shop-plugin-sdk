@@ -94,4 +94,43 @@ class OAuthServiceContext implements Context
             new MockResponse($response, [], (int) $statusCode)
         ));
     }
+
+    /**
+     * @Given /^I get from Oauth service invalid credentials response$/
+     */
+    public function andIGetFromOauthServiceInvalidCredentialsResponse()
+    {
+        $this->mockRequest('/oauth/token', new ResponseStack(
+            new MockResponse('', [], 401)
+        ));
+    }
+
+    /**
+     * @Given /^I successfully obtain token from oauth service$/
+     */
+    public function andIGetFromOauthServiceValidTokenResponse()
+    {
+        $this->mockRequest('/oauth/token', new ResponseStack(
+            new MockResponse(
+                json_encode(
+                    [
+                    'token_type' => 'bearer',
+                    'expires_in' => 3600,
+                    'access_token' => 'testToken',
+                    'refresh_token' => 'testRefreshToken',
+                ]
+            )
+            )
+        ));
+    }
+
+    /**
+     * @Given /^I get from Oauth service revoke token endpoint a successful response$/
+     */
+    public function iGetFromOauthServiceRevokeTokenEndpointASuccessfulResponse()
+    {
+        $this->mockRequest('/oauth/token/revoke', new ResponseStack(
+            new MockResponse('', [], 200)
+        ));
+    }
 }

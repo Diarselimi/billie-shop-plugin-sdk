@@ -6,6 +6,8 @@ use App\DomainModel\MerchantUser\AuthenticationServiceCreateClientResponseDTO;
 use App\DomainModel\MerchantUser\AuthenticationServiceCreateUserResponseDTO;
 use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
 use App\DomainModel\MerchantUser\AuthenticationServiceAuthorizeTokenResponseDTO;
+use App\DomainModel\MerchantUser\AuthenticationServiceTokenResponseDTO;
+use App\Infrastructure\DecodeResponseTrait;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use GuzzleHttp\Client;
@@ -14,13 +16,19 @@ use GuzzleHttp\TransferStats;
 
 class Smaug implements AuthenticationServiceInterface, LoggingInterface
 {
-    use LoggingTrait;
+    use LoggingTrait, DecodeResponseTrait;
 
     private $client;
 
-    public function __construct(Client $smaugClient)
+    private $smaugClientId;
+
+    private $smaugClientSecret;
+
+    public function __construct(Client $smaugClient, string $smaugClientId, string $smaugClientSecret)
     {
         $this->client = $smaugClient;
+        $this->smaugClientId = $smaugClientId;
+        $this->smaugClientSecret = $smaugClientSecret;
     }
 
     public function authorizeToken(string $token): ? AuthenticationServiceAuthorizeTokenResponseDTO
@@ -36,7 +44,7 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
                 ]
             );
 
-            $decodedResponse = json_decode((string) $response->getBody(), true);
+            $decodedResponse = $this->decodeResponse($response);
 
             return new AuthenticationServiceAuthorizeTokenResponseDTO(
                 $decodedResponse['client_id'],
@@ -60,7 +68,7 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
                 ]
             );
 
-            $decodedResponse = json_decode((string) $response->getBody(), true);
+            $decodedResponse = $this->decodeResponse($response);
 
             return new AuthenticationServiceCreateClientResponseDTO(
                 $decodedResponse['client_id'],
@@ -86,7 +94,7 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
                 ]
             );
 
-            $decodedResponse = json_decode((string) $response->getBody(), true);
+            $decodedResponse = $this->decodeResponse($response);
 
             return new AuthenticationServiceCreateUserResponseDTO(
                 $decodedResponse['user_id'],
@@ -94,6 +102,62 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
             );
         } catch (TransferException $exception) {
             $this->logSuppressedException($exception, 'Failed to create OAuth user', ['exception' => $exception]);
+
+            throw new AuthenticationServiceException();
+        }
+    }
+
+    public function requestUserToken(string $email, string $password): AuthenticationServiceTokenResponseDTO
+    {
+        try {
+            $response = $this->client->post(
+                '/oauth/token',
+                [
+                    'json' => [
+                        'grant_type' => 'password',
+                        'client_id' => $this->smaugClientId,
+                        'client_secret' => $this->smaugClientSecret,
+                        'email' => $email,
+                        'password' => $password,
+                        'scope' => 'all',
+                    ],
+                    'on_stats' => function (TransferStats $stats) {
+                        $this->logServiceRequestStats($stats, 'obtain_user_token');
+                    },
+                ]
+            );
+
+            $decodedResponse = $this->decodeResponse($response);
+
+            return new AuthenticationServiceTokenResponseDTO(
+                $decodedResponse['token_type'],
+                $decodedResponse['expires_in'],
+                $decodedResponse['access_token'],
+                $decodedResponse['refresh_token']
+            );
+        } catch (TransferException $exception) {
+            $this->logSuppressedException($exception, 'Failed to obtain user token', ['exception' => $exception]);
+
+            throw new AuthenticationServiceException();
+        }
+    }
+
+    public function revokeToken(string $token): void
+    {
+        try {
+            $this->client->post(
+                '/oauth/token/revoke',
+                [
+                    'headers' => [
+                        'Authorization' => $token,
+                    ],
+                    'on_stats' => function (TransferStats $stats) {
+                        $this->logServiceRequestStats($stats, 'revoke_token');
+                    },
+                ]
+            );
+        } catch (TransferException $exception) {
+            $this->logSuppressedException($exception, 'Failed to revoke token', ['exception' => $exception]);
 
             throw new AuthenticationServiceException();
         }
