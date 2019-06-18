@@ -117,7 +117,7 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
                         'grant_type' => 'password',
                         'client_id' => $this->smaugClientId,
                         'client_secret' => $this->smaugClientSecret,
-                        'email' => $email,
+                        'username' => $email,
                         'password' => $password,
                         'scope' => 'all',
                     ],
