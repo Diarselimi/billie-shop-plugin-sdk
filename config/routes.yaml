@@ -2,8 +2,14 @@ billie_monitoring:
   resource: '@BillieMonitoringBundle/Resources/config/routes.yaml'
 
 controllers:
-    resource: ../src/Http/Controller
-    type: openapi_annotation
+  resource: ../src/Http/Controller
+  type: openapi_annotation
+
+public_controllers:
+  resource: ../src/Http/Controller/PublicApi
+  type: openapi_annotation
+  prefix: /public
+  name_prefix: public_
 
 trigger_failed_order_notifications:
   path: /order/{id}/trigger-failed-notifications

@@ -38,7 +38,7 @@ Feature:
 
   Scenario: Debtor identification failed
     Given I get from companies service identify no match response
-    When I send a POST request to "/order" with body:
+    When I send a POST request to "/public/order" with body:
     """
     {
          "debtor_person":{

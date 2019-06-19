@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controller;
+namespace App\Http\Controller\PublicApi;
 
 use App\Application\Exception\CheckoutSessionConfirmException;
 use App\Application\Exception\OrderNotAuthorizedException;
