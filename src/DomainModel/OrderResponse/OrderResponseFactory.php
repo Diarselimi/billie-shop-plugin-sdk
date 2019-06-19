@@ -38,7 +38,9 @@ class OrderResponseFactory
             ->setExternalCode($order->getExternalCode())
             ->setUuid($order->getUuid())
             ->setState($order->getState())
-            ->setOriginalAmount($orderContainer->getOrderFinancialDetails()->getAmountGross())
+            ->setAmountGross($orderContainer->getOrderFinancialDetails()->getAmountGross())
+            ->setAmountNet($orderContainer->getOrderFinancialDetails()->getAmountNet())
+            ->setAmountTax($orderContainer->getOrderFinancialDetails()->getAmountTax())
             ->setDebtorExternalDataAddressCountry($orderContainer->getDebtorExternalDataAddress()->getCountry())
             ->setDebtorExternalDataAddressPostalCode($orderContainer->getDebtorExternalDataAddress()->getPostalCode())
             ->setDebtorExternalDataAddressStreet($orderContainer->getDebtorExternalDataAddress()->getStreet())
@@ -62,6 +64,10 @@ class OrderResponseFactory
 
         if ($this->orderStateManager->wasShipped($order)) {
             $this->addInvoiceData($order, $response);
+        }
+
+        if ($this->orderStateManager->isLate($order)) {
+            $response->setDunningStatus($orderContainer->getDunningStatus());
         }
 
         $response = $this->addReasons($order, $response);

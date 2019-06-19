@@ -11,8 +11,11 @@ use OpenApi\Annotations as OA;
  *      @OA\Property(property="uuid", ref="#/components/schemas/UUID"),
  *      @OA\Property(property="state", ref="#/components/schemas/OrderState", example="created"),
  *      @OA\Property(property="reasons", type="array", @OA\Items(ref="#/components/schemas/OrderDeclineReason"), nullable=true),
- *      @OA\Property(property="amount", type="number", format="float", nullable=true, example=123.45),
+ *      @OA\Property(property="amount", type="number", format="float", nullable=false, example=123.45),
+ *      @OA\Property(property="amount_tax", type="number", format="float", nullable=false, example=123.45),
+ *      @OA\Property(property="amount_net", type="number", format="float", nullable=false, example=123.45),
  *      @OA\Property(property="duration", ref="#/components/schemas/OrderDuration", example=30),
+ *      @OA\Property(property="dunning_status", ref="#/components/schemas/OrderDunningStatus"),
  *
  *      @OA\Property(property="debtor_company", type="object", description="Identified company", properties={
  *          @OA\Property(property="name", ref="#/components/schemas/TinyText", nullable=true, example="Billie GmbH"),
@@ -101,7 +104,11 @@ class OrderResponse implements ArrayableInterface
 
     private $outstandingAmount;
 
-    private $originalAmount;
+    private $amountGross;
+
+    private $amountTax;
+
+    private $amountNet;
 
     private $feeAmount;
 
@@ -128,6 +135,8 @@ class OrderResponse implements ArrayableInterface
     private $deliveryAddressCountry;
 
     private $duration;
+
+    private $dunningStatus;
 
     public function getExternalCode(): ? string
     {
@@ -381,14 +390,38 @@ class OrderResponse implements ArrayableInterface
         return $this;
     }
 
-    public function getOriginalAmount(): ? float
+    public function getAmountGross(): float
     {
-        return $this->originalAmount;
+        return $this->amountGross;
     }
 
-    public function setOriginalAmount(float $originalAmount): OrderResponse
+    public function setAmountGross(float $amountGross): OrderResponse
     {
-        $this->originalAmount = $originalAmount;
+        $this->amountGross = $amountGross;
+
+        return $this;
+    }
+
+    public function getAmountTax(): float
+    {
+        return $this->amountTax;
+    }
+
+    public function setAmountTax(float $amountTax): OrderResponse
+    {
+        $this->amountTax = $amountTax;
+
+        return $this;
+    }
+
+    public function getAmountNet(): float
+    {
+        return $this->amountNet;
+    }
+
+    public function setAmountNet(float $amountNet): OrderResponse
+    {
+        $this->amountNet = $amountNet;
 
         return $this;
     }
@@ -537,6 +570,18 @@ class OrderResponse implements ArrayableInterface
         return $this;
     }
 
+    public function getDunningStatus(): ? string
+    {
+        return $this->dunningStatus;
+    }
+
+    public function setDunningStatus(?string $dunningStatus): OrderResponse
+    {
+        $this->dunningStatus = $dunningStatus;
+
+        return $this;
+    }
+
     public function toArray(): array
     {
         return [
@@ -544,8 +589,11 @@ class OrderResponse implements ArrayableInterface
             'uuid' => $this->getUuid(),
             'state' => $this->getState(),
             'reasons' => $this->getReasons() ?: null,
-            'amount' => $this->getOriginalAmount(),
+            'amount' => $this->getAmountGross(),
+            'amount_net' => $this->getAmountNet(),
+            'amount_tax' => $this->getAmountTax(),
             'duration' => $this->getDuration(),
+            'dunning_status' => $this->getDunningStatus(),
             'debtor_company' => [
                 'name' => $this->getCompanyName(),
                 'house_number' => $this->getCompanyAddressHouseNumber(),

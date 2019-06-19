@@ -41,6 +41,8 @@ class OrderContainerRelationLoader
 
     private $orderFinancialDetailsRepository;
 
+    private $orderDunningStatusService;
+
     public function __construct(
         DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
         AddressRepositoryInterface $addressRepository,
@@ -50,7 +52,8 @@ class OrderContainerRelationLoader
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         MerchantDebtorFinancialDetailsRepositoryInterface $merchantDebtorFinancialDetailsRepository,
         CompaniesServiceInterface $companiesService,
-        OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository
+        OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
+        OrderDunningStatusService $orderDunningStatusService
     ) {
         $this->debtorExternalDataRepository = $debtorExternalDataRepository;
         $this->addressRepository = $addressRepository;
@@ -61,6 +64,7 @@ class OrderContainerRelationLoader
         $this->merchantDebtorFinancialDetailsRepository = $merchantDebtorFinancialDetailsRepository;
         $this->companyService = $companiesService;
         $this->orderFinancialDetailsRepository = $orderFinancialDetailsRepository;
+        $this->orderDunningStatusService = $orderDunningStatusService;
     }
 
     public function loadMerchantDebtor(OrderContainer $orderContainer): MerchantDebtorEntity
@@ -111,5 +115,10 @@ class OrderContainerRelationLoader
     public function loadOrderFinancialDetails(OrderContainer $orderContainer): OrderFinancialDetailsEntity
     {
         return $this->orderFinancialDetailsRepository->getCurrentByOrderId($orderContainer->getOrder()->getId());
+    }
+
+    public function loadOrderDunningStatus(OrderContainer $orderContainer): ? string
+    {
+        return $this->orderDunningStatusService->getStatus($orderContainer->getOrder()->getUuid());
     }
 }

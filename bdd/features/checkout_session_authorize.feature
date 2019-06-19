@@ -96,6 +96,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
        },
        "comment":"Some comment",
        "duration":30,
+       "dunning_status": null,
        "order_id":"A1"
     }
     """
@@ -149,6 +150,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
        },
        "comment":"Some comment",
        "duration":30,
+       "dunning_status": null,
        "order_id":"A1"
     }
     """
@@ -202,6 +204,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
        },
        "comment":"Some comment",
        "duration":30,
+       "dunning_status": null,
        "order_id":"A1"
     }
     """
@@ -256,6 +259,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
        },
        "comment":"Some comment",
        "duration":30,
+       "dunning_status": null,
        "order_id":"A1"
     }
     """
@@ -304,6 +308,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
        },
        "comment":"Some comment",
        "duration":30,
+       "dunning_status": null,
        "order_id":"A1"
     }
     """
@@ -360,6 +365,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
        },
        "comment":"Some comment",
        "duration":30,
+       "dunning_status": null,
        "order_id":"A1"
     }
     """
@@ -408,6 +414,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
        },
        "comment":"Some comment",
        "duration":30,
+       "dunning_status": null,
        "order_id":"A1"
     }
     """
@@ -461,6 +468,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
        },
        "comment":"Some comment",
        "duration":30,
+       "dunning_status": null,
        "order_id":"A1"
     }
     """
@@ -555,6 +563,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
        },
        "comment":"Some comment",
        "duration":30,
+       "dunning_status": null,
        "order_id":"A1"
     }
     """

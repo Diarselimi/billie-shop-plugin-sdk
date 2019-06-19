@@ -33,18 +33,42 @@ class Salesforce implements SalesforceInterface
                 ],
             ]);
         } catch (RequestException $exception) {
-            switch ($exception->getCode()) {
-                case Response::HTTP_UNAUTHORIZED:
-                    throw new SalesforceAuthenticationException();
-                case Response::HTTP_NOT_FOUND:
-                    throw new SalesforceOpportunityNotFoundException();
-                case Response::HTTP_FORBIDDEN:
-                    $decodedResponse = $this->decodeResponse($exception->getResponse());
+            $this->handleException($exception);
+        }
+    }
 
-                    throw new SalesforcePauseDunningException($decodedResponse['message']);
-                default:
-                    throw new SalesforceException($exception->getMessage());
+    public function getOrderDunningStatus(string $orderUuid): ? string
+    {
+        try {
+            $response = $this->client->get("/api/services/apexrest/v1/dunning/$orderUuid");
+
+            $decodedResponse = $this->decodeResponse($response);
+
+            foreach ($decodedResponse['result'] as $result) {
+                if ($orderUuid === $result['referenceUuid']) {
+                    return $result['collectionClaimStatus'];
+                }
             }
+
+            return null;
+        } catch (RequestException $exception) {
+            $this->handleException($exception);
+        }
+    }
+
+    private function handleException(RequestException $exception): void
+    {
+        switch ($exception->getCode()) {
+            case Response::HTTP_UNAUTHORIZED:
+                throw new SalesforceAuthenticationException();
+            case Response::HTTP_NOT_FOUND:
+                throw new SalesforceOpportunityNotFoundException();
+            case Response::HTTP_FORBIDDEN:
+                $decodedResponse = $this->decodeResponse($exception->getResponse());
+
+                throw new SalesforcePauseDunningException($decodedResponse['message']);
+            default:
+                throw new SalesforceException($exception->getMessage());
         }
     }
 }

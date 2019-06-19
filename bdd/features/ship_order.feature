@@ -49,6 +49,8 @@ Feature:
           "state": "shipped",
           "reasons": null,
           "amount": 1000,
+          "amount_net": 900.00,
+          "amount_tax": 100.00,
           "debtor_company": {
             "name": "Test User Company",
             "house_number": "10",
@@ -79,6 +81,7 @@ Feature:
             "merchant_customer_id":"ext_id"
          },
          "duration":30,
+         "dunning_status": null,
          "delivery_address":{
             "house_number":"test",
             "street":"test",
@@ -142,6 +145,8 @@ Feature:
           "state": "shipped",
           "reasons": null,
           "amount": 1000,
+          "amount_net": 900.00,
+          "amount_tax": 100.00,
           "debtor_company": {
             "name": "Test User Company",
             "house_number": "10",
@@ -172,6 +177,7 @@ Feature:
             "merchant_customer_id":"ext_id"
           },
             "duration":30,
+            "dunning_status": null,
             "delivery_address":{
                 "house_number":"test",
                 "street":"test",

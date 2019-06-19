@@ -52,4 +52,26 @@ class SalesforceContext implements Context
             new MockResponse(json_encode(['success' => false, 'message' => $errorMessage]), [], (int) $statusCode)
         ));
     }
+
+    /**
+     * @Given I get from salesforce dunning status endpoint :status status
+     */
+    public function iGetFromSalesforceDunningStatusEndpointStatus($status)
+    {
+        $this->mockRequest('/api/services/apexrest/v1/dunning/test123', new ResponseStack(
+            new MockResponse(
+                json_encode(
+                    [
+                        'success' => false,
+                        'message' => null,
+                        'result' => [
+                            ['referenceUuid' => 'test123', 'collectionClaimStatus' => $status],
+                        ],
+                    ]
+                ),
+                [],
+                200
+            )
+        ));
+    }
 }

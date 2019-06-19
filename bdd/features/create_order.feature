@@ -95,6 +95,8 @@ Feature:
           "debtor_not_identified"
        ],
        "amount":1000.00,
+       "amount_net": 900.00,
+       "amount_tax": 100.00,
        "debtor_company":{
           "name":null,
           "house_number":null,
@@ -125,6 +127,7 @@ Feature:
           "merchant_customer_id":"12"
        },
        "duration":30,
+       "dunning_status": null,
        "shipped_at":null,
        "delivery_address":{
           "house_number":"22",
@@ -197,6 +200,8 @@ Feature:
       "state":"created",
       "reasons":null,
       "amount":1000.00,
+      "amount_net": 900.00,
+      "amount_tax": 100.00,
       "debtor_company":{
         "name":"Test User Company",
         "house_number":"10",
@@ -227,6 +232,7 @@ Feature:
         "merchant_customer_id":"12"
      },
      "duration":30,
+     "dunning_status": null,
      "shipped_at":null,
      "delivery_address":{
         "house_number":"22",
@@ -300,6 +306,8 @@ Feature:
       "state":"created",
       "reasons":null,
       "amount":1000.00,
+      "amount_net": 900.00,
+      "amount_tax": 100.00,
       "debtor_company":{
         "name":"Test User Company",
         "house_number":"10",
@@ -330,6 +338,7 @@ Feature:
         "merchant_customer_id":"12"
       },
       "duration":30,
+      "dunning_status": null,
       "shipped_at":null,
       "delivery_address":{
         "house_number":"22",
@@ -403,6 +412,8 @@ Feature:
       "state":"created",
       "reasons":null,
       "amount":43.3,
+      "amount_net": 33.2,
+      "amount_tax": 10.10,
       "debtor_company":{
         "name":"Test User Company",
         "house_number":"10",
@@ -433,6 +444,7 @@ Feature:
         "merchant_customer_id":"12"
        },
        "duration":30,
+       "dunning_status": null,
        "shipped_at":null,
        "delivery_address":{
           "house_number":null,
@@ -507,6 +519,8 @@ Feature:
       "state":"created",
       "reasons":null,
       "amount":1000.00,
+      "amount_net": 900.00,
+      "amount_tax": 100.00,
       "debtor_company":{
         "name":"Test User Company",
         "house_number":"10",
@@ -537,6 +551,7 @@ Feature:
         "merchant_customer_id":"12"
        },
        "duration":30,
+       "dunning_status": null,
        "shipped_at":null,
        "delivery_address":{
           "house_number":"22",
@@ -608,6 +623,8 @@ Feature:
           "risk_policy"
        ],
        "amount":1000.00,
+       "amount_net": 900.00,
+       "amount_tax": 100.00,
        "debtor_company":{
           "name":"Test User Company",
           "house_number":"10",
@@ -638,6 +655,7 @@ Feature:
           "merchant_customer_id":"12"
        },
        "duration":30,
+       "dunning_status": null,
        "shipped_at":null,
        "delivery_address":{
           "house_number":"22",
