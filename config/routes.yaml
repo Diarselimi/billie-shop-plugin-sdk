@@ -50,8 +50,3 @@ whitelist_merchant_debtor:
   path: /merchant/{merchantId}/merchant-debtor/{merchantDebtorExternalId}/whitelist
   controller: App\Http\Controller\UpdateMerchantDebtorWhitelistController::execute
   methods: [PUT]
-
-pause_order_dunning:
-  path: /order/{id}/pause-dunning
-  controller: App\Http\Controller\PauseOrderDunningController::execute
-  methods: [POST]

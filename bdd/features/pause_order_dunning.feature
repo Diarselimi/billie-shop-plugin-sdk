@@ -6,7 +6,7 @@ Feature: As a merchant, i should be able to request pause dunning of an order fo
 	And I add "X-Api-Key" header equal to test
 
   Scenario: Request pause dunning for not existing order
-	And I send a POST request to "/order/wrongOrderCode/pause-dunning" with body:
+	And I send a POST request to "/public/order/wrongOrderCode/pause-dunning" with body:
 	"""
 	  {
 		  "number_of_days": 10
@@ -85,4 +85,4 @@ Feature: As a merchant, i should be able to request pause dunning of an order fo
 		  "number_of_days": 10
 	  }
 	"""
-	Then the response status code should be 200
+	Then the response status code should be 204

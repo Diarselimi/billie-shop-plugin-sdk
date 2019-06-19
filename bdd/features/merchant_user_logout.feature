@@ -20,6 +20,6 @@ Feature: Enable merchant users to logout
 	And I get from Oauth service a valid user token
 	And I get from Oauth service revoke token endpoint a successful response
 	And I add "Authorization" header equal to "Bearer SomeTokenHere"
-	When I send a POST request to "/merchant/user/logout"
+	When I send a POST request to "/public/merchant/user/logout"
 	Then the response status code should be 200
 	And the response should be empty

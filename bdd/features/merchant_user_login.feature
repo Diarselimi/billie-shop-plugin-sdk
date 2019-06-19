@@ -5,7 +5,7 @@ Feature: Enable merchant users to login
 	And I add "X-Test" header equal to 1
 
   Scenario: Invalid request
-	When I send a POST request to "/merchant/user/login" with body:
+	When I send a POST request to "/public/merchant/user/login" with body:
 	"""
 	  {
 		"email": "d",

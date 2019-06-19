@@ -11,7 +11,7 @@ Feature: Retrieve and search all orders of a merchant
 	Given I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
 	And I get from companies service get debtor response
 	And I get from payments service get debtor response
-	When I send a GET request to "/orders"
+	When I send a GET request to "/public/orders"
 	Then the response status code should be 200
 	And the JSON response should be:
 	"""

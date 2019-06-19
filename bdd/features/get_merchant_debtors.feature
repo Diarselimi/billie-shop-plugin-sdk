@@ -11,7 +11,7 @@ Feature:
         And I have a created order "XF43Y" with amounts 800/800/0, duration 30 and comment "test order"
         And I get from payments service get debtor response
         And I get from companies service get debtor response
-        When I send a GET request to "/debtors"
+        When I send a GET request to "/public/debtors"
         Then the response status code should be 200
         And the JSON response should be:
         """
