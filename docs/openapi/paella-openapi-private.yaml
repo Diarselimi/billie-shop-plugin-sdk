@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: 'Billie - PaD-Core API Documentation'
+  title: 'Billie - PaD API Documentation (private)'
   description: |
     # Introduction
     
@@ -68,17 +68,11 @@ info:
   license:
     name: '© Billie GmbH, 2019'
     url: 'https://www.billie.io/agb/'
-  version: 1.11.0
+  version: 1.12.0-7-g8254e3e
   x-logo:
     url: 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDIyLjAuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkViZW5lXzJfS29waWUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIKCSB5PSIwcHgiIHZpZXdCb3g9IjAgMCA0OC41IDY3LjYiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDQ4LjUgNjcuNjsiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPgoJLnN0MHtkaXNwbGF5Om5vbmU7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDo3O3N0cm9rZS1taXRlcmxpbWl0OjEwO30KCS5zdDF7ZmlsbDojMUYyNTMwO30KCS5zdDJ7ZmlsbDpub25lO30KCS5zdDN7ZGlzcGxheTpub25lO2VuYWJsZS1iYWNrZ3JvdW5kOm5ldyAgICA7fQoJLnN0NHtmb250LWZhbWlseTonQXZlbmlyTmV4dC1EZW1pQm9sZCc7fQoJLnN0NXtmb250LXNpemU6My4wMzAzcHg7fQoJLnN0NntsZXR0ZXItc3BhY2luZzoyO30KPC9zdHlsZT4KPHBhdGggY2xhc3M9InN0MCIgZD0iTTkuOCw0Ni4xYy0wLjUsMCwyNS4xLTEyLjYsMjUuMS0zMi43YzAtNi45LTUuNi0xMi42LTEyLjYtMTIuNlM5LjcsNi41LDkuNywxMy40TDkuOCw0Ni4xaDE4LjUKCWM2LjksMCwxMi42LTUuNiwxMi42LTEyLjZTMzUuMiwyMSwyOC4yLDIxSDkuNyIvPgo8Zz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0yOC4yLDQ3SDguOHYtMC44YzAtMC4xLDAtMC4yLDAtMC4zVjEzLjVDOC44LDYsMTQuOSwwLDIyLjMsMHMxMy41LDYsMTMuNSwxMy41YzAsMi44LTAuNSw1LjUtMS40LDguMgoJCWM0LjMsMi4yLDcuMyw2LjcsNy4zLDExLjlDNDEuNyw0MSwzNS42LDQ3LDI4LjIsNDd6IE0xMi45LDQ1LjJoMTUuM2M2LjQsMCwxMS43LTUuMywxMS43LTExLjdjMC00LjQtMi41LTguMy02LjEtMTAuMwoJCWMtMS44LDQuNC00LjgsOC43LTksMTIuOEMyMC40LDQwLjQsMTUuOCw0My41LDEyLjksNDUuMnogTTEwLjYsMjEuOXYyMi43YzEzLTcuNywxOC45LTE1LjYsMjEuNS0yMmMtMS4yLTAuNC0yLjUtMC43LTMuOS0wLjdIMTAuNgoJCXogTTEwLjYsMjAuMWgxNy42YzEuNiwwLDMuMSwwLjMsNC41LDAuOGMxLTIuOSwxLjMtNS41LDEuMy03LjRDMzQsNywyOC44LDEuOCwyMi4zLDEuOFMxMC42LDcsMTAuNiwxMy41VjIwLjF6Ii8+CjwvZz4KPHJlY3QgeD0iLTExLjEiIHk9Ii01OC43IiBjbGFzcz0ic3QyIiB3aWR0aD0iODUuNCIgaGVpZ2h0PSI0OS41Ii8+Cjx0ZXh0IHRyYW5zZm9ybT0ibWF0cml4KDEgMCAwIDEgLTEuMDQyNCA2Ny41NzcyKSIgY2xhc3M9InN0MyBzdDQgc3Q1IHN0NiI+QklMTElFPC90ZXh0Pgo8Zz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0wLDU4LjFoMy43YzAuNCwwLDAuNywwLjEsMS4xLDAuMWMwLjQsMC4xLDAuNywwLjIsMC45LDAuNGMwLjMsMC4yLDAuNSwwLjQsMC43LDAuN2MwLjIsMC4zLDAuMywwLjcsMC4zLDEuMQoJCWMwLDAuNS0wLjIsMS0wLjUsMS4zYy0wLjMsMC40LTAuNywwLjYtMS4yLDAuOHYwYzAuNiwwLjEsMS4xLDAuMywxLjUsMC43QzYuOCw2My42LDcsNjQuMiw3LDY0LjhjMCwwLjUtMC4xLDEtMC4zLDEuMwoJCWMtMC4yLDAuNC0wLjUsMC42LTAuOCwwLjljLTAuMywwLjItMC43LDAuNC0xLjIsMC41Yy0wLjQsMC4xLTAuOSwwLjItMS4zLDAuMkgwQzAsNjcuNiwwLDU4LjEsMCw1OC4xeiBNMS43LDYyaDEuNQoJCWMwLjYsMCwxLTAuMSwxLjMtMC4zYzAuMy0wLjIsMC40LTAuNSwwLjQtMWMwLTAuNC0wLjItMC43LTAuNS0wLjljLTAuMy0wLjItMC44LTAuMy0xLjQtMC4zSDEuN0wxLjcsNjJMMS43LDYyeiBNMS43LDY2LjFoMS41CgkJYzAuMiwwLDAuNSwwLDAuNy0wLjFzMC41LTAuMSwwLjctMC4yYzAuMi0wLjEsMC40LTAuMywwLjUtMC40YzAuMS0wLjIsMC4yLTAuNCwwLjItMC44YzAtMC41LTAuMi0wLjktMC41LTEKCQljLTAuMy0wLjItMC45LTAuMy0xLjUtMC4zSDEuN1Y2Ni4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTExLjEsNTguMWgxLjd2OS41aC0xLjdWNTguMXoiLz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0xNy4zLDU4LjFoMS43djhoNHYxLjVoLTUuN1Y1OC4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTI2LjUsNTguMWgxLjd2OGg0djEuNWgtNS43TDI2LjUsNTguMUwyNi41LDU4LjF6Ii8+Cgk8cGF0aCBjbGFzcz0ic3QxIiBkPSJNMzUuNyw1OC4xaDEuN3Y5LjVoLTEuN1Y1OC4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTQxLjksNTguMWg2LjN2MS41aC00LjZWNjJINDh2MS40aC00LjNWNjZoNC44djEuNWgtNi41VjU4LjF6Ii8+CjwvZz4KPC9zdmc+Cg=='
     href: '#'
 servers:
-  -
-    url: 'https://paella-sandbox.billie.io/api/v1'
-    description: 'Test Sandbox'
-  -
-    url: 'https://paella.billie.io/api/v1'
-    description: Production
   -
     url: 'http://paella.dev.ozean12.com'
     description: 'Local VM'
@@ -94,9 +88,7 @@ servers:
 paths:
   /healthcheck:
     get:
-      tags:
-        - Miscellaneous
-      summary: 'Get API Status'
+      summary: 'API Status'
       description: 'Check the status of the API server.'
       operationId: api_status
       responses:
@@ -377,195 +369,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        default:
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-        -
-          apiKey: []
-  '/checkout-session/{sessionUuid}/authorize':
-    put:
-      tags:
-        - 'Checkout API'
-      summary: 'Authorize Checkout Session'
-      description: 'Authorizes an existing checkout session, completing all missing order data.'
-      operationId: checkout_session_authorize
-      parameters:
-        -
-          name: sessionUuid
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/UUID'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateOrderRequest'
-      responses:
-        '201':
-          description: 'Order was created, but a confirmation is needed.'
-        '400':
-          description: 'Invalid request data or order declined.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CheckoutAuthorizeErrorObject'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/ServerError'
-  '/order/{id}/cancel':
-    post:
-      tags:
-        - 'Orders API'
-      summary: 'Cancel Order'
-      description: 'This call initiates a full order cancellation.'
-      operationId: order_cancel
-      parameters:
-        -
-          name: id
-          in: path
-          description: 'Order ID or UUID'
-          required: true
-          schema:
-            type: integer
-      responses:
-        '204':
-          description: 'Order cancelled.'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        default:
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-        -
-          apiKey: []
-  '/checkout-session/{sessionUuid}/confirm':
-    put:
-      tags:
-        - 'Checkout API'
-      summary: 'Confirm Checkout Session'
-      description: 'Confirms the creation of an existing checkout session.'
-      operationId: checkout_session_confirm
-      parameters:
-        -
-          name: sessionUuid
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/UUID'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CheckoutSessionConfirmOrderRequest'
-      responses:
-        '202':
-          description: 'Order successfully created and accepted'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        default:
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-        -
-          apiKey: []
-  '/order/{id}/confirm-payment':
-    post:
-      tags:
-        - 'Orders API'
-      summary: 'Confirm Order Payment'
-      description: |
-        This endpoint needs to be called if a customer is accidentally paying the purchase amount 
-        directly to the merchant. (See usage of virtual IBANs).
-      operationId: order_payment_confirm
-      parameters:
-        -
-          name: id
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/TinyText'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              properties:
-                amount:
-                  type: number
-                  format: float
-                  minimum: 0.1
-              type: object
-      responses:
-        '204':
-          description: 'Order payment successfully confirmed'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        default:
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-        -
-          apiKey: []
-  /checkout-session:
-    post:
-      tags:
-        - 'Checkout API'
-      summary: 'Create Checkout Session'
-      description: 'Initializes a new Billie Checkout session for the given customer.'
-      operationId: checkout_session_create
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              properties:
-                merchant_customer_id:
-                  description: 'Debtor ID in the merchant system.'
-                  $ref: '#/components/schemas/TinyText'
-              type: object
-      responses:
-        '200':
-          description: 'Order payment successfully confirmed.'
-          content:
-            application/json:
-              schema:
-                required:
-                  - id
-                properties:
-                  id: { description: 'Checkout Session Token', $ref: '#/components/schemas/UUID' }
-                type: object
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
+        '500':
           $ref: '#/components/responses/ServerError'
       security:
         -
@@ -601,50 +405,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AbstractErrorObject'
-        default:
+        '500':
           $ref: '#/components/responses/ServerError'
-  /order:
-    post:
-      tags:
-        - 'Orders API'
-      summary: 'Create Order'
-      description: |
-        Authorization of order financing requests.
-        
-        Provide with this endpoint relevant information about the customer and the respective purchase to understand if
-        Billie can offer financing for this transaction.
-        
-        The decision whether or not Billie can accept a specific order is made on a single transaction basis.
-        Therefore, orders need to be created to represent a specific transaction for the merchant.
-      operationId: order_create
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateOrderRequest'
-      responses:
-        '201':
-          description: 'Merchant successfully created'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-        -
-          apiKey: []
   '/merchant/{merchantId}/order/{id}/invoice':
     post:
       tags:
-        - 'Internal API (for Services)'
+        - 'Internal API for Services'
       summary: 'Create Order Invoice'
       description: 'Creates a new invoice, linking an order with a file. Called by the invoice uploader Lambda services.'
       operationId: order_create_invoice
@@ -688,7 +454,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
-        default:
+        '500':
           $ref: '#/components/responses/ServerError'
       security:
         -
@@ -717,7 +483,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        default:
+        '500':
           $ref: '#/components/responses/ServerError'
       security:
         -
@@ -749,40 +515,7 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
-        default:
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-        -
-          apiKey: []
-  '/debtor/{uuid}':
-    get:
-      tags:
-        - 'Dashboard API'
-      summary: 'Get Debtor Details'
-      operationId: debtor_get_details
-      parameters:
-        -
-          name: uuid
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/UUID'
-      responses:
-        '200':
-          description: 'Debtor Info'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MerchantDebtorResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
+        '500':
           $ref: '#/components/responses/ServerError'
       security:
         -
@@ -819,194 +552,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
-        default:
+        '500':
           $ref: '#/components/responses/ServerError'
-  /debtors:
-    get:
-      tags:
-        - 'Dashboard API'
-      summary: 'Get Debtors'
-      operationId: debtors_get
-      parameters:
-        -
-          name: sort_by
-          in: query
-          required: false
-          schema:
-            type: string
-            default: 'created_at,desc'
-            enum:
-              - created_at
-              - 'created_at,desc'
-              - 'created_at,asc'
-              - external_code
-              - 'external_code,desc'
-              - 'external_code,asc'
-        -
-          name: offset
-          in: query
-          required: false
-          schema:
-            type: integer
-            minimum: 0
-        -
-          name: limit
-          in: query
-          required: false
-          schema:
-            type: integer
-            maximum: 100
-            minimum: 1
-        -
-          name: search
-          in: query
-          description: 'Search text. Filters search results by: `external_code`.'
-          required: false
-          schema:
-            $ref: '#/components/schemas/TinyText'
-      responses:
-        '200':
-          description: 'Debtor results'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MerchantDebtorListResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-        -
-          apiKey: []
-  '/order/{id}':
-    get:
-      tags:
-        - 'Orders API'
-        - 'Dashboard API'
-      summary: 'Get Order Details'
-      description: |
-        Retrieves information about an order.
-        
-        Get relevant information about an order (e.g. in order to understand, if a specific order was already repaid 
-        by your customer).
-      operationId: order_get_details
-      parameters:
-        -
-          name: id
-          in: path
-          description: 'Order external code or UUID'
-          required: true
-          schema:
-            oneOf:
-              -
-                $ref: '#/components/schemas/UUID'
-              -
-                type: string
-      responses:
-        '200':
-          description: 'Order Info'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-        -
-          apiKey: []
-  /orders:
-    get:
-      tags:
-        - 'Orders API'
-        - 'Dashboard API'
-      summary: 'Get Orders'
-      operationId: orders_get
-      parameters:
-        -
-          name: sort_by
-          in: query
-          required: false
-          schema:
-            type: string
-            default: 'created_at,desc'
-            enum:
-              - created_at
-              - 'created_at,desc'
-              - 'created_at,asc'
-              - external_code
-              - 'external_code,desc'
-              - 'external_code,asc'
-              - amount_gross
-              - 'amount_gross,desc'
-              - 'amount_gross,asc'
-              - state
-              - 'state,desc'
-              - 'state,asc'
-        -
-          name: offset
-          in: query
-          required: false
-          schema:
-            type: integer
-            minimum: 0
-        -
-          name: limit
-          in: query
-          required: false
-          schema:
-            type: integer
-            maximum: 100
-            minimum: 1
-        -
-          name: search
-          in: query
-          description: 'Search text. Filters search results by: `external_code`, `uuid` or `invoice_number`.'
-          required: false
-          schema:
-            $ref: '#/components/schemas/TinyText'
-        -
-          name: filters
-          in: query
-          required: false
-          style: deepObject
-          schema:
-            properties:
-              merchant_debtor_id:
-                $ref: '#/components/schemas/UUID'
-            type: object
-      responses:
-        '200':
-          description: 'Order results'
-          content:
-            application/json:
-              schema:
-                properties:
-                  total: { type: integer, minimum: 0 }
-                  items: { type: array, items: { $ref: '#/components/schemas/OrderResponse' } }
-                type: object
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-        -
-          apiKey: []
 components:
   schemas:
     UUID:
@@ -1039,6 +586,16 @@ components:
         - debtor_address
         - debtor_limit_exceeded
       example: debtor_not_identified
+    OrderDunningStatus:
+      title: 'Order Dunning Status'
+      type: string
+      enum:
+        - not_started
+        - active
+        - paused
+        - inactive
+      example: active
+      nullable: true
     OrderDuration:
       title: 'Order Duration'
       type: integer
@@ -1430,6 +987,77 @@ components:
         country:
           $ref: '#/components/schemas/CountryCode'
       type: object
+    MerchantUserLoginRequest:
+      title: 'Merchant User Login'
+      properties:
+        email:
+          type: string
+          format: email
+          nullable: false
+        password:
+          type: string
+          format: password
+          nullable: false
+      type: object
+    MerchantUserLoginResponse:
+      title: 'Merchant User Login Response'
+      properties:
+        access_token:
+          type: string
+          example: l387435hzyoc0oo4kokow
+          nullable: false
+        roles:
+          type: array
+          items:
+            type: string
+            example: ROLE_USER
+      type: object
+    PauseOrderDunningRequest:
+      title: 'Pause Order Dunning'
+      properties:
+        number_of_days:
+          type: integer
+          minimum: 1
+          nullable: false
+      type: object
+    ShipOrderRequest:
+      title: 'Order Shipping Object'
+      properties:
+        external_order_id:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        invoice_number:
+          $ref: '#/components/schemas/TinyText'
+        invoice_url:
+          $ref: '#/components/schemas/TinyText'
+        proof_of_delivery_url:
+          $ref: '#/components/schemas/TinyText'
+      type: object
+    UpdateOrderRequest:
+      title: 'Order Update Object'
+      properties:
+        duration:
+          $ref: '#/components/schemas/OrderDuration'
+        amount_net:
+          type: number
+          format: float
+          minimum: 1
+          example: 119
+        amount_gross:
+          type: number
+          format: float
+          minimum: 1
+          example: 100
+        amount_tax:
+          type: number
+          format: float
+          minimum: 1
+          example: 19
+        invoice_number:
+          $ref: '#/components/schemas/TinyText'
+        invoice_url:
+          $ref: '#/components/schemas/TinyText'
+      type: object
     MerchantEntity:
       properties:
         id:
@@ -1577,10 +1205,22 @@ components:
           type: number
           format: float
           example: 123.45
-          nullable: true
+          nullable: false
+        amount_tax:
+          type: number
+          format: float
+          example: 123.45
+          nullable: false
+        amount_net:
+          type: number
+          format: float
+          example: 123.45
+          nullable: false
         duration:
           example: 30
           $ref: '#/components/schemas/OrderDuration'
+        dunning_status:
+          $ref: '#/components/schemas/OrderDunningStatus'
         debtor_company:
           description: 'Identified company'
           properties:
@@ -1756,53 +1396,8 @@ components:
       in: header
 tags:
   -
-    name: 'Orders API'
-    description: |
-      ## Order States
-      
-      | State       | Description                                                                                   |
-      |-------------|-----------------------------------------------------------------------------------------------|
-      | waiting     | The order creation failed and needs a manual operation in order to be approved or declined    |
-      | authorized  | The order is valid but it needs a confirmation from the merchant in order to be approved      |
-      | created     | The order is successfully approved and Billie can offer financing for this transaction        |
-      | declined    | The order was declined and no financing is offered for this transaction                       |
-      | shipped     | The order was successfully shipped by the merchant                                            |
-      | paid_out    | The outstanding amount for the respective order was successfully paid out to the merchant     |
-      | late        | The payment of the outstanding amount is overdue                                              |
-      | complete    | The outstanding amount was successfully paid back by the customer                             |
-      | canceled    | The order was canceled by the merchant       
-      
-      ## Order State Transitions
-      
-      ![transitions-diagram.png](data:image/png;base64,)
-      
-      ## Order Decline Reasons
-      
-      An order could be declined by any of these reasons:
-      
-      | Reason                | Description                                               |
-      |-----------------------|-----------------------------------------------------------|
-      | debtor_address        | Debtor address or name mismatch                           |
-      | debtor_not_identified | Debtor could not be identified with the information given |
-      | risk_policy           | Risk decline                                              |
-      | debtor_limit_exceeded | Financing limit of debtor currently exceeded              |
-      
-      
-      ## Usage of Virtual IBANs
-      
-      Since the money gets paid out to the merchant directly after shipment of the product or delivery of the agreed service, 
-      customers need to transfer the money directly to Billie when their invoice is due. Therefore Billie is using virtual IBANs 
-      that are delivered back to the merchant as an answer of a API order creation request. Virtual IBANs are unique for each of 
-      your debtor / customer. The virtual IBAN needs to be put on the invoice which the customer receives for the purchase.
-  -
-    name: 'Checkout API'
-  -
-    name: 'Dashboard API'
-  -
     name: 'OAuth API'
-  -
-    name: Miscellaneous
   -
     name: 'Internal API'
   -
-    name: 'Internal API (for Services)'
+    name: 'Internal API for Services'

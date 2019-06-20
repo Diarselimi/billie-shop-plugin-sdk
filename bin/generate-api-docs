@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+bin/redoc-bundle public "${@}"
+bin/redoc-bundle private "${@}"

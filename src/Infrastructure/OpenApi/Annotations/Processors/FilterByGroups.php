@@ -38,17 +38,28 @@ class FilterByGroups implements ProcessorInterface
         $this->filterFromList($analysis->openapi->components->callbacks);
         $this->filterFromList($analysis->openapi->components->links);
         $this->filterFromList($analysis->openapi->components->examples);
+        $this->filterXGroups($ext);
+    }
 
-        if (is_array($analysis->openapi->x) && isset($analysis->openapi->x['tagGroups'])) {
-            foreach ($analysis->openapi->x['tagGroups'] as $i => $tagGroup) {
-                if (isset($tagGroup['groups']) && is_array($tagGroup['groups']) && $this->isFilteredOut($tagGroup['groups'])) {
-                    unset($analysis->openapi->x['tagGroups'][$i]);
-                }
-                if (isset($tagGroup['groups'])) {
-                    unset($analysis->openapi->x['tagGroups'][$i]['groups']);
-                }
+    private function filterXGroups(&$ext)
+    {
+        if (!is_array($ext) && !isset($ext['tagGroups'])) {
+            return;
+        }
+        foreach ($ext['tagGroups'] as $i => $tagGroup) {
+            if (isset($tagGroup['groups'])
+                && is_array($tagGroup['groups'])
+                && $this->isFilteredOut($tagGroup['groups'])
+            ) {
+                unset($ext['tagGroups'][$i]);
+
+                continue;
+            }
+            if (isset($tagGroup['groups'])) {
+                unset($ext['tagGroups'][$i]['groups']);
             }
         }
+        $ext['tagGroups'] = array_values($ext['tagGroups']);
     }
 
     private function filterFromList(&$node)
@@ -56,7 +67,11 @@ class FilterByGroups implements ProcessorInterface
         if ($node === UNDEFINED || !is_array($node)) {
             return;
         }
+        $isNumericIndexed = true;
+
         foreach ($node as $i => $item) {
+            $isNumericIndexed = $isNumericIndexed && is_numeric($i);
+
             if ($this->isFilteredOut($item)) {
                 unset($node[$i]);
 
@@ -69,6 +84,10 @@ class FilterByGroups implements ProcessorInterface
             }
 
             continue;
+        }
+
+        if ($isNumericIndexed) {
+            $node = array_values($node);
         }
     }
 

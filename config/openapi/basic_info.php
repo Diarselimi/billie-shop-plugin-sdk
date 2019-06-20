@@ -11,8 +11,7 @@ use OpenApi\Annotations as OA;
  * @OA\Get(
  *     path="/healthcheck",
  *     operationId="api_status",
- *     tags={"Miscellaneous"},
- *     summary="Get API Status",
+ *     summary="API Status",
  *     @OA\Response(
  *          response=200,
  *          description="Successful",
