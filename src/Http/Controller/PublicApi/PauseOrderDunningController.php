@@ -38,7 +38,12 @@ use OpenApi\Annotations as OA;
  *     @OA\Response(response=204, description="Successfully paused order dunning"),
  *     @OA\Response(response=404, ref="#/components/responses/NotFound"),
  *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
- *     @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+ *     @OA\Response(response=403, description="Pause order dunning is not allowed", @OA\JsonContent(
+ *          type="object",
+ *          properties={
+ *              @OA\Property(property="error", type="string", description="Error message", example="maximum pausing attempts reached")
+ *          }
+ *     )),
  *     @OA\Response(response=500, ref="#/components/responses/ServerError")
  * )
  */

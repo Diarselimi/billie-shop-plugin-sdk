@@ -173,7 +173,7 @@ class PaellaCoreContext extends MinkContext
             ->setHouseNumber('test')
             ->setStreet('test')
             ->setPostalCode('test')
-            ->setCity('test22')
+            ->setCity('testCity')
             ->setCountry('TE');
         $this->getAddressRepository()->insert($debtorAddress);
 

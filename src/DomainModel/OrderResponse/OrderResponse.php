@@ -44,6 +44,7 @@ use OpenApi\Annotations as OA;
  *          @OA\Property(property="merchant_customer_id", ref="#/components/schemas/TinyText", example="C-10123456789"),
  *          @OA\Property(property="name", ref="#/components/schemas/TinyText", example="Billie G.m.b.H."),
  *          @OA\Property(property="address_country", type="string", maxLength=2, example="DE"),
+ *          @OA\Property(property="address_city", ref="#/components/schemas/TinyText", example="Berlin"),
  *          @OA\Property(property="address_postal_code", type="string", maxLength=5, example="10969"),
  *          @OA\Property(property="address_street", ref="#/components/schemas/TinyText", example="Charlotten Straße"),
  *          @OA\Property(property="address_house", ref="#/components/schemas/TinyText", example="4"),
@@ -89,6 +90,8 @@ class OrderResponse implements ArrayableInterface
     private $debtorExternalDataCompanyName;
 
     private $debtorExternalDataAddressCountry;
+
+    private $debtorExternalDataAddressCity;
 
     private $debtorExternalDataAddressPostalCode;
 
@@ -290,6 +293,18 @@ class OrderResponse implements ArrayableInterface
     public function setDebtorExternalDataAddressCountry(string $debtorExternalDataAddressCountry): OrderResponse
     {
         $this->debtorExternalDataAddressCountry = $debtorExternalDataAddressCountry;
+
+        return $this;
+    }
+
+    public function getDebtorExternalDataAddressCity(): string
+    {
+        return $this->debtorExternalDataAddressCity;
+    }
+
+    public function setDebtorExternalDataAddressCity(string $debtorExternalDataAddressCity): OrderResponse
+    {
+        $this->debtorExternalDataAddressCity = $debtorExternalDataAddressCity;
 
         return $this;
     }
@@ -618,6 +633,7 @@ class OrderResponse implements ArrayableInterface
                 'merchant_customer_id' => $this->getDebtorExternalDataCustomerId(),
                 'name' => $this->getDebtorExternalDataCompanyName(),
                 'address_country' => $this->getDebtorExternalDataAddressCountry(),
+                'address_city' => $this->getDebtorExternalDataAddressCity(),
                 'address_postal_code' => $this->getDebtorExternalDataAddressPostalCode(),
                 'address_street' => $this->getDebtorExternalDataAddressStreet(),
                 'address_house' => $this->getDebtorExternalDataAddressHouse(),

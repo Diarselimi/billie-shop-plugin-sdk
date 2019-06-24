@@ -42,6 +42,7 @@ class OrderResponseFactory
             ->setAmountNet($orderContainer->getOrderFinancialDetails()->getAmountNet())
             ->setAmountTax($orderContainer->getOrderFinancialDetails()->getAmountTax())
             ->setDebtorExternalDataAddressCountry($orderContainer->getDebtorExternalDataAddress()->getCountry())
+            ->setDebtorExternalDataAddressCity($orderContainer->getDebtorExternalDataAddress()->getCity())
             ->setDebtorExternalDataAddressPostalCode($orderContainer->getDebtorExternalDataAddress()->getPostalCode())
             ->setDebtorExternalDataAddressStreet($orderContainer->getDebtorExternalDataAddress()->getStreet())
             ->setDebtorExternalDataAddressHouse($orderContainer->getDebtorExternalDataAddress()->getHouseNumber())

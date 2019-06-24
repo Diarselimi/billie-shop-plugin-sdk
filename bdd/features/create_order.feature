@@ -120,6 +120,7 @@ Feature:
        "debtor_external_data":{
           "name":"billie GmbH",
           "address_country":"DE",
+          "address_city": "Berlin",
           "address_postal_code":"12345",
           "address_street":"c\/Velarus",
           "address_house":"33",
@@ -225,6 +226,7 @@ Feature:
       "debtor_external_data":{
         "name":"Test User Company",
         "address_country":"DE",
+        "address_city": "Berlin",
         "address_postal_code":"10179",
         "address_street":"Heinrich-Heine-Platz",
         "address_house":"10",
@@ -331,6 +333,7 @@ Feature:
       "debtor_external_data":{
         "name":"Test User Company",
         "address_country":"DE",
+        "address_city": "Berlin",
         "address_postal_code":"10179",
         "address_street":"Heinrich-Heine-Platz",
         "address_house":"10",
@@ -437,6 +440,7 @@ Feature:
       "debtor_external_data":{
         "name":"Test User Company",
         "address_country":"DE",
+        "address_city": "Berlin",
         "address_postal_code":"10179",
         "address_street":"Heinrich-Heine-Platz",
         "address_house":"10",
@@ -544,6 +548,7 @@ Feature:
       "debtor_external_data":{
         "name":"Test User Company",
         "address_country":"DE",
+        "address_city": "Berlin",
         "address_postal_code":"10179",
         "address_street":"Heinrich-Heine-Platz",
         "address_house":"10",
@@ -648,6 +653,7 @@ Feature:
        "debtor_external_data":{
           "name":"Test User Company",
           "address_country":"DE",
+          "address_city": "Berlin",
           "address_postal_code":"10179",
           "address_street":"Heinrich-Heine-Platz",
           "address_house":"10",

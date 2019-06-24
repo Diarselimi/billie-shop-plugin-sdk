@@ -50,6 +50,7 @@ Feature: Retrieve and search all orders of a merchant
 			 "debtor_external_data":{
 				"name":"test",
 				"address_country":"TE",
+				"address_city": "testCity",
 				"address_postal_code":"test",
 				"address_street":"test",
 				"address_house":"test",
@@ -114,6 +115,7 @@ Feature: Retrieve and search all orders of a merchant
 			 "debtor_external_data":{
 				"name":"test",
 				"address_country":"TE",
+				"address_city": "testCity",
 				"address_postal_code":"test",
 				"address_street":"test",
 				"address_house":"test",
@@ -178,6 +180,7 @@ Feature: Retrieve and search all orders of a merchant
 			 "debtor_external_data":{
 				"name":"test",
 				"address_country":"TE",
+				"address_city": "testCity",
 				"address_postal_code":"test",
 				"address_street":"test",
 				"address_house":"test",
@@ -280,6 +283,7 @@ Feature: Retrieve and search all orders of a merchant
 			 "debtor_external_data":{
 				"name":"test",
 				"address_country":"TE",
+				"address_city": "testCity",
 				"address_postal_code":"test",
 				"address_street":"test",
 				"address_house":"test",

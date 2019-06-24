@@ -56,6 +56,7 @@ Feature:
         "debtor_external_data": {
             "name": "test",
             "address_country": "TE",
+            "address_city": "testCity",
             "address_postal_code": "test",
             "address_street": "test",
             "address_house": "test",
@@ -115,6 +116,7 @@ Feature:
         "debtor_external_data": {
             "name": "test",
             "address_country": "TE",
+            "address_city": "testCity",
             "address_postal_code": "test",
             "address_street": "test",
             "address_house": "test",
@@ -179,6 +181,7 @@ Feature:
             "merchant_customer_id": "ext_id",
             "name": "test",
             "address_country": "TE",
+            "address_city": "testCity",
             "address_postal_code": "test",
             "address_street": "test",
             "address_house": "test",
