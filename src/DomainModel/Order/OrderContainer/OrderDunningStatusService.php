@@ -11,7 +11,7 @@ class OrderDunningStatusService
         null => 'not_started',
         'created' => 'active',
         'paused' => 'paused',
-        'fully Paid' => 'inactive',
+        'fully_paid' => 'inactive',
         'archived' => 'inactive',
         'unpaid' => 'active',
     ];
@@ -31,6 +31,6 @@ class OrderDunningStatusService
             $status = null;
         }
 
-        return self::STATUS_MAPPING[strtolower($status)] ?? null;
+        return self::STATUS_MAPPING[str_replace(' ', '_', strtolower($status))] ?? null;
     }
 }
