@@ -35,6 +35,17 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Schema(
+ *     schema="OrderDunningStatus",
+ *     title="Order Dunning Status",
+ *     type="string",
+ *     nullable=true,
+ *     enum={"not_started", "active", "paused", "inactive"},
+ *     example="active"
+ * )
+ */
+
+/**
+ * @OA\Schema(
  *     schema="OrderDuration",
  *     title="Order Duration",
  *     type="integer",

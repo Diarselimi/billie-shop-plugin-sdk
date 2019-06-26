@@ -11,8 +11,11 @@ use OpenApi\Annotations as OA;
  *      @OA\Property(property="uuid", ref="#/components/schemas/UUID"),
  *      @OA\Property(property="state", ref="#/components/schemas/OrderState", example="created"),
  *      @OA\Property(property="reasons", type="array", @OA\Items(ref="#/components/schemas/OrderDeclineReason"), nullable=true),
- *      @OA\Property(property="amount", type="number", format="float", nullable=true, example=123.45),
+ *      @OA\Property(property="amount", type="number", format="float", nullable=false, example=123.45),
+ *      @OA\Property(property="amount_tax", type="number", format="float", nullable=false, example=123.45),
+ *      @OA\Property(property="amount_net", type="number", format="float", nullable=false, example=123.45),
  *      @OA\Property(property="duration", ref="#/components/schemas/OrderDuration", example=30),
+ *      @OA\Property(property="dunning_status", ref="#/components/schemas/OrderDunningStatus"),
  *
  *      @OA\Property(property="debtor_company", type="object", description="Identified company", properties={
  *          @OA\Property(property="name", ref="#/components/schemas/TinyText", nullable=true, example="Billie GmbH"),
@@ -41,6 +44,7 @@ use OpenApi\Annotations as OA;
  *          @OA\Property(property="merchant_customer_id", ref="#/components/schemas/TinyText", example="C-10123456789"),
  *          @OA\Property(property="name", ref="#/components/schemas/TinyText", example="Billie G.m.b.H."),
  *          @OA\Property(property="address_country", type="string", maxLength=2, example="DE"),
+ *          @OA\Property(property="address_city", ref="#/components/schemas/TinyText", example="Berlin"),
  *          @OA\Property(property="address_postal_code", type="string", maxLength=5, example="10969"),
  *          @OA\Property(property="address_street", ref="#/components/schemas/TinyText", example="Charlotten Straße"),
  *          @OA\Property(property="address_house", ref="#/components/schemas/TinyText", example="4"),
@@ -87,6 +91,8 @@ class OrderResponse implements ArrayableInterface
 
     private $debtorExternalDataAddressCountry;
 
+    private $debtorExternalDataAddressCity;
+
     private $debtorExternalDataAddressPostalCode;
 
     private $debtorExternalDataAddressStreet;
@@ -101,7 +107,11 @@ class OrderResponse implements ArrayableInterface
 
     private $outstandingAmount;
 
-    private $originalAmount;
+    private $amountGross;
+
+    private $amountTax;
+
+    private $amountNet;
 
     private $feeAmount;
 
@@ -128,6 +138,8 @@ class OrderResponse implements ArrayableInterface
     private $deliveryAddressCountry;
 
     private $duration;
+
+    private $dunningStatus;
 
     public function getExternalCode(): ? string
     {
@@ -285,6 +297,18 @@ class OrderResponse implements ArrayableInterface
         return $this;
     }
 
+    public function getDebtorExternalDataAddressCity(): string
+    {
+        return $this->debtorExternalDataAddressCity;
+    }
+
+    public function setDebtorExternalDataAddressCity(string $debtorExternalDataAddressCity): OrderResponse
+    {
+        $this->debtorExternalDataAddressCity = $debtorExternalDataAddressCity;
+
+        return $this;
+    }
+
     public function getDebtorExternalDataAddressPostalCode(): string
     {
         return $this->debtorExternalDataAddressPostalCode;
@@ -381,14 +405,38 @@ class OrderResponse implements ArrayableInterface
         return $this;
     }
 
-    public function getOriginalAmount(): ? float
+    public function getAmountGross(): float
     {
-        return $this->originalAmount;
+        return $this->amountGross;
     }
 
-    public function setOriginalAmount(float $originalAmount): OrderResponse
+    public function setAmountGross(float $amountGross): OrderResponse
     {
-        $this->originalAmount = $originalAmount;
+        $this->amountGross = $amountGross;
+
+        return $this;
+    }
+
+    public function getAmountTax(): float
+    {
+        return $this->amountTax;
+    }
+
+    public function setAmountTax(float $amountTax): OrderResponse
+    {
+        $this->amountTax = $amountTax;
+
+        return $this;
+    }
+
+    public function getAmountNet(): float
+    {
+        return $this->amountNet;
+    }
+
+    public function setAmountNet(float $amountNet): OrderResponse
+    {
+        $this->amountNet = $amountNet;
 
         return $this;
     }
@@ -537,6 +585,18 @@ class OrderResponse implements ArrayableInterface
         return $this;
     }
 
+    public function getDunningStatus(): ? string
+    {
+        return $this->dunningStatus;
+    }
+
+    public function setDunningStatus(?string $dunningStatus): OrderResponse
+    {
+        $this->dunningStatus = $dunningStatus;
+
+        return $this;
+    }
+
     public function toArray(): array
     {
         return [
@@ -544,8 +604,11 @@ class OrderResponse implements ArrayableInterface
             'uuid' => $this->getUuid(),
             'state' => $this->getState(),
             'reasons' => $this->getReasons() ?: null,
-            'amount' => $this->getOriginalAmount(),
+            'amount' => $this->getAmountGross(),
+            'amount_net' => $this->getAmountNet(),
+            'amount_tax' => $this->getAmountTax(),
             'duration' => $this->getDuration(),
+            'dunning_status' => $this->getDunningStatus(),
             'debtor_company' => [
                 'name' => $this->getCompanyName(),
                 'house_number' => $this->getCompanyAddressHouseNumber(),
@@ -570,6 +633,7 @@ class OrderResponse implements ArrayableInterface
                 'merchant_customer_id' => $this->getDebtorExternalDataCustomerId(),
                 'name' => $this->getDebtorExternalDataCompanyName(),
                 'address_country' => $this->getDebtorExternalDataAddressCountry(),
+                'address_city' => $this->getDebtorExternalDataAddressCity(),
                 'address_postal_code' => $this->getDebtorExternalDataAddressPostalCode(),
                 'address_street' => $this->getDebtorExternalDataAddressStreet(),
                 'address_house' => $this->getDebtorExternalDataAddressHouse(),

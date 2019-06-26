@@ -5,19 +5,35 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+
         healthcheck:
             pattern: ^/healthcheck
             security: false
-        support_api: # TODO: move all support endpoints under the /private/ API prefix
-            pattern: ^/(merchant|merchant-debtor)/*
+
+        merchant_user_login:
+            pattern: ^/(public/)?merchant/user/login
             security: false
+
+        merchant_user_logout:
+            pattern: ^/(public/)?merchant/user/logout
+            anonymous: false
+            stateless: true
+            guard:
+                authenticators:
+                    - App\Http\Authentication\Authenticator\OAuthTokenAuthenticator
+
         checkout_authorize:
-            pattern: ^/checkout-session/.*/authorize
+            pattern: ^/(public/)?checkout-session/.*/authorize
             anonymous: false
             stateless: true
             guard:
                 authenticators:
                     - App\Http\Authentication\Authenticator\CheckoutSessionAuthenticator
+
+        support_api: # TODO: move all support endpoints under the /private/ API prefix
+            pattern: ^/(merchant|merchant-debtor)/*
+            security: false
+
         api_default:
             anonymous: false
             stateless: true

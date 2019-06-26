@@ -37,6 +37,8 @@ class OrderContainer
 
     private $debtorCompany;
 
+    private $dunningStatus;
+
     private $relationLoader;
 
     public function __construct(OrderEntity $order, OrderContainerRelationLoader $relationLoader)
@@ -166,6 +168,20 @@ class OrderContainer
     public function setDebtorCompany(DebtorCompany $debtorCompany): OrderContainer
     {
         $this->debtorCompany = $debtorCompany;
+
+        return $this;
+    }
+
+    public function getDunningStatus(): ?string
+    {
+        return $this->dunningStatus
+            ?: $this->dunningStatus = $this->relationLoader->loadOrderDunningStatus($this)
+            ;
+    }
+
+    public function setDunningStatus(?string $dunningStatus): OrderContainer
+    {
+        $this->dunningStatus = $dunningStatus;
 
         return $this;
     }

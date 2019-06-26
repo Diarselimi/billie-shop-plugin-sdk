@@ -2,36 +2,41 @@
 
 use Symfony\Component\Dotenv\Dotenv;
 
-require __DIR__.'/vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
 if (!isset($_SERVER['DATABASE_NAME'])) {
     if (!class_exists(Dotenv::class)) {
         throw new \RuntimeException('Database connection parameters are missing');
     }
 
-    (new Dotenv())->load(__DIR__.'/.env');
+    (new Dotenv())->load(__DIR__ . '/.env');
 }
+
+$db = [
+    'name' => getenv('DATABASE_NAME'),
+    'host' => getenv('DATABASE_HOST'),
+    'user' => getenv('DATABASE_USERNAME'),
+    'pass' => getenv('DATABASE_PASSWORD'),
+    'port' => getenv('DATABASE_PORT'),
+    'charset' => 'utf8',
+    'adapter' => 'mysql',
+];
+
+$env = getenv('APP_ENV') ?: 'dev';
 
 return [
     'environments' => [
-        'default' => [
-            'name' => getenv('DATABASE_NAME'),
-            'host' => getenv('DATABASE_HOST'),
-            'user' => getenv('DATABASE_USERNAME'),
-            'pass' => getenv('DATABASE_PASSWORD'),
-            'port' => getenv('DATABASE_PORT'),
-            'charset' => 'utf8',
-            'adapter' => 'mysql',
-        ],
+        'default' => $db,
+        $env => $db,
     ],
     'paths' => [
         'migrations' => [
             '%%PHINX_CONFIG_DIR%%/db/migrations/common',
-            '%%PHINX_CONFIG_DIR%%/db/migrations/'.getenv('APP_ENV'),
+            '%%PHINX_CONFIG_DIR%%/db/migrations/' . $env,
         ],
         'seeds' => [
             '%%PHINX_CONFIG_DIR%%/db/seeds/common',
-            '%%PHINX_CONFIG_DIR%%/db/seeds/'.getenv('APP_ENV'),
+            '%%PHINX_CONFIG_DIR%%/db/seeds/' . $env,
         ],
     ],
 ];

@@ -11,7 +11,7 @@ Feature: Retrieve and search all orders of a merchant
 	Given I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
 	And I get from companies service get debtor response
 	And I get from payments service get debtor response
-	When I send a GET request to "/orders"
+	When I send a GET request to "/public/orders"
 	Then the response status code should be 200
 	And the JSON response should be:
 	"""
@@ -24,6 +24,8 @@ Feature: Retrieve and search all orders of a merchant
 			 "state":"new",
 			 "reasons":null,
 			 "amount":1000,
+			 "amount_net": 900.00,
+      		 "amount_tax": 100.00,
 			 "created_at":"2019-05-07",
 			 "debtor_company":{
 				"name":"Test User Company",
@@ -48,6 +50,7 @@ Feature: Retrieve and search all orders of a merchant
 			 "debtor_external_data":{
 				"name":"test",
 				"address_country":"TE",
+				"address_city": "testCity",
 				"address_postal_code":"test",
 				"address_street":"test",
 				"address_house":"test",
@@ -55,6 +58,7 @@ Feature: Retrieve and search all orders of a merchant
 			 	"merchant_customer_id":"ext_id"
 			 },
 			 "duration":30,
+			 "dunning_status": null,
 			 "shipped_at":null,
 			 "delivery_address":{
 				"house_number":"test",
@@ -85,6 +89,8 @@ Feature: Retrieve and search all orders of a merchant
 			 "state":"new",
 			 "reasons":null,
 			 "amount":1000,
+			 "amount_net": 900.00,
+      		 "amount_tax": 100.00,
 			 "created_at":"2019-05-07",
 			 "debtor_company":{
 				"name":"Test User Company",
@@ -109,6 +115,7 @@ Feature: Retrieve and search all orders of a merchant
 			 "debtor_external_data":{
 				"name":"test",
 				"address_country":"TE",
+				"address_city": "testCity",
 				"address_postal_code":"test",
 				"address_street":"test",
 				"address_house":"test",
@@ -116,6 +123,7 @@ Feature: Retrieve and search all orders of a merchant
 				"merchant_customer_id":"ext_id"
 			 },
 			 "duration":30,
+			 "dunning_status": null,
 			 "shipped_at":null,
 			 "delivery_address":{
 				"house_number":"test",
@@ -146,6 +154,8 @@ Feature: Retrieve and search all orders of a merchant
 			 "state":"new",
 			 "reasons":null,
 			 "amount":1000,
+			 "amount_net": 900.00,
+      		 "amount_tax": 100.00,
 			 "created_at":"2019-05-07",
 			 "debtor_company":{
 				"name":"Test User Company",
@@ -170,6 +180,7 @@ Feature: Retrieve and search all orders of a merchant
 			 "debtor_external_data":{
 				"name":"test",
 				"address_country":"TE",
+				"address_city": "testCity",
 				"address_postal_code":"test",
 				"address_street":"test",
 				"address_house":"test",
@@ -177,6 +188,7 @@ Feature: Retrieve and search all orders of a merchant
 				"merchant_customer_id":"ext_id"
 			 },
 			 "duration":30,
+			 "dunning_status": null,
 			 "shipped_at":null,
 			 "delivery_address":{
 				"house_number":"test",
@@ -245,6 +257,8 @@ Feature: Retrieve and search all orders of a merchant
 			 "state":"new",
 			 "reasons":null,
 			 "amount":1000,
+			 "amount_net": 900.00,
+      		 "amount_tax": 100.00,
 			 "created_at":"2019-05-07",
 			 "debtor_company":{
 				"name":"Test User Company",
@@ -269,13 +283,15 @@ Feature: Retrieve and search all orders of a merchant
 			 "debtor_external_data":{
 				"name":"test",
 				"address_country":"TE",
+				"address_city": "testCity",
 				"address_postal_code":"test",
 				"address_street":"test",
 				"address_house":"test",
 				"industry_sector":"test",
-            "merchant_customer_id":"ext_id"
+            	"merchant_customer_id":"ext_id"
 			 },
 			 "duration":30,
+			 "dunning_status": null,
 			 "shipped_at":null,
 			 "delivery_address":{
 				"house_number":"test",

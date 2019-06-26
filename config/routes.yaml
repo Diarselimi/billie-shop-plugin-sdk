@@ -2,8 +2,14 @@ billie_monitoring:
   resource: '@BillieMonitoringBundle/Resources/config/routes.yaml'
 
 controllers:
-    resource: ../src/Http/Controller
-    type: openapi_annotation
+  resource: ../src/Http/Controller
+  type: openapi_annotation
+
+public_controllers:
+  resource: ../src/Http/Controller/PublicApi
+  type: openapi_annotation
+  prefix: /public
+  name_prefix: public_
 
 trigger_failed_order_notifications:
   path: /order/{id}/trigger-failed-notifications
@@ -44,8 +50,3 @@ whitelist_merchant_debtor:
   path: /merchant/{merchantId}/merchant-debtor/{merchantDebtorExternalId}/whitelist
   controller: App\Http\Controller\UpdateMerchantDebtorWhitelistController::execute
   methods: [PUT]
-
-pause_order_dunning:
-  path: /order/{id}/pause-dunning
-  controller: App\Http\Controller\PauseOrderDunningController::execute
-  methods: [POST]

@@ -4,7 +4,13 @@ namespace App\Application\UseCase\PauseOrderDunning;
 
 use App\Application\UseCase\ValidatedRequestInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Schema(schema="PauseOrderDunningRequest", title="Pause Order Dunning", type="object", properties={
+ *     @OA\Property(property="number_of_days", type="integer", nullable=false, minimum=1)
+ * })
+ */
 class PauseOrderDunningRequest implements ValidatedRequestInterface
 {
     /**

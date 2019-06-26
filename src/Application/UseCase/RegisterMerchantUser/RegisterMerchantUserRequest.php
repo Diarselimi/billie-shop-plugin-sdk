@@ -16,7 +16,7 @@ class RegisterMerchantUserRequest implements ValidatedRequestInterface
 
     /**
      * @Assert\NotBlank()
-     * @Assert\Email(strict="true")
+     * @Assert\Email(mode="strict")
      */
     private $userEmail;
 

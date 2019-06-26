@@ -4,7 +4,6 @@ namespace App\Infrastructure\OpenApi\Command;
 
 use App\Infrastructure\OpenApi\Annotations\Processors as CustomProcessors;
 use App\Infrastructure\OpenApi\RelativeFileReader;
-use LogicException;
 use OpenApi\Analyser;
 use OpenApi\Processors;
 use Symfony\Component\Console\Command\Command;
@@ -33,11 +32,17 @@ class GenerateOpenApiSpec extends Command
     protected function configure()
     {
         $this->setName(self::NAME)
-            ->setDescription('Generates an OpenApi specification out of the given source code directory, after reading all annotations.')
+            ->setDescription('Generates an OpenApi specification out of the given source code directory, parsing all annotations.')
             ->addArgument('version', InputArgument::REQUIRED, 'API version')
             ->addOption('output-file', null, InputOption::VALUE_REQUIRED, 'Output file name')
             ->addOption('title', null, InputOption::VALUE_REQUIRED, 'API title', 'Paella API Docs')
-            ->addOption('groups', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'White list of groups to include in the generated spec.', ['public', 'private']);
+            ->addOption(
+                'groups',
+                null,
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                'White list of groups to include in the generated spec.',
+                ['public', 'private']
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -46,62 +51,12 @@ class GenerateOpenApiSpec extends Command
             mkdir($this->projectDocsDir, 0755, true);
         }
 
-        $outputFile = $input->getOption('output-file') ?: ($this->projectDocsDir . '/paella-' . $input->getArgument('version') . '-openapi.yaml');
-        $outputFileIndex = ($this->projectDocsDir . '/paella-versions.json');
-        $versionsIndex = $this->getVersionsIndex($outputFileIndex);
-        $content = $this->buildYaml($input);
-        $specFileId = basename($outputFile, '.yaml');
-
-        $this->addVersion($versionsIndex, $input->getArgument('version'), $specFileId, md5($content));
+        $outputFile = $input->getOption('output-file') ?:
+            ($this->projectDocsDir . '/paella-' . $input->getArgument('version') . '-openapi.yaml');
 
         file_put_contents($outputFile, $this->buildYaml($input));
-        file_put_contents($outputFileIndex, json_encode($versionsIndex, JSON_PRETTY_PRINT));
 
         $output->writeln('The OpenAPI 3.0 specification has been generated under ' . $outputFile);
-    }
-
-    protected function getVersionsIndex($outputFileIndex): array
-    {
-        if (!file_exists($outputFileIndex)) {
-            file_put_contents($outputFileIndex, '{"versions":[]}');
-        }
-
-        return json_decode(file_get_contents($outputFileIndex), true, 512, JSON_THROW_ON_ERROR);
-    }
-
-    protected function addVersion(array &$versionsIndex, string $versionId, string $specFileId, string $contentMd5)
-    {
-        if (!isset($versionsIndex['versions']) || empty($versionsIndex['versions'])) {
-            $versionsIndex['versions'] = [['id' => $versionId, 'hashes' => [$specFileId => $contentMd5]]];
-
-            return;
-        }
-
-        if (preg_match('/.*-dev$/', $versionId)) {
-            // Allow rewriting -dev versions
-            return;
-        }
-
-        $versionIndex = null;
-
-        foreach ($versionsIndex['versions'] as $i => $v) {
-            if ($v['id'] === $versionId) {
-                if (array_key_exists($specFileId, $v['hashes'])) {
-                    throw new LogicException('Modifying an existing released spec version is not allowed.');
-                }
-                $versionIndex = $i;
-            }
-        }
-
-        if (!is_null($versionIndex)) {
-            $versionsIndex['versions'][$versionIndex]['hashes'][$specFileId] = $contentMd5;
-
-            return;
-        }
-
-        $versionsIndex['versions'][] = ['id' => $versionId, 'hashes' => [$specFileId => $contentMd5]];
-
-        return;
     }
 
     protected function buildYaml(InputInterface $input): string

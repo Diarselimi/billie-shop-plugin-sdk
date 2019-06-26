@@ -173,7 +173,7 @@ class PaellaCoreContext extends MinkContext
             ->setHouseNumber('test')
             ->setStreet('test')
             ->setPostalCode('test')
-            ->setCity('test22')
+            ->setCity('testCity')
             ->setCountry('TE');
         $this->getAddressRepository()->insert($debtorAddress);
 
@@ -216,7 +216,7 @@ class PaellaCoreContext extends MinkContext
             ->setExternalComment($comment)
             ->setMerchantDebtorId($merchantDebtor->getId())
             ->setMerchantId('1')
-            ->setPaymentId('test')
+            ->setPaymentId('1')
             ->setCreatedAt(new \DateTime('2019-05-20 13:00:00'))
             ->setCheckoutSessionId(1)
             ->setUuid('test123');

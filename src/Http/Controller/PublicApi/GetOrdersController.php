@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controller;
+namespace App\Http\Controller\PublicApi;
 
 use App\Application\UseCase\GetOrders\GetOrdersRequest;
 use App\Application\UseCase\GetOrders\GetOrdersUseCase;

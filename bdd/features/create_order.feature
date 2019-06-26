@@ -38,7 +38,7 @@ Feature:
 
   Scenario: Debtor identification failed
     Given I get from companies service identify no match response
-    When I send a POST request to "/order" with body:
+    When I send a POST request to "/public/order" with body:
     """
     {
          "debtor_person":{
@@ -95,6 +95,8 @@ Feature:
           "debtor_not_identified"
        ],
        "amount":1000.00,
+       "amount_net": 900.00,
+       "amount_tax": 100.00,
        "debtor_company":{
           "name":null,
           "house_number":null,
@@ -118,6 +120,7 @@ Feature:
        "debtor_external_data":{
           "name":"billie GmbH",
           "address_country":"DE",
+          "address_city": "Berlin",
           "address_postal_code":"12345",
           "address_street":"c\/Velarus",
           "address_house":"33",
@@ -125,6 +128,7 @@ Feature:
           "merchant_customer_id":"12"
        },
        "duration":30,
+       "dunning_status": null,
        "shipped_at":null,
        "delivery_address":{
           "house_number":"22",
@@ -197,6 +201,8 @@ Feature:
       "state":"created",
       "reasons":null,
       "amount":1000.00,
+      "amount_net": 900.00,
+      "amount_tax": 100.00,
       "debtor_company":{
         "name":"Test User Company",
         "house_number":"10",
@@ -220,6 +226,7 @@ Feature:
       "debtor_external_data":{
         "name":"Test User Company",
         "address_country":"DE",
+        "address_city": "Berlin",
         "address_postal_code":"10179",
         "address_street":"Heinrich-Heine-Platz",
         "address_house":"10",
@@ -227,6 +234,7 @@ Feature:
         "merchant_customer_id":"12"
      },
      "duration":30,
+     "dunning_status": null,
      "shipped_at":null,
      "delivery_address":{
         "house_number":"22",
@@ -300,6 +308,8 @@ Feature:
       "state":"created",
       "reasons":null,
       "amount":1000.00,
+      "amount_net": 900.00,
+      "amount_tax": 100.00,
       "debtor_company":{
         "name":"Test User Company",
         "house_number":"10",
@@ -323,6 +333,7 @@ Feature:
       "debtor_external_data":{
         "name":"Test User Company",
         "address_country":"DE",
+        "address_city": "Berlin",
         "address_postal_code":"10179",
         "address_street":"Heinrich-Heine-Platz",
         "address_house":"10",
@@ -330,6 +341,7 @@ Feature:
         "merchant_customer_id":"12"
       },
       "duration":30,
+      "dunning_status": null,
       "shipped_at":null,
       "delivery_address":{
         "house_number":"22",
@@ -403,6 +415,8 @@ Feature:
       "state":"created",
       "reasons":null,
       "amount":43.3,
+      "amount_net": 33.2,
+      "amount_tax": 10.10,
       "debtor_company":{
         "name":"Test User Company",
         "house_number":"10",
@@ -426,6 +440,7 @@ Feature:
       "debtor_external_data":{
         "name":"Test User Company",
         "address_country":"DE",
+        "address_city": "Berlin",
         "address_postal_code":"10179",
         "address_street":"Heinrich-Heine-Platz",
         "address_house":"10",
@@ -433,6 +448,7 @@ Feature:
         "merchant_customer_id":"12"
        },
        "duration":30,
+       "dunning_status": null,
        "shipped_at":null,
        "delivery_address":{
           "house_number":null,
@@ -507,6 +523,8 @@ Feature:
       "state":"created",
       "reasons":null,
       "amount":1000.00,
+      "amount_net": 900.00,
+      "amount_tax": 100.00,
       "debtor_company":{
         "name":"Test User Company",
         "house_number":"10",
@@ -530,6 +548,7 @@ Feature:
       "debtor_external_data":{
         "name":"Test User Company",
         "address_country":"DE",
+        "address_city": "Berlin",
         "address_postal_code":"10179",
         "address_street":"Heinrich-Heine-Platz",
         "address_house":"10",
@@ -537,6 +556,7 @@ Feature:
         "merchant_customer_id":"12"
        },
        "duration":30,
+       "dunning_status": null,
        "shipped_at":null,
        "delivery_address":{
           "house_number":"22",
@@ -608,6 +628,8 @@ Feature:
           "risk_policy"
        ],
        "amount":1000.00,
+       "amount_net": 900.00,
+       "amount_tax": 100.00,
        "debtor_company":{
           "name":"Test User Company",
           "house_number":"10",
@@ -631,6 +653,7 @@ Feature:
        "debtor_external_data":{
           "name":"Test User Company",
           "address_country":"DE",
+          "address_city": "Berlin",
           "address_postal_code":"10179",
           "address_street":"Heinrich-Heine-Platz",
           "address_house":"10",
@@ -638,6 +661,7 @@ Feature:
           "merchant_customer_id":"12"
        },
        "duration":30,
+       "dunning_status": null,
        "shipped_at":null,
        "delivery_address":{
           "house_number":"22",
