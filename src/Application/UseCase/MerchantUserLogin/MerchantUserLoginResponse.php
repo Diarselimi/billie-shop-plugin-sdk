@@ -13,14 +13,25 @@ use OpenApi\Annotations as OA;
  */
 class MerchantUserLoginResponse implements ArrayableInterface
 {
+    private $userId;
+
     private $accessToken;
 
     private $roles;
 
-    public function __construct(string $accessToken, array $roles)
+    private $merchantName;
+
+    public function __construct(int $userId, string $accessToken, array $roles, string $merchantName)
     {
+        $this->userId = $userId;
         $this->accessToken = $accessToken;
         $this->roles = $roles;
+        $this->merchantName = $merchantName;
+    }
+
+    public function getUserId(): int
+    {
+        return $this->userId;
     }
 
     public function getAccessToken(): string
@@ -33,11 +44,18 @@ class MerchantUserLoginResponse implements ArrayableInterface
         return $this->roles;
     }
 
+    public function getMerchantName(): string
+    {
+        return $this->merchantName;
+    }
+
     public function toArray(): array
     {
         return [
+            'user_id' => $this->getUserId(),
             'access_token' => $this->getAccessToken(),
             'roles' => $this->getRoles(),
+            'merchant_name' => $this->getMerchantName(),
         ];
     }
 }

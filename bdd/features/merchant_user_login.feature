@@ -57,9 +57,11 @@ Feature: Enable merchant users to login
 	And the JSON response should be:
 	"""
 	  {
+	  	"user_id": 1,
     	"access_token": "testToken",
     	"roles": [
         	"ROLE_USER"
-    	]
+    	],
+    	"merchant_name": "Behat User"
 	  }
 	"""

@@ -4,6 +4,7 @@ namespace App\Application\UseCase\MerchantUserLogin;
 
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
+use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
 use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
 use App\Infrastructure\Smaug\AuthenticationServiceException;
@@ -14,13 +15,17 @@ class MerchantUserLoginUseCase implements ValidatedUseCaseInterface
 
     private $merchantUserRepository;
 
+    private $merchantRepository;
+
     private $authenticationService;
 
     public function __construct(
         MerchantUserRepositoryInterface $merchantUserRepository,
+        MerchantRepositoryInterface $merchantRepository,
         AuthenticationServiceInterface $authenticationService
     ) {
         $this->merchantUserRepository = $merchantUserRepository;
+        $this->merchantRepository = $merchantRepository;
         $this->authenticationService = $authenticationService;
     }
 
@@ -48,6 +53,13 @@ class MerchantUserLoginUseCase implements ValidatedUseCaseInterface
             throw new MerchantUserLoginException();
         }
 
-        return new MerchantUserLoginResponse($tokenInfo->getAccessToken(), $merchantUser->getRoles());
+        $merchant = $this->merchantRepository->getOneById($merchantUser->getMerchantId());
+
+        return new MerchantUserLoginResponse(
+            $merchantUser->getId(),
+            $tokenInfo->getAccessToken(),
+            $merchantUser->getRoles(),
+            $merchant->getName()
+        );
     }
 }
