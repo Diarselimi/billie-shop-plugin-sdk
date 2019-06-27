@@ -92,6 +92,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
 
         $notificationScheduler->createAndSchedule($order, $eventPayload)->shouldBeCalledOnce()->willReturn(true);
         $paymentForgivenessService->begForgiveness($orderContainer, $amountChange)->shouldBeCalledOnce()->willReturn(true);
+        $orderStateManager->wasShipped($order)->shouldBeCalledOnce()->willReturn(true);
         $orderStateManager->complete($orderContainer)->shouldNotBeCalled();
 
         $request->getOrderAmountChangeDetails()->willReturn($amountChange);
@@ -133,12 +134,43 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         $limitsService->unlock($orderContainer, 25)->shouldBeCalledOnce();
         $merchantRepository->update($merchant)->shouldBeCalledOnce();
 
-        $orderStateManager->isCanceled($order)->shouldBeCalled()->willReturn(false);
+        $orderStateManager->wasShipped($order)->shouldBeCalledOnce()->willReturn(true);
 
         $notificationScheduler->createAndSchedule($order, $eventPayload)->shouldBeCalledOnce()->willReturn(true);
         $paymentForgivenessService->begForgiveness($orderContainer, $amountChange)->shouldBeCalledOnce()->willReturn(true);
         $orderStateManager->complete($orderContainer)->shouldBeCalledOnce();
-        $orderStateManager->isCanceled($order)->shouldBeCalledOnce()->willReturn(false);
+
+        $request->getOrderAmountChangeDetails()->willReturn($amountChange);
+        $this->execute($request);
+    }
+
+    public function it_should_not_do_anything_if_order_state_is_wrong(
+        OrderContainerFactory $orderContainerFactory,
+        MerchantRepositoryInterface $merchantRepository,
+        NotificationScheduler $notificationScheduler,
+        MerchantDebtorLimitsService $limitsService,
+        OrderPaymentForgivenessService $paymentForgivenessService,
+        OrderStateManager $orderStateManager,
+        OrderAmountChangeDTO $amountChange,
+        OrderContainer $orderContainer,
+        OrderEntity $order,
+        OrderOutstandingAmountChangeRequest $request
+    ) {
+        $orderContainerFactory
+            ->createFromPaymentId(self::TICKET_ID)
+            ->shouldBeCalled()
+            ->willReturn($orderContainer)
+        ;
+
+        $order->getState()->willReturn('complete');
+        $orderStateManager->wasShipped($order)->shouldBeCalledOnce()->willReturn(false);
+
+        $limitsService->unlock($orderContainer, self::AMOUNT_CHANGE)->shouldNotBeCalled();
+        $merchantRepository->update($orderContainer->getMerchant())->shouldNotBeCalled();
+
+        $notificationScheduler->createAndSchedule(Argument::any(), Argument::any())->shouldNotBeCalled();
+        $paymentForgivenessService->begForgiveness($orderContainer, $amountChange)->shouldNotBeCalled();
+        $orderStateManager->complete($orderContainer)->shouldNotBeCalled();
 
         $request->getOrderAmountChangeDetails()->willReturn($amountChange);
         $this->execute($request);
@@ -197,6 +229,8 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
 
         $notificationScheduler->createAndSchedule(Argument::any(), Argument::any())->shouldNotBeCalled();
         $paymentForgivenessService->begForgiveness($order, $amountChange)->shouldNotBeCalled();
+
+        $orderStateManager->wasShipped($order)->shouldBeCalledOnce()->willReturn(true);
         $orderStateManager->complete($orderContainer)->shouldNotBeCalled();
 
         $request->getOrderAmountChangeDetails()->willReturn($amountChange);
@@ -233,6 +267,8 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
 
         $notificationScheduler->createAndSchedule(Argument::any(), Argument::any())->shouldNotBeCalled();
         $paymentForgivenessService->begForgiveness($order, $amountChange)->shouldNotBeCalled();
+
+        $orderStateManager->wasShipped($order)->shouldBeCalledOnce()->willReturn(true);
         $orderStateManager->complete($orderContainer)->shouldNotBeCalled();
 
         $request->getOrderAmountChangeDetails()->willReturn($amountChange);

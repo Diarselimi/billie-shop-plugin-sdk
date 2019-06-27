@@ -3,6 +3,7 @@
 namespace App\Application\UseCase\OrderOutstandingAmountChange;
 
 use App\Application\Exception\OrderNotFoundException;
+use App\Application\Exception\OrderWorkflowException;
 use App\DomainModel\Borscht\OrderAmountChangeDTO;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
@@ -69,6 +70,20 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
         }
 
         $order = $orderContainer->getOrder();
+
+        if (!$this->orderStateManager->wasShipped($orderContainer->getOrder())) {
+            $this->logSuppressedException(
+                new OrderWorkflowException('Order state change not possible'),
+                '[suppressed] Outstanding amount change not possible for order {order_id}',
+                [
+                    'order_id' => $order->getId(),
+                    'state' => $order->getState(),
+                ]
+            );
+
+            return;
+        }
+
         if ($order->getAmountForgiven() > 0 && $amountChange->getOutstandingAmount() > 0) {
             $this->logInfo("Order {id} has been already forgiven by a total of {amount}. Current outstanding amount is {outstanding_amount}.", [
                 'id' => $order->getId(),
@@ -107,7 +122,7 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
             );
         }
 
-        if ($amountChange->getOutstandingAmount() <= 0 && !$this->orderStateManager->isCanceled($order)) {
+        if ($amountChange->getOutstandingAmount() <= 0) {
             $this->orderStateManager->complete($orderContainer);
         }
     }

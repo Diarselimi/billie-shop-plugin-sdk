@@ -43,7 +43,7 @@ class ConfirmOrderPaymentUseCase
             throw new FraudOrderException();
         }
 
-        if ($this->orderStateManager->canConfirmPayment($order)) {
+        if ($this->orderStateManager->wasShipped($order)) {
             $this->paymentService->confirmPayment($order, $request->getAmount());
         } else {
             throw new PaellaCoreCriticalException(
