@@ -106,15 +106,6 @@ class OrderStateManager implements LoggingInterface
         ], true);
     }
 
-    public function canConfirmPayment(OrderEntity $order): bool
-    {
-        return in_array($order->getState(), [
-            self::STATE_SHIPPED,
-            self::STATE_PAID_OUT,
-            self::STATE_LATE,
-        ], true);
-    }
-
     public function isNew(OrderEntity $order): bool
     {
         return $order->getState() === self::STATE_NEW;
