@@ -68,7 +68,7 @@ class GetOrdersController
             $request->query->getInt('limit', GetOrdersRequest::DEFAULT_LIMIT),
             $sortField,
             strtoupper($sortDirection ?: GetOrdersRequest::DEFAULT_SORT_DIRECTION),
-            $request->query->get('search'),
+            trim($request->query->get('search')),
             $request->query->get('filters')
         );
 
