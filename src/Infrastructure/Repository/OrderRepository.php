@@ -438,8 +438,9 @@ SQL;
             $query .= ' INNER JOIN (SELECT MAX(id) AS maxID FROM order_financial_details GROUP BY order_id) AS of ON of.maxID = order_financial_details.id';
         }
 
-        $query .= ' WHERE orders.merchant_id = :merchant_id';
+        $query .= ' WHERE orders.merchant_id = :merchant_id AND state != :state_new';
         $queryParameters['merchant_id'] = $merchantId;
+        $queryParameters['state_new'] = OrderStateManager::STATE_NEW;
 
         if ($searchString) {
             $query .= ' AND (orders.external_code LIKE :search OR orders.uuid LIKE :search OR orders.invoice_number LIKE :search )';

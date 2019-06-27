@@ -7,8 +7,22 @@ Feature: Retrieve and search all orders of a merchant
 	And I get from Oauth service a valid user token
 	And I add "Authorization" header equal to test
 
+  Scenario: Successfully retrieve orders that are not in state new
+    Given I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
+    And I get from companies service get debtor response
+    And I get from payments service get debtor response
+    When I send a GET request to "/public/orders"
+    Then the response status code should be 200
+    And the JSON response should be:
+	"""
+	  {
+		"total": 0,
+		"items":[]
+	  }
+	"""
+
   Scenario: Successfully retrieve orders
-	Given I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
+	Given I have a created order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
 	And I get from companies service get debtor response
 	And I get from payments service get debtor response
 	When I send a GET request to "/public/orders"
@@ -21,7 +35,7 @@ Feature: Retrieve and search all orders of a merchant
 		  {
 			 "external_code":"XF43Y",
 			 "uuid":"test123",
-			 "state":"new",
+			 "state":"created",
 			 "reasons":null,
 			 "amount":1000,
 			 "amount_net": 900.00,
@@ -73,7 +87,7 @@ Feature: Retrieve and search all orders of a merchant
 	"""
 
   Scenario: Search orders by external code
-	Given I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
+	Given I have a created order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
   	And I get from companies service get debtor response
 	And I get from payments service get debtor response
 	When I send a GET request to "/orders?search=XF43Y"
@@ -86,7 +100,7 @@ Feature: Retrieve and search all orders of a merchant
 		  {
 			 "external_code":"XF43Y",
 			 "uuid":"test123",
-			 "state":"new",
+			 "state":"created",
 			 "reasons":null,
 			 "amount":1000,
 			 "amount_net": 900.00,
@@ -138,7 +152,7 @@ Feature: Retrieve and search all orders of a merchant
 	"""
 
   Scenario: Search orders by uuid
-	Given I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
+	Given I have a created order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
   	And I get from companies service get debtor response
 	And I get from payments service get debtor response
 	When I send a GET request to "/orders?search=test123"
@@ -151,7 +165,7 @@ Feature: Retrieve and search all orders of a merchant
 		  {
 			 "external_code":"XF43Y",
 			 "uuid":"test123",
-			 "state":"new",
+			 "state":"created",
 			 "reasons":null,
 			 "amount":1000,
 			 "amount_net": 900.00,
@@ -203,7 +217,7 @@ Feature: Retrieve and search all orders of a merchant
 	"""
 
   Scenario: Search orders - no results
-	Given I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
+	Given I have a created order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
 	When I send a GET request to "/orders?search=AnySearchString"
 	Then the response status code should be 200
 	And the JSON response should be:
@@ -241,7 +255,7 @@ Feature: Retrieve and search all orders of a merchant
 	"""
 
   Scenario: Filter by merchant debtor UUID
-	Given I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
+	Given I have a created order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
   	And I get from companies service get debtor response
 	And I get from payments service get debtor response
 	When I send a GET request to "/orders?filters[merchant_debtor_id]=ad74bbc4-509e-47d5-9b50-a0320ce3d715"
@@ -254,7 +268,7 @@ Feature: Retrieve and search all orders of a merchant
 		  {
 			 "external_code":"XF43Y",
 			 "uuid":"test123",
-			 "state":"new",
+			 "state":"created",
 			 "reasons":null,
 			 "amount":1000,
 			 "amount_net": 900.00,
@@ -306,7 +320,7 @@ Feature: Retrieve and search all orders of a merchant
 	"""
 
   Scenario: Filter by merchant debtor UUID - no results
-	Given I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
+	Given I have a created order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
 	When I send a GET request to "/orders?filters[merchant_debtor_id]=ad74bbc4-449e-47d5-9b50-a0320ce3d715"
 	Then the response status code should be 200
 	And the JSON response should be:
