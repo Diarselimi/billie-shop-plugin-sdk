@@ -17,7 +17,7 @@ use OpenApi\Annotations as OA;
  * @OA\Post(
  *     path="/order/{id}/pause-dunning",
  *     operationId="order_pause_dunning",
- *     summary="Pause Order Dunniing",
+ *     summary="Pause Order Dunning",
  *     security={{"oauth2"={}}, {"apiKey"={}}},
  *
  *     tags={"Orders API", "Dashboard API"},

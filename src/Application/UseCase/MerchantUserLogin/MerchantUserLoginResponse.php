@@ -7,8 +7,15 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Schema(schema="MerchantUserLoginResponse", title="Merchant User Login Response", type="object", properties={
+ *      @OA\Property(property="user_id", type="integer", nullable=false),
  *      @OA\Property(property="access_token", type="string", nullable=false, example="l387435hzyoc0oo4kokow"),
- *      @OA\Property(property="roles", type="array", @OA\Items(type="string", example=\App\DomainModel\MerchantUser\MerchantUserEntity::ROLE_USER))
+ *      @OA\Property(
+ *          property="roles",
+ *          type="array",
+ *          nullable=false,
+ *          @OA\Items(type="string", example=\App\DomainModel\MerchantUser\MerchantUserEntity::ROLE_USER)
+ *      ),
+ *      @OA\Property(property="merchant_name", type="string", nullable=false, example="Billie GmbH")
  * })
  */
 class MerchantUserLoginResponse implements ArrayableInterface
