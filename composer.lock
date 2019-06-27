@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cb62c22e8c660ce2f65d466c7d01c581",
+    "content-hash": "9b0c406b17c731eec01993865641f32b",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -187,16 +187,16 @@
         },
         {
             "name": "billie/pdo-bundle",
-            "version": "dev-master",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/PdoBundle.git",
-                "reference": "29307e1d67891e85063c9a462fed24eb2be8cc97"
+                "reference": "d29d14855554e513474d14e5894eb06e5eeb3073"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/PdoBundle/zipball/29307e1d67891e85063c9a462fed24eb2be8cc97",
-                "reference": "29307e1d67891e85063c9a462fed24eb2be8cc97",
+                "url": "https://api.github.com/repos/ozean12/PdoBundle/zipball/d29d14855554e513474d14e5894eb06e5eeb3073",
+                "reference": "d29d14855554e513474d14e5894eb06e5eeb3073",
                 "shasum": ""
             },
             "require": {
@@ -234,9 +234,9 @@
             ],
             "description": "Minimal ORM built on top of PDO",
             "support": {
-                "source": "https://github.com/ozean12/PdoBundle/tree/master"
+                "source": "https://github.com/ozean12/PdoBundle/tree/1.1.0"
             },
-            "time": "2019-03-25T16:25:24+00:00"
+            "time": "2019-06-26T15:18:34+00:00"
         },
         {
             "name": "doctrine/annotations",
@@ -2246,63 +2246,6 @@
             "description": "Symfony DependencyInjection Component",
             "homepage": "https://symfony.com",
             "time": "2019-04-27T11:48:17+00:00"
-        },
-        {
-            "name": "symfony/dotenv",
-            "version": "v4.2.8",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/dotenv.git",
-                "reference": "b541d63b83532be55a020db8ed2e50598385a583"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/dotenv/zipball/b541d63b83532be55a020db8ed2e50598385a583",
-                "reference": "b541d63b83532be55a020db8ed2e50598385a583",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.1.3"
-            },
-            "require-dev": {
-                "symfony/process": "~3.4|~4.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "4.2-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\Dotenv\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Registers environment variables from a .env file",
-            "homepage": "https://symfony.com",
-            "keywords": [
-                "dotenv",
-                "env",
-                "environment"
-            ],
-            "time": "2019-04-01T07:32:59+00:00"
         },
         {
             "name": "symfony/event-dispatcher",
@@ -7293,6 +7236,63 @@
             "time": "2019-02-23T15:17:42+00:00"
         },
         {
+            "name": "symfony/dotenv",
+            "version": "v4.2.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/dotenv.git",
+                "reference": "b541d63b83532be55a020db8ed2e50598385a583"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/dotenv/zipball/b541d63b83532be55a020db8ed2e50598385a583",
+                "reference": "b541d63b83532be55a020db8ed2e50598385a583",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1.3"
+            },
+            "require-dev": {
+                "symfony/process": "~3.4|~4.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "4.2-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Dotenv\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Registers environment variables from a .env file",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "dotenv",
+                "env",
+                "environment"
+            ],
+            "time": "2019-04-01T07:32:59+00:00"
+        },
+        {
             "name": "symfony/panther",
             "version": "v0.3.0",
             "source": {
@@ -7720,9 +7720,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "billie/pdo-bundle": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
