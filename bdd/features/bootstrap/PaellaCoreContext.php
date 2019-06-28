@@ -62,7 +62,6 @@ class PaellaCoreContext extends MinkContext
         $this->cleanUpScenario();
 
         register_shutdown_function(function () {
-            $this->getConnection()->reconnect();
             $this->cleanUpScenario();
         });
 
