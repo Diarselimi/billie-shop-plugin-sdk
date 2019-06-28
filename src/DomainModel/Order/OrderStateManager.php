@@ -52,6 +52,7 @@ class OrderStateManager implements LoggingInterface
         self::STATE_LATE,
         self::STATE_COMPLETE,
         self::STATE_CANCELED,
+        self::STATE_PRE_APPROVED,
     ];
 
     public const TRANSITION_NEW = 'new';
