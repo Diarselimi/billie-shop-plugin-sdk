@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9b0c406b17c731eec01993865641f32b",
+    "content-hash": "a361c79c9f6828191feb50f85a093355",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -187,16 +187,16 @@
         },
         {
             "name": "billie/pdo-bundle",
-            "version": "1.1.0",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/PdoBundle.git",
-                "reference": "d29d14855554e513474d14e5894eb06e5eeb3073"
+                "reference": "a06a682cd47fa9e0a8573eb608c2861243a700c1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/PdoBundle/zipball/d29d14855554e513474d14e5894eb06e5eeb3073",
-                "reference": "d29d14855554e513474d14e5894eb06e5eeb3073",
+                "url": "https://api.github.com/repos/ozean12/PdoBundle/zipball/a06a682cd47fa9e0a8573eb608c2861243a700c1",
+                "reference": "a06a682cd47fa9e0a8573eb608c2861243a700c1",
                 "shasum": ""
             },
             "require": {
@@ -209,6 +209,9 @@
                 "symfony/http-kernel": "^4.2",
                 "symfony/yaml": "^4.2"
             },
+            "require-dev": {
+                "phpunit/phpunit": "^8.2"
+            },
             "type": "symfony-bundle",
             "autoload": {
                 "psr-4": {
@@ -220,7 +223,7 @@
             },
             "autoload-dev": {
                 "psr-4": {
-                    "Billie\\PdoBundle\\": "src/Tests/"
+                    "Test\\Billie\\PdoBundle\\": "tests/"
                 }
             },
             "license": [
@@ -234,9 +237,9 @@
             ],
             "description": "Minimal ORM built on top of PDO",
             "support": {
-                "source": "https://github.com/ozean12/PdoBundle/tree/1.1.0"
+                "source": "https://github.com/ozean12/PdoBundle/tree/1.2.0"
             },
-            "time": "2019-06-26T15:18:34+00:00"
+            "time": "2019-06-28T08:36:04+00:00"
         },
         {
             "name": "doctrine/annotations",
