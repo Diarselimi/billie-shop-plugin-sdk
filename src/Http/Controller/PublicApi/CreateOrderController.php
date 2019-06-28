@@ -54,8 +54,6 @@ class CreateOrderController
         $useCaseRequest = $this->orderRequestFactory
             ->createForCreateOrder($request);
 
-        $orderContainer = $this->createOrderUseCase->execute($useCaseRequest);
-
-        return new JsonResponse($this->orderResponseFactory->create($orderContainer)->toArray(), JsonResponse::HTTP_CREATED);
+        return new JsonResponse($this->createOrderUseCase->execute($useCaseRequest)->toArray(), JsonResponse::HTTP_CREATED);
     }
 }

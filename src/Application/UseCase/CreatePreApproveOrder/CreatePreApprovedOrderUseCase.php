@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Application\UseCase\CreateOrder;
+namespace App\Application\UseCase\CreatePreApproveOrder;
 
+use App\Application\UseCase\CreateOrder\CreateOrderRequest;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Order\IdentifyAndTriggerAsyncIdentification;
@@ -15,13 +16,15 @@ use App\DomainModel\OrderResponse\OrderResponseFactory;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
-class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
+class CreatePreApprovedOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 {
     use LoggingTrait, ValidatedUseCaseTrait;
 
     private $persistNewOrderService;
 
     private $orderContainerFactory;
+
+    private $orderPersistenceService;
 
     private $orderChecksRunnerService;
 
@@ -30,6 +33,8 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
     private $orderResponseFactory;
 
     private $orderStateManager;
+
+    private $merchantDebtorFinancialDetailsRepository;
 
     private $identifyAndTriggerAsyncIdentification;
 
@@ -67,19 +72,15 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
             $this->orderRepository->update($orderContainer->getOrder());
         }
 
-        if (!$this->orderChecksRunnerService->runPostIdentificationChecks($orderContainer)) {
+        if (!$this->orderChecksRunnerService->runPostIdentificationChecks($orderContainer) ||
+            $this->orderChecksRunnerService->checkForFailedSoftDeclinableCheckResults($orderContainer)
+        ) {
             $this->orderStateManager->decline($orderContainer);
 
             return $this->orderResponseFactory->create($orderContainer);
         }
 
-        if ($this->orderChecksRunnerService->checkForFailedSoftDeclinableCheckResults($orderContainer)) {
-            $this->orderStateManager->wait($orderContainer);
-
-            return $this->orderResponseFactory->create($orderContainer);
-        }
-
-        $this->orderStateManager->approve($orderContainer);
+        $this->orderStateManager->preApprove($orderContainer);
 
         return $this->orderResponseFactory->create($orderContainer);
     }

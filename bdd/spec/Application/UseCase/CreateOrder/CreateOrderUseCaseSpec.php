@@ -16,6 +16,7 @@ use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\Order\OrderChecksRunnerService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
+use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
@@ -38,6 +39,7 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
         OrderResponseFactory $orderResponseFactory,
         OrderStateManager $orderStateManager,
         CheckoutSessionRepositoryInterface $checkoutSessionRepository,
+        OrderDeclinedReasonsMapper $declinedReasonsMapper,
         ValidatorInterface $validator,
         OrderEntity $order,
         OrderCreationDTO $newOrderDTO,

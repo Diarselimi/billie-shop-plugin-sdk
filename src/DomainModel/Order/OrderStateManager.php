@@ -8,6 +8,7 @@ use App\DomainEvent\Order\OrderApprovedEvent;
 use App\DomainEvent\Order\OrderDeclinedEvent;
 use App\DomainEvent\Order\OrderInWaitingStateEvent;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
+use App\DomainEvent\Order\OrderPreApprovedEvent;
 use App\DomainModel\OrderRiskCheck\Checker\LimitCheck;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -37,6 +38,8 @@ class OrderStateManager implements LoggingInterface
     public const STATE_COMPLETE = 'complete';
 
     public const STATE_CANCELED = 'canceled';
+
+    public const STATE_PRE_APPROVED = 'pre_approved';
 
     public const ALL_STATES = [
         self::STATE_NEW,
@@ -72,6 +75,8 @@ class OrderStateManager implements LoggingInterface
     public const TRANSITION_CANCEL = 'cancel';
 
     public const TRANSITION_CANCEL_SHIPPED = 'cancel_shipped';
+
+    public const TRANSITION_PRE_APPROVED = 'pre_approve';
 
     private $orderRepository;
 
@@ -146,6 +151,11 @@ class OrderStateManager implements LoggingInterface
         return $order->getState() === self::STATE_AUTHORIZED;
     }
 
+    public function isPreApproved(OrderEntity $order): bool
+    {
+        return $order->getState() === self::STATE_PRE_APPROVED;
+    }
+
     public function approve(OrderContainer $orderContainer): void
     {
         $order = $orderContainer->getOrder();
@@ -195,6 +205,16 @@ class OrderStateManager implements LoggingInterface
         $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_AUTHORIZE);
         $this->orderRepository->update($orderContainer->getOrder());
         $this->logInfo("Order was moved to authorized state");
+    }
+
+    public function preApprove(OrderContainer $orderContainer)
+    {
+        $order = $orderContainer->getOrder();
+        $this->workflow->apply($order, OrderStateManager::TRANSITION_PRE_APPROVED);
+        $this->orderRepository->update($order);
+
+        $this->eventDispatcher->dispatch(OrderPreApprovedEvent::NAME, new OrderPreApprovedEvent($orderContainer));
+        $this->logInfo("Order was moved to Pre Approved state");
     }
 
     public function complete(OrderContainer $orderContainer): void

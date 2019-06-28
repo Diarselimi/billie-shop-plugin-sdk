@@ -2,8 +2,8 @@
 
 namespace App\Http\Controller\PublicApi;
 
-use App\Application\UseCase\CreateOrder\CreateOrderUseCase;
-use App\DomainModel\Order\OrderStateManager;
+use App\Application\Exception\OrderDeclinedException;
+use App\Application\UseCase\CheckoutSessionCreateOrder\CheckoutSessionCreateOrderUseCase;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
 use App\Http\Authentication\User;
 use App\Http\RequestHandler\CreateOrderRequestFactory;
@@ -47,7 +47,7 @@ class AuthorizeCheckoutSessionController
     private $responseFactory;
 
     public function __construct(
-        CreateOrderUseCase $useCase,
+        CheckoutSessionCreateOrderUseCase $useCase,
         Security $security,
         CreateOrderRequestFactory $orderRequestFactory,
         OrderResponseFactory $responseFactory
@@ -66,25 +66,19 @@ class AuthorizeCheckoutSessionController
         $useCaseRequest = $this->orderRequestFactory
             ->createForAuthorizeCheckoutSession($request, $user->getCheckoutSession());
 
-        $orderContainer = $this->useCase->execute($useCaseRequest);
-
-        // TODO: use own Authorize UseCase, moving this check inside or fail with exception.
-        if ($orderContainer->getOrder()->getState() === OrderStateManager::STATE_AUTHORIZED) {
-            return new Response('', JsonResponse::HTTP_CREATED);
+        try {
+            $this->useCase->execute($useCaseRequest);
+        } catch (OrderDeclinedException $exception) {
+            return new JsonResponse(
+                [
+                    'error' => $exception->getMessage(),
+                    'code' => 'order_declined',
+                    'reasons' => $exception->getReasons(),
+                ],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
         }
 
-        // TODO: this should be an error, using the common error response format.
-        // TODO: The use case should throw an "OrderDeclinedException" and the controller should catch it, adding reasons contained in the exception.
-        $reasons = $this->responseFactory->createAuthorizeResponse($orderContainer)->toArray()['reasons'];
-
-        return new JsonResponse(
-            [
-                'error' => 'Order declined',
-                'code' => 'order_declined',
-                'reasons' => $reasons,
-
-            ],
-            JsonResponse::HTTP_BAD_REQUEST
-        );
+        return new Response('', JsonResponse::HTTP_CREATED);
     }
 }

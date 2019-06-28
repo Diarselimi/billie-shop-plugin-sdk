@@ -310,6 +310,7 @@ Feature:
       "amount":1000.00,
       "amount_net": 900.00,
       "amount_tax": 100.00,
+      "created_at":"2019-06-06T16:21:53+0200",
       "debtor_company":{
         "name":"Test User Company",
         "house_number":"10",
@@ -349,7 +350,7 @@ Feature:
         "city":"Vienna",
         "postal_code":"AT-5130-123333",
         "country":"AT"
-     }
+       }
     }
     """
     And the response status code should be 201
