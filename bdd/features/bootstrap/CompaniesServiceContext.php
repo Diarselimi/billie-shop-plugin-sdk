@@ -50,7 +50,7 @@ class CompaniesServiceContext implements Context
     public function iGetFromCompaniesServiceIdentifyMatchResponse()
     {
         $this->mockRequest('/debtor/identify', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match.json'))
+            new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_match_trusted_source.json'))
         ));
     }
 
@@ -60,7 +60,7 @@ class CompaniesServiceContext implements Context
     public function iGetFromCompaniesServiceGetDebtorResponse()
     {
         $this->mockRequest('/debtor/1', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match.json'))
+            new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_match_trusted_source.json'))
         ));
     }
 
@@ -70,8 +70,8 @@ class CompaniesServiceContext implements Context
     public function iGetFromCompaniesServiceUpdateDebtorPositiveResponse()
     {
         $this->mockRequest('/debtor/1', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match.json')),
-            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match.json'))
+            new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_match_trusted_source.json')),
+            new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_match_trusted_source.json'))
         ));
     }
 
@@ -81,7 +81,7 @@ class CompaniesServiceContext implements Context
     public function iGetFromCompaniesServiceIdentifyMatchAndGoodDecisionResponse()
     {
         $this->mockRequest('/debtor/identify', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match.json'))
+            new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_match_trusted_source.json'))
         ));
 
         $this->mockRequest('/debtor/1/is-eligible-for-pay-after-delivery', new ResponseStack(
@@ -95,21 +95,11 @@ class CompaniesServiceContext implements Context
     public function iGetFromCompaniesServiceIdentifyMatchAndBadDecisionResponse()
     {
         $this->mockRequest('/debtor/identify', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match.json'))
+            new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_match_trusted_source.json'))
         ));
 
         $this->mockRequest('/debtor/1/is-eligible-for-pay-after-delivery', new ResponseStack(
             new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_decision_bad.json'))
-        ));
-    }
-
-    /**
-     * @Given /^I get from companies service identify v2 match response$/
-     */
-    public function iGetFromCompaniesServiceIdentifyV2MatchResponse()
-    {
-        $this->mockRequest('/debtor/identify/v2', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match_v2.json'))
         ));
     }
 
@@ -120,6 +110,16 @@ class CompaniesServiceContext implements Context
     {
         $this->mockRequest($url, new ResponseStack(
             new MockResponse($response, [], (int) $statusCode)
+        ));
+    }
+
+    /**
+     * @Given /^I get from companies service identify match from untrusted source$/
+     */
+    public function iGetFromCompaniesServiceIdentifyMatchFromUntrustedSource()
+    {
+        $this->mockRequest('/debtor/identify', new ResponseStack(
+            new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_match_untrusted_source.json'))
         ));
     }
 }

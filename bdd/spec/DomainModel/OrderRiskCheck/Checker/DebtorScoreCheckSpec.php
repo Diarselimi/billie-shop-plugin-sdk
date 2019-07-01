@@ -3,6 +3,7 @@
 namespace spec\App\DomainModel\OrderRiskCheck\Checker;
 
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
+use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorCompany\IsEligibleForPayAfterDeliveryRequestDTO;
 use App\DomainModel\DebtorCompany\IsEligibleForPayAfterDeliveryRequestDTOFactory;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
@@ -34,11 +35,15 @@ class DebtorScoreCheckSpec extends ObjectBehavior
         DebtorExternalDataEntity $debtorExternalData,
         MerchantSettingsEntity $merchantSettings,
         ScoreThresholdsConfigurationEntity $scoreThresholds,
-        IsEligibleForPayAfterDeliveryRequestDTO $request
+        IsEligibleForPayAfterDeliveryRequestDTO $request,
+        DebtorCompany $debtorCompany
     ) {
         $orderContainer->getMerchantDebtor()->willReturn($merchantDebtor);
         $orderContainer->getDebtorExternalData()->willReturn($debtorExternalData);
         $orderContainer->getMerchantSettings()->willReturn($merchantSettings);
+
+        $debtorCompany->isTrustedSource()->willReturn(true);
+        $orderContainer->getDebtorCompany()->willReturn($debtorCompany);
 
         $scoreThresholds->getCrefoHighScoreThreshold()->willReturn(100);
         $scoreThresholds->getCrefoLowScoreThreshold()->willReturn(20);
@@ -81,7 +86,8 @@ class DebtorScoreCheckSpec extends ObjectBehavior
     ) {
         $companiesService->isEligibleForPayAfterDelivery(Argument::any())->willReturn(false);
 
-        $this->check($orderContainer)->shouldBeLike(new CheckResult(false, DebtorScoreCheck::NAME));
+        $checkResult = $this->check($orderContainer);
+        $checkResult->isPassed()->shouldBe(false);
     }
 
     public function it_returns_false_check_result_if_companies_service_returns_true(
@@ -89,16 +95,25 @@ class DebtorScoreCheckSpec extends ObjectBehavior
         OrderContainer $orderContainer
     ) {
         $companiesService->isEligibleForPayAfterDelivery(Argument::any())->willReturn(true);
-        $this->check($orderContainer)->shouldBeLike(new CheckResult(true, DebtorScoreCheck::NAME));
+
+        $checkResult = $this->check($orderContainer);
+        $checkResult->isPassed()->shouldBe(true);
     }
 
     public function it_will_return_true_if_the_debtor_is_whitelisted(
-        CompaniesServiceInterface $companiesService,
         MerchantDebtorEntity $merchantDebtor,
         OrderContainer $orderContainer
     ) {
         $merchantDebtor->isWhitelisted()->willReturn(true);
-        $companiesService->isEligibleForPayAfterDelivery(Argument::any())->willReturn(false);
+
+        $this->check($orderContainer)->shouldBeLike(new CheckResult(true, DebtorScoreCheck::NAME));
+    }
+
+    public function it_will_return_true_if_the_debtor_is_from_untrusted_source(
+        OrderContainer $orderContainer,
+        DebtorCompany $debtorCompany
+    ) {
+        $debtorCompany->isTrustedSource()->willReturn(false);
 
         $this->check($orderContainer)->shouldBeLike(new CheckResult(true, DebtorScoreCheck::NAME));
     }

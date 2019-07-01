@@ -15,6 +15,7 @@ Feature:
       | debtor_industry_sector    |
       | debtor_identified         |
       | debtor_identified_strict  |
+      | debtor_is_trusted         |
       | limit                     |
       | debtor_not_customer       |
       | debtor_blacklisted        |
@@ -28,6 +29,7 @@ Feature:
       | debtor_industry_sector    | 1       | 1                  |
       | debtor_identified         | 1       | 1                  |
       | debtor_identified_strict  | 1       | 1                  |
+      | debtor_is_trusted         | 1       | 1                  |
       | limit                     | 1       | 1                  |
       | debtor_not_customer       | 1       | 1                  |
       | debtor_blacklisted        | 1       | 1                  |

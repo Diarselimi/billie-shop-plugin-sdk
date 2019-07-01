@@ -66,7 +66,7 @@ Feature:
             "payment_id":"test",
             "is_whitelisted":false,
             "is_blacklisted":false,
-            "is_trusted_source":false,
+            "is_trusted_source":true,
             "crefo_id":"123",
             "schufa_id":"123"
         }

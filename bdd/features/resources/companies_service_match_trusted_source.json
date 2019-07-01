@@ -2,7 +2,7 @@
     "id": 1,
     "crefo_id": "123",
     "schufa_id": "123",
-    "google_places_id": "123",
+    "google_places_id": null,
     "name": "Test User Company",
     "address_house": "10",
     "address_street": "Heinrich-Heine-Platz",
@@ -11,6 +11,6 @@
     "address_country": "DE",
     "address_addition": null,
     "is_blacklisted": 0,
-    "is_from_trusted_source": 0,
+    "is_from_trusted_source": 1,
     "financing_power": 1000
 }
