@@ -38,8 +38,10 @@ class DeclineOrderUseCase
             throw new OrderNotFoundException($exception);
         }
 
-        if (!$this->orderStateManager->isWaiting($orderContainer->getOrder())) {
-            throw new OrderWorkflowException("Cannot decline the order. Order is not in waiting state.");
+        $order = $orderContainer->getOrder();
+
+        if (!$this->orderStateManager->isWaiting($order) && !$this->orderStateManager->isPreApproved($order)) {
+            throw new OrderWorkflowException('Cannot decline the order. Order is not in waiting/pre_approved state.');
         }
 
         $this->orderStateManager->decline($orderContainer);
