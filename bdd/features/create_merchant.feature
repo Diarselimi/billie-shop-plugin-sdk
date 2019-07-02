@@ -103,5 +103,6 @@ Feature: Create a new merchant.
       """
     Then the response status code should be 201
     And the JSON response should have "id"
+    And the JSON response at "payment_merchant_id" should be an string
     And I keep the JSON response as "MERCHANT"
     And the default risk check setting should be created with "{$MERCHANT}"
