@@ -10,8 +10,7 @@ class OrderEntity extends AbstractTimestampableEntity
 
     const MAX_DURATION_IN_WAITING_STATE = '9 days';
 
-//    const MAX_DURATION_IN_PRE_APPROVED_STATE = '30 days';
-    const MAX_DURATION_IN_PRE_APPROVED_STATE = '5 minutes';
+    const MAX_DURATION_IN_PRE_APPROVED_STATE = '30 days';
 
     private $uuid;
 
