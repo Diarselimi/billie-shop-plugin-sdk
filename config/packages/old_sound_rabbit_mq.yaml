@@ -41,6 +41,11 @@ old_sound_rabbit_mq:
       exchange_options: { name: 'paella_delayed_events%env(INSTANCE_SUFFIX)%', type: 'x-delayed-message', arguments: {x-delayed-type: ['S', 'direct']} }
       queue_options:    { name: 'order_in_waiting_state_paella%env(INSTANCE_SUFFIX)%', routing_keys: ['order_in_waiting_state_paella'] }
       callback:         App\Amqp\Consumer\OrderInWaitingStateConsumer
+    order_in_pre_approved_state:
+      connection:       default
+      exchange_options: { name: 'paella_delayed_events%env(INSTANCE_SUFFIX)%', type: 'x-delayed-message', arguments: {x-delayed-type: ['S', 'direct']} }
+      queue_options:    { name: 'order_in_pre_approved_state_paella%env(INSTANCE_SUFFIX)%', routing_keys: ['order_in_pre_approved_state_paella'] }
+      callback:         App\Amqp\Consumer\OrderInPreApprovedStateConsumer
     http_invoice_upload:
       connection:       default
       exchange_options: { name: 'paella_events%env(INSTANCE_SUFFIX)%', type: direct }

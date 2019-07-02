@@ -16,7 +16,7 @@ Feature: Endpoint to decline an order in waiting state
 	Then the response status code should be 403
 	And the JSON response should be:
 	"""
-	{"error": "Cannot decline the order. Order is not in waiting state."}
+	{"error": "Cannot decline the order. Order is not in waiting/pre_approved state."}
 	"""
 
   Scenario: Successfully decline order in waiting state

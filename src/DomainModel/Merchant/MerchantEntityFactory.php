@@ -36,6 +36,7 @@ class MerchantEntityFactory
             ->setWebhookAuthorization($request->getWebhookAuthorization())
             ->setName($company->getName())
             ->setApiKey(Uuid::uuid4()->toString())
+            ->setPaymentMerchantId(Uuid::uuid4()->toString())
             ->setRoles(MerchantEntity::DEFAULT_ROLES)
             ->setIsActive(true)
         ;

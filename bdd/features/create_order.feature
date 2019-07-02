@@ -15,6 +15,7 @@ Feature:
       | debtor_industry_sector    |
       | debtor_identified         |
       | debtor_identified_strict  |
+      | debtor_is_trusted         |
       | limit                     |
       | debtor_not_customer       |
       | debtor_blacklisted        |
@@ -28,6 +29,7 @@ Feature:
       | debtor_industry_sector    | 1       | 1                  |
       | debtor_identified         | 1       | 1                  |
       | debtor_identified_strict  | 1       | 1                  |
+      | debtor_is_trusted         | 1       | 1                  |
       | limit                     | 1       | 1                  |
       | debtor_not_customer       | 1       | 1                  |
       | debtor_blacklisted        | 1       | 1                  |
@@ -310,6 +312,7 @@ Feature:
       "amount":1000.00,
       "amount_net": 900.00,
       "amount_tax": 100.00,
+      "created_at":"2019-06-06T16:21:53+0200",
       "debtor_company":{
         "name":"Test User Company",
         "house_number":"10",
@@ -349,7 +352,7 @@ Feature:
         "city":"Vienna",
         "postal_code":"AT-5130-123333",
         "country":"AT"
-     }
+       }
     }
     """
     And the response status code should be 201

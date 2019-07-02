@@ -21,6 +21,8 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
 
     private const WAITING_STATE_QUEUE_ROUTING_KEY = 'order_in_waiting_state_paella';
 
+    private const PRE_APPROVED_STATE_QUEUE_ROUTING_KEY = 'order_in_pre_approved_state_paella';
+
     private $orderRepository;
 
     private $notificationScheduler;
@@ -52,6 +54,7 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
             OrderDeclinedEvent::NAME => 'onDeclined',
             OrderInWaitingStateEvent::NAME => 'onWaiting',
             OrderCompleteEvent::NAME => 'onComplete',
+            OrderPreApprovedEvent::NAME => 'onPreApproved',
         ];
     }
 
@@ -106,6 +109,17 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
     public function onComplete(OrderCompleteEvent $event): void
     {
         $this->merchantDebtorLimitsService->recalculate($event->getOrderContainer());
+    }
+
+    public function onPreApproved(OrderPreApprovedEvent $event): void
+    {
+        $order = $event->getOrderContainer()->getOrder();
+
+        $this->delayedMessageProducer->produce(
+            self::PRE_APPROVED_STATE_QUEUE_ROUTING_KEY,
+            ['order_id' => $order->getUuid(), 'merchant_id' => $order->getMerchantId()],
+            OrderEntity::MAX_DURATION_IN_PRE_APPROVED_STATE
+        );
     }
 
     private function notifyMerchantWebhook(OrderEntity $order, string $event): void

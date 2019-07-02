@@ -38,7 +38,8 @@ class DebtorScoreCheck implements CheckInterface
         $merchantSettings = $orderContainer->getMerchantSettings();
         $merchantDebtor = $orderContainer->getMerchantDebtor();
 
-        if ($merchantDebtor->isWhitelisted()) {
+        // If debtor is not from trusted source, we can't do scoring
+        if (!$orderContainer->getDebtorCompany()->isTrustedSource() || $merchantDebtor->isWhitelisted()) {
             return new CheckResult(true, self::NAME);
         }
 

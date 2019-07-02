@@ -297,14 +297,10 @@ class PaellaCoreContext extends MinkContext
     public function orderRiskCheckHasFailed($orderId, $check)
     {
         $order = $this->getOrderRepository()->getOneByExternalCode($orderId, 1);
-        if ($order === null) {
-            throw new RuntimeException('Order not found');
-        }
+        Assert::notNull($order);
 
         $check = $this->getOrderRiskCheckRepositoryInterface()->findByOrderAndCheckName($order->getId(), $check);
-        if ($check->isPassed()) {
-            throw new RuntimeException("Risk check {$check} has not failed");
-        }
+        Assert::false($check->isPassed());
     }
 
     /**

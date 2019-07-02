@@ -4,11 +4,11 @@ namespace spec\App\Application\UseCase\CreateOrder;
 
 use App\Application\UseCase\CreateOrder\CreateOrderRequest;
 use App\Application\UseCase\CreateOrder\CreateOrderUseCase;
-use App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\MerchantDebtor\Finder\MerchantDebtorFinder;
 use App\DomainModel\MerchantDebtor\Finder\MerchantDebtorFinderResult;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
+use App\DomainModel\Order\IdentifyAndTriggerAsyncIdentification;
 use App\DomainModel\Order\NewOrder\OrderCreationDTO;
 use App\DomainModel\Order\NewOrder\OrderPersistenceService;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderAmountRequest;
@@ -16,11 +16,11 @@ use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\Order\OrderChecksRunnerService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
+use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
-use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -33,11 +33,9 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
         OrderContainerFactory $orderContainerFactory,
         OrderChecksRunnerService $orderChecksRunnerService,
         OrderRepositoryInterface $orderRepository,
-        MerchantDebtorFinder $debtorFinderService,
-        ProducerInterface $producer,
         OrderResponseFactory $orderResponseFactory,
         OrderStateManager $orderStateManager,
-        CheckoutSessionRepositoryInterface $checkoutSessionRepository,
+        IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification,
         ValidatorInterface $validator,
         OrderEntity $order,
         OrderCreationDTO $newOrderDTO,

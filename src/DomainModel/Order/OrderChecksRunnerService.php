@@ -106,6 +106,8 @@ class OrderChecksRunnerService implements LoggingInterface
         );
 
         if ($limitRiskCheck && $limitRiskCheck->isPassed()) {
+            $this->logInfo('Invalidating limit risk check');
+
             $limitRiskCheck->setIsPassed(false);
             $this->orderRiskCheckRepository->update($limitRiskCheck);
         }

@@ -18,15 +18,16 @@ framework:
         - complete
         - canceled
         - authorized
+        - pre_approved
       transitions:
         waiting:
           from: new
           to: waiting
         create:
-          from: [new, waiting, authorized]
+          from: [new, waiting, authorized, pre_approved]
           to: created
         decline:
-          from: [new, waiting]
+          from: [new, waiting, pre_approved]
           to: declined
         ship:
           from: created
@@ -49,3 +50,6 @@ framework:
         authorize:
           from: new
           to: authorized
+        pre_approve:
+          from: new
+          to: pre_approved
