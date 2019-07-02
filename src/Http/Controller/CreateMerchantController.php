@@ -21,8 +21,8 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  *     operationId="merchant_create",
  *     summary="Create Merchant",
  *
- *     tags={"Internal API"},
- *     x={"groups":{"private"}},
+ *     tags={"Merchants"},
+ *     x={"groups":{"support"}},
  *
  *     @OA\RequestBody(
  *          required=true,

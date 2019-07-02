@@ -7,7 +7,6 @@ use App\Application\UseCase\PauseOrderDunning\PauseOrderDunningException;
 use App\Application\UseCase\PauseOrderDunning\PauseOrderDunningRequest;
 use App\Application\UseCase\PauseOrderDunning\PauseOrderDunningUseCase;
 use App\Http\HttpConstantsInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -18,10 +17,10 @@ use OpenApi\Annotations as OA;
  *     path="/order/{id}/pause-dunning",
  *     operationId="order_pause_dunning",
  *     summary="Pause Order Dunning",
- *     security={{"oauth2"={}}, {"apiKey"={}}},
+ *     security={{"oauth2"={}}},
  *
- *     tags={"Orders API", "Dashboard API"},
- *     x={"groups":{"public"}},
+ *     tags={"Orders"},
+ *     x={"groups":{"standard", "checkout-server", "dashboard"}},
  *
  *     @OA\Parameter(in="path", name="id",
  *          @OA\Schema(oneOf={@OA\Schema(ref="#/components/schemas/UUID"), @OA\Schema(type="string")}),

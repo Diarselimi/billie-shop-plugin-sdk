@@ -12,6 +12,9 @@ use OpenApi\Annotations as OA;
  *     path="/healthcheck",
  *     operationId="api_status",
  *     summary="API Status",
+ *     description="Checks the health of the API server",
+ *     tags={"Misc."},
+ *     x={"groups":{"support", "salesforce"}},
  *     @OA\Response(
  *          response=200,
  *          description="Successful",

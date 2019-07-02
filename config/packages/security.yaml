@@ -34,7 +34,11 @@ security:
             pattern: ^/(merchant|merchant-debtor)/*
             security: false
 
-        api_default:
+        docs:
+            pattern: ^/(private/|public/)?(docs|internal-docs)(/.*)?
+            security: false
+
+        default_security:
             anonymous: false
             stateless: true
             guard:

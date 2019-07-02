@@ -19,8 +19,8 @@ use Symfony\Component\Security\Core\Security;
  *     operationId="checkout_session_authorize",
  *     summary="Authorize Checkout Session",
  *
- *     tags={"Checkout API"},
- *     x={"groups":{"public"}},
+ *     tags={"Checkout"},
+ *     x={"groups":{"checkout-client"}},
  *
  *     @OA\Parameter(in="path", name="sessionUuid", @OA\Schema(ref="#/components/schemas/UUID"), required=true),
  *

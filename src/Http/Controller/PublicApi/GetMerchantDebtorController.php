@@ -17,10 +17,10 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     path="/debtor/{uuid}",
  *     operationId="debtor_get_details",
  *     summary="Get Debtor Details",
- *     security={{"oauth2"={}}, {"apiKey"={}}},
+ *     security={{"oauth2"={}}},
  *
- *     tags={"Dashboard API"},
- *     x={"groups":{"public"}},
+ *     tags={"Debtors"},
+ *     x={"groups":{"dashboard"}},
  *
  *     @OA\Parameter(in="path", name="uuid", @OA\Schema(ref="#/components/schemas/UUID"), required=true),
  *

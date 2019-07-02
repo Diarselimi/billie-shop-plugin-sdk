@@ -39,7 +39,7 @@ class AugmentDescriptions implements ProcessorInterface
 
     private function readMarkdown(string $folder, string $id): ?string
     {
-        $fileName = "markdown/{$folder}/{$id}.md";
+        $fileName = "docs/markdown/{$folder}/{$id}.md";
 
         if (!$this->fileReader->exists($fileName)) {
             return null;

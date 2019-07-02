@@ -14,10 +14,10 @@ use Symfony\Component\HttpFoundation\Request;
  *     path="/order",
  *     operationId="order_create",
  *     summary="Create Order",
- *     security={{"oauth2"={}}, {"apiKey"={}}},
+ *     security={{"oauth2"={}}},
  *
- *     tags={"Orders API"},
- *     x={"groups":{"public"}},
+ *     tags={"Orders"},
+ *     x={"groups":{"standard"}},
  *
  *     @OA\RequestBody(
  *          required=true,

@@ -14,10 +14,10 @@ use Symfony\Component\HttpFoundation\Request;
  *     path="/orders",
  *     operationId="orders_get",
  *     summary="Get Orders",
- *     security={{"oauth2"={}}, {"apiKey"={}}},
+ *     security={{"oauth2"={}}},
  *
- *     tags={"Orders API", "Dashboard API"},
- *     x={"groups":{"public"}},
+ *     tags={"Orders"},
+ *     x={"groups":{"standard", "dashboard", "checkout-server"}},
  *
  *     @OA\Parameter(in="query", name="sort_by", @OA\Schema(type="string",
  *          enum={

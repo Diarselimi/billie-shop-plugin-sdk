@@ -18,8 +18,8 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
  *     summary="Merchant User Logout",
  *     security={{"oauth2"={}}},
  *
- *     tags={"Dashboard API"},
- *     x={"groups":{"public"}},
+ *     tags={"Authentication"},
+ *     x={"groups":{"dashboard"}},
  *
  *     @OA\Response(response=200, description="Logout successful"),
  *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),

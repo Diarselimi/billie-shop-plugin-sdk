@@ -16,10 +16,10 @@ use OpenApi\Annotations as OA;
  *     path="/order/{id}",
  *     operationId="order_get_details",
  *     summary="Get Order Details",
- *     security={{"oauth2"={}}, {"apiKey"={}}},
+ *     security={{"oauth2"={}}},
  *
- *     tags={"Orders API", "Dashboard API"},
- *     x={"groups":{"public"}},
+ *     tags={"Orders"},
+ *     x={"groups":{"standard", "dashboard", "checkout-server"}},
  *
  *     @OA\Parameter(in="path", name="id",
  *          @OA\Schema(oneOf={@OA\Schema(ref="#/components/schemas/UUID"), @OA\Schema(type="string")}),

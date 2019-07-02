@@ -1,115 +1,44 @@
 openapi: 3.0.0
 info:
-  title: 'Billie - PaD-Core API Documentation'
+  title: 'Billie - PaD API Documentation'
   description: |
     # Introduction
     
-    Billie PayAfterDelivery (PaD) offers an easy to use and easy to integrate client and server-side 
-    APIs based on our Pay After Delivery platform.
+    The PaD API provides an easy way to integrate both client and server-side 
+    with our __Billie Pay After Delivery (PaD)__ platform.
     
-    Billie enables you (referenced as the "merchant" from now on) to accept invoice payments from business customers (B2B)
-    without having to wait for the money to arrive, caring about reminding customers to pay, or taking over any credit risk.
+    _Billie PaD_ is a Business to Business (B2B) platform that enables you (the merchant) to accept invoice payments from
+    other business customers without having to wait for the money to arrive, caring about reminding customers to pay,
+    or taking over any credit risk.
     
     Based upon your contractual agreement with Billie, your customers will have 14, 30, 45, 60, 90 or 120 days (payment terms) 
-    to pay your invoices while Billie will transfer the money to you immediately after shipment of product or fulfilment of service obligation.
+    to pay your invoices while Billie will transfer the money to you immediately after shipment of product or fulfilment of
+    service obligation.
     
     If customers get late with paying their outstanding invoices, Billie will also take over reminding customers on your behalf 
-    (white label solution). In case of your customer's bankruptcy Billie fully covers this default for you.
+    (white label solution). In case of your customer's bankruptcy, Billie fully covers this default for you.
     
-    
-    # API Access
-    The API is based on REST and uses `application/json` as requests and responses Content Type. 
-    
-    The API base URLs are:
-    
-    - Production: https://paella.billie.io/api/v1
-    - Sandbox: https://paella-sandbox.billie.io/api/v1
-    
-    
-    # Authentication
-    
-    For authentication and authorisation the API requires requests to include valid API credentials via HTTP headers.
-    Different keys are used for the `sandbox` and `production` environments, which are completely independent
-    meaning that they cannot access or alter data from the other.
-    
-    To obtain your credentials for both environments please send an email to: pad@billie.io.
-    
-    
-    # Incoming Webhooks
-    To send updates on relevant events, Billie PaD sends POST requests to the incoming webhook URL provided by the merchant.
-    The following events can be communicated via webhooks:
-    
-    
-    ## Webhook Authentication
-    The authentication for webhooks sent from Billie to the merchants incoming webhook URL is done using the API Key,
-    either in the `Authorization: Basic` or the `X-Api-Key` header.
-    Examples:
-     - `X-Api-Key: Basic THE_API_KEY`
-     - `Authorization: Basic THE_API_KEY`
-    
-    The merchants will need to verify on their side the received API Key.
-    
-    ## Webhook Requests
-    
-    A `POST` request is sent to the configured merchant Webhook URL with one of the API Key headers mentioned above,
-    the `application/json` Content-Type and the following body format:
-    ```
-    {
-        event: reminder|dunning1|dunning2|dunning3|payment|dca
-        order_id: (string)
-        amount: (string) (optional) (contains sum of paid amounts)
-    	open amount: (string) (optional) (contains sum of outstanding amount)
-        url_notification: (string) (optional)
-    }
-    ```
     
   termsOfService: 'https://www.billie.io/agb/'
   license:
     name: '© Billie GmbH, 2019'
     url: 'https://www.billie.io/agb/'
-  version: 1.10.0
+  version: 2.0.0
   x-logo:
     url: 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDIyLjAuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkViZW5lXzJfS29waWUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIKCSB5PSIwcHgiIHZpZXdCb3g9IjAgMCA0OC41IDY3LjYiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDQ4LjUgNjcuNjsiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPgoJLnN0MHtkaXNwbGF5Om5vbmU7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDo3O3N0cm9rZS1taXRlcmxpbWl0OjEwO30KCS5zdDF7ZmlsbDojMUYyNTMwO30KCS5zdDJ7ZmlsbDpub25lO30KCS5zdDN7ZGlzcGxheTpub25lO2VuYWJsZS1iYWNrZ3JvdW5kOm5ldyAgICA7fQoJLnN0NHtmb250LWZhbWlseTonQXZlbmlyTmV4dC1EZW1pQm9sZCc7fQoJLnN0NXtmb250LXNpemU6My4wMzAzcHg7fQoJLnN0NntsZXR0ZXItc3BhY2luZzoyO30KPC9zdHlsZT4KPHBhdGggY2xhc3M9InN0MCIgZD0iTTkuOCw0Ni4xYy0wLjUsMCwyNS4xLTEyLjYsMjUuMS0zMi43YzAtNi45LTUuNi0xMi42LTEyLjYtMTIuNlM5LjcsNi41LDkuNywxMy40TDkuOCw0Ni4xaDE4LjUKCWM2LjksMCwxMi42LTUuNiwxMi42LTEyLjZTMzUuMiwyMSwyOC4yLDIxSDkuNyIvPgo8Zz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0yOC4yLDQ3SDguOHYtMC44YzAtMC4xLDAtMC4yLDAtMC4zVjEzLjVDOC44LDYsMTQuOSwwLDIyLjMsMHMxMy41LDYsMTMuNSwxMy41YzAsMi44LTAuNSw1LjUtMS40LDguMgoJCWM0LjMsMi4yLDcuMyw2LjcsNy4zLDExLjlDNDEuNyw0MSwzNS42LDQ3LDI4LjIsNDd6IE0xMi45LDQ1LjJoMTUuM2M2LjQsMCwxMS43LTUuMywxMS43LTExLjdjMC00LjQtMi41LTguMy02LjEtMTAuMwoJCWMtMS44LDQuNC00LjgsOC43LTksMTIuOEMyMC40LDQwLjQsMTUuOCw0My41LDEyLjksNDUuMnogTTEwLjYsMjEuOXYyMi43YzEzLTcuNywxOC45LTE1LjYsMjEuNS0yMmMtMS4yLTAuNC0yLjUtMC43LTMuOS0wLjdIMTAuNgoJCXogTTEwLjYsMjAuMWgxNy42YzEuNiwwLDMuMSwwLjMsNC41LDAuOGMxLTIuOSwxLjMtNS41LDEuMy03LjRDMzQsNywyOC44LDEuOCwyMi4zLDEuOFMxMC42LDcsMTAuNiwxMy41VjIwLjF6Ii8+CjwvZz4KPHJlY3QgeD0iLTExLjEiIHk9Ii01OC43IiBjbGFzcz0ic3QyIiB3aWR0aD0iODUuNCIgaGVpZ2h0PSI0OS41Ii8+Cjx0ZXh0IHRyYW5zZm9ybT0ibWF0cml4KDEgMCAwIDEgLTEuMDQyNCA2Ny41NzcyKSIgY2xhc3M9InN0MyBzdDQgc3Q1IHN0NiI+QklMTElFPC90ZXh0Pgo8Zz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0wLDU4LjFoMy43YzAuNCwwLDAuNywwLjEsMS4xLDAuMWMwLjQsMC4xLDAuNywwLjIsMC45LDAuNGMwLjMsMC4yLDAuNSwwLjQsMC43LDAuN2MwLjIsMC4zLDAuMywwLjcsMC4zLDEuMQoJCWMwLDAuNS0wLjIsMS0wLjUsMS4zYy0wLjMsMC40LTAuNywwLjYtMS4yLDAuOHYwYzAuNiwwLjEsMS4xLDAuMywxLjUsMC43QzYuOCw2My42LDcsNjQuMiw3LDY0LjhjMCwwLjUtMC4xLDEtMC4zLDEuMwoJCWMtMC4yLDAuNC0wLjUsMC42LTAuOCwwLjljLTAuMywwLjItMC43LDAuNC0xLjIsMC41Yy0wLjQsMC4xLTAuOSwwLjItMS4zLDAuMkgwQzAsNjcuNiwwLDU4LjEsMCw1OC4xeiBNMS43LDYyaDEuNQoJCWMwLjYsMCwxLTAuMSwxLjMtMC4zYzAuMy0wLjIsMC40LTAuNSwwLjQtMWMwLTAuNC0wLjItMC43LTAuNS0wLjljLTAuMy0wLjItMC44LTAuMy0xLjQtMC4zSDEuN0wxLjcsNjJMMS43LDYyeiBNMS43LDY2LjFoMS41CgkJYzAuMiwwLDAuNSwwLDAuNy0wLjFzMC41LTAuMSwwLjctMC4yYzAuMi0wLjEsMC40LTAuMywwLjUtMC40YzAuMS0wLjIsMC4yLTAuNCwwLjItMC44YzAtMC41LTAuMi0wLjktMC41LTEKCQljLTAuMy0wLjItMC45LTAuMy0xLjUtMC4zSDEuN1Y2Ni4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTExLjEsNTguMWgxLjd2OS41aC0xLjdWNTguMXoiLz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0xNy4zLDU4LjFoMS43djhoNHYxLjVoLTUuN1Y1OC4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTI2LjUsNTguMWgxLjd2OGg0djEuNWgtNS43TDI2LjUsNTguMUwyNi41LDU4LjF6Ii8+Cgk8cGF0aCBjbGFzcz0ic3QxIiBkPSJNMzUuNyw1OC4xaDEuN3Y5LjVoLTEuN1Y1OC4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTQxLjksNTguMWg2LjN2MS41aC00LjZWNjJINDh2MS40aC00LjNWNjZoNC44djEuNWgtNi41VjU4LjF6Ii8+CjwvZz4KPC9zdmc+Cg=='
     href: '#'
 servers:
   -
     url: 'https://paella-sandbox.billie.io/api/v1'
-    description: 'Test Sandbox'
+    description: 'Test Sandbox API'
   -
     url: 'https://paella.billie.io/api/v1'
-    description: Production
-  -
-    url: 'http://paella.dev.ozean12.com'
-    description: 'Local VM'
-  -
-    url: 'http://paella.test10.ozean12.com'
-    description: 'Test 10'
-  -
-    url: 'http://paella-core.dev.ozean12.com'
-    description: 'Local VM (Core)'
-  -
-    url: 'http://paella-core.test10.ozean12.com'
-    description: 'Test 10 (Core)'
+    description: 'Production API'
 paths:
-  /healthcheck:
-    get:
-      tags:
-        - Miscellaneous
-      summary: 'Get API Status'
-      description: 'Check the status of the API server.'
-      operationId: api_status
-      responses:
-        '200':
-          description: Successful
-          content:
-            text/plain:
-              schema:
-                type: string
-                default: 'paella_core is alive'
   /oauth/token:
     post:
       tags:
-        - 'OAuth API'
+        - Authentication
       summary: 'Request a new OAuth Token'
       description: |
         <!-- Grants documentation taken from: https://oauth2.thephpleague.com/ -->
@@ -327,7 +256,7 @@ paths:
   /oauth/authorization:
     get:
       tags:
-        - 'OAuth API'
+        - Authentication
       summary: 'Validate OAuth Token'
       description: |
         Validates the `Authorization: Bearer XXXX` OAuth 2.0 token header and returns a successful response
@@ -353,50 +282,47 @@ paths:
           $ref: '#/components/responses/Forbidden'
         default:
           $ref: '#/components/responses/ServerError'
-  '/order/{id}/approve':
+  '/order/{uuid}/confirm':
     post:
       tags:
-        - 'Internal API'
-      summary: 'Approve Order in Waiting State'
-      description: 'Approves an order manually if it''s in waiting state. Otherwise this call fails.'
-      operationId: order_approve
+        - Orders
+      summary: 'Confirm an order in pre approved state.'
+      operationId: order_pre_approve_confirmation
       parameters:
         -
           name: id
           in: path
           required: true
           schema:
-            type: integer
+            oneOf:
+              -
+                $ref: '#/components/schemas/UUID'
+              -
+                type: string
       responses:
-        '204':
-          description: 'Order approved.'
-        '404':
-          $ref: '#/components/responses/NotFound'
+        '202':
+          description: 'Order was confirmed and now it''s in state created.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        default:
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
           $ref: '#/components/responses/ServerError'
       security:
         -
           oauth2: []
-        -
-          apiKey: []
-  '/checkout-session/{sessionUuid}/authorize':
-    put:
+  /order/pre-approve:
+    post:
       tags:
-        - 'Checkout API'
-      summary: 'Authorize Checkout Session'
-      description: 'Authorizes an existing checkout session, completing all missing order data.'
-      operationId: checkout_session_authorize
-      parameters:
-        -
-          name: sessionUuid
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/UUID'
+        - Orders
+      summary: 'Creates an order in pre approved state.'
+      operationId: pre_approve_create_order
       requestBody:
         required: true
         content:
@@ -406,20 +332,23 @@ paths:
       responses:
         '201':
           description: 'Order was created, but a confirmation is needed.'
-        '400':
-          description: 'Invalid request data or order declined.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CheckoutAuthorizeErrorObject'
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
-        default:
+        '500':
           $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
   '/order/{id}/cancel':
     post:
       tags:
-        - 'Orders API'
+        - Orders
       summary: 'Cancel Order'
       description: 'This call initiates a full order cancellation.'
       operationId: order_cancel
@@ -440,57 +369,15 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        default:
+        '500':
           $ref: '#/components/responses/ServerError'
       security:
         -
           oauth2: []
-        -
-          apiKey: []
-  '/checkout-session/{sessionUuid}/confirm':
-    put:
-      tags:
-        - 'Checkout API'
-      summary: 'Confirm Checkout Session'
-      description: 'Confirms the creation of an existing checkout session.'
-      operationId: checkout_session_confirm
-      parameters:
-        -
-          name: sessionUuid
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/UUID'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CheckoutSessionConfirmOrderRequest'
-      responses:
-        '202':
-          description: 'Order successfully created and accepted'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        default:
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-        -
-          apiKey: []
   '/order/{id}/confirm-payment':
     post:
       tags:
-        - 'Orders API'
+        - Orders
       summary: 'Confirm Order Payment'
       description: |
         This endpoint needs to be called if a customer is accidentally paying the purchase amount 
@@ -502,8 +389,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string
-            maxLength: 255
+            $ref: '#/components/schemas/TinyText'
       requestBody:
         required: true
         content:
@@ -526,88 +412,15 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
-        default:
+        '500':
           $ref: '#/components/responses/ServerError'
       security:
         -
           oauth2: []
-        -
-          apiKey: []
-  /checkout-session:
-    post:
-      tags:
-        - 'Checkout API'
-      summary: 'Create Checkout Session'
-      description: 'Initializes a new Billie Checkout session for the given customer.'
-      operationId: checkout_session_create
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              properties:
-                merchant_customer_id:
-                  description: 'Debtor ID in the merchant system.'
-                  type: string
-                  maxLength: 255
-              type: object
-      responses:
-        '200':
-          description: 'Order payment successfully confirmed.'
-          content:
-            application/json:
-              schema:
-                required:
-                  - id
-                properties:
-                  id: { description: 'Checkout Session Token', $ref: '#/components/schemas/UUID' }
-                type: object
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-        -
-          apiKey: []
-  /merchant:
-    post:
-      tags:
-        - 'Internal API'
-      summary: 'Create Merchant'
-      operationId: merchant_create
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateMerchantRequest'
-      responses:
-        '201':
-          description: 'Merchant successfully created'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CreateMerchantResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '409':
-          description: 'Request conflicts with the current state of the server.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AbstractErrorObject'
-        default:
-          $ref: '#/components/responses/ServerError'
   /order:
     post:
       tags:
-        - 'Orders API'
+        - Orders
       summary: 'Create Order'
       description: |
         Authorization of order financing requests.
@@ -635,261 +448,15 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
-        default:
+        '500':
           $ref: '#/components/responses/ServerError'
       security:
         -
           oauth2: []
-        -
-          apiKey: []
-  '/merchant/{merchantId}/order/{id}/invoice':
-    post:
-      tags:
-        - 'Internal API (for Services)'
-      summary: 'Create Order Invoice'
-      description: 'Creates a new invoice, linking an order with a file. Called by the invoice uploader Lambda services.'
-      operationId: order_create_invoice
-      parameters:
-        -
-          name: id
-          in: path
-          description: 'Order ID'
-          required: true
-          schema:
-            type: integer
-        -
-          name: merchantId
-          in: path
-          description: 'Merchant ID'
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              required:
-                - file_id
-                - invoice_number
-              properties:
-                file_id:
-                  description: 'File ID in the Nachos file service.'
-                  type: integer
-                invoice_number:
-                  description: 'Invoice number provided by the merchant.'
-                  type: string
-                  maxLength: 255
-              type: object
-      responses:
-        '201':
-          description: 'Order invoice successfully created'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        default:
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-        -
-          apiKey: []
-  '/order/{id}/decline':
-    post:
-      tags:
-        - 'Internal API'
-      summary: 'Decline Order in Waiting State'
-      operationId: order_decline
-      parameters:
-        -
-          name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '204':
-          description: 'Order declined.'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        default:
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-        -
-          apiKey: []
-  '/merchant/{apiKey}':
-    get:
-      tags:
-        - 'Internal API'
-      summary: 'Get Merchant'
-      operationId: merchant_get
-      parameters:
-        -
-          name: apiKey
-          in: path
-          description: 'Merchant API Key'
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: 'Merchant Entity'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MerchantEntity'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        default:
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-        -
-          apiKey: []
-  '/debtor/{uuid}':
-    get:
-      tags:
-        - 'Dashboard API'
-      summary: 'Get Debtor Details'
-      operationId: debtor_get_details
-      parameters:
-        -
-          name: uuid
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/UUID'
-      responses:
-        '200':
-          description: 'Debtor Info'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MerchantDebtorResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-        -
-          apiKey: []
-  '/merchant/{merchantId}/merchant-debtor/{merchantDebtorExternalId}':
-    get:
-      tags:
-        - 'Internal API'
-      summary: 'Get Debtor Details (Extended)'
-      operationId: debtor_get_details_extended
-      parameters:
-        -
-          name: merchantId
-          in: path
-          required: true
-          schema:
-            type: integer
-        -
-          name: merchantDebtorExternalId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: 'Debtor Extended Info'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MerchantDebtorExtendedResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        default:
-          $ref: '#/components/responses/ServerError'
-  /debtors:
-    get:
-      tags:
-        - 'Dashboard API'
-      summary: 'Get Debtors'
-      operationId: debtors_get
-      parameters:
-        -
-          name: sort_by
-          in: query
-          required: false
-          schema:
-            type: string
-            default: 'created_at,desc'
-            enum:
-              - created_at
-              - 'created_at,desc'
-              - 'created_at,asc'
-              - external_code
-              - 'external_code,desc'
-              - 'external_code,asc'
-        -
-          name: offset
-          in: query
-          required: false
-          schema:
-            type: integer
-            minimum: 0
-        -
-          name: limit
-          in: query
-          required: false
-          schema:
-            type: integer
-            maximum: 100
-            minimum: 1
-        -
-          name: search
-          in: query
-          description: 'Search text. Filters search results by: `external_code`.'
-          required: false
-          schema:
-            type: string
-            maxLength: 255
-      responses:
-        '200':
-          description: 'Debtor results'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MerchantDebtorListResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-        -
-          apiKey: []
   '/order/{id}':
     get:
       tags:
-        - 'Orders API'
-        - 'Dashboard API'
+        - Orders
       summary: 'Get Order Details'
       description: |
         Retrieves information about an order.
@@ -922,18 +489,65 @@ paths:
           $ref: '#/components/responses/NotFound'
         '401':
           $ref: '#/components/responses/Unauthorized'
-        default:
+        '500':
           $ref: '#/components/responses/ServerError'
       security:
         -
           oauth2: []
+    patch:
+      tags:
+        - Orders
+      summary: 'Update Order'
+      description: |
+        Updates an order if changes are necessary. 
+        The following information can be updated until the order reached state complete:
+        
+        - order amount: decrease the order amount (mostly due to partial cancellations of a purchase), always possible 
+          unless the order is already fully paid.
+        - duration: extend timeframe for a payment. This changes the due date (§1).
+        - invoice details like invoice number and document URL.
+        
+        
+        §1 This call can also be used to move the due date into the future. This is possible from the moment the shipment is 
+        confirmed until the last day before reaching the current due date.
+        
+        The new duration is to be set (i.e. initial request for 30 days, shipment on the 01.01., due date = 31.01., 
+        update duration on 45 days, new due date = 15.02.).
+      operationId: order_update
+      parameters:
         -
-          apiKey: []
+          name: id
+          in: path
+          description: 'Order external code or UUID'
+          required: true
+          schema:
+            oneOf:
+              -
+                $ref: '#/components/schemas/UUID'
+              -
+                type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrderRequest'
+      responses:
+        '204':
+          description: 'Order successfully updated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
   /orders:
     get:
       tags:
-        - 'Orders API'
-        - 'Dashboard API'
+        - Orders
       summary: 'Get Orders'
       operationId: orders_get
       parameters:
@@ -978,8 +592,7 @@ paths:
           description: 'Search text. Filters search results by: `external_code`, `uuid` or `invoice_number`.'
           required: false
           schema:
-            type: string
-            maxLength: 255
+            $ref: '#/components/schemas/TinyText'
         -
           name: filters
           in: query
@@ -1004,13 +617,99 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
-        default:
+        '500':
           $ref: '#/components/responses/ServerError'
       security:
         -
           oauth2: []
+  '/order/{id}/pause-dunning':
+    post:
+      tags:
+        - Orders
+      summary: 'Pause Order Dunning'
+      operationId: order_pause_dunning
+      parameters:
         -
-          apiKey: []
+          name: id
+          in: path
+          description: 'Order external code or UUID'
+          required: true
+          schema:
+            oneOf:
+              -
+                $ref: '#/components/schemas/UUID'
+              -
+                type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PauseOrderDunningRequest'
+      responses:
+        '204':
+          description: 'Successfully paused order dunning'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: 'Pause order dunning is not allowed'
+          content:
+            application/json:
+              schema:
+                properties:
+                  error: { description: 'Error message', type: string, example: 'maximum pausing attempts reached' }
+                type: object
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+  '/order/{id}/ship':
+    post:
+      tags:
+        - Orders
+      summary: 'Ship Order'
+      description: |
+        Confirm that an order was shipped.
+        
+        Confirm the shipment of the product or delivery of the agreed service to receive the payout of the purchase amount.
+      operationId: order_ship
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'Order external code or UUID'
+          required: true
+          schema:
+            oneOf:
+              -
+                $ref: '#/components/schemas/UUID'
+              -
+                type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShipOrderRequest'
+      responses:
+        '200':
+          description: 'Order Info'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
 components:
   schemas:
     UUID:
@@ -1033,6 +732,7 @@ components:
         - late
         - complete
         - canceled
+        - pre_approved
       example: created
     OrderDeclineReason:
       title: 'Order Decline Reason'
@@ -1043,6 +743,16 @@ components:
         - debtor_address
         - debtor_limit_exceeded
       example: debtor_not_identified
+    OrderDunningStatus:
+      title: 'Order Dunning Status'
+      type: string
+      enum:
+        - not_started
+        - active
+        - paused
+        - inactive
+      example: active
+      nullable: true
     OrderDuration:
       title: 'Order Duration'
       type: integer
@@ -1053,7 +763,6 @@ components:
       title: 'Postal Code'
       type: string
       maxLength: 5
-      pattern: '^[a-zA-Z0-9]{5}$'
       example: '10969'
     CountryCode:
       title: 'Country Code'
@@ -1067,38 +776,21 @@ components:
       maxLength: 2
       pattern: '^(\+|\d|\()[ \-\/0-9()]{5,20}$'
       example: '030 31199251'
+    DateTime:
+      title: Date-Time
+      type: string
+      format: date-time
+      example: '2019-01-20 14:00:00'
+    TinyText:
+      title: string
+      type: string
+      maxLength: 255
     AbstractErrorObject:
       title: Error
       type: object
       oneOf:
         -
           $ref: '#/components/schemas/ErrorsObject'
-    CheckoutOrderDeclineErrorObject:
-      title: 'Checkout Order Decline Error'
-      required:
-        - error
-        - code
-      properties:
-        code:
-          description: 'Error code'
-          type: string
-        error:
-          description: 'Error message'
-          type: string
-        reasons:
-          description: 'Decline reasons'
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderDeclineReason'
-      type: object
-    CheckoutAuthorizeErrorObject:
-      title: 'Checkout Authorize Error'
-      type: object
-      oneOf:
-        -
-          $ref: '#/components/schemas/ValidationErrorsObject'
-        -
-          $ref: '#/components/schemas/CheckoutOrderDeclineErrorObject'
     ErrorsObject:
       title: 'Multiple Errors'
       properties:
@@ -1218,51 +910,6 @@ components:
       anyOf:
         -
           $ref: '#/components/schemas/OauthClientCredentialsGrantResponseBody'
-    CheckoutSessionConfirmOrderRequest:
-      required:
-        - amount
-        - duration
-      properties:
-        amount:
-          $ref: '#/components/schemas/CreateOrderAmountRequest'
-        duration:
-          $ref: '#/components/schemas/OrderDuration'
-      type: object
-    CreateMerchantRequest:
-      title: 'Merchant Data'
-      properties:
-        company_id:
-          type: string
-          format: numeric
-        merchant_financing_limit:
-          type: number
-          format: float
-        initial_debtor_financing_limit:
-          type: number
-          format: float
-        debtor_financing_limit:
-          type: number
-          format: float
-        webhook_url:
-          type: string
-          format: uri
-          nullable: true
-        webhook_authorization:
-          description: 'Authorization header that will be sent with the merchant webhooks. Currently `X-Api-Key: XXX` and `Authorization: Basic XXX` are supported.'
-          type: string
-          example: 'X-Api-Key: test'
-          nullable: true
-      type: object
-    CreateMerchantResponse:
-      properties:
-        oauth_client_id:
-          $ref: '#/components/schemas/UUID'
-        oauth_client_secret:
-          $ref: '#/components/schemas/UUID'
-      type: object
-      allOf:
-        -
-          $ref: '#/components/schemas/MerchantEntity'
     CreateOrderRequest:
       title: 'Order Creation Request'
       required:
@@ -1275,16 +922,14 @@ components:
         amount:
           $ref: '#/components/schemas/CreateOrderAmountRequest'
         comment:
-          type: string
-          maxLength: 255
           nullable: true
+          $ref: '#/components/schemas/TinyText'
         duration:
           $ref: '#/components/schemas/OrderDuration'
         order_id:
           description: 'Order external code'
-          type: string
-          maxLength: 255
           example: DE123456-1
+          $ref: '#/components/schemas/TinyText'
         delivery_address:
           $ref: '#/components/schemas/CreateOrderDeliveryAddressRequest'
         debtor_company:
@@ -1329,64 +974,50 @@ components:
         - industry_sector
       properties:
         merchant_customer_id:
-          type: string
-          maxLength: 255
           example: DE123456
           nullable: true
+          $ref: '#/components/schemas/TinyText'
         name:
-          type: string
-          maxLength: 255
           example: 'Billie GmbH'
+          $ref: '#/components/schemas/TinyText'
         tax_id:
-          type: string
-          maxLength: 255
           example: DE1234556
+          $ref: '#/components/schemas/TinyText'
         tax_number:
-          type: string
-          maxLength: 255
           nullable: true
+          $ref: '#/components/schemas/TinyText'
         registration_court:
-          type: string
-          maxLength: 255
           nullable: true
+          $ref: '#/components/schemas/TinyText'
         registration_number:
-          type: string
-          maxLength: 255
           example: 'HRB 1234556'
+          $ref: '#/components/schemas/TinyText'
         industry_sector:
-          type: string
-          maxLength: 255
           example: C
+          $ref: '#/components/schemas/TinyText'
         subindustry_sector:
-          type: string
-          maxLength: 255
           nullable: true
+          $ref: '#/components/schemas/TinyText'
         employees_number:
-          type: string
-          maxLength: 255
           example: 1-5
+          $ref: '#/components/schemas/TinyText'
         legal_form:
-          type: string
-          maxLength: 255
           example: '10122'
+          $ref: '#/components/schemas/TinyText'
         established_costumer:
           type: boolean
         address_addition:
-          type: string
-          maxLength: 255
           nullable: true
+          $ref: '#/components/schemas/TinyText'
         address_house_number:
-          type: string
-          maxLength: 255
           example: '4'
+          $ref: '#/components/schemas/TinyText'
         address_street:
-          type: string
-          maxLength: 255
           example: Charlottenstr.
+          $ref: '#/components/schemas/TinyText'
         address_city:
-          type: string
-          maxLength: 255
           example: Berlin
+          $ref: '#/components/schemas/TinyText'
         address_postal_code:
           $ref: '#/components/schemas/PostalCode'
         address_country:
@@ -1405,13 +1036,11 @@ components:
             - m
             - f
         first_name:
-          type: string
-          maxLength: 255
           example: James
+          $ref: '#/components/schemas/TinyText'
         last_name:
-          type: string
-          maxLength: 255
           example: Smith
+          $ref: '#/components/schemas/TinyText'
         phone_number:
           $ref: '#/components/schemas/PhoneNumber'
         email:
@@ -1428,170 +1057,68 @@ components:
         - country
       properties:
         addition:
-          type: string
-          maxLength: 255
           nullable: true
+          $ref: '#/components/schemas/TinyText'
         house_number:
-          type: string
-          maxLength: 255
           example: '4'
+          $ref: '#/components/schemas/TinyText'
         street:
-          type: string
-          maxLength: 255
           example: 'Charlotten Str.'
+          $ref: '#/components/schemas/TinyText'
         city:
-          type: string
-          maxLength: 255
           example: Berlin
+          $ref: '#/components/schemas/TinyText'
         postal_code:
           $ref: '#/components/schemas/PostalCode'
         country:
           $ref: '#/components/schemas/CountryCode'
       type: object
-    MerchantEntity:
+    PauseOrderDunningRequest:
+      title: 'Pause Order Dunning'
       properties:
-        id:
+        number_of_days:
           type: integer
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        name:
-          type: string
-          maxLength: 255
-        available_financing_limit:
-          type: number
-          format: float
-        api_key:
-          type: string
-          maxLength: 255
-        company_id:
-          type: string
-          maxLength: 255
-        payment_merchant_id:
-          $ref: '#/components/schemas/UUID'
-        roles:
-          type: array
-          items:
-            type: string
-            example: ROLE_API_USER
-        is_active:
-          type: boolean
-        webhook_url:
-          type: string
-          format: uri
-          nullable: true
-        webhook_authorization:
-          type: string
-          example: 'Authorization: Basic test'
-          nullable: true
+          minimum: 1
+          nullable: false
       type: object
-    AbstractMerchantDebtorResponse:
+    ShipOrderRequest:
+      title: 'Order Shipping Object'
       properties:
-        id:
-          description: 'Debtor UUID'
-          $ref: '#/components/schemas/UUID'
-        external_code:
-          description: 'Merchant Customer ID'
-          type: string
-          maxLength: 255
-        name:
-          type: string
-          maxLength: 255
-        financing_limit:
-          description: 'Full limit assigned to this debtor.'
-          type: number
-          format: float
-        financing_power:
-          description: 'Available limit for this debtor.'
-          type: number
-          format: float
-        bank_account_iban:
-          type: string
-          maxLength: 255
-        bank_account_bic:
-          type: string
-          maxLength: 255
-        created_at:
-          type: string
-          format: date-time
-          example: '2019-01-20 14:00:00'
-      type: object
-    MerchantDebtorResponse:
-      properties:
-        address_street:
-          type: string
-          maxLength: 255
-        address_house:
-          type: string
-          maxLength: 255
+        external_order_id:
           nullable: true
-        address_postal_code:
-          type: string
-          maxLength: 255
-        address_city:
-          type: string
-          maxLength: 255
-        address_country:
-          type: string
-          maxLength: 255
-        outstanding_amount:
-          type: number
-          format: float
-        outstanding_amount_created:
-          type: number
-          format: float
-        outstanding_amount_late:
-          type: number
-          format: float
+          $ref: '#/components/schemas/TinyText'
+        invoice_number:
+          $ref: '#/components/schemas/TinyText'
+        invoice_url:
+          $ref: '#/components/schemas/TinyText'
+        proof_of_delivery_url:
+          $ref: '#/components/schemas/TinyText'
       type: object
-      allOf:
-        -
-          $ref: '#/components/schemas/AbstractMerchantDebtorResponse'
-    MerchantDebtorExtendedResponse:
+    UpdateOrderRequest:
+      title: 'Order Update Object'
       properties:
-        merchant_debtor_id:
-          type: integer
-        company_id:
-          type: integer
-        payment_id:
-          $ref: '#/components/schemas/UUID'
-        is_whitelisted:
-          type: boolean
-        is_blacklisted:
-          type: boolean
-        is_trusted_source:
-          type: boolean
-        crefo_id:
-          type: string
-          maxLength: 255
-          nullable: true
-        schufa_id:
-          type: string
-          maxLength: 255
-          nullable: true
+        duration:
+          $ref: '#/components/schemas/OrderDuration'
+        amount_net:
+          type: number
+          format: float
+          minimum: 1
+          example: 119
+        amount_gross:
+          type: number
+          format: float
+          minimum: 1
+          example: 100
+        amount_tax:
+          type: number
+          format: float
+          minimum: 1
+          example: 19
+        invoice_number:
+          $ref: '#/components/schemas/TinyText'
+        invoice_url:
+          $ref: '#/components/schemas/TinyText'
       type: object
-      allOf:
-        -
-          $ref: '#/components/schemas/MerchantDebtorResponse'
-    MerchantDebtorListResponse:
-      properties:
-        total:
-          type: integer
-          minimum: 0
-        items:
-          type: array
-          items:
-            type: object
-            $ref: '#/components/schemas/MerchantDebtorListItem'
-      type: object
-    MerchantDebtorListItem:
-      title: 'Debtor Basic Info'
-      allOf:
-        -
-          $ref: '#/components/schemas/AbstractMerchantDebtorResponse'
     OrderResponse:
       title: 'Order Entity'
       properties:
@@ -1613,38 +1140,46 @@ components:
           type: number
           format: float
           example: 123.45
-          nullable: true
+          nullable: false
+        amount_tax:
+          type: number
+          format: float
+          example: 123.45
+          nullable: false
+        amount_net:
+          type: number
+          format: float
+          example: 123.45
+          nullable: false
         duration:
           example: 30
           $ref: '#/components/schemas/OrderDuration'
+        dunning_status:
+          $ref: '#/components/schemas/OrderDunningStatus'
         debtor_company:
           description: 'Identified company'
           properties:
             name:
-              type: string
-              maxLength: 255
               example: 'Billie GmbH'
               nullable: true
+              $ref: '#/components/schemas/TinyText'
             house_number:
-              type: string
-              maxLength: 255
               example: '4'
               nullable: true
+              $ref: '#/components/schemas/TinyText'
             street:
-              type: string
-              maxLength: 255
               example: Charlottenstr.
               nullable: true
+              $ref: '#/components/schemas/TinyText'
             postal_code:
               type: string
               maxLength: 5
               example: '10969'
               nullable: true
             city:
-              type: string
-              maxLength: 255
               example: Berlin
               nullable: true
+              $ref: '#/components/schemas/TinyText'
             country:
               type: string
               maxLength: 2
@@ -1654,20 +1189,17 @@ components:
           properties:
             iban:
               description: 'Virtual IBAN provided by Billie'
-              type: string
-              maxLength: 255
               nullable: true
+              $ref: '#/components/schemas/TinyText'
             bic:
-              type: string
-              maxLength: 255
               nullable: true
+              $ref: '#/components/schemas/TinyText'
           type: object
         invoice:
           properties:
             number:
-              type: string
-              maxLength: 255
               nullable: true
+              $ref: '#/components/schemas/TinyText'
             payout_amount:
               type: number
               format: float
@@ -1694,64 +1226,55 @@ components:
           description: 'Data provided in the order creation'
           properties:
             merchant_customer_id:
-              type: string
-              maxLength: 255
               example: C-10123456789
+              $ref: '#/components/schemas/TinyText'
             name:
-              type: string
-              maxLength: 255
               example: 'Billie G.m.b.H.'
+              $ref: '#/components/schemas/TinyText'
             address_country:
               type: string
               maxLength: 2
               example: DE
+            address_city:
+              example: Berlin
+              $ref: '#/components/schemas/TinyText'
             address_postal_code:
               type: string
               maxLength: 5
               example: '10969'
             address_street:
-              type: string
-              maxLength: 255
               example: 'Charlotten Straße'
+              $ref: '#/components/schemas/TinyText'
             address_house:
-              type: string
-              maxLength: 255
               example: '4'
+              $ref: '#/components/schemas/TinyText'
             industry_sector:
-              type: string
-              maxLength: 255
+              $ref: '#/components/schemas/TinyText'
           type: object
         delivery_address:
           properties:
             house_number:
-              type: string
-              maxLength: 255
               nullable: true
+              $ref: '#/components/schemas/TinyText'
             street:
-              type: string
-              maxLength: 255
               nullable: true
+              $ref: '#/components/schemas/TinyText'
             postal_code:
               type: string
               maxLength: 5
               nullable: true
             city:
-              type: string
-              maxLength: 255
               nullable: true
+              $ref: '#/components/schemas/TinyText'
             country:
               type: string
               maxLength: 2
               nullable: true
           type: object
         created_at:
-          type: string
-          format: date-time
-          example: '2019-01-20 14:00:00'
+          $ref: '#/components/schemas/DateTime'
         shipped_at:
-          type: string
-          format: date-time
-          example: '2019-01-24 14:00:00'
+          $ref: '#/components/schemas/DateTime'
       type: object
   responses:
     ServerError:
@@ -1800,34 +1323,46 @@ components:
           tokenUrl: /oauth/token
           scopes:
             default: default
-    apiKey:
-      type: apiKey
-      description: |
-        This authentication mechanism is based on the `X-Api-Key` header. It has been is **deprecated**, since it is
-        less secure because API Keys never expire, in comparison to OAuth tokens.
-        
-        > Example: `X-Api-Key: bf428b05-f80e-4ed0-aa79-e0e7bef274a3`.
-      name: X-Api-Key
-      in: header
 tags:
   -
-    name: 'Orders API'
+    name: Authentication
+    description: |
+      For authentication and authorisation the API requires some requests to include valid API credentials via HTTP headers.
+      Different keys are used for the `sandbox` and `production` environments, which are completely independent
+      meaning that they cannot access or alter data from the other.
+      
+      To obtain your credentials for both environments please contact us or send an email to: pad@billie.io.
+      
+      ## OAuth 2.0
+      The API uses OAuth 2.0 for authentication.
+      
+      This authentication mechanism is based on the OAuth 2.0 prototocol and requires a Client ID, a Client Secret Key and
+      in some flows also a user (email) and password.
+      
+      With these credentials, the client should request a token using the [oauth/token](#operation/oauth_token_create) endpoint,
+      which should be used in the `Authorization` header together with the `Bearer` challenge to authenticate all the requests.
+      
+      > Example: `Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c`.
+  -
+    name: Orders
     description: |
       ## Order States
       
-      | State    | Description                                                                                   |
-      |----------|-----------------------------------------------------------------------------------------------|
-      | created  | An order is successfully created when Bille can offer financing for this specific transaction |
-      | declined | The order was declined and no financing is offered for this transaction                       |
-      | shipped  | The order was successfully shipped by the merchant                                            |
-      | paid_out | The outstanding amount for the respective order was successfully paid out to the merchant     |
-      | late     | The payment of the outstanding amount is overdue                                              |
-      | complete | The outstanding amount was successfully paid back by the customer                             |
-      | canceled | The order was canceled by the merchant       
+      | State       | Description                                                                                   |
+      |-------------|-----------------------------------------------------------------------------------------------|
+      | waiting     | The order creation failed and needs a manual operation in order to be approved or declined    |
+      | authorized  | The order is valid but it needs a confirmation from the merchant in order to be approved      |
+      | created     | The order is successfully approved and Billie can offer financing for this transaction        |
+      | declined    | The order was declined and no financing is offered for this transaction                       |
+      | shipped     | The order was successfully shipped by the merchant                                            |
+      | paid_out    | The outstanding amount for the respective order was successfully paid out to the merchant     |
+      | late        | The payment of the outstanding amount is overdue                                              |
+      | complete    | The outstanding amount was successfully paid back by the customer                             |
+      | canceled    | The order was canceled by the merchant       
       
       ## Order State Transitions
       
-      ![transitions-diagram.png](data:image/png;base64,)
+      ![img](src/Resources/docs/orders-workflow.png)
       
       ## Order Decline Reasons
       
@@ -1848,14 +1383,33 @@ tags:
       that are delivered back to the merchant as an answer of a API order creation request. Virtual IBANs are unique for each of 
       your debtor / customer. The virtual IBAN needs to be put on the invoice which the customer receives for the purchase.
   -
-    name: 'Checkout API'
-  -
-    name: 'Dashboard API'
-  -
-    name: 'OAuth API'
-  -
-    name: Miscellaneous
-  -
-    name: 'Internal API'
-  -
-    name: 'Internal API (for Services)'
+    name: Webhooks
+    description: |
+      ## Incoming Webhooks
+      To send updates on relevant events, Billie PaD sends POST requests to the incoming webhook URL provided by the merchant.
+      The following events can be communicated via webhooks:
+      
+      
+      ### Webhook Authentication
+      The authentication for webhooks sent from Billie to the merchants incoming webhook URL depends on the merchant specifications 
+      and needs, but one possibility is sending the Billie API Key via headers:
+      Examples:
+       - `Authorization: Basic THE_API_KEY`
+       - `X-Api-Key: THE_API_KEY`
+       - `X-Another-Custom-Header: THE_API_KEY`
+      
+      The merchants will need to verify on their server side the authentication mechanism and credentials.
+      
+      ### Webhook Requests
+      
+      A `POST` request is sent to the configured merchant Webhook URL with one of the API Key headers mentioned above,
+      the `application/json` Content-Type and the following body format:
+      ```
+      {
+          event: reminder|dunning1|dunning2|dunning3|payment|dca
+          order_id: (string)
+          amount: (string) (optional) (contains sum of paid amounts)
+      	open amount: (string) (optional) (contains sum of outstanding amount)
+          url_notification: (string) (optional)
+      }
+      ```

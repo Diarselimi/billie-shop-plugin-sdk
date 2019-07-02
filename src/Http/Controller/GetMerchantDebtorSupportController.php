@@ -16,8 +16,8 @@ use OpenApi\Annotations as OA;
  *     operationId="debtor_get_details_extended",
  *     summary="Get Debtor Details (Extended)",
  *
- *     tags={"Internal API"},
- *     x={"groups":{"private"}},
+ *     tags={"Debtors"},
+ *     x={"groups":{"support"}},
  *
  *     @OA\Parameter(in="path", name="merchantId", @OA\Schema(type="integer"), required=true),
  *     @OA\Parameter(in="path", name="merchantDebtorExternalId", @OA\Schema(type="string"), required=true),

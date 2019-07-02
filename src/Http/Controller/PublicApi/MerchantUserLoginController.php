@@ -17,8 +17,8 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
  *     summary="Merchant User Login",
  *     security={},
  *
- *     tags={"Dashboard API"},
- *     x={"groups":{"public"}},
+ *     tags={"Authentication"},
+ *     x={"groups":{"dashboard"}},
  *
  *     @OA\RequestBody(
  *          required=true,

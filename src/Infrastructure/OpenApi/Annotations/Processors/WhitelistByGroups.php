@@ -12,7 +12,7 @@ use const OpenApi\UNDEFINED;
  *
  * Groups should be defined in the 'x-groups' Open API vendor extension, as array of strings.
  */
-class FilterByGroups implements ProcessorInterface
+class WhitelistByGroups implements ProcessorInterface
 {
     private $groups;
 
@@ -38,10 +38,10 @@ class FilterByGroups implements ProcessorInterface
         $this->filterFromList($analysis->openapi->components->callbacks);
         $this->filterFromList($analysis->openapi->components->links);
         $this->filterFromList($analysis->openapi->components->examples);
-        $this->filterXGroups($ext);
+        $this->filterTagGroups($analysis->openapi->x);
     }
 
-    private function filterXGroups(&$ext)
+    private function filterTagGroups(&$ext)
     {
         if (!is_array($ext) && !isset($ext['tagGroups'])) {
             return;

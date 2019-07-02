@@ -8,7 +8,7 @@ use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 use OpenApi\Annotations as OA;
 
 /**
- * @OA\Schema(schema="MerchantEntity", x={"groups":{"private"}}, type="object", properties={
+ * @OA\Schema(schema="MerchantEntity", type="object", properties={
  *      @OA\Property(property="id", type="integer"),
  *      @OA\Property(property="created_at", ref="#/components/schemas/DateTime"),
  *      @OA\Property(property="updated_at", ref="#/components/schemas/DateTime"),

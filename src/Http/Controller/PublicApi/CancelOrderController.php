@@ -17,10 +17,10 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     path="/order/{id}/cancel",
  *     operationId="order_cancel",
  *     summary="Cancel Order",
- *     security={{"oauth2"={}}, {"apiKey"={}}},
+ *     security={{"oauth2"={}}},
  *
- *     tags={"Orders API"},
- *     x={"groups":{"public"}},
+ *     tags={"Orders"},
+ *     x={"groups":{"standard", "checkout-server"}},
  *
  *     @OA\Parameter(in="path", name="id", @OA\Schema(type="integer"), required=true, description="Order ID or UUID"),
  *

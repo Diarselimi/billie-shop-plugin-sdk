@@ -22,11 +22,15 @@ class GenerateOpenApiSpec extends Command
 
     private $projectDocsDir;
 
-    public function __construct(string $projectRootDir)
+    private $fileReader;
+
+    public function __construct(string $projectRootDir, RelativeFileReader $resourcesFileReader)
     {
         parent::__construct(self::NAME);
+
         $this->projectRootDir = $projectRootDir;
         $this->projectDocsDir = $projectRootDir . '/docs/openapi';
+        $this->fileReader = $resourcesFileReader;
     }
 
     protected function configure()
@@ -55,8 +59,6 @@ class GenerateOpenApiSpec extends Command
             ($this->projectDocsDir . '/paella-' . $input->getArgument('version') . '-openapi.yaml');
 
         file_put_contents($outputFile, $this->buildYaml($input));
-
-        $output->writeln('The OpenAPI 3.0 specification has been generated under ' . $outputFile);
     }
 
     protected function buildYaml(InputInterface $input): string
@@ -80,21 +82,24 @@ class GenerateOpenApiSpec extends Command
         );
     }
 
-    protected function buildProcessorsData(InputInterface $input, RelativeFileReader $fileReader)
+    protected function buildProcessorsData(InputInterface $input)
     {
         return [
             'title' => $input->getOption('title'),
             'version' => $input->getArgument('version'),
-            'logo' => 'data:image/svg+xml;base64,' . base64_encode($fileReader->read('resources/billie-logo.svg')),
-            'info_description' => $fileReader->read('markdown/index.md'),
+            'logo' => 'data:image/svg+xml;base64,' . base64_encode($this->fileReader->read('docs/billie-logo.svg')),
+            'info_description' => $this->fileReader->read('docs/markdown/index.md'),
         ];
     }
 
     protected function buildProcessors(InputInterface $input): array
     {
-        $fileReader = new RelativeFileReader($this->projectDocsDir);
-        $data = $this->buildProcessorsData($input, $fileReader);
+        $data = $this->buildProcessorsData($input);
         $groups = $input->getOption('groups') ?: [];
+
+        if (in_array('full', $groups)) {
+            $groups = [];
+        }
 
         return [
             new Processors\MergeIntoOpenApi(),
@@ -104,7 +109,7 @@ class GenerateOpenApiSpec extends Command
             new Processors\AugmentProperties(),
             new CustomProcessors\AddServers(),
             new CustomProcessors\AugmentMainInfo($data),
-            new CustomProcessors\AugmentDescriptions($fileReader),
+            new CustomProcessors\AugmentDescriptions($this->fileReader),
             new Processors\BuildPaths(),
             new Processors\InheritProperties(),
             new Processors\AugmentOperations(),
@@ -113,7 +118,8 @@ class GenerateOpenApiSpec extends Command
             new Processors\MergeXmlContent(),
             new Processors\OperationId(),
             new Processors\CleanUnmerged(),
-            new CustomProcessors\FilterByGroups($groups),
+            new CustomProcessors\WhitelistByGroups($groups),
+            new CustomProcessors\RemoveOrphanComponents(),
         ];
     }
 }
