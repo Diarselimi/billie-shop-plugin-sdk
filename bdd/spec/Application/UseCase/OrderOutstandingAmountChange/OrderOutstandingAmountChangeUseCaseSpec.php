@@ -135,6 +135,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         $merchantRepository->update($merchant)->shouldBeCalledOnce();
 
         $orderStateManager->wasShipped($order)->shouldBeCalledOnce()->willReturn(true);
+        $orderStateManager->isCanceled($order)->shouldBeCalledOnce()->willReturn(false);
 
         $notificationScheduler->createAndSchedule($order, $eventPayload)->shouldBeCalledOnce()->willReturn(true);
         $paymentForgivenessService->begForgiveness($orderContainer, $amountChange)->shouldBeCalledOnce()->willReturn(true);
@@ -164,6 +165,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
 
         $order->getState()->willReturn('complete');
         $orderStateManager->wasShipped($order)->shouldBeCalledOnce()->willReturn(false);
+        $orderStateManager->isCanceled($order)->shouldBeCalledOnce()->willReturn(false);
 
         $limitsService->unlock($orderContainer, self::AMOUNT_CHANGE)->shouldNotBeCalled();
         $merchantRepository->update($orderContainer->getMerchant())->shouldNotBeCalled();
