@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "88ff5f8d0f5571e2df47d3ed1285a1ac",
+    "content-hash": "7efd23ddec2100fd543b5338c58d1730",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -144,16 +144,16 @@
         },
         {
             "name": "billie/monitoring-bundle",
-            "version": "2.1.0",
+            "version": "v2.3.0",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/MonitoringBundle.git",
-                "reference": "abae6f654834e3452d8f3a64610a9330dc3eed1c"
+                "reference": "3bcb34065ab80dca89bc82a86fabc3aa22de988c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/MonitoringBundle/zipball/abae6f654834e3452d8f3a64610a9330dc3eed1c",
-                "reference": "abae6f654834e3452d8f3a64610a9330dc3eed1c",
+                "url": "https://api.github.com/repos/ozean12/MonitoringBundle/zipball/3bcb34065ab80dca89bc82a86fabc3aa22de988c",
+                "reference": "3bcb34065ab80dca89bc82a86fabc3aa22de988c",
                 "shasum": ""
             },
             "require": {
@@ -181,9 +181,9 @@
                 }
             ],
             "support": {
-                "source": "https://github.com/ozean12/MonitoringBundle/tree/2.1.0"
+                "source": "https://github.com/ozean12/MonitoringBundle/tree/v2.3.0"
             },
-            "time": "2019-05-15T08:32:33+00:00"
+            "time": "2019-07-03T13:06:24+00:00"
         },
         {
             "name": "billie/pdo-bundle",
