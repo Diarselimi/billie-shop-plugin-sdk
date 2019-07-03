@@ -19,8 +19,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     summary="Decline Order in Waiting State",
  *     security={{"oauth2"={}}, {"apiKey"={}}},
  *
- *     tags={"Internal API"},
- *     x={"groups":{"private"}},
+ *     tags={"Orders"},
+ *     x={"groups":{"support", "salesforce"}},
  *
  *     @OA\Parameter(in="path", name="id", @OA\Schema(type="integer"), required=true),
  *

@@ -35,6 +35,26 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Schema(
+ *     schema="PublicApiGroup",
+ *     title="API Group",
+ *     type="string",
+ *     enum=\App\Http\Controller\PublicApi\PublicApiSpecController::API_GROUP_WHITELIST,
+ *     example="standard"
+ * )
+ */
+
+/**
+ * @OA\Schema(
+ *     schema="PrivateApiGroup",
+ *     title="API Group",
+ *     type="string",
+ *     enum=\App\Http\Controller\PrivateApi\PrivateApiSpecController::API_GROUP_WHITELIST,
+ *     example="standard"
+ * )
+ */
+
+/**
+ * @OA\Schema(
  *     schema="OrderDunningStatus",
  *     title="Order Dunning Status",
  *     type="string",

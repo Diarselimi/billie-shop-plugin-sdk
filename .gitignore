@@ -1,5 +1,7 @@
 config/secrets
-redoc-static.html
+*.html
+*.zip
+*.tar.gz
 
 ###> symfony/framework-bundle ###
 /.env

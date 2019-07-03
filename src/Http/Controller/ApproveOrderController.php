@@ -17,10 +17,10 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     path="/order/{id}/approve",
  *     operationId="order_approve",
  *     summary="Approve Order in Waiting State",
- *     security={{"oauth2"={}}, {"apiKey"={}}},
+ *     security={{"oauth2"={}}},
  *
- *     tags={"Internal API"},
- *     x={"groups":{"private"}},
+ *     tags={"Orders"},
+ *     x={"groups":{"support", "salesforce"}},
  *
  *     @OA\Parameter(in="path", name="id", @OA\Schema(type="integer"), required=true),
  *

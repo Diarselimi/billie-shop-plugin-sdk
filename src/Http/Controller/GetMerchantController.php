@@ -12,10 +12,9 @@ use OpenApi\Annotations as OA;
  *     path="/merchant/{apiKey}",
  *     operationId="merchant_get",
  *     summary="Get Merchant",
- *     security={{"oauth2"={}}, {"apiKey"={}}},
  *
- *     tags={"Internal API"},
- *     x={"groups":{"private"}},
+ *     tags={"Merchants"},
+ *     x={"groups":{"support"}},
  *
  *     @OA\Parameter(in="path", name="apiKey", @OA\Schema(type="string"), required=true, description="Merchant API Key"),
  *

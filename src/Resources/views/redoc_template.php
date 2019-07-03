@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf8"/>
-    <title>{{title}}</title>
-    <!-- needed for adaptive design -->
+    <meta charset="utf-8"/>
+
+    <title><?php /** @noinspection PhpUndefinedVariableInspection */echo $title; ?></title>
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        body {
-            padding: 0;
-            margin: 0;
-        }
-    </style>
-    {{{redocHead}}}
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet">
+    <meta http-equiv="content-language" content="en">
+    <meta name="robots" content="noindex, nofollow"/>
+    <meta name="author" content="Billie GmbH">
+    <meta name="publisher" content="Billie GmbH">
+    <meta name="copyright" content="Billie GmbH">
+
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet"
 
     <link rel="apple-touch-icon" sizes="57x57" href="https://www.billie.io/assets/images/favicons/apple-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="https://www.billie.io/assets/images/favicons/apple-icon-60x60.png">
@@ -23,13 +23,23 @@
     <link rel="apple-touch-icon" sizes="144x144" href="https://www.billie.io/assets/images/favicons/apple-icon-144x144.png">
     <link rel="apple-touch-icon" sizes="152x152" href="https://www.billie.io/assets/images/favicons/apple-icon-152x152.png">
     <link rel="apple-touch-icon" sizes="180x180" href="https://www.billie.io/assets/images/favicons/apple-icon-180x180.png">
+
     <link rel="icon" type="image/png" sizes="192x192" href="https://www.billie.io/assets/images/favicons/android-icon-192x192.png">
     <link rel="icon" type="image/png" sizes="32x32" href="https://www.billie.io/assets/images/favicons/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="96x96" href="https://www.billie.io/assets/images/favicons/favicon-96x96.png">
     <link rel="icon" type="image/png" sizes="16x16" href="https://www.billie.io/assets/images/favicons/favicon-16x16.png">
 
     <meta name="theme-color" content="#ffffff">
+
+    <!--
+    ReDoc doesn't change outer page styles
+    -->
     <style>
+        body {
+            padding: 0;
+            margin: 0;
+        }
+
         .kWDcCe, .kBvmFd code {
             color: inherit !important;
         }
@@ -53,9 +63,21 @@
         }
     </style>
 </head>
-
 <body>
-{{{redocHTML}}}
-</body>
+<div id="redoc_container">Loading ...</div>
+<script src="https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js"></script>
+<script>
 
+// noinspection JSAnnotator
+const OPENAPI_SPEC = <?php echo str_replace('`', '\\`', $spec); ?>;
+
+Redoc.init(
+    OPENAPI_SPEC,
+    <?php /** @noinspection PhpUndefinedVariableInspection */echo $redoc_config_json; ?>,
+        document.getElementById('redoc_container')
+);
+
+document.title += ' v' + OPENAPI_SPEC.info.version;
+</script>
+</body>
 </html>

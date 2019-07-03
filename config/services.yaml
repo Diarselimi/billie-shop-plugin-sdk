@@ -31,6 +31,8 @@ services:
       $projectRootDir: '%kernel.root_dir%/..'
       $smaugClientId: '%smaug_client_id%'
       $smaugClientSecret: '%smaug_client_secret%'
+      $resourcesFileReader: '@resources_file_reader'
+      $apiSpecFileReader: '@api_spec_file_reader'
 
   _instanceof:
     App\Application\UseCase\ValidatedUseCaseInterface:
@@ -39,7 +41,7 @@ services:
 
   App\:
     resource: '../src/*'
-    exclude: '../src/{Entity,Migrations,Tests,Test,Kernel.php}'
+    exclude: '../src/{Resources,Entity,Migrations,Tests,Test,Kernel.php}'
 
   App\Http\Controller\:
     resource: '../src/Http/Controller'
@@ -48,6 +50,16 @@ services:
   Symfony\Component\Workflow\Workflow: '@state_machine.order'
 
   Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter: '@serializer.name_converter.camel_case_to_snake_case'
+
+  resources_file_reader:
+    class: App\Infrastructure\OpenApi\RelativeFileReader
+    arguments:
+      - '%kernel.root_dir%/Resources'
+
+  api_spec_file_reader:
+    class: App\Infrastructure\OpenApi\RelativeFileReader
+    arguments:
+      - '%kernel.root_dir%/../docs/openapi'
 
   openapi_file_locator:
     class: Symfony\Component\HttpKernel\Config\FileLocator

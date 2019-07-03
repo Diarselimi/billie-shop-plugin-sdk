@@ -13,10 +13,10 @@ use OpenApi\Annotations as OA;
  *     path="/order/pre-approve",
  *     operationId="pre_approve_create_order",
  *     summary="Creates an order in pre approved state.",
- *     security={{"oauth2"={}}, {"apiKey"={}}},
+ *     security={{"oauth2"={}}},
  *
- *     tags={"Orders API"},
- *     x={"groups":{"public"}},
+ *     tags={"Orders"},
+ *     x={"groups":{"standard", "checkout-server"}},
  *
  *     @OA\RequestBody(
  *          required=true,

@@ -6,9 +6,11 @@ use OpenApi\Annotations as OA;
  * @OA\Components(
  *     securitySchemes={
  *         @OA\SecurityScheme(securityScheme="oauth2", type="oauth2", flows={@OA\Flow(flow="password", tokenUrl="/oauth/token", scopes={"default":"default"})}),
- *         @OA\SecurityScheme(securityScheme="apiKey", type="apiKey", in="header", name="X-Api-Key", description="Deprecated. Please use OAuth 2.0.")
+ *         @OA\SecurityScheme(securityScheme="apiKey", type="apiKey", in="header", name="X-Api-Key", description="Deprecated. Please use OAuth 2.0.", x={"groups":{"support"}})
  *     },
  *     responses={
+ *          @OA\Response(response="HtmlDocument", description="HTML Document", @OA\MediaType(mediaType="text/html", @OA\Schema(type="string"))),
+ *          @OA\Response(response="YamlDocument", description="YAML Document", @OA\MediaType(mediaType="text/x-yaml", @OA\Schema(type="string"))),
  *          @OA\Response(response="ServerError", description="Unexpected Server Error", @OA\JsonContent(ref="#/components/schemas/AbstractErrorObject")),
  *          @OA\Response(response="NotFound", description="Resource Not Found", @OA\JsonContent(ref="#/components/schemas/AbstractErrorObject")),
  *          @OA\Response(response="Unauthorized", description="Unauthorized request or invalid credentials", @OA\JsonContent(ref="#/components/schemas/AbstractErrorObject")),

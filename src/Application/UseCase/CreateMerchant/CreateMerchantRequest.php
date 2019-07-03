@@ -5,7 +5,7 @@ namespace App\Application\UseCase\CreateMerchant;
 use OpenApi\Annotations as OA;
 
 /**
- * @OA\Schema(schema="CreateMerchantRequest", title="Merchant Data", x={"groups":{"private"}}, properties={
+ * @OA\Schema(schema="CreateMerchantRequest", title="Merchant Data", properties={
  *     @OA\Property(property="company_id", type="string", format="numeric"),
  *     @OA\Property(property="merchant_financing_limit", type="number", format="float"),
  *     @OA\Property(property="initial_debtor_financing_limit", type="number", format="float"),

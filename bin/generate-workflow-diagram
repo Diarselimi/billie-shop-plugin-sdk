@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+echo "Generating Orders Workflow SVG Diagram:"
+php bin/console workflow:dump order declined complete canceled  | dot -Tsvg -o src/Resources/docs/orders-workflow.svg
+php bin/console workflow:dump order declined complete canceled  | dot -Tpng -o src/Resources/docs/orders-workflow.png
+echo "DONE."

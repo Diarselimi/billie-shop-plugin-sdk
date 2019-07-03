@@ -15,10 +15,10 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  *     path="/order/{id}/confirm-payment",
  *     operationId="order_payment_confirm",
  *     summary="Confirm Order Payment",
- *     security={{"oauth2"={}}, {"apiKey"={}}},
+ *     security={{"oauth2"={}}},
  *
- *     tags={"Orders API"},
- *     x={"groups":{"public"}},
+ *     tags={"Orders"},
+ *     x={"groups":{"standard", "checkout-server", "dashboard"}},
  *
  *     @OA\Parameter(in="path", name="id", @OA\Schema(ref="#/components/schemas/TinyText"), required=true),
  *

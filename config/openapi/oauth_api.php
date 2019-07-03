@@ -7,7 +7,8 @@ use OpenApi\Annotations as OA;
  * (
  *     path="/oauth/token",
  *     operationId="oauth_token_create",
- *     tags={"OAuth API"},
+ *     tags={"Authentication"},
+ *     x={"groups":{"standard", "checkout-server", "dashboard", "support"}},
  *     summary="Request a new OAuth Token",
  * @OA\RequestBody(
  *          @OA\MediaType(mediaType="application/x-www-form-urlencoded",
@@ -41,7 +42,8 @@ use OpenApi\Annotations as OA;
  * (
  *     path="/oauth/authorization",
  *     operationId="oauth_token_validate",
- *     tags={"OAuth API"},
+ *     tags={"Authentication"},
+ *     x={"groups":{"standard", "checkout-server", "dashboard", "support"}},
  *     summary="Validate OAuth Token",
  * @OA\Response(
  *          response=200,

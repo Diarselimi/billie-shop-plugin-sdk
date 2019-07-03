@@ -14,10 +14,10 @@ use Symfony\Component\HttpFoundation\Request;
  *     path="/checkout-session",
  *     operationId="checkout_session_create",
  *     summary="Create Checkout Session",
- *     security={{"oauth2"={}}, {"apiKey"={}}},
+ *     security={{"oauth2"={}}},
  *
- *     tags={"Checkout API"},
- *     x={"groups":{"public"}},
+ *     tags={"Checkout"},
+ *     x={"groups":{"checkout-server"}},
  *
  *     @OA\RequestBody(
  *          required=true,

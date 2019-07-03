@@ -5,7 +5,7 @@ namespace App\DomainModel\MerchantDebtorResponse;
 use OpenApi\Annotations as OA;
 
 /**
- * @OA\Schema(schema="MerchantDebtorExtendedResponse", x={"groups":{"private"}}, allOf={@OA\Schema(ref="#/components/schemas/MerchantDebtorResponse")}, type="object", properties={
+ * @OA\Schema(schema="MerchantDebtorExtendedResponse", allOf={@OA\Schema(ref="#/components/schemas/MerchantDebtorResponse")}, type="object", properties={
  *      @OA\Property(property="merchant_debtor_id", type="integer"),
  *      @OA\Property(property="company_id", type="integer"),
  *      @OA\Property(property="payment_id", ref="#/components/schemas/UUID"),

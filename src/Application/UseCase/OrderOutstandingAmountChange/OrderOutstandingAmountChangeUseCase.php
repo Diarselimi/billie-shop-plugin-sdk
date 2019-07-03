@@ -71,9 +71,9 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 
         $order = $orderContainer->getOrder();
 
-        if (!$this->orderStateManager->wasShipped($orderContainer->getOrder())) {
+        if (!$this->orderStateManager->wasShipped($order) && !$this->orderStateManager->isCanceled($order)) {
             $this->logSuppressedException(
-                new OrderWorkflowException('Order state change not possible'),
+                new OrderWorkflowException('Order amount change not possible'),
                 '[suppressed] Outstanding amount change not possible for order {order_id}',
                 [
                     'order_id' => $order->getId(),
@@ -122,7 +122,7 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
             );
         }
 
-        if ($amountChange->getOutstandingAmount() <= 0) {
+        if ($amountChange->getOutstandingAmount() <= 0 && !$this->orderStateManager->isCanceled($order)) {
             $this->orderStateManager->complete($orderContainer);
         }
     }

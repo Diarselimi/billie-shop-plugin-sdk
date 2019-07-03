@@ -1,4 +1,41 @@
 #!/usr/bin/env bash
 
-bin/redoc-bundle public "${@}"
-bin/redoc-bundle private "${@}"
+SPEC_DIR="docs/openapi"
+SPEC_TITLE="Billie - PaD API Documentation"
+SPEC_VERSION=${1:-$(git describe --tags 2> /dev/null || echo "dev")}
+SPEC_VERSION_ABBREV=${1:-$(git describe --tags --abbrev=0 2> /dev/null || echo "dev")}
+
+function generate_api_docs {
+    SPEC_GROUP=${1:-"full"}
+    SPEC_FILE="${SPEC_DIR}/paella-openapi-${SPEC_GROUP}.yaml"
+
+    echo "    - Building ${SPEC_FILE} ..."
+
+    mkdir -p ${SPEC_DIR}
+    rm -f ${SPEC_FILE}
+
+    bin/console paella:openapi:generate ${SPEC_VERSION_ABBREV} \
+            --output-file="${SPEC_FILE}" \
+            --title="${SPEC_TITLE}" \
+            --groups=${SPEC_GROUP}
+
+    if [[ ! -f ${SPEC_FILE} ]]; then
+        echo "ERROR: Open API generation failed. Spec. file does not exist."
+        exit 1;
+    fi
+}
+
+echo "Generating OpenAPI 3.0 YAML specifications (Paella API v${SPEC_VERSION}):"
+
+rm -rf docs/openapi
+mkdir -p docs/openapi
+
+generate_api_docs full
+generate_api_docs standard
+generate_api_docs support
+generate_api_docs dashboard
+generate_api_docs salesforce
+generate_api_docs checkout-server
+generate_api_docs checkout-client
+
+echo "DONE."
