@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     description="Creates a new invoice, linking an order with a file. Called by the invoice uploader Lambda services.",
  *     security={{"oauth2"={}}, {"apiKey"={}}},
  *
- *     tags={"Orders", "Automated"},
+ *     tags={"Order Management", "Automated"},
  *     x={"groups":{"support", "automated"}},
  *
  *     @OA\Parameter(in="path", name="id", @OA\Schema(type="integer"), required=true, description="Order ID"),

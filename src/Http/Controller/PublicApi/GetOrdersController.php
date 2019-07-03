@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
  *     summary="Get Orders",
  *     security={{"oauth2"={}}},
  *
- *     tags={"Orders"},
+ *     tags={"Order Management"},
  *     x={"groups":{"standard", "dashboard", "checkout-server"}},
  *
  *     @OA\Parameter(in="query", name="sort_by", @OA\Schema(type="string",

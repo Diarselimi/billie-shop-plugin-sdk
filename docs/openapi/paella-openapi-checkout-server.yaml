@@ -39,7 +39,7 @@ paths:
     post:
       tags:
         - Authentication
-      summary: 'Request a new OAuth Token'
+      summary: 'Request new OAuth Token'
       description: |
         <!-- Grants documentation taken from: https://oauth2.thephpleague.com/ -->
         
@@ -282,73 +282,10 @@ paths:
           $ref: '#/components/responses/Forbidden'
         default:
           $ref: '#/components/responses/ServerError'
-  '/order/{uuid}/confirm':
-    post:
-      tags:
-        - Orders
-      summary: 'Confirm an order in pre approved state.'
-      operationId: order_pre_approve_confirmation
-      parameters:
-        -
-          name: id
-          in: path
-          required: true
-          schema:
-            oneOf:
-              -
-                $ref: '#/components/schemas/UUID'
-              -
-                type: string
-      responses:
-        '202':
-          description: 'Order was confirmed and now it''s in state created.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-  /order/pre-approve:
-    post:
-      tags:
-        - Orders
-      summary: 'Creates an order in pre approved state.'
-      operationId: pre_approve_create_order
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateOrderRequest'
-      responses:
-        '201':
-          description: 'Order was created, but a confirmation is needed.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
   '/order/{id}/cancel':
     post:
       tags:
-        - Orders
+        - 'Order Management'
       summary: 'Cancel Order'
       description: 'This call initiates a full order cancellation.'
       operationId: order_cancel
@@ -377,8 +314,8 @@ paths:
   '/checkout-session/{sessionUuid}/confirm':
     put:
       tags:
-        - Checkout
-      summary: 'Confirm Checkout Session'
+        - 'Order Creation'
+      summary: 'Checkout Session Confirm'
       description: 'Confirms the creation of an existing checkout session.'
       operationId: checkout_session_confirm
       parameters:
@@ -415,11 +352,16 @@ paths:
   '/order/{id}/confirm-payment':
     post:
       tags:
-        - Orders
+        - 'Order Management'
       summary: 'Confirm Order Payment'
       description: |
         This endpoint needs to be called if a customer is accidentally paying the purchase amount 
         directly to the merchant. (See usage of virtual IBANs).
+        
+        As a consequence of sending this call, Billie will make a direct debit from the merchant 
+        or net it against the potential outstanding payout amount of the very day. 
+        Please mind that the order state will only be updated after Billie actually receives 
+        the money of the confirmed payment.
       operationId: order_payment_confirm
       parameters:
         -
@@ -458,8 +400,8 @@ paths:
   /checkout-session:
     post:
       tags:
-        - Checkout
-      summary: 'Create Checkout Session'
+        - 'Order Creation'
+      summary: 'Checkout Session Create'
       description: 'Initializes a new Billie Checkout session for the given customer.'
       operationId: checkout_session_create
       requestBody:
@@ -495,7 +437,7 @@ paths:
   '/order/{id}':
     get:
       tags:
-        - Orders
+        - 'Order Management'
       summary: 'Get Order Details'
       description: |
         Retrieves information about an order.
@@ -535,7 +477,7 @@ paths:
           oauth2: []
     patch:
       tags:
-        - Orders
+        - 'Order Management'
       summary: 'Update Order'
       description: |
         Updates an order if changes are necessary. 
@@ -586,7 +528,7 @@ paths:
   /orders:
     get:
       tags:
-        - Orders
+        - 'Order Management'
       summary: 'Get Orders'
       operationId: orders_get
       parameters:
@@ -664,8 +606,8 @@ paths:
   '/order/{id}/pause-dunning':
     post:
       tags:
-        - Orders
-      summary: 'Pause Order Dunning'
+        - 'Order Management'
+      summary: 'Pause Order Dunning Process'
       operationId: order_pause_dunning
       parameters:
         -
@@ -708,7 +650,7 @@ paths:
   '/order/{id}/ship':
     post:
       tags:
-        - Orders
+        - 'Order Creation'
       summary: 'Ship Order'
       description: |
         Confirm that an order was shipped.
@@ -798,23 +740,6 @@ components:
       maximum: 120
       minimum: 1
       example: 30
-    PostalCode:
-      title: 'Postal Code'
-      type: string
-      maxLength: 5
-      example: '10969'
-    CountryCode:
-      title: 'Country Code'
-      type: string
-      maxLength: 2
-      pattern: '^[A-Za-z]{2}$'
-      example: DE
-    PhoneNumber:
-      title: 'Phone Number'
-      type: string
-      maxLength: 2
-      pattern: '^(\+|\d|\()[ \-\/0-9()]{5,20}$'
-      example: '030 31199251'
     DateTime:
       title: Date-Time
       type: string
@@ -959,33 +884,6 @@ components:
         duration:
           $ref: '#/components/schemas/OrderDuration'
       type: object
-    CreateOrderRequest:
-      title: 'Order Creation Request'
-      required:
-        - amount
-        - duration
-        - delivery_address
-        - debtor_company
-        - debtor_person
-      properties:
-        amount:
-          $ref: '#/components/schemas/CreateOrderAmountRequest'
-        comment:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        duration:
-          $ref: '#/components/schemas/OrderDuration'
-        order_id:
-          description: 'Order external code'
-          example: DE123456-1
-          $ref: '#/components/schemas/TinyText'
-        delivery_address:
-          $ref: '#/components/schemas/CreateOrderDeliveryAddressRequest'
-        debtor_company:
-          $ref: '#/components/schemas/CreateOrderDebtorCompanyRequest'
-        debtor_person:
-          $ref: '#/components/schemas/CreateOrderDebtorPersonRequest'
-      type: object
     CreateOrderAmountRequest:
       title: 'Order Amount'
       required:
@@ -1008,119 +906,6 @@ components:
           format: float
           minimum: 1
           example: 19
-      type: object
-    CreateOrderDebtorCompanyRequest:
-      title: 'Debtor Company'
-      required:
-        - merchant_customer_id
-        - name
-        - legal_form
-        - address_house_number
-        - address_street
-        - address_city
-        - address_postal_code
-        - address_country
-        - industry_sector
-      properties:
-        merchant_customer_id:
-          example: DE123456
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        name:
-          example: 'Billie GmbH'
-          $ref: '#/components/schemas/TinyText'
-        tax_id:
-          example: DE1234556
-          $ref: '#/components/schemas/TinyText'
-        tax_number:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        registration_court:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        registration_number:
-          example: 'HRB 1234556'
-          $ref: '#/components/schemas/TinyText'
-        industry_sector:
-          example: C
-          $ref: '#/components/schemas/TinyText'
-        subindustry_sector:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        employees_number:
-          example: 1-5
-          $ref: '#/components/schemas/TinyText'
-        legal_form:
-          example: '10122'
-          $ref: '#/components/schemas/TinyText'
-        established_costumer:
-          type: boolean
-        address_addition:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        address_house_number:
-          example: '4'
-          $ref: '#/components/schemas/TinyText'
-        address_street:
-          example: Charlottenstr.
-          $ref: '#/components/schemas/TinyText'
-        address_city:
-          example: Berlin
-          $ref: '#/components/schemas/TinyText'
-        address_postal_code:
-          $ref: '#/components/schemas/PostalCode'
-        address_country:
-          $ref: '#/components/schemas/CountryCode'
-      type: object
-    CreateOrderDebtorPersonRequest:
-      title: 'Debtor Person'
-      required:
-        - gender
-        - email
-      properties:
-        gender:
-          type: string
-          maxLength: 1
-          enum:
-            - m
-            - f
-        first_name:
-          example: James
-          $ref: '#/components/schemas/TinyText'
-        last_name:
-          example: Smith
-          $ref: '#/components/schemas/TinyText'
-        phone_number:
-          $ref: '#/components/schemas/PhoneNumber'
-        email:
-          type: string
-          format: email
-          example: james.smith@example.com
-      type: object
-    CreateOrderDeliveryAddressRequest:
-      title: 'Delivery Address'
-      required:
-        - street
-        - city
-        - postal_code
-        - country
-      properties:
-        addition:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        house_number:
-          example: '4'
-          $ref: '#/components/schemas/TinyText'
-        street:
-          example: 'Charlotten Str.'
-          $ref: '#/components/schemas/TinyText'
-        city:
-          example: Berlin
-          $ref: '#/components/schemas/TinyText'
-        postal_code:
-          $ref: '#/components/schemas/PostalCode'
-        country:
-          $ref: '#/components/schemas/CountryCode'
       type: object
     PauseOrderDunningRequest:
       title: 'Pause Order Dunning'
@@ -1393,7 +1178,7 @@ tags:
       
       > Example: `Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c`.
   -
-    name: Orders
+    name: 'Order Creation'
     description: |
       ## Order States
       
@@ -1411,7 +1196,7 @@ tags:
       
       ## Order State Transitions
       
-      ![img](src/Resources/docs/orders-workflow.png)
+      ![img](src/Resources/docs/orders-workflow-public.png)
       
       ## Order Decline Reasons
       
@@ -1432,7 +1217,7 @@ tags:
       that are delivered back to the merchant as an answer of a API order creation request. Virtual IBANs are unique for each of 
       your debtor / customer. The virtual IBAN needs to be put on the invoice which the customer receives for the purchase.
   -
-    name: Checkout
+    name: 'Order Management'
   -
     name: Webhooks
     description: |
@@ -1457,10 +1242,37 @@ tags:
       the `application/json` Content-Type and the following body format:
       ```
       {
-          event: reminder|dunning1|dunning2|dunning3|payment|dca
+          event: (string) (event name, -check the following section for more details-)
           order_id: (string)
           amount: (string) (optional) (contains sum of paid amounts)
       	open amount: (string) (optional) (contains sum of outstanding amount)
           url_notification: (string) (optional)
       }
       ```
+      
+      ### Event Names
+      
+      **General**
+      
+      | Event Name      | Description                                                                                                                |
+      |-----------------|----------------------------------------------------------------------------------------------------------------------------|
+      | order\_approved | waiting order approved                                                                                                     |
+      | order\_declined | waiting order declined                                                                                                     |
+      | payment         | The outstanding amount for an order changed. <br><br> This message is sent for full as well as partial payments for orders |
+      
+      <br>
+      
+      **Webhooks for Dunning & Collections**
+      
+      | Event Name       | Description                              |
+      |------------------|------------------------------------------|
+      | reminder_email_1 | 1st Reminder mail was sent               |
+      | dunning_letter_1 | 1st Dunning letter was sent              |
+      | dunning_email_1  | 1st Dunning mail was sent                |
+      | reminder_email_2 | 2nd Reminder mail was sent               |
+      | dunning_letter_2 | 2nd Dunning letter was sent              |
+      | reminder_email_2 | 2nd Dunning email was sent               |
+      | dunning_email_2  | 2nd Dunning email was sent               |
+      | reminder_email_3 | 3rd Reminder email was sent              |
+      | dca_letter       | Debt collection handover letter was sent |
+      | dca_email        | Debt collection handover email was sent  |

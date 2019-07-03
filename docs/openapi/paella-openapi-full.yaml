@@ -126,7 +126,7 @@ paths:
     post:
       tags:
         - Authentication
-      summary: 'Request a new OAuth Token'
+      summary: 'Request new OAuth Token'
       description: |
         <!-- Grants documentation taken from: https://oauth2.thephpleague.com/ -->
         
@@ -382,7 +382,7 @@ paths:
   '/order/{id}/approve':
     post:
       tags:
-        - Orders
+        - 'Order Management'
       summary: 'Approve Order in Waiting State'
       description: 'Approves an order manually if it''s in waiting state. Otherwise this call fails.'
       operationId: order_approve
@@ -413,8 +413,8 @@ paths:
   '/order/{uuid}/confirm':
     post:
       tags:
-        - Orders
-      summary: 'Confirm an order in pre approved state.'
+        - 'Order Creation'
+      summary: 'Pre-approved Order Confirm'
       operationId: order_pre_approve_confirmation
       parameters:
         -
@@ -446,8 +446,7 @@ paths:
         -
           oauth2: []
       x-groups:
-        - standard
-        - checkout-server
+        - support
   /merchant:
     post:
       tags:
@@ -484,7 +483,7 @@ paths:
   '/merchant/{merchantId}/order/{id}/invoice':
     post:
       tags:
-        - Orders
+        - 'Order Management'
         - Automated
       summary: 'Create Order Invoice'
       description: 'Creates a new invoice, linking an order with a file. Called by the invoice uploader Lambda services.'
@@ -542,8 +541,8 @@ paths:
   /order/pre-approve:
     post:
       tags:
-        - Orders
-      summary: 'Creates an order in pre approved state.'
+        - 'Order Creation'
+      summary: 'Pre-approved Order Create'
       operationId: pre_approve_create_order
       requestBody:
         required: true
@@ -568,12 +567,11 @@ paths:
         -
           oauth2: []
       x-groups:
-        - standard
-        - checkout-server
+        - support
   '/order/{id}/decline':
     post:
       tags:
-        - Orders
+        - 'Order Management'
       summary: 'Decline Order in Waiting State'
       operationId: order_decline
       parameters:
@@ -770,8 +768,8 @@ paths:
   '/checkout-session/{sessionUuid}/authorize':
     put:
       tags:
-        - Checkout
-      summary: 'Authorize Checkout Session'
+        - 'Order Creation'
+      summary: 'Checkout Session Authorize'
       description: 'Authorizes an existing checkout session, completing all missing order data.'
       operationId: checkout_session_authorize
       parameters:
@@ -805,7 +803,7 @@ paths:
   '/order/{id}/cancel':
     post:
       tags:
-        - Orders
+        - 'Order Management'
       summary: 'Cancel Order'
       description: 'This call initiates a full order cancellation.'
       operationId: order_cancel
@@ -837,8 +835,8 @@ paths:
   '/checkout-session/{sessionUuid}/confirm':
     put:
       tags:
-        - Checkout
-      summary: 'Confirm Checkout Session'
+        - 'Order Creation'
+      summary: 'Checkout Session Confirm'
       description: 'Confirms the creation of an existing checkout session.'
       operationId: checkout_session_confirm
       parameters:
@@ -877,11 +875,16 @@ paths:
   '/order/{id}/confirm-payment':
     post:
       tags:
-        - Orders
+        - 'Order Management'
       summary: 'Confirm Order Payment'
       description: |
         This endpoint needs to be called if a customer is accidentally paying the purchase amount 
         directly to the merchant. (See usage of virtual IBANs).
+        
+        As a consequence of sending this call, Billie will make a direct debit from the merchant 
+        or net it against the potential outstanding payout amount of the very day. 
+        Please mind that the order state will only be updated after Billie actually receives 
+        the money of the confirmed payment.
       operationId: order_payment_confirm
       parameters:
         -
@@ -924,8 +927,8 @@ paths:
   /checkout-session:
     post:
       tags:
-        - Checkout
-      summary: 'Create Checkout Session'
+        - 'Order Creation'
+      summary: 'Checkout Session Create'
       description: 'Initializes a new Billie Checkout session for the given customer.'
       operationId: checkout_session_create
       requestBody:
@@ -963,7 +966,7 @@ paths:
   /order:
     post:
       tags:
-        - Orders
+        - 'Order Creation'
       summary: 'Create Order'
       description: |
         Authorization of order financing requests.
@@ -1095,7 +1098,7 @@ paths:
   '/order/{id}':
     get:
       tags:
-        - Orders
+        - 'Order Management'
       summary: 'Get Order Details'
       description: |
         Retrieves information about an order.
@@ -1139,7 +1142,7 @@ paths:
         - checkout-server
     patch:
       tags:
-        - Orders
+        - 'Order Management'
       summary: 'Update Order'
       description: |
         Updates an order if changes are necessary. 
@@ -1193,7 +1196,7 @@ paths:
   /orders:
     get:
       tags:
-        - Orders
+        - 'Order Management'
       summary: 'Get Orders'
       operationId: orders_get
       parameters:
@@ -1319,8 +1322,8 @@ paths:
   '/order/{id}/pause-dunning':
     post:
       tags:
-        - Orders
-      summary: 'Pause Order Dunning'
+        - 'Order Management'
+      summary: 'Pause Order Dunning Process'
       operationId: order_pause_dunning
       parameters:
         -
@@ -1469,7 +1472,7 @@ paths:
   '/order/{id}/ship':
     post:
       tags:
-        - Orders
+        - 'Order Creation'
       summary: 'Ship Order'
       description: |
         Confirm that an order was shipped.
@@ -2424,7 +2427,7 @@ tags:
       - dashboard
       - support
   -
-    name: Orders
+    name: 'Order Creation'
     description: |
       ## Order States
       
@@ -2442,7 +2445,7 @@ tags:
       
       ## Order State Transitions
       
-      ![img](src/Resources/docs/orders-workflow.png)
+      ![img](src/Resources/docs/orders-workflow-public.png)
       
       ## Order Decline Reasons
       
@@ -2464,14 +2467,16 @@ tags:
       your debtor / customer. The virtual IBAN needs to be put on the invoice which the customer receives for the purchase.
     x-groups:
       - standard
+      - support
+      - checkout-client
+      - checkout-server
+  -
+    name: 'Order Management'
+    x-groups:
+      - standard
       - dashboard
       - support
       - salesforce
-      - checkout-server
-  -
-    name: Checkout
-    x-groups:
-      - checkout-client
       - checkout-server
   -
     name: Debtors
@@ -2507,13 +2512,40 @@ tags:
       the `application/json` Content-Type and the following body format:
       ```
       {
-          event: reminder|dunning1|dunning2|dunning3|payment|dca
+          event: (string) (event name, -check the following section for more details-)
           order_id: (string)
           amount: (string) (optional) (contains sum of paid amounts)
       	open amount: (string) (optional) (contains sum of outstanding amount)
           url_notification: (string) (optional)
       }
       ```
+      
+      ### Event Names
+      
+      **General**
+      
+      | Event Name      | Description                                                                                                                |
+      |-----------------|----------------------------------------------------------------------------------------------------------------------------|
+      | order\_approved | waiting order approved                                                                                                     |
+      | order\_declined | waiting order declined                                                                                                     |
+      | payment         | The outstanding amount for an order changed. <br><br> This message is sent for full as well as partial payments for orders |
+      
+      <br>
+      
+      **Webhooks for Dunning & Collections**
+      
+      | Event Name       | Description                              |
+      |------------------|------------------------------------------|
+      | reminder_email_1 | 1st Reminder mail was sent               |
+      | dunning_letter_1 | 1st Dunning letter was sent              |
+      | dunning_email_1  | 1st Dunning mail was sent                |
+      | reminder_email_2 | 2nd Reminder mail was sent               |
+      | dunning_letter_2 | 2nd Dunning letter was sent              |
+      | reminder_email_2 | 2nd Dunning email was sent               |
+      | dunning_email_2  | 2nd Dunning email was sent               |
+      | reminder_email_3 | 3rd Reminder email was sent              |
+      | dca_letter       | Debt collection handover letter was sent |
+      | dca_email        | Debt collection handover email was sent  |
     x-groups:
       - standard
       - checkout-server

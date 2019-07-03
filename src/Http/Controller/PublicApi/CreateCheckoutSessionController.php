@@ -13,10 +13,10 @@ use Symfony\Component\HttpFoundation\Request;
  * @OA\Post(
  *     path="/checkout-session",
  *     operationId="checkout_session_create",
- *     summary="Create Checkout Session",
+ *     summary="Checkout Session Create",
  *     security={{"oauth2"={}}},
  *
- *     tags={"Checkout"},
+ *     tags={"Order Creation"},
  *     x={"groups":{"checkout-server"}},
  *
  *     @OA\RequestBody(

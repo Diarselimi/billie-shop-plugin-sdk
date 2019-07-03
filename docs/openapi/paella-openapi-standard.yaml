@@ -39,7 +39,7 @@ paths:
     post:
       tags:
         - Authentication
-      summary: 'Request a new OAuth Token'
+      summary: 'Request new OAuth Token'
       description: |
         <!-- Grants documentation taken from: https://oauth2.thephpleague.com/ -->
         
@@ -282,73 +282,10 @@ paths:
           $ref: '#/components/responses/Forbidden'
         default:
           $ref: '#/components/responses/ServerError'
-  '/order/{uuid}/confirm':
-    post:
-      tags:
-        - Orders
-      summary: 'Confirm an order in pre approved state.'
-      operationId: order_pre_approve_confirmation
-      parameters:
-        -
-          name: id
-          in: path
-          required: true
-          schema:
-            oneOf:
-              -
-                $ref: '#/components/schemas/UUID'
-              -
-                type: string
-      responses:
-        '202':
-          description: 'Order was confirmed and now it''s in state created.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-  /order/pre-approve:
-    post:
-      tags:
-        - Orders
-      summary: 'Creates an order in pre approved state.'
-      operationId: pre_approve_create_order
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateOrderRequest'
-      responses:
-        '201':
-          description: 'Order was created, but a confirmation is needed.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
   '/order/{id}/cancel':
     post:
       tags:
-        - Orders
+        - 'Order Management'
       summary: 'Cancel Order'
       description: 'This call initiates a full order cancellation.'
       operationId: order_cancel
@@ -377,11 +314,16 @@ paths:
   '/order/{id}/confirm-payment':
     post:
       tags:
-        - Orders
+        - 'Order Management'
       summary: 'Confirm Order Payment'
       description: |
         This endpoint needs to be called if a customer is accidentally paying the purchase amount 
         directly to the merchant. (See usage of virtual IBANs).
+        
+        As a consequence of sending this call, Billie will make a direct debit from the merchant 
+        or net it against the potential outstanding payout amount of the very day. 
+        Please mind that the order state will only be updated after Billie actually receives 
+        the money of the confirmed payment.
       operationId: order_payment_confirm
       parameters:
         -
@@ -420,7 +362,7 @@ paths:
   /order:
     post:
       tags:
-        - Orders
+        - 'Order Creation'
       summary: 'Create Order'
       description: |
         Authorization of order financing requests.
@@ -456,7 +398,7 @@ paths:
   '/order/{id}':
     get:
       tags:
-        - Orders
+        - 'Order Management'
       summary: 'Get Order Details'
       description: |
         Retrieves information about an order.
@@ -496,7 +438,7 @@ paths:
           oauth2: []
     patch:
       tags:
-        - Orders
+        - 'Order Management'
       summary: 'Update Order'
       description: |
         Updates an order if changes are necessary. 
@@ -547,7 +489,7 @@ paths:
   /orders:
     get:
       tags:
-        - Orders
+        - 'Order Management'
       summary: 'Get Orders'
       operationId: orders_get
       parameters:
@@ -625,8 +567,8 @@ paths:
   '/order/{id}/pause-dunning':
     post:
       tags:
-        - Orders
-      summary: 'Pause Order Dunning'
+        - 'Order Management'
+      summary: 'Pause Order Dunning Process'
       operationId: order_pause_dunning
       parameters:
         -
@@ -669,7 +611,7 @@ paths:
   '/order/{id}/ship':
     post:
       tags:
-        - Orders
+        - 'Order Creation'
       summary: 'Ship Order'
       description: |
         Confirm that an order was shipped.
@@ -1344,7 +1286,7 @@ tags:
       
       > Example: `Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c`.
   -
-    name: Orders
+    name: 'Order Creation'
     description: |
       ## Order States
       
@@ -1362,7 +1304,7 @@ tags:
       
       ## Order State Transitions
       
-      ![img](src/Resources/docs/orders-workflow.png)
+      ![img](src/Resources/docs/orders-workflow-public.png)
       
       ## Order Decline Reasons
       
@@ -1382,6 +1324,8 @@ tags:
       customers need to transfer the money directly to Billie when their invoice is due. Therefore Billie is using virtual IBANs 
       that are delivered back to the merchant as an answer of a API order creation request. Virtual IBANs are unique for each of 
       your debtor / customer. The virtual IBAN needs to be put on the invoice which the customer receives for the purchase.
+  -
+    name: 'Order Management'
   -
     name: Webhooks
     description: |
@@ -1406,10 +1350,37 @@ tags:
       the `application/json` Content-Type and the following body format:
       ```
       {
-          event: reminder|dunning1|dunning2|dunning3|payment|dca
+          event: (string) (event name, -check the following section for more details-)
           order_id: (string)
           amount: (string) (optional) (contains sum of paid amounts)
       	open amount: (string) (optional) (contains sum of outstanding amount)
           url_notification: (string) (optional)
       }
       ```
+      
+      ### Event Names
+      
+      **General**
+      
+      | Event Name      | Description                                                                                                                |
+      |-----------------|----------------------------------------------------------------------------------------------------------------------------|
+      | order\_approved | waiting order approved                                                                                                     |
+      | order\_declined | waiting order declined                                                                                                     |
+      | payment         | The outstanding amount for an order changed. <br><br> This message is sent for full as well as partial payments for orders |
+      
+      <br>
+      
+      **Webhooks for Dunning & Collections**
+      
+      | Event Name       | Description                              |
+      |------------------|------------------------------------------|
+      | reminder_email_1 | 1st Reminder mail was sent               |
+      | dunning_letter_1 | 1st Dunning letter was sent              |
+      | dunning_email_1  | 1st Dunning mail was sent                |
+      | reminder_email_2 | 2nd Reminder mail was sent               |
+      | dunning_letter_2 | 2nd Dunning letter was sent              |
+      | reminder_email_2 | 2nd Dunning email was sent               |
+      | dunning_email_2  | 2nd Dunning email was sent               |
+      | reminder_email_3 | 3rd Reminder email was sent              |
+      | dca_letter       | Debt collection handover letter was sent |
+      | dca_email        | Debt collection handover email was sent  |
