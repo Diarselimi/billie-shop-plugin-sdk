@@ -2,13 +2,15 @@
 
 namespace spec\App\Application\UseCase\UpdateMerchantWithOrderDunningStep;
 
-use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\UpdateMerchantWithOrderDunningStep\UpdateMerchantWithOrderDunningStepRequest;
 use App\Application\UseCase\UpdateMerchantWithOrderDunningStep\UpdateMerchantWithOrderDunningStepUseCase;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderNotification\NotificationScheduler;
+use Billie\MonitoringBundle\Service\Alerting\Sentry\Raven\RavenClient;
 use PhpSpec\ObjectBehavior;
+use Prophecy\Argument;
+use Psr\Log\NullLogger;
 
 class UpdateMerchantWithOrderDunningStepUseCaseSpec extends ObjectBehavior
 {
@@ -22,9 +24,12 @@ class UpdateMerchantWithOrderDunningStepUseCaseSpec extends ObjectBehavior
 
     public function let(
         OrderRepositoryInterface $orderRepository,
-        NotificationScheduler $notificationScheduler
+        NotificationScheduler $notificationScheduler,
+        RavenClient $sentry
     ) {
         $this->beConstructedWith($orderRepository, $notificationScheduler);
+
+        $this->setLogger(new NullLogger())->setSentry($sentry);
     }
 
     public function it_is_initializable()
@@ -32,13 +37,17 @@ class UpdateMerchantWithOrderDunningStepUseCaseSpec extends ObjectBehavior
         $this->shouldHaveType(UpdateMerchantWithOrderDunningStepUseCase::class);
     }
 
-    public function it_throws_exception_if_order_was_not_found(OrderRepositoryInterface $orderRepository)
-    {
+    public function it_does_nothing_if_order_was_not_found(
+        OrderRepositoryInterface $orderRepository,
+        NotificationScheduler $notificationScheduler
+    ) {
         $request = new UpdateMerchantWithOrderDunningStepRequest(self::ORDER_UUID, 's');
 
         $orderRepository->getOneByUuid(self::ORDER_UUID)->shouldBeCalled()->willReturn(null);
 
-        $this->shouldThrow(OrderNotFoundException::class)->during('execute', [$request]);
+        $notificationScheduler->createAndSchedule(Argument::any())->shouldNotBeCalled();
+
+        $this->execute($request);
     }
 
     public function it_sends_notification_to_merchant_webhook_with_dunning_step(

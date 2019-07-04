@@ -31,11 +31,6 @@ mark_order_as_fraud: # TODO: remove security requirements
   controller: App\Http\Controller\MarkOrderAsFraudController::execute
   methods: [POST]
 
-update_merchant_with_order_dunning_step: # TODO: remove security requirements
-  path: /order/{uuid}/update-dunning-step
-  controller: App\Http\Controller\UpdateMerchantWithOrderDunningStepController::execute
-  methods: [POST]
-
 register_merchant_user:
   path: /merchant/{merchantId}/user
   controller: App\Http\Controller\RegisterMerchantUserController::execute
