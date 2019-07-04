@@ -17,9 +17,9 @@ use Symfony\Component\Security\Core\Security;
  * @OA\Put(
  *     path="/checkout-session/{sessionUuid}/authorize",
  *     operationId="checkout_session_authorize",
- *     summary="Authorize Checkout Session",
+ *     summary="Checkout Session Authorize",
  *
- *     tags={"Checkout"},
+ *     tags={"Order Creation"},
  *     x={"groups":{"checkout-client"}},
  *
  *     @OA\Parameter(in="path", name="sessionUuid", @OA\Schema(ref="#/components/schemas/UUID"), required=true),

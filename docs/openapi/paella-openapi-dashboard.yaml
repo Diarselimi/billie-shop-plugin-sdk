@@ -39,7 +39,7 @@ paths:
     post:
       tags:
         - Authentication
-      summary: 'Request a new OAuth Token'
+      summary: 'Request new OAuth Token'
       description: |
         <!-- Grants documentation taken from: https://oauth2.thephpleague.com/ -->
         
@@ -285,11 +285,16 @@ paths:
   '/order/{id}/confirm-payment':
     post:
       tags:
-        - Orders
+        - 'Order Management'
       summary: 'Confirm Order Payment'
       description: |
         This endpoint needs to be called if a customer is accidentally paying the purchase amount 
         directly to the merchant. (See usage of virtual IBANs).
+        
+        As a consequence of sending this call, Billie will make a direct debit from the merchant 
+        or net it against the potential outstanding payout amount of the very day. 
+        Please mind that the order state will only be updated after Billie actually receives 
+        the money of the confirmed payment.
       operationId: order_payment_confirm
       parameters:
         -
@@ -418,7 +423,7 @@ paths:
   '/order/{id}':
     get:
       tags:
-        - Orders
+        - 'Order Management'
       summary: 'Get Order Details'
       description: |
         Retrieves information about an order.
@@ -459,7 +464,7 @@ paths:
   /orders:
     get:
       tags:
-        - Orders
+        - 'Order Management'
       summary: 'Get Orders'
       operationId: orders_get
       parameters:
@@ -577,8 +582,8 @@ paths:
   '/order/{id}/pause-dunning':
     post:
       tags:
-        - Orders
-      summary: 'Pause Order Dunning'
+        - 'Order Management'
+      summary: 'Pause Order Dunning Process'
       operationId: order_pause_dunning
       parameters:
         -
@@ -1134,43 +1139,6 @@ tags:
       
       > Example: `Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c`.
   -
-    name: Orders
-    description: |
-      ## Order States
-      
-      | State       | Description                                                                                   |
-      |-------------|-----------------------------------------------------------------------------------------------|
-      | waiting     | The order creation failed and needs a manual operation in order to be approved or declined    |
-      | authorized  | The order is valid but it needs a confirmation from the merchant in order to be approved      |
-      | created     | The order is successfully approved and Billie can offer financing for this transaction        |
-      | declined    | The order was declined and no financing is offered for this transaction                       |
-      | shipped     | The order was successfully shipped by the merchant                                            |
-      | paid_out    | The outstanding amount for the respective order was successfully paid out to the merchant     |
-      | late        | The payment of the outstanding amount is overdue                                              |
-      | complete    | The outstanding amount was successfully paid back by the customer                             |
-      | canceled    | The order was canceled by the merchant       
-      
-      ## Order State Transitions
-      
-      ![img](src/Resources/docs/orders-workflow.png)
-      
-      ## Order Decline Reasons
-      
-      An order could be declined by any of these reasons:
-      
-      | Reason                | Description                                               |
-      |-----------------------|-----------------------------------------------------------|
-      | debtor_address        | Debtor address or name mismatch                           |
-      | debtor_not_identified | Debtor could not be identified with the information given |
-      | risk_policy           | Risk decline                                              |
-      | debtor_limit_exceeded | Financing limit of debtor currently exceeded              |
-      
-      
-      ## Usage of Virtual IBANs
-      
-      Since the money gets paid out to the merchant directly after shipment of the product or delivery of the agreed service, 
-      customers need to transfer the money directly to Billie when their invoice is due. Therefore Billie is using virtual IBANs 
-      that are delivered back to the merchant as an answer of a API order creation request. Virtual IBANs are unique for each of 
-      your debtor / customer. The virtual IBAN needs to be put on the invoice which the customer receives for the purchase.
+    name: 'Order Management'
   -
     name: Debtors

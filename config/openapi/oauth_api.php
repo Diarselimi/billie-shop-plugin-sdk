@@ -9,7 +9,7 @@ use OpenApi\Annotations as OA;
  *     operationId="oauth_token_create",
  *     tags={"Authentication"},
  *     x={"groups":{"standard", "checkout-server", "dashboard", "support"}},
- *     summary="Request a new OAuth Token",
+ *     summary="Request new OAuth Token",
  * @OA\RequestBody(
  *          @OA\MediaType(mediaType="application/x-www-form-urlencoded",
  *          @OA\Schema(ref="#/components/schemas/OauthTokenCreateRequestBodyParams"))

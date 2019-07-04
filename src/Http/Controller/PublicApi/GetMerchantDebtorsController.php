@@ -57,7 +57,7 @@ class GetMerchantDebtorsController
             $request->query->getInt('limit', GetMerchantDebtorsRequest::DEFAULT_LIMIT),
             $sortField,
             strtoupper($sortDirection ?: GetMerchantDebtorsRequest::DEFAULT_SORT_DIRECTION),
-            $request->query->get('search')
+            trim($request->query->get('search'))
         );
 
         return $this->useCase->execute($useCaseRequest);

@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  *     summary="Confirm Order Payment",
  *     security={{"oauth2"={}}},
  *
- *     tags={"Orders"},
+ *     tags={"Order Management"},
  *     x={"groups":{"standard", "checkout-server", "dashboard"}},
  *
  *     @OA\Parameter(in="path", name="id", @OA\Schema(ref="#/components/schemas/TinyText"), required=true),

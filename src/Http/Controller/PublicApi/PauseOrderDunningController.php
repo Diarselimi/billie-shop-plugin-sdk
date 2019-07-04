@@ -16,10 +16,10 @@ use OpenApi\Annotations as OA;
  * @OA\Post(
  *     path="/order/{id}/pause-dunning",
  *     operationId="order_pause_dunning",
- *     summary="Pause Order Dunning",
+ *     summary="Pause Order Dunning Process",
  *     security={{"oauth2"={}}},
  *
- *     tags={"Orders"},
+ *     tags={"Order Management"},
  *     x={"groups":{"standard", "checkout-server", "dashboard"}},
  *
  *     @OA\Parameter(in="path", name="id",

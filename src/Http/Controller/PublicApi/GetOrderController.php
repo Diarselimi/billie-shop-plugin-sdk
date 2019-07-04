@@ -18,7 +18,7 @@ use OpenApi\Annotations as OA;
  *     summary="Get Order Details",
  *     security={{"oauth2"={}}},
  *
- *     tags={"Orders"},
+ *     tags={"Order Management"},
  *     x={"groups":{"standard", "dashboard", "checkout-server"}},
  *
  *     @OA\Parameter(in="path", name="id",

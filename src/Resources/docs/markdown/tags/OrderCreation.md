@@ -14,7 +14,7 @@
 
 ## Order State Transitions
 
-![img](src/Resources/docs/orders-workflow.png)
+![img](src/Resources/docs/orders-workflow-public.png)
 
 ## Order Decline Reasons
 

@@ -18,7 +18,7 @@ use OpenApi\Annotations as OA;
  *     summary="Ship Order",
  *     security={{"oauth2"={}}},
  *
- *     tags={"Orders"},
+ *     tags={"Order Creation"},
  *     x={"groups":{"standard", "checkout-server"}},
  *
  *     @OA\Parameter(in="path", name="id",
