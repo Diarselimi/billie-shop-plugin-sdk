@@ -39,6 +39,9 @@ Feature:
       | company_b2b_score         | 1       | 1                  |
     And I get from companies service identify match and good decision response
     And I get from payments service register debtor positive response
+    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    """
+    """
     When I send a POST request to "/order" with body:
       """
       {

@@ -167,8 +167,83 @@ paths:
           oauth2: []
         -
           apiKey: []
+  '/debtor-company/{uuid}/limits':
+    get:
+      tags:
+        - Debtors
+      summary: 'Get Debtor Company Limits'
+      operationId: get_debtor_company_limits
+      parameters:
+        -
+          name: uuid
+          in: path
+          description: 'Company UUID'
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetDebtorCompanyLimitsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  '/merchant-debtor/{debtorUuid}/update-limit':
+    post:
+      tags:
+        - Debtors
+      summary: 'Update Merchant Debtor Limit'
+      operationId: update_merchant_debtor_limit
+      parameters:
+        -
+          name: debtorUuid
+          in: path
+          description: 'Merchant Debtor UUID'
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                financing_limit:
+                  description: 'New financing limit.'
+                  type: number
+                  format: float
+              type: object
+      responses:
+        '204':
+          description: 'Successful response'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
 components:
   schemas:
+    UUID:
+      type: string
+      format: uuid
+      maxLength: 36
+      minLength: 36
+      example: 12345667-890a-bcde-f123-34567890abcd
     AbstractErrorObject:
       title: Error
       type: object
@@ -191,6 +266,59 @@ components:
               code:
                 description: 'Error code'
                 type: string
+            type: object
+      type: object
+    ValidationErrorsObject:
+      title: 'Multiple Validation Errors'
+      properties:
+        errors:
+          type: array
+          items:
+            required:
+              - title
+              - code
+            properties:
+              source:
+                description: 'Property path where the error occurred.'
+                type: string
+              title:
+                description: 'Error message'
+                type: string
+              code:
+                description: 'Error code'
+                type: string
+            type: object
+      type: object
+    GetDebtorCompanyLimitsResponse:
+      title: 'Get Debtor Company Limits Response'
+      properties:
+        company_id:
+          type: integer
+        company_uuid:
+          $ref: '#/components/schemas/UUID'
+        financing_power:
+          description: 'Current available limit for this company in Platform.'
+          type: number
+          format: float
+        merchant_debtors:
+          description: 'List of debtors created in Paella for this company.'
+          type: array
+          items:
+            properties:
+              merchant_id:
+                type: integer
+              merchant_debtor_id:
+                type: integer
+              merchant_debtor_uuid:
+                $ref: '#/components/schemas/UUID'
+              financing_limit:
+                description: 'Full limit assigned in Paella to this debtor and merchant combination.'
+                type: number
+                format: float
+              financing_power:
+                description: 'Current available limit in Paella for this debtor and merchant combination.'
+                type: number
+                format: float
             type: object
       type: object
   responses:
@@ -218,6 +346,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/AbstractErrorObject'
+    BadRequest:
+      description: 'Invalid Request Data'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationErrorsObject'
   securitySchemes:
     oauth2:
       type: oauth2

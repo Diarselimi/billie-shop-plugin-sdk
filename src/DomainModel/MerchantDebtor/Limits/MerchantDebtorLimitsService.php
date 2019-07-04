@@ -52,7 +52,7 @@ class MerchantDebtorLimitsService implements LoggingInterface
             $financingDetails->reduceFinancingPower($amount);
             $this->merchantDebtorFinancialDetailsRepository->insert($financingDetails);
         } catch (AlfredRequestException $exception) {
-            throw new MerchantDebtorLimitsException();
+            throw new MerchantDebtorLimitsException('Lock debtor limit failed: ' . $exception->getMessage());
         }
     }
 
@@ -68,7 +68,7 @@ class MerchantDebtorLimitsService implements LoggingInterface
             $financingDetails->increaseFinancingPower($amount);
             $this->merchantDebtorFinancialDetailsRepository->insert($financingDetails);
         } catch (AlfredRequestException $exception) {
-            throw new MerchantDebtorLimitsException();
+            throw new MerchantDebtorLimitsException('Unlock debtor limit failed: ' . $exception->getMessage());
         }
     }
 

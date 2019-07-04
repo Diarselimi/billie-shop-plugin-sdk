@@ -5,15 +5,19 @@ namespace App\DomainModel\MerchantDebtorResponse;
 use OpenApi\Annotations as OA;
 
 /**
- * @OA\Schema(schema="MerchantDebtorExtendedResponse", allOf={@OA\Schema(ref="#/components/schemas/MerchantDebtorResponse")}, type="object", properties={
- *      @OA\Property(property="merchant_debtor_id", type="integer"),
- *      @OA\Property(property="company_id", type="integer"),
- *      @OA\Property(property="payment_id", ref="#/components/schemas/UUID"),
- *      @OA\Property(property="is_whitelisted", type="boolean"),
- *      @OA\Property(property="is_blacklisted", type="boolean"),
- *      @OA\Property(property="is_trusted_source", type="boolean"),
- *      @OA\Property(property="crefo_id", ref="#/components/schemas/TinyText", nullable=true),
- *      @OA\Property(property="schufa_id", ref="#/components/schemas/TinyText", nullable=true),
+ * @OA\Schema(schema="MerchantDebtorExtendedResponse",
+ *     allOf={@OA\Schema(ref="#/components/schemas/MerchantDebtorResponse")},
+ *     type="object",
+ *     properties={
+ *          @OA\Property(property="merchant_debtor_id", type="integer"),
+ *          @OA\Property(property="company_id", type="integer"),
+ *          @OA\Property(property="company_uuid", ref="#/components/schemas/UUID"),
+ *          @OA\Property(property="payment_id", ref="#/components/schemas/UUID"),
+ *          @OA\Property(property="is_whitelisted", type="boolean"),
+ *          @OA\Property(property="is_blacklisted", type="boolean"),
+ *          @OA\Property(property="is_trusted_source", type="boolean"),
+ *          @OA\Property(property="crefo_id", ref="#/components/schemas/TinyText", nullable=true),
+ *          @OA\Property(property="schufa_id", ref="#/components/schemas/TinyText", nullable=true),
  * })
  */
 class MerchantDebtorExtended extends MerchantDebtor
@@ -27,6 +31,11 @@ class MerchantDebtorExtended extends MerchantDebtor
      * @var string
      */
     private $companyId;
+
+    /**
+     * @var string
+     */
+    private $companyUuid;
 
     /**
      * @var string
@@ -86,6 +95,18 @@ class MerchantDebtorExtended extends MerchantDebtor
     public function setCompanyId(string $companyId): MerchantDebtorExtended
     {
         $this->companyId = $companyId;
+
+        return $this;
+    }
+
+    public function getCompanyUuid(): string
+    {
+        return $this->companyUuid;
+    }
+
+    public function setCompanyUuid(string $companyUuid): MerchantDebtorExtended
+    {
+        $this->companyUuid = $companyUuid;
 
         return $this;
     }
@@ -193,6 +214,7 @@ class MerchantDebtorExtended extends MerchantDebtor
         return array_merge($data, [
             'merchant_debtor_id' => $this->merchantDebtorId,
             'company_id' => (int) $this->companyId,
+            'company_uuid' => $this->companyUuid,
             'payment_id' => $this->paymentId,
             'is_whitelisted' => $this->isWhitelisted,
             'is_blacklisted' => $this->isBlacklisted,

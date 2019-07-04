@@ -51,29 +51,35 @@ class PaellaCoreContext extends MinkContext
      */
     private $merchant;
 
-    private const DEBTOR_UUID = 'ad74bbc4-509e-47d5-9b50-a0320ce3d715';
+    public const DEBTOR_UUID = 'ad74bbc4-509e-47d5-9b50-a0320ce3d715';
+
+    public const DEBTOR_COMPANY_UUID = 'c7be46c0-e049-4312-b274-258ec5aeeb70';
 
     public function __construct(KernelInterface $kernel, PdoConnection $connection)
     {
         $this->kernel = $kernel;
         $this->connection = $connection;
 
-        $this->getConnection()->exec('SET SESSION wait_timeout=30; SET SESSION max_connections = 500;');
+        $this->getConnection()->exec('
+            SET SESSION wait_timeout=45;
+            SET SESSION max_connections = 1000;
+            SET SESSION max_allowed_packet = "16M";
+        ');
         $this->cleanUpScenario();
+        $this->initScenario();
+    }
 
-        register_shutdown_function(function () {
-            $this->cleanUpScenario();
-        });
-
+    public function initScenario()
+    {
         $this->merchant = (new MerchantEntity())
-                ->setName('Behat User')
-                ->setIsActive(true)
-                ->setRoles(['ROLE_NOTHING'])
-                ->setPaymentMerchantId('f2ec4d5e-79f4-40d6-b411-31174b6519ac')
-                ->setAvailableFinancingLimit(10000)
-                ->setApiKey('test')
-                ->setCompanyId('10')
-                ->setOauthClientId('oauthClientId');
+            ->setName('Behat User')
+            ->setIsActive(true)
+            ->setRoles(['ROLE_NOTHING'])
+            ->setPaymentMerchantId('f2ec4d5e-79f4-40d6-b411-31174b6519ac')
+            ->setAvailableFinancingLimit(10000)
+            ->setApiKey('test')
+            ->setCompanyId('10')
+            ->setOauthClientId('oauthClientId');
 
         $this->getMerchantRepository()->insert($this->merchant);
 
@@ -116,6 +122,7 @@ class PaellaCoreContext extends MinkContext
             TRUNCATE order_risk_checks;
             TRUNCATE order_financial_details;
             TRUNCATE orders;
+            TRUNCATE order_notifications;
             TRUNCATE persons;
             TRUNCATE debtor_external_data;
             TRUNCATE checkout_sessions;

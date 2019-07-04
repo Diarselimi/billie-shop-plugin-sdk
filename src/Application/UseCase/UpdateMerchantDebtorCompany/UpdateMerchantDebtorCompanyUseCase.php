@@ -34,11 +34,7 @@ class UpdateMerchantDebtorCompanyUseCase implements LoggingInterface, ValidatedU
     {
         $this->validateRequest($request);
 
-        $merchantDebtor = $this->merchantDebtorRepository->getOneByExternalIdAndMerchantId(
-            $request->getMerchantDebtorExternalId(),
-            $request->getMerchantId(),
-            []
-        );
+        $merchantDebtor = $this->merchantDebtorRepository->getOneByUuid($request->getDebtorUuid());
 
         if (!$merchantDebtor) {
             throw new MerchantDebtorNotFoundException();
@@ -53,19 +49,18 @@ class UpdateMerchantDebtorCompanyUseCase implements LoggingInterface, ValidatedU
             throw new MerchantDebtorUpdateFailedException();
         }
 
-        $this->logUpdateDetails($request->getMerchantDebtorExternalId(), $merchantDebtor, $originalDebtor, $updatedDebtor);
+        $this->logUpdateDetails($merchantDebtor, $originalDebtor, $updatedDebtor);
     }
 
     private function logUpdateDetails(
-        string $externalId,
         MerchantDebtorEntity $merchantDebtor,
         DebtorCompany $originalDebtor,
         DebtorCompany $updatedDebtor
     ) {
         $this->logInfo('Merchant debtor {external_id} (id:{id}) company data updated', [
-            'external_id' => $externalId,
-            'merchant_id' => $merchantDebtor->getMerchantId(),
             'id' => $merchantDebtor->getId(),
+            'uuid' => $merchantDebtor->getUuid(),
+            'merchant_id' => $merchantDebtor->getMerchantId(),
             'company_id' => $merchantDebtor->getDebtorId(),
             'old_name' => $originalDebtor->getName(),
             'new_name' => $updatedDebtor->getName(),

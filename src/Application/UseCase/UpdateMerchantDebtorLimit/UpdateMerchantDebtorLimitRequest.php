@@ -3,14 +3,16 @@
 namespace App\Application\UseCase\UpdateMerchantDebtorLimit;
 
 use App\Application\UseCase\ValidatedRequestInterface;
-use Symfony\Component\Validator\Constraints as Assert;
 use App\Application\Validator\Constraint as PaellaAssert;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class UpdateMerchantDebtorLimitRequest implements ValidatedRequestInterface
 {
-    private $merchantDebtorExternalId;
-
-    private $merchantId;
+    /**
+     * @Assert\NotBlank()
+     * @Assert\Uuid()
+     */
+    private $merchantDebtorUuid;
 
     /**
      * @Assert\NotBlank()
@@ -19,21 +21,15 @@ class UpdateMerchantDebtorLimitRequest implements ValidatedRequestInterface
      */
     private $limit;
 
-    public function __construct(string $merchantDebtorExternalId, int $merchantId, $limit)
+    public function __construct(string $uuid, $limit)
     {
-        $this->merchantDebtorExternalId = $merchantDebtorExternalId;
-        $this->merchantId = $merchantId;
+        $this->merchantDebtorUuid = $uuid;
         $this->limit = $limit;
     }
 
-    public function getMerchantDebtorExternalId(): string
+    public function getMerchantDebtorUuid(): string
     {
-        return $this->merchantDebtorExternalId;
-    }
-
-    public function getMerchantId(): int
-    {
-        return $this->merchantId;
+        return $this->merchantDebtorUuid;
     }
 
     public function getLimit(): float

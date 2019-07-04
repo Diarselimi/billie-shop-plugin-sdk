@@ -5,9 +5,13 @@ namespace App\Application\UseCase\UpdateMerchantWithOrderDunningStep;
 use App\Application\Exception\OrderNotFoundException;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderNotification\NotificationScheduler;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
-class UpdateMerchantWithOrderDunningStepUseCase
+class UpdateMerchantWithOrderDunningStepUseCase implements LoggingInterface
 {
+    use LoggingTrait;
+
     private $orderRepository;
 
     private $notificationScheduler;
@@ -25,7 +29,16 @@ class UpdateMerchantWithOrderDunningStepUseCase
         $order = $this->orderRepository->getOneByUuid($request->getOrderUuid());
 
         if (!$order) {
-            throw new OrderNotFoundException();
+            $this->logSuppressedException(
+                new OrderNotFoundException(),
+                'Failed to notify merchant with order dunning step change. Order not found',
+                [
+                    'order_uuid' => $request->getOrderUuid(),
+                    'dunning_step' => $request->getStep(),
+                ]
+            );
+
+            return;
         }
 
         $payload = [

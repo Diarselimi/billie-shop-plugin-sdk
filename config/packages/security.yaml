@@ -30,8 +30,8 @@ security:
                 authenticators:
                     - App\Http\Authentication\Authenticator\CheckoutSessionAuthenticator
 
-        support_api: # TODO: move all support endpoints under the /private/ API prefix
-            pattern: ^/(merchant|merchant-debtor)/*
+        private_api: # TODO: move all internal or support endpoints under the /private/ API prefix
+            pattern: ^/(private/)?(merchant|merchant-debtor|debtor-company)(/.*)?
             security: false
 
         docs:

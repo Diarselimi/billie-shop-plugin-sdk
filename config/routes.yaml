@@ -1,7 +1,7 @@
 billie_monitoring:
   resource: '@BillieMonitoringBundle/Resources/config/routes.yaml'
 
-controllers:
+all_controllers:
   resource: ../src/Http/Controller
   type: openapi_annotation
 
@@ -11,19 +11,24 @@ public_controllers:
   prefix: /public
   name_prefix: public_
 
-trigger_failed_order_notifications:
+private_controllers:
+  resource: ../src/Http/Controller/PrivateApi
+  type: openapi_annotation
+  prefix: /private
+  name_prefix: private_
+
+###############################
+## Other private endpoints:
+## TODO: convert to openapi_annotation controllers
+
+trigger_failed_order_notifications: # TODO: remove security requirements, use uuid
   path: /order/{id}/trigger-failed-notifications
   controller: App\Http\Controller\TriggerFailedOrderNotificationsController::execute
   methods: [POST]
 
-mark_order_as_fraud:
+mark_order_as_fraud: # TODO: remove security requirements
   path: /order/{uuid}/mark-as-fraud
   controller: App\Http\Controller\MarkOrderAsFraudController::execute
-  methods: [POST]
-
-update_merchant_with_order_dunning_step:
-  path: /order/{uuid}/update-dunning-step
-  controller: App\Http\Controller\UpdateMerchantWithOrderDunningStepController::execute
   methods: [POST]
 
 register_merchant_user:
@@ -31,22 +36,17 @@ register_merchant_user:
   controller: App\Http\Controller\RegisterMerchantUserController::execute
   methods: [POST]
 
-update_merchant_debtor_limit:
-  path: /merchant/{merchantId}/merchant-debtor/{merchantDebtorExternalId}/limit
-  controller: App\Http\Controller\UpdateMerchantDebtorLimitController::execute
-  methods: [PUT]
-
 update_merchant_debtor_company:
-  path: /merchant/{merchantId}/merchant-debtor/{merchantDebtorExternalId}/company
+  path: /merchant-debtor/{debtorUuid}/update-company
   controller: App\Http\Controller\UpdateMerchantDebtorCompanyController::execute
-  methods: [PUT]
+  methods: [POST]
+
+whitelist_merchant_debtor:
+  path: /merchant-debtor/{debtorUuid}/whitelist
+  controller: App\Http\Controller\UpdateMerchantDebtorWhitelistController::execute
+  methods: [POST]
 
 mark_duplicate_debtors:
   path: /merchant-debtor/mark-duplicates
   controller: App\Http\Controller\MarkDuplicateDebtorsController::execute
   methods: [POST]
-
-whitelist_merchant_debtor:
-  path: /merchant/{merchantId}/merchant-debtor/{merchantDebtorExternalId}/whitelist
-  controller: App\Http\Controller\UpdateMerchantDebtorWhitelistController::execute
-  methods: [PUT]

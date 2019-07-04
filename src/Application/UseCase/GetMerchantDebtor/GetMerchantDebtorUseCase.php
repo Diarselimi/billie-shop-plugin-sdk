@@ -44,22 +44,19 @@ class GetMerchantDebtorUseCase implements ValidatedUseCaseInterface
     {
         $this->validateRequest($request);
 
-        $merchantDebtor = $request->getMerchantDebtorUuid() ?
+        $merchantDebtor = $request->getMerchantId() ?
             $this->merchantDebtorRepository->getOneByUuidAndMerchantId(
                 $request->getMerchantDebtorUuid(),
                 $request->getMerchantId()
-            ) : $this->merchantDebtorRepository->getOneByExternalIdAndMerchantId(
-                $request->getMerchantDebtorExternalId(),
-                $request->getMerchantId(),
-                []
+            ) : $this->merchantDebtorRepository->getOneByUuid(
+                $request->getMerchantDebtorUuid()
             );
 
         if (!$merchantDebtor) {
             throw new MerchantDebtorNotFoundException();
         }
 
-        $externalId = $request->getMerchantDebtorExternalId() ? $request->getMerchantDebtorExternalId() :
-            $this->merchantDebtorRepository->findExternalId($merchantDebtor->getId());
+        $externalId = $this->merchantDebtorRepository->findExternalId($merchantDebtor->getId());
 
         $financingDetails = $this->financialDetailsRepository->getCurrentByMerchantDebtorId($merchantDebtor->getId());
         $company = $this->companiesService->getDebtor($merchantDebtor->getDebtorId());

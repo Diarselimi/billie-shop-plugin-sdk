@@ -10,7 +10,9 @@ interface CompaniesServiceInterface
 
     public const DEBTOR_IDENTIFICATION_ALGORITHM_V2 = 'v2';
 
-    public function getDebtor(int $debtorId): ? DebtorCompany;
+    public function getDebtor(int $debtorCompanyId): ? DebtorCompany;
+
+    public function getDebtorByUuid(string $debtorCompanyUuid): ? DebtorCompany;
 
     public function identifyDebtor(IdentifyDebtorRequestDTO $requestDTO): ? DebtorCompany;
 

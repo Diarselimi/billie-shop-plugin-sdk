@@ -60,6 +60,15 @@ class MerchantDebtorResponseFactory
         float $totalLateOrdersAmount
     ): MerchantDebtorExtended {
         return (new MerchantDebtorExtended())
+            ->setMerchantDebtorId($merchantDebtor->getId())
+            ->setCompanyId($company->getId())
+            ->setCompanyUuid($company->getUuid())
+            ->setPaymentId($merchantDebtor->getPaymentDebtorId())
+            ->setIsWhitelisted($merchantDebtor->isWhitelisted())
+            ->setIsBlacklisted($company->isBlacklisted())
+            ->setIsTrustedSource($company->isTrustedSource())
+            ->setCrefoId($company->getCrefoId())
+            ->setSchufaId($company->getSchufaId())
             ->setUuid($merchantDebtor->getUuid())
             ->setExternalCode($merchantExternalId)
             ->setName($company->getName())
@@ -75,14 +84,6 @@ class MerchantDebtorResponseFactory
             ->setOutstandingAmountLate($totalLateOrdersAmount)
             ->setBankAccountIban($paymentDetails->getBankAccountIban())
             ->setBankAccountBic($paymentDetails->getBankAccountBic())
-            ->setMerchantDebtorId($merchantDebtor->getId())
-            ->setCompanyId($company->getId())
-            ->setPaymentId($merchantDebtor->getPaymentDebtorId())
-            ->setIsWhitelisted($merchantDebtor->isWhitelisted())
-            ->setIsBlacklisted($company->isBlacklisted())
-            ->setIsTrustedSource($company->isTrustedSource())
-            ->setCrefoId($company->getCrefoId())
-            ->setSchufaId($company->getSchufaId())
             ->setCreatedAt($merchantDebtor->getCreatedAt());
     }
 

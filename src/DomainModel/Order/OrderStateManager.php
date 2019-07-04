@@ -167,7 +167,7 @@ class OrderStateManager implements LoggingInterface
         } catch (OrderWorkflowException $exception) {
             $this->logSuppressedException($exception, 'Order approve failed because of cross checks');
 
-            throw new OrderWorkflowException('Order approve exception', null, $exception);
+            throw new OrderWorkflowException('Order cannot be approved', null, $exception);
         }
 
         $this->workflow->apply($order, OrderStateManager::TRANSITION_CREATE);

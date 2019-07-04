@@ -3,7 +3,6 @@ Feature: Create a new merchant.
   Background:
     Given I add "Content-type" header equal to "application/json"
     And I add "X-Test" header equal to 1
-    And I add "X-Api-Key" header equal to test
 
   Scenario: Failed to create a merchant - company doesn't exist
     Given I get from companies service "/debtor/1" endpoint response with status 404 and body

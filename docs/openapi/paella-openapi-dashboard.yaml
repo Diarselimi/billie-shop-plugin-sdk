@@ -858,11 +858,11 @@ components:
         name:
           $ref: '#/components/schemas/TinyText'
         financing_limit:
-          description: 'Full limit assigned to this debtor.'
+          description: 'Full limit assigned to this merchant debtor.'
           type: number
           format: float
         financing_power:
-          description: 'Available limit for this debtor.'
+          description: 'Current available limit for this merchant debtor.'
           type: number
           format: float
         bank_account_iban:

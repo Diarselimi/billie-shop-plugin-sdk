@@ -10,11 +10,15 @@ interface MerchantDebtorRepositoryInterface
 
     public function getOneById(int $id): ?MerchantDebtorEntity;
 
+    public function getOneByUuid(string $uuid): ?MerchantDebtorEntity;
+
     public function getOneByUuidAndMerchantId(string $uuid, int $merchantId): ?MerchantDebtorEntity;
 
     public function getOneByMerchantAndDebtorId(string $merchantId, string $debtorId): ?MerchantDebtorEntity;
 
-    public function getOneByExternalIdAndMerchantId(string $externalMerchantId, string $merchantId, array $excludedOrderStates): ?MerchantDebtorEntity;
+    public function getOneByExternalIdAndMerchantId(string $externalMerchantId, string $merchantId, array $excludedOrderStates = []): ?MerchantDebtorEntity;
+
+    public function getOneByUuidOrExternalIdAndMerchantId(string $uuidOrExternalID, int $merchantId): ?MerchantDebtorEntity;
 
     public function getMerchantDebtorCreatedOrdersAmount(int $merchantDebtorId): float;
 
@@ -47,4 +51,10 @@ interface MerchantDebtorRepositoryInterface
         string $sortDirection,
         ?string $searchString
     ): array;
+
+    /**
+     * @param  int                    $debtorCompanyId
+     * @return MerchantDebtorEntity[]
+     */
+    public function getManyByDebtorCompanyId(int $debtorCompanyId): array;
 }

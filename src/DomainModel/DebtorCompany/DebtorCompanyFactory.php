@@ -8,6 +8,7 @@ class DebtorCompanyFactory
     {
         return (new DebtorCompany())
             ->setId($data['id'])
+            ->setUuid($data['uuid'])
             ->setName($data['name'])
             ->setAddressHouse($data['address_house'])
             ->setAddressStreet($data['address_street'])
