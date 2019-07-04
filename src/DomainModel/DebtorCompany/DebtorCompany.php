@@ -6,6 +6,8 @@ class DebtorCompany
 {
     private $id;
 
+    private $uuid;
+
     private $name;
 
     private $addressHouse;
@@ -38,6 +40,18 @@ class DebtorCompany
     public function setId(int $id): DebtorCompany
     {
         $this->id = $id;
+
+        return $this;
+    }
+
+    public function getUuid(): string
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid(string $uuid): DebtorCompany
+    {
+        $this->uuid = $uuid;
 
         return $this;
     }

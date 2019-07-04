@@ -25,7 +25,7 @@ class UpdateMerchantDebtorCompanyUseCaseSpec extends ObjectBehavior
 
     private const MERCHANT_DEBTOR_ID = 15;
 
-    private const MERCHANT_DEBTOR_EXTERNAL_ID = 'TE56DD';
+    private const MERCHANT_DEBTOR_UUID = 'wawawaaaahwaaahahaharrrgggh';
 
     public function let(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
@@ -51,7 +51,7 @@ class UpdateMerchantDebtorCompanyUseCaseSpec extends ObjectBehavior
         $this->mockRequest($request);
 
         $validator->validate($request, Argument::any(), Argument::any())->shouldBeCalledOnce()->willReturn(new ConstraintViolationList());
-        $merchantDebtorRepository->getOneByExternalIdAndMerchantId(self::MERCHANT_DEBTOR_EXTERNAL_ID, self::MERCHANT_ID, [])->shouldBeCalledOnce()->willReturn(null);
+        $merchantDebtorRepository->getOneByUuid(self::MERCHANT_DEBTOR_UUID)->shouldBeCalledOnce()->willReturn(null);
 
         $this->shouldThrow(MerchantDebtorNotFoundException::class)->during('execute', [$request]);
     }
@@ -69,7 +69,7 @@ class UpdateMerchantDebtorCompanyUseCaseSpec extends ObjectBehavior
         $this->mockDebtorCompany($debtorCompany);
 
         $validator->validate($request, Argument::any(), Argument::any())->shouldBeCalledOnce()->willReturn(new ConstraintViolationList());
-        $merchantDebtorRepository->getOneByExternalIdAndMerchantId(self::MERCHANT_DEBTOR_EXTERNAL_ID, self::MERCHANT_ID, [])->shouldBeCalledOnce()->willReturn($merchantDebtor);
+        $merchantDebtorRepository->getOneByUuid(self::MERCHANT_DEBTOR_UUID)->shouldBeCalledOnce()->willReturn($merchantDebtor);
         $companiesService->getDebtor(self::DEBTOR_ID)->shouldBeCalledOnce()->willReturn($debtorCompany);
         $companiesService->updateDebtor(self::DEBTOR_ID, [
             'name' => 'Billie1',
@@ -95,7 +95,7 @@ class UpdateMerchantDebtorCompanyUseCaseSpec extends ObjectBehavior
         $this->mockDebtorCompany($debtorCompany);
 
         $validator->validate($request, Argument::any(), Argument::any())->shouldBeCalledOnce()->willReturn(new ConstraintViolationList());
-        $merchantDebtorRepository->getOneByExternalIdAndMerchantId(self::MERCHANT_DEBTOR_EXTERNAL_ID, self::MERCHANT_ID, [])->shouldBeCalledOnce()->willReturn($merchantDebtor);
+        $merchantDebtorRepository->getOneByUuid(self::MERCHANT_DEBTOR_UUID)->shouldBeCalledOnce()->willReturn($merchantDebtor);
         $companiesService->getDebtor(self::DEBTOR_ID)->shouldBeCalledOnce()->willReturn($debtorCompany);
         $companiesService->updateDebtor(self::DEBTOR_ID, [
             'name' => 'Billie1',
@@ -111,14 +111,14 @@ class UpdateMerchantDebtorCompanyUseCaseSpec extends ObjectBehavior
     private function mockMerchantDebtor(MerchantDebtorEntity $merchantDebtor): void
     {
         $merchantDebtor->getId()->willReturn(self::MERCHANT_DEBTOR_ID);
+        $merchantDebtor->getUuid()->willReturn(self::MERCHANT_DEBTOR_UUID);
         $merchantDebtor->getDebtorId()->willReturn(self::DEBTOR_ID);
         $merchantDebtor->getMerchantId()->willReturn(self::MERCHANT_ID);
     }
 
     private function mockRequest(UpdateMerchantDebtorCompanyRequest $request): void
     {
-        $request->getMerchantId()->willReturn(self::MERCHANT_ID);
-        $request->getMerchantDebtorExternalId()->willReturn(self::MERCHANT_DEBTOR_EXTERNAL_ID);
+        $request->getDebtorUuid()->willReturn(self::MERCHANT_DEBTOR_UUID);
         $request->getName()->willReturn('Billie1');
         $request->getAddressHouse()->willReturn('House1');
         $request->getAddressStreet()->willReturn('Street1');

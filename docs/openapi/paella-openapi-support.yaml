@@ -357,34 +357,6 @@ paths:
           $ref: '#/components/responses/Forbidden'
         default:
           $ref: '#/components/responses/ServerError'
-  '/order/{id}/approve':
-    post:
-      tags:
-        - 'Order Management'
-      summary: 'Approve Order in Waiting State'
-      description: 'Approves an order manually if it''s in waiting state. Otherwise this call fails.'
-      operationId: order_approve
-      parameters:
-        -
-          name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '204':
-          description: 'Order approved.'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
   '/order/{uuid}/confirm':
     post:
       tags:
@@ -415,6 +387,62 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+  /order/pre-approve:
+    post:
+      tags:
+        - 'Order Creation'
+      summary: 'Pre-approved Order Create'
+      operationId: pre_approve_create_order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '201':
+          description: 'Order was created, but a confirmation is needed.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+  '/order/{id}/approve':
+    post:
+      tags:
+        - 'Order Management'
+      summary: 'Approve Order in Waiting State'
+      description: 'Approves an order manually if it''s in waiting state. Otherwise this call fails.'
+      operationId: order_approve
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: 'Order approved.'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/ServerError'
       security:
@@ -457,7 +485,7 @@ paths:
         - 'Order Management'
         - Automated
       summary: 'Create Order Invoice'
-      description: 'Creates a new invoice, linking an order with a file. Called by the invoice uploader Lambda services.'
+      description: 'Creates a new invoice, linking an order with a file. Called automatically by the invoice uploader Lambda services.'
       operationId: order_create_invoice
       parameters:
         -
@@ -501,39 +529,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-        -
-          apiKey: []
-  /order/pre-approve:
-    post:
-      tags:
-        - 'Order Creation'
-      summary: 'Pre-approved Order Create'
-      operationId: pre_approve_create_order
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateOrderRequest'
-      responses:
-        '201':
-          description: 'Order was created, but a confirmation is needed.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
   '/order/{id}/decline':
     post:
       tags:
@@ -563,6 +558,37 @@ paths:
           oauth2: []
         -
           apiKey: []
+  '/debtor-company/{uuid}/limits':
+    get:
+      tags:
+        - Debtors
+      summary: 'Get Debtor Company Limits'
+      operationId: get_debtor_company_limits
+      parameters:
+        -
+          name: uuid
+          in: path
+          description: 'Company UUID'
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetDebtorCompanyLimitsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
   '/merchant/{apiKey}':
     get:
       tags:
@@ -590,7 +616,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-  '/merchant/{merchantId}/merchant-debtor/{merchantDebtorExternalId}':
+  '/merchant-debtor/{debtorUuid}':
     get:
       tags:
         - Debtors
@@ -604,8 +630,9 @@ paths:
           schema:
             type: integer
         -
-          name: merchantDebtorExternalId
+          name: debtorUuid
           in: path
+          description: 'Merchant-Debtor UUID'
           required: true
           schema:
             type: string
@@ -714,6 +741,44 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/YamlDocument'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  '/merchant-debtor/{debtorUuid}/update-limit':
+    post:
+      tags:
+        - Debtors
+      summary: 'Update Merchant Debtor Limit'
+      operationId: update_merchant_debtor_limit
+      parameters:
+        -
+          name: debtorUuid
+          in: path
+          description: 'Merchant Debtor UUID'
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                financing_limit:
+                  description: 'New financing limit.'
+                  type: number
+                  format: float
+              type: object
+      responses:
+        '204':
+          description: 'Successful response'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -1231,6 +1296,38 @@ components:
         country:
           $ref: '#/components/schemas/CountryCode'
       type: object
+    GetDebtorCompanyLimitsResponse:
+      title: 'Get Debtor Company Limits Response'
+      properties:
+        company_id:
+          type: integer
+        company_uuid:
+          $ref: '#/components/schemas/UUID'
+        financing_power:
+          description: 'Current available limit for this company in Platform.'
+          type: number
+          format: float
+        merchant_debtors:
+          description: 'List of debtors created in Paella for this company.'
+          type: array
+          items:
+            properties:
+              merchant_id:
+                type: integer
+              merchant_debtor_id:
+                type: integer
+              merchant_debtor_uuid:
+                $ref: '#/components/schemas/UUID'
+              financing_limit:
+                description: 'Full limit assigned in Paella to this debtor and merchant combination.'
+                type: number
+                format: float
+              financing_power:
+                description: 'Current available limit in Paella for this debtor and merchant combination.'
+                type: number
+                format: float
+            type: object
+      type: object
     MerchantEntity:
       properties:
         id:
@@ -1277,11 +1374,11 @@ components:
         name:
           $ref: '#/components/schemas/TinyText'
         financing_limit:
-          description: 'Full limit assigned to this debtor.'
+          description: 'Full limit assigned to this merchant debtor.'
           type: number
           format: float
         financing_power:
-          description: 'Available limit for this debtor.'
+          description: 'Current available limit for this merchant debtor.'
           type: number
           format: float
         bank_account_iban:
@@ -1323,6 +1420,8 @@ components:
           type: integer
         company_id:
           type: integer
+        company_uuid:
+          $ref: '#/components/schemas/UUID'
         payment_id:
           $ref: '#/components/schemas/UUID'
         is_whitelisted:

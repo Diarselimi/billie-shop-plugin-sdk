@@ -6,9 +6,7 @@ use App\Application\UseCase\ValidatedRequestInterface;
 
 class UpdateMerchantDebtorCompanyRequest implements ValidatedRequestInterface
 {
-    private $merchantDebtorExternalId;
-
-    private $merchantId;
+    private $debtorUuid;
 
     private $name;
 
@@ -20,26 +18,14 @@ class UpdateMerchantDebtorCompanyRequest implements ValidatedRequestInterface
 
     private $addressPostalCode;
 
-    public function getMerchantDebtorExternalId(): string
+    public function getDebtorUuid(): string
     {
-        return $this->merchantDebtorExternalId;
+        return $this->debtorUuid;
     }
 
-    public function setMerchantDebtorExternalId(string $merchantDebtorExternalId): UpdateMerchantDebtorCompanyRequest
+    public function setDebtorUuid(string $debtorUuid): UpdateMerchantDebtorCompanyRequest
     {
-        $this->merchantDebtorExternalId = $merchantDebtorExternalId;
-
-        return $this;
-    }
-
-    public function getMerchantId(): int
-    {
-        return $this->merchantId;
-    }
-
-    public function setMerchantId(int $merchantId): UpdateMerchantDebtorCompanyRequest
-    {
-        $this->merchantId = $merchantId;
+        $this->debtorUuid = $debtorUuid;
 
         return $this;
     }

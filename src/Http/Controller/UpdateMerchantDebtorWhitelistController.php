@@ -18,13 +18,12 @@ class UpdateMerchantDebtorWhitelistController
         $this->useCase = $useCase;
     }
 
-    public function execute(Request $request, int $merchantId, string $merchantDebtorExternalId): void
+    public function execute(Request $request, string $debtorUuid): void
     {
         try {
             $this->useCase->execute(
                 new WhitelistMerchantDebtorRequest(
-                    $merchantDebtorExternalId,
-                    $merchantId,
+                    $debtorUuid,
                     $request->request->getBoolean('is_whitelisted')
                 )
             );

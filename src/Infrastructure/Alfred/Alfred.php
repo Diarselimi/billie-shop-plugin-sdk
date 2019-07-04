@@ -31,10 +31,35 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         $this->factory = $debtorFactory;
     }
 
-    public function getDebtor(int $debtorId): ?DebtorCompany
+    public function getDebtor(int $debtorCompanyId): ?DebtorCompany
+    {
+        return $this->doGetDebtor($debtorCompanyId);
+    }
+
+    public function getDebtorByUuid(string $debtorCompanyUuid): ?DebtorCompany
+    {
+        return $this->doGetDebtor($debtorCompanyUuid);
+    }
+
+    private function doGetDebtor($identifier): ?DebtorCompany
     {
         try {
-            $response = $this->client->get("/debtor/$debtorId");
+            $response = $this->client->get("/debtor/{$identifier}");
+        } catch (TransferException $exception) {
+            if ($exception->getCode() === Response::HTTP_NOT_FOUND) {
+                return null;
+            }
+
+            throw new AlfredRequestException($exception->getCode(), $exception);
+        }
+
+        return $this->factory->createFromAlfredResponse($this->decodeResponse($response));
+    }
+
+    public function getDebtorByCompanyUuid(string $uuid): ?DebtorCompany
+    {
+        try {
+            $response = $this->client->get("/debtor/company/$uuid");
         } catch (TransferException $exception) {
             if ($exception->getCode() === Response::HTTP_NOT_FOUND) {
                 return null;
@@ -179,7 +204,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
     {
         $decodedResponse = json_decode((string) $response->getBody(), true);
 
-        if (!$decodedResponse) {
+        if (!is_array($decodedResponse)) {
             throw new AlfredResponseDecodeException();
         }
 

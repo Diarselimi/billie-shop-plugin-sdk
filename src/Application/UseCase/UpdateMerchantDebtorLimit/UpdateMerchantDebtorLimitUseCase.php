@@ -35,11 +35,7 @@ class UpdateMerchantDebtorLimitUseCase implements LoggingInterface, ValidatedUse
     {
         $this->validateRequest($request);
 
-        $merchantDebtor = $this->merchantDebtorRepository->getOneByExternalIdAndMerchantId(
-            $request->getMerchantDebtorExternalId(),
-            $request->getMerchantId(),
-            []
-        );
+        $merchantDebtor = $this->merchantDebtorRepository->getOneByUuid($request->getMerchantDebtorUuid());
 
         if (!$merchantDebtor) {
             throw new MerchantDebtorNotFoundException();
@@ -53,9 +49,15 @@ class UpdateMerchantDebtorLimitUseCase implements LoggingInterface, ValidatedUse
         $createdAmount = $this->merchantDebtorRepository->getMerchantDebtorCreatedOrdersAmount($merchantDebtor->getId());
         $newFinancingPower = $request->getLimit() - $paymentsDebtor->getOutstandingAmount() - $createdAmount;
 
+        $merchantDebtorFinancingDetails
+            ->setFinancingLimit($request->getLimit())
+            ->setFinancingPower($newFinancingPower);
+
+        $this->merchantDebtorFinancialDetailsRepository->insert($merchantDebtorFinancingDetails);
+
         $this->logInfo('Merchant debtor {external_id} (id:{id}) limit updated to {new_limit}', [
-            'external_id' => $request->getMerchantDebtorExternalId(),
-            'merchant_id' => $request->getMerchantId(),
+            'uuid_or_external_id' => $request->getMerchantDebtorUuid(),
+            'merchant_id' => $merchantDebtor->getMerchantId(),
             'id' => $merchantDebtor->getId(),
             'company_id' => $merchantDebtor->getDebtorId(),
             'old_limit' => $merchantDebtorFinancingDetails->getFinancingLimit(),
@@ -63,12 +65,5 @@ class UpdateMerchantDebtorLimitUseCase implements LoggingInterface, ValidatedUse
             'outstanding_amount' => $paymentsDebtor->getOutstandingAmount(),
             'created_amount' => $createdAmount,
         ]);
-
-        $merchantDebtorFinancingDetails
-            ->setFinancingLimit($request->getLimit())
-            ->setFinancingPower($newFinancingPower)
-        ;
-
-        $this->merchantDebtorFinancialDetailsRepository->insert($merchantDebtorFinancingDetails);
     }
 }

@@ -7,7 +7,7 @@ use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorFinancialDetailsEntity;
 
-class MerchantDebtorContainer
+class MerchantDebtorContainer extends BaseMerchantDebtorContainer
 {
     /**
      * @var string
@@ -15,24 +15,9 @@ class MerchantDebtorContainer
     private $merchantExternalId;
 
     /**
-     * @var MerchantDebtorEntity
-     */
-    private $merchantDebtor;
-
-    /**
-     * @var DebtorCompany
-     */
-    private $company;
-
-    /**
      * @var DebtorPaymentDetailsDTO
      */
     private $paymentDetails;
-
-    /**
-     * @var MerchantDebtorFinancialDetailsEntity
-     */
-    private $financialDetails;
 
     /**
      * @var float
@@ -54,12 +39,11 @@ class MerchantDebtorContainer
         float $totalLateOrdersAmount
     ) {
         $this->merchantExternalId = $merchantExternalId;
-        $this->merchantDebtor = $merchantDebtor;
-        $this->company = $company;
         $this->paymentDetails = $paymentDetails;
-        $this->financialDetails = $financialDetails;
         $this->totalCreatedOrdersAmount = $totalCreatedOrdersAmount;
         $this->totalLateOrdersAmount = $totalLateOrdersAmount;
+
+        parent::__construct($merchantDebtor, $company, $financialDetails);
     }
 
     public function getMerchantExternalId(): string
@@ -67,24 +51,9 @@ class MerchantDebtorContainer
         return $this->merchantExternalId;
     }
 
-    public function getMerchantDebtor(): MerchantDebtorEntity
-    {
-        return $this->merchantDebtor;
-    }
-
-    public function getCompany(): DebtorCompany
-    {
-        return $this->company;
-    }
-
     public function getPaymentDetails(): DebtorPaymentDetailsDTO
     {
         return $this->paymentDetails;
-    }
-
-    public function getFinancialDetails(): MerchantDebtorFinancialDetailsEntity
-    {
-        return $this->financialDetails;
     }
 
     public function getTotalCreatedOrdersAmount(): float

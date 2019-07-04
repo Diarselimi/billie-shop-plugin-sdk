@@ -4,17 +4,16 @@ namespace spec\App\Application\UseCase\GetMerchantDebtor;
 
 use App\Application\Exception\MerchantDebtorNotFoundException;
 use App\Application\UseCase\GetMerchantDebtor\GetMerchantDebtorRequest;
-use App\DomainModel\Borscht\BorschtInterface;
-use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
-use App\DomainModel\MerchantDebtorResponse\MerchantDebtorContainer;
 use App\Application\UseCase\GetMerchantDebtor\GetMerchantDebtorUseCase;
+use App\DomainModel\Borscht\BorschtInterface;
 use App\DomainModel\Borscht\DebtorPaymentDetailsDTO;
+use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorFinancialDetailsEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
-use App\DomainModel\MerchantDebtorResponse\MerchantDebtorResponseFactory;
+use App\DomainModel\MerchantDebtorResponse\MerchantDebtorContainer;
 use App\DomainModel\Order\OrderStateManager;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -57,13 +56,10 @@ class GetMerchantDebtorUseCaseSpec extends ObjectBehavior
         GetMerchantDebtorRequest $request
     ) {
         $request->getMerchantId()->willReturn(self::MERCHANT_ID);
-        $request->getMerchantDebtorExternalId()->willReturn(self::MERCHANT_DEBTOR_EXTERNAL_ID);
-        $request->getMerchantDebtorUuid()->willReturn(null);
+        $request->getMerchantDebtorUuid()->willReturn(self::MERCHANT_DEBTOR_UUID);
 
-        $merchantDebtorRepository->getOneByExternalIdAndMerchantId(self::MERCHANT_DEBTOR_EXTERNAL_ID, self::MERCHANT_ID, [])
+        $merchantDebtorRepository->getOneByUuidAndMerchantId(self::MERCHANT_DEBTOR_UUID, self::MERCHANT_ID)
             ->shouldBeCalledOnce()->willReturn(null);
-
-        $merchantDebtorRepository->getOneByUuidAndMerchantId(Argument::any(), Argument::any())->shouldNotBeCalled();
 
         $this->shouldThrow(MerchantDebtorNotFoundException::class)->during('execute', [$request]);
     }
@@ -73,13 +69,10 @@ class GetMerchantDebtorUseCaseSpec extends ObjectBehavior
         GetMerchantDebtorRequest $request
     ) {
         $request->getMerchantId()->willReturn(self::MERCHANT_ID);
-        $request->getMerchantDebtorExternalId()->willReturn(null);
         $request->getMerchantDebtorUuid()->willReturn(self::MERCHANT_DEBTOR_UUID);
 
         $merchantDebtorRepository->getOneByUuidAndMerchantId(self::MERCHANT_DEBTOR_UUID, self::MERCHANT_ID)
             ->shouldBeCalledOnce()->willReturn(null);
-
-        $merchantDebtorRepository->getOneByExternalIdAndMerchantId(Argument::any(), Argument::any(), Argument::any())->shouldNotBeCalled();
 
         $this->shouldThrow(MerchantDebtorNotFoundException::class)->during('execute', [$request]);
     }
@@ -98,14 +91,10 @@ class GetMerchantDebtorUseCaseSpec extends ObjectBehavior
         $this->mockMerchantDebtor($merchantDebtor);
 
         $request->getMerchantId()->willReturn(self::MERCHANT_ID);
-        $request->getMerchantDebtorExternalId()->willReturn(null);
         $request->getMerchantDebtorUuid()->willReturn(self::MERCHANT_DEBTOR_UUID);
 
         $merchantDebtorRepository->getOneByUuidAndMerchantId(self::MERCHANT_DEBTOR_UUID, self::MERCHANT_ID)
             ->shouldBeCalledOnce()->willReturn($merchantDebtor);
-
-        $merchantDebtorRepository->getOneByExternalIdAndMerchantId(Argument::any(), Argument::any(), Argument::any())
-            ->shouldNotBeCalled();
 
         $merchantDebtorRepository->findExternalId(self::MERCHANT_DEBTOR_ID)
             ->shouldBeCalledOnce()->willReturn(self::MERCHANT_DEBTOR_EXTERNAL_ID);

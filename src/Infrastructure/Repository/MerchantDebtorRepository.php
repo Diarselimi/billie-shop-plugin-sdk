@@ -71,6 +71,38 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
         return $row ? $this->factory->createFromDatabaseRow($row) : null;
     }
 
+    public function getManyByDebtorCompanyId(int $debtorCompanyId): array
+    {
+        $results = [];
+
+        $stmt = $this->doExecute('
+          SELECT ' . self::SELECT_FIELDS . '
+          FROM ' . self::TABLE_NAME . '
+          WHERE debtor_id = :debtor_id
+        ', [
+            'debtor_id' => $debtorCompanyId,
+        ]);
+
+        while ($stmt && $row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            $results[] = $this->factory->createFromDatabaseRow($row);
+        }
+
+        return $results;
+    }
+
+    public function getOneByUuid(string $uuid): ?MerchantDebtorEntity
+    {
+        $row = $this->doFetchOne('
+          SELECT ' . self::SELECT_FIELDS . '
+          FROM ' . self::TABLE_NAME . '
+          WHERE uuid = :uuid
+        ', [
+            'uuid' => $uuid,
+        ]);
+
+        return $row ? $this->factory->createFromDatabaseRow($row) : null;
+    }
+
     public function getOneByUuidAndMerchantId(string $uuid, int $merchantId): ?MerchantDebtorEntity
     {
         $row = $this->doFetchOne('
@@ -99,7 +131,7 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
         return $row ? $this->factory->createFromDatabaseRow($row) : null;
     }
 
-    public function getOneByExternalIdAndMerchantId(string $merchantExternalId, string $merchantId, array $excludedOrderStates): ?MerchantDebtorEntity
+    public function getOneByExternalIdAndMerchantId(string $merchantExternalId, string $merchantId, array $excludedOrderStates = []): ?MerchantDebtorEntity
     {
         $row = $this->doFetchOne('
             SELECT ' . self::SELECT_FIELDS . '
@@ -114,9 +146,33 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
                 ' . ($excludedOrderStates ? 'AND orders.state NOT IN ("' . implode('", "', $excludedOrderStates) . '")' : '') . '
                 ORDER BY orders.id DESC
                 LIMIT 1
-            )
+            ) AND merchant_id = :merchant_id
         ', [
             'merchant_external_id' => $merchantExternalId,
+            'merchant_id' => $merchantId,
+        ]);
+
+        return $row ? $this->factory->createFromDatabaseRow($row) : null;
+    }
+
+    public function getOneByUuidOrExternalIdAndMerchantId(string $uuidOrExternalID, int $merchantId): ?MerchantDebtorEntity
+    {
+        $row = $this->doFetchOne('
+            SELECT ' . self::SELECT_FIELDS . '
+            FROM ' . self::TABLE_NAME . ' 
+            WHERE (merchants_debtors.id = (
+                SELECT merchant_debtor_id
+                FROM orders
+                INNER JOIN debtor_external_data ON orders.debtor_external_data_id = debtor_external_data.id
+                WHERE orders.merchant_id = :merchant_id
+                AND debtor_external_data.merchant_external_id = :merchant_external_id
+                AND merchant_debtor_id IS NOT NULL
+                ORDER BY orders.id DESC
+                LIMIT 1
+            ) OR uuid = :uuid) AND merchant_id = :merchant_id
+        ', [
+            'merchant_external_id' => $uuidOrExternalID,
+            'uuid' => $uuidOrExternalID,
             'merchant_id' => $merchantId,
         ]);
 
@@ -216,14 +272,14 @@ SQL;
 
         if ($searchString) {
             $where .= ' AND (debtor_external_data.merchant_external_id LIKE :search)';
-            $queryParameters['search'] = '%'.$searchString.'%';
+            $queryParameters['search'] = '%' . $searchString . '%';
         }
 
         $totalCount = $this->doFetchOne('SELECT count(*) as total_count FROM (' . sprintf(
             $sql,
             'merchants_debtors.id',
             $where
-        ) . ') AS md', $queryParameters);
+            ) . ') AS md', $queryParameters);
 
         $sql .= " ORDER BY :sort_field :sort_direction LIMIT {$offset},{$limit}";
         $queryParameters['sort_field'] = $tableName . '.' . $sortBy;

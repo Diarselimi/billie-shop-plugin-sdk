@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controller;
+namespace App\Http\Controller\PrivateApi;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\OrderWorkflowException;
@@ -13,6 +13,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
+ * TODO: use uuid and change route to /order/{uuid}/approve
  * @OA\Post(
  *     path="/order/{id}/approve",
  *     operationId="order_approve",

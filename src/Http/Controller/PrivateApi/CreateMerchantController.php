@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controller;
+namespace App\Http\Controller\PrivateApi;
 
 use App\Application\UseCase\CreateMerchant\CreateMerchantRequest;
 use App\Application\UseCase\CreateMerchant\CreateMerchantUseCase;

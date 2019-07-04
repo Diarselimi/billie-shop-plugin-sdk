@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controller;
+namespace App\Http\Controller\PrivateApi;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\CreateOrderInvoice\CreateOrderInvoiceRequest;
@@ -11,12 +11,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
+ * TODO: use uuid and change route to /order/{uuid}/invoice
  * @OA\Post(
  *     path="/merchant/{merchantId}/order/{id}/invoice",
  *     operationId="order_create_invoice",
  *     summary="Create Order Invoice",
- *     description="Creates a new invoice, linking an order with a file. Called by the invoice uploader Lambda services.",
- *     security={{"oauth2"={}}, {"apiKey"={}}},
+ *     description="Creates a new invoice, linking an order with a file. Called automatically by the invoice uploader Lambda services.",
  *
  *     tags={"Order Management", "Automated"},
  *     x={"groups":{"support", "automated"}},

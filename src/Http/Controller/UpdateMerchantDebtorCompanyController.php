@@ -18,12 +18,11 @@ class UpdateMerchantDebtorCompanyController
         $this->useCase = $useCase;
     }
 
-    public function execute(Request $request, int $merchantId, string $merchantDebtorExternalId): void
+    public function execute(Request $request, string $debtorUuid): void
     {
         try {
             $request = (new UpdateMerchantDebtorCompanyRequest())
-                ->setMerchantDebtorExternalId($merchantDebtorExternalId)
-                ->setMerchantId($merchantId)
+                ->setDebtorUuid($debtorUuid)
                 ->setName($request->request->get('name'))
                 ->setAddressHouse($request->request->get('address_house'))
                 ->setAddressStreet($request->request->get('address_street'))

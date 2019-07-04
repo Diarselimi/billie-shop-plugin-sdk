@@ -29,7 +29,7 @@ class UpdateMerchantDebtorLimitUseCaseSpec extends ObjectBehavior
 
     private const MERCHANT_DEBTOR_PAYMENT_ID = 'uuid123';
 
-    private const MERCHANT_DEBTOR_EXTERNAL_ID = 'TE56DD';
+    private const MERCHANT_DEBTOR_UUID = 'wawawaaaahwaaahahaharrrgggh';
 
     public function let(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
@@ -53,12 +53,11 @@ class UpdateMerchantDebtorLimitUseCaseSpec extends ObjectBehavior
         ValidatorInterface $validator,
         UpdateMerchantDebtorLimitRequest $request
     ) {
-        $request->getMerchantId()->willReturn(self::MERCHANT_ID);
-        $request->getMerchantDebtorExternalId()->willReturn(self::MERCHANT_DEBTOR_EXTERNAL_ID);
+        $request->getMerchantDebtorUuid()->willReturn(self::MERCHANT_DEBTOR_UUID);
         $request->getLimit()->willReturn(100);
 
         $validator->validate($request, Argument::any(), Argument::any())->shouldBeCalledOnce()->willReturn(new ConstraintViolationList());
-        $merchantDebtorRepository->getOneByExternalIdAndMerchantId(self::MERCHANT_DEBTOR_EXTERNAL_ID, self::MERCHANT_ID, [])->shouldBeCalledOnce()->willReturn(null);
+        $merchantDebtorRepository->getOneByUuid(self::MERCHANT_DEBTOR_UUID)->shouldBeCalledOnce()->willReturn(null);
 
         $this->shouldThrow(MerchantDebtorNotFoundException::class)->during('execute', [$request]);
     }
@@ -87,8 +86,7 @@ class UpdateMerchantDebtorLimitUseCaseSpec extends ObjectBehavior
         $this->mockMerchantDebtor($merchantDebtor);
         $this->mockDebtorPaymentDetails($debtorPaymentDetails);
 
-        $request->getMerchantId()->willReturn(self::MERCHANT_ID);
-        $request->getMerchantDebtorExternalId()->willReturn(self::MERCHANT_DEBTOR_EXTERNAL_ID);
+        $request->getMerchantDebtorUuid()->willReturn(self::MERCHANT_DEBTOR_UUID);
         $request->getLimit()->willReturn(1000);
 
         $merchantDebtor->getId()->willReturn(self::MERCHANT_DEBTOR_ID);
@@ -98,7 +96,7 @@ class UpdateMerchantDebtorLimitUseCaseSpec extends ObjectBehavior
 
         $validator->validate($request, Argument::any(), Argument::any())->shouldBeCalledOnce()->willReturn(new ConstraintViolationList());
 
-        $merchantDebtorRepository->getOneByExternalIdAndMerchantId(self::MERCHANT_DEBTOR_EXTERNAL_ID, self::MERCHANT_ID, [])->shouldBeCalledOnce()->willReturn($merchantDebtor);
+        $merchantDebtorRepository->getOneByUuid(self::MERCHANT_DEBTOR_UUID)->shouldBeCalledOnce()->willReturn($merchantDebtor);
         $merchantDebtorRepository->getMerchantDebtorCreatedOrdersAmount(self::MERCHANT_DEBTOR_ID)->shouldBeCalledOnce()->willReturn(150.55);
 
         $merchantDebtorFinancialDetailsRepository->getCurrentByMerchantDebtorId(self::MERCHANT_DEBTOR_ID)->willReturn($financialDetails);
@@ -114,6 +112,7 @@ class UpdateMerchantDebtorLimitUseCaseSpec extends ObjectBehavior
         $merchantDebtor->getId()->willReturn(self::MERCHANT_DEBTOR_ID);
         $merchantDebtor->getPaymentDebtorId()->willReturn(self::MERCHANT_DEBTOR_PAYMENT_ID);
         $merchantDebtor->getDebtorId()->willReturn(self::DEBTOR_ID);
+        $merchantDebtor->getMerchantId()->willReturn(self::MERCHANT_ID);
     }
 
     private function mockDebtorPaymentDetails(DebtorPaymentDetailsDTO $debtorPaymentDetails): void

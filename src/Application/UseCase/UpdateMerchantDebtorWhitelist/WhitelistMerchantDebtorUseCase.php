@@ -22,14 +22,10 @@ class WhitelistMerchantDebtorUseCase implements LoggingInterface, ValidatedUseCa
 
     public function execute(WhitelistMerchantDebtorRequest $request): void
     {
-        $merchantDebtor = $this->merchantDebtorRepository->getOneByExternalIdAndMerchantId(
-            $request->getMerchantDebtorExternalId(),
-            $request->getMerchantId(),
-            []
-        );
+        $merchantDebtor = $this->merchantDebtorRepository->getOneByUuid($request->getDebtorUuid());
 
         if (!$merchantDebtor) {
-            throw new MerchantDebtorNotFoundException("Merchant Debtor with external id #{$request->getMerchantDebtorExternalId()} not found");
+            throw new MerchantDebtorNotFoundException("Merchant Debtor with external id #{$request->getDebtorUuid()} not found");
         }
 
         $this->validateRequest($request);

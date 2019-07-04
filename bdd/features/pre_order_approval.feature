@@ -39,6 +39,9 @@ Feature:
 
   Scenario: Successfully create an order in pre-approved state
     Given I get from companies service identify match and good decision response
+    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    """
+    """
     And I send a POST request to "/order/pre-approve" with body:
     """
     {
@@ -91,6 +94,9 @@ Feature:
 
   Scenario: Debtor identification failed
     Given I get from companies service identify match and bad decision response
+    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    """
+    """
     And I send a POST request to "/order/pre-approve" with body:
     """
     {

@@ -7,7 +7,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class WhitelistMerchantDebtorRequest implements ValidatedRequestInterface
 {
-    private $merchantExternalId;
+    private $debtorUuid;
 
     /**
      * @var bool|mixed
@@ -15,23 +15,20 @@ class WhitelistMerchantDebtorRequest implements ValidatedRequestInterface
      */
     private $isWhitelisted;
 
-    private $merchantId;
-
-    public function __construct(string $merchantExternalId, int $merchantId, bool $isWhitelisted)
+    public function __construct(string $debtorUuid, bool $isWhitelisted)
     {
-        $this->merchantExternalId = $merchantExternalId;
-        $this->merchantId = $merchantId;
+        $this->debtorUuid = $debtorUuid;
         $this->isWhitelisted = $isWhitelisted;
     }
 
-    public function getMerchantDebtorExternalId(): string
+    public function getDebtorUuid(): string
     {
-        return $this->merchantExternalId;
+        return $this->debtorUuid;
     }
 
-    public function setMerchantDebtorExternalId(string $merchantExternalId): WhitelistMerchantDebtorRequest
+    public function setDebtorUuid(string $debtorUuid): WhitelistMerchantDebtorRequest
     {
-        $this->merchantExternalId = $merchantExternalId;
+        $this->debtorUuid = $debtorUuid;
 
         return $this;
     }
@@ -46,10 +43,5 @@ class WhitelistMerchantDebtorRequest implements ValidatedRequestInterface
         $this->isWhitelisted = $isWhitelisted;
 
         return $this;
-    }
-
-    public function getMerchantId(): string
-    {
-        return $this->merchantId;
     }
 }

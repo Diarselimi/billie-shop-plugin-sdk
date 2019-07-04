@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controller;
+namespace App\Http\Controller\PrivateApi;
 
 use App\Application\UseCase\GetMerchant\GetMerchantRequest;
 use App\Application\UseCase\GetMerchant\GetMerchantResponse;
@@ -8,6 +8,7 @@ use App\Application\UseCase\GetMerchant\GetMerchantUseCase;
 use OpenApi\Annotations as OA;
 
 /**
+ * TODO: use uuid and change route to /merchant/{uuid}
  * @OA\Get(
  *     path="/merchant/{apiKey}",
  *     operationId="merchant_get",

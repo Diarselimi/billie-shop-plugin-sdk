@@ -2,15 +2,15 @@
 
 namespace App\Application\UseCase\GetMerchantDebtor;
 
-use App\Application\UseCase\ValidatedRequestInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class GetMerchantDebtorRequest implements ValidatedRequestInterface
+class GetMerchantDebtorPublicRequest extends GetMerchantDebtorRequest
 {
     /**
      * @Assert\Type(type="integer")
+     * @Assert\NotBlank()
      * @Assert\GreaterThan(0)
-     * @var int|null
+     * @var int
      */
     protected $merchantId;
 
@@ -21,19 +21,15 @@ class GetMerchantDebtorRequest implements ValidatedRequestInterface
      */
     protected $merchantDebtorUuid;
 
-    public function __construct(?int $merchantId, string $merchantDebtorUuid)
+    public function __construct(int $merchantId, string $merchantDebtorUuid)
     {
         $this->merchantId = $merchantId;
         $this->merchantDebtorUuid = $merchantDebtorUuid;
+        parent::__construct($merchantId, $merchantDebtorUuid);
     }
 
-    public function getMerchantId(): ?int
+    public function getMerchantId(): int
     {
         return $this->merchantId;
-    }
-
-    public function getMerchantDebtorUuid(): string
-    {
-        return $this->merchantDebtorUuid;
     }
 }

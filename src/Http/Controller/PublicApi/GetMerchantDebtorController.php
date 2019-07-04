@@ -3,7 +3,7 @@
 namespace App\Http\Controller\PublicApi;
 
 use App\Application\Exception\MerchantDebtorNotFoundException;
-use App\Application\UseCase\GetMerchantDebtor\GetMerchantDebtorRequest;
+use App\Application\UseCase\GetMerchantDebtor\GetMerchantDebtorPublicRequest;
 use App\Application\UseCase\GetMerchantDebtor\GetMerchantDebtorUseCase;
 use App\DomainModel\MerchantDebtorResponse\MerchantDebtor;
 use App\DomainModel\MerchantDebtorResponse\MerchantDebtorResponseFactory;
@@ -46,10 +46,9 @@ class GetMerchantDebtorController
     public function execute(string $uuid, Request $request): MerchantDebtor
     {
         try {
-            $container = $this->useCase->execute(new GetMerchantDebtorRequest(
+            $container = $this->useCase->execute(new GetMerchantDebtorPublicRequest(
                 $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID),
-                $uuid,
-                null
+                $uuid
             ));
         } catch (MerchantDebtorNotFoundException $e) {
             throw new NotFoundHttpException('Merchant Debtor not found.');
