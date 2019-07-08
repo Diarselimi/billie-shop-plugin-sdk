@@ -27,7 +27,7 @@ use Symfony\Component\HttpFoundation\Request;
  *          }))
  *     ),
  *
- *     @OA\Response(response=200, description="Order payment successfully confirmed.", @OA\JsonContent(
+ *     @OA\Response(response=200, description="Checkout session created.", @OA\JsonContent(
  *          type="object",
  *          required={"id"},
  *          properties={

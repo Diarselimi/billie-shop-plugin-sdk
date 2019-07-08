@@ -11,10 +11,10 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Schema(schema="ShipOrderRequest", title="Order Shipping Object", type="object", properties={
- *      @OA\Property(property="external_order_id", ref="#/components/schemas/TinyText", nullable=true),
+ *      @OA\Property(property="external_order_id", ref="#/components/schemas/TinyText", nullable=true, description="External Order ID. It should only be provided if it was not provided in the create order call."),
  *      @OA\Property(property="invoice_number", ref="#/components/schemas/TinyText"),
- *      @OA\Property(property="invoice_url", ref="#/components/schemas/TinyText"),
- *      @OA\Property(property="proof_of_delivery_url", ref="#/components/schemas/TinyText")
+ *      @OA\Property(property="invoice_url", ref="#/components/schemas/URL"),
+ *      @OA\Property(property="shipping_document_url", ref="#/components/schemas/URL")
  * })
  */
 class ShipOrderRequest extends AbstractOrderRequest implements ValidatedRequestInterface, ArrayableInterface
@@ -45,7 +45,7 @@ class ShipOrderRequest extends AbstractOrderRequest implements ValidatedRequestI
      * @var string
      * @Assert\Length(max="255")
      */
-    private $proofOfDeliveryUrl;
+    private $shippingDocumentUrl;
 
     public function getExternalCode(): ? string
     {
@@ -62,9 +62,9 @@ class ShipOrderRequest extends AbstractOrderRequest implements ValidatedRequestI
         return $this->invoiceUrl;
     }
 
-    public function getProofOfDeliveryUrl(): ?string
+    public function getShippingDocumentUrl(): ?string
     {
-        return $this->proofOfDeliveryUrl;
+        return $this->shippingDocumentUrl;
     }
 
     public function setExternalCode(?string $externalCode): ShipOrderRequest
@@ -88,9 +88,9 @@ class ShipOrderRequest extends AbstractOrderRequest implements ValidatedRequestI
         return $this;
     }
 
-    public function setProofOfDeliveryUrl(?string $proofOfDeliveryUrl): ShipOrderRequest
+    public function setShippingDocumentUrl(?string $shippingDocumentUrl): ShipOrderRequest
     {
-        $this->proofOfDeliveryUrl = $proofOfDeliveryUrl;
+        $this->shippingDocumentUrl = $shippingDocumentUrl;
 
         return $this;
     }
@@ -103,7 +103,7 @@ class ShipOrderRequest extends AbstractOrderRequest implements ValidatedRequestI
             'merchant_id' => $this->getMerchantId(),
             'invoice_number' => $this->getInvoiceNumber(),
             'invoice_url' => $this->getInvoiceUrl(),
-            'proof_of_delivery' => $this->getProofOfDeliveryUrl(),
+            'shipping_document_url' => $this->getShippingDocumentUrl(),
         ];
     }
 }

@@ -30,7 +30,7 @@ use Symfony\Component\HttpFoundation\Request;
  *     @OA\Parameter(in="query", name="search", description="Search text. Filters search results by: `external_code`.",
  *          @OA\Schema(ref="#/components/schemas/TinyText"), required=false),
  *
- *     @OA\Response(response=200, @OA\JsonContent(ref="#/components/schemas/MerchantDebtorListResponse"), description="Debtor results"),
+ *     @OA\Response(response=200, @OA\JsonContent(ref="#/components/schemas/MerchantDebtorListResponse"), description="Debtors list"),
  *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),
  *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
  *     @OA\Response(response=500, ref="#/components/responses/ServerError")

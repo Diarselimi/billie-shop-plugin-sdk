@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\Request;
  *          @OA\Schema(ref="#/components/schemas/CreateOrderRequest"))
  *     ),
  *
- *     @OA\Response(response=201, description="Merchant successfully created", @OA\JsonContent(ref="#/components/schemas/OrderResponse")),
+ *     @OA\Response(response=201, description="Order successfully created", @OA\JsonContent(ref="#/components/schemas/OrderResponse")),
  *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),
  *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
  *     @OA\Response(response=500, ref="#/components/responses/ServerError")
@@ -54,6 +54,9 @@ class CreateOrderController
         $useCaseRequest = $this->orderRequestFactory
             ->createForCreateOrder($request);
 
-        return new JsonResponse($this->createOrderUseCase->execute($useCaseRequest)->toArray(), JsonResponse::HTTP_CREATED);
+        return new JsonResponse(
+            $this->createOrderUseCase->execute($useCaseRequest)->toArray(),
+            JsonResponse::HTTP_CREATED
+        );
     }
 }

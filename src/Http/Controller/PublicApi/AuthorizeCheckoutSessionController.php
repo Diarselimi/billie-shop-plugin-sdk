@@ -18,6 +18,7 @@ use Symfony\Component\Security\Core\Security;
  *     path="/checkout-session/{sessionUuid}/authorize",
  *     operationId="checkout_session_authorize",
  *     summary="Checkout Session Authorize",
+ *     description="Fills the required order information for the given checkout session. The order will then need to be confirmed by the merchant aftewards.",
  *
  *     tags={"Order Creation"},
  *     x={"groups":{"checkout-client"}},
@@ -30,7 +31,7 @@ use Symfony\Component\Security\Core\Security;
  *          @OA\Schema(ref="#/components/schemas/CreateOrderRequest"))
  *     ),
  *
- *     @OA\Response(response=201, description="Order was created, but a confirmation is needed."),
+ *     @OA\Response(response=201, description="Order created with 'authorized' state, but a merchant confirmation is needed."),
  *     @OA\Response(response=400, description="Invalid request data or order declined.", @OA\JsonContent(ref="#/components/schemas/CheckoutAuthorizeErrorObject")),
  *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
  *     @OA\Response(response=500, ref="#/components/responses/ServerError")

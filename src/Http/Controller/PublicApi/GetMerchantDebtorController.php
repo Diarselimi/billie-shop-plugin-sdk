@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *
  *     @OA\Parameter(in="path", name="uuid", @OA\Schema(ref="#/components/schemas/UUID"), required=true),
  *
- *     @OA\Response(response=200, @OA\JsonContent(ref="#/components/schemas/MerchantDebtorResponse"), description="Debtor Info"),
+ *     @OA\Response(response=200, @OA\JsonContent(ref="#/components/schemas/MerchantDebtorResponse"), description="Debtor details"),
  *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),
  *     @OA\Response(response=404, ref="#/components/responses/NotFound"),
  *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),

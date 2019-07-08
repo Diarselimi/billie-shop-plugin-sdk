@@ -71,7 +71,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
         $request->getExternalCode()->willReturn(self::EXTERNAL_CODE);
         $request->getInvoiceNumber()->willReturn(self::INVOICE_NUMBER);
         $request->getInvoiceUrl()->willReturn(self::INVOICE_URL);
-        $request->getProofOfDeliveryUrl()->willReturn(self::PROOF_OF_DELIVERY_URL);
+        $request->getShippingDocumentUrl()->willReturn(self::PROOF_OF_DELIVERY_URL);
 
         $this->beConstructedWith(...func_get_args());
 

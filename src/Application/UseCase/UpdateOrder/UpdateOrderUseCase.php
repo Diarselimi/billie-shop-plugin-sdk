@@ -101,7 +101,7 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
             || $request->getAmountNet() !== null && (float) $request->getAmountNet() !== $orderFinancialDetails->getAmountNet()
             || $request->getAmountTax() !== null && (float) $request->getAmountTax() !== $orderFinancialDetails->getAmountTax();
 
-        $invoiceChanged = !$amountChanged && (
+        $invoiceChanged = (
             $request->getInvoiceNumber() !== null && $request->getInvoiceNumber() !== $order->getInvoiceNumber()
             || $request->getInvoiceUrl() !== null && $request->getInvoiceUrl() !== $order->getInvoiceUrl()
         );
@@ -122,6 +122,10 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 
         if ($durationChanged) {
             $this->updateDuration($orderContainer, $request);
+        }
+
+        if ($amountChanged || $invoiceChanged || $durationChanged) {
+            $this->applyUpdate($orderContainer);
         }
     }
 
@@ -154,8 +158,6 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         $this->orderFinancialDetailsRepository->insert($newOrderFinancialDetails);
 
         $orderContainer->setOrderFinancialDetails($newOrderFinancialDetails);
-
-        $this->applyUpdate($orderContainer);
     }
 
     private function updateAmount(OrderContainer $orderContainer, UpdateOrderRequest $request)
@@ -192,8 +194,6 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         $orderContainer->setOrderFinancialDetails($newOrderFinancialDetails);
 
         if ($this->orderStateManager->wasShipped($order)) {
-            $this->applyUpdate($orderContainer);
-
             return;
         }
 
@@ -214,9 +214,7 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
     {
         $order = $orderContainer->getOrder();
 
-        if ($this->orderStateManager->isCanceled($order) || $this->orderStateManager->isComplete($order)
-            || !$this->orderStateManager->wasShipped($order)
-        ) {
+        if (!$this->orderStateManager->wasShipped($order)) {
             throw new PaellaCoreCriticalException(
                 'Update invoice is not possible',
                 PaellaCoreCriticalException::CODE_ORDER_INVOICE_CANT_BE_UPDATED,
@@ -228,8 +226,6 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
             ->setInvoiceNumber($request->getInvoiceNumber())
             ->setInvoiceUrl($request->getInvoiceUrl())
         ;
-
-        $this->applyUpdate($orderContainer);
 
         try {
             $this->invoiceManager->upload($order, InvoiceUploadHandlerInterface::EVENT_UPDATE);

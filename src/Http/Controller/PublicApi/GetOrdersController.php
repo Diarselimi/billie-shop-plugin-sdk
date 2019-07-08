@@ -40,7 +40,7 @@ use Symfony\Component\HttpFoundation\Request;
  *     @OA\Response(response=200, @OA\JsonContent(type="object", properties={
  *          @OA\Property(property="total", type="integer", minimum=0),
  *          @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/OrderResponse"))
- *     }), description="Order results"),
+ *     }), description="Orders list"),
  *
  *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),
  *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),

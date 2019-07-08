@@ -400,9 +400,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
 
         $this->mockRequest($request, null, null, null, null, $newInvoiceNumber, $newInvoiceUrl);
 
-        $orderStateManager->wasShipped($order)->willReturn(true);
-        $orderStateManager->isCanceled($order)->willReturn(true);
-        $orderStateManager->isComplete($order)->willReturn(true);
+        $orderStateManager->wasShipped($order)->willReturn(false);
 
         $orderContainerFactory
             ->loadByMerchantIdAndExternalId(self::ORDER_MERCHANT_ID, self::ORDER_EXTERNAL_CODE)

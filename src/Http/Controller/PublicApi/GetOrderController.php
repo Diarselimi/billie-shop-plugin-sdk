@@ -27,7 +27,7 @@ use OpenApi\Annotations as OA;
  *          required=true
  *     ),
  *
- *     @OA\Response(response=200, @OA\JsonContent(ref="#/components/schemas/OrderResponse"), description="Order Info"),
+ *     @OA\Response(response=200, @OA\JsonContent(ref="#/components/schemas/OrderResponse"), description="Order details"),
  *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),
  *     @OA\Response(response=404, ref="#/components/responses/NotFound"),
  *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
