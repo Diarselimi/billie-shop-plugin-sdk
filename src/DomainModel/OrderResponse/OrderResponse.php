@@ -333,12 +333,12 @@ class OrderResponse implements ArrayableInterface
         return $this;
     }
 
-    public function getDebtorExternalDataAddressHouse(): string
+    public function getDebtorExternalDataAddressHouse(): ? string
     {
         return $this->debtorExternalDataAddressHouse;
     }
 
-    public function setDebtorExternalDataAddressHouse(string $debtorExternalDataAddressHouse): OrderResponse
+    public function setDebtorExternalDataAddressHouse(?string $debtorExternalDataAddressHouse): OrderResponse
     {
         $this->debtorExternalDataAddressHouse = $debtorExternalDataAddressHouse;
 

@@ -249,6 +249,114 @@ Feature:
     """
     And the order "A1" has the same hash "testusercompanyva2223333somenumbersomelegalberlin10179heinrichheineplatz10de"
 
+  Scenario: Successful order creation without house
+    Given I get from companies service identify match and good decision response
+    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    """
+    """
+    And I get from payments service register debtor positive response
+    When I send a POST request to "/order" with body:
+    """
+    {
+       "debtor_person":{
+          "salutation":"m",
+          "first_name":"",
+          "last_name":"else",
+          "phone_number":"+491234567",
+          "email":"someone@billie.io"
+       },
+       "debtor_company":{
+          "merchant_customer_id":"12",
+          "name":"Test User Company",
+          "address_addition":"left door",
+          "address_house_number":null,
+          "address_street":"Heinrich-Heine-Platz",
+          "address_city":"Berlin",
+          "address_postal_code":"10179",
+          "address_country":"DE",
+          "tax_id":"VA222",
+          "tax_number":"3333",
+          "registration_court":"",
+          "registration_number":" some number",
+          "industry_sector":"some sector",
+          "subindustry_sector":"some sub",
+          "employees_number":"33",
+          "legal_form":"some legal",
+          "established_customer":1
+       },
+       "delivery_address":{
+          "house_number":"22",
+          "street":"Charlot strasse",
+          "city":"Paris",
+          "postal_code":"98765",
+          "country":"DE"
+       },
+       "amount":{
+          "net":900.00,
+          "gross":1000.00,
+          "tax":100.00
+       },
+       "comment":"Some comment",
+       "duration":30,
+       "order_id":"A1"
+    }
+    """
+    Then print last JSON response
+    Then the order A1 is in state created
+    And the response status code should be 201
+    And the JSON response should be:
+    """
+    {
+      "external_code":"A1",
+      "state":"created",
+      "reasons":null,
+      "amount":1000.00,
+      "amount_net": 900.00,
+      "amount_tax": 100.00,
+      "debtor_company":{
+        "name":"Test User Company",
+        "house_number":"10",
+        "street":"Heinrich-Heine-Platz",
+        "postal_code":"10179",
+        "city":"Berlin",
+        "country":"DE"
+      },
+      "bank_account":{
+        "iban":"DE1234",
+        "bic":"BICISHERE"
+      },
+      "invoice":{
+        "number":null,
+        "payout_amount":null,
+        "outstanding_amount":null,
+        "fee_amount":null,
+        "fee_rate":null,
+        "due_date":null
+      },
+      "debtor_external_data":{
+        "name":"Test User Company",
+        "address_country":"DE",
+        "address_city": "Berlin",
+        "address_postal_code":"10179",
+        "address_street":"Heinrich-Heine-Platz",
+        "address_house":null,
+        "industry_sector":"SOME SECTOR",
+        "merchant_customer_id":"12"
+     },
+     "duration":30,
+     "dunning_status": null,
+     "shipped_at":null,
+     "delivery_address":{
+        "house_number":"22",
+        "street":"Charlot strasse",
+        "city": "Paris",
+        "postal_code":"98765",
+        "country":"DE"
+     }
+    }
+    """
+    And the order "A1" has the same hash "testusercompanyva2223333somenumbersomelegalberlin10179heinrichheineplatzde"
+
     Scenario: Successful order creation with a not german postal code in shipping
     Given I get from companies service identify match and good decision response
     And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body

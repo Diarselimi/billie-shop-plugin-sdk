@@ -1189,7 +1189,6 @@ components:
         - merchant_customer_id
         - name
         - legal_form
-        - address_house_number
         - address_street
         - address_city
         - address_postal_code
@@ -1198,13 +1197,13 @@ components:
       properties:
         merchant_customer_id:
           example: DE123456
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         name:
           example: 'Billie GmbH'
           $ref: '#/components/schemas/TinyText'
         tax_id:
           example: DE1234556
+          nullable: true
           $ref: '#/components/schemas/TinyText'
         tax_number:
           nullable: true
@@ -1214,6 +1213,7 @@ components:
           $ref: '#/components/schemas/TinyText'
         registration_number:
           example: 'HRB 1234556'
+          nullable: true
           $ref: '#/components/schemas/TinyText'
         industry_sector:
           example: C
@@ -1223,17 +1223,20 @@ components:
           $ref: '#/components/schemas/TinyText'
         employees_number:
           example: 1-5
+          nullable: true
           $ref: '#/components/schemas/TinyText'
         legal_form:
           example: '10122'
           $ref: '#/components/schemas/TinyText'
         established_costumer:
           type: boolean
+          nullable: true
         address_addition:
           nullable: true
           $ref: '#/components/schemas/TinyText'
         address_house_number:
           example: '4'
+          nullable: true
           $ref: '#/components/schemas/TinyText'
         address_street:
           example: Charlottenstr.

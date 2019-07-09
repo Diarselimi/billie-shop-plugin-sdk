@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+command -v git >/dev/null 2>&1 || {
+    echo "ERROR: git is not installed. Aborting..."
+    exit 1
+}
+
 SPEC_DIR="docs/openapi"
 SPEC_TITLE="Billie - PaD API Documentation"
 SPEC_VERSION=${1:-$(git describe --tags 2> /dev/null || echo "dev")}
@@ -26,6 +31,8 @@ function generate_api_docs {
 }
 
 echo "Generating OpenAPI 3.0 YAML specifications (Paella API v${SPEC_VERSION}):"
+
+bin/console cache:clear
 
 rm -rf docs/openapi
 mkdir -p docs/openapi
