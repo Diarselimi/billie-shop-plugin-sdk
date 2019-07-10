@@ -164,6 +164,8 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
     private function updateAmount(OrderContainer $orderContainer, UpdateOrderRequest $request)
     {
         $order = $orderContainer->getOrder();
+        $amountChanged = $orderContainer->getOrderFinancialDetails()->getAmountGross() - $request->getAmountGross();
+
         if ($this->orderStateManager->isCanceled($order) || $this->orderStateManager->isComplete($order)) {
             throw new PaellaCoreCriticalException(
                 'Update amount not possible',
@@ -197,8 +199,6 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         if ($this->orderStateManager->wasShipped($order)) {
             return;
         }
-
-        $amountChanged = $orderContainer->getOrderFinancialDetails()->getAmountGross() - $request->getAmount()->getGross();
 
         $this->updateLimits($orderContainer, $amountChanged);
     }
