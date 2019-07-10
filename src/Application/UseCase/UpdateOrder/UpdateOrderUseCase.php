@@ -243,6 +243,11 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
     private function applyUpdate(OrderContainer $orderContainer)
     {
         $order = $orderContainer->getOrder();
+        $this->orderRepository->update($order);
+
+        if (!$this->orderStateManager->wasShipped($order)) {
+            return;
+        }
 
         try {
             $this->paymentsService->modifyOrder(
@@ -259,8 +264,6 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 
             throw $exception;
         }
-
-        $this->orderRepository->update($order);
     }
 
     private function validate(OrderContainer $orderContainer, UpdateOrderRequest $request): void
