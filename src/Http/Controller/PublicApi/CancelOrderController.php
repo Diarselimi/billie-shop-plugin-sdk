@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *
  *     @OA\Parameter(in="path", name="id", @OA\Schema(type="integer"), required=true, description="Order ID or UUID"),
  *
- *     @OA\Response(response=204, description="Order cancelled."),
+ *     @OA\Response(response=204, description="Order successfully cancelled"),
  *     @OA\Response(response=404, ref="#/components/responses/NotFound"),
  *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
  *     @OA\Response(response=403, ref="#/components/responses/Forbidden"),

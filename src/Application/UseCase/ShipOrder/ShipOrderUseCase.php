@@ -76,7 +76,7 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface
         $order
             ->setInvoiceNumber($request->getInvoiceNumber())
             ->setInvoiceUrl($request->getInvoiceUrl())
-            ->setProofOfDeliveryUrl($request->getProofOfDeliveryUrl())
+            ->setProofOfDeliveryUrl($request->getShippingDocumentUrl())
             ->setShippedAt(new \DateTime())
         ;
 

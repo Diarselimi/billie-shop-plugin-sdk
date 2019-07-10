@@ -23,7 +23,7 @@ info:
   license:
     name: '© Billie GmbH, 2019'
     url: 'https://www.billie.io/agb/'
-  version: 2.0.0
+  version: 2.3.0
   x-logo:
     url: 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDIyLjAuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkViZW5lXzJfS29waWUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIKCSB5PSIwcHgiIHZpZXdCb3g9IjAgMCA0OC41IDY3LjYiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDQ4LjUgNjcuNjsiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPgoJLnN0MHtkaXNwbGF5Om5vbmU7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDo3O3N0cm9rZS1taXRlcmxpbWl0OjEwO30KCS5zdDF7ZmlsbDojMUYyNTMwO30KCS5zdDJ7ZmlsbDpub25lO30KCS5zdDN7ZGlzcGxheTpub25lO2VuYWJsZS1iYWNrZ3JvdW5kOm5ldyAgICA7fQoJLnN0NHtmb250LWZhbWlseTonQXZlbmlyTmV4dC1EZW1pQm9sZCc7fQoJLnN0NXtmb250LXNpemU6My4wMzAzcHg7fQoJLnN0NntsZXR0ZXItc3BhY2luZzoyO30KPC9zdHlsZT4KPHBhdGggY2xhc3M9InN0MCIgZD0iTTkuOCw0Ni4xYy0wLjUsMCwyNS4xLTEyLjYsMjUuMS0zMi43YzAtNi45LTUuNi0xMi42LTEyLjYtMTIuNlM5LjcsNi41LDkuNywxMy40TDkuOCw0Ni4xaDE4LjUKCWM2LjksMCwxMi42LTUuNiwxMi42LTEyLjZTMzUuMiwyMSwyOC4yLDIxSDkuNyIvPgo8Zz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0yOC4yLDQ3SDguOHYtMC44YzAtMC4xLDAtMC4yLDAtMC4zVjEzLjVDOC44LDYsMTQuOSwwLDIyLjMsMHMxMy41LDYsMTMuNSwxMy41YzAsMi44LTAuNSw1LjUtMS40LDguMgoJCWM0LjMsMi4yLDcuMyw2LjcsNy4zLDExLjlDNDEuNyw0MSwzNS42LDQ3LDI4LjIsNDd6IE0xMi45LDQ1LjJoMTUuM2M2LjQsMCwxMS43LTUuMywxMS43LTExLjdjMC00LjQtMi41LTguMy02LjEtMTAuMwoJCWMtMS44LDQuNC00LjgsOC43LTksMTIuOEMyMC40LDQwLjQsMTUuOCw0My41LDEyLjksNDUuMnogTTEwLjYsMjEuOXYyMi43YzEzLTcuNywxOC45LTE1LjYsMjEuNS0yMmMtMS4yLTAuNC0yLjUtMC43LTMuOS0wLjdIMTAuNgoJCXogTTEwLjYsMjAuMWgxNy42YzEuNiwwLDMuMSwwLjMsNC41LDAuOGMxLTIuOSwxLjMtNS41LDEuMy03LjRDMzQsNywyOC44LDEuOCwyMi4zLDEuOFMxMC42LDcsMTAuNiwxMy41VjIwLjF6Ii8+CjwvZz4KPHJlY3QgeD0iLTExLjEiIHk9Ii01OC43IiBjbGFzcz0ic3QyIiB3aWR0aD0iODUuNCIgaGVpZ2h0PSI0OS41Ii8+Cjx0ZXh0IHRyYW5zZm9ybT0ibWF0cml4KDEgMCAwIDEgLTEuMDQyNCA2Ny41NzcyKSIgY2xhc3M9InN0MyBzdDQgc3Q1IHN0NiI+QklMTElFPC90ZXh0Pgo8Zz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0wLDU4LjFoMy43YzAuNCwwLDAuNywwLjEsMS4xLDAuMWMwLjQsMC4xLDAuNywwLjIsMC45LDAuNGMwLjMsMC4yLDAuNSwwLjQsMC43LDAuN2MwLjIsMC4zLDAuMywwLjcsMC4zLDEuMQoJCWMwLDAuNS0wLjIsMS0wLjUsMS4zYy0wLjMsMC40LTAuNywwLjYtMS4yLDAuOHYwYzAuNiwwLjEsMS4xLDAuMywxLjUsMC43QzYuOCw2My42LDcsNjQuMiw3LDY0LjhjMCwwLjUtMC4xLDEtMC4zLDEuMwoJCWMtMC4yLDAuNC0wLjUsMC42LTAuOCwwLjljLTAuMywwLjItMC43LDAuNC0xLjIsMC41Yy0wLjQsMC4xLTAuOSwwLjItMS4zLDAuMkgwQzAsNjcuNiwwLDU4LjEsMCw1OC4xeiBNMS43LDYyaDEuNQoJCWMwLjYsMCwxLTAuMSwxLjMtMC4zYzAuMy0wLjIsMC40LTAuNSwwLjQtMWMwLTAuNC0wLjItMC43LTAuNS0wLjljLTAuMy0wLjItMC44LTAuMy0xLjQtMC4zSDEuN0wxLjcsNjJMMS43LDYyeiBNMS43LDY2LjFoMS41CgkJYzAuMiwwLDAuNSwwLDAuNy0wLjFzMC41LTAuMSwwLjctMC4yYzAuMi0wLjEsMC40LTAuMywwLjUtMC40YzAuMS0wLjIsMC4yLTAuNCwwLjItMC44YzAtMC41LTAuMi0wLjktMC41LTEKCQljLTAuMy0wLjItMC45LTAuMy0xLjUtMC4zSDEuN1Y2Ni4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTExLjEsNTguMWgxLjd2OS41aC0xLjdWNTguMXoiLz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0xNy4zLDU4LjFoMS43djhoNHYxLjVoLTUuN1Y1OC4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTI2LjUsNTguMWgxLjd2OGg0djEuNWgtNS43TDI2LjUsNTguMUwyNi41LDU4LjF6Ii8+Cgk8cGF0aCBjbGFzcz0ic3QxIiBkPSJNMzUuNyw1OC4xaDEuN3Y5LjVoLTEuN1Y1OC4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTQxLjksNTguMWg2LjN2MS41aC00LjZWNjJINDh2MS40aC00LjNWNjZoNC44djEuNWgtNi41VjU4LjF6Ii8+CjwvZz4KPC9zdmc+Cg=='
     href: '#'
@@ -299,7 +299,7 @@ paths:
             type: integer
       responses:
         '204':
-          description: 'Order cancelled.'
+          description: 'Order successfully cancelled'
         '404':
           $ref: '#/components/responses/NotFound'
         '401':
@@ -381,7 +381,7 @@ paths:
               $ref: '#/components/schemas/CreateOrderRequest'
       responses:
         '201':
-          description: 'Merchant successfully created'
+          description: 'Order successfully created'
           content:
             application/json:
               schema:
@@ -420,7 +420,7 @@ paths:
                 type: string
       responses:
         '200':
-          description: 'Order Info'
+          description: 'Order details'
           content:
             application/json:
               schema:
@@ -547,7 +547,7 @@ paths:
             type: object
       responses:
         '200':
-          description: 'Order results'
+          description: 'Orders list'
           content:
             application/json:
               schema:
@@ -638,7 +638,7 @@ paths:
               $ref: '#/components/schemas/ShipOrderRequest'
       responses:
         '200':
-          description: 'Order Info'
+          description: 'Order successfully shipped. Order details.'
           content:
             application/json:
               schema:
@@ -726,6 +726,11 @@ components:
     TinyText:
       title: string
       type: string
+      maxLength: 255
+    URL:
+      title: URL
+      type: string
+      format: url
       maxLength: 255
     AbstractErrorObject:
       title: Error
@@ -908,7 +913,6 @@ components:
         - merchant_customer_id
         - name
         - legal_form
-        - address_house_number
         - address_street
         - address_city
         - address_postal_code
@@ -917,13 +921,13 @@ components:
       properties:
         merchant_customer_id:
           example: DE123456
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         name:
           example: 'Billie GmbH'
           $ref: '#/components/schemas/TinyText'
         tax_id:
           example: DE1234556
+          nullable: true
           $ref: '#/components/schemas/TinyText'
         tax_number:
           nullable: true
@@ -933,6 +937,7 @@ components:
           $ref: '#/components/schemas/TinyText'
         registration_number:
           example: 'HRB 1234556'
+          nullable: true
           $ref: '#/components/schemas/TinyText'
         industry_sector:
           example: C
@@ -942,17 +947,20 @@ components:
           $ref: '#/components/schemas/TinyText'
         employees_number:
           example: 1-5
+          nullable: true
           $ref: '#/components/schemas/TinyText'
         legal_form:
           example: '10122'
           $ref: '#/components/schemas/TinyText'
         established_costumer:
           type: boolean
+          nullable: true
         address_addition:
           nullable: true
           $ref: '#/components/schemas/TinyText'
         address_house_number:
           example: '4'
+          nullable: true
           $ref: '#/components/schemas/TinyText'
         address_street:
           example: Charlottenstr.
@@ -1027,14 +1035,15 @@ components:
       title: 'Order Shipping Object'
       properties:
         external_order_id:
+          description: 'External Order ID. It should only be provided if it was not provided in the create order call.'
           nullable: true
           $ref: '#/components/schemas/TinyText'
         invoice_number:
           $ref: '#/components/schemas/TinyText'
         invoice_url:
-          $ref: '#/components/schemas/TinyText'
-        proof_of_delivery_url:
-          $ref: '#/components/schemas/TinyText'
+          $ref: '#/components/schemas/URL'
+        shipping_document_url:
+          $ref: '#/components/schemas/URL'
       type: object
     UpdateOrderRequest:
       title: 'Order Update Object'

@@ -125,3 +125,13 @@ use OpenApi\Annotations as OA;
  *     maxLength=255
  * )
  */
+
+/**
+ * @OA\Schema(
+ *     schema="URL",
+ *     title="URL",
+ *     type="string",
+ *     format="url",
+ *     maxLength=255
+ * )
+ */

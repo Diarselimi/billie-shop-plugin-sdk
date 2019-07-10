@@ -123,6 +123,8 @@ Feature:
     And the order "CO123" amountGross is 500
     And the order "CO123" amountNet is 400
     And the order "CO123" amountTax is 100
+    And the order "CO123" invoiceNumber is DE12
+    And the order "CO123" invoiceUrl is "http://google.de"
 
   Scenario: Case 5: Order exists, is shipped but not paid back, new duration invalid
     Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
@@ -173,6 +175,8 @@ Feature:
     And the order "CO123" amountGross is 500
     And the order "CO123" amountNet is 500
     And the order "CO123" amountTax is 0
+    And the order "CO123" invoiceNumber is DE12
+    And the order "CO123" invoiceUrl is "http://google.de"
 
   Scenario: Case 8: Order does not exist
     When I send a PATCH request to "/order/CO123XX" with body:

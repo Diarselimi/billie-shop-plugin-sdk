@@ -33,7 +33,7 @@ use OpenApi\Annotations as OA;
  *          @OA\Schema(ref="#/components/schemas/ShipOrderRequest"))
  *     ),
  *
- *     @OA\Response(response=200, @OA\JsonContent(ref="#/components/schemas/OrderResponse"), description="Order Info"),
+ *     @OA\Response(response=200, @OA\JsonContent(ref="#/components/schemas/OrderResponse"), description="Order successfully shipped. Order details."),
  *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),
  *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
  *     @OA\Response(response=500, ref="#/components/responses/ServerError")
@@ -54,7 +54,7 @@ class ShipOrderController
             ->setExternalCode($request->request->get('external_order_id'))
             ->setInvoiceNumber($request->request->get('invoice_number'))
             ->setInvoiceUrl($request->request->get('invoice_url'))
-            ->setProofOfDeliveryUrl($request->request->get('shipping_document_url'));
+            ->setShippingDocumentUrl($request->request->get('shipping_document_url'));
 
         try {
             return $this->useCase->execute($orderRequest);

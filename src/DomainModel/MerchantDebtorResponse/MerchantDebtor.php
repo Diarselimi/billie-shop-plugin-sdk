@@ -50,7 +50,7 @@ class MerchantDebtor extends AbstractMerchantDebtor
         return $this;
     }
 
-    public function getAddressHouse(): string
+    public function getAddressHouse(): ? string
     {
         return $this->addressHouse;
     }
@@ -59,7 +59,7 @@ class MerchantDebtor extends AbstractMerchantDebtor
      * @param  string                $addressHouse
      * @return MerchantDebtor|static
      */
-    public function setAddressHouse(string $addressHouse): MerchantDebtor
+    public function setAddressHouse(?string $addressHouse): MerchantDebtor
     {
         $this->addressHouse = $addressHouse;
 

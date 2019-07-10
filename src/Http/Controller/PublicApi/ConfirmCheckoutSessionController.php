@@ -33,7 +33,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *          @OA\Schema(ref="#/components/schemas/CheckoutSessionConfirmOrderRequest"))
  *     ),
  *
- *     @OA\Response(response=202, description="Order successfully created and accepted", @OA\JsonContent(ref="#/components/schemas/OrderResponse")),
+ *     @OA\Response(response=202, description="Order data successfully confirmed", @OA\JsonContent(ref="#/components/schemas/OrderResponse")),
  *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),
  *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
  *     @OA\Response(response=404, ref="#/components/responses/NotFound"),
