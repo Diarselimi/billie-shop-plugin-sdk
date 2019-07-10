@@ -205,7 +205,6 @@ Feature:
     And I get from payments service get order details response
     And I get from companies service get debtor response
     When I send a GET request to "/order/XF43Y"
-    Then print last JSON response
     Then the response status code should be 200
     And the JSON response should be:
     """

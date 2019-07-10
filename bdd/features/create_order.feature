@@ -299,13 +299,12 @@ Feature:
        "order_id":"A1"
     }
     """
-    Then print last JSON response
     Then the order A1 is in state created
-    And the response status code should be 201
+    And the response status code should be 200
     And the JSON response should be:
     """
     {
-      "external_code":"A1",
+      "order_id":"A1",
       "state":"created",
       "reasons":null,
       "amount":1000.00,
@@ -313,18 +312,18 @@ Feature:
       "amount_tax": 100.00,
       "debtor_company":{
         "name":"Test User Company",
-        "house_number":"10",
-        "street":"Heinrich-Heine-Platz",
-        "postal_code":"10179",
-        "city":"Berlin",
-        "country":"DE"
+        "address_house_number":"10",
+        "address_street":"Heinrich-Heine-Platz",
+        "address_postal_code":"10179",
+        "address_city":"Berlin",
+        "address_country":"DE"
       },
       "bank_account":{
         "iban":"DE1234",
         "bic":"BICISHERE"
       },
       "invoice":{
-        "number":null,
+        "invoice_number":null,
         "payout_amount":null,
         "outstanding_amount":null,
         "fee_amount":null,
