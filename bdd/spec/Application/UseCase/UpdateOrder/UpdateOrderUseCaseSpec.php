@@ -76,7 +76,6 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $order->getState()->willReturn(OrderStateManager::STATE_CREATED);
         $order->getMarkedAsFraudAt()->willReturn(null);
         $order->getMerchantDebtorId()->willReturn(self::ORDER_MERCHANT_DEBTOR_ID);
-        $order->getPaymentId()->willReturn(self::ORDER_PAYMENT_ID);
 
         $orderFinancialDetails->getAmountGross()->willReturn(self::ORDER_AMOUNT_GROSS);
         $orderFinancialDetails->getAmountNet()->willReturn(self::ORDER_AMOUNT_NET);
@@ -173,12 +172,11 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         OrderStateManager $orderStateManager,
         OrderFinancialDetailsFactory $orderFinancialDetailsFactory,
         OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
-        BorschtInterface $paymentsService,
         UpdateOrderRequest $request,
         OrderEntity $order,
-        OrderContainer $orderContainer,
-        OrderFinancialDetailsEntity $orderFinancialDetails
+        OrderContainer $orderContainer
     ) {
+        $order->getPaymentId()->willReturn(self::ORDER_PAYMENT_ID);
         $newDuration = self::ORDER_DURATION + 1;
 
         $this->mockRequest($request, $newDuration);
@@ -270,6 +268,8 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         OrderContainer $orderContainer,
         OrderFinancialDetailsEntity $orderFinancialDetails
     ) {
+        $order->getPaymentId()->shouldBeCalledOnce()->willReturn(self::ORDER_PAYMENT_ID);
+
         $newAmountGross = self::ORDER_AMOUNT_GROSS - 10;
         $newAmountNet = self::ORDER_AMOUNT_NET - 10;
         $newAmountTax = self::ORDER_AMOUNT_TAX - 10;
@@ -335,6 +335,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         MerchantDebtorLimitsService $limitsService,
         OrderFinancialDetailsFactory $orderFinancialDetailsFactory,
         OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
+        BorschtInterface $paymentsService,
         OrderContainer $orderContainer
     ) {
         $newAmountGross = self::ORDER_AMOUNT_GROSS - 10;
@@ -349,6 +350,8 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $orderStateManager->isComplete($order)->willReturn(false);
 
         $orderContainer->getMerchant()->shouldBeCalledTimes(2)->willReturn($merchant);
+
+        $paymentsService->modifyOrder(Argument::any(), Argument::any(), Argument::any(), Argument::any())->shouldNotBeCalled();
 
         $orderContainerFactory
             ->loadByMerchantIdAndExternalId(self::ORDER_MERCHANT_ID, self::ORDER_EXTERNAL_CODE)
@@ -443,7 +446,6 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         BorschtInterface $paymentsService,
         UpdateOrderRequest $request,
         OrderEntity $order,
-        OrderFinancialDetailsEntity $orderFinancialDetails,
         OrderContainer $orderContainer
     ) {
         $newInvoiceNumber = 'NewInvoiceNum';
@@ -461,6 +463,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
             ->willReturn($orderContainer)
         ;
 
+        $order->getPaymentId()->shouldBeCalledOnce()->willReturn(self::ORDER_PAYMENT_ID);
         $order->setInvoiceNumber($newInvoiceNumber)->shouldBeCalled()->willReturn($order);
         $order->setInvoiceUrl($newInvoiceUrl)->shouldBeCalled()->willReturn($order);
 
