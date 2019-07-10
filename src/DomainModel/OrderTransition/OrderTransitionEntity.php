@@ -5,13 +5,18 @@ namespace App\DomainModel\OrderTransition;
 class OrderTransitionEntity
 {
     private $id;
+
     private $orderId;
+
     private $from;
+
     private $to;
+
     private $transition;
+
     private $transitedAt;
 
-    public function getId():? int
+    public function getId(): ? int
     {
         return $this->id;
     }
@@ -35,7 +40,7 @@ class OrderTransitionEntity
         return $this;
     }
 
-    public function getFrom():? string
+    public function getFrom(): ? string
     {
         return $this->from;
     }

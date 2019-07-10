@@ -46,7 +46,7 @@ class CreateOrderAmountRequest
         return $this->net;
     }
 
-    public function setNet(?float $net): CreateOrderAmountRequest
+    public function setNet($net): CreateOrderAmountRequest
     {
         $this->net = $net;
 
@@ -58,7 +58,7 @@ class CreateOrderAmountRequest
         return $this->gross;
     }
 
-    public function setGross(?float $gross): CreateOrderAmountRequest
+    public function setGross($gross): CreateOrderAmountRequest
     {
         $this->gross = $gross;
 
@@ -70,7 +70,7 @@ class CreateOrderAmountRequest
         return $this->tax;
     }
 
-    public function setTax(?float $tax): CreateOrderAmountRequest
+    public function setTax($tax): CreateOrderAmountRequest
     {
         $this->tax = $tax;
 

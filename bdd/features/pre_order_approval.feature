@@ -206,7 +206,7 @@ Feature:
     Given I have a pre_approved order "CO123" with amounts 43.30/55.2/10.10, duration 30 and comment "test order"
     And I get from companies service identify match and good decision response
     And I get from companies service get debtor response
-    And I send a POST request to "/order/test123/confirm" with body:
+    And I send a POST request to "/order/test-order-uuid/confirm" with body:
     """
     """
     Then the response status code should be 200
@@ -221,17 +221,17 @@ Feature:
     Then the response status code should be 404
     And the JSON response should be:
     """
-    {"error":"Order not found"}
+    {"errors":[{"title":"Order not found","code":"resource_not_found"}]}
     """
 
   Scenario: Order success confirmation when the order exists in another state than pre_confirmed
     Given I have a created order "CO123" with amounts 43.30/55.2/10.10, duration 30 and comment "test order"
     And I get from companies service identify match and good decision response
-    And I send a POST request to "/order/test123/confirm" with body:
+    And I send a POST request to "/order/test-order-uuid/confirm" with body:
     """
     """
     Then the response status code should be 400
     And the JSON response should be:
     """
-    {"error":"The order is not in pre approved state to be confirmed"}
+    {"errors":[{"title":"The order is not in pre approved state to be confirmed","code":"request_invalid"}]}
     """

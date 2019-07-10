@@ -17,6 +17,8 @@ use PhpSpec\ObjectBehavior;
 
 class ApproveOrderUseCaseSpec extends ObjectBehavior
 {
+    private const ORDER_UUID = 'test-order-uuid';
+
     public function let(
         OrderContainerFactory $orderContainerFactory,
         OrderStateManager $orderStateManager,
@@ -29,8 +31,7 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
         $this->beConstructedWith(...func_get_args());
 
         $orderContainer->getOrder()->willReturn($order);
-        $request->getOrderId()->willReturn(10);
-        $request->getMerchantId()->willReturn(50);
+        $request->getUuid()->willReturn(self::ORDER_UUID);
     }
 
     public function it_is_initializable()
@@ -43,7 +44,7 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
         ApproveOrderRequest $request
     ) {
         $orderContainerFactory
-            ->loadByMerchantIdAndExternalId(50, 10)
+            ->loadByUuid(self::ORDER_UUID)
             ->shouldBeCalled()
             ->willThrow(OrderContainerFactoryException::class)
         ;
@@ -59,7 +60,7 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
         OrderContainer $orderContainer
     ) {
         $orderContainerFactory
-            ->loadByMerchantIdAndExternalId(50, 10)
+            ->loadByUuid(self::ORDER_UUID)
             ->shouldBeCalled()
             ->willReturn($orderContainer)
         ;
@@ -82,7 +83,7 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
         ApproveOrderRequest $request
     ) {
         $orderContainerFactory
-            ->loadByMerchantIdAndExternalId(50, 10)
+            ->loadByUuid(self::ORDER_UUID)
             ->shouldBeCalled()
             ->willReturn($orderContainer)
         ;
@@ -113,7 +114,7 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
         ApproveOrderRequest $request
     ) {
         $orderContainerFactory
-            ->loadByMerchantIdAndExternalId(50, 10)
+            ->loadByUuid(self::ORDER_UUID)
             ->shouldBeCalled()
             ->willReturn($orderContainer)
         ;

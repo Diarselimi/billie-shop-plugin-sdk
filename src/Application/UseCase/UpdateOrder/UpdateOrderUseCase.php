@@ -7,7 +7,8 @@ use App\Application\Exception\OrderNotFoundException;
 use App\Application\PaellaCoreCriticalException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
-use App\DomainModel\Borscht\BorschtInterface;
+use App\DomainModel\Payment\PaymentsServiceInterface;
+use App\DomainModel\Payment\PaymentsServiceRequestException;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
@@ -48,7 +49,7 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 
     public function __construct(
         OrderContainerFactory $orderContainerFactory,
-        BorschtInterface $paymentsService,
+        PaymentsServiceInterface $paymentsService,
         MerchantDebtorLimitsService $limitsService,
         OrderRepositoryInterface $orderRepository,
         MerchantRepositoryInterface $merchantRepository,
@@ -96,10 +97,10 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 
         $durationChanged = $request->getDuration() !== null && $request->getDuration() !== $orderFinancialDetails->getDuration();
 
-        $amountChanged = $request->getAmountGross() !== null
-            && (float) $request->getAmountGross() !== $orderFinancialDetails->getAmountGross()
-            || $request->getAmountNet() !== null && (float) $request->getAmountNet() !== $orderFinancialDetails->getAmountNet()
-            || $request->getAmountTax() !== null && (float) $request->getAmountTax() !== $orderFinancialDetails->getAmountTax();
+        $amountChanged = $request->getAmount()->getGross() !== null
+            && (float) $request->getAmount()->getGross() !== $orderFinancialDetails->getAmountGross()
+            || $request->getAmount()->getNet() !== null && (float) $request->getAmount()->getNet() !== $orderFinancialDetails->getAmountNet()
+            || $request->getAmount()->getTax() !== null && (float) $request->getAmount()->getTax() !== $orderFinancialDetails->getAmountTax();
 
         $invoiceChanged = (
             $request->getInvoiceNumber() !== null && $request->getInvoiceNumber() !== $order->getInvoiceNumber()
@@ -173,20 +174,20 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 
         $this->logInfo('Update amount', [
             'old_gross' => $orderContainer->getOrderFinancialDetails()->getAmountGross(),
-            'new_gross' => $request->getAmountGross(),
+            'new_gross' => $request->getAmount()->getGross(),
 
             'old_net' => $orderContainer->getOrderFinancialDetails()->getAmountNet(),
-            'new_net' => $request->getAmountNet(),
+            'new_net' => $request->getAmount()->getNet(),
 
             'old_tax' => $orderContainer->getOrderFinancialDetails()->getAmountTax(),
-            'new_tax' => $request->getAmountTax(),
+            'new_tax' => $request->getAmount()->getTax(),
         ]);
 
         $newOrderFinancialDetails = $this->orderFinancialDetailsFactory->create(
             $order->getId(),
-            $request->getAmountGross(),
-            $request->getAmountNet(),
-            $request->getAmountTax(),
+            $request->getAmount()->getGross(),
+            $request->getAmount()->getNet(),
+            $request->getAmount()->getTax(),
             $orderContainer->getOrderFinancialDetails()->getDuration()
         );
         $this->orderFinancialDetailsRepository->insert($newOrderFinancialDetails);
@@ -197,7 +198,7 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
             return;
         }
 
-        $amountChanged = $orderContainer->getOrderFinancialDetails()->getAmountGross() - $request->getAmountGross();
+        $amountChanged = $orderContainer->getOrderFinancialDetails()->getAmountGross() - $request->getAmount()->getGross();
 
         $this->updateLimits($orderContainer, $amountChanged);
     }
@@ -250,8 +251,8 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
                 $orderContainer->getOrderFinancialDetails()->getAmountGross(),
                 $order->getInvoiceNumber()
             );
-        } catch (PaellaCoreCriticalException $exception) {
-            $this->logError('Borscht responded with an error when updating the order', [
+        } catch (PaymentsServiceRequestException $exception) {
+            $this->logError('Payment responded with an error when updating the order', [
                 'order' => $order->getId(),
                 'error' => $exception,
             ]);
@@ -268,10 +269,10 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 
         $orderFinancialDetails = $orderContainer->getOrderFinancialDetails();
 
-        if (!empty($request->getAmountGross()) && (
-            $request->getAmountGross() > $orderFinancialDetails->getAmountGross()
-                || $request->getAmountNet() > $orderFinancialDetails->getAmountNet()
-                || $request->getAmountTax() > $orderFinancialDetails->getAmountTax()
+        if (!empty($request->getAmount()->getGross()) && (
+            $request->getAmount()->getGross() > $orderFinancialDetails->getAmountGross()
+                || $request->getAmount()->getNet() > $orderFinancialDetails->getAmountNet()
+                || $request->getAmount()->getTax() > $orderFinancialDetails->getAmountTax()
             )) {
             throw new PaellaCoreCriticalException(
                 'Invalid amount',

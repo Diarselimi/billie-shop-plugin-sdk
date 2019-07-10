@@ -6,7 +6,7 @@ use App\Application\Exception\OrderNotFoundException;
 use App\Application\PaellaCoreCriticalException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
-use App\DomainModel\Borscht\BorschtInterface;
+use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderRepositoryInterface;
@@ -37,7 +37,7 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface
     public function __construct(
         Workflow $workflow,
         OrderRepositoryInterface $orderRepository,
-        BorschtInterface $paymentsService,
+        PaymentsServiceInterface $paymentsService,
         OrderInvoiceManager $invoiceManager,
         OrderContainerFactory $orderContainerFactory,
         OrderResponseFactory $orderResponseFactory

@@ -4,7 +4,7 @@ namespace spec\App\Application\UseCase\OrderOutstandingAmountChange;
 
 use App\Application\UseCase\OrderOutstandingAmountChange\OrderOutstandingAmountChangeRequest;
 use App\Application\UseCase\OrderOutstandingAmountChange\OrderOutstandingAmountChangeUseCase;
-use App\DomainModel\Borscht\OrderAmountChangeDTO;
+use App\DomainModel\Payment\OrderAmountChangeDTO;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;

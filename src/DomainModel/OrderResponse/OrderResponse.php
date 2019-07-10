@@ -7,10 +7,10 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Schema(schema="OrderResponse", title="Order Entity", type="object", properties={
- *      @OA\Property(property="external_code", type="string", nullable=true, example="C-10123456789-0001"),
+ *      @OA\Property(property="order_id", type="string", nullable=true, example="C-10123456789-0001"),
  *      @OA\Property(property="uuid", ref="#/components/schemas/UUID"),
  *      @OA\Property(property="state", ref="#/components/schemas/OrderState", example="created"),
- *      @OA\Property(property="reasons", type="array", @OA\Items(ref="#/components/schemas/OrderDeclineReason"), nullable=true),
+ *      @OA\Property(property="reasons", ref="#/components/schemas/OrderDeclineReason", nullable=true),
  *      @OA\Property(property="amount", type="number", format="float", nullable=false, example=123.45),
  *      @OA\Property(property="amount_tax", type="number", format="float", nullable=false, example=123.45),
  *      @OA\Property(property="amount_net", type="number", format="float", nullable=false, example=123.45),
@@ -19,11 +19,11 @@ use OpenApi\Annotations as OA;
  *
  *      @OA\Property(property="debtor_company", type="object", description="Identified company", properties={
  *          @OA\Property(property="name", ref="#/components/schemas/TinyText", nullable=true, example="Billie GmbH"),
- *          @OA\Property(property="house_number", ref="#/components/schemas/TinyText", nullable=true, example="4"),
- *          @OA\Property(property="street", ref="#/components/schemas/TinyText", nullable=true, example="Charlottenstr."),
- *          @OA\Property(property="postal_code", type="string", nullable=true, maxLength=5, example="10969"),
- *          @OA\Property(property="city", ref="#/components/schemas/TinyText", nullable=true, example="Berlin"),
- *          @OA\Property(property="country", type="string", nullable=true, maxLength=2),
+ *          @OA\Property(property="address_house_number", ref="#/components/schemas/TinyText", nullable=true, example="4"),
+ *          @OA\Property(property="address_street", ref="#/components/schemas/TinyText", nullable=true, example="Charlottenstr."),
+ *          @OA\Property(property="address_postal_code", type="string", nullable=true, maxLength=5, example="10969"),
+ *          @OA\Property(property="address_city", ref="#/components/schemas/TinyText", nullable=true, example="Berlin"),
+ *          @OA\Property(property="address_country", type="string", nullable=true, maxLength=2),
  *      }),
  *
  *      @OA\Property(property="bank_account", type="object", properties={
@@ -32,7 +32,7 @@ use OpenApi\Annotations as OA;
  *      }),
  *
  *      @OA\Property(property="invoice", type="object", properties={
- *          @OA\Property(property="number", ref="#/components/schemas/TinyText", nullable=true),
+ *          @OA\Property(property="invoice_number", ref="#/components/schemas/TinyText", nullable=true),
  *          @OA\Property(property="payout_amount", type="number", format="float", nullable=true),
  *          @OA\Property(property="outstanding_amount", type="number", format="float", nullable=true),
  *          @OA\Property(property="fee_amount", type="number", format="float", nullable=true),
@@ -600,10 +600,10 @@ class OrderResponse implements ArrayableInterface
     public function toArray(): array
     {
         return [
-            'external_code' => $this->getExternalCode(),
+            'order_id' => $this->getExternalCode(), // This is very confusing because the api used to return the external_code as an order_id.
             'uuid' => $this->getUuid(),
             'state' => $this->getState(),
-            'reasons' => $this->getReasons() ?: null,
+            'reasons' => $this->getReasons() ? join(', ', $this->getReasons()) : null,
             'amount' => $this->getAmountGross(),
             'amount_net' => $this->getAmountNet(),
             'amount_tax' => $this->getAmountTax(),
@@ -611,18 +611,18 @@ class OrderResponse implements ArrayableInterface
             'dunning_status' => $this->getDunningStatus(),
             'debtor_company' => [
                 'name' => $this->getCompanyName(),
-                'house_number' => $this->getCompanyAddressHouseNumber(),
-                'street' => $this->getCompanyAddressStreet(),
-                'postal_code' => $this->getCompanyAddressPostalCode(),
-                'city' => $this->getCompanyAddressCity(),
-                'country' => $this->getCompanyAddressCountry(),
+                'address_house_number' => $this->getCompanyAddressHouseNumber(),
+                'address_street' => $this->getCompanyAddressStreet(),
+                'address_postal_code' => $this->getCompanyAddressPostalCode(),
+                'address_city' => $this->getCompanyAddressCity(),
+                'address_country' => $this->getCompanyAddressCountry(),
             ],
             'bank_account' => [
                 'iban' => $this->getBankAccountIban(),
                 'bic' => $this->getBankAccountBic(),
             ],
             'invoice' => [
-                'number' => $this->getInvoiceNumber(),
+                'invoice_number' => $this->getInvoiceNumber(),
                 'payout_amount' => $this->getPayoutAmount(),
                 'outstanding_amount' => $this->getOutstandingAmount(),
                 'fee_amount' => $this->getFeeAmount(),

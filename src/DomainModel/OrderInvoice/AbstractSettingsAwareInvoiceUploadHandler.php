@@ -15,12 +15,8 @@ abstract class AbstractSettingsAwareInvoiceUploadHandler implements InvoiceUploa
         $this->merchantSettingsRepository = $merchantSettingsRepository;
     }
 
-    public function supports(
-        string $orderExternalCode,
-        int $merchantId,
-        string $invoiceNumber,
-        string $invoiceUrl
-    ): bool {
+    public function supports(int $merchantId): bool
+    {
         $settings = $this->merchantSettingsRepository->getOneByMerchant($merchantId);
 
         return $settings->getInvoiceHandlingStrategy() === static::SUPPORTED_STRATEGY;

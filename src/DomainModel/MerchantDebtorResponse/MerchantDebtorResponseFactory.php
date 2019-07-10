@@ -2,7 +2,7 @@
 
 namespace App\DomainModel\MerchantDebtorResponse;
 
-use App\DomainModel\Borscht\DebtorPaymentDetailsDTO;
+use App\DomainModel\Payment\DebtorPaymentDetailsDTO;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorFinancialDetailsEntity;

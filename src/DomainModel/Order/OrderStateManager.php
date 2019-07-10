@@ -85,20 +85,20 @@ class OrderStateManager implements LoggingInterface
 
     private $eventDispatcher;
 
-    private $orderApproveCrossChecksService;
+    private $orderCrossChecksService;
 
     private $orderChecksRunnerService;
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         Workflow $workflow,
-        CreateOrderCrossChecksService $approveCrossChecksService,
+        CreateOrderCrossChecksService $orderCrossChecksService,
         EventDispatcherInterface $eventDispatcher,
         OrderChecksRunnerService $orderChecksRunnerService
     ) {
         $this->orderRepository = $orderRepository;
         $this->workflow = $workflow;
-        $this->orderApproveCrossChecksService = $approveCrossChecksService;
+        $this->orderCrossChecksService = $orderCrossChecksService;
         $this->eventDispatcher = $eventDispatcher;
         $this->orderChecksRunnerService = $orderChecksRunnerService;
     }
@@ -163,7 +163,7 @@ class OrderStateManager implements LoggingInterface
         $shouldNotifyWebhook = $this->isWaiting($order);
 
         try {
-            $this->orderApproveCrossChecksService->run($orderContainer);
+            $this->orderCrossChecksService->run($orderContainer);
         } catch (OrderWorkflowException $exception) {
             $this->logSuppressedException($exception, 'Order approve failed because of cross checks');
 

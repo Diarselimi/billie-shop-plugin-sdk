@@ -4,6 +4,7 @@ namespace App\Http\Controller\PublicApi;
 
 use App\Application\Exception\FraudOrderException;
 use App\Application\Exception\OrderNotFoundException;
+use App\Application\UseCase\CreateOrder\Request\CreateOrderAmountRequest;
 use App\Application\UseCase\UpdateOrder\UpdateOrderRequest;
 use App\Application\UseCase\UpdateOrder\UpdateOrderUseCase;
 use App\Http\HttpConstantsInterface;
@@ -53,10 +54,13 @@ class UpdateOrderController
     {
         try {
             $orderRequest = (new UpdateOrderRequest($id, $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID)))
-                ->setAmountGross($request->request->get('amount_gross'))
-                ->setAmountNet($request->request->get('amount_net'))
-                ->setAmountTax($request->request->get('amount_tax'))
-                ->setDuration($request->request->get('duration'))
+                ->setAmount(
+                    (new CreateOrderAmountRequest())
+                        ->setGross($request->request->get('amount')['gross'] ?? null)
+                        ->setNet($request->request->get('amount')['net'] ?? null)
+                        ->setTax($request->request->get('amount')['tax'] ?? null)
+                )
+                ->setDuration($request->request->get('duration') ?: null)
                 ->setInvoiceNumber($request->request->get('invoice_number'))
                 ->setInvoiceUrl($request->request->get('invoice_url'));
 

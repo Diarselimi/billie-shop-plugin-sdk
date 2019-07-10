@@ -4,13 +4,14 @@ namespace App\Amqp\Consumer;
 
 use App\Application\UseCase\OrderPaymentStateChange\OrderPaymentStateChangeRequest;
 use App\Application\UseCase\OrderPaymentStateChange\OrderPaymentStateChangeUseCase;
-use App\DomainModel\Borscht\OrderPaymentDetailsFactory;
+use App\DomainModel\Payment\OrderPaymentDetailsFactory;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 
 class OrderPaymentStateChangeConsumer implements ConsumerInterface
 {
     private $useCase;
+
     private $paymentDetailsFactory;
 
     public function __construct(

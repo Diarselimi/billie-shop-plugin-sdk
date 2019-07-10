@@ -87,32 +87,30 @@ Feature:
     }
     """
     Then the order A1 is in state declined
-    And the response status code should be 201
+    And the response status code should be 200
     And the JSON response should be:
     """
     {
-       "external_code":"A1",
+       "order_id":"A1",
        "state":"declined",
-       "reasons":[
-          "debtor_not_identified"
-       ],
+       "reasons":"debtor_not_identified",
        "amount":1000.00,
        "amount_net": 900.00,
        "amount_tax": 100.00,
        "debtor_company":{
           "name":null,
-          "house_number":null,
-          "street":null,
-          "postal_code":null,
-          "city":null,
-          "country":null
+          "address_house_number":null,
+          "address_street":null,
+          "address_postal_code":null,
+          "address_city":null,
+          "address_country":null
        },
        "bank_account":{
           "iban":null,
           "bic":null
        },
        "invoice":{
-          "number":null,
+          "invoice_number":null,
           "payout_amount":null,
           "outstanding_amount":null,
           "fee_amount":null,
@@ -195,11 +193,11 @@ Feature:
     }
     """
     Then the order A1 is in state created
-    And the response status code should be 201
+    And the response status code should be 200
     And the JSON response should be:
     """
     {
-      "external_code":"A1",
+      "order_id":"A1",
       "state":"created",
       "reasons":null,
       "amount":1000.00,
@@ -207,18 +205,18 @@ Feature:
       "amount_tax": 100.00,
       "debtor_company":{
         "name":"Test User Company",
-        "house_number":"10",
-        "street":"Heinrich-Heine-Platz",
-        "postal_code":"10179",
-        "city":"Berlin",
-        "country":"DE"
+        "address_house_number":"10",
+        "address_street":"Heinrich-Heine-Platz",
+        "address_postal_code":"10179",
+        "address_city":"Berlin",
+        "address_country":"DE"
       },
       "bank_account":{
         "iban":"DE1234",
         "bic":"BICISHERE"
       },
       "invoice":{
-        "number":null,
+        "invoice_number":null,
         "payout_amount":null,
         "outstanding_amount":null,
         "fee_amount":null,
@@ -410,11 +408,11 @@ Feature:
     }
     """
     Then the order A1 is in state created
-    And the response status code should be 201
+    And the response status code should be 200
     And the JSON response should be:
     """
     {
-      "external_code":"A1",
+      "order_id":"A1",
       "state":"created",
       "reasons":null,
       "amount":1000.00,
@@ -423,18 +421,18 @@ Feature:
       "created_at":"2019-06-06T16:21:53+0200",
       "debtor_company":{
         "name":"Test User Company",
-        "house_number":"10",
-        "street":"Heinrich-Heine-Platz",
-        "postal_code":"10179",
-        "city":"Berlin",
-        "country":"DE"
+        "address_house_number":"10",
+        "address_street":"Heinrich-Heine-Platz",
+        "address_postal_code":"10179",
+        "address_city":"Berlin",
+        "address_country":"DE"
       },
       "bank_account":{
         "iban":"DE1234",
         "bic":"BICISHERE"
       },
       "invoice":{
-        "number":null,
+        "invoice_number":null,
         "payout_amount":null,
         "outstanding_amount":null,
         "fee_amount":null,
@@ -463,7 +461,7 @@ Feature:
        }
     }
     """
-    And the response status code should be 201
+    And the response status code should be 200
 
 
   Scenario: Successful order creation without delivery_address.house_number
@@ -518,11 +516,11 @@ Feature:
     }
     """
     Then the order A123 is in state created
-    And the response status code should be 201
+    And the response status code should be 200
     And the JSON response should be:
     """
     {
-      "external_code":"A123",
+      "order_id":"A123",
       "state":"created",
       "reasons":null,
       "amount":43.3,
@@ -530,18 +528,18 @@ Feature:
       "amount_tax": 10.10,
       "debtor_company":{
         "name":"Test User Company",
-        "house_number":"10",
-        "street":"Heinrich-Heine-Platz",
-        "postal_code":"10179",
-        "city":"Berlin",
-        "country":"DE"
+        "address_house_number":"10",
+        "address_street":"Heinrich-Heine-Platz",
+        "address_postal_code":"10179",
+        "address_city":"Berlin",
+        "address_country":"DE"
       },
       "bank_account":{
         "iban":"DE1234",
         "bic":"BICISHERE"
       },
       "invoice":{
-        "number":null,
+        "invoice_number":null,
         "payout_amount":null,
         "outstanding_amount":null,
         "fee_amount":null,
@@ -626,11 +624,11 @@ Feature:
     }
     """
     Then the order A1 is in state created
-    And the response status code should be 201
+    And the response status code should be 200
     And the JSON response should be:
     """
     {
-      "external_code":"A1",
+      "order_id":"A1",
       "state":"created",
       "reasons":null,
       "amount":1000.00,
@@ -638,18 +636,18 @@ Feature:
       "amount_tax": 100.00,
       "debtor_company":{
         "name":"Test User Company",
-        "house_number":"10",
-        "street":"Heinrich-Heine-Platz",
-        "postal_code":"10179",
-        "city":"Berlin",
-        "country":"DE"
+        "address_house_number":"10",
+        "address_street":"Heinrich-Heine-Platz",
+        "address_postal_code":"10179",
+        "address_city":"Berlin",
+        "address_country":"DE"
       },
       "bank_account":{
         "iban":"DE1234",
         "bic":"BICISHERE"
       },
       "invoice":{
-        "number":null,
+        "invoice_number":null,
         "payout_amount":null,
         "outstanding_amount":null,
         "fee_amount":null,
@@ -729,32 +727,30 @@ Feature:
     }
     """
     Then the order A1 is in state declined
-    And the response status code should be 201
+    And the response status code should be 200
     And the JSON response should be:
     """
     {
-       "external_code":"A1",
+       "order_id":"A1",
        "state":"declined",
-       "reasons":[
-          "risk_policy"
-       ],
+       "reasons":"risk_policy",
        "amount":1000.00,
        "amount_net": 900.00,
        "amount_tax": 100.00,
        "debtor_company":{
           "name":"Test User Company",
-          "house_number":"10",
-          "street":"Heinrich-Heine-Platz",
-          "postal_code":"10179",
-          "city":"Berlin",
-          "country":"DE"
+          "address_house_number":"10",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_postal_code":"10179",
+          "address_city":"Berlin",
+          "address_country":"DE"
        },
        "bank_account":{
           "iban":null,
           "bic":null
        },
        "invoice":{
-          "number":null,
+          "invoice_number":null,
           "payout_amount":null,
           "outstanding_amount":null,
           "fee_amount":null,
@@ -1041,7 +1037,7 @@ Feature:
          "order_id":"A1"
       }
       """
-    Then the response status code should be 201
+    Then the response status code should be 200
     And the order A1 is in state created
 
   Scenario: Order exceeds the merchant available financing limit
@@ -1092,7 +1088,7 @@ Feature:
          "order_id":"A1"
       }
       """
-    Then the response status code should be 201
+    Then the response status code should be 200
     And the order A1 is in state declined
 
   Scenario: The order should be on a state created if the previous order was declined because of the amount exceeded
@@ -1149,7 +1145,7 @@ Feature:
     }
     """
     Then the order A3 is in state created
-    And the response status code should be 201
+    And the response status code should be 200
 
   Scenario: Order stays in state new if debtor limit lock was unsuccessful
     Given I get from companies service identify match and good decision response
@@ -1257,7 +1253,7 @@ Feature:
          "duration":30
     }
     """
-    Then the response status code should be 201
+    Then the response status code should be 200
 
   Scenario: Invalid order amounts, gross != net + tax
     When I send a POST request to "/order" with body:

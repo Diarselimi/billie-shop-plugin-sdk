@@ -9,8 +9,6 @@ use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
-use App\Infrastructure\Alfred\AlfredRequestException;
-use App\Infrastructure\Alfred\AlfredResponseDecodeException;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
@@ -42,12 +40,8 @@ class UpdateMerchantDebtorCompanyUseCase implements LoggingInterface, ValidatedU
 
         $originalDebtor = $this->companiesService->getDebtor($merchantDebtor->getDebtorId());
 
-        try {
-            $updateData = $this->prepareUpdateData($request);
-            $updatedDebtor = $this->companiesService->updateDebtor($merchantDebtor->getDebtorId(), $updateData);
-        } catch (AlfredResponseDecodeException | AlfredRequestException $exception) {
-            throw new MerchantDebtorUpdateFailedException();
-        }
+        $updateData = $this->prepareUpdateData($request);
+        $updatedDebtor = $this->companiesService->updateDebtor($merchantDebtor->getDebtorId(), $updateData);
 
         $this->logUpdateDetails($merchantDebtor, $originalDebtor, $updatedDebtor);
     }

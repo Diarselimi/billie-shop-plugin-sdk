@@ -3,11 +3,12 @@
 namespace App\Infrastructure\Nachos;
 
 use App\DomainModel\FileService\FileServiceInterface;
+use App\DomainModel\FileService\FileServiceRequestException;
 use App\DomainModel\FileService\FileServiceResponseDTO;
 use App\DomainModel\FileService\FileServiceResponseFactory;
 use App\Infrastructure\DecodeResponseTrait;
-use Aws\Transfer\Exception\TransferException;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\TransferException;
 
 class Nachos implements FileServiceInterface
 {
@@ -34,7 +35,7 @@ class Nachos implements FileServiceInterface
                 ]],
             ]);
         } catch (TransferException $exception) {
-            throw new NachosCommunicationException('Nachos communication exception', null, $exception);
+            throw new FileServiceRequestException($exception);
         }
 
         return $this->factory->createFromArray($this->decodeResponse($response));

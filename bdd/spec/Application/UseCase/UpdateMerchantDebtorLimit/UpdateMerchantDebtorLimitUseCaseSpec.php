@@ -6,8 +6,8 @@ use App\Application\Exception\MerchantDebtorNotFoundException;
 use App\Application\Exception\RequestValidationException;
 use App\Application\UseCase\UpdateMerchantDebtorLimit\UpdateMerchantDebtorLimitRequest;
 use App\Application\UseCase\UpdateMerchantDebtorLimit\UpdateMerchantDebtorLimitUseCase;
-use App\DomainModel\Borscht\BorschtInterface;
-use App\DomainModel\Borscht\DebtorPaymentDetailsDTO;
+use App\DomainModel\Payment\PaymentsServiceInterface;
+use App\DomainModel\Payment\DebtorPaymentDetailsDTO;
 use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorFinancialDetailsEntity;
@@ -34,7 +34,7 @@ class UpdateMerchantDebtorLimitUseCaseSpec extends ObjectBehavior
     public function let(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         MerchantDebtorFinancialDetailsRepositoryInterface $merchantDebtorFinancialDetailsRepository,
-        BorschtInterface $paymentsService,
+        PaymentsServiceInterface $paymentsService,
         ValidatorInterface $validator,
         LoggerInterface $logger
     ) {
@@ -78,7 +78,7 @@ class UpdateMerchantDebtorLimitUseCaseSpec extends ObjectBehavior
         MerchantDebtorFinancialDetailsRepositoryInterface $merchantDebtorFinancialDetailsRepository,
         ValidatorInterface $validator,
         UpdateMerchantDebtorLimitRequest $request,
-        BorschtInterface $paymentsService,
+        PaymentsServiceInterface $paymentsService,
         MerchantDebtorEntity $merchantDebtor,
         MerchantDebtorFinancialDetailsEntity $financialDetails,
         DebtorPaymentDetailsDTO $debtorPaymentDetails

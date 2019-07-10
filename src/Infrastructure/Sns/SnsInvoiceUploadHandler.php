@@ -4,6 +4,7 @@ namespace App\Infrastructure\Sns;
 
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
+use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderInvoice\AbstractSettingsAwareInvoiceUploadHandler;
 use Aws\Sns\Exception\SnsException;
 use Aws\Sns\SnsClient;
@@ -31,37 +32,34 @@ class SnsInvoiceUploadHandler extends AbstractSettingsAwareInvoiceUploadHandler 
         parent::__construct($merchantSettingsRepository);
     }
 
-    public function handleInvoice(
-        string $orderExternalCode,
-        int $merchantId,
-        string $invoiceNumber,
-        string $invoiceUrl,
-        string $event
-    ): void {
+    public function handleInvoice(OrderEntity $order, string $event): void
+    {
         $this->logInfo('Sending message to SNS');
+
+        $orderUuid = $order->getUuid();
 
         try {
             $this->snsClient->publish([
                 "TopicArn" => $this->topicArn,
-                "Message" => "Invoice Received for order #$orderExternalCode",
-                "Subject" => "Invoice Received for order #$orderExternalCode",
+                "Message" => "Invoice Received for order #$orderUuid",
+                "Subject" => "Invoice Received for order #$orderUuid",
                 "MessageStructure" => "string",
                 "MessageAttributes" => [
-                    "orderExternalCode" => [
+                    "orderUuid" => [
                         "DataType" => "String",
-                        "StringValue" => $orderExternalCode,
+                        "StringValue" => $orderUuid,
                     ],
                     "merchantId" => [
                         "DataType" => "Number",
-                        "StringValue" => $merchantId,
+                        "StringValue" => $order->getMerchantId(),
                     ],
                     "invoiceNumber" => [
                         "DataType" => "String",
-                        "StringValue" => $invoiceNumber,
+                        "StringValue" => $order->getInvoiceNumber(),
                     ],
                     "invoiceUrl" => [
                         "DataType" => "String",
-                        "StringValue" => $invoiceUrl,
+                        "StringValue" => $order->getInvoiceUrl(),
                     ],
                     "eventType" => [
                         "DataType" => "String",
@@ -71,7 +69,7 @@ class SnsInvoiceUploadHandler extends AbstractSettingsAwareInvoiceUploadHandler 
             ]);
         } catch (SnsException $ex) {
             $this->logError("Failed to publish invoice receive SNS topic for order #{order_id} with error: {error}", [
-                'order_id' => $orderExternalCode,
+                'order_id' => $orderUuid,
                 'error' => $ex->getAwsErrorMessage(),
             ]);
         }

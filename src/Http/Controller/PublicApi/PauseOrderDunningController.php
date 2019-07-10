@@ -40,19 +40,26 @@ use OpenApi\Annotations as OA;
  *     @OA\Response(response=403, description="Pause order dunning is not allowed", @OA\JsonContent(
  *          type="object",
  *          properties={
- *              @OA\Property(
- *                  property="error",
- *                  type="string",
- *                  nullable=false,
- *                  enum={
- *                       "maximum pausing attempts reached",
- *                       "requested number of days exceeds maximum duration allowed",
- *                       "maximum dunning stage reached",
- *                       "other orders exceed maximum dunning stage",
- *                       "Cannot pause dunning. Order is not in state late"
- *                   },
- *                  example="maximum pausing attempts reached"
- *              )
+ *             @OA\Property(property="errors", type="array", @OA\Items(
+ *                 type="object",
+ *                 required={"title", "code"},
+ *                 properties={
+ *                    @OA\Property(
+ *                        property="title",
+ *                        type="string",
+ *                        nullable=false,
+ *                        enum={
+ *                             "maximum pausing attempts reached",
+ *                             "requested number of days exceeds maximum duration allowed",
+ *                             "maximum dunning stage reached",
+ *                             "other orders exceed maximum dunning stage",
+ *                             "Cannot pause dunning. Order is not in state late"
+ *                         },
+ *                        example="maximum pausing attempts reached"
+ *                    ),
+ *                    @OA\Property(property="code", type="string", nullable=true, example="forbidden"),
+ *                 }
+ *             ))
  *          }
  *     )),
  *     @OA\Response(response=500, ref="#/components/responses/ServerError")

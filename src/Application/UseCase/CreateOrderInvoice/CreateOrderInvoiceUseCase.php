@@ -27,7 +27,7 @@ class CreateOrderInvoiceUseCase
 
     public function execute(CreateOrderInvoiceRequest $request): void
     {
-        $order = $this->orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($request->getOrderId(), $request->getMerchantId());
+        $order = $this->orderRepository->getOneByUuid($request->getOrderUuid());
 
         if (!$order) {
             throw new OrderNotFoundException();

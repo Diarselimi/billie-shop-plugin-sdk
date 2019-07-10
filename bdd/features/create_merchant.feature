@@ -9,7 +9,7 @@ Feature: Create a new merchant.
       """
       {}
       """
-    When I send a POST request to "/merchant" with body:
+    When I send a POST request to "/private/merchant" with body:
       """
       {
         "company_id": "1",
@@ -20,17 +20,15 @@ Feature: Create a new merchant.
         "webhook_authorization": "X-Api-Key: key"
       }
       """
-    Then the response status code should be 400
+    Then the response status code should be 404
     And the JSON response should be:
     """
-    {
-      "error": "Company with the given ID was not found or could't be retrieved"
-    }
+    {"errors":[{"title":"Company with the given ID was not found or couldn't be retrieved","code":"resource_not_found"}]}
     """
 
   Scenario: Failed to create a merchant - a merchant already exists with the same company ID
     Given a merchant exists with company ID 1
-    When I send a POST request to "/merchant" with body:
+    When I send a POST request to "/private/merchant" with body:
       """
       {
         "company_id": "1",
@@ -44,9 +42,7 @@ Feature: Create a new merchant.
     Then the response status code should be 409
     And the JSON response should be:
     """
-    {
-      "error": "Merchant with the same company ID already exists"
-    }
+    {"errors":[{"title":"Merchant with the same company ID already exists","code":"operation_failed"}]}
     """
 
   Scenario: Failed to create a merchant - Failed to create OAuth client
@@ -54,7 +50,7 @@ Feature: Create a new merchant.
     And I get from OAuth service "/clients" endpoint response with status 500 and body:
     """
     """
-    When I send a POST request to "/merchant" with body:
+    When I send a POST request to "/private/merchant" with body:
       """
       {
         "company_id": "1",
@@ -65,12 +61,10 @@ Feature: Create a new merchant.
         "webhook_authorization": "X-Api-Key: key"
       }
       """
-    Then the response status code should be 500
+    Then the response status code should be 503
     And the JSON response should be:
     """
-    {
-      "error": "Failed to create OAuth client for merchant"
-    }
+    {"errors":[{"title":"Failed to create OAuth client for merchant","code":"service_unavailable"}]}
     """
 
   Scenario: Successfully create a merchant
@@ -89,7 +83,7 @@ Feature: Create a new merchant.
       | debtor_overdue            |
       | company_b2b_score         |
     And I successfully create OAuth client with id testClientId and secret testClientSecret
-    When I send a POST request to "/merchant" with body:
+    When I send a POST request to "/private/merchant" with body:
       """
       {
         "company_id": "1",

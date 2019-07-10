@@ -2,7 +2,7 @@
 
 namespace App\Application\UseCase\OrderOutstandingAmountChange;
 
-use App\DomainModel\Borscht\OrderAmountChangeDTO;
+use App\DomainModel\Payment\OrderAmountChangeDTO;
 
 class OrderOutstandingAmountChangeRequest
 {

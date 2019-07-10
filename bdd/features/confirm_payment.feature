@@ -13,27 +13,55 @@ Feature:
         When I send a POST request to "/order/CO123/confirm-payment" with body:
         """
         {
-          "amount": 1000
+          "paid_amount": 1000
         }
         """
         Then the response status code should be 204
         And the response should be empty
+
+    Scenario: Unsuccessful confirm order payment when missing paid_amount
+        When I send a POST request to "/order/CO123/confirm-payment" with body:
+        """
+        {
+        }
+        """
+        Then the response status code should be 400
+        And the JSON response should be:
+        """
+        {
+            "errors": [
+                {
+                    "source": "paid_amount",
+                    "title": "This value should not be blank.",
+                    "code": "request_validation_error"
+                }
+            ]
+        }
+        """
 
     Scenario: Unsuccessful payment confirmation
         Given I have a created order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
         When I send a POST request to "/order/CO123/confirm-payment" with body:
         """
         {
-          "amount": 1000
+            "paid_amount": "NOT AN AMOUNT"
         }
         """
-        Then the response status code should be 403
-        Then the JSON response should be:
+        Then the response status code should be 400
+        And the JSON response should be:
         """
-        {
-            "code": "order_payment_confirmation_failed",
-            "error": "Order #CO123 payment can not be confirmed"
-        }
+        {"errors":[{"source":"paid_amount","title":"This value should be greater than 0.","code":"request_validation_error"}]}
+        """
+
+    Scenario: Try to confirm a non existing Order
+        Given I send a POST request to "/order/NON-EXISTING/confirm-payment" with body:
+        """
+        {"paid_amount": 1000.00}
+        """
+        Then the response status code should be 404
+        And the JSON response should be:
+        """
+        {"errors":[{"title":"Order not found","code":"resource_not_found"}]}
         """
 
     Scenario: Confirm payment of fraud order
@@ -42,13 +70,11 @@ Feature:
         When I send a POST request to "/order/CO123/confirm-payment" with body:
         """
         {
-          "amount": 1000
+          "paid_amount": 1000
         }
         """
         Then the response status code should be 403
         And the JSON response should be:
         """
-        {
-            "error": "Order was marked as fraud"
-        }
+        {"errors":[{"title":"Order was marked as fraud","code":"forbidden"}]}
         """

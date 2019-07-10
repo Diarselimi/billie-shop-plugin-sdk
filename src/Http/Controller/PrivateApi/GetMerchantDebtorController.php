@@ -19,7 +19,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     tags={"Debtors"},
  *     x={"groups":{"support"}},
  *
- *     @OA\Parameter(in="path", name="merchantId", @OA\Schema(type="integer"), required=true),
  *     @OA\Parameter(in="path", name="debtorUuid", description="Merchant-Debtor UUID", @OA\Schema(type="string"), required=true),
  *
  *     @OA\Response(response=200, @OA\JsonContent(ref="#/components/schemas/MerchantDebtorExtendedResponse"), description="Debtor Extended Info"),

@@ -6,13 +6,13 @@ use App\Application\UseCase\HttpInvoiceUpload\HttpInvoiceUploadException;
 use App\Application\UseCase\HttpInvoiceUpload\HttpInvoiceUploadRequest;
 use App\Application\UseCase\HttpInvoiceUpload\HttpInvoiceUploadUseCase;
 use App\DomainModel\FileService\FileServiceInterface;
+use App\DomainModel\FileService\FileServiceRequestException;
 use App\DomainModel\FileService\FileServiceResponseDTO;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderInvoice\OrderInvoiceEntity;
 use App\DomainModel\OrderInvoice\OrderInvoiceFactory;
 use App\DomainModel\OrderInvoice\OrderInvoiceRepositoryInterface;
-use App\Infrastructure\Nachos\NachosCommunicationException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Psr7\Response;
@@ -106,7 +106,7 @@ class HttpInvoiceUploadUseCaseSpec extends ObjectBehavior
 
         $invoiceUploadClient->head(self::INVOICE_URL)->shouldBeCalledOnce()->willReturn($headResponse);
         $invoiceUploadClient->get(self::INVOICE_URL)->shouldBeCalledOnce()->willReturn($getResponse);
-        $fileService->upload(self::INVOICE, self::INVOICE_URL)->shouldBeCalledOnce()->willThrow(new NachosCommunicationException());
+        $fileService->upload(self::INVOICE, self::INVOICE_URL)->shouldBeCalledOnce()->willThrow(new FileServiceRequestException());
 
         $this->shouldThrow(new HttpInvoiceUploadException('Exception wile uploading invoice to file service'))->during('execute', [$request]);
     }

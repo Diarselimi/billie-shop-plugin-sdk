@@ -5,7 +5,7 @@ namespace App\Application\UseCase\GetMerchantDebtors;
 use App\Application\Exception\MerchantDebtorNotFoundException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
-use App\DomainModel\Borscht\BorschtInterface;
+use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
@@ -32,7 +32,7 @@ class GetMerchantDebtorsUseCase implements ValidatedUseCaseInterface
         CompaniesServiceInterface $companiesService,
         MerchantDebtorFinancialDetailsRepositoryInterface $financialDetailsRepository,
         MerchantDebtorResponseFactory $responseFactory,
-        BorschtInterface $paymentService
+        PaymentsServiceInterface $paymentService
     ) {
         $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->responseFactory = $responseFactory;

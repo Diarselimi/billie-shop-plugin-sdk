@@ -8,6 +8,7 @@ use App\Application\UseCase\CreateMerchant\CreateMerchantUseCase;
 use App\Application\UseCase\CreateMerchant\Exception\DuplicateMerchantCompanyException;
 use App\Application\UseCase\CreateMerchant\Exception\MerchantCompanyNotFoundException;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
+use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantEntityFactory;
@@ -21,7 +22,6 @@ use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntity;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntityFactory;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
-use App\Infrastructure\Alfred\AlfredRequestException;
 use PhpSpec\ObjectBehavior;
 
 class CreateMerchantUseCaseSpec extends ObjectBehavior
@@ -85,7 +85,7 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
         CreateMerchantRequest $request
     ) {
         $merchantRepository->getOneByCompanyId(self::COMPANY_ID)->shouldBeCalled()->willReturn(null);
-        $companiesService->getDebtor(self::COMPANY_ID)->shouldBeCalled()->willThrow(AlfredRequestException::class);
+        $companiesService->getDebtor(self::COMPANY_ID)->shouldBeCalled()->willThrow(CompaniesServiceRequestException::class);
 
         $this->shouldThrow(MerchantCompanyNotFoundException::class)->during('execute', [$request]);
     }

@@ -1,52 +1,22 @@
 billie_monitoring:
   resource: '@BillieMonitoringBundle/Resources/config/routes.yaml'
 
-all_controllers:
-  resource: ../src/Http/Controller
+public_api_controllers:
+  resource: ../src/Http/Controller/PublicApi
   type: openapi_annotation
 
-public_controllers:
+prefixed_public_api_controllers:
   resource: ../src/Http/Controller/PublicApi
   type: openapi_annotation
   prefix: /public
   name_prefix: public_
 
-private_controllers:
+private_api_controllers:
   resource: ../src/Http/Controller/PrivateApi
   type: openapi_annotation
   prefix: /private
   name_prefix: private_
 
-###############################
-## Other private endpoints:
-## TODO: convert to openapi_annotation controllers
-
-trigger_failed_order_notifications: # TODO: remove security requirements, use uuid
-  path: /order/{id}/trigger-failed-notifications
-  controller: App\Http\Controller\TriggerFailedOrderNotificationsController::execute
-  methods: [POST]
-
-mark_order_as_fraud: # TODO: remove security requirements
-  path: /order/{uuid}/mark-as-fraud
-  controller: App\Http\Controller\MarkOrderAsFraudController::execute
-  methods: [POST]
-
-register_merchant_user:
-  path: /merchant/{merchantId}/user
-  controller: App\Http\Controller\RegisterMerchantUserController::execute
-  methods: [POST]
-
-update_merchant_debtor_company:
-  path: /merchant-debtor/{debtorUuid}/update-company
-  controller: App\Http\Controller\UpdateMerchantDebtorCompanyController::execute
-  methods: [POST]
-
-whitelist_merchant_debtor:
-  path: /merchant-debtor/{debtorUuid}/whitelist
-  controller: App\Http\Controller\UpdateMerchantDebtorWhitelistController::execute
-  methods: [POST]
-
-mark_duplicate_debtors:
-  path: /merchant-debtor/mark-duplicates
-  controller: App\Http\Controller\MarkDuplicateDebtorsController::execute
-  methods: [POST]
+api_docs_controllers:
+  resource: ../src/Http/Controller/ApiDocs
+  type: openapi_annotation

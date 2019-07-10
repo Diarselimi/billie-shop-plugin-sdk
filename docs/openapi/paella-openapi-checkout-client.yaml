@@ -63,7 +63,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CheckoutAuthorizeErrorObject'
+                title: 'Checkout Authorize Error'
+                properties:
+                  reasons: { description: 'Decline reasons', type: array, items: { $ref: '#/components/schemas/OrderDeclineReason' } }
+                type: object
+                allOf:
+                  - { $ref: '#/components/schemas/ErrorsObject' }
         '401':
           $ref: '#/components/responses/Unauthorized'
         '500':
@@ -112,77 +117,6 @@ components:
       title: string
       type: string
       maxLength: 255
-    AbstractErrorObject:
-      title: Error
-      type: object
-      oneOf:
-        -
-          $ref: '#/components/schemas/ErrorsObject'
-    CheckoutOrderDeclineErrorObject:
-      title: 'Checkout Order Decline Error'
-      required:
-        - error
-        - code
-      properties:
-        code:
-          description: 'Error code'
-          type: string
-        error:
-          description: 'Error message'
-          type: string
-        reasons:
-          description: 'Decline reasons'
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderDeclineReason'
-      type: object
-    CheckoutAuthorizeErrorObject:
-      title: 'Checkout Authorize Error'
-      type: object
-      oneOf:
-        -
-          $ref: '#/components/schemas/ValidationErrorsObject'
-        -
-          $ref: '#/components/schemas/CheckoutOrderDeclineErrorObject'
-    ErrorsObject:
-      title: 'Multiple Errors'
-      properties:
-        errors:
-          type: array
-          items:
-            required:
-              - title
-              - code
-            properties:
-              title:
-                description: 'Error message'
-                type: string
-              code:
-                description: 'Error code'
-                type: string
-            type: object
-      type: object
-    ValidationErrorsObject:
-      title: 'Multiple Validation Errors'
-      properties:
-        errors:
-          type: array
-          items:
-            required:
-              - title
-              - code
-            properties:
-              source:
-                description: 'Property path where the error occurred.'
-                type: string
-              title:
-                description: 'Error message'
-                type: string
-              code:
-                description: 'Error code'
-                type: string
-            type: object
-      type: object
     CreateOrderRequest:
       title: 'Order Creation Request'
       required:
@@ -349,19 +283,42 @@ components:
         country:
           $ref: '#/components/schemas/CountryCode'
       type: object
+    ErrorsObject:
+      title: 'API Errors'
+      properties:
+        errors:
+          type: array
+          items:
+            required:
+              - title
+              - code
+            properties:
+              title:
+                description: 'Error message'
+                type: string
+              code:
+                description: 'Error code'
+                type: string
+                nullable: true
+              source:
+                description: 'Property path where the error occurred, if applicable'
+                type: string
+                nullable: true
+            type: object
+      type: object
   responses:
     ServerError:
       description: 'Unexpected Server Error'
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/AbstractErrorObject'
+            $ref: '#/components/schemas/ErrorsObject'
     Unauthorized:
       description: 'Unauthorized request or invalid credentials'
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/AbstractErrorObject'
+            $ref: '#/components/schemas/ErrorsObject'
   securitySchemes:
     oauth2:
       type: oauth2

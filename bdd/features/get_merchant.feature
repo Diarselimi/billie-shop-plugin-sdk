@@ -6,21 +6,17 @@ Feature:
     Background:
         Given I add "Content-type" header equal to "application/json"
         And I add "X-Test" header equal to 1
-        And I add "X-Api-Key" header equal to test
 
     Scenario: Unsuccessful merchant retrieve
-        When I send a GET request to "/merchant/1"
+        When I send a GET request to "/private/merchant/100"
         Then the response status code should be 404
         And the JSON response should be:
         """
-        {
-            "code": "not_found",
-            "error": "Merchant with api-key 1 not found"
-        }
+        {"errors":[{"title":"Merchant with id 100 not found","code":"resource_not_found"}]}
         """
 
     Scenario: Successful merchant retrieve
-        When I send a GET request to "/merchant/test"
+        When I send a GET request to "/private/merchant/1"
         Then the JSON response should include:
         """
         {

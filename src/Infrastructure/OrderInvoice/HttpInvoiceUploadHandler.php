@@ -5,6 +5,7 @@ namespace App\Infrastructure\OrderInvoice;
 use App\Application\UseCase\HttpInvoiceUpload\HttpInvoiceUploadRequest;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
+use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderInvoice\AbstractSettingsAwareInvoiceUploadHandler;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -27,14 +28,16 @@ class HttpInvoiceUploadHandler extends AbstractSettingsAwareInvoiceUploadHandler
         parent::__construct($merchantSettingsRepository);
     }
 
-    public function handleInvoice(
-        string $orderExternalCode,
-        int $merchantId,
-        string $invoiceNumber,
-        string $invoiceUrl,
-        string $event
-    ): void {
-        $message = new HttpInvoiceUploadRequest($merchantId, $orderExternalCode, $invoiceUrl, $orderExternalCode, $event);
+    public function handleInvoice(OrderEntity $order, string $event): void
+    {
+        $message = new HttpInvoiceUploadRequest(
+            $order->getMerchantId(),
+            $order->getExternalCode(),
+            $order->getInvoiceUrl(),
+            $order->getInvoiceNumber(),
+            $event
+        );
+
         $data = json_encode($message->toArray());
 
         try {

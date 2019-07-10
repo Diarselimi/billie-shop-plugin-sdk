@@ -2,9 +2,7 @@
 
 namespace App\Application\UseCase\GetMerchant;
 
-use App\Application\PaellaCoreCriticalException;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
-use Symfony\Component\HttpFoundation\Response;
 
 class GetMerchantUseCase
 {
@@ -17,15 +15,11 @@ class GetMerchantUseCase
 
     public function execute(GetMerchantRequest $request): GetMerchantResponse
     {
-        $apiKey = $request->getApiKey();
-        $merchant = $this->merchantRepository->getOneByApiKey($apiKey);
+        $id = $request->getId();
+        $merchant = $this->merchantRepository->getOneById($id);
 
         if (!$merchant) {
-            throw new PaellaCoreCriticalException(
-                "Merchant with api-key $apiKey not found",
-                PaellaCoreCriticalException::CODE_NOT_FOUND,
-                Response::HTTP_NOT_FOUND
-            );
+            throw new MerchantNotFoundException("Merchant with id $id not found");
         }
 
         return new GetMerchantResponse($merchant);

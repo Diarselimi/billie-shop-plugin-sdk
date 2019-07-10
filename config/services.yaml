@@ -1,12 +1,12 @@
 parameters:
   locale: 'en'
-  google_cloud_project_id: bbox-150315
-  google_cloud_credentials_file_path: '%kernel.root_dir%/../config/secrets/gcloud.json'
   project_name: paella_core
   receive_invoices_sns_topic_arn: '%env(RECEIVE_INVOICES_SNS_TOPIC_ARN)%'
   billie_monitoring_slack_webhook_url: '%env(SLACK_WEBHOOK_URL)%'
   smaug_client_id: '%env(string:SMAUG_CLIENT_ID)%'
   smaug_client_secret: '%env(string:SMAUG_CLIENT_SECRET)%'
+  env(APP_DEBUG): false
+  env(bool:APP_DEBUG): false
 
 services:
   _defaults:
@@ -31,6 +31,7 @@ services:
       $projectRootDir: '%kernel.root_dir%/..'
       $smaugClientId: '%smaug_client_id%'
       $smaugClientSecret: '%smaug_client_secret%'
+      $showExtendedErrorInfo: '%env(bool:APP_DEBUG)%'
       $resourcesFileReader: '@resources_file_reader'
       $apiSpecFileReader: '@api_spec_file_reader'
 

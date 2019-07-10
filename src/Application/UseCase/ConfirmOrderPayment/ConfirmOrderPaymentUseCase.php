@@ -3,14 +3,18 @@
 namespace App\Application\UseCase\ConfirmOrderPayment;
 
 use App\Application\Exception\FraudOrderException;
-use App\Application\PaellaCoreCriticalException;
-use App\DomainModel\Borscht\BorschtInterface;
+use App\Application\Exception\OrderNotFoundException;
+use App\Application\Exception\PaymentOrderConfirmException;
+use App\Application\UseCase\ValidatedUseCaseInterface;
+use App\Application\UseCase\ValidatedUseCaseTrait;
+use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
-use Symfony\Component\HttpFoundation\Response;
 
-class ConfirmOrderPaymentUseCase
+class ConfirmOrderPaymentUseCase implements ValidatedUseCaseInterface
 {
+    use ValidatedUseCaseTrait;
+
     private $orderRepository;
 
     private $paymentService;
@@ -19,7 +23,7 @@ class ConfirmOrderPaymentUseCase
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
-        BorschtInterface $paymentService,
+        PaymentsServiceInterface $paymentService,
         OrderStateManager $orderStateManager
     ) {
         $this->orderRepository = $orderRepository;
@@ -27,16 +31,20 @@ class ConfirmOrderPaymentUseCase
         $this->orderStateManager = $orderStateManager;
     }
 
+    /**
+     * @param  ConfirmOrderPaymentRequest   $request
+     * @throws FraudOrderException
+     * @throws OrderNotFoundException
+     * @throws PaymentOrderConfirmException
+     */
     public function execute(ConfirmOrderPaymentRequest $request): void
     {
+        $this->validateRequest($request);
+
         $order = $this->orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($request->getOrderId(), $request->getMerchantId());
 
         if (!$order) {
-            throw new PaellaCoreCriticalException(
-                "Order #{$request->getOrderId()} not found",
-                PaellaCoreCriticalException::CODE_NOT_FOUND,
-                Response::HTTP_NOT_FOUND
-            );
+            throw new OrderNotFoundException();
         }
 
         if ($order->getMarkedAsFraudAt()) {
@@ -46,11 +54,7 @@ class ConfirmOrderPaymentUseCase
         if ($this->orderStateManager->wasShipped($order)) {
             $this->paymentService->confirmPayment($order, $request->getAmount());
         } else {
-            throw new PaellaCoreCriticalException(
-                "Order #{$request->getOrderId()} payment can not be confirmed",
-                PaellaCoreCriticalException::CODE_ORDER_PAYMENT_CANT_BE_CONFIRMED,
-                Response::HTTP_FORBIDDEN
-            );
+            throw new PaymentOrderConfirmException();
         }
     }
 }

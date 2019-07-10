@@ -43,10 +43,7 @@ Feature:
         Then the response status code should be 400
         And the JSON response should be:
         """
-        {
-            "code": "order_cancel_failed",
-            "error": "Order #CO123 can not be cancelled"
-        }
+        {"errors":[{"title":"Order #CO123 can not be cancelled","code":"order_cancel_failed"}]}
         """
 
     Scenario: Unsuccessful canceled order cancellation
@@ -55,10 +52,7 @@ Feature:
         Then the response status code should be 400
         And the JSON response should be:
         """
-        {
-            "code": "order_cancel_failed",
-            "error": "Order #CO123 can not be cancelled"
-        }
+        {"errors":[{"title":"Order #CO123 can not be cancelled","code":"order_cancel_failed"}]}
         """
 
     Scenario: Not existing order cancellation
@@ -66,9 +60,7 @@ Feature:
         Then the response status code should be 404
         And the JSON response should be:
         """
-        {
-            "error": "Order not found"
-        }
+        {"errors":[{"title":"Order not found","code":"resource_not_found"}]}
         """
 
     Scenario: Fraud order cancellation
@@ -78,7 +70,5 @@ Feature:
         Then the response status code should be 403
         And the JSON response should be:
         """
-        {
-            "error": "Order was marked as fraud"
-        }
+        {"errors":[{"title":"Order was marked as fraud","code":"forbidden"}]}
         """

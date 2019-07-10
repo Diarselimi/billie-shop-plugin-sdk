@@ -38,17 +38,15 @@ Feature:
       "code": 404
     }
     """
-    When I send a GET request to "/debtor-company/944c4cf4-3eb8-4ff3-872e-961deac79702/limits"
+    When I send a GET request to "/private/debtor-company/944c4cf4-3eb8-4ff3-872e-961deac79702/limits"
     Then the response status code should be 404
     And the JSON response should be:
     """
-    {
-      "error": "Company not found."
-    }
+    {"errors":[{"title":"Company not found.","code":"resource_not_found"}]}
     """
 
   Scenario: Get merchant debtor details - invalid uuid error
-    When I send a GET request to "/debtor-company/944c4cf4-3eb8-4ff3-872e-xxxx/limits"
+    When I send a GET request to "/private/debtor-company/944c4cf4-3eb8-4ff3-872e-xxxx/limits"
     Then the response status code should be 400
     And the JSON response should be:
     """

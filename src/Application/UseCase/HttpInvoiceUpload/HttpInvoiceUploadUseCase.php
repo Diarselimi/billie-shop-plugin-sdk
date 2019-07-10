@@ -3,11 +3,11 @@
 namespace App\Application\UseCase\HttpInvoiceUpload;
 
 use App\DomainModel\FileService\FileServiceInterface;
+use App\DomainModel\FileService\FileServiceRequestException;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderInvoice\OrderInvoiceFactory;
 use App\DomainModel\OrderInvoice\OrderInvoiceRepositoryInterface;
 use App\Infrastructure\ClientResponseDecodeException;
-use App\Infrastructure\Nachos\NachosCommunicationException;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use GuzzleHttp\Client;
@@ -62,7 +62,7 @@ class HttpInvoiceUploadUseCase implements LoggingInterface
 
         try {
             $file = $this->fileService->upload((string) $response->getBody(), $fileUrl);
-        } catch (NachosCommunicationException | ClientResponseDecodeException $exception) {
+        } catch (FileServiceRequestException | ClientResponseDecodeException $exception) {
             throw new HttpInvoiceUploadException('Exception wile uploading invoice to file service', null, $exception);
         }
 

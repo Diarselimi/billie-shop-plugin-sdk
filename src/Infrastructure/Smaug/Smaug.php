@@ -6,6 +6,7 @@ use App\DomainModel\MerchantUser\AuthenticationServiceCreateClientResponseDTO;
 use App\DomainModel\MerchantUser\AuthenticationServiceCreateUserResponseDTO;
 use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
 use App\DomainModel\MerchantUser\AuthenticationServiceAuthorizeTokenResponseDTO;
+use App\DomainModel\MerchantUser\AuthenticationServiceRequestException;
 use App\DomainModel\MerchantUser\AuthenticationServiceTokenResponseDTO;
 use App\Infrastructure\DecodeResponseTrait;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
@@ -77,7 +78,7 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
         } catch (TransferException $exception) {
             $this->logSuppressedException($exception, 'Failed to create OAuth client', ['exception' => $exception]);
 
-            throw new AuthenticationServiceException();
+            throw new AuthenticationServiceRequestException($exception);
         }
     }
 
@@ -103,7 +104,7 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
         } catch (TransferException $exception) {
             $this->logSuppressedException($exception, 'Failed to create OAuth user', ['exception' => $exception]);
 
-            throw new AuthenticationServiceException();
+            throw new AuthenticationServiceRequestException($exception);
         }
     }
 
@@ -138,7 +139,7 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
         } catch (TransferException $exception) {
             $this->logSuppressedException($exception, 'Failed to obtain user token', ['exception' => $exception]);
 
-            throw new AuthenticationServiceException();
+            throw new AuthenticationServiceRequestException($exception);
         }
     }
 
@@ -159,7 +160,7 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
         } catch (TransferException $exception) {
             $this->logSuppressedException($exception, 'Failed to revoke token', ['exception' => $exception]);
 
-            throw new AuthenticationServiceException();
+            throw new AuthenticationServiceRequestException($exception);
         }
     }
 }

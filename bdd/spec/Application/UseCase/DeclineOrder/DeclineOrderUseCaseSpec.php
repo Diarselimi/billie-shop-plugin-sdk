@@ -10,14 +10,14 @@ use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use PhpSpec\ObjectBehavior;
 
 class DeclineOrderUseCaseSpec extends ObjectBehavior
 {
+    private const ORDER_UUID = 'test-order-uuid';
+
     public function let(
-        OrderRepositoryInterface $orderRepository,
         OrderStateManager $orderStateManager,
         OrderContainerFactory $orderContainerFactory,
         OrderContainer $orderContainer,
@@ -27,8 +27,7 @@ class DeclineOrderUseCaseSpec extends ObjectBehavior
         $this->beConstructedWith(...func_get_args());
 
         $orderContainer->getOrder()->willReturn($order);
-        $request->getOrderId()->willReturn(10);
-        $request->getMerchantId()->willReturn(50);
+        $request->getUuid()->willReturn(self::ORDER_UUID);
     }
 
     public function it_is_initializable()
@@ -41,7 +40,7 @@ class DeclineOrderUseCaseSpec extends ObjectBehavior
         DeclineOrderRequest $request
     ) {
         $orderContainerFactory
-            ->loadByMerchantIdAndExternalId(50, 10)
+            ->loadByUuid(self::ORDER_UUID)
             ->shouldBeCalled()
             ->willThrow(OrderContainerFactoryException::class)
         ;
@@ -57,7 +56,7 @@ class DeclineOrderUseCaseSpec extends ObjectBehavior
         OrderContainer $orderContainer
     ) {
         $orderContainerFactory
-            ->loadByMerchantIdAndExternalId(50, 10)
+            ->loadByUuid(self::ORDER_UUID)
             ->shouldBeCalled()
             ->willReturn($orderContainer)
         ;
@@ -85,7 +84,7 @@ class DeclineOrderUseCaseSpec extends ObjectBehavior
         OrderContainer $orderContainer
     ) {
         $orderContainerFactory
-            ->loadByMerchantIdAndExternalId(50, 10)
+            ->loadByUuid(self::ORDER_UUID)
             ->shouldBeCalled()
             ->willReturn($orderContainer)
         ;
@@ -108,7 +107,7 @@ class DeclineOrderUseCaseSpec extends ObjectBehavior
         OrderContainer $orderContainer
     ) {
         $orderContainerFactory
-            ->loadByMerchantIdAndExternalId(50, 10)
+            ->loadByUuid(self::ORDER_UUID)
             ->shouldBeCalled()
             ->willReturn($orderContainer)
         ;

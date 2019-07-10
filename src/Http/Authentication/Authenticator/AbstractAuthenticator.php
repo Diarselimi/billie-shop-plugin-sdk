@@ -2,10 +2,10 @@
 
 namespace App\Http\Authentication\Authenticator;
 
+use App\Http\ApiError\ApiError;
+use App\Http\ApiError\ApiErrorResponse;
 use App\Http\HttpConstantsInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -15,23 +15,17 @@ abstract class AbstractAuthenticator extends AbstractGuardAuthenticator
 {
     public function start(Request $request, AuthenticationException $authException = null)
     {
-        return new JsonResponse(
-            [
-                'title' => 'Access denied',
-                'code' => 'access_denied',
-            ],
-            Response::HTTP_UNAUTHORIZED
+        return new ApiErrorResponse(
+            [new ApiError('Access denied', ApiError::CODE_FORBIDDEN)],
+            ApiErrorResponse::HTTP_FORBIDDEN
         );
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        return new JsonResponse(
-            [
-                'title' => 'Unauthorized',
-                'code' => 'unauthorized',
-            ],
-            Response::HTTP_FORBIDDEN
+        return new ApiErrorResponse(
+            [new ApiError('Unauthorized', ApiError::CODE_UNAUTHORIZED)],
+            ApiErrorResponse::HTTP_UNAUTHORIZED
         );
     }
 

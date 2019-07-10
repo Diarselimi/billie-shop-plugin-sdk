@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Alfred;
 
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
+use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorCompany\DebtorCompanyFactory;
 use App\DomainModel\DebtorCompany\IdentifyDebtorRequestDTO;
@@ -65,7 +66,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
                 return null;
             }
 
-            throw new AlfredRequestException($exception->getCode(), $exception);
+            throw new CompaniesServiceRequestException($exception);
         }
 
         return $this->factory->createFromAlfredResponse($this->decodeResponse($response));
@@ -78,7 +79,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
                 'json' => $updateData,
             ]);
         } catch (TransferException $exception) {
-            throw new AlfredRequestException($exception->getCode(), $exception);
+            throw new CompaniesServiceRequestException($exception);
         }
 
         return $this->factory->createFromAlfredResponse($this->decodeResponse($response));
@@ -104,9 +105,9 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
                 return null;
             }
 
-            throw new AlfredRequestException($exception->getCode(), $exception);
+            throw new CompaniesServiceRequestException($exception);
         } catch (TransferException $exception) {
-            throw new AlfredRequestException($exception->getCode(), $exception);
+            throw new CompaniesServiceRequestException($exception);
         }
 
         $decodedResponse = $this->decodeResponse($response);
@@ -126,7 +127,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
                 },
             ]);
         } catch (TransferException $exception) {
-            throw new AlfredRequestException($exception->getCode(), $exception);
+            throw new CompaniesServiceRequestException($exception);
         }
     }
 
@@ -139,7 +140,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
                 ],
             ]);
         } catch (TransferException $exception) {
-            throw new AlfredRequestException($exception->getCode(), $exception);
+            throw new CompaniesServiceRequestException($exception);
         }
     }
 
@@ -150,7 +151,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
 
             return $this->decodeResponse($response)['is_debtor_blacklisted'];
         } catch (TransferException $exception) {
-            throw new AlfredRequestException($exception->getCode(), $exception);
+            throw new CompaniesServiceRequestException($exception);
         }
     }
 
@@ -175,7 +176,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
 
             return $this->decodeResponse($response)['is_eligible'];
         } catch (TransferException $exception) {
-            throw new AlfredRequestException($exception->getCode(), $exception);
+            throw new CompaniesServiceRequestException($exception);
         }
     }
 
@@ -196,7 +197,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
                 'json' => $payload,
             ]);
         } catch (TransferException $exception) {
-            throw new AlfredRequestException($exception->getCode(), $exception);
+            throw new CompaniesServiceRequestException($exception);
         }
     }
 
@@ -205,7 +206,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         $decodedResponse = json_decode((string) $response->getBody(), true);
 
         if (!is_array($decodedResponse)) {
-            throw new AlfredResponseDecodeException();
+            throw new CompaniesServiceRequestException(null, 'Companies API response decode failed');
         }
 
         return $decodedResponse;

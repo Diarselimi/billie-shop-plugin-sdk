@@ -7,7 +7,7 @@ use App\Application\UseCase\MarkOrderAsFraud\FraudReclaimActionException;
 use App\Application\UseCase\MarkOrderAsFraud\MarkOrderAsFraudRequest;
 use App\Application\UseCase\MarkOrderAsFraud\MarkOrderAsFraudUseCase;
 use App\DomainModel\Address\AddressEntity;
-use App\DomainModel\Borscht\BorschtInterface;
+use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
@@ -46,7 +46,7 @@ class MarkOrderAsFraudUseCaseSpec extends ObjectBehavior
         OrderRepositoryInterface $orderRepository,
         OrderStateManager $orderStateManager,
         OrderContainerFactory $orderContainerFactory,
-        BorschtInterface $borscht,
+        PaymentsServiceInterface $borscht,
         MarkOrderAsFraudRequest $request,
         OrderContainer $orderContainer,
         OrderEntity $order,
@@ -102,7 +102,7 @@ class MarkOrderAsFraudUseCaseSpec extends ObjectBehavior
         OrderRepositoryInterface $orderRepository,
         OrderContainerFactory $orderContainerFactory,
         OrderStateManager $orderStateManager,
-        BorschtInterface $borscht,
+        PaymentsServiceInterface $borscht,
         DebtorExternalDataEntity $debtorExternalData,
         OrderEntity $order,
         OrderContainer $orderContainer
@@ -131,7 +131,7 @@ class MarkOrderAsFraudUseCaseSpec extends ObjectBehavior
         OrderRepositoryInterface $orderRepository,
         OrderStateManager $orderStateManager,
         OrderContainerFactory $orderContainerFactory,
-        BorschtInterface $borscht,
+        PaymentsServiceInterface $borscht,
         DebtorExternalDataEntity $debtorExternalData,
         OrderEntity $order,
         OrderContainer $orderContainer
@@ -160,7 +160,7 @@ class MarkOrderAsFraudUseCaseSpec extends ObjectBehavior
         OrderRepositoryInterface $orderRepository,
         OrderStateManager $orderStateManager,
         OrderContainerFactory $orderContainerFactory,
-        BorschtInterface $borscht,
+        PaymentsServiceInterface $borscht,
         DebtorExternalDataEntity $debtorExternalData,
         AddressEntity $debtorAddress,
         OrderEntity $order,
@@ -192,7 +192,7 @@ class MarkOrderAsFraudUseCaseSpec extends ObjectBehavior
         OrderRepositoryInterface $orderRepository,
         OrderStateManager $orderStateManager,
         OrderContainerFactory $orderContainerFactory,
-        BorschtInterface $borscht,
+        PaymentsServiceInterface $borscht,
         DebtorExternalDataEntity $debtorExternalData,
         OrderEntity $order,
         OrderContainer $orderContainer,

@@ -2,8 +2,8 @@
 
 namespace App\DomainModel\OrderPayment;
 
-use App\DomainModel\Borscht\BorschtInterface;
-use App\DomainModel\Borscht\OrderAmountChangeDTO;
+use App\DomainModel\Payment\PaymentsServiceInterface;
+use App\DomainModel\Payment\OrderAmountChangeDTO;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
@@ -18,7 +18,7 @@ class OrderPaymentForgivenessService implements LoggingInterface
     private $orderRepository;
 
     public function __construct(
-        BorschtInterface $paymentsService,
+        PaymentsServiceInterface $paymentsService,
         OrderRepositoryInterface $orderRepository
     ) {
         $this->paymentsService = $paymentsService;

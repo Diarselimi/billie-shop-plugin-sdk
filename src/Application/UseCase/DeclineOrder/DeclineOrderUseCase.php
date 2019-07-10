@@ -6,23 +6,18 @@ use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\OrderWorkflowException;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
-use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 
 class DeclineOrderUseCase
 {
-    private $orderRepository;
-
     private $orderStateManager;
 
     private $orderContainerFactory;
 
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
         OrderStateManager $orderStateManager,
         OrderContainerFactory $orderManagerFactory
     ) {
-        $this->orderRepository = $orderRepository;
         $this->orderStateManager = $orderStateManager;
         $this->orderContainerFactory = $orderManagerFactory;
     }
@@ -30,10 +25,7 @@ class DeclineOrderUseCase
     public function execute(DeclineOrderRequest $request): void
     {
         try {
-            $orderContainer = $this->orderContainerFactory->loadByMerchantIdAndExternalId(
-                $request->getMerchantId(),
-                $request->getOrderId()
-            );
+            $orderContainer = $this->orderContainerFactory->loadByUuid($request->getUuid());
         } catch (OrderContainerFactoryException $exception) {
             throw new OrderNotFoundException($exception);
         }

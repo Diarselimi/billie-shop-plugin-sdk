@@ -3,7 +3,19 @@
 namespace App\Application\UseCase\UpdateMerchantDebtorCompany;
 
 use App\Application\UseCase\ValidatedRequestInterface;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Schema(schema="UpdateMerchantDebtorCompanyRequest",
+ *     properties={
+ *          @OA\Property(property="name", ref="#/components/schemas/TinyText", example="Billie GmbH"),
+ *          @OA\Property(property="address_house", ref="#/components/schemas/TinyText", example="4"),
+ *          @OA\Property(property="address_street", ref="#/components/schemas/TinyText", example="Charlottenstr."),
+ *          @OA\Property(property="address_city", ref="#/components/schemas/TinyText", example="Berlin"),
+ *          @OA\Property(property="address_postal_code", ref="#/components/schemas/TinyText", example="10969")
+ *     }
+ * )
+ */
 class UpdateMerchantDebtorCompanyRequest implements ValidatedRequestInterface
 {
     private $debtorUuid;

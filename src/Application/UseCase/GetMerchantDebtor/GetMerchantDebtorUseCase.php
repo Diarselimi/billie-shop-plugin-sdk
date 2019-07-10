@@ -5,7 +5,7 @@ namespace App\Application\UseCase\GetMerchantDebtor;
 use App\Application\Exception\MerchantDebtorNotFoundException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
-use App\DomainModel\Borscht\BorschtInterface;
+use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
@@ -26,7 +26,7 @@ class GetMerchantDebtorUseCase implements ValidatedUseCaseInterface
 
     public function __construct(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
-        BorschtInterface $paymentService,
+        PaymentsServiceInterface $paymentService,
         CompaniesServiceInterface $companiesService,
         MerchantDebtorFinancialDetailsRepositoryInterface $financialDetailsRepository
     ) {

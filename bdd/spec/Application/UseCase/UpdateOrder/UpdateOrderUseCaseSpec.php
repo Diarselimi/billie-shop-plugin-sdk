@@ -5,9 +5,10 @@ namespace spec\App\Application\UseCase\UpdateOrder;
 use App\Application\Exception\FraudOrderException;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\PaellaCoreCriticalException;
+use App\Application\UseCase\CreateOrder\Request\CreateOrderAmountRequest;
 use App\Application\UseCase\UpdateOrder\UpdateOrderRequest;
 use App\Application\UseCase\UpdateOrder\UpdateOrderUseCase;
-use App\DomainModel\Borscht\BorschtInterface;
+use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
@@ -54,7 +55,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
 
     public function let(
         OrderContainerFactory $orderContainerFactory,
-        BorschtInterface $paymentsService,
+        PaymentsServiceInterface $paymentsService,
         MerchantDebtorLimitsService $limitsService,
         OrderRepositoryInterface $orderRepository,
         MerchantRepositoryInterface $merchantRepository,
@@ -173,7 +174,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         OrderStateManager $orderStateManager,
         OrderFinancialDetailsFactory $orderFinancialDetailsFactory,
         OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
-        BorschtInterface $paymentsService,
+        PaymentsServiceInterface $paymentsService,
         UpdateOrderRequest $request,
         OrderEntity $order,
         OrderContainer $orderContainer,
@@ -262,7 +263,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         OrderRepositoryInterface $orderRepository,
         OrderContainerFactory $orderContainerFactory,
         OrderStateManager $orderStateManager,
-        BorschtInterface $paymentsService,
+        PaymentsServiceInterface $paymentsService,
         UpdateOrderRequest $request,
         OrderEntity $order,
         OrderFinancialDetailsFactory $orderFinancialDetailsFactory,
@@ -440,7 +441,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         OrderContainerFactory $orderContainerFactory,
         OrderRepositoryInterface $orderRepository,
         OrderStateManager $orderStateManager,
-        BorschtInterface $paymentsService,
+        PaymentsServiceInterface $paymentsService,
         UpdateOrderRequest $request,
         OrderEntity $order,
         OrderFinancialDetailsEntity $orderFinancialDetails,
@@ -491,9 +492,12 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $invoiceUrl = null
     ) {
         $request->getDuration()->willReturn($duration);
-        $request->getAmountGross()->willReturn($amountGross);
-        $request->getAmountNet()->willReturn($amountNet);
-        $request->getAmountTax()->willReturn($amountTax);
+        $request->getAmount()->willReturn(
+            (new CreateOrderAmountRequest())
+                ->setTax($amountTax)
+                ->setNet($amountNet)
+                ->setGross($amountGross)
+        );
         $request->getInvoiceNumber()->willReturn($invoiceNumber);
         $request->getInvoiceUrl()->willReturn($invoiceUrl);
     }

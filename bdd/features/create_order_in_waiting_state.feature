@@ -88,7 +88,7 @@ Feature:
          "order_id":"A1"
       }
       """
-    Then the response status code should be 201
+    Then the response status code should be 200
     And the order A1 is in state created
 
   Scenario: Soft decline is enabled for limit check - limit check failed - order in waiting state
@@ -158,7 +158,7 @@ Feature:
          "order_id":"A1"
       }
       """
-	Then the response status code should be 201
+	Then the response status code should be 200
 	And the order A1 is in state waiting
   	And the order A1 has risk check limit failed
 
@@ -224,7 +224,7 @@ Feature:
          "duration":30
       }
       """
-    Then the response status code should be 201
+    Then the response status code should be 200
 
   Scenario: Soft decline is enabled for debtor_is_trusted check - check failed - order in waiting state
     Given The following merchant risk check settings exist for merchant 1:
@@ -292,6 +292,6 @@ Feature:
          "order_id":"A1"
       }
     """
-    Then the response status code should be 201
+    Then the response status code should be 200
     And the order A1 has risk check debtor_is_trusted failed
     And the order A1 is in state waiting

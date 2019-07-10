@@ -3,7 +3,6 @@ Feature: Endpoint to approve an order in waiting state
   Background:
     Given I add "Content-type" header equal to "application/json"
     And I add "X-Test" header equal to 1
-    And I add "X-Api-Key" header equal to test
     And The following risk check definitions exist:
       | name                      |
       | available_financing_limit |
@@ -33,16 +32,16 @@ Feature: Endpoint to approve an order in waiting state
 
   Scenario: Order doesn't exists
     Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-    When I send a POST request to "/order/WrongOrderCode/approve"
+    When I send a POST request to "/private/order/WrongOrderCode/approve"
     Then the response status code should be 404
 
   Scenario: Order is not in waiting state
     Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-    When I send a POST request to "/order/CO123/approve"
+    When I send a POST request to "/private/order/test-order-uuid/approve"
     Then the response status code should be 403
     And the JSON response should be:
 	"""
-	{"error": "Cannot approve the order. Order is not in waiting state."}
+	{"errors":[{"title":"Cannot approve the order. Order is not in waiting state.","code":"forbidden"}]}
 	"""
 
   Scenario: Failed to approve order in waiting state because if failed checks
@@ -61,11 +60,11 @@ Feature: Endpoint to approve an order in waiting state
 	  | debtor_overdue                    |	1		  |
 	  | company_b2b_score                 |	1		  |
 	And I get from companies service get debtor response
-	When I send a POST request to "/order/CO123/approve"
+	When I send a POST request to "/private/order/test-order-uuid/approve"
 	Then the response status code should be 403
 	And the JSON response should be:
 	"""
-	{"error": "Cannot approve the order. failed risk checks: debtor_limit_exceeded"}
+	{"errors":[{"title":"Cannot approve the order. failed risk checks: debtor_limit_exceeded","code":"forbidden"}]}
 	"""
 	And the order CO123 is in state waiting
   	And the order CO123 has risk check limit failed
@@ -86,7 +85,7 @@ Feature: Endpoint to approve an order in waiting state
       | debtor_overdue            | 1         |
       | company_b2b_score         | 1         |
     And I get from companies service get debtor response
-    When I send a POST request to "/order/CO123/approve"
+    When I send a POST request to "/private/order/test-order-uuid/approve"
     Then the response status code should be 204
     And the order CO123 is in state created
 
@@ -109,7 +108,7 @@ Feature: Endpoint to approve an order in waiting state
     And I get from companies service "/debtor/1/lock" endpoint response with status 400 and body
     """
     """
-    When I send a POST request to "/order/CO123/approve"
+    When I send a POST request to "/private/order/test-order-uuid/approve"
     Then the response status code should be 403
     And the order CO123 is in state waiting
 
@@ -132,6 +131,6 @@ Feature: Endpoint to approve an order in waiting state
     And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
     """
     """
-    When I send a POST request to "/order/CO123/approve"
+    When I send a POST request to "/private/order/test-order-uuid/approve"
     Then the response status code should be 204
     And the order CO123 is in state created

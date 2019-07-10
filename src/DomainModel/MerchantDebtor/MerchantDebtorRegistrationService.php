@@ -2,7 +2,7 @@
 
 namespace App\DomainModel\MerchantDebtor;
 
-use App\DomainModel\Borscht\BorschtInterface;
+use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
@@ -27,7 +27,7 @@ class MerchantDebtorRegistrationService
         MerchantSettingsRepositoryInterface $merchantSettingsRepository,
         MerchantDebtorFinancingDetailsEntityFactory $merchantDebtorFinancingDetailsEntityFactory,
         MerchantDebtorFinancialDetailsRepositoryInterface $merchantDebtorFinancialDetailsRepository,
-        BorschtInterface $paymentsService
+        PaymentsServiceInterface $paymentsService
     ) {
         $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->merchantDebtorEntityFactory = $merchantDebtorEntityFactory;

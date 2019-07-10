@@ -10,6 +10,7 @@ class OrderTransitionManager
      * @var OrderTransitionEntity[]
      */
     private $transitions = [];
+
     private $transitionRepository;
 
     public function __construct(OrderTransitionRepositoryInterface $transitionRepository)
