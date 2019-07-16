@@ -383,7 +383,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
 
         $orderContainer->setOrderFinancialDetails($newOrderFinancialDetails)->shouldBeCalled();
 
-        $limitsService->unlock(Argument::any(), Argument::any())->shouldBeCalled();
+        $limitsService->unlock($orderContainer, $amountChanged)->shouldBeCalled();
 
         $merchant->increaseAvailableFinancingLimit($amountChanged)->shouldBeCalled();
 
