@@ -2,12 +2,12 @@
 
 namespace App\Infrastructure\Borscht;
 
-use App\Application\PaellaCoreCriticalException;
-use App\DomainModel\Borscht\BorschtInterface;
-use App\DomainModel\Borscht\DebtorPaymentDetailsDTO;
-use App\DomainModel\Borscht\DebtorPaymentRegistrationDTO;
-use App\DomainModel\Borscht\OrderPaymentDetailsDTO;
-use App\DomainModel\Borscht\OrderPaymentDetailsFactory;
+use App\DomainModel\Payment\PaymentsServiceInterface;
+use App\DomainModel\Payment\DebtorPaymentDetailsDTO;
+use App\DomainModel\Payment\DebtorPaymentRegistrationDTO;
+use App\DomainModel\Payment\OrderPaymentDetailsDTO;
+use App\DomainModel\Payment\OrderPaymentDetailsFactory;
+use App\DomainModel\Payment\PaymentsServiceRequestException;
 use App\DomainModel\Order\OrderEntity;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -16,13 +16,13 @@ use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\TransferStats;
 use Psr\Http\Message\ResponseInterface;
 
-class Borscht implements BorschtInterface, LoggingInterface
+class Borscht implements PaymentsServiceInterface, LoggingInterface
 {
     use LoggingTrait;
 
     private const ERR_DEFAULT_MESSAGE = 'Payments API call was not successful';
 
-    private const ERR_BODY_DECODE_MESSAGE = 'Borscht response decode exception';
+    private const ERR_BODY_DECODE_MESSAGE = 'Payments API response decode failed';
 
     private $client;
 
@@ -39,12 +39,7 @@ class Borscht implements BorschtInterface, LoggingInterface
         try {
             $response = $this->client->get("/debtor/$debtorPaymentId.json");
         } catch (TransferException $exception) {
-            throw new PaellaCoreCriticalException(
-                self::ERR_DEFAULT_MESSAGE,
-                PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION,
-                null,
-                $exception
-            );
+            throw new PaymentsServiceRequestException($exception);
         }
 
         $decodedResponse = $this->decodeResponse($response);
@@ -52,8 +47,7 @@ class Borscht implements BorschtInterface, LoggingInterface
         return (new DebtorPaymentDetailsDTO())
             ->setBankAccountBic($decodedResponse['bic'])
             ->setBankAccountIban($decodedResponse['iban'])
-            ->setOutstandingAmount($decodedResponse['outstanding_amount'])
-        ;
+            ->setOutstandingAmount($decodedResponse['outstanding_amount']);
     }
 
     public function getOrderPaymentDetails(string $orderPaymentId): OrderPaymentDetailsDTO
@@ -61,12 +55,7 @@ class Borscht implements BorschtInterface, LoggingInterface
         try {
             $response = $this->client->get("/order/$orderPaymentId.json");
         } catch (TransferException $exception) {
-            throw new PaellaCoreCriticalException(
-                self::ERR_DEFAULT_MESSAGE,
-                PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION,
-                null,
-                $exception
-            );
+            throw new PaymentsServiceRequestException($exception);
         }
 
         $decodedResponse = $this->decodeResponse($response);
@@ -87,12 +76,7 @@ class Borscht implements BorschtInterface, LoggingInterface
                 'json' => $json,
             ]);
         } catch (TransferException $exception) {
-            throw new PaellaCoreCriticalException(
-                self::ERR_DEFAULT_MESSAGE,
-                PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION,
-                null,
-                $exception
-            );
+            throw new PaymentsServiceRequestException($exception);
         }
     }
 
@@ -112,12 +96,7 @@ class Borscht implements BorschtInterface, LoggingInterface
         try {
             $this->client->put('/order.json', ['json' => $json]);
         } catch (TransferException $exception) {
-            throw new PaellaCoreCriticalException(
-                self::ERR_DEFAULT_MESSAGE,
-                PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION,
-                null,
-                $exception
-            );
+            throw new PaymentsServiceRequestException($exception);
         }
     }
 
@@ -137,12 +116,7 @@ class Borscht implements BorschtInterface, LoggingInterface
                 'json' => $json,
             ]);
         } catch (TransferException $exception) {
-            throw new PaellaCoreCriticalException(
-                self::ERR_DEFAULT_MESSAGE,
-                PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION,
-                null,
-                $exception
-            );
+            throw new PaymentsServiceRequestException($exception);
         }
     }
 
@@ -173,12 +147,7 @@ class Borscht implements BorschtInterface, LoggingInterface
                 },
             ]);
         } catch (TransferException $exception) {
-            throw new PaellaCoreCriticalException(
-                self::ERR_DEFAULT_MESSAGE,
-                PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION,
-                null,
-                $exception
-            );
+            throw new PaymentsServiceRequestException($exception);
         }
 
         $decodedResponse = $this->decodeResponse($response);
@@ -198,12 +167,7 @@ class Borscht implements BorschtInterface, LoggingInterface
                 },
             ]);
         } catch (TransferException $exception) {
-            throw new PaellaCoreCriticalException(
-                self::ERR_DEFAULT_MESSAGE,
-                PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION,
-                null,
-                $exception
-            );
+            throw new PaymentsServiceRequestException($exception);
         }
 
         $decodedResponse = $this->decodeResponse($response);
@@ -216,12 +180,7 @@ class Borscht implements BorschtInterface, LoggingInterface
         try {
             $this->client->post("/order/$orderPaymentId/fraud-reclaim.json");
         } catch (TransferException $exception) {
-            throw new PaellaCoreCriticalException(
-                'Fraud reclaim request to Borscht failed',
-                PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION,
-                null,
-                $exception
-            );
+            throw new PaymentsServiceRequestException($exception, 'Fraud reclaim request to Payment failed');
         }
     }
 
@@ -231,10 +190,7 @@ class Borscht implements BorschtInterface, LoggingInterface
         $decodedResponse = json_decode($response, true);
 
         if (!$decodedResponse) {
-            throw new PaellaCoreCriticalException(
-                self::ERR_BODY_DECODE_MESSAGE,
-                PaellaCoreCriticalException::CODE_BORSCHT_EXCEPTION
-            );
+            throw new PaymentsServiceRequestException(null, self::ERR_BODY_DECODE_MESSAGE);
         }
 
         return $decodedResponse;

@@ -38,7 +38,7 @@ use OpenApi\Annotations as OA;
  *     schema="PublicApiGroup",
  *     title="API Group",
  *     type="string",
- *     enum=\App\Http\Controller\PublicApi\PublicApiSpecController::API_GROUP_WHITELIST,
+ *     enum=\App\Http\Controller\ApiDocs\PublicApiSpecController::API_GROUP_WHITELIST,
  *     example="standard"
  * )
  */
@@ -48,7 +48,7 @@ use OpenApi\Annotations as OA;
  *     schema="PrivateApiGroup",
  *     title="API Group",
  *     type="string",
- *     enum=\App\Http\Controller\PrivateApi\PrivateApiSpecController::API_GROUP_WHITELIST,
+ *     enum=\App\Http\Controller\ApiDocs\PrivateApiSpecController::API_GROUP_WHITELIST,
  *     example="standard"
  * )
  */

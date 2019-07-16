@@ -6,7 +6,7 @@ Feature: Register merchant user to access dashboard
 
   Scenario: successfully register merchant user
 	Given I successfully create OAuth client with email "test@merchantX.com" and user id "test-auth-id"
-	When I send a POST request to "/merchant/1/user" with body:
+	When I send a POST request to "/private/merchant/1/user" with body:
 	"""
 	{
 		"email": "test@merchantX.com",
@@ -17,7 +17,7 @@ Feature: Register merchant user to access dashboard
 	And merchant user with merchant id 1 and user id "test-auth-id" should be created
 
   Scenario: validation error
-	When I send a POST request to "/merchant/1/user" with body:
+	When I send a POST request to "/private/merchant/1/user" with body:
 	"""
 	{
 		"email": "test@.com",

@@ -2,7 +2,7 @@
 
 namespace App\DomainModel\OrderResponse;
 
-use App\DomainModel\Borscht\BorschtInterface;
+use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\Order\OrderEntity;
@@ -21,7 +21,7 @@ class OrderResponseFactory
 
     public function __construct(
         CompaniesServiceInterface $companiesService,
-        BorschtInterface $paymentsService,
+        PaymentsServiceInterface $paymentsService,
         OrderStateManager $orderStateManager,
         OrderDeclinedReasonsMapper $declinedReasonsMapper
     ) {

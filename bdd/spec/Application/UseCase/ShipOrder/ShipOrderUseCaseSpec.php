@@ -6,8 +6,8 @@ use App\Application\Exception\OrderNotFoundException;
 use App\Application\PaellaCoreCriticalException;
 use App\Application\UseCase\ShipOrder\ShipOrderRequest;
 use App\Application\UseCase\ShipOrder\ShipOrderUseCase;
-use App\DomainModel\Borscht\BorschtInterface;
-use App\DomainModel\Borscht\OrderPaymentDetailsDTO;
+use App\DomainModel\Payment\PaymentsServiceInterface;
+use App\DomainModel\Payment\OrderPaymentDetailsDTO;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
@@ -52,7 +52,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
     public function let(
         Workflow $workflow,
         OrderRepositoryInterface $orderRepository,
-        BorschtInterface $paymentsService,
+        PaymentsServiceInterface $paymentsService,
         OrderInvoiceManager $invoiceManager,
         OrderContainerFactory $orderContainerFactory,
         OrderResponseFactory $orderResponseFactory,
@@ -121,7 +121,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
     public function it_updates_order_and_create_borscht_order(
         Workflow $workflow,
         OrderRepositoryInterface $orderRepository,
-        BorschtInterface $paymentsService,
+        PaymentsServiceInterface $paymentsService,
         OrderInvoiceManager $invoiceManager,
         OrderContainerFactory $orderContainerFactory,
         OrderResponseFactory $orderResponseFactory,

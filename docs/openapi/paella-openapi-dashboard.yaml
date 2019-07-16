@@ -309,7 +309,7 @@ paths:
           application/json:
             schema:
               properties:
-                amount:
+                paid_amount:
                   type: number
                   format: float
                   minimum: 0.1
@@ -616,7 +616,7 @@ paths:
             application/json:
               schema:
                 properties:
-                  error: { type: string, enum: ['maximum pausing attempts reached', 'requested number of days exceeds maximum duration allowed', 'maximum dunning stage reached', 'other orders exceed maximum dunning stage', 'Cannot pause dunning. Order is not in state late'], example: 'maximum pausing attempts reached', nullable: false }
+                  errors: { type: array, items: { required: [title, code], properties: { title: { type: string, enum: ['maximum pausing attempts reached', 'requested number of days exceeds maximum duration allowed', 'maximum dunning stage reached', 'other orders exceed maximum dunning stage', 'Cannot pause dunning. Order is not in state late'], example: 'maximum pausing attempts reached', nullable: false }, code: { type: string, example: forbidden, nullable: true } }, type: object } }
                 type: object
         '500':
           $ref: '#/components/responses/ServerError'
@@ -681,51 +681,6 @@ components:
       title: string
       type: string
       maxLength: 255
-    AbstractErrorObject:
-      title: Error
-      type: object
-      oneOf:
-        -
-          $ref: '#/components/schemas/ErrorsObject'
-    ErrorsObject:
-      title: 'Multiple Errors'
-      properties:
-        errors:
-          type: array
-          items:
-            required:
-              - title
-              - code
-            properties:
-              title:
-                description: 'Error message'
-                type: string
-              code:
-                description: 'Error code'
-                type: string
-            type: object
-      type: object
-    ValidationErrorsObject:
-      title: 'Multiple Validation Errors'
-      properties:
-        errors:
-          type: array
-          items:
-            required:
-              - title
-              - code
-            properties:
-              source:
-                description: 'Property path where the error occurred.'
-                type: string
-              title:
-                description: 'Error message'
-                type: string
-              code:
-                description: 'Error code'
-                type: string
-            type: object
-      type: object
     OauthGrantType:
       title: 'OAuth Grant Type'
       type: string
@@ -917,7 +872,7 @@ components:
     OrderResponse:
       title: 'Order Entity'
       properties:
-        external_code:
+        order_id:
           type: string
           example: C-10123456789-0001
           nullable: true
@@ -927,10 +882,8 @@ components:
           example: created
           $ref: '#/components/schemas/OrderState'
         reasons:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderDeclineReason'
           nullable: true
+          $ref: '#/components/schemas/OrderDeclineReason'
         amount:
           type: number
           format: float
@@ -958,24 +911,24 @@ components:
               example: 'Billie GmbH'
               nullable: true
               $ref: '#/components/schemas/TinyText'
-            house_number:
+            address_house_number:
               example: '4'
               nullable: true
               $ref: '#/components/schemas/TinyText'
-            street:
+            address_street:
               example: Charlottenstr.
               nullable: true
               $ref: '#/components/schemas/TinyText'
-            postal_code:
+            address_postal_code:
               type: string
               maxLength: 5
               example: '10969'
               nullable: true
-            city:
+            address_city:
               example: Berlin
               nullable: true
               $ref: '#/components/schemas/TinyText'
-            country:
+            address_country:
               type: string
               maxLength: 2
               nullable: true
@@ -992,7 +945,7 @@ components:
           type: object
         invoice:
           properties:
-            number:
+            invoice_number:
               nullable: true
               $ref: '#/components/schemas/TinyText'
             payout_amount:
@@ -1071,37 +1024,60 @@ components:
         shipped_at:
           $ref: '#/components/schemas/DateTime'
       type: object
+    ErrorsObject:
+      title: 'API Errors'
+      properties:
+        errors:
+          type: array
+          items:
+            required:
+              - title
+              - code
+            properties:
+              title:
+                description: 'Error message'
+                type: string
+              code:
+                description: 'Error code'
+                type: string
+                nullable: true
+              source:
+                description: 'Property path where the error occurred, if applicable'
+                type: string
+                nullable: true
+            type: object
+      type: object
   responses:
     ServerError:
       description: 'Unexpected Server Error'
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/AbstractErrorObject'
+            $ref: '#/components/schemas/ErrorsObject'
     NotFound:
       description: 'Resource Not Found'
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/AbstractErrorObject'
+            $ref: '#/components/schemas/ErrorsObject'
     Unauthorized:
       description: 'Unauthorized request or invalid credentials'
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/AbstractErrorObject'
+            $ref: '#/components/schemas/ErrorsObject'
     Forbidden:
       description: 'Forbidden Request. The operation cannot be completed.'
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/AbstractErrorObject'
+            $ref: '#/components/schemas/ErrorsObject'
     BadRequest:
       description: 'Invalid Request Data'
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ValidationErrorsObject'
+            $ref: '#/components/schemas/ErrorsObject'
   securitySchemes:
     oauth2:
       type: oauth2

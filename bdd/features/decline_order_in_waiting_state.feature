@@ -7,21 +7,21 @@ Feature: Endpoint to decline an order in waiting state
 
   Scenario: Order doesn't exist
 	Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-	When I send a POST request to "/order/WrongOrderCode/decline"
+	When I send a POST request to "/private/order/WrongOrderCode/decline"
 	Then the response status code should be 404
 
   Scenario: Order is not in waiting state
 	Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-	When I send a POST request to "/order/CO123/decline"
+	When I send a POST request to "/private/order/test-order-uuid/decline"
 	Then the response status code should be 403
 	And the JSON response should be:
 	"""
-	{"error": "Cannot decline the order. Order is not in waiting/pre_approved state."}
+    {"errors":[{"title":"Cannot decline the order. Order is not in waiting/pre_approved state.","code":"forbidden"}]}
 	"""
 
   Scenario: Successfully decline order in waiting state
 	Given I have a waiting order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
   	And I get from companies service get debtor response
-	When I send a POST request to "/order/CO123/decline"
+	When I send a POST request to "/private/order/test-order-uuid/decline"
 	Then the response status code should be 204
 	And the order CO123 is in state declined

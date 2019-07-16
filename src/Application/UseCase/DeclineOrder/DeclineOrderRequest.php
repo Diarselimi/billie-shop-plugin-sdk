@@ -2,8 +2,17 @@
 
 namespace App\Application\UseCase\DeclineOrder;
 
-use App\Application\UseCase\AbstractOrderRequest;
-
-class DeclineOrderRequest extends AbstractOrderRequest
+class DeclineOrderRequest
 {
+    private $uuid;
+
+    public function __construct(string $uuid)
+    {
+        $this->uuid = $uuid;
+    }
+
+    public function getUuid(): string
+    {
+        return $this->uuid;
+    }
 }

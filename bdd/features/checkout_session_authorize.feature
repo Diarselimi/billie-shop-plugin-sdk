@@ -210,7 +210,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     """
     Then the order A1 is in state declined
     And the response status code should be 400
-    And the JSON response at "reasons/0" should be "risk_policy"
+    And the JSON response at "errors/0/reasons/0" should be "risk_policy"
 
   Scenario: An order goes to declined if it doesn't pass all the soft checks
     Given I get from companies service identify match and good decision response
@@ -366,10 +366,10 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
        "order_id":"A1"
     }
     """
-    Then the response status code should be 403
+    Then the response status code should be 401
     And the JSON response should be:
     """
-    {"title":"Unauthorized","code":"unauthorized"}
+    {"errors":[{"title":"Unauthorized","code":"unauthorized"}]}
     """
 
   Scenario: I success if I try to create an order with a valid session_id but gets declined,
@@ -425,7 +425,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     """
     Then the order A1 is in state declined
     And the response status code should be 400
-    And the JSON response at "reasons/0" should be "risk_policy"
+    And the JSON response at "errors/0/reasons/0" should be "risk_policy"
     And I send a PUT request to "/checkout-session/123123/authorize" with body:
     """
     {
@@ -472,10 +472,10 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
        "order_id":"A1"
     }
     """
-    Then the response status code should be 403
+    Then the response status code should be 401
     And the JSON response should be:
     """
-    {"title":"Unauthorized","code":"unauthorized"}
+    {"errors":[{"title":"Unauthorized","code":"unauthorized"}]}
     """
 
   Scenario: I fail authorization if I try to create an order with a invalid session_id
@@ -528,7 +528,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     """
     Then the JSON response should be:
     """
-    {"title":"Unauthorized","code":"unauthorized"}
+    {"errors":[{"title":"Unauthorized","code":"unauthorized"}]}
     """
 
   Scenario: Trying to create an order without an existing session id
@@ -573,7 +573,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
       """
     Then the JSON response should be:
     """
-    {"title":"Unauthorized","code":"unauthorized"}
+    {"errors":[{"title":"Unauthorized","code":"unauthorized"}]}
     """
 
   Scenario: Trying to create a order without amount data

@@ -6,6 +6,7 @@ use App\Application\UseCase\CreateMerchant\Exception\CreateMerchantException;
 use App\Application\UseCase\CreateMerchant\Exception\DuplicateMerchantCompanyException;
 use App\Application\UseCase\CreateMerchant\Exception\MerchantCompanyNotFoundException;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
+use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
 use App\DomainModel\Merchant\MerchantEntityFactory;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
@@ -13,11 +14,9 @@ use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntityFactory;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
 use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
+use App\DomainModel\MerchantUser\AuthenticationServiceRequestException;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntityFactory;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
-use App\Infrastructure\Alfred\AlfredRequestException;
-use App\Infrastructure\Alfred\AlfredResponseDecodeException;
-use App\Infrastructure\Smaug\AuthenticationServiceException;
 
 class CreateMerchantUseCase
 {
@@ -72,7 +71,7 @@ class CreateMerchantUseCase
 
         try {
             $company = $this->companiesService->getDebtor($companyId);
-        } catch (AlfredRequestException | AlfredResponseDecodeException $exception) {
+        } catch (CompaniesServiceRequestException $exception) {
             $company = null;
         }
 
@@ -82,7 +81,7 @@ class CreateMerchantUseCase
 
         try {
             $oauthClient = $this->authenticationService->createClient($company->getName());
-        } catch (AuthenticationServiceException $exception) {
+        } catch (AuthenticationServiceRequestException $exception) {
             throw new CreateMerchantException('Failed to create OAuth client for merchant');
         }
 

@@ -5,19 +5,20 @@ namespace App\Http\Controller\PrivateApi;
 use App\Application\UseCase\GetMerchant\GetMerchantRequest;
 use App\Application\UseCase\GetMerchant\GetMerchantResponse;
 use App\Application\UseCase\GetMerchant\GetMerchantUseCase;
+use App\Application\UseCase\GetMerchant\MerchantNotFoundException;
 use OpenApi\Annotations as OA;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * TODO: use uuid and change route to /merchant/{uuid}
  * @OA\Get(
- *     path="/merchant/{apiKey}",
+ *     path="/merchant/{id}",
  *     operationId="merchant_get",
  *     summary="Get Merchant",
  *
  *     tags={"Merchants"},
  *     x={"groups":{"support"}},
  *
- *     @OA\Parameter(in="path", name="apiKey", @OA\Schema(type="string"), required=true, description="Merchant API Key"),
+ *     @OA\Parameter(in="path", name="id", @OA\Schema(type="integer"), required=true, description="Merchant ID"),
  *
  *     @OA\Response(response=200, @OA\JsonContent(ref="#/components/schemas/MerchantEntity"), description="Merchant Entity"),
  *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),
@@ -34,11 +35,12 @@ class GetMerchantController
         $this->useCase = $useCase;
     }
 
-    public function execute(string $apiKey): GetMerchantResponse
+    public function execute(string $id): GetMerchantResponse
     {
-        $request = new GetMerchantRequest($apiKey);
-        $response = $this->useCase->execute($request);
-
-        return $response;
+        try {
+            return $this->useCase->execute(new GetMerchantRequest($id));
+        } catch (MerchantNotFoundException $exception) {
+            throw new NotFoundHttpException($exception->getMessage());
+        }
     }
 }

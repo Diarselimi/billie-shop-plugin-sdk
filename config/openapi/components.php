@@ -11,11 +11,11 @@ use OpenApi\Annotations as OA;
  *     responses={
  *          @OA\Response(response="HtmlDocument", description="HTML Document", @OA\MediaType(mediaType="text/html", @OA\Schema(type="string"))),
  *          @OA\Response(response="YamlDocument", description="YAML Document", @OA\MediaType(mediaType="text/x-yaml", @OA\Schema(type="string"))),
- *          @OA\Response(response="ServerError", description="Unexpected Server Error", @OA\JsonContent(ref="#/components/schemas/AbstractErrorObject")),
- *          @OA\Response(response="NotFound", description="Resource Not Found", @OA\JsonContent(ref="#/components/schemas/AbstractErrorObject")),
- *          @OA\Response(response="Unauthorized", description="Unauthorized request or invalid credentials", @OA\JsonContent(ref="#/components/schemas/AbstractErrorObject")),
- *          @OA\Response(response="Forbidden", description="Forbidden Request. The operation cannot be completed.", @OA\JsonContent(ref="#/components/schemas/AbstractErrorObject")),
- *          @OA\Response(response="BadRequest", description="Invalid Request Data", @OA\JsonContent(ref="#/components/schemas/ValidationErrorsObject")),
+ *          @OA\Response(response="ServerError", description="Unexpected Server Error", @OA\JsonContent(ref="#/components/schemas/ErrorsObject")),
+ *          @OA\Response(response="NotFound", description="Resource Not Found", @OA\JsonContent(ref="#/components/schemas/ErrorsObject")),
+ *          @OA\Response(response="Unauthorized", description="Unauthorized request or invalid credentials", @OA\JsonContent(ref="#/components/schemas/ErrorsObject")),
+ *          @OA\Response(response="Forbidden", description="Forbidden Request. The operation cannot be completed.", @OA\JsonContent(ref="#/components/schemas/ErrorsObject")),
+ *          @OA\Response(response="BadRequest", description="Invalid Request Data", @OA\JsonContent(ref="#/components/schemas/ErrorsObject")),
  *     }
  * )
  */

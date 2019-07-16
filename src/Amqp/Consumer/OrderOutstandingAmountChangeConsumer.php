@@ -4,13 +4,14 @@ namespace App\Amqp\Consumer;
 
 use App\Application\UseCase\OrderOutstandingAmountChange\OrderOutstandingAmountChangeRequest;
 use App\Application\UseCase\OrderOutstandingAmountChange\OrderOutstandingAmountChangeUseCase;
-use App\DomainModel\Borscht\OrderAmountChangeFactory;
+use App\DomainModel\Payment\OrderAmountChangeFactory;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 
 class OrderOutstandingAmountChangeConsumer implements ConsumerInterface
 {
     private $useCase;
+
     private $orderAmountChangeFactory;
 
     public function __construct(

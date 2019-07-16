@@ -3,12 +3,16 @@
 namespace App\Http\Controller\PublicApi;
 
 use App\Application\Exception\FraudOrderException;
+use App\Application\Exception\OrderNotFoundException;
+use App\Application\Exception\PaymentOrderConfirmException;
 use App\Application\UseCase\ConfirmOrderPayment\ConfirmOrderPaymentRequest;
 use App\Application\UseCase\ConfirmOrderPayment\ConfirmOrderPaymentUseCase;
 use App\Http\HttpConstantsInterface;
 use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @OA\Post(
@@ -26,7 +30,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  *          required=true,
  *          @OA\MediaType(mediaType="application/json",
  *          @OA\Schema(type="object", properties={
- *              @OA\Property(property="amount", type="number", format="float", minimum=0.1)
+ *              @OA\Property(property="paid_amount", type="number", format="float", minimum=0.1)
  *          }))
  *     ),
  *
@@ -53,11 +57,15 @@ class ConfirmOrderPaymentController
             $orderRequest = new ConfirmOrderPaymentRequest(
                 $id,
                 $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID),
-                $request->request->get('amount')
+                $request->request->get('paid_amount')
             );
             $this->useCase->execute($orderRequest);
         } catch (FraudOrderException $e) {
             throw new AccessDeniedHttpException($e->getMessage());
+        } catch (OrderNotFoundException $exception) {
+            throw new NotFoundHttpException($exception->getMessage(), $exception);
+        } catch (PaymentOrderConfirmException $exception) {
+            throw new AccessDeniedHttpException($exception->getMessage(), $exception, JsonResponse::HTTP_FORBIDDEN);
         }
     }
 }

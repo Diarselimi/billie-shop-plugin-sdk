@@ -2,13 +2,13 @@
 
 namespace App\Http\EventSubscriber;
 
-use App\Application\PaellaCoreCriticalException;
 use App\DomainModel\ArrayableInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 class JsonConverterSubscriber implements EventSubscriberInterface
@@ -28,10 +28,7 @@ class JsonConverterSubscriber implements EventSubscriberInterface
         $requestData = json_decode($json, true);
 
         if (!is_array($requestData)) {
-            throw new PaellaCoreCriticalException(
-                "Request couldn't be decoded",
-                PaellaCoreCriticalException::CODE_REQUEST_DECODE_EXCEPTION
-            );
+            throw new BadRequestHttpException('Malformed request');
         }
 
         $requestData = $this->sanitizeRecursive($requestData);

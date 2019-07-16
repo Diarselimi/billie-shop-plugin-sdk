@@ -33,7 +33,7 @@ Feature: Retrieve and search all orders of a merchant
 		"total": 1,
 		"items":[
 		  {
-			 "external_code":"XF43Y",
+			 "order_id":"XF43Y",
 			 "uuid":"test123",
 			 "state":"created",
 			 "reasons":null,
@@ -43,18 +43,18 @@ Feature: Retrieve and search all orders of a merchant
 			 "created_at":"2019-05-07",
 			 "debtor_company":{
 				"name":"Test User Company",
-				"house_number":"10",
-				"street":"Heinrich-Heine-Platz",
-				"postal_code":"10179",
-				"city":"Berlin",
-				"country":"DE"
+				"address_house_number":"10",
+				"address_street":"Heinrich-Heine-Platz",
+				"address_postal_code":"10179",
+				"address_city":"Berlin",
+				"address_country":"DE"
 			 },
 			 "bank_account":{
 				"iban":"DE1234",
 				"bic":"BICISHERE"
 			 },
 			 "invoice":{
-				"number":null,
+				"invoice_number":null,
 				"payout_amount":null,
 				"outstanding_amount":null,
 				"fee_amount":null,
@@ -98,7 +98,7 @@ Feature: Retrieve and search all orders of a merchant
 		"total": 1,
 		"items":[
 		  {
-			 "external_code":"XF43Y",
+			 "order_id":"XF43Y",
 			 "uuid":"test123",
 			 "state":"created",
 			 "reasons":null,
@@ -108,18 +108,18 @@ Feature: Retrieve and search all orders of a merchant
 			 "created_at":"2019-05-07",
 			 "debtor_company":{
 				"name":"Test User Company",
-				"house_number":"10",
-				"street":"Heinrich-Heine-Platz",
-				"postal_code":"10179",
-				"city":"Berlin",
-				"country":"DE"
+				"address_house_number":"10",
+				"address_street":"Heinrich-Heine-Platz",
+				"address_postal_code":"10179",
+				"address_city":"Berlin",
+				"address_country":"DE"
 			 },
 			 "bank_account":{
 				"iban":"DE1234",
 				"bic":"BICISHERE"
 			 },
 			 "invoice":{
-				"number":null,
+				"invoice_number":null,
 				"payout_amount":null,
 				"outstanding_amount":null,
 				"fee_amount":null,
@@ -155,7 +155,7 @@ Feature: Retrieve and search all orders of a merchant
 	Given I have a created order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
   	And I get from companies service get debtor response
 	And I get from payments service get debtor response
-	When I send a GET request to "/orders?search=test123"
+	When I send a GET request to "/orders?search=test-order-uuid"
 	Then the response status code should be 200
 	And the JSON response should be:
 	"""
@@ -163,7 +163,7 @@ Feature: Retrieve and search all orders of a merchant
 		"total": 1,
 		"items":[
 		  {
-			 "external_code":"XF43Y",
+			 "order_id":"XF43Y",
 			 "uuid":"test123",
 			 "state":"created",
 			 "reasons":null,
@@ -173,18 +173,18 @@ Feature: Retrieve and search all orders of a merchant
 			 "created_at":"2019-05-07",
 			 "debtor_company":{
 				"name":"Test User Company",
-				"house_number":"10",
-				"street":"Heinrich-Heine-Platz",
-				"postal_code":"10179",
-				"city":"Berlin",
-				"country":"DE"
+				"address_house_number":"10",
+				"address_street":"Heinrich-Heine-Platz",
+				"address_postal_code":"10179",
+				"address_city":"Berlin",
+				"address_country":"DE"
 			 },
 			 "bank_account":{
 				"iban":"DE1234",
 				"bic":"BICISHERE"
 			 },
 			 "invoice":{
-				"number":null,
+				"invoice_number":null,
 				"payout_amount":null,
 				"outstanding_amount":null,
 				"fee_amount":null,
@@ -266,7 +266,7 @@ Feature: Retrieve and search all orders of a merchant
 		"total": 1,
 		"items":[
 		  {
-			 "external_code":"XF43Y",
+			 "order_id":"XF43Y",
 			 "uuid":"test123",
 			 "state":"created",
 			 "reasons":null,
@@ -276,18 +276,18 @@ Feature: Retrieve and search all orders of a merchant
 			 "created_at":"2019-05-07",
 			 "debtor_company":{
 				"name":"Test User Company",
-				"house_number":"10",
-				"street":"Heinrich-Heine-Platz",
-				"postal_code":"10179",
-				"city":"Berlin",
-				"country":"DE"
+				"address_house_number":"10",
+				"address_street":"Heinrich-Heine-Platz",
+				"address_postal_code":"10179",
+				"address_city":"Berlin",
+				"address_country":"DE"
 			 },
 			 "bank_account":{
 				"iban":"DE1234",
 				"bic":"BICISHERE"
 			 },
 			 "invoice":{
-				"number":null,
+				"invoice_number":null,
 				"payout_amount":null,
 				"outstanding_amount":null,
 				"fee_amount":null,

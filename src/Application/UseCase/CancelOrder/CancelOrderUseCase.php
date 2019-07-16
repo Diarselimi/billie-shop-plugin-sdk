@@ -5,7 +5,7 @@ namespace App\Application\UseCase\CancelOrder;
 use App\Application\Exception\FraudOrderException;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\PaellaCoreCriticalException;
-use App\DomainModel\Borscht\BorschtInterface;
+use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsException;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
@@ -34,7 +34,7 @@ class CancelOrderUseCase
         Workflow $workflow,
         OrderRepositoryInterface $orderRepository,
         MerchantDebtorLimitsService $limitsService,
-        BorschtInterface $paymentsService,
+        PaymentsServiceInterface $paymentsService,
         OrderContainerFactory $orderContainerFactory,
         MerchantRepositoryInterface $merchantRepository
     ) {

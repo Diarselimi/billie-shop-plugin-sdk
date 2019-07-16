@@ -35,10 +35,7 @@ class ApproveOrderUseCase
     public function execute(ApproveOrderRequest $request): void
     {
         try {
-            $orderContainer = $this->orderContainerFactory->loadByMerchantIdAndExternalId(
-                $request->getMerchantId(),
-                $request->getOrderId()
-            );
+            $orderContainer = $this->orderContainerFactory->loadByUuid($request->getUuid());
         } catch (OrderContainerFactoryException $exception) {
             throw new OrderNotFoundException($exception);
         }

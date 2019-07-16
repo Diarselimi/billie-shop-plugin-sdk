@@ -6,19 +6,19 @@ Feature: As a merchant, i should be able to access all endpoints by providing AP
 
   Scenario: Not providing API key
 	When I send a GET request to "/order/XF43Y"
-	Then the response status code should be 401
+	Then the response status code should be 403
 	And the JSON response should be:
 	"""
-	{"title":"Access denied","code":"access_denied"}
+	{"errors":[{"title":"Access denied","code":"forbidden"}]}
 	"""
 
   Scenario: Providing wrong API key
 	Given I add "X-Api-Key" header equal to WrongKey
 	When I send a GET request to "/order/XF43Y"
-	Then the response status code should be 403
+	Then the response status code should be 401
 	And the JSON response should be:
 	"""
-	{"title":"Unauthorized","code":"unauthorized"}
+	{"errors":[{"title":"Unauthorized","code":"unauthorized"}]}
 	"""
 
   Scenario: Providing valid API key

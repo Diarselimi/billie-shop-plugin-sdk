@@ -26,11 +26,11 @@ class OrderAmountsValidator extends ConstraintValidator
         }
 
         if ($request instanceof UpdateOrderRequest) {
-            if (is_null($request->getAmountGross()) || is_null($request->getAmountNet()) || is_null($request->getAmountTax())) {
+            if (is_null($request->getAmount()) || is_null($request->getAmount()->getNet()) || is_null($request->getAmount()->getTax())) {
                 return;
             }
 
-            if (!$this->checkAmounts($request->getAmountGross(), $request->getAmountNet(), $request->getAmountTax())) {
+            if (!$this->checkAmounts($request->getAmount()->getGross(), $request->getAmount()->getNet(), $request->getAmount()->getTax())) {
                 $this->context->addViolation($constraint->message);
             }
         }

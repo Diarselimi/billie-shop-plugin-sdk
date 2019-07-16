@@ -3,11 +3,11 @@
 namespace App\DomainModel\MerchantDebtor\Limits;
 
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
+use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
 use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
-use App\Infrastructure\Alfred\AlfredRequestException;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
@@ -51,7 +51,7 @@ class MerchantDebtorLimitsService implements LoggingInterface
 
             $financingDetails->reduceFinancingPower($amount);
             $this->merchantDebtorFinancialDetailsRepository->insert($financingDetails);
-        } catch (AlfredRequestException $exception) {
+        } catch (CompaniesServiceRequestException $exception) {
             throw new MerchantDebtorLimitsException('Lock debtor limit failed: ' . $exception->getMessage());
         }
     }
@@ -67,7 +67,7 @@ class MerchantDebtorLimitsService implements LoggingInterface
 
             $financingDetails->increaseFinancingPower($amount);
             $this->merchantDebtorFinancialDetailsRepository->insert($financingDetails);
-        } catch (AlfredRequestException $exception) {
+        } catch (CompaniesServiceRequestException $exception) {
             throw new MerchantDebtorLimitsException('Unlock debtor limit failed: ' . $exception->getMessage());
         }
     }

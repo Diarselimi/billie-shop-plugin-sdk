@@ -134,5 +134,5 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     Then the response status code should be 400
     And the JSON response should be:
     """
-    {"error":"The order is not authorized"}
+    {"errors":[{"title":"The order is not authorized","code":"request_invalid"}]}
     """

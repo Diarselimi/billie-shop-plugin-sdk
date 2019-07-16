@@ -225,7 +225,7 @@ class PaellaCoreContext extends MinkContext
             ->setPaymentId('1')
             ->setCreatedAt(new \DateTime('2019-05-20 13:00:00'))
             ->setCheckoutSessionId(1)
-            ->setUuid('test123');
+            ->setUuid('test-order-uuid');
 
         $this->iHaveASessionId("123123", 0);
 

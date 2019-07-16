@@ -11,18 +11,22 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * TODO: use uuid and change route to /order/{uuid}/invoice
  * @OA\Post(
- *     path="/merchant/{merchantId}/order/{id}/invoice",
+ *     path="/order/{uuid}/add-invoice",
  *     operationId="order_create_invoice",
  *     summary="Create Order Invoice",
- *     description="Creates a new invoice, linking an order with a file. Called automatically by the invoice uploader Lambda services.",
+ *     description="Creates a new invoice, linking an order with a file. Called automatically by the invoice uploader Lambda service.",
  *
  *     tags={"Order Management", "Automated"},
  *     x={"groups":{"support", "automated"}},
  *
- *     @OA\Parameter(in="path", name="id", @OA\Schema(type="integer"), required=true, description="Order ID"),
- *     @OA\Parameter(in="path", name="merchantId", @OA\Schema(type="integer"), required=true, description="Merchant ID"),
+ *     @OA\Parameter(
+ *          in="path",
+ *          name="uuid",
+ *          @OA\Schema(ref="#/components/schemas/UUID"),
+ *          description="Order UUID",
+ *          required=true
+ *     ),
  *
  *     @OA\RequestBody(
  *          required=true,
@@ -49,12 +53,11 @@ class CreateOrderInvoiceController
         $this->createOrderInvoiceUseCase = $createOrderInvoiceUseCase;
     }
 
-    public function execute(int $merchantId, string $id, Request $request): JsonResponse
+    public function execute(string $uuid, Request $request): JsonResponse
     {
         try {
             $useCaseRequest = new CreateOrderInvoiceRequest(
-                $id,
-                $merchantId,
+                $uuid,
                 $request->request->getInt('file_id'),
                 $request->request->get('invoice_number')
             );

@@ -28,7 +28,7 @@ class TriggerFailedOrderNotificationsUseCase
 
     public function execute(TriggerFailedOrderNotificationsRequest $request): void
     {
-        $order = $this->orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($request->getOrderId(), $request->getMerchantId());
+        $order = $this->orderRepository->getOneByUuid($request->getUuid());
 
         if (!$order) {
             throw new OrderNotFoundException();

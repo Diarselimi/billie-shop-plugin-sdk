@@ -251,26 +251,6 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
         return $result['max_overdue'] ?: 0;
     }
 
-    public function getWithInvoiceNumber(int $limit, int $lastId = 0): Generator
-    {
-        $stmt = $this->doExecute(
-            'SELECT id, external_code, merchant_id, invoice_number
-              FROM '.self::TABLE_NAME.'
-              WHERE invoice_number IS NOT NULL
-              AND id > :lastId
-              AND NOT EXISTS (SELECT * FROM order_invoices WHERE order_invoices.order_id = orders.id)
-              ORDER BY id ASC
-              LIMIT ' . $limit,
-            [
-                'lastId' => $lastId,
-            ]
-        );
-
-        while ($row = $stmt->fetch(PdoConnection::FETCH_ASSOC)) {
-            yield $row;
-        }
-    }
-
     public function debtorHasAtLeastOneFullyPaidOrder(int $debtorId): bool
     {
         $result = $this->doFetchOne(

@@ -6,24 +6,26 @@ use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\OrderWorkflowException;
 use App\Application\UseCase\ApproveOrder\ApproveOrderRequest;
 use App\Application\UseCase\ApproveOrder\ApproveOrderUseCase;
-use App\Http\HttpConstantsInterface;
 use OpenApi\Annotations as OA;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * TODO: use uuid and change route to /order/{uuid}/approve
  * @OA\Post(
- *     path="/order/{id}/approve",
+ *     path="/order/{uuid}/approve",
  *     operationId="order_approve",
  *     summary="Approve Order in Waiting State",
- *     security={{"oauth2"={}}},
  *
  *     tags={"Order Management"},
  *     x={"groups":{"support", "salesforce"}},
  *
- *     @OA\Parameter(in="path", name="id", @OA\Schema(type="integer"), required=true),
+ *     @OA\Parameter(
+ *          in="path",
+ *          name="uuid",
+ *          @OA\Schema(ref="#/components/schemas/UUID"),
+ *          description="Order UUID",
+ *          required=true
+ *     ),
  *
  *     @OA\Response(response=204, description="Order approved."),
  *     @OA\Response(response=404, ref="#/components/responses/NotFound"),
@@ -41,15 +43,10 @@ class ApproveOrderController
         $this->useCase = $useCase;
     }
 
-    public function execute(string $id, Request $request): void
+    public function execute(string $uuid): void
     {
         try {
-            $useCaseRequest = new ApproveOrderRequest(
-                $id,
-                $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID)
-            );
-
-            $this->useCase->execute($useCaseRequest);
+            $this->useCase->execute(new ApproveOrderRequest($uuid));
         } catch (OrderNotFoundException $e) {
             throw new NotFoundHttpException($e->getMessage());
         } catch (OrderWorkflowException $e) {

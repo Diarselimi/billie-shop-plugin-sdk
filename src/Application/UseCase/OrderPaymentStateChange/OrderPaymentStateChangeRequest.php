@@ -2,7 +2,7 @@
 
 namespace App\Application\UseCase\OrderPaymentStateChange;
 
-use App\DomainModel\Borscht\OrderPaymentDetailsDTO;
+use App\DomainModel\Payment\OrderPaymentDetailsDTO;
 
 class OrderPaymentStateChangeRequest
 {

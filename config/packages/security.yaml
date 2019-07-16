@@ -10,6 +10,14 @@ security:
             pattern: ^/healthcheck
             security: false
 
+        private_api:
+            pattern: ^/private/*
+            security: false
+
+        api_docs:
+            pattern: ^/(docs|internal-docs)(/.*)?
+            security: false
+
         merchant_user_login:
             pattern: ^/(public/)?merchant/user/login
             security: false
@@ -29,14 +37,6 @@ security:
             guard:
                 authenticators:
                     - App\Http\Authentication\Authenticator\CheckoutSessionAuthenticator
-
-        private_api: # TODO: move all internal or support endpoints under the /private/ API prefix
-            pattern: ^/(private/)?(merchant|merchant-debtor|debtor-company)(/.*)?
-            security: false
-
-        docs:
-            pattern: ^/(private/|public/)?(docs|internal-docs)(/.*)?
-            security: false
 
         default_security:
             anonymous: false

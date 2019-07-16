@@ -4,7 +4,7 @@ namespace App\Application\UseCase\OrderOutstandingAmountChange;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\OrderWorkflowException;
-use App\DomainModel\Borscht\OrderAmountChangeDTO;
+use App\DomainModel\Payment\OrderAmountChangeDTO;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsException;

@@ -19,27 +19,31 @@ Feature:
         """
         {
           "duration": 50,
-          "amount_gross": 1000,
-          "amount_net": 900,
-          "amount_tax": 100
+          "amount": {
+            "gross": 1000,
+            "net": 900,
+            "tax": 100
+          }
         }
         """
     Then the response status code should be 412
     And the JSON response should be:
     """
-    {"code":"order_duration_update_not_possible","error":"Update duration not possible"}
+    {"errors":[{"title":"Update duration not possible","code":"order_duration_update_not_possible"}]}
     """
 
   Scenario: Case 1.1: Order exists, not yet shipped, due date provided, valid new amount
     Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
     When I send a PATCH request to "/order/CO123" with body:
-        """
-        {
-          "amount_gross": 500,
-          "amount_net": 400,
-          "amount_tax": 100
-        }
-        """
+    """
+    {
+      "amount": {
+        "gross": 500,
+        "net": 400,
+        "tax": 100
+      }
+    }
+    """
     Then the response status code should be 204
     And the response should be empty
     And the order "CO123" duration is 30
@@ -48,13 +52,15 @@ Feature:
   Scenario: Case 2: Order exists, not yet shipped, due date unchanged/not set, valid new amount
     Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
     When I send a PATCH request to "/order/CO123" with body:
-        """
-        {
-          "amount_gross": 500,
-          "amount_net": 400,
-          "amount_tax": 100
-        }
-        """
+    """
+    {
+      "amount": {
+        "gross": 500,
+        "net": 400,
+        "tax": 100
+      }
+    }
+    """
     Then the response status code should be 204
     And the response should be empty
     And the order "CO123" duration is 30
@@ -69,9 +75,11 @@ Feature:
         """
         {
           "duration": 50,
-          "amount_gross": 1000,
-          "amount_net": 900,
-          "amount_tax": 100
+          "amount": {
+            "gross": 1000,
+            "net": 900,
+            "tax": 100
+          }
         }
         """
     Then the response status code should be 204
@@ -85,9 +93,11 @@ Feature:
         """
         {
           "duration": 121,
-          "amount_gross": 1000,
-          "amount_net": 900,
-          "amount_tax": 100
+          "amount": {
+            "gross": 500,
+            "net": 400,
+            "tax": 100
+          }
         }
         """
     Then the response status code should be 400
@@ -110,9 +120,11 @@ Feature:
         """
         {
           "duration": 30,
-          "amount_gross": 500,
-          "amount_net": 400,
-          "amount_tax": 100,
+          "amount": {
+            "gross": 500,
+            "net": 400,
+            "tax": 100
+          },
           "invoice_number": "DE12",
           "invoice_url": "http://google.de"
         }
@@ -129,15 +141,16 @@ Feature:
   Scenario: Case 5: Order exists, is shipped but not paid back, new duration invalid
     Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
     When I send a PATCH request to "/order/CO123" with body:
-        """
-        {
-          "duration": 20
-        }
-        """
-    Then the response status code should be 412
+    """
+    {
+        "duration": "THIS IS NOT A DURATION"
+    }
+    """
+    Then the response status code should be 400
+    And print last response
     And the JSON response should be:
     """
-    {"code":"order_validation_failed","error":"Invalid duration"}
+    {"errors":[{"source":"duration","title":"This value should be of type int.","code":"request_validation_error"},{"source":"duration","title":"This value should be a valid number.","code":"request_validation_error"}]}
     """
 
   Scenario: Case 6: Order exists, is shipped but not paid back, new amount invalid
@@ -145,15 +158,17 @@ Feature:
     When I send a PATCH request to "/order/CO123" with body:
         """
         {
-          "amount_gross": 2000,
-          "amount_net": 1800,
-          "amount_tax": 200
+          "amount": {
+            "gross": 2000,
+            "net": 1800,
+            "tax": 200
+          }
         }
         """
     Then the response status code should be 412
     And the JSON response should be:
     """
-    {"code":"order_validation_failed","error":"Invalid amount"}
+    {"errors":[{"title":"Invalid amount","code":"order_validation_failed"}]}
     """
 
   Scenario: Case 7: Order exists, is shipped but not paid back, valid new due date, valid new amount
@@ -162,12 +177,14 @@ Feature:
     When I send a PATCH request to "/order/CO123" with body:
         """
         {
-          "duration": 50,
-          "amount_net": 500,
-          "amount_gross": 500,
-          "amount_tax": 0,
-          "invoice_number": "DE12",
-          "invoice_url": "http://google.de"
+            "invoice_number": "UPDATED_CO123",
+            "invoice_url": "/invoice.pdf",
+            "duration": 50,
+            "amount": {
+                "net": 500,
+                "gross": 500,
+                "tax": 0
+            }
         }
         """
     Then the response status code should be 204
@@ -175,17 +192,19 @@ Feature:
     And the order "CO123" amountGross is 500
     And the order "CO123" amountNet is 500
     And the order "CO123" amountTax is 0
-    And the order "CO123" invoiceNumber is DE12
-    And the order "CO123" invoiceUrl is "http://google.de"
+    And the order "CO123" invoiceNumber is UPDATED_CO123
+    And the order "CO123" invoiceUrl is "/invoice.pdf"
 
   Scenario: Case 8: Order does not exist
     When I send a PATCH request to "/order/CO123XX" with body:
     """
     {
         "duration": 50,
-        "amount_net": 400,
-        "amount_gross": 500,
-        "amount_tax": 100
+        "amount": {
+            "net": 500,
+            "gross": 500,
+            "tax": 0
+        }
     }
     """
     Then the response status code should be 404
@@ -197,15 +216,17 @@ Feature:
         """
         {
           "duration": 30,
-          "amount_gross": 500,
-          "amount_net": 400,
-          "amount_tax": 100
+          "amount": {
+            "gross": 500,
+            "net": 400,
+            "tax": 100
+          }
         }
         """
     Then the response status code should be 403
     And the JSON response should be:
         """
-        {"error": "Order was marked as fraud"}
+        {"errors":[{"title":"Order was marked as fraud","code":"forbidden"}]}
         """
 
   Scenario: Case 10: Order exists, is shipped, valid new invoice number and url
@@ -234,7 +255,7 @@ Feature:
     Then the response status code should be 412
     And the JSON response should be:
     """
-    {"code":"order_invoice_update_not_possible","error":"Update invoice is not possible"}
+    {"errors":[{"title":"Update invoice is not possible","code":"order_invoice_update_not_possible"}]}
     """
 
   Scenario: Case 12: Order exists, not yet shipped, invalid amounts provided
@@ -242,9 +263,11 @@ Feature:
     When I send a PATCH request to "/order/CO123" with body:
         """
         {
-          "amount_gross": 500,
-          "amount_net": 45,
-          "amount_tax": 10
+          "amount": {
+            "gross": 500,
+            "net": 40,
+            "tax": 10
+          }
         }
         """
     Then the response status code should be 400
@@ -253,17 +276,7 @@ Feature:
       {
         "errors":[
           {
-             "source":"amount_gross",
-             "title":"Invalid amounts",
-             "code":"request_validation_error"
-          },
-          {
-             "source":"amount_net",
-             "title":"Invalid amounts",
-             "code":"request_validation_error"
-          },
-          {
-             "source":"amount_tax",
+             "source":"amount",
              "title":"Invalid amounts",
              "code":"request_validation_error"
           }

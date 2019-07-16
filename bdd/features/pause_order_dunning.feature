@@ -15,9 +15,7 @@ Feature: As a merchant, i should be able to request pause dunning of an order fo
 	Then the response status code should be 404
 	And the JSON response should be:
 	"""
-	  {
-		  "error": "Order not found"
-	  }
+    	{"errors":[{"title":"Order not found","code":"resource_not_found"}]}
 	"""
 
   Scenario: Invalid number of days provided
@@ -54,9 +52,7 @@ Feature: As a merchant, i should be able to request pause dunning of an order fo
 	Then the response status code should be 403
 	And the JSON response should be:
 	"""
-	  {
-		  "error": "maximum pausing attempts reached"
-	  }
+	  {"errors":[{"title":"maximum pausing attempts reached","code":"forbidden"}]}
 	"""
 
   Scenario: Failed to pause order - order is not in state late
@@ -71,9 +67,7 @@ Feature: As a merchant, i should be able to request pause dunning of an order fo
 	Then the response status code should be 403
 	And the JSON response should be:
 	"""
-	  {
-		  "error": "Cannot pause dunning. Order is not in state late"
-	  }
+	  {"errors":[{"title":"Cannot pause dunning. Order is not in state late","code":"forbidden"}]}
 	"""
 
   Scenario: Successfully pause order dunning

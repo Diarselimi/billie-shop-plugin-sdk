@@ -2,19 +2,26 @@
 
 namespace App\Application\UseCase\ConfirmOrderPayment;
 
-class ConfirmOrderPaymentRequest
+use App\Application\UseCase\ValidatedRequestInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+
+class ConfirmOrderPaymentRequest implements ValidatedRequestInterface
 {
     private $orderId;
 
     private $merchantId;
 
-    private $amount;
+    /**
+     * @Assert\GreaterThan(value=0)
+     * @Assert\NotBlank()
+     */
+    private $paidAmount;
 
-    public function __construct(string $orderId, int $merchantId, float $amount)
+    public function __construct(string $orderId, int $merchantId, $amount)
     {
         $this->orderId = $orderId;
         $this->merchantId = $merchantId;
-        $this->amount = $amount;
+        $this->paidAmount = $amount;
     }
 
     public function getOrderId(): string
@@ -29,6 +36,6 @@ class ConfirmOrderPaymentRequest
 
     public function getAmount(): float
     {
-        return $this->amount;
+        return $this->paidAmount;
     }
 }

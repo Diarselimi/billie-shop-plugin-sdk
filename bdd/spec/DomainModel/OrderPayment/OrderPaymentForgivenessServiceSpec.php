@@ -2,8 +2,8 @@
 
 namespace spec\App\DomainModel\OrderPayment;
 
-use App\DomainModel\Borscht\BorschtInterface;
-use App\DomainModel\Borscht\OrderAmountChangeDTO;
+use App\DomainModel\Payment\PaymentsServiceInterface;
+use App\DomainModel\Payment\OrderAmountChangeDTO;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
@@ -21,7 +21,7 @@ class OrderPaymentForgivenessServiceSpec extends ObjectBehavior
     }
 
     public function let(
-        BorschtInterface $paymentsService,
+        PaymentsServiceInterface $paymentsService,
         OrderRepositoryInterface $orderRepository,
         OrderContainer $orderContainer,
         OrderEntity $order,
@@ -39,7 +39,7 @@ class OrderPaymentForgivenessServiceSpec extends ObjectBehavior
     }
 
     public function it_should_trigger_merchant_payment_if_debtor_partially_paid_and_outstanding_is_less_than_forgiveness_threshold(
-        BorschtInterface $paymentsService,
+        PaymentsServiceInterface $paymentsService,
         OrderAmountChangeDTO $amountChange,
         OrderContainer $orderContainer,
         OrderEntity $order
@@ -56,7 +56,7 @@ class OrderPaymentForgivenessServiceSpec extends ObjectBehavior
     }
 
     public function it_should_store_amount_forgiven_if_successful(
-        BorschtInterface $paymentsService,
+        PaymentsServiceInterface $paymentsService,
         OrderRepositoryInterface $orderRepository,
         OrderAmountChangeDTO $amountChange,
         OrderContainer $orderContainer,
@@ -75,7 +75,7 @@ class OrderPaymentForgivenessServiceSpec extends ObjectBehavior
     }
 
     public function it_should_not_call_payments_if_amount_forgiven_is_greater_than_zero(
-        BorschtInterface $paymentsService,
+        PaymentsServiceInterface $paymentsService,
         OrderAmountChangeDTO $amountChange,
         OrderContainer $orderContainer,
         OrderEntity $order
@@ -92,7 +92,7 @@ class OrderPaymentForgivenessServiceSpec extends ObjectBehavior
     }
 
     public function it_should_trigger_merchant_payment_if_debtor_partially_paid_and_outstanding_equals_forgiveness_threshold(
-        BorschtInterface $paymentsService,
+        PaymentsServiceInterface $paymentsService,
         OrderAmountChangeDTO $amountChange,
         OrderContainer $orderContainer,
         OrderEntity $order
@@ -109,7 +109,7 @@ class OrderPaymentForgivenessServiceSpec extends ObjectBehavior
     }
 
     public function it_should_not_trigger_merchant_payment_if_forgiveness_threshold_is_zero(
-        BorschtInterface $paymentsService,
+        PaymentsServiceInterface $paymentsService,
         OrderAmountChangeDTO $amountChange,
         OrderContainer $orderContainer,
         OrderEntity $order,
@@ -128,7 +128,7 @@ class OrderPaymentForgivenessServiceSpec extends ObjectBehavior
     }
 
     public function it_should_not_trigger_merchant_payment_if_debtor_did_not_pay_anything_yet(
-        BorschtInterface $paymentsService,
+        PaymentsServiceInterface $paymentsService,
         OrderAmountChangeDTO $amountChange,
         OrderContainer $orderContainer,
         OrderEntity $order
@@ -145,7 +145,7 @@ class OrderPaymentForgivenessServiceSpec extends ObjectBehavior
     }
 
     public function it_should_not_trigger_merchant_payment_if_debtor_partially_paid_and_outstanding_is_over_forgiveness_threshold(
-        BorschtInterface $paymentsService,
+        PaymentsServiceInterface $paymentsService,
         OrderAmountChangeDTO $amountChange,
         OrderContainer $orderContainer,
         OrderEntity $order
@@ -162,7 +162,7 @@ class OrderPaymentForgivenessServiceSpec extends ObjectBehavior
     }
 
     public function it_should_not_trigger_merchant_payment_if_outstanding_amount_is_zero(
-        BorschtInterface $paymentsService,
+        PaymentsServiceInterface $paymentsService,
         OrderAmountChangeDTO $amountChange,
         OrderContainer $orderContainer,
         OrderEntity $order

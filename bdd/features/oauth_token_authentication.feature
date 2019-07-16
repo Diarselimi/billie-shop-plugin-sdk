@@ -7,30 +7,30 @@ Feature: As a merchant, i should be able to access all endpoints
 
   Scenario: Not providing Token
 	When I send a GET request to "/order/XF43Y"
-	Then the response status code should be 401
+	Then the response status code should be 403
 	And the JSON response should be:
 	"""
-	{"title":"Access denied","code":"access_denied"}
+    {"errors":[{"title":"Access denied","code":"forbidden"}]}
 	"""
 
   Scenario: Providing invalid token
 	Given I get from Oauth service invalid token response
 	When I add "Authorization" header equal to WrongToken
 	And I send a GET request to "/order/XF43Y"
-	Then the response status code should be 403
+	Then the response status code should be 401
 	And the JSON response should be:
 	"""
-	{"title":"Unauthorized","code":"unauthorized"}
+    {"errors":[{"title":"Unauthorized","code":"unauthorized"}]}
 	"""
 
   Scenario: Providing valid token of a not existing merchant user
 	Given I get from Oauth service a valid user token
 	When I add "Authorization" header equal to "Bearer someToken"
 	And I send a GET request to "/order/XF43Y"
-	Then the response status code should be 403
+	Then the response status code should be 401
 	And the JSON response should be:
 	"""
-	{"title":"Unauthorized","code":"unauthorized"}
+    {"errors":[{"title":"Unauthorized","code":"unauthorized"}]}
 	"""
 
   Scenario: Providing valid merchant user token

@@ -6,13 +6,10 @@ Feature: Enable merchant users to logout
 
   Scenario: Missing authorization header
 	When I send a POST request to "/merchant/user/logout"
-	Then the response status code should be 401
+	Then the response status code should be 403
 	And the JSON response should be:
 	"""
-	  {
-		"title": "Access denied",
-		"code": "access_denied"
-	  }
+	  {"errors":[{"title":"Access denied","code":"forbidden"}]}
 	"""
 
   Scenario: Successfully logout

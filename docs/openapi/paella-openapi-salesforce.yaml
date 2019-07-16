@@ -110,7 +110,7 @@ paths:
               schema:
                 type: string
                 default: 'paella is alive'
-  '/order/{id}/approve':
+  '/order/{uuid}/approve':
     post:
       tags:
         - 'Order Management'
@@ -119,11 +119,12 @@ paths:
       operationId: order_approve
       parameters:
         -
-          name: id
+          name: uuid
           in: path
+          description: 'Order UUID'
           required: true
           schema:
-            type: integer
+            $ref: '#/components/schemas/UUID'
       responses:
         '204':
           description: 'Order approved.'
@@ -135,10 +136,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-  '/order/{id}/decline':
+  '/order/{uuid}/decline':
     post:
       tags:
         - 'Order Management'
@@ -146,11 +144,12 @@ paths:
       operationId: order_decline
       parameters:
         -
-          name: id
+          name: uuid
           in: path
+          description: 'Order UUID'
           required: true
           schema:
-            type: integer
+            $ref: '#/components/schemas/UUID'
       responses:
         '204':
           description: 'Order declined.'
@@ -162,11 +161,6 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-        -
-          apiKey: []
   '/debtor-company/{uuid}/limits':
     get:
       tags:
@@ -196,6 +190,55 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /merchant-debtor/mark-duplicates:
+    post:
+      tags:
+        - Debtors
+      summary: 'Mark Merchant Debtor Duplicates'
+      operationId: mark_duplicate_debtors
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                duplicates:
+                  type: array
+                  items: { $ref: '#/components/schemas/MarkDuplicateDebtorItem' }
+                  nullable: false
+              type: object
+      responses:
+        '204':
+          description: 'Merchant debtor is marked as duplicate'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  '/order/{uuid}/mark-as-fraud':
+    post:
+      tags:
+        - 'Order Management'
+      summary: 'Mark Order As Fraud'
+      operationId: mark_order_as_fraud
+      parameters:
+        -
+          name: uuid
+          in: path
+          description: 'Order UUID'
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '204':
+          description: 'Order Marked As Fraud'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/ServerError'
   '/merchant-debtor/{debtorUuid}/update-limit':
@@ -236,6 +279,37 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
+  '/merchant-debtor/{debtorUuid}/whitelist':
+    post:
+      tags:
+        - Debtors
+      summary: 'Whitelist Merchant Debtor'
+      operationId: whitelist_merchant_debtor
+      parameters:
+        -
+          name: debtorUuid
+          in: path
+          description: 'Merchant-Debtor UUID'
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                is_whitelisted:
+                  type: boolean
+                  nullable: false
+              type: object
+      responses:
+        '204':
+          description: 'Merchant debtor is whitelisted'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
 components:
   schemas:
     UUID:
@@ -244,51 +318,6 @@ components:
       maxLength: 36
       minLength: 36
       example: 12345667-890a-bcde-f123-34567890abcd
-    AbstractErrorObject:
-      title: Error
-      type: object
-      oneOf:
-        -
-          $ref: '#/components/schemas/ErrorsObject'
-    ErrorsObject:
-      title: 'Multiple Errors'
-      properties:
-        errors:
-          type: array
-          items:
-            required:
-              - title
-              - code
-            properties:
-              title:
-                description: 'Error message'
-                type: string
-              code:
-                description: 'Error code'
-                type: string
-            type: object
-      type: object
-    ValidationErrorsObject:
-      title: 'Multiple Validation Errors'
-      properties:
-        errors:
-          type: array
-          items:
-            required:
-              - title
-              - code
-            properties:
-              source:
-                description: 'Property path where the error occurred.'
-                type: string
-              title:
-                description: 'Error message'
-                type: string
-              code:
-                description: 'Error code'
-                type: string
-            type: object
-      type: object
     GetDebtorCompanyLimitsResponse:
       title: 'Get Debtor Company Limits Response'
       properties:
@@ -321,37 +350,70 @@ components:
                 format: float
             type: object
       type: object
+    MarkDuplicateDebtorItem:
+      required:
+        - debtor_id
+        - is_duplicate_of
+      properties:
+        debtor_id:
+          type: integer
+        is_duplicate_of:
+          type: integer
+      type: object
+    ErrorsObject:
+      title: 'API Errors'
+      properties:
+        errors:
+          type: array
+          items:
+            required:
+              - title
+              - code
+            properties:
+              title:
+                description: 'Error message'
+                type: string
+              code:
+                description: 'Error code'
+                type: string
+                nullable: true
+              source:
+                description: 'Property path where the error occurred, if applicable'
+                type: string
+                nullable: true
+            type: object
+      type: object
   responses:
     ServerError:
       description: 'Unexpected Server Error'
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/AbstractErrorObject'
+            $ref: '#/components/schemas/ErrorsObject'
     NotFound:
       description: 'Resource Not Found'
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/AbstractErrorObject'
+            $ref: '#/components/schemas/ErrorsObject'
     Unauthorized:
       description: 'Unauthorized request or invalid credentials'
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/AbstractErrorObject'
+            $ref: '#/components/schemas/ErrorsObject'
     Forbidden:
       description: 'Forbidden Request. The operation cannot be completed.'
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/AbstractErrorObject'
+            $ref: '#/components/schemas/ErrorsObject'
     BadRequest:
       description: 'Invalid Request Data'
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ValidationErrorsObject'
+            $ref: '#/components/schemas/ErrorsObject'
   securitySchemes:
     oauth2:
       type: oauth2

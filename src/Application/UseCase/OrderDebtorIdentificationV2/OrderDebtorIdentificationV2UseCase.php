@@ -4,12 +4,12 @@ namespace App\Application\UseCase\OrderDebtorIdentificationV2;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
+use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
 use App\DomainModel\DebtorCompany\IdentifyDebtorRequestDTO;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\OrderIdentification\OrderIdentificationEntity;
 use App\DomainModel\OrderIdentification\OrderIdentificationRepositoryInterface;
-use App\Infrastructure\Alfred\AlfredRequestException;
 
 class OrderDebtorIdentificationV2UseCase
 {
@@ -67,7 +67,7 @@ class OrderDebtorIdentificationV2UseCase
                     ->setV2CompanyId($identifiedDebtor ? $identifiedDebtor->getId() : null)
                     ->setV2StrictMatch($identifiedDebtor ? $identifiedDebtor->isStrictMatch() : null)
             );
-        } catch (AlfredRequestException $e) {
+        } catch (CompaniesServiceRequestException $e) {
             $this->orderIdentificationRepository->insert(
                 (new OrderIdentificationEntity())
                     ->setOrderId($request->getOrderId())

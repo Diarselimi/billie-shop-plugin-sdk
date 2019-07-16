@@ -3,14 +3,13 @@
 namespace spec\App\Application\UseCase\UpdateMerchantDebtorCompany;
 
 use App\Application\Exception\MerchantDebtorNotFoundException;
-use App\Application\UseCase\UpdateMerchantDebtorCompany\MerchantDebtorUpdateFailedException;
 use App\Application\UseCase\UpdateMerchantDebtorCompany\UpdateMerchantDebtorCompanyRequest;
 use App\Application\UseCase\UpdateMerchantDebtorCompany\UpdateMerchantDebtorCompanyUseCase;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
+use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
-use App\Infrastructure\Alfred\AlfredRequestException;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
@@ -77,9 +76,9 @@ class UpdateMerchantDebtorCompanyUseCaseSpec extends ObjectBehavior
             'address_street' => 'Street1',
             'address_city' => 'City1',
             'address_postal_code' => 'PostalCode1',
-        ])->shouldBeCalledOnce()->willThrow(AlfredRequestException::class);
+        ])->shouldBeCalledOnce()->willThrow(CompaniesServiceRequestException::class);
 
-        $this->shouldThrow(MerchantDebtorUpdateFailedException::class)->during('execute', [$request]);
+        $this->shouldThrow(CompaniesServiceRequestException::class)->during('execute', [$request]);
     }
 
     public function it_updates_the_company_data(

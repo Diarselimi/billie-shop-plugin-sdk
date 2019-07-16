@@ -4,16 +4,16 @@ namespace spec\App\Application\UseCase\GetMerchantDebtor;
 
 use App\Application\Exception\MerchantDebtorNotFoundException;
 use App\Application\UseCase\GetMerchantDebtor\GetMerchantDebtorRequest;
-use App\Application\UseCase\GetMerchantDebtor\GetMerchantDebtorUseCase;
-use App\DomainModel\Borscht\BorschtInterface;
-use App\DomainModel\Borscht\DebtorPaymentDetailsDTO;
+use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
+use App\DomainModel\MerchantDebtorResponse\MerchantDebtorContainer;
+use App\Application\UseCase\GetMerchantDebtor\GetMerchantDebtorUseCase;
+use App\DomainModel\Payment\DebtorPaymentDetailsDTO;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorFinancialDetailsEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
-use App\DomainModel\MerchantDebtorResponse\MerchantDebtorContainer;
 use App\DomainModel\Order\OrderStateManager;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -36,7 +36,7 @@ class GetMerchantDebtorUseCaseSpec extends ObjectBehavior
 
     public function let(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
-        BorschtInterface $paymentService,
+        PaymentsServiceInterface $paymentService,
         CompaniesServiceInterface $companiesService,
         MerchantDebtorFinancialDetailsRepositoryInterface $financialDetailsRepository,
         ValidatorInterface $validator
@@ -85,7 +85,7 @@ class GetMerchantDebtorUseCaseSpec extends ObjectBehavior
         MerchantDebtorFinancialDetailsEntity $financialDetails,
         CompaniesServiceInterface $companiesService,
         DebtorCompany $debtorCompany,
-        BorschtInterface $paymentService,
+        PaymentsServiceInterface $paymentService,
         DebtorPaymentDetailsDTO $paymentDetails
     ) {
         $this->mockMerchantDebtor($merchantDebtor);

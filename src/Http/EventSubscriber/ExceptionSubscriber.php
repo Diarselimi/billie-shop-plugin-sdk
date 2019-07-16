@@ -2,97 +2,52 @@
 
 namespace App\Http\EventSubscriber;
 
-use App\Application\Exception\RequestValidationException;
-use App\Application\PaellaCoreCriticalException;
+use App\Http\ApiError\ApiErrorResponse;
+use App\Http\ApiError\ApiErrorResponseFactory;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
-use GuzzleHttp\Exception\RequestException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
-use Symfony\Component\Validator\ConstraintViolationInterface;
 
 class ExceptionSubscriber implements EventSubscriberInterface, LoggingInterface
 {
     use LoggingTrait;
 
-    private $camelCaseToSnakeCaseNameConverter;
+    private $errorResponseFactory;
 
-    public function __construct(CamelCaseToSnakeCaseNameConverter $camelCaseToSnakeCaseNameConverter)
+    public function __construct(ApiErrorResponseFactory $errorResponseFactory)
     {
-        $this->camelCaseToSnakeCaseNameConverter = $camelCaseToSnakeCaseNameConverter;
+        $this->errorResponseFactory = $errorResponseFactory;
     }
 
     public static function getSubscribedEvents()
     {
         return [
-            KernelEvents::EXCEPTION => 'onKernelException',
+            KernelEvents::EXCEPTION => [
+                ['onException', -1],
+            ],
         ];
     }
 
-    public function onKernelException(GetResponseForExceptionEvent $event)
+    public function onException(GetResponseForExceptionEvent $event)
     {
         $exception = $event->getException();
-        $previousException = $exception->getPrevious();
 
-        if ($exception instanceof HttpException) {
-            $event->setResponse(new JsonResponse(['error' => $exception->getMessage()], $exception->getStatusCode()));
+        $response = $this->errorResponseFactory->createFromException($exception);
+        $event->setResponse($response);
 
+        if ($response->getStatusCode() < ApiErrorResponse::HTTP_INTERNAL_SERVER_ERROR) {
             return;
         }
 
-        if ($exception instanceof RequestValidationException) {
-            /** @var ConstraintViolationInterface $validationError */
-            foreach ($exception->getValidationErrors() as $validationError) {
-                $errors[] = [
-                    'source' => $this->camelCaseToSnakeCaseNameConverter->normalize($validationError->getPropertyPath()),
-                    'title' => $validationError->getMessage(),
-                    'code' => $exception->getMessage(),
-                ];
-            }
-
-            $event->setResponse(new JsonResponse(['errors' => $errors], Response::HTTP_BAD_REQUEST));
-
-            return;
+        $this->logError('Critical Exception', $response->getErrors());
+        if ($exception->getPrevious()) {
+            $prevResponse = $this->errorResponseFactory->createFromException($exception->getPrevious());
+            $this->logError(
+                'Critical Exception (previous)',
+                $prevResponse->getErrors()
+            );
         }
-
-        $responseCode = $exception instanceof PaellaCoreCriticalException && $exception->getResponseCode()
-            ? $exception->getResponseCode()
-            : JsonResponse::HTTP_INTERNAL_SERVER_ERROR
-        ;
-
-        $errorCode = $exception instanceof PaellaCoreCriticalException
-            ? $exception->getErrorCode()
-            : $exception->getCode();
-
-        $error = [
-            'code' => $errorCode,
-            'error' => $exception->getMessage(),
-        ];
-
-        if (!($exception instanceof PaellaCoreCriticalException)) {
-            $error['stack_trace'] = $exception->getTraceAsString();
-        }
-
-        if ($previousException instanceof RequestException && $previousException->getResponse()) {
-            $remoteError = json_decode($previousException->getResponse()->getBody()->__toString(), true);
-            if (is_array($remoteError)) {
-                if (isset($remoteError['stack_trace'])) {
-                    unset($remoteError['stack_trace']);
-                }
-                if (isset($remoteError['stack'])) {
-                    unset($remoteError['stack']);
-                }
-                $error['remote_error'] = $remoteError;
-                $error['remote_error']['status_code'] = $previousException->getResponse()->getStatusCode();
-            }
-        }
-
-        $this->logError('Critical exception', $error);
-        $event->setResponse(new JsonResponse($error, $responseCode));
     }
 }

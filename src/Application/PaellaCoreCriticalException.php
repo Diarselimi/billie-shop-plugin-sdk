@@ -7,13 +7,9 @@ namespace App\Application;
  * @package App\Application
  * @deprecated
  */
-class PaellaCoreCriticalException extends \RuntimeException
+final class PaellaCoreCriticalException extends \RuntimeException
 {
     const CODE_NOT_FOUND = 'not_found';
-
-    const CODE_ALFRED_EXCEPTION = 'alfred_exception';
-
-    const CODE_BORSCHT_EXCEPTION = 'borscht_exception';
 
     const CODE_REQUEST_DECODE_EXCEPTION = 'request_decode_failed';
 

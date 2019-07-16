@@ -20,9 +20,7 @@ Feature:
         Then the response status code should be 404
         And the JSON response should be:
         """
-        {
-            "error": "Order not found"
-        }
+        {"errors":[{"title":"Order not found","code":"resource_not_found"}]}
         """
 
     Scenario: Successful order shipment
@@ -44,7 +42,7 @@ Feature:
         And the JSON response should be:
         """
         {
-          "external_code": "CO123",
+          "order_id": "CO123",
           "uuid": "test123",
           "state": "shipped",
           "reasons": null,
@@ -53,18 +51,18 @@ Feature:
           "amount_tax": 100.00,
           "debtor_company": {
             "name": "Test User Company",
-            "house_number": "10",
-            "street": "Heinrich-Heine-Platz",
-            "postal_code": "10179",
-            "city": "Berlin",
-            "country": "DE"
+            "address_house_number": "10",
+            "address_street": "Heinrich-Heine-Platz",
+            "address_postal_code": "10179",
+            "address_city": "Berlin",
+            "address_country": "DE"
           },
           "bank_account": {
             "iban": "DE1234",
             "bic": "BICISHERE"
           },
           "invoice": {
-            "number": "CO123",
+            "invoice_number": "CO123",
             "payout_amount": 1000,
             "outstanding_amount": 1000,
             "fee_amount": 10,
@@ -98,7 +96,7 @@ Feature:
         Given I have a created order with amounts 1000/900/100, duration 30 and comment "test order"
         And I get from payments service create ticket response
         And I get from companies service get debtor response
-        When I send a POST request to "/order/test123/ship" with body:
+        When I send a POST request to "/order/test-order-uuid/ship" with body:
         """
         {
             "invoice_number": "test",
@@ -106,6 +104,7 @@ Feature:
             "shipping_document_url": "http://example.com/proove/is/here"
         }
         """
+        Then the response status code should be 400
         And the JSON response should be:
         """
         {
@@ -118,7 +117,6 @@ Feature:
             ]
         }
         """
-        Then the response status code should be 400
 
     Scenario: Order shipped if external code is provided
         Given I have a created order with amounts 1000/900/100, duration 30 and comment "test order"
@@ -127,7 +125,7 @@ Feature:
         And I get from payments service get debtor response
         And I get from payments service get order details response
         And I get from companies service get debtor response
-        When I send a POST request to "/order/test123/ship" with body:
+        When I send a POST request to "/order/test-order-uuid/ship" with body:
         """
         {
             "invoice_number": "test",
@@ -136,12 +134,12 @@ Feature:
             "external_order_id": "DD123"
         }
         """
-        And the order "DD123" is in state shipped
         Then the response status code should be 200
+        And the order "DD123" is in state shipped
         And the JSON response should be:
         """
         {
-          "external_code": "DD123",
+          "order_id": "DD123",
           "uuid": "test123",
           "state": "shipped",
           "reasons": null,
@@ -150,18 +148,18 @@ Feature:
           "amount_tax": 100.00,
           "debtor_company": {
             "name": "Test User Company",
-            "house_number": "10",
-            "street": "Heinrich-Heine-Platz",
-            "postal_code": "10179",
-            "city": "Berlin",
-            "country": "DE"
+            "address_house_number": "10",
+            "address_street": "Heinrich-Heine-Platz",
+            "address_postal_code": "10179",
+            "address_city": "Berlin",
+            "address_country": "DE"
           },
           "bank_account": {
             "iban": "DE1234",
             "bic": "BICISHERE"
           },
           "invoice": {
-            "number": "test",
+            "invoice_number": "test",
             "payout_amount": 1000,
             "outstanding_amount": 1000,
             "fee_amount": 10,

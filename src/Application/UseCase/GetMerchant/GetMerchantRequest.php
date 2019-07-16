@@ -4,15 +4,15 @@ namespace App\Application\UseCase\GetMerchant;
 
 class GetMerchantRequest
 {
-    private $apiKey;
+    private $id;
 
-    public function __construct(string $apiKey)
+    public function __construct(int $id)
     {
-        $this->apiKey = $apiKey;
+        $this->id = $id;
     }
 
-    public function getApiKey(): string
+    public function getId(): int
     {
-        return $this->apiKey;
+        return $this->id;
     }
 }

@@ -14,6 +14,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 /**
  * @OA\Post(
@@ -33,7 +35,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  *     @OA\Response(response=201, description="Merchant successfully created", @OA\JsonContent(ref="#/components/schemas/CreateMerchantResponse")),
  *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),
  *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
- *     @OA\Response(response=409, @OA\JsonContent(ref="#/components/schemas/AbstractErrorObject"), description="Request conflicts with the current state of the server."),
+ *     @OA\Response(response=409, @OA\JsonContent(ref="#/components/schemas/ErrorsObject"), description="Request conflicts with the current state of the server."),
  *     @OA\Response(response=500, ref="#/components/responses/ServerError")
  * )
  */
@@ -63,9 +65,9 @@ class CreateMerchantController
         } catch (DuplicateMerchantCompanyException $e) {
             throw new ConflictHttpException($e->getMessage());
         } catch (MerchantCompanyNotFoundException $e) {
-            throw new BadRequestHttpException($e->getMessage());
+            throw new NotFoundHttpException($e->getMessage());
         } catch (CreateMerchantException $e) {
-            throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
+            throw new ServiceUnavailableHttpException(null, $e->getMessage());
         }
     }
 }

@@ -23,24 +23,13 @@ class OrderInvoiceManager implements LoggingInterface
     public function upload(OrderEntity $order, string $event): void
     {
         foreach ($this->uploadHandlers as $name => $handler) {
-            if ($handler->supports(
-                $order->getExternalCode(),
-                $order->getMerchantId(),
-                $order->getInvoiceNumber(),
-                $order->getInvoiceUrl()
-            )) {
+            if ($handler->supports($order->getMerchantId())) {
                 $this->logInfo('Handling invoice {invoice_number} using {handler} handler', [
                     'invoice_number' => $order->getInvoiceNumber(),
                     'handler' => $name,
                 ]);
 
-                $handler->handleInvoice(
-                    $order->getExternalCode(),
-                    $order->getMerchantId(),
-                    $order->getInvoiceNumber(),
-                    $order->getInvoiceUrl(),
-                    $event
-                );
+                $handler->handleInvoice($order, $event);
 
                 return;
             }

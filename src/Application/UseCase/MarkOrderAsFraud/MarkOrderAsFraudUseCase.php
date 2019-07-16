@@ -5,7 +5,7 @@ namespace App\Application\UseCase\MarkOrderAsFraud;
 use App\Application\Exception\FraudOrderException;
 use App\Application\Exception\OrderNotFoundException;
 use App\DomainModel\Address\AddressEntity;
-use App\DomainModel\Borscht\BorschtInterface;
+use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
@@ -28,7 +28,7 @@ class MarkOrderAsFraudUseCase
         OrderRepositoryInterface $orderRepository,
         OrderStateManager $orderStateManager,
         OrderContainerFactory $orderContainerFactory,
-        BorschtInterface $paymentsService
+        PaymentsServiceInterface $paymentsService
     ) {
         $this->orderRepository = $orderRepository;
         $this->orderStateManager = $orderStateManager;
