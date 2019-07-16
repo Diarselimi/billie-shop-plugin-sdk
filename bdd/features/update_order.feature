@@ -16,7 +16,7 @@ Feature:
   Scenario: Case 1: Order exists, not yet shipped, due date provided, amount unchanged
     Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
     When I send a PATCH request to "/order/CO123" with body:
-        """
+    """
         {
           "duration": 50,
           "amount": {
@@ -25,12 +25,13 @@ Feature:
             "tax": 100
           }
         }
-        """
+    """
     Then the response status code should be 412
     And the JSON response should be:
     """
     {"errors":[{"title":"Update duration not possible","code":"order_duration_update_not_possible"}]}
     """
+    And merchant debtor has financing power 1000
 
   Scenario: Case 1.1: Order exists, not yet shipped, due date provided, valid new amount
     Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
@@ -48,6 +49,7 @@ Feature:
     And the response should be empty
     And the order "CO123" duration is 30
     And the order "CO123" amountGross is 500
+    And merchant debtor has financing power 1500
 
   Scenario: Case 2: Order exists, not yet shipped, due date unchanged/not set, valid new amount
     Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
@@ -67,6 +69,7 @@ Feature:
     And the order "CO123" amountGross is 500
     And the order "CO123" amountNet is 400
     And the order "CO123" amountTax is 100
+    And merchant debtor has financing power 1500
 
   Scenario: Case 3: Order exists, is shipped but not paid back, valid new due date*, amount unchanged
     Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
@@ -86,6 +89,7 @@ Feature:
     And the response should be empty
     And the order "CO123" duration is 50
     And the order "CO123" amountGross is 1000
+    And merchant debtor has financing power 1000
 
   Scenario: Case 3.1: Order exists, is shipped but not paid back, valid new due date*, amount unchanged
     Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
@@ -113,6 +117,7 @@ Feature:
        ]
       }
     """
+    And merchant debtor has financing power 1000
 
   Scenario: Case 4: Order exists, is shipped but not paid back, due date unchanged, new valid amount
     Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
@@ -137,6 +142,7 @@ Feature:
     And the order "CO123" amountTax is 100
     And the order "CO123" invoiceNumber is DE12
     And the order "CO123" invoiceUrl is "http://google.de"
+    And merchant debtor has financing power 1000
 
   Scenario: Case 5: Order exists, is shipped but not paid back, new duration invalid
     Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
@@ -152,6 +158,7 @@ Feature:
     """
     {"errors":[{"source":"duration","title":"This value should be of type int.","code":"request_validation_error"},{"source":"duration","title":"This value should be a valid number.","code":"request_validation_error"}]}
     """
+    And merchant debtor has financing power 1000
 
   Scenario: Case 6: Order exists, is shipped but not paid back, new amount invalid
     Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
@@ -170,6 +177,7 @@ Feature:
     """
     {"errors":[{"title":"Invalid amount","code":"order_validation_failed"}]}
     """
+    And merchant debtor has financing power 1000
 
   Scenario: Case 7: Order exists, is shipped but not paid back, valid new due date, valid new amount
     Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
@@ -194,6 +202,7 @@ Feature:
     And the order "CO123" amountTax is 0
     And the order "CO123" invoiceNumber is UPDATED_CO123
     And the order "CO123" invoiceUrl is "/invoice.pdf"
+    And merchant debtor has financing power 1000
 
   Scenario: Case 8: Order does not exist
     When I send a PATCH request to "/order/CO123XX" with body:
@@ -213,7 +222,7 @@ Feature:
     Given I have a created order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
     And The order "CO123" was already marked as fraud
     When I send a PATCH request to "/order/CO123" with body:
-        """
+    """
         {
           "duration": 30,
           "amount": {
@@ -222,7 +231,7 @@ Feature:
             "tax": 100
           }
         }
-        """
+    """
     Then the response status code should be 403
     And the JSON response should be:
         """
@@ -242,6 +251,7 @@ Feature:
     And the response should be empty
     And the order "CO123" invoiceNumber is "newInvoiceNumber"
     And the order "CO123" invoiceUrl is "/newInvoice.pdf"
+    And merchant debtor has financing power 1000
 
   Scenario: Case 11: Order exists, not yet shipped, valid new invoice number and url
     Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
@@ -257,6 +267,7 @@ Feature:
     """
     {"errors":[{"title":"Update invoice is not possible","code":"order_invoice_update_not_possible"}]}
     """
+    And merchant debtor has financing power 1000
 
   Scenario: Case 12: Order exists, not yet shipped, invalid amounts provided
     Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
@@ -283,3 +294,4 @@ Feature:
         ]
       }
       """
+    And merchant debtor has financing power 1000

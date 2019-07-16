@@ -246,6 +246,7 @@ Feature:
     }
     """
     And the order "A1" has the same hash "testusercompanyva2223333somenumbersomelegalberlin10179heinrichheineplatz10de"
+    And merchant debtor has financing power 9000
 
   Scenario: Successful order creation without house
     Given I get from companies service identify match and good decision response
@@ -353,6 +354,7 @@ Feature:
     }
     """
     And the order "A1" has the same hash "testusercompanyva2223333somenumbersomelegalberlin10179heinrichheineplatzde"
+    And merchant debtor has financing power 9000
 
     Scenario: Successful order creation with a not german postal code in shipping
     Given I get from companies service identify match and good decision response
@@ -461,6 +463,7 @@ Feature:
     }
     """
     And the response status code should be 200
+    And merchant debtor has financing power 9000
 
 
   Scenario: Successful order creation without delivery_address.house_number
@@ -568,6 +571,7 @@ Feature:
     }
     """
     And the order "A123" has the same hash "testusercompanyva2223333somenumbersomelegalberlin10179heinrichheineplatz10de"
+    And merchant debtor has financing power 9956.7
 
 
   Scenario: Successful order creation using lowercase country
@@ -675,6 +679,7 @@ Feature:
        }
     }
     """
+    And merchant debtor has financing power 9000
 
   Scenario: Debtor is not eligible for Point Of Sale
     Given I get from companies service identify match and bad decision response
@@ -778,6 +783,7 @@ Feature:
        }
     }
     """
+    And merchant debtor has financing power 10000
 
   Scenario: Missing required fields
     When I send a POST request to "/order" with body:
@@ -1038,6 +1044,7 @@ Feature:
       """
     Then the response status code should be 200
     And the order A1 is in state created
+    And merchant debtor has financing power 9000
 
   Scenario: Order exceeds the merchant available financing limit
     Given I get from companies service identify match response
@@ -1145,6 +1152,7 @@ Feature:
     """
     Then the order A3 is in state created
     And the response status code should be 200
+    And merchant debtor has financing power 0
 
   Scenario: Order stays in state new if debtor limit lock was unsuccessful
     Given I get from companies service identify match and good decision response
@@ -1200,6 +1208,7 @@ Feature:
     """
     Then the response status code should be 500
     And the order A3 is in state new
+    And merchant debtor has financing power 10000
 
   Scenario: Successful order creation without providing external code
     Given I get from companies service identify match and good decision response
@@ -1253,6 +1262,7 @@ Feature:
     }
     """
     Then the response status code should be 200
+    And merchant debtor has financing power 9000
 
   Scenario: Invalid order amounts, gross != net + tax
     When I send a POST request to "/order" with body:

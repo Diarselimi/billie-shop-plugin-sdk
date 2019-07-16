@@ -91,6 +91,7 @@ Feature:
     Then the order A1 is in state pre_approved
     And the response status code should be 200
     And the response should contain "pre_approved"
+    And merchant debtor has financing power 10000
 
   Scenario: Successfully create an order in pre-approved state without house
     Given I get from companies service identify match and good decision response
@@ -146,6 +147,7 @@ Feature:
     Then the order A1 is in state pre_approved
     And the response status code should be 200
     And the response should contain "pre_approved"
+    And merchant debtor has financing power 10000
 
   Scenario: Debtor identification failed
     Given I get from companies service identify match and bad decision response
@@ -201,9 +203,10 @@ Feature:
     Then the order A1 is in state declined
     And the response status code should be 200
     And the response should contain "declined"
+    And merchant debtor has financing power 10000
 
   Scenario: Order success confirmation when the order exists
-    Given I have a pre_approved order "CO123" with amounts 43.30/55.2/10.10, duration 30 and comment "test order"
+    Given I have a pre_approved order "CO123" with amounts 55.2/43.30/10.10, duration 30 and comment "test order"
     And I get from companies service identify match and good decision response
     And I get from companies service get debtor response
     And I send a POST request to "/order/test-order-uuid/confirm" with body:
@@ -211,9 +214,10 @@ Feature:
     """
     Then the response status code should be 200
     And the order CO123 is in state created
+    And merchant debtor has financing power 944.8
 
   Scenario: Order success confirmation when the order does not exists
-    Given I have a pre_approved order "CO123" with amounts 43.30/55.2/10.10, duration 30 and comment "test order"
+    Given I have a pre_approved order "CO123" with amounts 55.2/43.30/10.10, duration 30 and comment "test order"
     And I get from companies service identify match and good decision response
     And I send a POST request to "/order/not_existent_uuid/confirm" with body:
     """
@@ -223,9 +227,10 @@ Feature:
     """
     {"errors":[{"title":"Order not found","code":"resource_not_found"}]}
     """
+    And merchant debtor has financing power 1000
 
   Scenario: Order success confirmation when the order exists in another state than pre_confirmed
-    Given I have a created order "CO123" with amounts 43.30/55.2/10.10, duration 30 and comment "test order"
+    Given I have a created order "CO123" with amounts 55.2/43.30/10.10, duration 30 and comment "test order"
     And I get from companies service identify match and good decision response
     And I send a POST request to "/order/test-order-uuid/confirm" with body:
     """
@@ -235,3 +240,4 @@ Feature:
     """
     {"errors":[{"title":"The order is not in pre approved state to be confirmed","code":"request_invalid"}]}
     """
+    And merchant debtor has financing power 1000

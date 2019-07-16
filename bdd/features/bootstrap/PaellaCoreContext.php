@@ -569,6 +569,17 @@ class PaellaCoreContext extends MinkContext
         Assert::eq($user->getUserId(), $userId);
     }
 
+    /**
+     * @Given merchant debtor has financing power :power
+     */
+    public function merchantDebtorHasFinancingPower(string $power)
+    {
+        $merchantDebtor = $this->getMerchantDebtorFinancialDetailsRepository()->getCurrentByMerchantDebtorId(1);
+
+        Assert::notNull($merchantDebtor);
+        Assert::eq($merchantDebtor->getFinancingPower(), $power);
+    }
+
     private function getDebtorExternalDataRepository(): DebtorExternalDataRepositoryInterface
     {
         return $this->get(DebtorExternalDataRepositoryInterface::class);
