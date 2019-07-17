@@ -85,6 +85,19 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         return $this->factory->createFromAlfredResponse($this->decodeResponse($response));
     }
 
+    public function synchronizeDebtor(int $debtorId): DebtorCompany
+    {
+        try {
+            $response = $this->client->post(
+                "/debtor/$debtorId/synchronize"
+            );
+        } catch (TransferException $exception) {
+            throw new CompaniesServiceRequestException($exception);
+        }
+
+        return $this->factory->createFromAlfredResponse($this->decodeResponse($response));
+    }
+
     public function identifyDebtor(IdentifyDebtorRequestDTO $requestDTO): ?DebtorCompany
     {
         try {

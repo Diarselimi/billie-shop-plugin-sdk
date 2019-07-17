@@ -904,6 +904,33 @@ paths:
           $ref: '#/components/responses/ServerError'
       x-groups:
         - support
+  '/merchant-debtor/{merchantDebtorUuid}/synchronize':
+    post:
+      tags:
+        - Merchants
+      summary: 'Synchronize merchant_debtor address.'
+      operationId: synchronize_merchant_debtor
+      parameters:
+        -
+          name: Uuid
+          in: path
+          description: 'Mechant Debtor UUID'
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: 'Debtor synchronized successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantDebtorSynchronizationResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      x-groups:
+        - support
   '/order/{uuid}/trigger-failed-notifications':
     post:
       tags:
@@ -2397,6 +2424,35 @@ components:
       allOf:
         -
           $ref: '#/components/schemas/AbstractMerchantDebtorResponse'
+    MerchantDebtorSynchronizationResponse:
+      title: 'Merchant Debtor Synchronization'
+      properties:
+        debtor_company:
+          description: 'Updated debtor company data'
+          properties:
+            name:
+              type: string
+              example: 'Some company'
+            address_house_number:
+              type: string
+              example: '123'
+            address_street:
+              type: string
+              example: 'Random street'
+            address_postal_code:
+              type: string
+              example: '10356'
+            address_city:
+              type: string
+              example: Berlin
+            address_country:
+              type: string
+              example: Germany
+          type: object
+        is_updated:
+          type: boolean
+          example: 'true'
+      type: object
     OrderResponse:
       title: 'Order Entity'
       properties:

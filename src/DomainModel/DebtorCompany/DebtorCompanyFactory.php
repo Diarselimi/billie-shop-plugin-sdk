@@ -21,6 +21,7 @@ class DebtorCompanyFactory
             ->setIsTrustedSource(boolval($data['is_from_trusted_source']))
             ->setIsStrictMatch($isStrictMatch)
             ->setFinancingPower(floatval($data['financing_power']))
+            ->setIsSynchronized(boolval($data['is_synchronized'] ?? null))
         ;
     }
 }
