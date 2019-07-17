@@ -32,6 +32,8 @@ class DebtorCompany
 
     private $financingPower;
 
+    private $isSynchronized;
+
     public function getId(): int
     {
         return $this->id;
@@ -196,6 +198,18 @@ class DebtorCompany
     public function setFinancingPower(float $financingPower): DebtorCompany
     {
         $this->financingPower = $financingPower;
+
+        return $this;
+    }
+
+    public function isSynchronized(): ?bool
+    {
+        return $this->isSynchronized;
+    }
+
+    public function setIsSynchronized(?bool $isSynchronized): DebtorCompany
+    {
+        $this->isSynchronized = $isSynchronized;
 
         return $this;
     }

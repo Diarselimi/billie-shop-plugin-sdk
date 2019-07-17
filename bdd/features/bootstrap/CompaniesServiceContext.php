@@ -125,4 +125,14 @@ class CompaniesServiceContext implements Context
             new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_match_untrusted_source.json'))
         ));
     }
+
+    /**
+     * @Given /^I get from companies service synchronize merchant debtor good response and synchronized$/
+     */
+    public function iGetFromCompaniesServiceSynchronizedGoodResponseAndSynchronized()
+    {
+        $this->mockRequest('/debtor/1/synchronize', new ResponseStack(
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match_trusted_source_is_synchronized.json'))
+        ));
+    }
 }

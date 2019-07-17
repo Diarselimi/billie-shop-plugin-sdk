@@ -137,4 +137,11 @@ class MerchantDebtorResponseFactory
     ): float {
         return min($merchantDbtorfinancialDetails->getFinancingPower(), $debtorCompany->getFinancingPower());
     }
+
+    public function createFromDebtorCompany(DebtorCompany $debtorCompany): MerchantDebtorSynchronizationResponse
+    {
+        return (new MerchantDebtorSynchronizationResponse())
+            ->setDebtorCompany($debtorCompany)
+            ->setIsUpdated($debtorCompany->isSynchronized() ?? false);
+    }
 }
