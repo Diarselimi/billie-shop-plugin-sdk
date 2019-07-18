@@ -2,58 +2,78 @@
 
 namespace App\DomainModel\MerchantDebtorResponse;
 
+use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Payment\DebtorPaymentDetailsDTO;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorFinancialDetailsEntity;
 
-class MerchantDebtorContainer extends BaseMerchantDebtorContainer
+class MerchantDebtorContainer
 {
-    /**
-     * @var string
-     */
-    private $merchantExternalId;
+    private $merchantDebtor;
 
-    /**
-     * @var DebtorPaymentDetailsDTO
-     */
+    private $merchant;
+
+    private $debtorCompany;
+
+    private $financialDetails;
+
     private $paymentDetails;
 
-    /**
-     * @var float
-     */
+    private $externalId;
+
     private $totalCreatedOrdersAmount;
 
-    /**
-     * @var float
-     */
     private $totalLateOrdersAmount;
 
     public function __construct(
-        string $merchantExternalId,
         MerchantDebtorEntity $merchantDebtor,
-        DebtorCompany $company,
-        DebtorPaymentDetailsDTO $paymentDetails,
+        MerchantEntity $merchant,
+        DebtorCompany $debtorCompany,
         MerchantDebtorFinancialDetailsEntity $financialDetails,
+        DebtorPaymentDetailsDTO $paymentDetails,
+        string $externalId,
         float $totalCreatedOrdersAmount,
         float $totalLateOrdersAmount
     ) {
-        $this->merchantExternalId = $merchantExternalId;
+        $this->merchantDebtor = $merchantDebtor;
+        $this->merchant = $merchant;
+        $this->debtorCompany = $debtorCompany;
+        $this->financialDetails = $financialDetails;
         $this->paymentDetails = $paymentDetails;
+        $this->externalId = $externalId;
         $this->totalCreatedOrdersAmount = $totalCreatedOrdersAmount;
         $this->totalLateOrdersAmount = $totalLateOrdersAmount;
-
-        parent::__construct($merchantDebtor, $company, $financialDetails);
     }
 
-    public function getMerchantExternalId(): string
+    public function getMerchantDebtor(): MerchantDebtorEntity
     {
-        return $this->merchantExternalId;
+        return $this->merchantDebtor;
+    }
+
+    public function getMerchant(): MerchantEntity
+    {
+        return $this->merchant;
+    }
+
+    public function getDebtorCompany(): DebtorCompany
+    {
+        return $this->debtorCompany;
+    }
+
+    public function getFinancialDetails(): MerchantDebtorFinancialDetailsEntity
+    {
+        return $this->financialDetails;
     }
 
     public function getPaymentDetails(): DebtorPaymentDetailsDTO
     {
         return $this->paymentDetails;
+    }
+
+    public function getExternalId(): string
+    {
+        return $this->externalId;
     }
 
     public function getTotalCreatedOrdersAmount(): float

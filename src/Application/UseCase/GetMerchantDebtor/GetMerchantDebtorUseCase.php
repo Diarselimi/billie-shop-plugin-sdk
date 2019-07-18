@@ -5,12 +5,9 @@ namespace App\Application\UseCase\GetMerchantDebtor;
 use App\Application\Exception\MerchantDebtorNotFoundException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
-use App\DomainModel\Payment\PaymentsServiceInterface;
-use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
-use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
+use App\DomainModel\MerchantDebtorResponse\MerchantDebtorContainerFactory;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\MerchantDebtorResponse\MerchantDebtorContainer;
-use App\DomainModel\Order\OrderStateManager;
 
 class GetMerchantDebtorUseCase implements ValidatedUseCaseInterface
 {
@@ -18,28 +15,16 @@ class GetMerchantDebtorUseCase implements ValidatedUseCaseInterface
 
     private $merchantDebtorRepository;
 
-    private $paymentService;
-
-    private $companiesService;
-
-    private $financialDetailsRepository;
+    private $merchantDebtorContainerFactory;
 
     public function __construct(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
-        PaymentsServiceInterface $paymentService,
-        CompaniesServiceInterface $companiesService,
-        MerchantDebtorFinancialDetailsRepositoryInterface $financialDetailsRepository
+        MerchantDebtorContainerFactory $merchantDebtorContainerFactory
     ) {
         $this->merchantDebtorRepository = $merchantDebtorRepository;
-        $this->paymentService = $paymentService;
-        $this->companiesService = $companiesService;
-        $this->financialDetailsRepository = $financialDetailsRepository;
+        $this->merchantDebtorContainerFactory = $merchantDebtorContainerFactory;
     }
 
-    /**
-     * @param  GetMerchantDebtorRequest $request
-     * @return MerchantDebtorContainer
-     */
     public function execute(GetMerchantDebtorRequest $request): MerchantDebtorContainer
     {
         $this->validateRequest($request);
@@ -56,26 +41,6 @@ class GetMerchantDebtorUseCase implements ValidatedUseCaseInterface
             throw new MerchantDebtorNotFoundException();
         }
 
-        $externalId = $this->merchantDebtorRepository->findExternalId($merchantDebtor->getId());
-
-        $financingDetails = $this->financialDetailsRepository->getCurrentByMerchantDebtorId($merchantDebtor->getId());
-        $company = $this->companiesService->getDebtor($merchantDebtor->getDebtorId());
-        $paymentsDetails = $this->paymentService->getDebtorPaymentDetails($merchantDebtor->getPaymentDebtorId());
-
-        $createdOutstandingAmount = $this->merchantDebtorRepository
-            ->getMerchantDebtorOrdersAmountByState($merchantDebtor->getId(), OrderStateManager::STATE_CREATED);
-
-        $lateOutstandingAmount = $this->merchantDebtorRepository
-            ->getMerchantDebtorOrdersAmountByState($merchantDebtor->getId(), OrderStateManager::STATE_LATE);
-
-        return new MerchantDebtorContainer(
-            $externalId,
-            $merchantDebtor,
-            $company,
-            $paymentsDetails,
-            $financingDetails,
-            $createdOutstandingAmount,
-            $lateOutstandingAmount
-        );
+        return $this->merchantDebtorContainerFactory->create($merchantDebtor);
     }
 }

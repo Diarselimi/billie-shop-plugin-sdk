@@ -718,6 +718,11 @@ components:
       maxLength: 2
       pattern: '^(\+|\d|\()[ \-\/0-9()]{5,20}$'
       example: '030 31199251'
+    Date:
+      title: Date
+      type: string
+      format: date
+      example: '2019-01-20'
     DateTime:
       title: Date-Time
       type: string
@@ -732,6 +737,7 @@ components:
       type: string
       format: url
       maxLength: 255
+      example: 'https://example.com'
     OauthGrantType:
       title: 'OAuth Grant Type'
       type: string

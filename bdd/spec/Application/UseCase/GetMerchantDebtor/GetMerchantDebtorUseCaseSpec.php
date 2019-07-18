@@ -4,17 +4,11 @@ namespace spec\App\Application\UseCase\GetMerchantDebtor;
 
 use App\Application\Exception\MerchantDebtorNotFoundException;
 use App\Application\UseCase\GetMerchantDebtor\GetMerchantDebtorRequest;
-use App\DomainModel\Payment\PaymentsServiceInterface;
-use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
+use App\DomainModel\MerchantDebtorResponse\MerchantDebtorContainerFactory;
 use App\DomainModel\MerchantDebtorResponse\MerchantDebtorContainer;
 use App\Application\UseCase\GetMerchantDebtor\GetMerchantDebtorUseCase;
-use App\DomainModel\Payment\DebtorPaymentDetailsDTO;
-use App\DomainModel\DebtorCompany\DebtorCompany;
-use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
-use App\DomainModel\MerchantDebtor\MerchantDebtorFinancialDetailsEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
-use App\DomainModel\Order\OrderStateManager;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -30,18 +24,15 @@ class GetMerchantDebtorUseCaseSpec extends ObjectBehavior
 
     private const MERCHANT_DEBTOR_PAYMENT_ID = 'uuid123';
 
-    private const MERCHANT_DEBTOR_EXTERNAL_ID = 'TE56DD';
-
     private const MERCHANT_DEBTOR_UUID = 'wawawaaaahwaaahahaharrrgggh';
 
     public function let(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
-        PaymentsServiceInterface $paymentService,
-        CompaniesServiceInterface $companiesService,
-        MerchantDebtorFinancialDetailsRepositoryInterface $financialDetailsRepository,
+        MerchantDebtorContainerFactory $merchantDebtorContainerFactory,
         ValidatorInterface $validator
     ) {
-        $this->beConstructedWith($merchantDebtorRepository, $paymentService, $companiesService, $financialDetailsRepository);
+        $this->beConstructedWith($merchantDebtorRepository, $merchantDebtorContainerFactory);
+
         $validator->validate(Argument::any(), Argument::any(), Argument::any())->willReturn(new ConstraintViolationList());
         $this->setValidator($validator);
     }
@@ -79,14 +70,10 @@ class GetMerchantDebtorUseCaseSpec extends ObjectBehavior
 
     public function it_returns_the_merchant_debtor_when_found_by_uuid(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
+        MerchantDebtorContainerFactory $merchantDebtorContainerFactory,
         GetMerchantDebtorRequest $request,
         MerchantDebtorEntity $merchantDebtor,
-        MerchantDebtorFinancialDetailsRepositoryInterface $financialDetailsRepository,
-        MerchantDebtorFinancialDetailsEntity $financialDetails,
-        CompaniesServiceInterface $companiesService,
-        DebtorCompany $debtorCompany,
-        PaymentsServiceInterface $paymentService,
-        DebtorPaymentDetailsDTO $paymentDetails
+        MerchantDebtorContainer $merchantDebtorContainer
     ) {
         $this->mockMerchantDebtor($merchantDebtor);
 
@@ -96,27 +83,13 @@ class GetMerchantDebtorUseCaseSpec extends ObjectBehavior
         $merchantDebtorRepository->getOneByUuidAndMerchantId(self::MERCHANT_DEBTOR_UUID, self::MERCHANT_ID)
             ->shouldBeCalledOnce()->willReturn($merchantDebtor);
 
-        $merchantDebtorRepository->findExternalId(self::MERCHANT_DEBTOR_ID)
-            ->shouldBeCalledOnce()->willReturn(self::MERCHANT_DEBTOR_EXTERNAL_ID);
+        $merchantDebtorContainerFactory
+            ->create($merchantDebtor)
+            ->shouldBeCalled()
+            ->willReturn($merchantDebtorContainer)
+        ;
 
-        $financialDetailsRepository->getCurrentByMerchantDebtorId(self::MERCHANT_DEBTOR_ID)
-            ->shouldBeCalledOnce()->willReturn($financialDetails);
-
-        $companiesService->getDebtor(self::DEBTOR_ID)
-            ->shouldBeCalledOnce()->willReturn($debtorCompany);
-
-        $paymentService->getDebtorPaymentDetails(self::MERCHANT_DEBTOR_PAYMENT_ID)
-            ->shouldBeCalledOnce()->willReturn($paymentDetails);
-
-        $merchantDebtorRepository
-            ->getMerchantDebtorOrdersAmountByState(self::MERCHANT_DEBTOR_ID, OrderStateManager::STATE_CREATED)
-            ->shouldBeCalledOnce()->willReturn(123.456);
-
-        $merchantDebtorRepository
-            ->getMerchantDebtorOrdersAmountByState(self::MERCHANT_DEBTOR_ID, OrderStateManager::STATE_LATE)
-            ->shouldBeCalledOnce()->willReturn(7.89);
-
-        $this->execute($request)->shouldBeAnInstanceOf(MerchantDebtorContainer::class);
+        $this->execute($request)->shouldBe($merchantDebtorContainer);
     }
 
     private function mockMerchantDebtor(MerchantDebtorEntity $merchantDebtor): void
