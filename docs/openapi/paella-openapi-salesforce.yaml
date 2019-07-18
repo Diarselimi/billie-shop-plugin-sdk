@@ -318,36 +318,57 @@ components:
       maxLength: 36
       minLength: 36
       example: 12345667-890a-bcde-f123-34567890abcd
+    Money:
+      title: Money
+      type: number
+      format: float
+      pattern: '^(\d{1,}(.\d{2})?)$'
+      example: 7500
+    GetDebtorCompanyLimitsMerchant:
+      title: 'Debtor''s Merchant IDs Object'
+      properties:
+        id:
+          type: integer
+        payment_uuid:
+          $ref: '#/components/schemas/UUID'
+      type: object
     GetDebtorCompanyLimitsResponse:
-      title: 'Get Debtor Company Limits Response'
+      title: 'Debtor Company Limits Object'
       properties:
         company_id:
           type: integer
         company_uuid:
           $ref: '#/components/schemas/UUID'
-        financing_power:
+        company_financing_power:
           description: 'Current available limit for this company in Platform.'
-          type: number
-          format: float
+          example: 10000
+          allOf:
+            -
+              $ref: '#/components/schemas/Money'
         merchant_debtors:
           description: 'List of debtors created in Paella for this company.'
           type: array
           items:
             properties:
-              merchant_id:
+              id:
+                description: 'Merchant Debtor ID'
                 type: integer
-              merchant_debtor_id:
-                type: integer
-              merchant_debtor_uuid:
+              uuid:
+                description: 'Merchant Debtor UUID'
                 $ref: '#/components/schemas/UUID'
               financing_limit:
                 description: 'Full limit assigned in Paella to this debtor and merchant combination.'
-                type: number
-                format: float
+                example: 2500
+                allOf:
+                  - { $ref: '#/components/schemas/Money' }
               financing_power:
                 description: 'Current available limit in Paella for this debtor and merchant combination.'
-                type: number
-                format: float
+                example: 2251.01
+                allOf:
+                  - { $ref: '#/components/schemas/Money' }
+              merchant:
+                description: 'The merchant the merchant-debtor belongs to.'
+                $ref: '#/components/schemas/GetDebtorCompanyLimitsMerchant'
             type: object
       type: object
     MarkDuplicateDebtorItem:

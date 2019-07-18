@@ -6,6 +6,7 @@ use App\Application\Exception\MerchantDebtorNotFoundException;
 use App\Application\UseCase\GetDebtorCompanyLimits\GetDebtorCompanyLimitsRequest;
 use App\Application\UseCase\GetDebtorCompanyLimits\GetDebtorCompanyLimitsResponse;
 use App\Application\UseCase\GetDebtorCompanyLimits\GetDebtorCompanyLimitsUseCase;
+use App\DomainModel\Merchant\MerchantNotFoundException;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -53,7 +54,7 @@ class GetDebtorCompanyLimitsController
             $useCaseRequest = new GetDebtorCompanyLimitsRequest($uuid);
 
             return $this->useCase->execute($useCaseRequest);
-        } catch (MerchantDebtorNotFoundException $e) {
+        } catch (MerchantDebtorNotFoundException | MerchantNotFoundException $e) {
             throw new NotFoundHttpException($e->getMessage());
         }
     }

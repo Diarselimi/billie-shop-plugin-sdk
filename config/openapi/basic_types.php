@@ -109,6 +109,16 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Schema(
+ *     schema="Date",
+ *     title="Date",
+ *     type="string",
+ *     format="date",
+ *     example="2019-01-20"
+ * )
+ */
+
+/**
+ * @OA\Schema(
  *     schema="DateTime",
  *     title="Date-Time",
  *     type="string",
@@ -132,6 +142,37 @@ use OpenApi\Annotations as OA;
  *     title="URL",
  *     type="string",
  *     format="url",
- *     maxLength=255
+ *     maxLength=255,
+ *     example="https://example.com"
+ * )
+ */
+
+/**
+ * @OA\Schema(
+ *     schema="Email",
+ *     title="Email",
+ *     type="string",
+ *     format="email",
+ *     example="foo@bar.com"
+ * )
+ */
+
+/**
+ * @OA\Schema(
+ *     schema="Password",
+ *     title="Password",
+ *     type="string",
+ *     format="password"
+ * )
+ */
+
+/**
+ * @OA\Schema(
+ *     schema="Money",
+ *     title="Money",
+ *     type="number",
+ *     format="float",
+ *     pattern="^(\d{1,}(.\d{2})?)$",
+ *     example=7500.00
  * )
  */

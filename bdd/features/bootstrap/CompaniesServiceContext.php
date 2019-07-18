@@ -60,8 +60,10 @@ class CompaniesServiceContext implements Context
     public function iGetFromCompaniesServiceGetDebtorResponse()
     {
         $this->mockRequest('/debtor/1', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_match_trusted_source.json'))
+            new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_match_trusted_source.json')),
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match_trusted_source.json'))
         ));
+
         $this->mockRequest('/debtor/' . PaellaCoreContext::DEBTOR_COMPANY_UUID, new ResponseStack(
             new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match_trusted_source.json'))
         ));

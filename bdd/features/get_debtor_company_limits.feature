@@ -20,11 +20,14 @@ Feature:
       "company_financing_power": 1000,
       "merchant_debtors": [
         {
-          "merchant_id": "1",
-          "merchant_debtor_id": 1,
-          "merchant_debtor_uuid": "ad74bbc4-509e-47d5-9b50-a0320ce3d715",
+          "id": 1,
+          "uuid": "ad74bbc4-509e-47d5-9b50-a0320ce3d715",
           "financing_limit": 2000,
-          "financing_power": 1000
+          "financing_power": 1000,
+          "merchant": {
+            "id": 1,
+            "payment_uuid": "f2ec4d5e-79f4-40d6-b411-31174b6519ac"
+          }
         }
       ]
     }

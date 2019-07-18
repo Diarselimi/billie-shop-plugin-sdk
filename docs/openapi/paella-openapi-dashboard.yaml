@@ -672,6 +672,11 @@ components:
       maximum: 120
       minimum: 1
       example: 30
+    Date:
+      title: Date
+      type: string
+      format: date
+      example: '2019-01-20'
     DateTime:
       title: Date-Time
       type: string

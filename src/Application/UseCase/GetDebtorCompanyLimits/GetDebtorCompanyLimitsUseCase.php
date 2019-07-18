@@ -6,9 +6,9 @@ use App\Application\Exception\MerchantDebtorNotFoundException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
-use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
+use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
-use App\DomainModel\MerchantDebtorResponse\BaseMerchantDebtorContainer;
+use App\DomainModel\MerchantDebtorResponse\MerchantDebtorContainerFactory;
 
 class GetDebtorCompanyLimitsUseCase implements ValidatedUseCaseInterface
 {
@@ -18,19 +18,16 @@ class GetDebtorCompanyLimitsUseCase implements ValidatedUseCaseInterface
 
     private $merchantDebtorRepository;
 
-    /**
-     * @var MerchantDebtorFinancialDetailsRepositoryInterface
-     */
-    private $financialDetailsRepository;
+    private $merchantDebtorContainerFactory;
 
     public function __construct(
         CompaniesServiceInterface $companiesService,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
-        MerchantDebtorFinancialDetailsRepositoryInterface $financialDetailsRepository
+        MerchantDebtorContainerFactory $merchantDebtorContainerFactory
     ) {
         $this->companiesService = $companiesService;
         $this->merchantDebtorRepository = $merchantDebtorRepository;
-        $this->financialDetailsRepository = $financialDetailsRepository;
+        $this->merchantDebtorContainerFactory = $merchantDebtorContainerFactory;
     }
 
     public function execute(GetDebtorCompanyLimitsRequest $request): GetDebtorCompanyLimitsResponse
@@ -44,12 +41,10 @@ class GetDebtorCompanyLimitsUseCase implements ValidatedUseCaseInterface
         }
 
         $merchantDebtors = $this->merchantDebtorRepository->getManyByDebtorCompanyId($company->getId());
-        $merchantDebtorContainers = [];
 
-        foreach ($merchantDebtors as $merchantDebtor) {
-            $limits = $this->financialDetailsRepository->getCurrentByMerchantDebtorId($merchantDebtor->getId());
-            $merchantDebtorContainers[] = new BaseMerchantDebtorContainer($merchantDebtor, $company, $limits);
-        }
+        $merchantDebtorContainers = array_map(function (MerchantDebtorEntity $merchantDebtor) {
+            return $this->merchantDebtorContainerFactory->create($merchantDebtor);
+        }, $merchantDebtors);
 
         return new GetDebtorCompanyLimitsResponse($company, ...$merchantDebtorContainers);
     }

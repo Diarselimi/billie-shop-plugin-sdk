@@ -5,9 +5,7 @@ namespace App\Application\UseCase\GetMerchantDebtors;
 use App\Application\Exception\MerchantDebtorNotFoundException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
-use App\DomainModel\Payment\PaymentsServiceInterface;
-use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
-use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
+use App\DomainModel\MerchantDebtorResponse\MerchantDebtorContainerFactory;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\MerchantDebtorResponse\MerchantDebtorList;
 use App\DomainModel\MerchantDebtorResponse\MerchantDebtorListItem;
@@ -19,26 +17,19 @@ class GetMerchantDebtorsUseCase implements ValidatedUseCaseInterface
 
     private $merchantDebtorRepository;
 
-    private $companiesService;
-
-    private $financialDetailsRepository;
+    private $merchantDebtorContainerFactory;
 
     private $responseFactory;
 
-    private $paymentService;
-
     public function __construct(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
-        CompaniesServiceInterface $companiesService,
-        MerchantDebtorFinancialDetailsRepositoryInterface $financialDetailsRepository,
-        MerchantDebtorResponseFactory $responseFactory,
-        PaymentsServiceInterface $paymentService
+        MerchantDebtorContainerFactory $merchantDebtorContainerFactory,
+        MerchantDebtorResponseFactory $responseFactory
     ) {
         $this->merchantDebtorRepository = $merchantDebtorRepository;
+        $this->merchantDebtorContainerFactory = $merchantDebtorContainerFactory;
+
         $this->responseFactory = $responseFactory;
-        $this->companiesService = $companiesService;
-        $this->financialDetailsRepository = $financialDetailsRepository;
-        $this->paymentService = $paymentService;
     }
 
     public function execute(GetMerchantDebtorsRequest $request): MerchantDebtorList
@@ -55,13 +46,13 @@ class GetMerchantDebtorsUseCase implements ValidatedUseCaseInterface
         );
 
         $merchantDebtors = array_map(function (array $row) use ($request) {
-            return $this->createListItem($row['id'], $row['external_id'], $row['debtor_id']);
+            return $this->createListItem($row['id']);
         }, $result['rows']);
 
         return $this->responseFactory->createList($result['total'], $merchantDebtors);
     }
 
-    private function createListItem(int $id, string $externalId, int $companyId): MerchantDebtorListItem
+    private function createListItem(int $id): MerchantDebtorListItem
     {
         $merchantDebtor = $this->merchantDebtorRepository->getOneById($id);
 
@@ -69,10 +60,8 @@ class GetMerchantDebtorsUseCase implements ValidatedUseCaseInterface
             throw new MerchantDebtorNotFoundException();
         }
 
-        $financingDetails = $this->financialDetailsRepository->getCurrentByMerchantDebtorId($id);
-        $company = $this->companiesService->getDebtor($companyId);
-        $paymentsDetails = $this->paymentService->getDebtorPaymentDetails($merchantDebtor->getPaymentDebtorId());
+        $container = $this->merchantDebtorContainerFactory->create($merchantDebtor);
 
-        return $this->responseFactory->createListItem($externalId, $merchantDebtor, $company, $financingDetails, $paymentsDetails);
+        return $this->responseFactory->createListItemFromContainer($container);
     }
 }
