@@ -103,8 +103,8 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
             || $request->getAmount()->getTax() !== null && (float) $request->getAmount()->getTax() !== $orderFinancialDetails->getAmountTax();
 
         $invoiceChanged = (
-            $request->getInvoiceNumber() !== null && $request->getInvoiceNumber() !== $order->getInvoiceNumber()
-            || $request->getInvoiceUrl() !== null && $request->getInvoiceUrl() !== $order->getInvoiceUrl()
+            $request->getInvoiceNumber() && $request->getInvoiceNumber() !== $order->getInvoiceNumber()
+            || $request->getInvoiceUrl() && $request->getInvoiceUrl() !== $order->getInvoiceUrl()
         );
 
         $this->logInfo('Start order update, state {state}, duration changed: {duration}, amount changed: {amount}', [
