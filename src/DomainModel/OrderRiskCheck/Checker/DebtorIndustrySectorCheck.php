@@ -13,8 +13,11 @@ class DebtorIndustrySectorCheck implements CheckInterface
     public function check(OrderContainer $orderContainer): CheckResult
     {
         $industrySector = $orderContainer->getDebtorExternalData()->getIndustrySector();
-        $result = !in_array($industrySector, self::BLACKLISTED_INDUSTRY_SECTORS, true);
 
-        return new CheckResult($result, self::NAME);
+        if (!$industrySector) {
+            return new CheckResult(true, self::NAME);
+        }
+
+        return new CheckResult(!in_array($industrySector, self::BLACKLISTED_INDUSTRY_SECTORS, true), self::NAME);
     }
 }

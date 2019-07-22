@@ -48,7 +48,7 @@ use OpenApi\Annotations as OA;
  *          @OA\Property(property="address_postal_code", type="string", maxLength=5, example="10969"),
  *          @OA\Property(property="address_street", ref="#/components/schemas/TinyText", example="Charlotten Straße"),
  *          @OA\Property(property="address_house", ref="#/components/schemas/TinyText", example="4"),
- *          @OA\Property(property="industry_sector", ref="#/components/schemas/TinyText"),
+ *          @OA\Property(property="industry_sector", ref="#/components/schemas/TinyText", nullable=true),
  *      }),
  *
  *      @OA\Property(property="delivery_address", type="object", properties={
@@ -345,12 +345,12 @@ class OrderResponse implements ArrayableInterface
         return $this;
     }
 
-    public function getDebtorExternalDataIndustrySector(): string
+    public function getDebtorExternalDataIndustrySector(): ? string
     {
         return $this->debtorExternalDataIndustrySector;
     }
 
-    public function setDebtorExternalDataIndustrySector(string $debtorExternalDataIndustrySector): OrderResponse
+    public function setDebtorExternalDataIndustrySector(?string $debtorExternalDataIndustrySector): OrderResponse
     {
         $this->debtorExternalDataIndustrySector = $debtorExternalDataIndustrySector;
 

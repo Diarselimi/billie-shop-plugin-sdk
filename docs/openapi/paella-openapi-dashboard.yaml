@@ -1002,6 +1002,7 @@ components:
               example: '4'
               $ref: '#/components/schemas/TinyText'
             industry_sector:
+              nullable: true
               $ref: '#/components/schemas/TinyText'
           type: object
         delivery_address:
