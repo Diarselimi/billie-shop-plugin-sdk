@@ -4,5 +4,7 @@ namespace App\DomainModel\FileService;
 
 interface FileServiceInterface
 {
-    public function upload(string $contents, string $filename): FileServiceResponseDTO;
+    public const TYPE_ORDER_INVOICE = 'order_invoice';
+
+    public function upload(string $contents, string $filename, string $type): FileServiceResponseDTO;
 }

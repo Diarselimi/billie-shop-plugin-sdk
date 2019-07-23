@@ -24,7 +24,7 @@ class Nachos implements FileServiceInterface
         $this->factory = $factory;
     }
 
-    public function upload(string $contents, string $filename): FileServiceResponseDTO
+    public function upload(string $contents, string $filename, string $type): FileServiceResponseDTO
     {
         try {
             $response = $this->client->post('/files', [
@@ -32,6 +32,7 @@ class Nachos implements FileServiceInterface
                     'name' => 'file',
                     'contents' => $contents,
                     'filename' => $filename,
+                    'type' => $type,
                 ]],
             ]);
         } catch (TransferException $exception) {

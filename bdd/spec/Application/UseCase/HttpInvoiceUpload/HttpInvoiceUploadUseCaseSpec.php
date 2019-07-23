@@ -27,8 +27,6 @@ class HttpInvoiceUploadUseCaseSpec extends ObjectBehavior
 
     private const MERCHANT_ID = 60;
 
-    private const EVENT = 'best_event';
-
     private const INVOICE = 'invoice_contents';
 
     private const FILE_ID = 888;
@@ -106,7 +104,7 @@ class HttpInvoiceUploadUseCaseSpec extends ObjectBehavior
 
         $invoiceUploadClient->head(self::INVOICE_URL)->shouldBeCalledOnce()->willReturn($headResponse);
         $invoiceUploadClient->get(self::INVOICE_URL)->shouldBeCalledOnce()->willReturn($getResponse);
-        $fileService->upload(self::INVOICE, self::INVOICE_URL)->shouldBeCalledOnce()->willThrow(new FileServiceRequestException());
+        $fileService->upload(self::INVOICE, self::INVOICE_URL, 'order_invoice')->shouldBeCalledOnce()->willThrow(new FileServiceRequestException());
 
         $this->shouldThrow(new HttpInvoiceUploadException('Exception wile uploading invoice to file service'))->during('execute', [$request]);
     }
@@ -138,7 +136,7 @@ class HttpInvoiceUploadUseCaseSpec extends ObjectBehavior
         $invoiceUploadClient->head(self::INVOICE_URL)->shouldBeCalledOnce()->willReturn($headResponse);
         $invoiceUploadClient->get(self::INVOICE_URL)->shouldBeCalledOnce()->willReturn($getResponse);
 
-        $fileService->upload(self::INVOICE, self::INVOICE_URL)->shouldBeCalledOnce()->willReturn($file);
+        $fileService->upload(self::INVOICE, self::INVOICE_URL, 'order_invoice')->shouldBeCalledOnce()->willReturn($file);
 
         $orderRepository->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID)->willReturn($order);
         $orderInvoiceFactory->create(self::ORDER_ID, self::FILE_ID, self::INVOICE_NUMBER)->shouldBeCalledOnce()->willReturn($orderInvoice);

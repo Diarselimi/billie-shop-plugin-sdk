@@ -61,7 +61,7 @@ class HttpInvoiceUploadUseCase implements LoggingInterface
         }
 
         try {
-            $file = $this->fileService->upload((string) $response->getBody(), $fileUrl);
+            $file = $this->fileService->upload((string) $response->getBody(), $fileUrl, FileServiceInterface::TYPE_ORDER_INVOICE);
         } catch (FileServiceRequestException | ClientResponseDecodeException $exception) {
             throw new HttpInvoiceUploadException('Exception wile uploading invoice to file service', null, $exception);
         }
