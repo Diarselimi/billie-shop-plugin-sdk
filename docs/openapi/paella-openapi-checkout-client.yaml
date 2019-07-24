@@ -177,7 +177,6 @@ components:
         - address_city
         - address_postal_code
         - address_country
-        - industry_sector
       properties:
         merchant_customer_id:
           example: DE123456

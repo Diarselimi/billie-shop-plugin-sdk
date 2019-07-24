@@ -51,8 +51,7 @@ class CreateOrderController
 
     public function execute(Request $request): JsonResponse
     {
-        $useCaseRequest = $this->orderRequestFactory
-            ->createForCreateOrder($request);
+        $useCaseRequest = $this->orderRequestFactory->createForCreateOrder($request);
 
         return new JsonResponse(
             $this->createOrderUseCase->execute($useCaseRequest)->toArray(),

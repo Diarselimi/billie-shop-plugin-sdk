@@ -96,12 +96,12 @@ class DebtorExternalDataEntity extends AbstractTimestampableEntity
         return $this;
     }
 
-    public function getIndustrySector(): string
+    public function getIndustrySector(): ? string
     {
         return $this->industrySector;
     }
 
-    public function setIndustrySector(string $industrySector): DebtorExternalDataEntity
+    public function setIndustrySector(?string $industrySector): DebtorExternalDataEntity
     {
         $this->industrySector = $industrySector;
 

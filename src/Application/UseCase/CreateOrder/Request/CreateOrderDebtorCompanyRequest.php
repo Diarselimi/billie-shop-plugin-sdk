@@ -11,7 +11,7 @@ use OpenApi\Annotations as OA;
  *     title="Debtor Company",
  *     required={
  *          "merchant_customer_id", "name", "legal_form", "address_street",
- *          "address_city", "address_postal_code", "address_country", "industry_sector"
+ *          "address_city", "address_postal_code", "address_country"
  *     },
  *     properties={
  *          @OA\Property(property="merchant_customer_id", ref="#/components/schemas/TinyText", example="DE123456"),
@@ -69,7 +69,6 @@ class CreateOrderDebtorCompanyRequest
     private $registrationNumber;
 
     /**
-     * @Assert\NotBlank()
      * @Assert\Length(max=255)
      */
     private $industrySector;

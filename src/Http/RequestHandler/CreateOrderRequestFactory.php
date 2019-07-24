@@ -112,7 +112,6 @@ class CreateOrderRequestFactory
         );
         $request->attributes->set('checkout_session_id', $checkoutSessionEntity->getId());
 
-        return $this
-            ->createForCreateOrder($request);
+        return $this->createForCreateOrder($request);
     }
 }
