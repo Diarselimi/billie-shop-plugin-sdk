@@ -1,7 +1,7 @@
 parameters:
   env(X_TEST_ID): ~
   x_test_id: '%env(string:X_TEST_ID)%'
-  billie_monitoring_slack_webhook_url: ''
+#  billie_monitoring_slack_webhook_url: ''
 
 services:
   _defaults:
