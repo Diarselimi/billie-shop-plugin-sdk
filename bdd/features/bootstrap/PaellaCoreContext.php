@@ -299,6 +299,26 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
+     * @Given the checkout_session_id :sessionId should be valid
+     */
+    public function theCheckoutSessionIdShouldBeValid($sessionId)
+    {
+        $sessionEntity = $this->getCheckoutSessionRepository()->findOneByUuid($sessionId);
+        Assert::notNull($sessionEntity);
+        Assert::true($sessionEntity->isActive());
+    }
+
+    /**
+     * @Given the checkout_session_id :sessionId should be invalid
+     */
+    public function theCheckoutSessionIdShouldBeInValid($sessionId)
+    {
+        $sessionEntity = $this->getCheckoutSessionRepository()->findOneByUuid($sessionId);
+        Assert::notNull($sessionEntity);
+        Assert::false($sessionEntity->isActive());
+    }
+
+    /**
      * @Given the order :orderId has risk check :check failed
      */
     public function orderRiskCheckHasFailed($orderId, $check)
