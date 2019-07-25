@@ -51,7 +51,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
                 return null;
             }
 
-            throw new AlfredRequestException($exception->getCode(), $exception);
+            throw new CompaniesServiceRequestException($exception);
         }
 
         return $this->factory->createFromAlfredResponse($this->decodeResponse($response));
