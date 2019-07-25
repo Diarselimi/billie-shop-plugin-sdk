@@ -1,5 +1,6 @@
 parameters:
   behat_mock_server_url: "http://localhost"
+  billie_monitoring_slack_webhook_url: ''
 
 services:
   _defaults:
