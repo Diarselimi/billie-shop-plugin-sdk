@@ -28,12 +28,16 @@ class Nachos implements FileServiceInterface
     {
         try {
             $response = $this->client->post('/files', [
-                'multipart' => [[
-                    'name' => 'file',
-                    'contents' => $contents,
-                    'filename' => $filename,
+                'multipart' => [
+                    [
+                        'name' => 'file',
+                        'contents' => $contents,
+                        'filename' => $filename,
+                    ],
+                ],
+                'query' => [
                     'type' => $type,
-                ]],
+                ],
             ]);
         } catch (TransferException $exception) {
             throw new FileServiceRequestException($exception);
