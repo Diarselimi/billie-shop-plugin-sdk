@@ -33,7 +33,9 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
 
     private $name;
 
-    private $availableFinancingLimit;
+    private $financingPower;
+
+    private $financingLimit;
 
     private $apiKey;
 
@@ -63,31 +65,46 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
         return $this;
     }
 
-    public function getAvailableFinancingLimit(): float
+    public function getFinancingPower(): float
     {
-        return $this->availableFinancingLimit;
+        return $this->financingPower;
     }
 
-    public function setAvailableFinancingLimit(float $availableFinancingLimit): MerchantEntity
+    public function setFinancingPower(float $financingPower): MerchantEntity
     {
-        $this->availableFinancingLimit = $availableFinancingLimit;
+        $this->financingPower = $financingPower;
 
         return $this;
     }
 
-    public function increaseAvailableFinancingLimit(float $difference): void
+    public function getFinancingLimit(): ?float
     {
-        $this->availableFinancingLimit = $this->availableFinancingLimit + $difference;
+        return $this->financingLimit;
     }
 
-    public function reduceAvailableFinancingLimit(float $difference): void
+    public function setFinancingLimit(float $financingLimit): MerchantEntity
     {
-        $newLimit = $this->availableFinancingLimit - $difference;
+        $this->financingLimit = $financingLimit;
+
+        return $this;
+    }
+
+    public function increaseFinancingLimit(float $difference): void
+    {
+        if ($this->getFinancingPower() > $this->getFinancingLimit()) {
+            $this->financingLimit = $this->getFinancingPower();
+        }
+        $this->financingPower = $this->financingPower + $difference;
+    }
+
+    public function reduceFinancingLimit(float $difference): void
+    {
+        $newLimit = $this->financingPower - $difference;
         if ($newLimit < 0) {
             throw new MerchantDebtorLimitsException('Trying to set negative merchant financing limit');
         }
 
-        $this->availableFinancingLimit = $newLimit;
+        $this->financingPower = $newLimit;
     }
 
     public function getApiKey(): string
@@ -191,7 +208,8 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
         return [
             'id' => $this->getId(),
             'name' => $this->getName(),
-            'available_financing_limit' => $this->getAvailableFinancingLimit(),
+            'financing_power' => $this->getFinancingPower(),
+            'financing_limit' => $this->getFinancingLimit(),
             'api_key' => $this->getApiKey(),
             'company_id' => $this->getCompanyId(),
             'payment_merchant_id' => $this->getPaymentMerchantId(),

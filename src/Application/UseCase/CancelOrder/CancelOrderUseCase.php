@@ -63,7 +63,7 @@ class CancelOrderUseCase
         }
 
         if ($this->workflow->can($order, OrderStateManager::TRANSITION_CANCEL)) {
-            $orderContainer->getMerchant()->increaseAvailableFinancingLimit($orderContainer->getOrderFinancialDetails()->getAmountGross());
+            $orderContainer->getMerchant()->increaseFinancingLimit($orderContainer->getOrderFinancialDetails()->getAmountGross());
             $this->merchantRepository->update($orderContainer->getMerchant());
 
             try {

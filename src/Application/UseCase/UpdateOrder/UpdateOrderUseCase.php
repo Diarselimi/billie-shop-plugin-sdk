@@ -207,7 +207,7 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
     {
         $this->limitsService->unlock($orderContainer, $amountChanged);
 
-        $orderContainer->getMerchant()->increaseAvailableFinancingLimit($amountChanged);
+        $orderContainer->getMerchant()->increaseFinancingLimit($amountChanged);
         $this->merchantRepository->update($orderContainer->getMerchant());
     }
 

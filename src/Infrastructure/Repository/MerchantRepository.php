@@ -11,7 +11,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
 {
     public const TABLE_NAME = "merchants";
 
-    private const SELECT_FIELDS = 'id, name, api_key, oauth_client_id, company_id, payment_merchant_id, roles, is_active, available_financing_limit, webhook_url, webhook_authorization, created_at, updated_at';
+    private const SELECT_FIELDS = 'id, name, api_key, oauth_client_id, company_id, payment_merchant_id, roles, is_active, financing_power, available_financing_limit, webhook_url, webhook_authorization, created_at, updated_at';
 
     private $factory;
 
@@ -24,16 +24,17 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
     {
         $id = $this->doInsert('
             INSERT INTO '.self::TABLE_NAME.'
-            (name, api_key, oauth_client_id, roles, is_active, available_financing_limit, company_id, payment_merchant_id, webhook_url, webhook_authorization, created_at, updated_at)
+            (name, api_key, oauth_client_id, roles, is_active, financing_power, available_financing_limit, company_id, payment_merchant_id, webhook_url, webhook_authorization, created_at, updated_at)
             VALUES
-            (:name, :api_key, :oauth_client_id, :roles, :is_active, :available_financing_limit, :company_id, :payment_merchant_id, :webhook_url, :webhook_authorization, :created_at, :updated_at)
+            (:name, :api_key, :oauth_client_id, :roles, :is_active, :financing_power, :available_financing_limit, :company_id, :payment_merchant_id, :webhook_url, :webhook_authorization, :created_at, :updated_at)
         ', [
             'name' => $merchant->getName(),
             'api_key' => $merchant->getApiKey(),
             'oauth_client_id' => $merchant->getOauthClientId(),
             'roles' => json_encode($merchant->getRoles()),
             'is_active' => $merchant->isActive(),
-            'available_financing_limit' => $merchant->getAvailableFinancingLimit(),
+            'financing_power' => $merchant->getFinancingPower(),
+            'available_financing_limit' => $merchant->getFinancingPower(),
             'company_id' => $merchant->getCompanyId(),
             'payment_merchant_id' => $merchant->getPaymentMerchantId(),
             'webhook_url' => $merchant->getWebhookUrl(),
@@ -51,12 +52,14 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
         $this->doUpdate('
             UPDATE '.self::TABLE_NAME.'
             SET 
+              financing_power = :financing_power, 
               available_financing_limit = :available_financing_limit, 
               updated_at = :updated_at
             WHERE id = :id
         ', [
             'id' => $merchant->getId(),
-            'available_financing_limit' => $merchant->getAvailableFinancingLimit(),
+            'financing_power' => $merchant->getFinancingPower(),
+            'available_financing_limit' => $merchant->getFinancingLimit(),
             'updated_at' => $merchant->getUpdatedAt()->format(self::DATE_FORMAT),
         ]);
     }
@@ -103,5 +106,20 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
         ', ['oauth_client_id' => $oauthClientId]);
 
         return $row ? $this->factory->createFromDatabaseRow($row) : null;
+    }
+
+    public function findWithFinancingPowerBelowPercentage(float $percentage): ?array
+    {
+        $rows = $this->doFetchAll(
+            'SELECT '.self::SELECT_FIELDS.
+            ' FROM '.self::TABLE_NAME.
+            ' WHERE available_financing_limit IS NOT NULL '.
+            ' AND (financing_power / available_financing_limit * 100) < :percentage ',
+            [
+                'percentage' => $percentage,
+            ]
+        );
+
+        return $rows ? $this->factory->createFromDatabaseRows($rows) : null;
     }
 }
