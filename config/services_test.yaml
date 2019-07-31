@@ -7,6 +7,8 @@ services:
     autowire: true
     public: true
 
+  App\Http\ApiError\ApiErrorResponseFactory: '@App\Http\ApiError\VerboseApiErrorResponseFactory'
+
   App\DomainModel\Order\OrderRepositoryInterface:
     alias: 'App\Infrastructure\Repository\OrderRepository'
     public: true

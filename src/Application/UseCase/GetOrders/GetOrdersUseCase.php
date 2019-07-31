@@ -33,7 +33,7 @@ class GetOrdersUseCase implements ValidatedUseCaseInterface
     {
         $this->validateRequest($request);
 
-        $result = $this->orderRepository->getByMerchantId(
+        $result = $this->orderRepository->search(
             $request->getMerchantId(),
             $request->getOffset(),
             $request->getLimit(),

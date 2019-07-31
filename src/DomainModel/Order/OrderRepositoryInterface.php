@@ -3,6 +3,7 @@
 namespace App\DomainModel\Order;
 
 use Generator;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 interface OrderRepositoryInterface
 {
@@ -35,14 +36,14 @@ interface OrderRepositoryInterface
      */
     public function getOrdersByInvoiceHandlingStrategy(string $strategy): Generator;
 
-    public function getByMerchantId(
+    public function search(
         int $merchantId,
         int $offset,
         int $limit,
         string $sortBy,
         string $sortDirection,
         ?string $searchString,
-        ?array $filters
+        array $filters
     ): array;
 
     public function getOrdersCountByMerchantDebtorAndState(int $merchantDebtorId, string $state): int;

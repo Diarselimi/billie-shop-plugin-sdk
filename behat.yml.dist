@@ -15,6 +15,7 @@ default:
         - CompaniesServiceContext
         - OAuthServiceContext
         - SalesforceContext
+        - CustomRestContext
 
   extensions:
     Behatch\Extension: ~

@@ -5,8 +5,8 @@ namespace App\Http\Controller\PublicApi;
 use App\Application\UseCase\GetOrders\GetOrdersRequest;
 use App\Application\UseCase\GetOrders\GetOrdersUseCase;
 use App\Http\HttpConstantsInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -33,8 +33,9 @@ use Symfony\Component\HttpFoundation\Request;
  *     @OA\Parameter(in="query", name="search", description="Search text. Filters search results by: `external_code`, `uuid` or `invoice_number`.",
  *          @OA\Schema(ref="#/components/schemas/TinyText"), required=false),
  *
- *     @OA\Parameter(in="query", name="filters", style="deepObject", @OA\Schema(type="object", properties={
- *          @OA\Property(property="merchant_debtor_id", ref="#/components/schemas/UUID")
+ *     @OA\Parameter(in="query", name="filters", style="deepObject", explode=true, @OA\Schema(type="object", properties={
+ *          @OA\Property(property="merchant_debtor_id", ref="#/components/schemas/UUID"),
+ *          @OA\Property(property="state", type="array", @OA\Items(ref="#/components/schemas/OrderState"), minItems=1)
  *     }), required=false),
  *
  *     @OA\Response(response=200, @OA\JsonContent(type="object", properties={
@@ -68,12 +69,19 @@ class GetOrdersController
             $request->query->getInt('limit', GetOrdersRequest::DEFAULT_LIMIT),
             $sortField,
             strtoupper($sortDirection ?: GetOrdersRequest::DEFAULT_SORT_DIRECTION),
-            trim($request->query->get('search')),
-            $request->query->get('filters')
+            $request->query->has('search') ? trim($request->query->get('search')) : null,
+            $this->parseFilters($request)
         );
 
         $useCaseResponse = $this->useCase->execute($useCaseRequest);
 
         return new JsonResponse($useCaseResponse->toArray());
+    }
+
+    private function parseFilters(Request $request): array
+    {
+        $filters = $request->query->get('filters', []);
+
+        return is_array($filters) ? $filters : [];
     }
 }
