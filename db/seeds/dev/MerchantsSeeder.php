@@ -19,6 +19,7 @@ class MerchantsSeeder extends AbstractSeed
 
         $this->table('merchants')->insert([
             'name' => 'Test Contorion',
+            'financing_power' => 2000000,
             'available_financing_limit' => 2000000,
             'api_key' => $testApiKey,
             'roles' => json_encode(MerchantEntity::DEFAULT_ROLES),
