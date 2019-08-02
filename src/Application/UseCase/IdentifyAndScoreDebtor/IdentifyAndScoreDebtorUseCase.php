@@ -105,16 +105,7 @@ class IdentifyAndScoreDebtorUseCase
         }
 
         if ($request->getLimit()) {
-            $merchantDebtorFinancingDetails = $this->merchantDebtorFinancialDetailsRepository->getCurrentByMerchantDebtorId(
-                $merchantDebtor->getId()
-            );
-
-            $difference = $request->getLimit() - $merchantDebtorFinancingDetails->getFinancingLimit();
-            $merchantDebtorFinancingDetails
-                ->setFinancingLimit($request->getLimit())
-                ->setFinancingPower($merchantDebtorFinancingDetails->getFinancingPower() + $difference);
-
-            $this->merchantDebtorFinancialDetailsRepository->insert($merchantDebtorFinancingDetails);
+            $this->updateLimit($merchantDebtor, $request->getLimit());
         }
 
         return (new IdentifyAndScoreDebtorResponse())
@@ -144,5 +135,19 @@ class IdentifyAndScoreDebtorUseCase
         );
 
         return $this->companiesService->isEligibleForPayAfterDelivery($IsEligibleForPayAfterDeliveryRequestDTO);
+    }
+
+    private function updateLimit(MerchantDebtorEntity $merchantDebtor, float $limit)
+    {
+        $merchantDebtorFinancingDetails = $this->merchantDebtorFinancialDetailsRepository->getCurrentByMerchantDebtorId(
+            $merchantDebtor->getId()
+        );
+
+        $difference = $limit - $merchantDebtorFinancingDetails->getFinancingLimit();
+        $merchantDebtorFinancingDetails
+            ->setFinancingLimit($limit)
+            ->setFinancingPower($merchantDebtorFinancingDetails->getFinancingPower() + $difference);
+
+        $this->merchantDebtorFinancialDetailsRepository->insert($merchantDebtorFinancingDetails);
     }
 }
