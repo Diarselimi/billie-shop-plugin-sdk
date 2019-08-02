@@ -2,6 +2,7 @@
 
 namespace App\Amqp\Consumer;
 
+use App\Application\Exception\OrderWorkflowException;
 use App\Application\UseCase\DeclineOrder\DeclineOrderRequest;
 use App\Application\UseCase\DeclineOrder\DeclineOrderUseCase;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
@@ -25,10 +26,12 @@ class OrderInWaitingStateConsumer implements ConsumerInterface, LoggingInterface
         $data = $msg->getBody();
         $data = json_decode($data, true);
 
-        $request = new DeclineOrderRequest($data['order_id'], $data['merchant_id']);
+        $request = new DeclineOrderRequest($data['order_id']);
 
         try {
             $this->useCase->execute($request);
+        } catch (OrderWorkflowException $exception) {
+            return; // order was already manually approved/declined
         } catch (\Exception $exception) {
             $this->logSuppressedException(
                 $exception,
