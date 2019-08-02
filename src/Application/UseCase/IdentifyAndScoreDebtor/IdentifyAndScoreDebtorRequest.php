@@ -36,6 +36,8 @@ class IdentifyAndScoreDebtorRequest
 
     private $lastName;
 
+    private $limit;
+
     public function getMerchantId(): int
     {
         return $this->merchantId;
@@ -224,6 +226,18 @@ class IdentifyAndScoreDebtorRequest
     public function setLastName(?string $lastName): IdentifyAndScoreDebtorRequest
     {
         $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    public function getLimit(): ? float
+    {
+        return $this->limit;
+    }
+
+    public function setLimit(?float $limit): IdentifyAndScoreDebtorRequest
+    {
+        $this->limit = $limit;
 
         return $this;
     }

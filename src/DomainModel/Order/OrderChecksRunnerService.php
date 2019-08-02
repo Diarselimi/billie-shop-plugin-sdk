@@ -57,7 +57,7 @@ class OrderChecksRunnerService implements LoggingInterface
 
     public function checkForFailedSoftDeclinableCheckResults(OrderContainer $orderContainer): bool
     {
-        $riskCheckResults = $this->orderRiskCheckRepository->findByOrder($orderContainer->getOrder()->getId());
+        $riskCheckResults = $orderContainer->getRiskChecks();
 
         foreach ($riskCheckResults as $riskCheckResult) {
             $merchantRiskCheckSetting = $this->merchantRiskCheckSettingsRepository->getOneByMerchantIdAndRiskCheckName(
@@ -77,7 +77,7 @@ class OrderChecksRunnerService implements LoggingInterface
     {
         /** @var OrderRiskCheckEntity[] $failedRiskChecks */
         $failedRiskChecks = array_filter(
-            $this->orderRiskCheckRepository->findByOrder($orderContainer->getOrder()->getId()),
+            $orderContainer->getRiskChecks(),
             function (OrderRiskCheckEntity $orderRiskCheck) {
                 return !$orderRiskCheck->isPassed();
             }
@@ -98,19 +98,23 @@ class OrderChecksRunnerService implements LoggingInterface
         return true;
     }
 
-    public function invalidateRiskCheck(OrderContainer $orderContainer, string $name)
+    public function rerunCheck(OrderContainer $orderContainer, string $checkName): bool
     {
-        $limitRiskCheck = $this->orderRiskCheckRepository->findByOrderAndCheckName(
-            $orderContainer->getOrder()->getId(),
-            $name
-        );
+        foreach ($orderContainer->getRiskChecks() as $orderCheckResult) {
+            if ($checkName !== $orderCheckResult->getRiskCheckDefinition()->getName()) {
+                continue;
+            }
 
-        if ($limitRiskCheck && $limitRiskCheck->isPassed()) {
-            $this->logInfo('Invalidating limit risk check');
+            $check = $this->getCheck($checkName);
+            $result = $check->check($orderContainer)->isPassed();
 
-            $limitRiskCheck->setIsPassed(false);
-            $this->orderRiskCheckRepository->update($limitRiskCheck);
+            $orderCheckResult->setIsPassed($result);
+            $this->orderRiskCheckRepository->update($orderCheckResult);
+
+            return $result;
         }
+
+        return false;
     }
 
     private function runChecks(OrderContainer $orderContainer, array $checkNames): bool

@@ -18,6 +18,8 @@ use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface;
+use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntity;
+use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
 use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonRepositoryInterface;
 
@@ -43,6 +45,8 @@ class OrderContainerRelationLoader
 
     private $orderDunningStatusService;
 
+    private $orderRiskCheckRepository;
+
     public function __construct(
         DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
         AddressRepositoryInterface $addressRepository,
@@ -53,7 +57,8 @@ class OrderContainerRelationLoader
         MerchantDebtorFinancialDetailsRepositoryInterface $merchantDebtorFinancialDetailsRepository,
         CompaniesServiceInterface $companiesService,
         OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
-        OrderDunningStatusService $orderDunningStatusService
+        OrderDunningStatusService $orderDunningStatusService,
+        OrderRiskCheckRepositoryInterface $orderRiskCheckRepository
     ) {
         $this->debtorExternalDataRepository = $debtorExternalDataRepository;
         $this->addressRepository = $addressRepository;
@@ -65,6 +70,7 @@ class OrderContainerRelationLoader
         $this->companyService = $companiesService;
         $this->orderFinancialDetailsRepository = $orderFinancialDetailsRepository;
         $this->orderDunningStatusService = $orderDunningStatusService;
+        $this->orderRiskCheckRepository = $orderRiskCheckRepository;
     }
 
     public function loadMerchantDebtor(OrderContainer $orderContainer): MerchantDebtorEntity
@@ -120,5 +126,15 @@ class OrderContainerRelationLoader
     public function loadOrderDunningStatus(OrderContainer $orderContainer): ? string
     {
         return $this->orderDunningStatusService->getStatus($orderContainer->getOrder()->getUuid());
+    }
+
+    /**
+     * @param OrderContainer $orderContainer
+     *
+     * @return OrderRiskCheckEntity[]
+     */
+    public function loadOrderRiskChecks(OrderContainer $orderContainer): array
+    {
+        return $this->orderRiskCheckRepository->findByOrder($orderContainer->getOrder()->getId());
     }
 }

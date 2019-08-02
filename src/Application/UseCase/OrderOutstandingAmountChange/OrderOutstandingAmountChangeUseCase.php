@@ -102,7 +102,7 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
             $this->logSuppressedException($exception, 'Amazing merchant payment borscht bug');
         }
 
-        $merchant->increaseAvailableFinancingLimit($amountChange->getAmountChange());
+        $merchant->increaseFinancingLimit($amountChange->getAmountChange());
         $this->merchantRepository->update($merchant);
 
         if (!$amountChange->isPayment()) {

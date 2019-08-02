@@ -11,7 +11,7 @@ class AvailableFinancingLimitCheck implements CheckInterface
     public function check(OrderContainer $orderContainer): CheckResult
     {
         return new CheckResult(
-            $orderContainer->getMerchant()->getAvailableFinancingLimit() > $orderContainer->getOrderFinancialDetails()->getAmountGross(),
+            $orderContainer->getMerchant()->getFinancingPower() > $orderContainer->getOrderFinancialDetails()->getAmountGross(),
             self::NAME
         );
     }

@@ -171,6 +171,7 @@ class IdentifyAndScoreDebtorsCommand extends Command
             ->setLegalForm($debtorExternalData['legal_form'])
             ->setFirstName($debtorExternalData['first_name'] ?? null)
             ->setLastName($debtorExternalData['last_name'] ?? null)
+            ->setLimit($debtorExternalData['limit'] ?? null)
         ;
     }
 

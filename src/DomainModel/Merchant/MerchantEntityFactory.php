@@ -14,7 +14,8 @@ class MerchantEntityFactory
             ->setId($row['id'])
             ->setName($row['name'])
             ->setApiKey($row['api_key'])
-            ->setAvailableFinancingLimit($row['available_financing_limit'])
+            ->setFinancingPower($row['financing_power'])
+            ->setFinancingLimit($row['available_financing_limit'])
             ->setCompanyId($row['company_id'])
             ->setPaymentMerchantId($row['payment_merchant_id'])
             ->setRoles((array) json_decode($row['roles'], true))
@@ -31,7 +32,8 @@ class MerchantEntityFactory
     {
         return (new MerchantEntity())
             ->setCompanyId($request->getCompanyId())
-            ->setAvailableFinancingLimit($request->getMerchantFinancingLimit())
+            ->setFinancingPower($request->getMerchantFinancingLimit())
+            ->setFinancingLimit($request->getMerchantFinancingLimit())
             ->setWebhookUrl($request->getWebhookUrl())
             ->setWebhookAuthorization($request->getWebhookAuthorization())
             ->setName($company->getName())
@@ -40,5 +42,19 @@ class MerchantEntityFactory
             ->setRoles(MerchantEntity::DEFAULT_ROLES)
             ->setIsActive(true)
         ;
+    }
+
+    /**
+     * @return MerchantEntity[]
+     */
+    public function createFromDatabaseRows(array $rows)
+    {
+        $merchants = [];
+
+        foreach ($rows as $row) {
+            $merchants[] = $this->createFromDatabaseRow($row);
+        }
+
+        return $merchants;
     }
 }

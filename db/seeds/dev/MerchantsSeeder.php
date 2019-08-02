@@ -19,11 +19,13 @@ class MerchantsSeeder extends AbstractSeed
 
         $this->table('merchants')->insert([
             'name' => 'Test Contorion',
+            'financing_power' => 2000000,
             'available_financing_limit' => 2000000,
             'api_key' => $testApiKey,
             'roles' => json_encode(MerchantEntity::DEFAULT_ROLES),
             'is_active' => true,
             'company_id' => 4,
+            'oauth_client_id' => '02706840-e7ef-48ef-8576-bcfec20b4458',
             'payment_merchant_id' => 'b95adad7-f747-45b9-b3cb-7851c4b90fac',
             'created_at' => $now,
             'updated_at' => $now,

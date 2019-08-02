@@ -34,6 +34,10 @@ phpspec.yml
 ###< phpspec/phpspec ###
 
 ###> phpunit/phpunit ###
-/phpunit.xml
 .phpunit.result.cache
 ###< phpunit/phpunit ###
+
+###> graphql PHPStorm plugin ###
+.graphqlconfig
+schema.graphql
+###< graphql PHPStorm plugin ###

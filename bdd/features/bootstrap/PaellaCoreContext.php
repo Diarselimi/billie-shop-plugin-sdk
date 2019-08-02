@@ -76,7 +76,8 @@ class PaellaCoreContext extends MinkContext
             ->setIsActive(true)
             ->setRoles(['ROLE_NOTHING'])
             ->setPaymentMerchantId('f2ec4d5e-79f4-40d6-b411-31174b6519ac')
-            ->setAvailableFinancingLimit(10000)
+            ->setFinancingLimit(10000)
+            ->setFinancingPower(10000)
             ->setApiKey('test')
             ->setCompanyId('10')
             ->setOauthClientId('oauthClientId');
@@ -200,16 +201,14 @@ class PaellaCoreContext extends MinkContext
             ->setUuid(self::DEBTOR_UUID)
             ->setPaymentDebtorId('test')
             ->setCreatedAt(new \DateTime('2019-01-01 12:00:00'))
-            ->setIsWhitelisted(false)
-        ;
+            ->setIsWhitelisted(false);
         $this->getMerchantDebtorRepository()->insert($merchantDebtor);
 
         $financialDetails = (new MerchantDebtorFinancialDetailsEntity())
             ->setMerchantDebtorId($merchantDebtor->getId())
             ->setFinancingLimit(2000)
             ->setFinancingPower(1000)
-            ->setCreatedAt(new DateTime())
-        ;
+            ->setCreatedAt(new DateTime());
         $this->getMerchantDebtorFinancialDetailsRepository()->insert($financialDetails);
 
         $order = (new OrderEntity())
@@ -296,6 +295,26 @@ class PaellaCoreContext extends MinkContext
                 $state
             ));
         }
+    }
+
+    /**
+     * @Given the checkout_session_id :sessionId should be valid
+     */
+    public function theCheckoutSessionIdShouldBeValid($sessionId)
+    {
+        $sessionEntity = $this->getCheckoutSessionRepository()->findOneByUuid($sessionId);
+        Assert::notNull($sessionEntity);
+        Assert::true($sessionEntity->isActive());
+    }
+
+    /**
+     * @Given the checkout_session_id :sessionId should be invalid
+     */
+    public function theCheckoutSessionIdShouldBeInValid($sessionId)
+    {
+        $sessionEntity = $this->getCheckoutSessionRepository()->findOneByUuid($sessionId);
+        Assert::notNull($sessionEntity);
+        Assert::false($sessionEntity->isActive());
     }
 
     /**
@@ -550,7 +569,8 @@ class PaellaCoreContext extends MinkContext
                 ->setIsActive(true)
                 ->setRoles(['ROLE_NOTHING'])
                 ->setPaymentMerchantId('any-payment-id')
-                ->setAvailableFinancingLimit(10000)
+                ->setFinancingPower(10000)
+                ->setFinancingLimit(10000)
                 ->setApiKey('testMerchantApiKey')
                 ->setCompanyId((int) $companyId)
                 ->setOauthClientId('testMerchantOauthClientId')

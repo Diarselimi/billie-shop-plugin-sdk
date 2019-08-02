@@ -15,13 +15,10 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 
 class ApiErrorResponseFactory
 {
-    private $showExtendedErrorInfo;
-
     private $propertyNameConverter;
 
-    public function __construct(bool $showExtendedErrorInfo, CamelCaseToSnakeCaseNameConverter $propertyNameConverter)
+    public function __construct(CamelCaseToSnakeCaseNameConverter $propertyNameConverter)
     {
-        $this->showExtendedErrorInfo = $showExtendedErrorInfo;
         $this->propertyNameConverter = $propertyNameConverter;
     }
 
@@ -115,10 +112,15 @@ class ApiErrorResponseFactory
         return $this->createResponse([new ApiError($exception->getMessage(), $exception->getErrorCode())], $statusCode);
     }
 
-    private function createResponse(array $errors, int $statusCode, array $headers = []): ApiErrorResponse
+    protected function createResponse(array $errors, int $statusCode, array $headers = []): ApiErrorResponse
     {
-        if (($statusCode == 500) && !$this->showExtendedErrorInfo) {
-            $errors = [new ApiError('Internal Error', ApiError::CODE_INTERNAL_ERROR)];
+        if ($statusCode === 500) {
+            // hide real message of uncaught exceptions
+            return new ApiErrorResponse(
+                [new ApiError('Unexpected Internal Error', ApiError::CODE_INTERNAL_ERROR)],
+                $statusCode,
+                $headers
+            );
         }
 
         return new ApiErrorResponse($errors, $statusCode, $headers);

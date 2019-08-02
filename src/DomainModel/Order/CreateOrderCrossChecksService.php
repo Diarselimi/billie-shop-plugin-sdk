@@ -32,7 +32,7 @@ class CreateOrderCrossChecksService implements LoggingInterface
 
         try {
             $this->merchantDebtorLimitsService->lock($orderContainer);
-            $merchant->reduceAvailableFinancingLimit($orderContainer->getOrderFinancialDetails()->getAmountGross());
+            $merchant->reduceFinancingLimit($orderContainer->getOrderFinancialDetails()->getAmountGross());
         } catch (MerchantDebtorLimitsException $exception) {
             $this->logSuppressedException($exception, 'Merchant debtor limit lock failed', [
                 'exception' => $exception,

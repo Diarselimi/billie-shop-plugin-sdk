@@ -153,7 +153,6 @@ Feature:
     }
     """
     Then the response status code should be 400
-    And print last response
     And the JSON response should be:
     """
     {"errors":[{"source":"duration","title":"This value should be of type int.","code":"request_validation_error"},{"source":"duration","title":"This value should be a valid number.","code":"request_validation_error"}]}

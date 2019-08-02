@@ -52,7 +52,7 @@ class CreateOrderCrossChecksServiceSpec extends ObjectBehavior
         MerchantEntity $merchant
     ) {
         $merchantDebtorLimitsService->lock($orderContainer)->shouldBeCalledOnce()->willThrow(MerchantDebtorLimitsException::class);
-        $merchant->reduceAvailableFinancingLimit(self::AMOUNT)->shouldNotBeCalled();
+        $merchant->reduceFinancingLimit(self::AMOUNT)->shouldNotBeCalled();
 
         $this->shouldThrow(OrderWorkflowException::class)->during('run', [$orderContainer]);
     }
@@ -64,7 +64,7 @@ class CreateOrderCrossChecksServiceSpec extends ObjectBehavior
         MerchantEntity $merchant
     ) {
         $merchantDebtorLimitsService->lock($orderContainer)->shouldBeCalledOnce();
-        $merchant->reduceAvailableFinancingLimit(self::AMOUNT)->shouldBeCalledOnce()->willThrow(MerchantDebtorLimitsException::class);
+        $merchant->reduceFinancingLimit(self::AMOUNT)->shouldBeCalledOnce()->willThrow(MerchantDebtorLimitsException::class);
 
         $merchantRepository->update($merchant)->shouldNotBeCalled();
 
@@ -78,7 +78,7 @@ class CreateOrderCrossChecksServiceSpec extends ObjectBehavior
         MerchantEntity $merchant
     ) {
         $merchantDebtorLimitsService->lock($orderContainer)->shouldBeCalledOnce();
-        $merchant->reduceAvailableFinancingLimit(self::AMOUNT)->shouldBeCalledOnce();
+        $merchant->reduceFinancingLimit(self::AMOUNT)->shouldBeCalledOnce();
 
         $merchantRepository->update($merchant)->shouldBeCalledOnce();
 

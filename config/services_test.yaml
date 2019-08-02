@@ -1,10 +1,13 @@
 parameters:
   behat_mock_server_url: "http://localhost"
+  billie_monitoring_slack_webhook_url: ''
 
 services:
   _defaults:
     autowire: true
     public: true
+
+  App\Http\ApiError\ApiErrorResponseFactory: '@App\Http\ApiError\VerboseApiErrorResponseFactory'
 
   App\DomainModel\Order\OrderRepositoryInterface:
     alias: 'App\Infrastructure\Repository\OrderRepository'

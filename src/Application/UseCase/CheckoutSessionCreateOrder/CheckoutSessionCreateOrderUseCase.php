@@ -70,8 +70,6 @@ class CheckoutSessionCreateOrderUseCase implements LoggingInterface, ValidatedUs
         $orderRequest = $this->persistNewOrderService->persistFromRequest($request);
         $orderContainer = $this->orderContainerFactory->createFromNewOrderDTO($orderRequest);
 
-        $this->checkoutSessionRepository->invalidateById($request->getCheckoutSessionId());
-
         if (!$this->orderChecksRunnerService->runPreIdentificationChecks($orderContainer)) {
             $this->orderStateManager->decline($orderContainer);
 
@@ -90,6 +88,7 @@ class CheckoutSessionCreateOrderUseCase implements LoggingInterface, ValidatedUs
         }
 
         $this->orderStateManager->authorize($orderContainer);
+        $this->checkoutSessionRepository->invalidateById($request->getCheckoutSessionId());
 
         return $orderContainer;
     }

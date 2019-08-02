@@ -13,6 +13,7 @@ use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderStateManager;
+use App\DomainModel\OrderRiskCheck\Checker\LimitCheck;
 use PhpSpec\ObjectBehavior;
 
 class ApproveOrderUseCaseSpec extends ObjectBehavior
@@ -74,6 +75,35 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
         $this->shouldThrow(OrderWorkflowException::class)->during('execute', [$request]);
     }
 
+    public function it_throws_exception_if_limit_check_fails(
+        OrderContainerFactory $orderContainerFactory,
+        ApproveOrderRequest $request,
+        OrderStateManager $orderStateManager,
+        OrderChecksRunnerService $orderChecksRunnerService,
+        OrderEntity $order,
+        OrderContainer $orderContainer
+    ) {
+        $orderContainerFactory
+            ->loadByUuid(self::ORDER_UUID)
+            ->shouldBeCalled()
+            ->willReturn($orderContainer)
+        ;
+
+        $orderStateManager
+            ->isWaiting($order)
+            ->shouldBeCalled()
+            ->willReturn(true)
+        ;
+
+        $orderChecksRunnerService
+            ->rerunCheck($orderContainer, LimitCheck::NAME)
+            ->shouldBeCalled()
+            ->willReturn(false)
+        ;
+
+        $this->shouldThrow(OrderWorkflowException::class)->during('execute', [$request]);
+    }
+
     public function it_successfully_approves_the_order(
         OrderContainerFactory $orderContainerFactory,
         OrderStateManager $orderStateManager,
@@ -95,6 +125,12 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
         ;
 
         $orderChecksRunnerService
+            ->rerunCheck($orderContainer, LimitCheck::NAME)
+            ->shouldBeCalled()
+            ->willReturn(true)
+        ;
+
+        $orderChecksRunnerService
             ->rerunFailedChecks($orderContainer)
             ->shouldBeCalled()
             ->willReturn(true)
@@ -104,7 +140,7 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
         $this->execute($request);
     }
 
-    public function it_throws_exception_if_risk_check_fails_again(
+    public function it_throws_exception_if_risk_checks_fail_again(
         OrderContainerFactory $orderContainerFactory,
         OrderStateManager $orderStateManager,
         OrderChecksRunnerService $orderChecksRunnerService,
@@ -121,6 +157,12 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
 
         $orderStateManager
             ->isWaiting($order)
+            ->shouldBeCalled()
+            ->willReturn(true)
+        ;
+
+        $orderChecksRunnerService
+            ->rerunCheck($orderContainer, LimitCheck::NAME)
             ->shouldBeCalled()
             ->willReturn(true)
         ;

@@ -13,6 +13,7 @@ use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 use Billie\PdoBundle\Infrastructure\Pdo\PdoConnection;
 use Generator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 class OrderRepository extends AbstractPdoRepository implements OrderRepositoryInterface
 {
@@ -58,7 +59,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
     public function insert(OrderEntity $order): void
     {
         $id = $this->doInsert('
-            INSERT INTO '.self::TABLE_NAME.'
+            INSERT INTO ' . self::TABLE_NAME . '
             (
               amount_forgiven, 
               external_code, 
@@ -131,7 +132,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
     {
         $order = $this->doFetchOne('
           SELECT ' . implode(', ', self::SELECT_FIELDS) . '
-          FROM '.self::TABLE_NAME.'
+          FROM ' . self::TABLE_NAME . '
           WHERE external_code = :external_code AND merchant_id = :merchant_id
         ', [
             'external_code' => $externalCode,
@@ -145,7 +146,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
     {
         $order = $this->doFetchOne('
           SELECT ' . implode(', ', self::SELECT_FIELDS) . '
-          FROM '.self::TABLE_NAME.'
+          FROM ' . self::TABLE_NAME . '
           WHERE merchant_id = :merchant_id AND (external_code = :external_code OR uuid = :uuid)
         ', [
             'merchant_id' => $merchantId,
@@ -173,7 +174,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
     {
         $order = $this->doFetchOne('
           SELECT ' . implode(', ', self::SELECT_FIELDS) . '
-          FROM '.self::TABLE_NAME.' 
+          FROM ' . self::TABLE_NAME . ' 
           WHERE id = :id
         ', [
             'id' => $id,
@@ -186,7 +187,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
     {
         $order = $this->doFetchOne('
           SELECT ' . implode(', ', self::SELECT_FIELDS) . '
-          FROM '.self::TABLE_NAME.'
+          FROM ' . self::TABLE_NAME . '
           WHERE uuid = :uuid
         ', [
             'uuid' => $uuid,
@@ -198,7 +199,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
     public function update(OrderEntity $order): void
     {
         $this->doUpdate('
-            UPDATE '.self::TABLE_NAME.'
+            UPDATE ' . self::TABLE_NAME . '
             SET
               external_code = :external_code,
               state = :state,
@@ -255,7 +256,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
     {
         $result = $this->doFetchOne(
             'SELECT COUNT(id) as total
-              FROM '.self::TABLE_NAME.'
+              FROM ' . self::TABLE_NAME . '
               WHERE state = :state
               AND orders.merchant_debtor_id IN (SELECT id FROM merchants_debtors WHERE debtor_id = :debtor_id)',
             [
@@ -275,7 +276,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
     {
         $result = $this->doFetchOne(
             'SELECT COUNT(id) as total
-              FROM '.self::TABLE_NAME.'
+              FROM ' . self::TABLE_NAME . '
               WHERE state NOT IN (:state_new, :state_declined)
               AND orders.merchant_debtor_id = :merchant_debtor_id',
             [
@@ -369,11 +370,11 @@ SQL;
     public function getOneByCheckoutSessionUuid(string $checkoutSessionUuid): ?OrderEntity
     {
         $sql = ' SELECT ' . implode(', ', self::SELECT_FIELDS) . ' FROM ' . self::TABLE_NAME .
-                ' WHERE id IN ('.
-                ' SELECT orders.id '.
-                ' FROM '.self::TABLE_NAME.
-                ' LEFT JOIN '.CheckoutSessionRepository::TABLE_NAME.' checkoutSession ON checkoutSession.id = checkout_session_id '.
-                ' WHERE checkoutSession.uuid = :uuid ORDER BY orders.created_at DESC )  LIMIT 1';
+            ' WHERE id IN (' .
+            ' SELECT orders.id ' .
+            ' FROM ' . self::TABLE_NAME .
+            ' LEFT JOIN ' . CheckoutSessionRepository::TABLE_NAME . ' checkoutSession ON checkoutSession.id = checkout_session_id ' .
+            ' WHERE checkoutSession.uuid = :uuid ORDER BY orders.created_at DESC )  LIMIT 1';
 
         $row = $this->doFetchOne($sql, ['uuid' => $checkoutSessionUuid]);
 
@@ -397,20 +398,21 @@ SQL;
         return intval($result['total']);
     }
 
-    public function getByMerchantId(
+    public function search(
         int $merchantId,
         int $offset,
         int $limit,
         string $sortBy,
         string $sortDirection,
         ?string $searchString,
-        ?array $filters
+        array $filters
     ): array {
         $query = 'SELECT %s FROM orders';
+        $filters = new ParameterBag($filters);
 
-        if ($filters && isset($filters['merchant_debtor_id'])) {
+        if ($filters->has('merchant_debtor_id')) {
             $query .= ' INNER JOIN merchants_debtors ON orders.merchant_debtor_id = merchants_debtors.id AND merchants_debtors.uuid = :merchant_debtor_id';
-            $queryParameters['merchant_debtor_id'] = $filters['merchant_debtor_id'];
+            $queryParameters['merchant_debtor_id'] = $filters->get('merchant_debtor_id');
         }
 
         if ($sortBy === 'amount_gross') {
@@ -426,6 +428,14 @@ SQL;
             $query .= ' AND (orders.external_code LIKE :search OR orders.uuid LIKE :search OR orders.invoice_number LIKE :search )';
 
             $queryParameters['search'] = '%' . $searchString . '%';
+        }
+
+        if ($filters->has('state') && is_array($filters->get('state')) && !empty($filters->get('state'))) {
+            $states = array_map(function ($state) {
+                return "'{$state}'";
+            }, $filters->get('state'));
+
+            $query .= ' AND orders.state IN (' . implode(',', $states) . ')';
         }
 
         $totalCount = $this->doFetchOne(sprintf($query, 'COUNT(*) as total_count'), $queryParameters);

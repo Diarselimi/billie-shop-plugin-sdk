@@ -192,7 +192,6 @@ class OrderStateManager implements LoggingInterface
     public function wait(OrderContainer $orderContainer)
     {
         $order = $orderContainer->getOrder();
-        $this->orderChecksRunnerService->invalidateRiskCheck($orderContainer, LimitCheck::NAME);
 
         $this->workflow->apply($order, OrderStateManager::TRANSITION_WAITING);
         $this->orderRepository->update($order);

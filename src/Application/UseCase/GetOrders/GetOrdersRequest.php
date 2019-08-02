@@ -46,6 +46,9 @@ class GetOrdersRequest implements ValidatedRequestInterface, PaginationAwareInte
      *         "merchant_debtor_id" = {
      *             @Assert\NotBlank,
      *             @Assert\Uuid()
+     *         },
+     *         "state" = {
+     *             @Assert\Choice(choices=\App\DomainModel\Order\OrderStateManager::ALL_STATES, multiple=true, min=1)
      *         }
      *     },
      *     allowMissingFields = true
@@ -60,7 +63,7 @@ class GetOrdersRequest implements ValidatedRequestInterface, PaginationAwareInte
         string $sortBy,
         string $sortDirection,
         ?string $searchString,
-        ?array $filters
+        array $filters
     ) {
         $this->merchantId = $merchantId;
         $this->offset = $offset;
@@ -86,12 +89,12 @@ class GetOrdersRequest implements ValidatedRequestInterface, PaginationAwareInte
         return $this->sortDirection;
     }
 
-    public function getSearchString(): ? string
+    public function getSearchString(): ?string
     {
         return $this->searchString;
     }
 
-    public function getFilters(): ? array
+    public function getFilters(): array
     {
         return $this->filters;
     }

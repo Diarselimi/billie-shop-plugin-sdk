@@ -1,12 +1,15 @@
 parameters:
   env(X_TEST_ID): ~
   x_test_id: '%env(string:X_TEST_ID)%'
+#  billie_monitoring_slack_webhook_url: ''
 
 services:
   _defaults:
     autowire: true
     autoconfigure: true
     public: false
+
+  App\Http\ApiError\ApiErrorResponseFactory: '@App\Http\ApiError\VerboseApiErrorResponseFactory'
 
   App\Test\TestGuzzleSubscriber:
     arguments:
