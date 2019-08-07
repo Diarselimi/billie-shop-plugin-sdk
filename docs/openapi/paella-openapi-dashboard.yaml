@@ -515,6 +515,7 @@ paths:
           in: query
           required: false
           style: deepObject
+          explode: true
           schema:
             properties:
               merchant_debtor_id:

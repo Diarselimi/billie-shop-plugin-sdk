@@ -1366,6 +1366,26 @@ paths:
           oauth2: []
       x-groups:
         - support
+  /legal-forms:
+    get:
+      tags:
+        - Misc.
+      summary: 'Get Legal Forms'
+      operationId: get_legal_forms
+      responses:
+        '200':
+          description: 'List of supported legal forms'
+          content:
+            application/json:
+              schema:
+                properties:
+                  items: { type: array, items: { properties: { code: { description: 'Legal form code', type: integer, example: '90101' }, name: { description: 'Legal form name', type: string, example: 'AG & Co. KG', nullable: true }, required_input: { description: 'Required input (HR-NR => Registration Number, Ust-ID => Registration ID)', type: string, example: HR-NR }, required: { description: Required, type: boolean } }, type: object } }
+                type: object
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security: []
+      x-groups:
+        - checkout-client
   '/debtor/{uuid}':
     get:
       tags:
@@ -1612,6 +1632,7 @@ paths:
           in: query
           required: false
           style: deepObject
+          explode: true
           schema:
             properties:
               merchant_debtor_id:
