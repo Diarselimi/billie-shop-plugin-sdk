@@ -101,7 +101,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     }
     """
     And the order A1 is in state declined
-    And the response status code should be 400
+    And the response status code should be 403
     And the checkout_session_id "123123" should be valid
 
   Scenario: I success if I try to create an order with a valid session_id
@@ -156,8 +156,20 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     """
     Then the order A1 is in state authorized
     And the response status code should be 201
-    And the response should be empty
     And the checkout_session_id "123123" should be invalid
+    And the JSON response should be:
+    """
+    {
+      "debtor_company":{
+        "name":"Test User Company",
+        "address_house_number":"10",
+        "address_street":"Heinrich-Heine-Platz",
+        "address_postal_code":"10179",
+        "address_city":"Berlin",
+        "address_country":"DE"
+      }
+    }
+    """
 
   Scenario: I success if I try to create an order with a valid session_id and no house
     Given I get from companies service identify match and good decision response
@@ -211,7 +223,10 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     """
     Then the order A1 is in state authorized
     And the response status code should be 201
-    And the response should be empty
+    And the JSON response should be:
+    """
+    {"debtor_company":{"name":"Test User Company","address_house_number":"10","address_street":"Heinrich-Heine-Platz","address_postal_code":"10179","address_city":"Berlin","address_country":"DE"}}
+    """
 
   Scenario: An order goes to declined if we cannot identify the company
     Given I get from companies service identify match and bad decision response
@@ -264,7 +279,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     }
     """
     Then the order A1 is in state declined
-    And the response status code should be 400
+    And the response status code should be 403
     And the JSON response at "errors/0/reasons/0" should be "risk_policy"
 
   Scenario: An order goes to declined if it doesn't pass all the soft checks
@@ -317,7 +332,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
        "order_id":"A1"
     }
     """
-    And the response status code should be 400
+    And the response status code should be 403
     Then the order A1 is in state declined
 
   Scenario:
@@ -374,7 +389,6 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     """
     Then the order A1 is in state authorized
     And the response status code should be 201
-    And the response should be empty
     And I send a PUT request to "/checkout-session/123123/authorize" with body:
     """
     {

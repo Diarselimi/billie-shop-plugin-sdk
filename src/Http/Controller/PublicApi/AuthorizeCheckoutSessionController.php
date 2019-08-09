@@ -4,7 +4,7 @@ namespace App\Http\Controller\PublicApi;
 
 use App\Application\Exception\OrderDeclinedException;
 use App\Application\UseCase\CheckoutSessionCreateOrder\CheckoutSessionCreateOrderUseCase;
-use App\DomainModel\OrderResponse\OrderResponseFactory;
+use App\DomainModel\CheckoutSessionResponse\AuthorizeOrderResponseFactory;
 use App\Http\ApiError\ApiError;
 use App\Http\ApiError\ApiErrorResponse;
 use App\Http\Authentication\User;
@@ -12,7 +12,6 @@ use App\Http\RequestHandler\CreateOrderRequestFactory;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
 
 /**
@@ -33,8 +32,10 @@ use Symfony\Component\Security\Core\Security;
  *          @OA\Schema(ref="#/components/schemas/CreateOrderRequest"))
  *     ),
  *
- *     @OA\Response(response=201, description="Order created with 'authorized' state, but a merchant confirmation is needed."),
- *     @OA\Response(response=400, description="Invalid request data or order declined.", @OA\JsonContent(
+ *     @OA\Response(response=201, description="Order created with 'authorized' state, but a merchant confirmation is needed.", ref="#/components/schemas/AuthorizeOrderResponse"),
+ *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),
+ *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+ *     @OA\Response(response=403, description="Order declined.", @OA\JsonContent(
  *          title="Checkout Authorize Error",
  *          type="object",
  *          allOf={
@@ -49,7 +50,6 @@ use Symfony\Component\Security\Core\Security;
  *            )
  *          }
  *     )),
- *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
  *     @OA\Response(response=500, ref="#/components/responses/ServerError")
  * )
  */
@@ -67,7 +67,7 @@ class AuthorizeCheckoutSessionController
         CheckoutSessionCreateOrderUseCase $useCase,
         Security $security,
         CreateOrderRequestFactory $orderRequestFactory,
-        OrderResponseFactory $responseFactory
+        AuthorizeOrderResponseFactory $responseFactory
     ) {
         $this->useCase = $useCase;
         $this->security = $security;
@@ -75,7 +75,7 @@ class AuthorizeCheckoutSessionController
         $this->responseFactory = $responseFactory;
     }
 
-    public function execute(Request $request): Response
+    public function execute(Request $request): JsonResponse
     {
         /** @var User $user */
         $user = $this->security->getUser();
@@ -84,7 +84,7 @@ class AuthorizeCheckoutSessionController
             ->createForAuthorizeCheckoutSession($request, $user->getCheckoutSession());
 
         try {
-            $this->useCase->execute($useCaseRequest);
+            $orderContainer = $this->useCase->execute($useCaseRequest);
         } catch (OrderDeclinedException $exception) {
             return new ApiErrorResponse(
                 [new ApiError(
@@ -93,10 +93,12 @@ class AuthorizeCheckoutSessionController
                     null,
                     ['reasons' => $exception->getReasons()]
                 )],
-                JsonResponse::HTTP_BAD_REQUEST
+                JsonResponse::HTTP_FORBIDDEN
             );
         }
 
-        return new Response('', JsonResponse::HTTP_CREATED);
+        $response = $this->responseFactory->create($orderContainer);
+
+        return new JsonResponse($response->toArray(), JsonResponse::HTTP_CREATED);
     }
 }
