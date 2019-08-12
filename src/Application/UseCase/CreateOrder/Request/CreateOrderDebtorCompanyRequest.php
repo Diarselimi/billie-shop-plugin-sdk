@@ -24,7 +24,7 @@ use OpenApi\Annotations as OA;
  *          @OA\Property(property="subindustry_sector", ref="#/components/schemas/TinyText", nullable=true),
  *          @OA\Property(property="employees_number", ref="#/components/schemas/TinyText", example="1-5", nullable=true),
  *          @OA\Property(property="legal_form", ref="#/components/schemas/TinyText", example="10122"),
- *          @OA\Property(property="established_costumer", type="boolean", nullable=true),
+ *          @OA\Property(property="established_customer", type="boolean", nullable=true),
  *          @OA\Property(property="address_addition", ref="#/components/schemas/TinyText", nullable=true),
  *          @OA\Property(property="address_house_number", ref="#/components/schemas/TinyText", example="4", nullable=true),
  *          @OA\Property(property="address_street", ref="#/components/schemas/TinyText", example="Charlottenstr."),

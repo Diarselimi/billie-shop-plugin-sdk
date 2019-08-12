@@ -34,6 +34,8 @@ class DebtorExternalDataEntity extends AbstractTimestampableEntity
 
     private $addressId;
 
+    private $billingAddressId;
+
     private $dataHash;
 
     public function getName(): string
@@ -181,6 +183,18 @@ class DebtorExternalDataEntity extends AbstractTimestampableEntity
     public function setAddressId(int $addressId): DebtorExternalDataEntity
     {
         $this->addressId = $addressId;
+
+        return $this;
+    }
+
+    public function getBillingAddressId(): int
+    {
+        return $this->billingAddressId;
+    }
+
+    public function setBillingAddressId(int $billingAddressId): DebtorExternalDataEntity
+    {
+        $this->billingAddressId = $billingAddressId;
 
         return $this;
     }

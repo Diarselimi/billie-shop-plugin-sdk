@@ -3,6 +3,7 @@
 namespace App\DomainModel\Order\NewOrder;
 
 use App\Application\UseCase\CreateOrder\CreateOrderRequest;
+use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\Address\AddressEntityFactory;
 use App\DomainModel\Address\AddressRepositoryInterface;
@@ -74,9 +75,11 @@ class OrderPersistenceService
         $order = $this->orderFactory->createFromRequest($request);
 
         $debtorPerson = $this->persistDebtorPerson($request);
-        $deliveryAddress = $this->persistDeliveryAddress($request);
         $debtorAddress = $this->persistDebtorAddress($request);
-        $debtorExternalData = $this->persistDebtorExternalData($request, $debtorAddress->getId());
+        $billingAddress = $request->getBillingAddress() ? $this->persistAddress($request->getBillingAddress()) : $debtorAddress;
+        $deliveryAddress = $request->getDeliveryAddress() ? $this->persistAddress($request->getDeliveryAddress()) : $billingAddress;
+
+        $debtorExternalData = $this->persistDebtorExternalData($request, $debtorAddress->getId(), $billingAddress->getId());
 
         $order
             ->setDebtorPersonId($debtorPerson->getId())
@@ -98,14 +101,6 @@ class OrderPersistenceService
         return $debtorPerson;
     }
 
-    private function persistDeliveryAddress(CreateOrderRequest $request): AddressEntity
-    {
-        $deliveryAddress = $this->addressFactory->createFromRequestDelivery($request);
-        $this->addressRepository->insert($deliveryAddress);
-
-        return $deliveryAddress;
-    }
-
     private function persistDebtorAddress(CreateOrderRequest $request): AddressEntity
     {
         $debtorAddress = $this->addressFactory->createFromRequestDebtor($request);
@@ -114,11 +109,20 @@ class OrderPersistenceService
         return $debtorAddress;
     }
 
-    private function persistDebtorExternalData(CreateOrderRequest $request, int $addressId): DebtorExternalDataEntity
+    public function persistAddress(CreateOrderAddressRequest $addressRequest): AddressEntity
+    {
+        $address = $this->addressFactory->createFromAddressRequest($addressRequest);
+        $this->addressRepository->insert($address);
+
+        return $address;
+    }
+
+    private function persistDebtorExternalData(CreateOrderRequest $request, int $addressId, ?int $invoiceAddressId): DebtorExternalDataEntity
     {
         $debtorExternalData = $this->debtorExternalDataFactory
             ->createFromRequest($request)
             ->setAddressId($addressId)
+            ->setBillingAddressId($invoiceAddressId)
         ;
 
         $debtorExternalData->setDataHash($this->arrayHasher->generateHash($request));

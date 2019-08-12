@@ -678,6 +678,17 @@ components:
       maximum: 120
       minimum: 1
       example: 30
+    PostalCode:
+      title: 'Postal Code'
+      type: string
+      maxLength: 5
+      example: '10969'
+    CountryCode:
+      title: 'Country Code'
+      type: string
+      maxLength: 2
+      pattern: '^[A-Za-z]{2}$'
+      example: DE
     Date:
       title: Date
       type: string
@@ -772,6 +783,32 @@ components:
       anyOf:
         -
           $ref: '#/components/schemas/OauthClientCredentialsGrantResponseBody'
+    CreateOrderAddressRequest:
+      title: 'Delivery Address'
+      required:
+        - street
+        - city
+        - postal_code
+        - country
+      properties:
+        addition:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        house_number:
+          example: '4'
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        street:
+          example: 'Charlotten Str.'
+          $ref: '#/components/schemas/TinyText'
+        city:
+          example: Berlin
+          $ref: '#/components/schemas/TinyText'
+        postal_code:
+          $ref: '#/components/schemas/PostalCode'
+        country:
+          $ref: '#/components/schemas/CountryCode'
+      type: object
     MerchantUserLoginRequest:
       title: 'Merchant User Login'
       properties:
@@ -1012,25 +1049,11 @@ components:
               $ref: '#/components/schemas/TinyText'
           type: object
         delivery_address:
-          properties:
-            house_number:
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            street:
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            postal_code:
-              type: string
-              maxLength: 5
-              nullable: true
-            city:
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            country:
-              type: string
-              maxLength: 2
-              nullable: true
           type: object
+          $ref: '#/components/schemas/CreateOrderAddressRequest'
+        billing_address:
+          type: object
+          $ref: '#/components/schemas/CreateOrderAddressRequest'
         created_at:
           $ref: '#/components/schemas/DateTime'
         shipped_at:

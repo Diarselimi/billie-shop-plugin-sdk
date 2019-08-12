@@ -80,7 +80,14 @@ Feature: Retrieve and search all orders of a merchant
 				"city": "test",
 				"postal_code":"test",
 				"country":"TE"
-			 }
+			 },
+			 "billing_address":{
+			    "house_number":"test",
+			    "street":"test",
+			    "city":"test",
+			    "postal_code":"test",
+			    "country":"TE"
+             }
 		  }
 		]
 	  }
@@ -145,7 +152,14 @@ Feature: Retrieve and search all orders of a merchant
 				"city": "test",
 				"postal_code":"test",
 				"country":"TE"
-			 }
+			 },
+			 "billing_address":{
+			    "house_number":"test",
+			    "street":"test",
+			    "city":"test",
+			    "postal_code":"test",
+			    "country":"TE"
+             }
 		  }
 		]
 	  }
@@ -210,7 +224,14 @@ Feature: Retrieve and search all orders of a merchant
 				"city": "test",
 				"postal_code":"test",
 				"country":"TE"
-			 }
+			 },
+			 "billing_address":{
+				"house_number":"test",
+				"street":"test",
+				"city": "test",
+				"postal_code":"test",
+				"country":"TE"
+             }
 		  }
 		]
 	  }
@@ -275,7 +296,14 @@ Feature: Retrieve and search all orders of a merchant
 				"city": "test",
 				"postal_code":"test",
 				"country":"TE"
-			 }
+			 },
+			 "billing_address":{
+				"house_number":"test",
+				"street":"test",
+				"city": "test",
+				"postal_code":"test",
+				"country":"TE"
+             }
 		  }
 		]
 	  }
@@ -354,7 +382,14 @@ Feature: Retrieve and search all orders of a merchant
 				"city": "test",
 				"postal_code":"test",
 				"country":"TE"
-			 }
+			 },
+			 "billing_address":{
+			    "house_number":"test",
+			    "street":"test",
+			    "city":"test",
+			    "postal_code":"test",
+			    "country":"TE"
+             }
 		  }
 		]
 	  }
@@ -457,7 +492,14 @@ Feature: Retrieve and search all orders of a merchant
 				"city":"test",
 				"postal_code":"test",
 				"country":"TE"
-			 }
+			 },
+			 "billing_address":{
+			    "house_number":"test",
+			    "street":"test",
+			    "city":"test",
+			    "postal_code":"test",
+			    "country":"TE"
+             }
 		  }
 		]
 	  }

@@ -64,7 +64,7 @@ Feature: Endpoint to approve an order in waiting state
 	Then the response status code should be 403
 	And the JSON response should be:
 	"""
-	{"errors":[{"title":"Cannot approve the order. Limit check failed","code":"forbidden"}]}
+      {"errors":[{"title":"Cannot approve the order. Limit check failed","code":"forbidden"}]}
 	"""
 	And the order CO123 is in state waiting
   	And the order CO123 has risk check limit failed

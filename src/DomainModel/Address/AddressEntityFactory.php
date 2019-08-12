@@ -3,19 +3,20 @@
 namespace App\DomainModel\Address;
 
 use App\Application\UseCase\CreateOrder\CreateOrderRequest;
+use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
 
 class AddressEntityFactory
 {
-    public function createFromRequestDelivery(CreateOrderRequest $request): AddressEntity
+    public function createFromAddressRequest(CreateOrderAddressRequest $addressRequest)
     {
         return (new AddressEntity())
-            ->setAddition($request->getDeliveryAddress()->getAddition())
-            ->setHouseNumber($request->getDeliveryAddress()->getHouseNumber())
-            ->setStreet($request->getDeliveryAddress()->getStreet())
-            ->setPostalCode($request->getDeliveryAddress()->getPostalCode())
-            ->setCity($request->getDeliveryAddress()->getCity())
-            ->setCountry($request->getDeliveryAddress()->getCountry())
-        ;
+            ->setAddition($addressRequest->getAddition())
+            ->setHouseNumber($addressRequest->getHouseNumber())
+            ->setStreet($addressRequest->getStreet())
+            ->setPostalCode($addressRequest->getPostalCode())
+            ->setCity($addressRequest->getCity())
+            ->setCountry($addressRequest->getCountry())
+            ;
     }
 
     public function createFromRequestDebtor(CreateOrderRequest $request): AddressEntity

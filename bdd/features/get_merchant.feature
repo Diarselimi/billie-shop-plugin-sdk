@@ -22,7 +22,8 @@ Feature:
         {
             "id": "1",
             "name": "Behat User",
-            "available_financing_limit": 10000,
+            "financing_power": 10000,
+            "financing_limit": 10000,
             "api_key": "test",
             "company_id": "10",
             "payment_merchant_id": "f2ec4d5e-79f4-40d6-b411-31174b6519ac",

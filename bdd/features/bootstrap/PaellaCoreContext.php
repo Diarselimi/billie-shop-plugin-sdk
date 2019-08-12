@@ -190,6 +190,7 @@ class PaellaCoreContext extends MinkContext
             ->setIndustrySector('test')
             ->setSubindustrySector('test')
             ->setEstablishedCustomer(true)
+            ->setBillingAddressId($deliveryAddress->getId())
             ->setMerchantExternalId('ext_id')
             ->setDataHash('829d100ebf4264d17fe53049a477efb2')
             ->setAddressId($debtorAddress->getId());

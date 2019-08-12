@@ -9,6 +9,8 @@ use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class AddressRepository extends AbstractPdoRepository implements AddressRepositoryInterface
 {
+    public const TABLE_NAME = 'addresses';
+
     private const SELECT_FIELDS = 'id, house, street, postal_code, city, country, addition, created_at, updated_at';
 
     private $addressEntityFactory;
@@ -21,7 +23,7 @@ class AddressRepository extends AbstractPdoRepository implements AddressReposito
     public function insert(AddressEntity $address): void
     {
         $id = $this->doInsert('
-            INSERT INTO addresses
+            INSERT INTO ' . self::TABLE_NAME . '
             (house, street, postal_code, city, country, addition, created_at, updated_at)
             VALUES
             (:house, :street, :postal_code, :city, :country, :addition, :created_at, :updated_at)
@@ -43,7 +45,7 @@ class AddressRepository extends AbstractPdoRepository implements AddressReposito
     public function getOneById(int $id): ?AddressEntity
     {
         $rawAddress = $this->doFetchOne(
-            'SELECT ' . self::SELECT_FIELDS . ' FROM addresses WHERE id = :id',
+            'SELECT ' . self::SELECT_FIELDS . ' FROM ' .self::TABLE_NAME. ' WHERE id = :id',
             ['id' => $id]
         );
 

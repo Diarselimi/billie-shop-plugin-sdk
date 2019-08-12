@@ -87,6 +87,13 @@ Feature:
             "city": "test",
             "postal_code":"test",
             "country":"TE"
+          },
+          "billing_address":{
+            "house_number":"test",
+            "street":"test",
+            "city":"test",
+            "postal_code":"test",
+            "country":"TE"
           }
         }
         """
@@ -184,6 +191,13 @@ Feature:
                 "city": "test",
                 "postal_code":"test",
                 "country":"TE"
+          },
+          "billing_address":{
+            "house_number":"test",
+            "street":"test",
+            "city":"test",
+            "postal_code":"test",
+            "country":"TE"
           }
         }
         """

@@ -7,14 +7,14 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Schema(
- *     schema="CreateOrderDeliveryAddressRequest",
+ *     schema="CreateOrderAddressRequest",
  *     title="Delivery Address",
  *     required={
  *          "street", "city", "postal_code", "country"
  *     },
  *     properties={
  *          @OA\Property(property="addition", ref="#/components/schemas/TinyText", nullable=true),
- *          @OA\Property(property="house_number", ref="#/components/schemas/TinyText", example="4"),
+ *          @OA\Property(property="house_number", ref="#/components/schemas/TinyText", example="4", nullable=true),
  *          @OA\Property(property="street", ref="#/components/schemas/TinyText", example="Charlotten Str."),
  *          @OA\Property(property="city", ref="#/components/schemas/TinyText", example="Berlin"),
  *          @OA\Property(property="postal_code", ref="#/components/schemas/PostalCode"),
@@ -22,7 +22,7 @@ use OpenApi\Annotations as OA;
  *     }
  * )
  */
-class CreateOrderDeliveryAddressRequest
+class CreateOrderAddressRequest
 {
     /**
      * @Assert\Length(max=255)
@@ -63,7 +63,7 @@ class CreateOrderDeliveryAddressRequest
         return $this->addition;
     }
 
-    public function setAddition(?string $addition): CreateOrderDeliveryAddressRequest
+    public function setAddition(?string $addition): CreateOrderAddressRequest
     {
         $this->addition = $addition;
 
@@ -75,7 +75,7 @@ class CreateOrderDeliveryAddressRequest
         return $this->houseNumber;
     }
 
-    public function setHouseNumber(?string $houseNumber): CreateOrderDeliveryAddressRequest
+    public function setHouseNumber(?string $houseNumber): CreateOrderAddressRequest
     {
         $this->houseNumber = $houseNumber;
 
@@ -87,7 +87,7 @@ class CreateOrderDeliveryAddressRequest
         return $this->street;
     }
 
-    public function setStreet(?string $street): CreateOrderDeliveryAddressRequest
+    public function setStreet(?string $street): CreateOrderAddressRequest
     {
         $this->street = $street;
 
@@ -99,7 +99,7 @@ class CreateOrderDeliveryAddressRequest
         return $this->city;
     }
 
-    public function setCity(?string $city): CreateOrderDeliveryAddressRequest
+    public function setCity(?string $city): CreateOrderAddressRequest
     {
         $this->city = $city;
 
@@ -111,7 +111,7 @@ class CreateOrderDeliveryAddressRequest
         return $this->postalCode;
     }
 
-    public function setPostalCode(?string $postalCode): CreateOrderDeliveryAddressRequest
+    public function setPostalCode(?string $postalCode): CreateOrderAddressRequest
     {
         $this->postalCode = $postalCode;
 
@@ -123,7 +123,7 @@ class CreateOrderDeliveryAddressRequest
         return $this->country;
     }
 
-    public function setCountry(?string $country): CreateOrderDeliveryAddressRequest
+    public function setCountry(?string $country): CreateOrderAddressRequest
     {
         $this->country = $country;
 

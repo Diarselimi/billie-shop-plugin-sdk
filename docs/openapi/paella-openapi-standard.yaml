@@ -845,11 +845,41 @@ components:
           example: DE123456-1
           $ref: '#/components/schemas/TinyText'
         delivery_address:
-          $ref: '#/components/schemas/CreateOrderDeliveryAddressRequest'
+          nullable: true
+          $ref: '#/components/schemas/CreateOrderAddressRequest'
+        billing_address:
+          nullable: true
+          $ref: '#/components/schemas/CreateOrderAddressRequest'
         debtor_company:
           $ref: '#/components/schemas/CreateOrderDebtorCompanyRequest'
         debtor_person:
           $ref: '#/components/schemas/CreateOrderDebtorPersonRequest'
+      type: object
+    CreateOrderAddressRequest:
+      title: 'Delivery Address'
+      required:
+        - street
+        - city
+        - postal_code
+        - country
+      properties:
+        addition:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        house_number:
+          example: '4'
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        street:
+          example: 'Charlotten Str.'
+          $ref: '#/components/schemas/TinyText'
+        city:
+          example: Berlin
+          $ref: '#/components/schemas/TinyText'
+        postal_code:
+          $ref: '#/components/schemas/PostalCode'
+        country:
+          $ref: '#/components/schemas/CountryCode'
       type: object
     CreateOrderAmountRequest:
       title: 'Order Amount'
@@ -918,7 +948,7 @@ components:
         legal_form:
           example: '10122'
           $ref: '#/components/schemas/TinyText'
-        established_costumer:
+        established_customer:
           type: boolean
           nullable: true
         address_addition:
@@ -963,31 +993,6 @@ components:
           type: string
           format: email
           example: james.smith@example.com
-      type: object
-    CreateOrderDeliveryAddressRequest:
-      title: 'Delivery Address'
-      required:
-        - street
-        - city
-        - postal_code
-        - country
-      properties:
-        addition:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        house_number:
-          example: '4'
-          $ref: '#/components/schemas/TinyText'
-        street:
-          example: 'Charlotten Str.'
-          $ref: '#/components/schemas/TinyText'
-        city:
-          example: Berlin
-          $ref: '#/components/schemas/TinyText'
-        postal_code:
-          $ref: '#/components/schemas/PostalCode'
-        country:
-          $ref: '#/components/schemas/CountryCode'
       type: object
     PauseOrderDunningRequest:
       title: 'Pause Order Dunning'
@@ -1155,25 +1160,11 @@ components:
               $ref: '#/components/schemas/TinyText'
           type: object
         delivery_address:
-          properties:
-            house_number:
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            street:
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            postal_code:
-              type: string
-              maxLength: 5
-              nullable: true
-            city:
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            country:
-              type: string
-              maxLength: 2
-              nullable: true
           type: object
+          $ref: '#/components/schemas/CreateOrderAddressRequest'
+        billing_address:
+          type: object
+          $ref: '#/components/schemas/CreateOrderAddressRequest'
         created_at:
           $ref: '#/components/schemas/DateTime'
         shipped_at:

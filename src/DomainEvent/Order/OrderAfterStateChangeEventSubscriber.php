@@ -15,7 +15,7 @@ use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, SlackClientAwareInterface, LoggingInterface
+class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, LoggingInterface, SlackClientAwareInterface
 {
     use LoggingTrait, SlackClientAwareTrait;
 

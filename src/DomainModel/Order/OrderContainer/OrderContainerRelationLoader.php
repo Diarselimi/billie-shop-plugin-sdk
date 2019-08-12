@@ -103,6 +103,11 @@ class OrderContainerRelationLoader
         return $this->addressRepository->getOneById($orderContainer->getOrder()->getDeliveryAddressId());
     }
 
+    public function loadBillingAddress(OrderContainer $orderContainer): AddressEntity
+    {
+        return $this->addressRepository->getOneById($orderContainer->getDebtorExternalData()->getBillingAddressId());
+    }
+
     public function loadMerchant(OrderContainer $orderContainer): MerchantEntity
     {
         return $this->merchantRepository->getOneById($orderContainer->getOrder()->getMerchantId());

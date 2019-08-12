@@ -5,7 +5,7 @@ namespace App\Application\UseCase\CreateOrder;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderAmountRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderDebtorCompanyRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderDebtorPersonRequest;
-use App\Application\UseCase\CreateOrder\Request\CreateOrderDeliveryAddressRequest;
+use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
 use App\Application\UseCase\ValidatedRequestInterface;
 use App\Application\Validator\Constraint as CustomConstrains;
 use App\DomainModel\ArrayableInterface;
@@ -19,7 +19,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          @OA\Property(property="comment", ref="#/components/schemas/TinyText", nullable=true),
  *          @OA\Property(property="duration", ref="#/components/schemas/OrderDuration"),
  *          @OA\Property(property="order_id", ref="#/components/schemas/TinyText", description="Order external code", example="DE123456-1"),
- *          @OA\Property(property="delivery_address", ref="#/components/schemas/CreateOrderDeliveryAddressRequest"),
+ *          @OA\Property(property="delivery_address", ref="#/components/schemas/CreateOrderAddressRequest", nullable=true),
+ *          @OA\Property(property="billing_address", ref="#/components/schemas/CreateOrderAddressRequest", nullable=true),
  *          @OA\Property(property="debtor_company", ref="#/components/schemas/CreateOrderDebtorCompanyRequest"),
  *          @OA\Property(property="debtor_person", ref="#/components/schemas/CreateOrderDebtorPersonRequest"),
  *     }
@@ -51,7 +52,6 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
     private $externalCode;
 
     /**
-     *
      * @Assert\Valid()
      */
     private $deliveryAddress;
@@ -73,6 +73,11 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
     private $merchantId;
 
     private $checkoutSessionId;
+
+    /**
+     * @Assert\Valid()
+     */
+    private $billingAddress;
 
     public function getAmount(): CreateOrderAmountRequest
     {
@@ -122,12 +127,12 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
         return $this;
     }
 
-    public function getDeliveryAddress(): CreateOrderDeliveryAddressRequest
+    public function getDeliveryAddress(): ?CreateOrderAddressRequest
     {
         return $this->deliveryAddress;
     }
 
-    public function setDeliveryAddress(CreateOrderDeliveryAddressRequest $deliveryAddress): CreateOrderRequest
+    public function setDeliveryAddress(?CreateOrderAddressRequest $deliveryAddress): CreateOrderRequest
     {
         $this->deliveryAddress = $deliveryAddress;
 
@@ -178,6 +183,18 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
     public function setCheckoutSessionId(?int $checkoutSessionId)
     {
         $this->checkoutSessionId = $checkoutSessionId;
+
+        return $this;
+    }
+
+    public function getBillingAddress(): ?CreateOrderAddressRequest
+    {
+        return $this->billingAddress;
+    }
+
+    public function setBillingAddress(?CreateOrderAddressRequest $billingAddress): CreateOrderRequest
+    {
+        $this->billingAddress = $billingAddress;
 
         return $this;
     }
