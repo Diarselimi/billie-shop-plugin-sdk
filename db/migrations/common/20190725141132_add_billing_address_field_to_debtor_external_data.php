@@ -30,7 +30,7 @@ class AddBillingAddressFieldToDebtorExternalData extends AbstractMigration
 
         $this
             ->table(DebtorExternalDataRepository::TABLE_NAME)
-            ->changeColumn('billing_address_id', 'int', ['null' => false])
+            ->changeColumn('billing_address_id', 'integer', ['null' => false])
             ->save()
         ;
     }
