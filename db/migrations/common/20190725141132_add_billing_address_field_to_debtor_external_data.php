@@ -18,11 +18,6 @@ class AddBillingAddressFieldToDebtorExternalData extends AbstractMigration
                     'after' => 'address_id',
                 ]
             )
-            ->addForeignKey(
-                'billing_address_id',
-                AddressRepository::TABLE_NAME,
-                'id'
-            )
             ->update();
 
         $sql = 'UPDATE ' . DebtorExternalDataRepository::TABLE_NAME . ' SET billing_address_id = address_id';
@@ -31,6 +26,12 @@ class AddBillingAddressFieldToDebtorExternalData extends AbstractMigration
         $this
             ->table(DebtorExternalDataRepository::TABLE_NAME)
             ->changeColumn('billing_address_id', 'integer', ['null' => false])
+            ->addIndex(['billing_address_id'])
+            ->addForeignKey(
+                'billing_address_id',
+                AddressRepository::TABLE_NAME,
+                'id'
+            )
             ->save()
         ;
     }
