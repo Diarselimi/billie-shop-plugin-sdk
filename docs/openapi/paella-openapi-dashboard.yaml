@@ -420,6 +420,28 @@ paths:
       security:
         -
           oauth2: []
+  /merchant/user:
+    get:
+      tags:
+        - Authentication
+      summary: 'Get Merchant User'
+      operationId: get_merchant_user
+      responses:
+        '200':
+          description: 'Merchant User details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMerchantUserResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
   '/order/{id}':
     get:
       tags:
@@ -703,6 +725,16 @@ components:
       title: string
       type: string
       maxLength: 255
+    MerchantUserRoles:
+      title: 'Merchant User Roles'
+      type: string
+      enum:
+        - ROLE_VIEW_ORDERS
+        - ROLE_VIEW_DEBTORS
+        - ROLE_VIEW_PAYMENTS
+        - ROLE_CONFIRM_ORDER_PAYMENT
+        - ROLE_PAUSE_DUNNING
+      example: ROLE_VIEW_ORDERS
     OauthGrantType:
       title: 'OAuth Grant Type'
       type: string
@@ -809,6 +841,18 @@ components:
         country:
           $ref: '#/components/schemas/CountryCode'
       type: object
+    GetMerchantUserResponse:
+      title: 'Get Merchant User Response'
+      properties:
+        user_id:
+          type: integer
+          nullable: false
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/MerchantUserRoles'
+          nullable: false
+      type: object
     MerchantUserLoginRequest:
       title: 'Merchant User Login'
       properties:
@@ -831,11 +875,10 @@ components:
           type: string
           example: l387435hzyoc0oo4kokow
           nullable: false
-        roles:
+        permissions:
           type: array
           items:
-            type: string
-            example: ROLE_USER
+            $ref: '#/components/schemas/MerchantUserRoles'
           nullable: false
         merchant_name:
           type: string

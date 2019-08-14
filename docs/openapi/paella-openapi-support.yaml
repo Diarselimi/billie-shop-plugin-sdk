@@ -827,16 +827,7 @@ paths:
         content:
           application/json:
             schema:
-              properties:
-                email:
-                  type: string
-                  format: email
-                  nullable: false
-                password:
-                  type: string
-                  format: password
-                  nullable: false
-              type: object
+              $ref: '#/components/schemas/RegisterMerchantUserRequest'
       responses:
         '201':
           description: 'Merchant user was successfully registered'
@@ -1154,6 +1145,16 @@ components:
       format: float
       pattern: '^(\d{1,}(.\d{2})?)$'
       example: 7500
+    MerchantUserRoles:
+      title: 'Merchant User Roles'
+      type: string
+      enum:
+        - ROLE_VIEW_ORDERS
+        - ROLE_VIEW_DEBTORS
+        - ROLE_VIEW_PAYMENTS
+        - ROLE_CONFIRM_ORDER_PAYMENT
+        - ROLE_PAUSE_DUNNING
+      example: ROLE_VIEW_ORDERS
     OauthGrantType:
       title: 'OAuth Grant Type'
       type: string
@@ -1496,6 +1497,23 @@ components:
         is_duplicate_of:
           type: integer
       type: object
+    RegisterMerchantUserRequest:
+      title: 'Register Merchant User'
+      properties:
+        email:
+          type: string
+          format: email
+          nullable: false
+        password:
+          type: string
+          format: password
+          nullable: false
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/MerchantUserRoles'
+          nullable: true
+      type: object
     UpdateMerchantDebtorCompanyRequest:
       properties:
         name:
@@ -1533,11 +1551,6 @@ components:
           $ref: '#/components/schemas/TinyText'
         payment_merchant_id:
           $ref: '#/components/schemas/UUID'
-        roles:
-          type: array
-          items:
-            type: string
-            example: ROLE_API_USER
         is_active:
           type: boolean
         webhook_url:

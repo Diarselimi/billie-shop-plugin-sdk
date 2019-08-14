@@ -885,16 +885,7 @@ paths:
         content:
           application/json:
             schema:
-              properties:
-                email:
-                  type: string
-                  format: email
-                  nullable: false
-                password:
-                  type: string
-                  format: password
-                  nullable: false
-              type: object
+              $ref: '#/components/schemas/RegisterMerchantUserRequest'
       responses:
         '201':
           description: 'Merchant user was successfully registered'
@@ -1483,6 +1474,30 @@ paths:
           oauth2: []
       x-groups:
         - dashboard
+  /merchant/user:
+    get:
+      tags:
+        - Authentication
+      summary: 'Get Merchant User'
+      operationId: get_merchant_user
+      responses:
+        '200':
+          description: 'Merchant User details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMerchantUserResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+      x-groups:
+        - dashboard
   '/order/{id}':
     get:
       tags:
@@ -1919,6 +1934,16 @@ components:
       format: float
       pattern: '^(\d{1,}(.\d{2})?)$'
       example: 7500
+    MerchantUserRoles:
+      title: 'Merchant User Roles'
+      type: string
+      enum:
+        - ROLE_VIEW_ORDERS
+        - ROLE_VIEW_DEBTORS
+        - ROLE_VIEW_PAYMENTS
+        - ROLE_CONFIRM_ORDER_PAYMENT
+        - ROLE_PAUSE_DUNNING
+      example: ROLE_VIEW_ORDERS
     OauthGrantType:
       title: 'OAuth Grant Type'
       type: string
@@ -2261,6 +2286,18 @@ components:
                 $ref: '#/components/schemas/GetDebtorCompanyLimitsMerchant'
             type: object
       type: object
+    GetMerchantUserResponse:
+      title: 'Get Merchant User Response'
+      properties:
+        user_id:
+          type: integer
+          nullable: false
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/MerchantUserRoles'
+          nullable: false
+      type: object
     MarkDuplicateDebtorItem:
       required:
         - debtor_id
@@ -2293,11 +2330,10 @@ components:
           type: string
           example: l387435hzyoc0oo4kokow
           nullable: false
-        roles:
+        permissions:
           type: array
           items:
-            type: string
-            example: ROLE_USER
+            $ref: '#/components/schemas/MerchantUserRoles'
           nullable: false
         merchant_name:
           type: string
@@ -2311,6 +2347,23 @@ components:
           type: integer
           minimum: 1
           nullable: false
+      type: object
+    RegisterMerchantUserRequest:
+      title: 'Register Merchant User'
+      properties:
+        email:
+          type: string
+          format: email
+          nullable: false
+        password:
+          type: string
+          format: password
+          nullable: false
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/MerchantUserRoles'
+          nullable: true
       type: object
     ShipOrderRequest:
       title: 'Order Shipping Object'
@@ -2403,11 +2456,6 @@ components:
           $ref: '#/components/schemas/TinyText'
         payment_merchant_id:
           $ref: '#/components/schemas/UUID'
-        roles:
-          type: array
-          items:
-            type: string
-            example: ROLE_API_USER
         is_active:
           type: boolean
         webhook_url:

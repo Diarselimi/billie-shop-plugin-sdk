@@ -38,7 +38,7 @@ Feature: As a merchant, i should be able to access all endpoints
 	And I get from companies service get debtor response
 	And I get from payments service get debtor response
 	And I get from Oauth service a valid user token
-	And a merchant user exists
+	And a merchant user exists with role ROLE_MERCHANT
 	When I add "Authorization" header equal to "Bearer someToken"
 	And I send a GET request to "/order/XF43Y"
 	Then the response status code should be 200
@@ -48,7 +48,7 @@ Feature: As a merchant, i should be able to access all endpoints
 	And I get from companies service get debtor response
 	And I get from payments service get debtor response
 	And I get from Oauth service a valid client token response
-	And a merchant user exists
+	And a merchant user exists with role ROLE_MERCHANT
 	When I add "Authorization" header equal to "Bearer someToken"
 	And I send a GET request to "/order/XF43Y"
 	Then the response status code should be 200
@@ -58,7 +58,7 @@ Feature: As a merchant, i should be able to access all endpoints
 	And I get from companies service get debtor response
 	And I get from payments service get debtor response
 	And I get from Oauth service a valid client token response
-	And a merchant user exists
+	And a merchant user exists with role ROLE_MERCHANT
 	When I add "Authorization" header equal to "Bearer someToken"
 	And I add "X-Api-Key" header equal to WrongKey
 	And I send a GET request to "/order/XF43Y"

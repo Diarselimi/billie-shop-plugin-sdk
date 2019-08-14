@@ -3,9 +3,9 @@ Feature: Retrieve and search all orders of a merchant
   Background:
     Given I add "Content-type" header equal to "application/json"
     And I add "X-Test" header equal to 1
-    And a merchant user exists
-    And I get from Oauth service a valid user token
-    And I add "Authorization" header equal to test
+	And I add "Authorization" header equal to "Bearer someToken"
+	And I get from Oauth service a valid user token
+	And a merchant user exists with role ROLE_VIEW_ORDERS
 
   Scenario: Successfully retrieve orders that are not in state new
     Given I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"

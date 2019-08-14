@@ -5,7 +5,6 @@ namespace App\Http\Authentication\Authenticator;
 use App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantUser\MerchantUserEntity;
-use App\Http\Authentication\Authenticator\AbstractAuthenticator;
 use App\Http\Authentication\User;
 use App\Http\HttpConstantsInterface;
 use Symfony\Component\HttpFoundation\Request;

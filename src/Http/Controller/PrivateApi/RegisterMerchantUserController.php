@@ -5,6 +5,7 @@ namespace App\Http\Controller\PrivateApi;
 use App\Application\UseCase\RegisterMerchantUser\RegisterMerchantUserRequest;
 use App\Application\UseCase\RegisterMerchantUser\RegisterMerchantUserUseCase;
 use App\DomainModel\Merchant\MerchantNotFoundException;
+use App\DomainModel\MerchantUser\MerchantUserEntity;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,10 +26,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     @OA\RequestBody(
  *          required=true,
  *          @OA\MediaType(mediaType="application/json",
- *          @OA\Schema(type="object", properties={
- *              @OA\Property(property="email", format="email", type="string", nullable=false),
- *              @OA\Property(property="password", format="password", type="string", nullable=false)
- *          }))
+ *          @OA\Schema(ref="#/components/schemas/RegisterMerchantUserRequest"))
  *     ),
  *
  *     @OA\Response(response=201, description="Merchant user was successfully registered"),
@@ -52,7 +50,8 @@ class RegisterMerchantUserController
                 new RegisterMerchantUserRequest(
                     $merchantId,
                     $request->request->get('email'),
-                    $request->request->get('password')
+                    $request->request->get('password'),
+                    $request->request->get('roles', MerchantUserEntity::DEFAULT_ROLES)
                 )
             );
 

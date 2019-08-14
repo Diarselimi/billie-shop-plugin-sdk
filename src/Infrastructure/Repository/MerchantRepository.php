@@ -11,7 +11,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
 {
     public const TABLE_NAME = "merchants";
 
-    private const SELECT_FIELDS = 'id, name, api_key, oauth_client_id, company_id, payment_merchant_id, roles, is_active, financing_power, available_financing_limit, webhook_url, webhook_authorization, created_at, updated_at';
+    private const SELECT_FIELDS = 'id, name, api_key, oauth_client_id, company_id, payment_merchant_id, is_active, financing_power, available_financing_limit, webhook_url, webhook_authorization, created_at, updated_at';
 
     private $factory;
 
@@ -24,14 +24,13 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
     {
         $id = $this->doInsert('
             INSERT INTO '.self::TABLE_NAME.'
-            (name, api_key, oauth_client_id, roles, is_active, financing_power, available_financing_limit, company_id, payment_merchant_id, webhook_url, webhook_authorization, created_at, updated_at)
+            (name, api_key, oauth_client_id, is_active, financing_power, available_financing_limit, company_id, payment_merchant_id, webhook_url, webhook_authorization, created_at, updated_at)
             VALUES
-            (:name, :api_key, :oauth_client_id, :roles, :is_active, :financing_power, :available_financing_limit, :company_id, :payment_merchant_id, :webhook_url, :webhook_authorization, :created_at, :updated_at)
+            (:name, :api_key, :oauth_client_id, :is_active, :financing_power, :available_financing_limit, :company_id, :payment_merchant_id, :webhook_url, :webhook_authorization, :created_at, :updated_at)
         ', [
             'name' => $merchant->getName(),
             'api_key' => $merchant->getApiKey(),
             'oauth_client_id' => $merchant->getOauthClientId(),
-            'roles' => json_encode($merchant->getRoles()),
             'is_active' => $merchant->isActive(),
             'financing_power' => $merchant->getFinancingPower(),
             'available_financing_limit' => $merchant->getFinancingPower(),

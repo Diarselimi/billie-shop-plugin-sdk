@@ -8,7 +8,6 @@ use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
 use App\DomainModel\MerchantUser\AuthenticationServiceRequestException;
 use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
-use App\Infrastructure\Smaug\AuthenticationServiceException;
 
 class MerchantUserLoginUseCase implements ValidatedUseCaseInterface
 {

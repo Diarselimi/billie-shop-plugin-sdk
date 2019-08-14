@@ -3,9 +3,21 @@
 namespace App\Application\UseCase\RegisterMerchantUser;
 
 use App\Application\UseCase\ValidatedRequestInterface;
-use App\DomainModel\MerchantUser\MerchantUserEntity;
 use Symfony\Component\Validator\Constraints as Assert;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Schema(schema="RegisterMerchantUserRequest", title="Register Merchant User", type="object", properties={
+ *     @OA\Property(property="email", format="email", type="string", nullable=false),
+ *     @OA\Property(property="password", format="password", type="string", nullable=false),
+ *     @OA\Property(
+ *          property="roles",
+ *          type="array",
+ *          nullable=true,
+ *          @OA\Items(ref="#/components/schemas/MerchantUserRoles")
+ *      )
+ * })
+ */
 class RegisterMerchantUserRequest implements ValidatedRequestInterface
 {
     /**
@@ -36,7 +48,7 @@ class RegisterMerchantUserRequest implements ValidatedRequestInterface
         int $merchantId,
         string $userEmail,
         string $userPassword,
-        array $roles = [MerchantUserEntity::ROLE_USER]
+        array $roles
     ) {
         $this->merchantId = $merchantId;
         $this->userEmail = $userEmail;
