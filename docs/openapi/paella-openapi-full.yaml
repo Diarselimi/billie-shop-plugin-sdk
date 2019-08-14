@@ -1070,24 +1070,16 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateOrderRequest'
       responses:
-        '201':
+        '200':
           description: 'Order created with ''authorized'' state, but a merchant confirmation is needed.'
-          $ref: '#/components/schemas/AuthorizeOrderResponse'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckoutSessionAuthorizeResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
-        '403':
-          description: 'Order declined.'
-          content:
-            application/json:
-              schema:
-                title: 'Checkout Authorize Error'
-                properties:
-                  reasons: { description: 'Decline reasons', type: array, items: { $ref: '#/components/schemas/OrderDeclineReason' } }
-                type: object
-                allOf:
-                  - { $ref: '#/components/schemas/ErrorsObject' }
         '500':
           $ref: '#/components/responses/ServerError'
       x-groups:
@@ -2409,34 +2401,6 @@ components:
         invoice_url:
           $ref: '#/components/schemas/TinyText'
       type: object
-    AuthorizeOrderResponse:
-      title: 'Order Entity'
-      properties:
-        debtor_company:
-          description: 'Identified company'
-          properties:
-            name:
-              example: 'Billie GmbH'
-              $ref: '#/components/schemas/TinyText'
-            address_house_number:
-              example: '4'
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            address_street:
-              example: Charlottenstr.
-              $ref: '#/components/schemas/TinyText'
-            address_postal_code:
-              type: string
-              maxLength: 5
-              example: '10969'
-            address_city:
-              example: Berlin
-              $ref: '#/components/schemas/TinyText'
-            address_country:
-              type: string
-              maxLength: 2
-          type: object
-      type: object
     MerchantEntity:
       properties:
         id:
@@ -2588,6 +2552,45 @@ components:
         is_updated:
           type: boolean
           example: 'true'
+      type: object
+    CheckoutSessionAuthorizeResponse:
+      title: 'Authorize Checkout Order Response'
+      properties:
+        state:
+          example: created
+          $ref: '#/components/schemas/OrderState'
+        reasons:
+          nullable: true
+          $ref: '#/components/schemas/OrderDeclineReason'
+        debtor_company:
+          description: 'Identified company'
+          properties:
+            name:
+              example: 'Billie GmbH'
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_house_number:
+              example: '4'
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_street:
+              example: Charlottenstr.
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_postal_code:
+              type: string
+              maxLength: 5
+              example: '10969'
+              nullable: true
+            address_city:
+              example: Berlin
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_country:
+              type: string
+              maxLength: 2
+              nullable: true
+          type: object
       type: object
     OrderResponse:
       title: 'Order Entity'

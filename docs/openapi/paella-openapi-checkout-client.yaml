@@ -56,24 +56,16 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateOrderRequest'
       responses:
-        '201':
+        '200':
           description: 'Order created with ''authorized'' state, but a merchant confirmation is needed.'
-          $ref: '#/components/schemas/AuthorizeOrderResponse'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckoutSessionAuthorizeResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
-        '403':
-          description: 'Order declined.'
-          content:
-            application/json:
-              schema:
-                title: 'Checkout Authorize Error'
-                properties:
-                  reasons: { description: 'Decline reasons', type: array, items: { $ref: '#/components/schemas/OrderDeclineReason' } }
-                type: object
-                allOf:
-                  - { $ref: '#/components/schemas/ErrorsObject' }
         '500':
           $ref: '#/components/responses/ServerError'
   /legal-forms:
@@ -102,6 +94,22 @@ components:
       maxLength: 36
       minLength: 36
       example: 12345667-890a-bcde-f123-34567890abcd
+    OrderState:
+      title: 'Order State'
+      type: string
+      enum:
+        - new
+        - authorized
+        - waiting
+        - created
+        - declined
+        - shipped
+        - paid_out
+        - late
+        - complete
+        - canceled
+        - pre_approved
+      example: created
     OrderDeclineReason:
       title: 'Order Decline Reason'
       type: string
@@ -308,14 +316,21 @@ components:
           format: email
           example: james.smith@example.com
       type: object
-    AuthorizeOrderResponse:
-      title: 'Order Entity'
+    CheckoutSessionAuthorizeResponse:
+      title: 'Authorize Checkout Order Response'
       properties:
+        state:
+          example: created
+          $ref: '#/components/schemas/OrderState'
+        reasons:
+          nullable: true
+          $ref: '#/components/schemas/OrderDeclineReason'
         debtor_company:
           description: 'Identified company'
           properties:
             name:
               example: 'Billie GmbH'
+              nullable: true
               $ref: '#/components/schemas/TinyText'
             address_house_number:
               example: '4'
@@ -323,17 +338,21 @@ components:
               $ref: '#/components/schemas/TinyText'
             address_street:
               example: Charlottenstr.
+              nullable: true
               $ref: '#/components/schemas/TinyText'
             address_postal_code:
               type: string
               maxLength: 5
               example: '10969'
+              nullable: true
             address_city:
               example: Berlin
+              nullable: true
               $ref: '#/components/schemas/TinyText'
             address_country:
               type: string
               maxLength: 2
+              nullable: true
           type: object
       type: object
     ErrorsObject:

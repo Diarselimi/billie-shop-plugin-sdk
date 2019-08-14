@@ -77,7 +77,10 @@ class OrderResponseFactory
         return $response;
     }
 
-    private function addCompanyData(OrderContainer $orderContainer, OrderResponse $response)
+    /**
+     * @param OrderResponse|CheckoutSessionAuthorizeResponse $response
+     */
+    private function addCompanyData(OrderContainer $orderContainer, $response)
     {
         $debtor = $orderContainer->getDebtorCompany();
 
@@ -124,9 +127,15 @@ class OrderResponseFactory
     public function createAuthorizeResponse(OrderContainer $orderContainer): CheckoutSessionAuthorizeResponse
     {
         $order = $orderContainer->getOrder();
-        $response = new CheckoutSessionAuthorizeResponse();
+        $response = (new CheckoutSessionAuthorizeResponse())
+            ->setState($order->getState())
+        ;
 
         $response = $this->addReasons($order, $response);
+
+        if ($order->getMerchantDebtorId()) {
+            $this->addCompanyData($orderContainer, $response);
+        }
 
         return $response;
     }
