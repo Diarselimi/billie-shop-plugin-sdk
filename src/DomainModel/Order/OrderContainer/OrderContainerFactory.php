@@ -71,9 +71,9 @@ class OrderContainerFactory
         return new OrderContainer($order, $this->relationLoader);
     }
 
-    public function loadByCheckoutSessionUuid(string $checkoutSessionUuid): OrderContainer
+    public function loadAuthorizedByCheckoutSessionUuid(string $checkoutSessionUuid): OrderContainer
     {
-        $order = $this->orderRepository->getOneByCheckoutSessionUuid($checkoutSessionUuid);
+        $order = $this->orderRepository->getAuthorizedByCheckoutSessionUuid($checkoutSessionUuid);
         if (!$order) {
             throw new OrderContainerFactoryException("Order not found");
         }

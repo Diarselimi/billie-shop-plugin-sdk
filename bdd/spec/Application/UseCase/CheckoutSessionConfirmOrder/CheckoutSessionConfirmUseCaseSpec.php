@@ -33,7 +33,7 @@ class CheckoutSessionConfirmUseCaseSpec extends ObjectBehavior
         $this->setValidator($validator);
         $validator->validate(Argument::any(), Argument::any(), Argument::any())->willReturn(new ConstraintViolationList());
 
-        $orderContainerFactory->loadByCheckoutSessionUuid('test123')->willReturn($orderContainer);
+        $orderContainerFactory->loadAuthorizedByCheckoutSessionUuid('test123')->willReturn($orderContainer);
 
         $order->getState()->willReturn(OrderStateManager::STATE_AUTHORIZED);
         $orderContainer->getOrder()->willReturn($order);
