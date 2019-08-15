@@ -885,16 +885,7 @@ paths:
         content:
           application/json:
             schema:
-              properties:
-                email:
-                  type: string
-                  format: email
-                  nullable: false
-                password:
-                  type: string
-                  format: password
-                  nullable: false
-              type: object
+              $ref: '#/components/schemas/RegisterMerchantUserRequest'
       responses:
         '201':
           description: 'Merchant user was successfully registered'
@@ -1079,19 +1070,14 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateOrderRequest'
       responses:
-        '201':
+        '200':
           description: 'Order created with ''authorized'' state, but a merchant confirmation is needed.'
-        '400':
-          description: 'Invalid request data or order declined.'
           content:
             application/json:
               schema:
-                title: 'Checkout Authorize Error'
-                properties:
-                  reasons: { description: 'Decline reasons', type: array, items: { $ref: '#/components/schemas/OrderDeclineReason' } }
-                type: object
-                allOf:
-                  - { $ref: '#/components/schemas/ErrorsObject' }
+                $ref: '#/components/schemas/CheckoutSessionAuthorizeResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '500':
@@ -1366,6 +1352,26 @@ paths:
           oauth2: []
       x-groups:
         - support
+  /legal-forms:
+    get:
+      tags:
+        - Misc.
+      summary: 'Get Legal Forms'
+      operationId: get_legal_forms
+      responses:
+        '200':
+          description: 'List of supported legal forms'
+          content:
+            application/json:
+              schema:
+                properties:
+                  items: { type: array, items: { properties: { code: { description: 'Legal form code', type: integer, example: '90101' }, name: { description: 'Legal form name', type: string, example: 'AG & Co. KG', nullable: true }, required_input: { description: 'Required input (HR-NR => Registration Number, Ust-ID => Registration ID)', type: string, example: HR-NR }, required: { description: Required, type: boolean } }, type: object } }
+                type: object
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security: []
+      x-groups:
+        - checkout-client
   '/debtor/{uuid}':
     get:
       tags:
@@ -1451,6 +1457,30 @@ paths:
                 $ref: '#/components/schemas/MerchantDebtorListResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+      x-groups:
+        - dashboard
+  /merchant/user:
+    get:
+      tags:
+        - Authentication
+      summary: 'Get Merchant User'
+      operationId: get_merchant_user
+      responses:
+        '200':
+          description: 'Merchant User details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMerchantUserResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '500':
@@ -1612,6 +1642,7 @@ paths:
           in: query
           required: false
           style: deepObject
+          explode: true
           schema:
             properties:
               merchant_debtor_id:
@@ -1895,6 +1926,16 @@ components:
       format: float
       pattern: '^(\d{1,}(.\d{2})?)$'
       example: 7500
+    MerchantUserRoles:
+      title: 'Merchant User Roles'
+      type: string
+      enum:
+        - ROLE_VIEW_ORDERS
+        - ROLE_VIEW_DEBTORS
+        - ROLE_VIEW_PAYMENTS
+        - ROLE_CONFIRM_ORDER_PAYMENT
+        - ROLE_PAUSE_DUNNING
+      example: ROLE_VIEW_ORDERS
     OauthGrantType:
       title: 'OAuth Grant Type'
       type: string
@@ -2041,11 +2082,41 @@ components:
           example: DE123456-1
           $ref: '#/components/schemas/TinyText'
         delivery_address:
-          $ref: '#/components/schemas/CreateOrderDeliveryAddressRequest'
+          nullable: true
+          $ref: '#/components/schemas/CreateOrderAddressRequest'
+        billing_address:
+          nullable: true
+          $ref: '#/components/schemas/CreateOrderAddressRequest'
         debtor_company:
           $ref: '#/components/schemas/CreateOrderDebtorCompanyRequest'
         debtor_person:
           $ref: '#/components/schemas/CreateOrderDebtorPersonRequest'
+      type: object
+    CreateOrderAddressRequest:
+      title: 'Delivery Address'
+      required:
+        - street
+        - city
+        - postal_code
+        - country
+      properties:
+        addition:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        house_number:
+          example: '4'
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        street:
+          example: 'Charlotten Str.'
+          $ref: '#/components/schemas/TinyText'
+        city:
+          example: Berlin
+          $ref: '#/components/schemas/TinyText'
+        postal_code:
+          $ref: '#/components/schemas/PostalCode'
+        country:
+          $ref: '#/components/schemas/CountryCode'
       type: object
     CreateOrderAmountRequest:
       title: 'Order Amount'
@@ -2114,7 +2185,7 @@ components:
         legal_form:
           example: '10122'
           $ref: '#/components/schemas/TinyText'
-        established_costumer:
+        established_customer:
           type: boolean
           nullable: true
         address_addition:
@@ -2159,31 +2230,6 @@ components:
           type: string
           format: email
           example: james.smith@example.com
-      type: object
-    CreateOrderDeliveryAddressRequest:
-      title: 'Delivery Address'
-      required:
-        - street
-        - city
-        - postal_code
-        - country
-      properties:
-        addition:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        house_number:
-          example: '4'
-          $ref: '#/components/schemas/TinyText'
-        street:
-          example: 'Charlotten Str.'
-          $ref: '#/components/schemas/TinyText'
-        city:
-          example: Berlin
-          $ref: '#/components/schemas/TinyText'
-        postal_code:
-          $ref: '#/components/schemas/PostalCode'
-        country:
-          $ref: '#/components/schemas/CountryCode'
       type: object
     GetDebtorCompanyLimitsMerchant:
       title: 'Debtor''s Merchant IDs Object'
@@ -2232,6 +2278,18 @@ components:
                 $ref: '#/components/schemas/GetDebtorCompanyLimitsMerchant'
             type: object
       type: object
+    GetMerchantUserResponse:
+      title: 'Get Merchant User Response'
+      properties:
+        user_id:
+          type: integer
+          nullable: false
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/MerchantUserRoles'
+          nullable: false
+      type: object
     MarkDuplicateDebtorItem:
       required:
         - debtor_id
@@ -2264,11 +2322,10 @@ components:
           type: string
           example: l387435hzyoc0oo4kokow
           nullable: false
-        roles:
+        permissions:
           type: array
           items:
-            type: string
-            example: ROLE_USER
+            $ref: '#/components/schemas/MerchantUserRoles'
           nullable: false
         merchant_name:
           type: string
@@ -2282,6 +2339,23 @@ components:
           type: integer
           minimum: 1
           nullable: false
+      type: object
+    RegisterMerchantUserRequest:
+      title: 'Register Merchant User'
+      properties:
+        email:
+          type: string
+          format: email
+          nullable: false
+        password:
+          type: string
+          format: password
+          nullable: false
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/MerchantUserRoles'
+          nullable: true
       type: object
     ShipOrderRequest:
       title: 'Order Shipping Object'
@@ -2346,11 +2420,6 @@ components:
           $ref: '#/components/schemas/TinyText'
         payment_merchant_id:
           $ref: '#/components/schemas/UUID'
-        roles:
-          type: array
-          items:
-            type: string
-            example: ROLE_API_USER
         is_active:
           type: boolean
         webhook_url:
@@ -2484,6 +2553,45 @@ components:
           type: boolean
           example: 'true'
       type: object
+    CheckoutSessionAuthorizeResponse:
+      title: 'Authorize Checkout Order Response'
+      properties:
+        state:
+          example: created
+          $ref: '#/components/schemas/OrderState'
+        reasons:
+          nullable: true
+          $ref: '#/components/schemas/OrderDeclineReason'
+        debtor_company:
+          description: 'Identified company'
+          properties:
+            name:
+              example: 'Billie GmbH'
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_house_number:
+              example: '4'
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_street:
+              example: Charlottenstr.
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_postal_code:
+              type: string
+              maxLength: 5
+              example: '10969'
+              nullable: true
+            address_city:
+              example: Berlin
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_country:
+              type: string
+              maxLength: 2
+              nullable: true
+          type: object
+      type: object
     OrderResponse:
       title: 'Order Entity'
       properties:
@@ -2616,25 +2724,11 @@ components:
               $ref: '#/components/schemas/TinyText'
           type: object
         delivery_address:
-          properties:
-            house_number:
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            street:
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            postal_code:
-              type: string
-              maxLength: 5
-              nullable: true
-            city:
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            country:
-              type: string
-              maxLength: 2
-              nullable: true
           type: object
+          $ref: '#/components/schemas/CreateOrderAddressRequest'
+        billing_address:
+          type: object
+          $ref: '#/components/schemas/CreateOrderAddressRequest'
         created_at:
           $ref: '#/components/schemas/DateTime'
         shipped_at:

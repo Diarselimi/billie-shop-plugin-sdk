@@ -30,6 +30,10 @@ security:
                 authenticators:
                     - App\Http\Authentication\Authenticator\OAuthTokenAuthenticator
 
+        legal_forms:
+            pattern: ^/(public/)?legal-forms
+            security: false
+
         checkout_authorize:
             pattern: ^/(public/)?checkout-session/.*/authorize
             anonymous: false
@@ -48,5 +52,8 @@ security:
                 entry_point: App\Http\Authentication\Authenticator\OAuthTokenAuthenticator
 
     access_control:
-         - { path: ^/, roles: [ROLE_USER, ROLE_MERCHANT] }
-         - { path: ^/checkout-session/.*/authorize, roles: [ROLE_CHECKOUT_USER] }
+         - { path: ^/(public/)?checkout-session/.*/authorize, roles: [ROLE_CHECKOUT_USER], methods: [PUT] }
+         - { path: ^/(public/)?orders, roles: [ROLE_VIEW_ORDERS], methods: [GET] }
+         - { path: ^/(public/)?debtors, roles: [ROLE_VIEW_DEBTORS], methods: [GET] }
+         - { path: ^/(public/)?order/.*/confirm-payment, roles: [ROLE_MERCHANT, ROLE_CONFIRM_ORDER_PAYMENT], methods: [POST] }
+         - { path: ^/(public/)?order/.*/pause-dunning, roles: [ROLE_PAUSE_DUNNING], methods: [POST] }

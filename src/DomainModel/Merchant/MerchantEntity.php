@@ -17,7 +17,6 @@ use OpenApi\Annotations as OA;
  *      @OA\Property(property="api_key", ref="#/components/schemas/TinyText"),
  *      @OA\Property(property="company_id", ref="#/components/schemas/TinyText"),
  *      @OA\Property(property="payment_merchant_id", ref="#/components/schemas/UUID"),
- *      @OA\Property(property="roles", type="array", @OA\Items(type="string", example=\App\DomainModel\Merchant\MerchantEntity::ROLE_API_USER)),
  *      @OA\Property(property="is_active", type="boolean"),
  *      @OA\Property(property="webhook_url", type="string", format="uri", nullable=true),
  *      @OA\Property(property="webhook_authorization", type="string", nullable=true, example="Authorization: Basic test"),
@@ -25,12 +24,6 @@ use OpenApi\Annotations as OA;
  */
 class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInterface
 {
-    public const ROLE_API_USER = 'ROLE_API_USER';
-
-    public const DEFAULT_ROLES = [
-        self::ROLE_API_USER,
-    ];
-
     private $name;
 
     private $financingPower;
@@ -42,8 +35,6 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
     private $companyId;
 
     private $paymentMerchantId;
-
-    private $roles;
 
     private $isActive;
 
@@ -131,18 +122,6 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
         return $this;
     }
 
-    public function getRoles(): array
-    {
-        return $this->roles;
-    }
-
-    public function setRoles(array $roles): MerchantEntity
-    {
-        $this->roles = $roles;
-
-        return $this;
-    }
-
     public function isActive(): bool
     {
         return $this->isActive;
@@ -213,7 +192,6 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
             'api_key' => $this->getApiKey(),
             'company_id' => $this->getCompanyId(),
             'payment_merchant_id' => $this->getPaymentMerchantId(),
-            'roles' => $this->getRoles(),
             'is_active' => $this->isActive(),
             'webhook_url' => $this->getWebhookUrl(),
             'webhook_authorization' => $this->getWebhookAuthorization(),

@@ -71,7 +71,14 @@ Feature:
             "city": "test",
             "postal_code":"test",
             "country":"TE"
-         }
+         },
+         "billing_address":{
+          "house_number":"test",
+          "street":"test",
+          "city":"test",
+          "postal_code":"test",
+          "country":"TE"
+        }
       }
       """
 
@@ -131,7 +138,14 @@ Feature:
             "city": "test",
             "postal_code":"test",
             "country":"TE"
-         }
+         },
+         "billing_address":{
+          "house_number":"test",
+          "street":"test",
+          "city":"test",
+          "postal_code":"test",
+          "country":"TE"
+        }
     }
     """
 
@@ -192,6 +206,13 @@ Feature:
             "city": "test",
             "postal_code": "test",
             "country": "TE"
+        },
+        "billing_address":{
+          "house_number":"test",
+          "street":"test",
+          "city":"test",
+          "postal_code":"test",
+          "country":"TE"
         },
         "created_at": "2019-05-20T13:00:00+0200",
         "shipped_at": null
@@ -254,6 +275,13 @@ Feature:
             "city": "test",
             "postal_code": "test",
             "country": "TE"
+        },
+        "billing_address":{
+          "house_number":"test",
+          "street":"test",
+          "city":"test",
+          "postal_code":"test",
+          "country":"TE"
         },
         "created_at": "2019-05-20T13:00:00+0200",
         "shipped_at": null

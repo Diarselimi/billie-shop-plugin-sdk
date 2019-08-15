@@ -74,7 +74,6 @@ class PaellaCoreContext extends MinkContext
         $this->merchant = (new MerchantEntity())
             ->setName('Behat User')
             ->setIsActive(true)
-            ->setRoles(['ROLE_NOTHING'])
             ->setPaymentMerchantId('f2ec4d5e-79f4-40d6-b411-31174b6519ac')
             ->setFinancingLimit(10000)
             ->setFinancingPower(10000)
@@ -190,6 +189,7 @@ class PaellaCoreContext extends MinkContext
             ->setIndustrySector('test')
             ->setSubindustrySector('test')
             ->setEstablishedCustomer(true)
+            ->setBillingAddressId($deliveryAddress->getId())
             ->setMerchantExternalId('ext_id')
             ->setDataHash('829d100ebf4264d17fe53049a477efb2')
             ->setAddressId($debtorAddress->getId());
@@ -546,15 +546,15 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
-     * @Given /^a merchant user exists$/
+     * @Given a merchant user exists with role :role
      */
-    public function aMerchantUserExists()
+    public function aMerchantUserExists(string $role)
     {
         $this->getMerchantUserRepository()->create(
             (new MerchantUserEntity())
                 ->setUserId('oauthUserId')
                 ->setMerchantId(1)
-                ->setRoles(['ROLE_USER'])
+                ->setRoles([$role])
         );
     }
 
@@ -567,7 +567,6 @@ class PaellaCoreContext extends MinkContext
             (new MerchantEntity())
                 ->setName('test merchant')
                 ->setIsActive(true)
-                ->setRoles(['ROLE_NOTHING'])
                 ->setPaymentMerchantId('any-payment-id')
                 ->setFinancingPower(10000)
                 ->setFinancingLimit(10000)

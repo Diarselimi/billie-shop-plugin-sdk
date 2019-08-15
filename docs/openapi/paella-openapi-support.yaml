@@ -827,16 +827,7 @@ paths:
         content:
           application/json:
             schema:
-              properties:
-                email:
-                  type: string
-                  format: email
-                  nullable: false
-                password:
-                  type: string
-                  format: password
-                  nullable: false
-              type: object
+              $ref: '#/components/schemas/RegisterMerchantUserRequest'
       responses:
         '201':
           description: 'Merchant user was successfully registered'
@@ -1154,6 +1145,16 @@ components:
       format: float
       pattern: '^(\d{1,}(.\d{2})?)$'
       example: 7500
+    MerchantUserRoles:
+      title: 'Merchant User Roles'
+      type: string
+      enum:
+        - ROLE_VIEW_ORDERS
+        - ROLE_VIEW_DEBTORS
+        - ROLE_VIEW_PAYMENTS
+        - ROLE_CONFIRM_ORDER_PAYMENT
+        - ROLE_PAUSE_DUNNING
+      example: ROLE_VIEW_ORDERS
     OauthGrantType:
       title: 'OAuth Grant Type'
       type: string
@@ -1290,11 +1291,41 @@ components:
           example: DE123456-1
           $ref: '#/components/schemas/TinyText'
         delivery_address:
-          $ref: '#/components/schemas/CreateOrderDeliveryAddressRequest'
+          nullable: true
+          $ref: '#/components/schemas/CreateOrderAddressRequest'
+        billing_address:
+          nullable: true
+          $ref: '#/components/schemas/CreateOrderAddressRequest'
         debtor_company:
           $ref: '#/components/schemas/CreateOrderDebtorCompanyRequest'
         debtor_person:
           $ref: '#/components/schemas/CreateOrderDebtorPersonRequest'
+      type: object
+    CreateOrderAddressRequest:
+      title: 'Delivery Address'
+      required:
+        - street
+        - city
+        - postal_code
+        - country
+      properties:
+        addition:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        house_number:
+          example: '4'
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        street:
+          example: 'Charlotten Str.'
+          $ref: '#/components/schemas/TinyText'
+        city:
+          example: Berlin
+          $ref: '#/components/schemas/TinyText'
+        postal_code:
+          $ref: '#/components/schemas/PostalCode'
+        country:
+          $ref: '#/components/schemas/CountryCode'
       type: object
     CreateOrderAmountRequest:
       title: 'Order Amount'
@@ -1363,7 +1394,7 @@ components:
         legal_form:
           example: '10122'
           $ref: '#/components/schemas/TinyText'
-        established_costumer:
+        established_customer:
           type: boolean
           nullable: true
         address_addition:
@@ -1408,31 +1439,6 @@ components:
           type: string
           format: email
           example: james.smith@example.com
-      type: object
-    CreateOrderDeliveryAddressRequest:
-      title: 'Delivery Address'
-      required:
-        - street
-        - city
-        - postal_code
-        - country
-      properties:
-        addition:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        house_number:
-          example: '4'
-          $ref: '#/components/schemas/TinyText'
-        street:
-          example: 'Charlotten Str.'
-          $ref: '#/components/schemas/TinyText'
-        city:
-          example: Berlin
-          $ref: '#/components/schemas/TinyText'
-        postal_code:
-          $ref: '#/components/schemas/PostalCode'
-        country:
-          $ref: '#/components/schemas/CountryCode'
       type: object
     GetDebtorCompanyLimitsMerchant:
       title: 'Debtor''s Merchant IDs Object'
@@ -1491,6 +1497,23 @@ components:
         is_duplicate_of:
           type: integer
       type: object
+    RegisterMerchantUserRequest:
+      title: 'Register Merchant User'
+      properties:
+        email:
+          type: string
+          format: email
+          nullable: false
+        password:
+          type: string
+          format: password
+          nullable: false
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/MerchantUserRoles'
+          nullable: true
+      type: object
     UpdateMerchantDebtorCompanyRequest:
       properties:
         name:
@@ -1528,11 +1551,6 @@ components:
           $ref: '#/components/schemas/TinyText'
         payment_merchant_id:
           $ref: '#/components/schemas/UUID'
-        roles:
-          type: array
-          items:
-            type: string
-            example: ROLE_API_USER
         is_active:
           type: boolean
         webhook_url:
@@ -1782,25 +1800,11 @@ components:
               $ref: '#/components/schemas/TinyText'
           type: object
         delivery_address:
-          properties:
-            house_number:
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            street:
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            postal_code:
-              type: string
-              maxLength: 5
-              nullable: true
-            city:
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            country:
-              type: string
-              maxLength: 2
-              nullable: true
           type: object
+          $ref: '#/components/schemas/CreateOrderAddressRequest'
+        billing_address:
+          type: object
+          $ref: '#/components/schemas/CreateOrderAddressRequest'
         created_at:
           $ref: '#/components/schemas/DateTime'
         shipped_at:

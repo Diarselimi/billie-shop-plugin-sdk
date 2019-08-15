@@ -136,6 +136,13 @@ Feature:
           "city":"Paris",
           "postal_code":"98765",
           "country":"DE"
+       },
+       "billing_address":{
+          "house_number":"33",
+          "street":"c/Velarus",
+          "city": "Berlin",
+          "postal_code":"12345",
+          "country":"DE"
        }
     }
     """
@@ -241,6 +248,13 @@ Feature:
         "street":"Charlot strasse",
         "city": "Paris",
         "postal_code":"98765",
+        "country":"DE"
+     },
+     "billing_address":{
+        "house_number":"10",
+        "street":"Heinrich-Heine-Platz",
+        "city": "Berlin",
+        "postal_code":"10179",
         "country":"DE"
      }
     }
@@ -350,13 +364,20 @@ Feature:
         "city": "Paris",
         "postal_code":"98765",
         "country":"DE"
+     },
+     "billing_address":{
+        "house_number":null,
+        "street":"Heinrich-Heine-Platz",
+        "city": "Berlin",
+        "postal_code":"10179",
+        "country":"DE"
      }
     }
     """
     And the order "A1" has the same hash "testusercompanyva2223333somenumbersomelegalberlin10179heinrichheineplatzde"
     And merchant debtor has financing power 9000
 
-    Scenario: Successful order creation with a not german postal code in shipping
+  Scenario: Successful order creation with a not german postal code in shipping
     Given I get from companies service identify match and good decision response
     And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
     """
@@ -459,6 +480,13 @@ Feature:
         "city":"Vienna",
         "postal_code":"AT-5130-123333",
         "country":"AT"
+       },
+       "billing_address":{
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city": "Berlin",
+          "postal_code":"10179",
+          "country":"DE"
        }
     }
     """
@@ -502,9 +530,10 @@ Feature:
           "established_customer":1
        },
        "delivery_address":{
-          "street":"Moulin Rouge Str.",
-          "city":"Paris",
-          "postal_code":"98765",
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city": "Berlin",
+          "postal_code":"10179",
           "country":"DE"
        },
        "amount":{
@@ -562,10 +591,17 @@ Feature:
        "dunning_status": null,
        "shipped_at":null,
        "delivery_address":{
-          "house_number":null,
-          "street":"Moulin Rouge Str.",
-          "city":"Paris",
-          "postal_code":"98765",
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city": "Berlin",
+          "postal_code":"10179",
+          "country":"DE"
+       },
+       "billing_address":{
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city": "Berlin",
+          "postal_code":"10179",
           "country":"DE"
        }
     }
@@ -676,7 +712,15 @@ Feature:
           "city":"Paris",
           "postal_code":"98765",
           "country":"de"
+       },
+      "billing_address":{
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city": "Berlin",
+          "postal_code":"10179",
+          "country":"DE"
        }
+
     }
     """
     And merchant debtor has financing power 9000
@@ -780,7 +824,15 @@ Feature:
           "city":"Paris",
           "postal_code":"98765",
           "country":"DE"
+       },
+      "billing_address":{
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city": "Berlin",
+          "postal_code":"10179",
+          "country":"DE"
        }
+
     }
     """
     And merchant debtor has financing power 10000

@@ -10,10 +10,10 @@ use OpenApi\Annotations as OA;
  *      @OA\Property(property="user_id", type="integer", nullable=false),
  *      @OA\Property(property="access_token", type="string", nullable=false, example="l387435hzyoc0oo4kokow"),
  *      @OA\Property(
- *          property="roles",
+ *          property="permissions",
  *          type="array",
  *          nullable=false,
- *          @OA\Items(type="string", example=\App\DomainModel\MerchantUser\MerchantUserEntity::ROLE_USER)
+ *          @OA\Items(ref="#/components/schemas/MerchantUserRoles")
  *      ),
  *      @OA\Property(property="merchant_name", type="string", nullable=false, example="Billie GmbH")
  * })
@@ -61,7 +61,7 @@ class MerchantUserLoginResponse implements ArrayableInterface
         return [
             'user_id' => $this->getUserId(),
             'access_token' => $this->getAccessToken(),
-            'roles' => $this->getRoles(),
+            'permissions' => $this->getRoles(),
             'merchant_name' => $this->getMerchantName(),
         ];
     }

@@ -1,6 +1,5 @@
 <?php
 
-use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntityFactory;
 use Phinx\Seed\AbstractSeed;
@@ -22,7 +21,6 @@ class MerchantsSeeder extends AbstractSeed
             'financing_power' => 2000000,
             'available_financing_limit' => 2000000,
             'api_key' => $testApiKey,
-            'roles' => json_encode(MerchantEntity::DEFAULT_ROLES),
             'is_active' => true,
             'company_id' => 4,
             'oauth_client_id' => '02706840-e7ef-48ef-8576-bcfec20b4458',

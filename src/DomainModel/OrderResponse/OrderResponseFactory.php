@@ -2,6 +2,7 @@
 
 namespace App\DomainModel\OrderResponse;
 
+use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\Order\OrderDeclinedReasonsMapper;
@@ -54,9 +55,9 @@ class OrderResponseFactory
             ->setShippedAt($order->getShippedAt())
         ;
 
-        if ($orderContainer->getDeliveryAddress()) {
-            $this->addDeliveryData($orderContainer, $response);
-        }
+        $this->addDeliveryData($orderContainer, $response);
+
+        $this->addBillingAddressData($orderContainer->getBillingAddress(), $response);
 
         if ($order->getMerchantDebtorId()) {
             $this->addCompanyData($orderContainer, $response);
@@ -76,7 +77,10 @@ class OrderResponseFactory
         return $response;
     }
 
-    private function addCompanyData(OrderContainer $orderContainer, OrderResponse $response)
+    /**
+     * @param OrderResponse|CheckoutSessionAuthorizeResponse $response
+     */
+    private function addCompanyData(OrderContainer $orderContainer, $response)
     {
         $debtor = $orderContainer->getDebtorCompany();
 
@@ -123,9 +127,15 @@ class OrderResponseFactory
     public function createAuthorizeResponse(OrderContainer $orderContainer): CheckoutSessionAuthorizeResponse
     {
         $order = $orderContainer->getOrder();
-        $response = new CheckoutSessionAuthorizeResponse();
+        $response = (new CheckoutSessionAuthorizeResponse())
+            ->setState($order->getState())
+        ;
 
         $response = $this->addReasons($order, $response);
+
+        if ($order->getMerchantDebtorId()) {
+            $this->addCompanyData($orderContainer, $response);
+        }
 
         return $response;
     }
@@ -154,5 +164,14 @@ class OrderResponseFactory
             ->setDeliveryAddressCity($orderContainer->getDeliveryAddress()->getCity())
             ->setDeliveryAddressPostalCode($orderContainer->getDeliveryAddress()->getPostalCode())
             ->setDeliveryAddressCountry($orderContainer->getDeliveryAddress()->getCountry());
+    }
+
+    private function addBillingAddressData(AddressEntity $billingAddress, OrderResponse $response): void
+    {
+        $response->setBillingAddressStreet($billingAddress->getStreet())
+            ->setBillingAddressHouseNumber($billingAddress->getHouseNumber())
+            ->setBillingAddressCity($billingAddress->getCity())
+            ->setBillingAddressPostalCode($billingAddress->getPostalCode())
+            ->setBillingAddressCountry($billingAddress->getCountry());
     }
 }

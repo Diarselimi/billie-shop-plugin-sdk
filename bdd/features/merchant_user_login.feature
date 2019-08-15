@@ -43,7 +43,7 @@ Feature: Enable merchant users to login
 	Then the response status code should be 401
 
   Scenario: Valid credentials - successful login
-	Given a merchant user exists
+	Given a merchant user exists with role ROLE_VIEW_DEBTORS
 	And I successfully obtain token from oauth service
 	And I get from Oauth service a valid user token
 	When I send a POST request to "/merchant/user/login" with body:
@@ -59,8 +59,8 @@ Feature: Enable merchant users to login
 	  {
 	  	"user_id": 1,
     	"access_token": "testToken",
-    	"roles": [
-        	"ROLE_USER"
+    	"permissions": [
+        	"ROLE_VIEW_DEBTORS"
     	],
     	"merchant_name": "Behat User"
 	  }

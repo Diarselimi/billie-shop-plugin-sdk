@@ -176,3 +176,13 @@ use OpenApi\Annotations as OA;
  *     example=7500.00
  * )
  */
+
+/**
+ * @OA\Schema(
+ *     schema="MerchantUserRoles",
+ *     title="Merchant User Roles",
+ *     type="string",
+ *     enum=\App\DomainModel\MerchantUser\MerchantUserEntity::DEFAULT_ROLES,
+ *     example=\App\DomainModel\MerchantUser\MerchantUserEntity::ROLE_VIEW_ORDERS
+ * )
+ */

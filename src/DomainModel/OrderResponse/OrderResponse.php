@@ -51,14 +51,8 @@ use OpenApi\Annotations as OA;
  *          @OA\Property(property="industry_sector", ref="#/components/schemas/TinyText", nullable=true),
  *      }),
  *
- *      @OA\Property(property="delivery_address", type="object", properties={
- *          @OA\Property(property="house_number", ref="#/components/schemas/TinyText", nullable=true),
- *          @OA\Property(property="street", ref="#/components/schemas/TinyText", nullable=true),
- *          @OA\Property(property="postal_code", type="string", nullable=true, maxLength=5),
- *          @OA\Property(property="city", ref="#/components/schemas/TinyText", nullable=true),
- *          @OA\Property(property="country", type="string", nullable=true, maxLength=2),
- *      }),
- *
+ *      @OA\Property(property="delivery_address", type="object", ref="#/components/schemas/CreateOrderAddressRequest"),
+ *      @OA\Property(property="billing_address", type="object", ref="#/components/schemas/CreateOrderAddressRequest"),
  *      @OA\Property(property="created_at", ref="#/components/schemas/DateTime"),
  *      @OA\Property(property="shipped_at", ref="#/components/schemas/DateTime"),
  * })
@@ -136,6 +130,16 @@ class OrderResponse implements ArrayableInterface
     private $deliveryAddressCity;
 
     private $deliveryAddressCountry;
+
+    private $billingAddressStreet;
+
+    private $billingAddressHouseNumber;
+
+    private $billingAddressPostalCode;
+
+    private $billingAddressCity;
+
+    private $billingAddressCountry;
 
     private $duration;
 
@@ -573,6 +577,66 @@ class OrderResponse implements ArrayableInterface
         return $this;
     }
 
+    public function getBillingAddressStreet(): ?string
+    {
+        return $this->billingAddressStreet;
+    }
+
+    public function setBillingAddressStreet(?string $deliveryBillingStreet): OrderResponse
+    {
+        $this->billingAddressStreet = $deliveryBillingStreet;
+
+        return $this;
+    }
+
+    public function getBillingAddressHouseNumber(): ?string
+    {
+        return $this->billingAddressHouseNumber;
+    }
+
+    public function setBillingAddressHouseNumber(?string $deliveryBillingHouseNumber): OrderResponse
+    {
+        $this->billingAddressHouseNumber = $deliveryBillingHouseNumber;
+
+        return $this;
+    }
+
+    public function getBillingAddressPostalCode(): ?string
+    {
+        return $this->billingAddressPostalCode;
+    }
+
+    public function setBillingAddressPostalCode(?string $deliveryBillingPostalCode): OrderResponse
+    {
+        $this->billingAddressPostalCode = $deliveryBillingPostalCode;
+
+        return $this;
+    }
+
+    public function getBillingAddressCity(): ?string
+    {
+        return $this->billingAddressCity;
+    }
+
+    public function setBillingAddressCity(?string $deliveryBillingCity): OrderResponse
+    {
+        $this->billingAddressCity = $deliveryBillingCity;
+
+        return $this;
+    }
+
+    public function getBillingAddressCountry(): ?string
+    {
+        return $this->billingAddressCountry;
+    }
+
+    public function setBillingAddressCountry(?string $deliveryBillingCountry): OrderResponse
+    {
+        $this->billingAddressCountry = $deliveryBillingCountry;
+
+        return $this;
+    }
+
     public function getDuration(): ?int
     {
         return $this->duration;
@@ -645,6 +709,13 @@ class OrderResponse implements ArrayableInterface
                 'city' => $this->getDeliveryAddressCity(),
                 'postal_code' => $this->getDeliveryAddressPostalCode(),
                 'country' => $this->getDeliveryAddressCountry(),
+            ],
+            'billing_address' => [
+                'house_number' => $this->getBillingAddressHouseNumber(),
+                'street' => $this->getBillingAddressStreet(),
+                'city' => $this->getBillingAddressCity(),
+                'postal_code' => $this->getBillingAddressPostalCode(),
+                'country' => $this->getBillingAddressCountry(),
             ],
             'created_at' => $this->getCreatedAt()->format(\DateTime::ISO8601),
             'shipped_at' => ($this->getShippedAt() ? $this->getShippedAt()->format(\DateTime::ISO8601) : null),

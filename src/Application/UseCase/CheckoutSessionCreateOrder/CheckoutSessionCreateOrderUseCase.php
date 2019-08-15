@@ -3,7 +3,6 @@
 namespace App\Application\UseCase\CheckoutSessionCreateOrder;
 
 use App\Application\UseCase\CreateOrder\CreateOrderRequest;
-use App\Application\Exception\OrderDeclinedException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface;
@@ -12,10 +11,8 @@ use App\DomainModel\Order\NewOrder\OrderPersistenceService;
 use App\DomainModel\Order\OrderChecksRunnerService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
-use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
-use App\DomainModel\OrderResponse\OrderResponseFactory;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
@@ -31,13 +28,9 @@ class CheckoutSessionCreateOrderUseCase implements LoggingInterface, ValidatedUs
 
     private $orderRepository;
 
-    private $orderResponseFactory;
-
     private $orderStateManager;
 
     private $checkoutSessionRepository;
-
-    private $declinedReasonsMapper;
 
     private $identifyAndTriggerAsyncIdentification;
 
@@ -46,20 +39,16 @@ class CheckoutSessionCreateOrderUseCase implements LoggingInterface, ValidatedUs
         OrderContainerFactory $orderContainerFactory,
         OrderChecksRunnerService $orderChecksRunnerService,
         OrderRepositoryInterface $orderRepository,
-        OrderResponseFactory $orderResponseFactory,
         OrderStateManager $orderStateManager,
         CheckoutSessionRepositoryInterface $checkoutSessionRepository,
-        OrderDeclinedReasonsMapper $declinedReasonsMapper,
         IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification
     ) {
         $this->persistNewOrderService = $persistNewOrderService;
         $this->orderContainerFactory = $orderContainerFactory;
         $this->orderChecksRunnerService = $orderChecksRunnerService;
         $this->orderRepository = $orderRepository;
-        $this->orderResponseFactory = $orderResponseFactory;
         $this->orderStateManager = $orderStateManager;
         $this->checkoutSessionRepository = $checkoutSessionRepository;
-        $this->declinedReasonsMapper = $declinedReasonsMapper;
         $this->identifyAndTriggerAsyncIdentification = $identifyAndTriggerAsyncIdentification;
     }
 
@@ -73,7 +62,7 @@ class CheckoutSessionCreateOrderUseCase implements LoggingInterface, ValidatedUs
         if (!$this->orderChecksRunnerService->runPreIdentificationChecks($orderContainer)) {
             $this->orderStateManager->decline($orderContainer);
 
-            throw new OrderDeclinedException($this->declinedReasonsMapper->mapReasons($orderContainer->getOrder()));
+            return $orderContainer;
         }
 
         if ($this->identifyAndTriggerAsyncIdentification->identifyDebtor($orderContainer)) {
@@ -84,7 +73,7 @@ class CheckoutSessionCreateOrderUseCase implements LoggingInterface, ValidatedUs
             $this->orderChecksRunnerService->checkForFailedSoftDeclinableCheckResults($orderContainer)) {
             $this->orderStateManager->decline($orderContainer);
 
-            throw new OrderDeclinedException($this->declinedReasonsMapper->mapReasons($orderContainer->getOrder()));
+            return $orderContainer;
         }
 
         $this->orderStateManager->authorize($orderContainer);

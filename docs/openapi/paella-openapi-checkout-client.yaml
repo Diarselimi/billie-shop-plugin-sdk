@@ -56,23 +56,36 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateOrderRequest'
       responses:
-        '201':
+        '200':
           description: 'Order created with ''authorized'' state, but a merchant confirmation is needed.'
-        '400':
-          description: 'Invalid request data or order declined.'
           content:
             application/json:
               schema:
-                title: 'Checkout Authorize Error'
-                properties:
-                  reasons: { description: 'Decline reasons', type: array, items: { $ref: '#/components/schemas/OrderDeclineReason' } }
-                type: object
-                allOf:
-                  - { $ref: '#/components/schemas/ErrorsObject' }
+                $ref: '#/components/schemas/CheckoutSessionAuthorizeResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/ServerError'
+  /legal-forms:
+    get:
+      tags:
+        - Misc.
+      summary: 'Get Legal Forms'
+      operationId: get_legal_forms
+      responses:
+        '200':
+          description: 'List of supported legal forms'
+          content:
+            application/json:
+              schema:
+                properties:
+                  items: { type: array, items: { properties: { code: { description: 'Legal form code', type: integer, example: '90101' }, name: { description: 'Legal form name', type: string, example: 'AG & Co. KG', nullable: true }, required_input: { description: 'Required input (HR-NR => Registration Number, Ust-ID => Registration ID)', type: string, example: HR-NR }, required: { description: Required, type: boolean } }, type: object } }
+                type: object
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security: []
 components:
   schemas:
     UUID:
@@ -81,6 +94,22 @@ components:
       maxLength: 36
       minLength: 36
       example: 12345667-890a-bcde-f123-34567890abcd
+    OrderState:
+      title: 'Order State'
+      type: string
+      enum:
+        - new
+        - authorized
+        - waiting
+        - created
+        - declined
+        - shipped
+        - paid_out
+        - late
+        - complete
+        - canceled
+        - pre_approved
+      example: created
     OrderDeclineReason:
       title: 'Order Decline Reason'
       type: string
@@ -138,11 +167,41 @@ components:
           example: DE123456-1
           $ref: '#/components/schemas/TinyText'
         delivery_address:
-          $ref: '#/components/schemas/CreateOrderDeliveryAddressRequest'
+          nullable: true
+          $ref: '#/components/schemas/CreateOrderAddressRequest'
+        billing_address:
+          nullable: true
+          $ref: '#/components/schemas/CreateOrderAddressRequest'
         debtor_company:
           $ref: '#/components/schemas/CreateOrderDebtorCompanyRequest'
         debtor_person:
           $ref: '#/components/schemas/CreateOrderDebtorPersonRequest'
+      type: object
+    CreateOrderAddressRequest:
+      title: 'Delivery Address'
+      required:
+        - street
+        - city
+        - postal_code
+        - country
+      properties:
+        addition:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        house_number:
+          example: '4'
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        street:
+          example: 'Charlotten Str.'
+          $ref: '#/components/schemas/TinyText'
+        city:
+          example: Berlin
+          $ref: '#/components/schemas/TinyText'
+        postal_code:
+          $ref: '#/components/schemas/PostalCode'
+        country:
+          $ref: '#/components/schemas/CountryCode'
       type: object
     CreateOrderAmountRequest:
       title: 'Order Amount'
@@ -211,7 +270,7 @@ components:
         legal_form:
           example: '10122'
           $ref: '#/components/schemas/TinyText'
-        established_costumer:
+        established_customer:
           type: boolean
           nullable: true
         address_addition:
@@ -257,30 +316,44 @@ components:
           format: email
           example: james.smith@example.com
       type: object
-    CreateOrderDeliveryAddressRequest:
-      title: 'Delivery Address'
-      required:
-        - street
-        - city
-        - postal_code
-        - country
+    CheckoutSessionAuthorizeResponse:
+      title: 'Authorize Checkout Order Response'
       properties:
-        addition:
+        state:
+          example: created
+          $ref: '#/components/schemas/OrderState'
+        reasons:
           nullable: true
-          $ref: '#/components/schemas/TinyText'
-        house_number:
-          example: '4'
-          $ref: '#/components/schemas/TinyText'
-        street:
-          example: 'Charlotten Str.'
-          $ref: '#/components/schemas/TinyText'
-        city:
-          example: Berlin
-          $ref: '#/components/schemas/TinyText'
-        postal_code:
-          $ref: '#/components/schemas/PostalCode'
-        country:
-          $ref: '#/components/schemas/CountryCode'
+          $ref: '#/components/schemas/OrderDeclineReason'
+        debtor_company:
+          description: 'Identified company'
+          properties:
+            name:
+              example: 'Billie GmbH'
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_house_number:
+              example: '4'
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_street:
+              example: Charlottenstr.
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_postal_code:
+              type: string
+              maxLength: 5
+              example: '10969'
+              nullable: true
+            address_city:
+              example: Berlin
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_country:
+              type: string
+              maxLength: 2
+              nullable: true
+          type: object
       type: object
     ErrorsObject:
       title: 'API Errors'
@@ -314,6 +387,12 @@ components:
             $ref: '#/components/schemas/ErrorsObject'
     Unauthorized:
       description: 'Unauthorized request or invalid credentials'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorsObject'
+    BadRequest:
+      description: 'Invalid Request Data'
       content:
         application/json:
           schema:

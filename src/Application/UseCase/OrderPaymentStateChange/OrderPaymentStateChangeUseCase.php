@@ -47,16 +47,7 @@ class OrderPaymentStateChangeUseCase implements LoggingInterface
         }
 
         if ($this->orderStateManager->isCanceled($order)) {
-            $this->logSuppressedException(
-                new PaellaCoreCriticalException('Order state change not possible'),
-                '[suppressed] Trying to change state for canceled order',
-                [
-                    'new_state' => $orderPaymentDetails->getState(),
-                    'order_id' => $order->getId(),
-                ]
-            );
-
-            return;
+            $this->logInfo('Canceled order has been paid back by merchant');
         }
 
         try {

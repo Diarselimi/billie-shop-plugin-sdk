@@ -101,8 +101,23 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     }
     """
     And the order A1 is in state declined
-    And the response status code should be 400
+    And the response status code should be 200
     And the checkout_session_id "123123" should be valid
+    And the JSON response should be:
+    """
+    {
+      "state": "declined",
+      "debtor_company":{
+        "name":"Test User Company",
+        "address_house_number":"10",
+        "address_street":"Heinrich-Heine-Platz",
+        "address_postal_code":"10179",
+        "address_city":"Berlin",
+        "address_country":"DE"
+      },
+      "reasons":"debtor_limit_exceeded"
+    }
+    """
 
   Scenario: I success if I try to create an order with a valid session_id
     Given I get from companies service identify match and good decision response
@@ -155,9 +170,23 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     }
     """
     Then the order A1 is in state authorized
-    And the response status code should be 201
-    And the response should be empty
+    And the response status code should be 200
     And the checkout_session_id "123123" should be invalid
+    And the JSON response should be:
+    """
+    {
+      "state": "authorized",
+      "debtor_company":{
+        "name":"Test User Company",
+        "address_house_number":"10",
+        "address_street":"Heinrich-Heine-Platz",
+        "address_postal_code":"10179",
+        "address_city":"Berlin",
+        "address_country":"DE"
+      },
+      "reasons":null
+    }
+    """
 
   Scenario: I success if I try to create an order with a valid session_id and no house
     Given I get from companies service identify match and good decision response
@@ -210,12 +239,25 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     }
     """
     Then the order A1 is in state authorized
-    And the response status code should be 201
-    And the response should be empty
+    And the response status code should be 200
+    And the JSON response should be:
+    """
+    {
+      "state": "authorized",
+      "debtor_company":{
+        "name":"Test User Company",
+        "address_house_number":"10",
+        "address_street":"Heinrich-Heine-Platz",
+        "address_postal_code":"10179",
+        "address_city":"Berlin",
+        "address_country":"DE"
+      },
+      "reasons":null
+    }
+    """
 
   Scenario: An order goes to declined if we cannot identify the company
-    Given I get from companies service identify match and bad decision response
-    And I get from payments service register debtor positive response
+    Given I get from companies service identify no match response
     And I have a checkout_session_id "123123"
     And I send a PUT request to "/checkout-session/123123/authorize" with body:
     """
@@ -264,8 +306,22 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     }
     """
     Then the order A1 is in state declined
-    And the response status code should be 400
-    And the JSON response at "errors/0/reasons/0" should be "risk_policy"
+    And the response status code should be 200
+    And the JSON response should be:
+    """
+    {
+      "state": "declined",
+      "debtor_company":{
+          "name":null,
+          "address_house_number":null,
+          "address_street":null,
+          "address_postal_code":null,
+          "address_city":null,
+          "address_country":null
+       },
+      "reasons":"debtor_not_identified"
+    }
+    """
 
   Scenario: An order goes to declined if it doesn't pass all the soft checks
     Given I get from companies service identify match and good decision response
@@ -317,7 +373,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
        "order_id":"A1"
     }
     """
-    And the response status code should be 400
+    And the response status code should be 200
     Then the order A1 is in state declined
 
   Scenario:
@@ -373,8 +429,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     }
     """
     Then the order A1 is in state authorized
-    And the response status code should be 201
-    And the response should be empty
+    And the response status code should be 200
     And I send a PUT request to "/checkout-session/123123/authorize" with body:
     """
     {
@@ -426,8 +481,6 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     """
     {"errors":[{"title":"Unauthorized","code":"unauthorized"}]}
     """
-
-
 
   Scenario: I fail authorization if I try to create an order with a invalid session_id
     Given I have a invalid checkout_session_id "123123"

@@ -32,6 +32,8 @@ class OrderContainer
 
     private $deliveryAddress;
 
+    private $billingAddress;
+
     private $merchant;
 
     private $merchantSettings;
@@ -102,6 +104,12 @@ class OrderContainer
         return $this->deliveryAddress
             ?: $this->deliveryAddress = $this->relationLoader->loadDeliveryAddress($this)
         ;
+    }
+
+    public function getBillingAddress(): AddressEntity
+    {
+        return $this->billingAddress
+            ?? $this->billingAddress = $this->relationLoader->loadBillingAddress($this);
     }
 
     public function getMerchant(): MerchantEntity
