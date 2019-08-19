@@ -15,7 +15,7 @@ class PaymentRequestFactory
         $requestDTO
             ->setDuration($orderContainer->getOrderFinancialDetails()->getDuration())
             ->setAmountGross($orderContainer->getOrderFinancialDetails()->getAmountGross())
-            ->setDebtorPaymentId($orderContainer->getMerchantDebtor()->getDebtorId())
+            ->setDebtorPaymentId($orderContainer->getMerchantDebtor()->getPaymentDebtorId())
             ;
         $this->createFromOrder($orderContainer->getOrder(), $requestDTO);
     }
