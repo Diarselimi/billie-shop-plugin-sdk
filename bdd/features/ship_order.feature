@@ -129,6 +129,7 @@ Feature:
         Given I have a created order with amounts 1000/900/100, duration 30 and comment "test order"
         And I get from payments service create ticket response
         And I get from companies service identify match response
+        And I get from payments service create ticket response
         And I get from payments service get debtor response
         And I get from payments service get order details response
         And I get from companies service get debtor response

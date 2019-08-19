@@ -83,6 +83,8 @@ services:
       - '@openapi_file_locator'
       - '@App\Infrastructure\OpenApi\Routing\OpenApiClassLoader'
 
+  App\Helper\Uuid\UuidGeneratorInterface: '@App\Helper\Uuid\UuidGenerator'
+
   App\DomainModel\Order\OrderChecksRunnerService:
     arguments:
       $preIdentificationChecks:

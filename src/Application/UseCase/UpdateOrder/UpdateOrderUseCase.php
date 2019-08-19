@@ -7,6 +7,7 @@ use App\Application\Exception\OrderNotFoundException;
 use App\Application\PaellaCoreCriticalException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
+use App\DomainModel\Payment\PaymentRequestFactory;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Payment\PaymentsServiceRequestException;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
@@ -47,6 +48,8 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 
     private $orderFinancialDetailsRepository;
 
+    private $paymentRequestFactory;
+
     public function __construct(
         OrderContainerFactory $orderContainerFactory,
         PaymentsServiceInterface $paymentsService,
@@ -56,7 +59,8 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         OrderStateManager $orderStateManager,
         OrderInvoiceManager $invoiceManager,
         OrderFinancialDetailsFactory $orderFinancialDetailsFactory,
-        OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository
+        OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
+        PaymentRequestFactory $paymentRequestFactory
     ) {
         $this->orderContainerFactory = $orderContainerFactory;
         $this->paymentsService = $paymentsService;
@@ -67,6 +71,7 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         $this->invoiceManager = $invoiceManager;
         $this->orderFinancialDetailsFactory = $orderFinancialDetailsFactory;
         $this->orderFinancialDetailsRepository = $orderFinancialDetailsRepository;
+        $this->paymentRequestFactory = $paymentRequestFactory;
     }
 
     public function execute(UpdateOrderRequest $request): void
@@ -251,10 +256,7 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 
         try {
             $this->paymentsService->modifyOrder(
-                $order->getPaymentId(),
-                $orderContainer->getOrderFinancialDetails()->getDuration(),
-                $orderContainer->getOrderFinancialDetails()->getAmountGross(),
-                $order->getInvoiceNumber()
+                $this->paymentRequestFactory->createModifyRequestDTO($orderContainer)
             );
         } catch (PaymentsServiceRequestException $exception) {
             $this->logError('Payment responded with an error when updating the order', [

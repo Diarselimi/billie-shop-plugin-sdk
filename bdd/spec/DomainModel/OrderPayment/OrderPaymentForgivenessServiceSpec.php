@@ -2,6 +2,7 @@
 
 namespace spec\App\DomainModel\OrderPayment;
 
+use App\DomainModel\Payment\PaymentRequestFactory;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Payment\OrderAmountChangeDTO;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
@@ -23,13 +24,13 @@ class OrderPaymentForgivenessServiceSpec extends ObjectBehavior
     public function let(
         PaymentsServiceInterface $paymentsService,
         OrderRepositoryInterface $orderRepository,
+        PaymentRequestFactory $paymentRequestFactory,
         OrderContainer $orderContainer,
         OrderEntity $order,
         MerchantSettingsEntity $merchantSettings
     ) {
         $orderContainer->getOrder()->willReturn($order);
         $orderContainer->getMerchantSettings()->willReturn($merchantSettings);
-
         $order->getId()->willReturn(100);
 
         $merchantSettings->getDebtorForgivenessThreshold()->willReturn(1.0);
@@ -42,15 +43,21 @@ class OrderPaymentForgivenessServiceSpec extends ObjectBehavior
         PaymentsServiceInterface $paymentsService,
         OrderAmountChangeDTO $amountChange,
         OrderContainer $orderContainer,
-        OrderEntity $order
+        OrderEntity $order,
+        PaymentRequestFactory $paymentRequestFactory
     ) {
+        $paymentRequestFactory
+            ->createConfirmRequestDTO(
+                Argument::any(),
+                Argument::any()
+            )->shouldBeCalled();
         $amountChange->getPaidAmount()->willReturn(75);
         $amountChange->getOutstandingAmount()->willReturn(0.9);
 
         $order->getAmountForgiven()->willReturn(0);
         $order->setAmountForgiven(0.9)->shouldBeCalled();
 
-        $paymentsService->confirmPayment($order, 0.9)->shouldBeCalledOnce();
+        $paymentsService->confirmPayment(Argument::any())->shouldBeCalledOnce();
 
         $this->begForgiveness($orderContainer, $amountChange)->shouldBe(true);
     }
@@ -60,15 +67,18 @@ class OrderPaymentForgivenessServiceSpec extends ObjectBehavior
         OrderRepositoryInterface $orderRepository,
         OrderAmountChangeDTO $amountChange,
         OrderContainer $orderContainer,
-        OrderEntity $order
+        OrderEntity $order,
+        PaymentRequestFactory $paymentRequestFactory
     ) {
         $amountChange->getPaidAmount()->willReturn(75);
         $amountChange->getOutstandingAmount()->willReturn(0.9);
+        $paymentRequestFactory->createConfirmRequestDTO(Argument::any(), Argument::any())->shouldBeCalled();
 
         $order->getAmountForgiven()->willReturn(0);
         $order->setAmountForgiven(0.9)->shouldBeCalled();
 
-        $paymentsService->confirmPayment($order, 0.9)->shouldBeCalledOnce();
+        $paymentsService->confirmPayment(Argument::any())->shouldBeCalledOnce();
+
         $orderRepository->update($order)->shouldBeCalledOnce();
 
         $this->begForgiveness($orderContainer, $amountChange)->shouldBe(true);
@@ -78,7 +88,8 @@ class OrderPaymentForgivenessServiceSpec extends ObjectBehavior
         PaymentsServiceInterface $paymentsService,
         OrderAmountChangeDTO $amountChange,
         OrderContainer $orderContainer,
-        OrderEntity $order
+        OrderEntity $order,
+        PaymentRequestFactory $paymentRequestFactory
     ) {
         $amountChange->getPaidAmount()->willReturn(75);
         $amountChange->getOutstandingAmount()->willReturn(0.9);
@@ -95,15 +106,18 @@ class OrderPaymentForgivenessServiceSpec extends ObjectBehavior
         PaymentsServiceInterface $paymentsService,
         OrderAmountChangeDTO $amountChange,
         OrderContainer $orderContainer,
-        OrderEntity $order
+        OrderEntity $order,
+        PaymentRequestFactory $paymentRequestFactory
     ) {
+        $paymentRequestFactory->createConfirmRequestDTO(Argument::any(), Argument::any())->shouldBeCalled();
+
         $amountChange->getPaidAmount()->willReturn(75);
         $amountChange->getOutstandingAmount()->willReturn(1.0);
 
         $order->getAmountForgiven()->willReturn(0);
         $order->setAmountForgiven(1.0)->shouldBeCalled();
 
-        $paymentsService->confirmPayment($order, 1.0)->shouldBeCalledOnce();
+        $paymentsService->confirmPayment(Argument::any())->shouldBeCalledOnce();
 
         $this->begForgiveness($orderContainer, $amountChange)->shouldBe(true);
     }

@@ -322,9 +322,11 @@ Feature:
       "order_id":"A1",
       "state":"created",
       "reasons":null,
-      "amount":1000.00,
-      "amount_net": 900.00,
-      "amount_tax": 100.00,
+      "amount":1000,
+      "amount_net": 900,
+      "amount_tax": 100,
+      "duration":30,
+      "dunning_status": null,
       "debtor_company":{
         "name":"Test User Company",
         "address_house_number":"10",
@@ -346,18 +348,15 @@ Feature:
         "due_date":null
       },
       "debtor_external_data":{
+        "merchant_customer_id":"12",
         "name":"Test User Company",
         "address_country":"DE",
         "address_city": "Berlin",
         "address_postal_code":"10179",
         "address_street":"Heinrich-Heine-Platz",
         "address_house":null,
-        "industry_sector":"SOME SECTOR",
-        "merchant_customer_id":"12"
+        "industry_sector":"SOME SECTOR"
      },
-     "duration":30,
-     "dunning_status": null,
-     "shipped_at":null,
      "delivery_address":{
         "house_number":"22",
         "street":"Charlot strasse",

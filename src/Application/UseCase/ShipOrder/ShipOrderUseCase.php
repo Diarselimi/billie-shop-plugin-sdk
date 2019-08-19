@@ -3,9 +3,10 @@
 namespace App\Application\UseCase\ShipOrder;
 
 use App\Application\Exception\OrderNotFoundException;
-use App\Application\PaellaCoreCriticalException;
+use App\Application\Exception\OrderWorkflowException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
+use App\DomainModel\Payment\PaymentRequestFactory;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
@@ -16,6 +17,8 @@ use App\DomainModel\OrderInvoice\OrderInvoiceManager;
 use App\DomainModel\OrderInvoice\OrderInvoiceUploadException;
 use App\DomainModel\OrderResponse\OrderResponse;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
+use App\DomainModel\Payment\PaymentsServiceRequestException;
+use App\Helper\Uuid\UuidGeneratorInterface;
 use Symfony\Component\Workflow\Workflow;
 
 class ShipOrderUseCase implements ValidatedUseCaseInterface
@@ -34,13 +37,19 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface
 
     private $orderResponseFactory;
 
+    private $paymentRequestFactory;
+
+    private $uuidGenerator;
+
     public function __construct(
         Workflow $workflow,
         OrderRepositoryInterface $orderRepository,
         PaymentsServiceInterface $paymentsService,
         OrderInvoiceManager $invoiceManager,
         OrderContainerFactory $orderContainerFactory,
-        OrderResponseFactory $orderResponseFactory
+        OrderResponseFactory $orderResponseFactory,
+        PaymentRequestFactory $paymentRequestFactory,
+        UuidGeneratorInterface $uuidGenerator
     ) {
         $this->workflow = $workflow;
         $this->orderRepository = $orderRepository;
@@ -48,6 +57,8 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface
         $this->invoiceManager = $invoiceManager;
         $this->orderContainerFactory = $orderContainerFactory;
         $this->orderResponseFactory = $orderResponseFactory;
+        $this->paymentRequestFactory = $paymentRequestFactory;
+        $this->uuidGenerator = $uuidGenerator;
     }
 
     public function execute(ShipOrderRequest $request): OrderResponse
@@ -67,10 +78,7 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface
         $this->validateRequest($request, null, $groups);
 
         if (!$this->workflow->can($order, OrderStateManager::TRANSITION_SHIP)) {
-            throw new PaellaCoreCriticalException(
-                "Order #{$request->getOrderId()} can not be shipped",
-                PaellaCoreCriticalException::CODE_ORDER_CANT_BE_SHIPPED
-            );
+            throw new OrderWorkflowException("Order state does not support shipment");
         }
 
         $order
@@ -84,15 +92,17 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface
             $order->setExternalCode($request->getExternalCode());
         }
 
-        $paymentDetails = $this->paymentsService->createOrder(
-            $orderContainer->getMerchantDebtor()->getPaymentDebtorId(),
-            $order->getInvoiceNumber(),
-            $order->getShippedAt(),
-            $orderContainer->getOrderFinancialDetails()->getDuration(),
-            $orderContainer->getOrderFinancialDetails()->getAmountGross(),
-            $order->getExternalCode()
-        );
-        $order->setPaymentId($paymentDetails->getId());
+        $order->setPaymentId($this->uuidGenerator->uuid4());
+
+        try {
+            $this->paymentsService->createOrder(
+                $this->paymentRequestFactory->createCreateRequestDTO($orderContainer)
+            );
+        } catch (PaymentsServiceRequestException $exception) {
+            $this->orderRepository->update($order);
+
+            throw new ShipOrderException("Payments call unsuccessful", null, $exception);
+        }
 
         $this->workflow->apply($order, OrderStateManager::TRANSITION_SHIP);
         $this->orderRepository->update($order);
@@ -100,12 +110,7 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface
         try {
             $this->invoiceManager->upload($order, InvoiceUploadHandlerInterface::EVENT_SHIPMENT);
         } catch (OrderInvoiceUploadException $exception) {
-            throw new PaellaCoreCriticalException(
-                "Order #{$request->getOrderId()} can not be shipped",
-                PaellaCoreCriticalException::CODE_ORDER_CANT_BE_SHIPPED,
-                500,
-                $exception
-            );
+            throw new ShipOrderException("Invoice can't be scheduled for upload", null, $exception);
         }
 
         return $this->orderResponseFactory->create($orderContainer);

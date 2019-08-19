@@ -7,6 +7,7 @@ use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\PaymentOrderConfirmException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
+use App\DomainModel\Payment\PaymentRequestFactory;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
@@ -21,14 +22,18 @@ class ConfirmOrderPaymentUseCase implements ValidatedUseCaseInterface
 
     private $orderStateManager;
 
+    private $paymentRequestFactory;
+
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         PaymentsServiceInterface $paymentService,
-        OrderStateManager $orderStateManager
+        OrderStateManager $orderStateManager,
+        PaymentRequestFactory $paymentRequestFactory
     ) {
         $this->orderRepository = $orderRepository;
         $this->paymentService = $paymentService;
         $this->orderStateManager = $orderStateManager;
+        $this->paymentRequestFactory = $paymentRequestFactory;
     }
 
     /**
@@ -52,7 +57,9 @@ class ConfirmOrderPaymentUseCase implements ValidatedUseCaseInterface
         }
 
         if ($this->orderStateManager->wasShipped($order)) {
-            $this->paymentService->confirmPayment($order, $request->getAmount());
+            $requestDTO = $this->paymentRequestFactory->createConfirmRequestDTO($order, $request->getAmount());
+
+            $this->paymentService->confirmPayment($requestDTO);
         } else {
             throw new PaymentOrderConfirmException();
         }

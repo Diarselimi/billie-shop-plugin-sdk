@@ -9,6 +9,9 @@ use App\DomainModel\Payment\OrderPaymentDetailsDTO;
 use App\DomainModel\Payment\OrderPaymentDetailsFactory;
 use App\DomainModel\Payment\PaymentsServiceRequestException;
 use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\Payment\RequestDTO\ConfirmRequestDTO;
+use App\DomainModel\Payment\RequestDTO\CreateRequestDTO;
+use App\DomainModel\Payment\RequestDTO\ModifyRequestDTO;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use GuzzleHttp\Client;
@@ -80,62 +83,37 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
         }
     }
 
-    public function modifyOrder(string $paymentId, int $duration, float $amountGross, ?string $invoiceNumber): void
+    public function modifyOrder(ModifyRequestDTO $requestDTO): void
     {
-        $json = [
-            'ticket_id' => $paymentId,
-            'invoice_number' => $invoiceNumber,
-            'duration' => $duration,
-            'amount' => $amountGross,
-        ];
-
         $this->logInfo('Modify borscht ticket', [
-            'json' => $json,
+            'json' => $requestDTO->toArray(),
         ]);
 
         try {
-            $this->client->put('/order.json', ['json' => $json]);
+            $this->client->put('/order.json', ['json' => $requestDTO->toArray()]);
         } catch (TransferException $exception) {
             throw new PaymentsServiceRequestException($exception);
         }
     }
 
-    public function confirmPayment(OrderEntity $order, float $amount): void
+    public function confirmPayment(ConfirmRequestDTO $requestDTO): void
     {
-        $json = [
-            'ticket_id' => $order->getPaymentId(),
-            'amount' => $amount,
-        ];
-
         $this->logInfo('Confirm borscht ticket payment', [
-            'json' => $json,
+            'json' => $requestDTO->toArray(),
         ]);
 
         try {
             $this->client->post('/merchant/payment.json', [
-                'json' => $json,
+                'json' => $requestDTO->toArray(),
             ]);
         } catch (TransferException $exception) {
             throw new PaymentsServiceRequestException($exception);
         }
     }
 
-    public function createOrder(
-        string $debtorPaymentId,
-        string $invoiceNumber,
-        \DateTime $shippedAt,
-        int $duration,
-        float $amountGross,
-        string $externalCode
-    ): OrderPaymentDetailsDTO {
-        $json = [
-            'debtor_id' => $debtorPaymentId,
-            'invoice_number' => $invoiceNumber,
-            'billing_date' => $shippedAt->format('Y-m-d'),
-            'duration' => $duration,
-            'amount' => $amountGross,
-            'order_code' => $externalCode,
-        ];
+    public function createOrder(CreateRequestDTO $requestDTO): OrderPaymentDetailsDTO
+    {
+        $json = $requestDTO->toArray();
 
         $this->logInfo('Create borscht ticket', ['json' => $json]);
 

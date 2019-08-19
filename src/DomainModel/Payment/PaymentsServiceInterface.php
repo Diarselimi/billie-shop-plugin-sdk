@@ -3,6 +3,9 @@
 namespace App\DomainModel\Payment;
 
 use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\Payment\RequestDTO\ConfirmRequestDTO;
+use App\DomainModel\Payment\RequestDTO\CreateRequestDTO;
+use App\DomainModel\Payment\RequestDTO\ModifyRequestDTO;
 
 interface PaymentsServiceInterface
 {
@@ -14,18 +17,11 @@ interface PaymentsServiceInterface
 
     public function cancelOrder(OrderEntity $order): void;
 
-    public function modifyOrder(string $paymentId, int $duration, float $amountGross, ?string $invoiceNumber): void;
+    public function modifyOrder(ModifyRequestDTO $requestDTO): void;
 
-    public function confirmPayment(OrderEntity $order, float $amount): void;
+    public function confirmPayment(ConfirmRequestDTO $requestDTO): void;
 
-    public function createOrder(
-        string $debtorPaymentId,
-        string $invoiceNumber,
-        \DateTime $shippedAt,
-        int $duration,
-        float $amountGross,
-        string $externalCode
-    ): OrderPaymentDetailsDTO;
+    public function createOrder(CreateRequestDTO $requestDTO): OrderPaymentDetailsDTO;
 
     public function createFraudReclaim(string $orderPaymentId): void;
 }

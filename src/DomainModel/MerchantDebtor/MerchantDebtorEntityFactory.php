@@ -2,10 +2,17 @@
 
 namespace App\DomainModel\MerchantDebtor;
 
-use Ramsey\Uuid\Uuid;
+use App\Helper\Uuid\UuidGeneratorInterface;
 
 class MerchantDebtorEntityFactory
 {
+    private $uuidGenerator;
+
+    public function __construct(UuidGeneratorInterface $uuidGenerator)
+    {
+        $this->uuidGenerator = $uuidGenerator;
+    }
+
     public function createFromDatabaseRow(array $row): MerchantDebtorEntity
     {
         return (new MerchantDebtorEntity())
@@ -31,7 +38,7 @@ class MerchantDebtorEntityFactory
         return (new MerchantDebtorEntity())
             ->setMerchantId($merchantId)
             ->setDebtorId($debtorId)
-            ->setUuid(Uuid::uuid4()->toString())
+            ->setUuid($this->uuidGenerator->uuid4())
             ->setPaymentDebtorId($paymentDebtorId)
             ->setIsWhitelisted($isWhitelisted)
             ->setCreatedAt($now)

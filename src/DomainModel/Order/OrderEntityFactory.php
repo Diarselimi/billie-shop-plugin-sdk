@@ -3,10 +3,17 @@
 namespace App\DomainModel\Order;
 
 use App\Application\UseCase\CreateOrder\CreateOrderRequest;
-use Ramsey\Uuid\Uuid;
+use App\Helper\Uuid\UuidGeneratorInterface;
 
 class OrderEntityFactory
 {
+    private $uuidGenerator;
+
+    public function __construct(UuidGeneratorInterface $uuidGenerator)
+    {
+        $this->uuidGenerator = $uuidGenerator;
+    }
+
     public function createFromRequest(CreateOrderRequest $request): OrderEntity
     {
         return (new OrderEntity())
@@ -15,7 +22,7 @@ class OrderEntityFactory
             ->setExternalCode($request->getExternalCode())
             ->setMerchantId($request->getMerchantId())
             ->setState(OrderStateManager::STATE_NEW)
-            ->setUuid(Uuid::uuid4()->toString())
+            ->setUuid($this->uuidGenerator->uuid4())
             ->setCheckoutSessionId($request->getCheckoutSessionId())
         ;
     }

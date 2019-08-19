@@ -4,10 +4,17 @@ namespace App\DomainModel\Merchant;
 
 use App\Application\UseCase\CreateMerchant\CreateMerchantRequest;
 use App\DomainModel\DebtorCompany\DebtorCompany;
-use Ramsey\Uuid\Uuid;
+use App\Helper\Uuid\UuidGeneratorInterface;
 
 class MerchantEntityFactory
 {
+    private $uuidGenerator;
+
+    public function __construct(UuidGeneratorInterface $uuidGenerator)
+    {
+        $this->uuidGenerator = $uuidGenerator;
+    }
+
     public function createFromDatabaseRow(array $row): MerchantEntity
     {
         return (new MerchantEntity())
@@ -36,8 +43,8 @@ class MerchantEntityFactory
             ->setWebhookUrl($request->getWebhookUrl())
             ->setWebhookAuthorization($request->getWebhookAuthorization())
             ->setName($company->getName())
-            ->setApiKey(Uuid::uuid4()->toString())
-            ->setPaymentMerchantId(Uuid::uuid4()->toString())
+            ->setApiKey($this->uuidGenerator->uuid4())
+            ->setPaymentMerchantId($this->uuidGenerator->uuid4())
             ->setIsActive(true)
         ;
     }

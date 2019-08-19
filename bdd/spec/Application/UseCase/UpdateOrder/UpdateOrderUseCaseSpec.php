@@ -8,10 +8,12 @@ use App\Application\PaellaCoreCriticalException;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderAmountRequest;
 use App\Application\UseCase\UpdateOrder\UpdateOrderRequest;
 use App\Application\UseCase\UpdateOrder\UpdateOrderUseCase;
+use App\DomainModel\Payment\PaymentRequestFactory;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
+use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
@@ -22,6 +24,7 @@ use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsFactory;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface;
 use App\DomainModel\OrderInvoice\OrderInvoiceManager;
+use App\DomainModel\Payment\RequestDTO\ModifyRequestDTO;
 use DateTime;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -63,6 +66,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         OrderInvoiceManager $invoiceManager,
         OrderFinancialDetailsFactory $orderFinancialDetailsFactory,
         OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
+        PaymentRequestFactory $paymentRequestFactory,
         OrderContainer $orderContainer,
         OrderEntity $order,
         OrderFinancialDetailsEntity $orderFinancialDetails,
@@ -77,6 +81,8 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $order->getState()->willReturn(OrderStateManager::STATE_CREATED);
         $order->getMarkedAsFraudAt()->willReturn(null);
         $order->getMerchantDebtorId()->willReturn(self::ORDER_MERCHANT_DEBTOR_ID);
+
+        $paymentRequestFactory->createModifyRequestDTO(Argument::any())->willReturn(new ModifyRequestDTO());
 
         $orderFinancialDetails->getAmountGross()->willReturn(self::ORDER_AMOUNT_GROSS);
         $orderFinancialDetails->getAmountNet()->willReturn(self::ORDER_AMOUNT_NET);
@@ -175,7 +181,9 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
         UpdateOrderRequest $request,
         OrderEntity $order,
-        OrderContainer $orderContainer
+        OrderContainer $orderContainer,
+        OrderFinancialDetailsEntity $orderFinancialDetails,
+        MerchantDebtorEntity $merchantDebtorEntity
     ) {
         $order->getPaymentId()->willReturn(self::ORDER_PAYMENT_ID);
         $newDuration = self::ORDER_DURATION + 1;
@@ -267,10 +275,9 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         OrderFinancialDetailsFactory $orderFinancialDetailsFactory,
         OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
         OrderContainer $orderContainer,
-        OrderFinancialDetailsEntity $orderFinancialDetails
+        OrderFinancialDetailsEntity $orderFinancialDetails,
+        MerchantDebtorEntity $merchantDebtorEntity
     ) {
-        $order->getPaymentId()->shouldBeCalledOnce()->willReturn(self::ORDER_PAYMENT_ID);
-
         $newAmountGross = self::ORDER_AMOUNT_GROSS - 10;
         $newAmountNet = self::ORDER_AMOUNT_NET - 10;
         $newAmountTax = self::ORDER_AMOUNT_TAX - 10;
@@ -314,12 +321,7 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         $orderRepository->update($order)->shouldBeCalled();
 
         $paymentsService
-            ->modifyOrder(
-                self::ORDER_PAYMENT_ID,
-                self::ORDER_DURATION,
-                $newAmountGross,
-                self::ORDER_INVOICE_NUMBER
-            )
+            ->modifyOrder(Argument::any())
             ->shouldBeCalled()
         ;
 
@@ -337,7 +339,8 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         OrderFinancialDetailsFactory $orderFinancialDetailsFactory,
         OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
         PaymentsServiceInterface $paymentsService,
-        OrderContainer $orderContainer
+        OrderContainer $orderContainer,
+        MerchantDebtorEntity $merchantDebtorEntity
     ) {
         $newAmountGross = self::ORDER_AMOUNT_GROSS - 10;
         $newAmountNet = self::ORDER_AMOUNT_NET - 10;
@@ -447,7 +450,9 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
         PaymentsServiceInterface $paymentsService,
         UpdateOrderRequest $request,
         OrderEntity $order,
-        OrderContainer $orderContainer
+        OrderFinancialDetailsEntity $orderFinancialDetails,
+        OrderContainer $orderContainer,
+        MerchantDebtorEntity $merchantDebtorEntity
     ) {
         $newInvoiceNumber = 'NewInvoiceNum';
         $newInvoiceUrl = '/NewInvoiceNum.pdf';
@@ -464,21 +469,13 @@ class UpdateOrderUseCaseSpec extends ObjectBehavior
             ->willReturn($orderContainer)
         ;
 
-        $order->getPaymentId()->shouldBeCalledOnce()->willReturn(self::ORDER_PAYMENT_ID);
         $order->setInvoiceNumber($newInvoiceNumber)->shouldBeCalled()->willReturn($order);
         $order->setInvoiceUrl($newInvoiceUrl)->shouldBeCalled()->willReturn($order);
-
-        $order->getInvoiceNumber()->willReturn($newInvoiceNumber);
 
         $orderRepository->update($order)->shouldBeCalled();
 
         $paymentsService
-            ->modifyOrder(
-                self::ORDER_PAYMENT_ID,
-                self::ORDER_DURATION,
-                self::ORDER_AMOUNT_GROSS,
-                $newInvoiceNumber
-            )
+            ->modifyOrder(Argument::any())
             ->shouldBeCalled()
         ;
 
