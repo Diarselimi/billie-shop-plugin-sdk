@@ -73,10 +73,10 @@ Feature:
           "established_customer":1
        },
        "delivery_address":{
-          "house_number":"22",
-          "street":"Charlot strasse",
-          "city":"Paris",
-          "postal_code":"98765",
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city":"Berlin",
+          "postal_code":"10179",
           "country":"DE"
        },
        "amount":{
@@ -134,10 +134,10 @@ Feature:
      "dunning_status": null,
      "shipped_at":null,
      "delivery_address":{
-        "house_number":"22",
-        "street":"Charlot strasse",
-        "city": "Paris",
-        "postal_code":"98765",
+        "house_number":"10",
+        "street":"Heinrich-Heine-Platz",
+        "city":"Berlin",
+        "postal_code":"10179",
         "country":"DE"
      },
      "billing_address":{
@@ -150,7 +150,7 @@ Feature:
     }
     """
 
-  Scenario: Successful order creation by adding the billing address address
+  Scenario: Successful order creation by adding the billing address
     Given I get from companies service identify match and good decision response
     And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
     """
@@ -186,10 +186,10 @@ Feature:
           "established_customer":1
        },
        "delivery_address":{
-          "house_number":"22",
-          "street":"Charlot strasse",
-          "city":"Paris",
-          "postal_code":"98765",
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city":"Berlin",
+          "postal_code":"10179",
           "country":"DE"
        },
        "billing_address":{
@@ -254,10 +254,10 @@ Feature:
      "dunning_status": null,
      "shipped_at":null,
      "delivery_address":{
-        "house_number":"22",
-        "street":"Charlot strasse",
-        "city": "Paris",
-        "postal_code":"98765",
+        "house_number":"10",
+        "street":"Heinrich-Heine-Platz",
+        "city":"Berlin",
+        "postal_code":"10179",
         "country":"DE"
      },
      "billing_address":{
@@ -307,10 +307,10 @@ Feature:
           "established_customer":1
        },
        "delivery_address":{
-          "house_number":"22",
-          "street":"Charlot strasse",
-          "city":"Paris",
-          "postal_code":"98765",
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city":"Berlin",
+          "postal_code":"10179",
           "country":"DE"
        },
        "amount":{
@@ -368,10 +368,10 @@ Feature:
      "dunning_status": null,
      "shipped_at":null,
      "delivery_address":{
-        "house_number":"22",
-        "street":"Charlot strasse",
-        "city": "Paris",
-        "postal_code":"98765",
+        "house_number":"10",
+        "street":"Heinrich-Heine-Platz",
+        "city":"Berlin",
+        "postal_code":"10179",
         "country":"DE"
      },
      "billing_address":{
@@ -528,10 +528,10 @@ Feature:
           "established_customer":1
        },
        "delivery_address":{
-          "house_number":"22",
-          "street":"Charlot strasse",
-          "city":"Paris",
-          "postal_code":"98765",
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city":"Berlin",
+          "postal_code":"10179",
           "country":"DE"
        },
        "billing_address":{},
@@ -590,10 +590,10 @@ Feature:
      "dunning_status": null,
      "shipped_at":null,
      "delivery_address":{
-        "house_number":"22",
-        "street":"Charlot strasse",
-        "city": "Paris",
-        "postal_code":"98765",
+        "house_number":"10",
+        "street":"Heinrich-Heine-Platz",
+        "city":"Berlin",
+        "postal_code":"10179",
         "country":"DE"
      },
      "billing_address":{

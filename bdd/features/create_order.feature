@@ -15,6 +15,7 @@ Feature:
       | debtor_industry_sector    |
       | debtor_identified         |
       | debtor_identified_strict  |
+      | delivery_address          |
       | debtor_is_trusted         |
       | limit                     |
       | debtor_not_customer       |
@@ -28,6 +29,7 @@ Feature:
       | debtor_country            | 1       | 1                  |
       | debtor_industry_sector    | 1       | 1                  |
       | debtor_identified         | 1       | 1                  |
+      | delivery_address          | 1       | 1                  |
       | debtor_identified_strict  | 1       | 1                  |
       | debtor_is_trusted         | 1       | 1                  |
       | limit                     | 1       | 1                  |
@@ -183,10 +185,10 @@ Feature:
           "established_customer":1
        },
        "delivery_address":{
-          "house_number":"22",
-          "street":"Charlot strasse",
-          "city":"Paris",
-          "postal_code":"98765",
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city":"Berlin",
+          "postal_code":"10179",
           "country":"DE"
        },
        "amount":{
@@ -244,10 +246,10 @@ Feature:
      "dunning_status": null,
      "shipped_at":null,
      "delivery_address":{
-        "house_number":"22",
-        "street":"Charlot strasse",
-        "city": "Paris",
-        "postal_code":"98765",
+        "house_number":"10",
+        "street":"Heinrich-Heine-Platz",
+        "postal_code":"10179",
+        "city":"Berlin",
         "country":"DE"
      },
      "billing_address":{
@@ -298,10 +300,10 @@ Feature:
           "established_customer":1
        },
        "delivery_address":{
-          "house_number":"22",
-          "street":"Charlot strasse",
-          "city":"Paris",
-          "postal_code":"98765",
+          "house_number":null,
+          "street":"Heinrich-Heine-Platz",
+          "city":"Berlin",
+          "postal_code":"10179",
           "country":"DE"
        },
        "amount":{
@@ -358,10 +360,10 @@ Feature:
         "industry_sector":"SOME SECTOR"
      },
      "delivery_address":{
-        "house_number":"22",
-        "street":"Charlot strasse",
-        "city": "Paris",
-        "postal_code":"98765",
+        "house_number":null,
+        "street":"Heinrich-Heine-Platz",
+        "city":"Berlin",
+        "postal_code":"10179",
         "country":"DE"
      },
      "billing_address":{
@@ -375,123 +377,6 @@ Feature:
     """
     And the order "A1" has the same hash "testusercompanyva2223333somenumbersomelegalberlin10179heinrichheineplatzde"
     And merchant debtor has financing power 9000
-
-  Scenario: Successful order creation with a not german postal code in shipping
-    Given I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
-    """
-    """
-    And I get from payments service register debtor positive response
-    When I send a POST request to "/order" with body:
-    """
-    {
-       "debtor_person":{
-          "salutation":"m",
-          "first_name":"",
-          "last_name":"else",
-          "phone_number":"+491234567",
-          "email":"someone@billie.io"
-       },
-       "debtor_company":{
-          "merchant_customer_id":"12",
-          "name":"Test User Company",
-          "address_addition":"left door",
-          "address_house_number":"10",
-          "address_street":"Heinrich-Heine-Platz",
-          "address_city":"Berlin",
-          "address_postal_code":"10179",
-          "address_country":"DE",
-          "tax_id":"VA222",
-          "tax_number":"3333",
-          "registration_court":"",
-          "registration_number":" some number",
-          "industry_sector":"some sector",
-          "subindustry_sector":"some sub",
-          "employees_number":"33",
-          "legal_form":"some legal",
-          "established_customer":1
-       },
-       "delivery_address":{
-          "house_number":"22",
-          "street":"An der Ronne",
-          "city":"Vienna",
-          "postal_code":"AT-5130-123333",
-          "country":"AT"
-       },
-       "amount":{
-          "net":900.00,
-          "gross":1000.00,
-          "tax":100.00
-       },
-       "comment":"Some comment",
-       "duration":30,
-       "order_id":"A1"
-    }
-    """
-    Then the order A1 is in state created
-    And the response status code should be 200
-    And the JSON response should be:
-    """
-    {
-      "order_id":"A1",
-      "state":"created",
-      "reasons":null,
-      "amount":1000.00,
-      "amount_net": 900.00,
-      "amount_tax": 100.00,
-      "created_at":"2019-06-06T16:21:53+0200",
-      "debtor_company":{
-        "name":"Test User Company",
-        "address_house_number":"10",
-        "address_street":"Heinrich-Heine-Platz",
-        "address_postal_code":"10179",
-        "address_city":"Berlin",
-        "address_country":"DE"
-      },
-      "bank_account":{
-        "iban":"DE1234",
-        "bic":"BICISHERE"
-      },
-      "invoice":{
-        "invoice_number":null,
-        "payout_amount":null,
-        "outstanding_amount":null,
-        "fee_amount":null,
-        "fee_rate":null,
-        "due_date":null
-      },
-      "debtor_external_data":{
-        "name":"Test User Company",
-        "address_country":"DE",
-        "address_city": "Berlin",
-        "address_postal_code":"10179",
-        "address_street":"Heinrich-Heine-Platz",
-        "address_house":"10",
-        "industry_sector":"SOME SECTOR",
-        "merchant_customer_id":"12"
-      },
-      "duration":30,
-      "dunning_status": null,
-      "shipped_at":null,
-      "delivery_address":{
-        "house_number":"22",
-        "street":"An der Ronne",
-        "city":"Vienna",
-        "postal_code":"AT-5130-123333",
-        "country":"AT"
-       },
-       "billing_address":{
-          "house_number":"10",
-          "street":"Heinrich-Heine-Platz",
-          "city": "Berlin",
-          "postal_code":"10179",
-          "country":"DE"
-       }
-    }
-    """
-    And the response status code should be 200
-    And merchant debtor has financing power 9000
-
 
   Scenario: Successful order creation without delivery_address.house_number
     Given I get from companies service identify match and good decision response
@@ -608,7 +493,6 @@ Feature:
     And the order "A123" has the same hash "testusercompanyva2223333somenumbersomelegalberlin10179heinrichheineplatz10de"
     And merchant debtor has financing power 9956.7
 
-
   Scenario: Successful order creation using lowercase country
     Given I get from companies service identify match and good decision response
     And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
@@ -633,7 +517,7 @@ Feature:
           "address_street":"Heinrich-Heine-Platz",
           "address_city":"Berlin",
           "address_postal_code":"10179",
-          "address_country":"DE",
+          "address_country":"de",
           "tax_id":"VA222",
           "tax_number":"3333",
           "registration_court":"",
@@ -645,10 +529,10 @@ Feature:
           "established_customer":1
        },
        "delivery_address":{
-          "house_number":"22",
-          "street":"Charlot strasse",
-          "city":"Paris",
-          "postal_code":"98765",
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city":"Berlin",
+          "postal_code":"10179",
           "country":"de"
        },
        "amount":{
@@ -666,60 +550,59 @@ Feature:
     And the JSON response should be:
     """
     {
-      "order_id":"A1",
-      "state":"created",
-      "reasons":null,
-      "amount":1000.00,
-      "amount_net": 900.00,
-      "amount_tax": 100.00,
-      "debtor_company":{
-        "name":"Test User Company",
-        "address_house_number":"10",
-        "address_street":"Heinrich-Heine-Platz",
-        "address_postal_code":"10179",
-        "address_city":"Berlin",
-        "address_country":"DE"
-      },
-      "bank_account":{
-        "iban":"DE1234",
-        "bic":"BICISHERE"
-      },
-      "invoice":{
-        "invoice_number":null,
-        "payout_amount":null,
-        "outstanding_amount":null,
-        "fee_amount":null,
-        "fee_rate":null,
-        "due_date":null
-      },
-      "debtor_external_data":{
-        "name":"Test User Company",
-        "address_country":"DE",
-        "address_city": "Berlin",
-        "address_postal_code":"10179",
-        "address_street":"Heinrich-Heine-Platz",
-        "address_house":"10",
-        "industry_sector":"SOME SECTOR",
-        "merchant_customer_id":"12"
-       },
+       "order_id":"A1",
+       "state":"created",
+       "reasons":null,
+       "amount":1000,
+       "amount_net":900,
+       "amount_tax":100,
        "duration":30,
-       "dunning_status": null,
-       "shipped_at":null,
-       "delivery_address":{
-          "house_number":"22",
-          "street":"Charlot strasse",
-          "city":"Paris",
-          "postal_code":"98765",
-          "country":"de"
+       "dunning_status":null,
+       "debtor_company":{
+          "name":"Test User Company",
+          "address_house_number":"10",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_postal_code":"10179",
+          "address_city":"Berlin",
+          "address_country":"DE"
        },
-      "billing_address":{
+       "bank_account":{
+          "iban":"DE1234",
+          "bic":"BICISHERE"
+       },
+       "invoice":{
+          "invoice_number":null,
+          "payout_amount":null,
+          "outstanding_amount":null,
+          "fee_amount":null,
+          "fee_rate":null,
+          "due_date":null
+       },
+       "debtor_external_data":{
+          "merchant_customer_id":"12",
+          "name":"Test User Company",
+          "address_country":"DE",
+          "address_city":"Berlin",
+          "address_postal_code":"10179",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_house":"10",
+          "industry_sector":"SOME SECTOR"
+       },
+       "delivery_address":{
           "house_number":"10",
           "street":"Heinrich-Heine-Platz",
-          "city": "Berlin",
+          "city":"Berlin",
+          "postal_code":"10179",
+          "country":"de"
+       },
+       "billing_address":{
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city":"Berlin",
           "postal_code":"10179",
           "country":"DE"
-       }
-
+       },
+       "shipped_at":null
     }
     """
     And merchant debtor has financing power 9000
@@ -1185,10 +1068,10 @@ Feature:
           "established_customer":1
        },
        "delivery_address":{
-          "house_number":"22",
-          "street":"Charlot strasse",
-          "city":"Paris",
-          "postal_code":"98765",
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city":"Berlin",
+          "postal_code":"10179",
           "country":"DE"
        },
        "amount":{
@@ -1297,10 +1180,10 @@ Feature:
             "established_customer":1
          },
          "delivery_address":{
-            "house_number":"22",
-            "street":"Charlot strasse",
-            "city":"Paris",
-            "postal_code":"98765",
+            "house_number":"10",
+            "street":"Heinrich-Heine-Platz",
+            "city":"Berlin",
+            "postal_code":"10179",
             "country":"DE"
          },
          "amount":{
@@ -1438,3 +1321,113 @@ Feature:
     }
     """
     Then the response status code should be 200
+
+  Scenario: Successful order creation (delivery and company address mismatch and Order amount < 250)
+    Given I get from companies service identify match and good decision response
+    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    """
+    """
+    And I get from payments service register debtor positive response
+    When I send a POST request to "/order" with body:
+    """
+    {
+       "debtor_person":{
+          "salutation":"m",
+          "first_name":"",
+          "last_name":"else",
+          "phone_number":"+491234567",
+          "email":"someone@billie.io"
+       },
+       "debtor_company":{
+          "merchant_customer_id":"12",
+          "name":"Test User Company",
+          "address_addition":"left door",
+          "address_house_number":"10",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_city":"Berlin",
+          "address_postal_code":"10179",
+          "address_country":"DE",
+          "tax_id":"VA222",
+          "tax_number":"3333",
+          "registration_court":"",
+          "registration_number":" some number",
+          "industry_sector":"some sector",
+          "subindustry_sector":"some sub",
+          "employees_number":"33",
+          "legal_form":"some legal",
+          "established_customer":1
+       },
+       "delivery_address":{
+          "house_number":"4",
+          "street":"somestr.",
+          "city":"Berlin",
+          "postal_code":"10000",
+          "country":"DE"
+       },
+       "amount":{
+          "net":50.00,
+          "gross":60.00,
+          "tax":10.00
+       },
+       "comment":"Some comment",
+       "duration":30,
+       "order_id":"A1"
+    }
+    """
+    Then the order A1 is in state created
+    And the response status code should be 200
+
+  Scenario: Order declined (delivery and company address mismatch and Order amount > 250)
+    Given I get from companies service identify match and good decision response
+    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    """
+    """
+    And I get from payments service register debtor positive response
+    When I send a POST request to "/order" with body:
+    """
+    {
+       "debtor_person":{
+          "salutation":"m",
+          "first_name":"",
+          "last_name":"else",
+          "phone_number":"+491234567",
+          "email":"someone@billie.io"
+       },
+       "debtor_company":{
+          "merchant_customer_id":"12",
+          "name":"Test User Company",
+          "address_addition":"left door",
+          "address_house_number":"10",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_city":"Berlin",
+          "address_postal_code":"10179",
+          "address_country":"DE",
+          "tax_id":"VA222",
+          "tax_number":"3333",
+          "registration_court":"",
+          "registration_number":" some number",
+          "industry_sector":"some sector",
+          "subindustry_sector":"some sub",
+          "employees_number":"33",
+          "legal_form":"some legal",
+          "established_customer":1
+       },
+       "delivery_address":{
+          "house_number":"4",
+          "street":"somestr.",
+          "city":"Berlin",
+          "postal_code":"10000",
+          "country":"DE"
+       },
+       "amount":{
+          "net":500.00,
+          "gross":600.00,
+          "tax":100.00
+       },
+       "comment":"Some comment",
+       "duration":30,
+       "order_id":"A1"
+    }
+    """
+    Then the order A1 is in state declined
+    And the response status code should be 200

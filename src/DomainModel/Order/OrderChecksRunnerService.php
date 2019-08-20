@@ -6,6 +6,7 @@ use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositor
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\OrderRiskCheck\Checker\CheckInterface;
 use App\DomainModel\OrderRiskCheck\Checker\CheckResult;
+use App\DomainModel\OrderRiskCheck\Checker\DeliveryAddressCheck;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntity;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntityFactory;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
@@ -84,6 +85,10 @@ class OrderChecksRunnerService implements LoggingInterface
         );
 
         foreach ($failedRiskChecks as $orderCheckResult) {
+            if ($orderCheckResult->getRiskCheckDefinition()->getName() === DeliveryAddressCheck::NAME) {
+                continue;
+            }
+
             $check = $this->getCheck($orderCheckResult->getRiskCheckDefinition()->getName());
             $result = $check->check($orderContainer);
 
