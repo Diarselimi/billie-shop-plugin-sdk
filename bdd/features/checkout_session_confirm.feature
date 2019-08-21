@@ -115,24 +115,3 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     }
     """
     And the response status code should be 404
-
-  Scenario: I fail to confirm an order if it's in declined state
-    Given I have a declined order "C123" with amounts 43.30/55.2/10.10, duration 30 and comment "test"
-    And I get from companies service identify match response
-    And I get from companies service get debtor response
-    And I send a PUT request to "/checkout-session/123123/confirm" with body:
-    """
-    {
-       "amount":{
-          "net":55.2,
-          "gross":43.30,
-          "tax":10.10
-       },
-       "duration":31
-    }
-    """
-    Then the response status code should be 400
-    And the JSON response should be:
-    """
-    {"errors":[{"title":"The order is not authorized","code":"request_invalid"}]}
-    """

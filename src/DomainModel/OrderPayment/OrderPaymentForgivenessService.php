@@ -2,6 +2,7 @@
 
 namespace App\DomainModel\OrderPayment;
 
+use App\DomainModel\Payment\PaymentRequestFactory;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Payment\OrderAmountChangeDTO;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
@@ -17,12 +18,16 @@ class OrderPaymentForgivenessService implements LoggingInterface
 
     private $orderRepository;
 
+    private $paymentRequestFactory;
+
     public function __construct(
         PaymentsServiceInterface $paymentsService,
-        OrderRepositoryInterface $orderRepository
+        OrderRepositoryInterface $orderRepository,
+        PaymentRequestFactory $paymentRequestFactory
     ) {
         $this->paymentsService = $paymentsService;
         $this->orderRepository = $orderRepository;
+        $this->paymentRequestFactory = $paymentRequestFactory;
     }
 
     public function begForgiveness(OrderContainer $orderContainer, OrderAmountChangeDTO $amountChange): bool
@@ -52,7 +57,10 @@ class OrderPaymentForgivenessService implements LoggingInterface
             return false;
         }
 
-        $this->paymentsService->confirmPayment($order, $outstandingAmount);
+        $requestDTO = $this->paymentRequestFactory
+            ->createConfirmRequestDTO($order, $outstandingAmount);
+
+        $this->paymentsService->confirmPayment($requestDTO);
 
         $order->setAmountForgiven($outstandingAmount);
         $this->orderRepository->update($order);

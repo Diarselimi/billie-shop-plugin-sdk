@@ -83,6 +83,8 @@ services:
       - '@openapi_file_locator'
       - '@App\Infrastructure\OpenApi\Routing\OpenApiClassLoader'
 
+  App\Helper\Uuid\UuidGeneratorInterface: '@App\Helper\Uuid\UuidGenerator'
+
   App\DomainModel\Order\OrderChecksRunnerService:
     arguments:
       $preIdentificationChecks:
@@ -93,6 +95,7 @@ services:
       $postIdentificationChecks:
         - 'debtor_identified'
         - 'debtor_identified_strict'
+        - 'delivery_address'
         - 'debtor_is_trusted'
         - 'limit'
         - 'debtor_not_customer'
@@ -116,3 +119,4 @@ services:
             debtor_identified: '@App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedCheck'
             debtor_identified_strict: '@App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedStrictCheck'
             debtor_is_trusted: '@App\DomainModel\OrderRiskCheck\Checker\DebtorIsTrusted'
+            delivery_address: '@App\DomainModel\OrderRiskCheck\Checker\DeliveryAddressCheck'

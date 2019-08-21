@@ -2,9 +2,10 @@
 
 namespace App\DomainModel\Address;
 
+use App\DomainModel\ArrayableInterface;
 use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 
-class AddressEntity extends AbstractTimestampableEntity
+class AddressEntity extends AbstractTimestampableEntity implements ArrayableInterface
 {
     private $country;
 
@@ -88,5 +89,16 @@ class AddressEntity extends AbstractTimestampableEntity
         $this->addition = $addition;
 
         return $this;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'street' => $this->street,
+            'house_number' => $this->houseNumber,
+            'postal_code' => $this->postalCode,
+            'city' => $this->city,
+            'country' => $this->country,
+        ];
     }
 }

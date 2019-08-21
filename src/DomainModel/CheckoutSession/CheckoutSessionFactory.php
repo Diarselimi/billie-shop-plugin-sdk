@@ -2,17 +2,24 @@
 
 namespace App\DomainModel\CheckoutSession;
 
-use Ramsey\Uuid\Uuid;
+use App\Helper\Uuid\UuidGeneratorInterface;
 
 class CheckoutSessionFactory
 {
+    private $uuidGenerator;
+
+    public function __construct(UuidGeneratorInterface $uuidGenerator)
+    {
+        $this->uuidGenerator = $uuidGenerator;
+    }
+
     public function createFromRequest(string $merchantExternalId, int $merchantId): CheckoutSessionEntity
     {
         $entity = (new CheckoutSessionEntity())
             ->setMerchantDebtorExternalId($merchantExternalId)
             ->setMerchantId($merchantId)
             ->setIsActive(true)
-            ->setUuid(Uuid::uuid4()->toString());
+            ->setUuid($this->uuidGenerator->uuid4());
 
         return $entity;
     }

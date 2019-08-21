@@ -367,16 +367,20 @@ SQL;
         }
     }
 
-    public function getOneByCheckoutSessionUuid(string $checkoutSessionUuid): ?OrderEntity
+    public function getAuthorizedByCheckoutSessionUuid(string $checkoutSessionUuid): ?OrderEntity
     {
-        $sql = ' SELECT ' . implode(', ', self::SELECT_FIELDS) . ' FROM ' . self::TABLE_NAME .
-            ' WHERE id IN (' .
-            ' SELECT orders.id ' .
-            ' FROM ' . self::TABLE_NAME .
-            ' LEFT JOIN ' . CheckoutSessionRepository::TABLE_NAME . ' checkoutSession ON checkoutSession.id = checkout_session_id ' .
-            ' WHERE checkoutSession.uuid = :uuid ORDER BY orders.created_at DESC )  LIMIT 1';
+        $sql = 'SELECT orders.'  . implode(', orders.', self::SELECT_FIELDS) . ' FROM orders
+            INNER JOIN checkout_sessions ch ON ch.id = orders.checkout_session_id
+            WHERE ch.uuid = :checkout_session_uuid AND orders.state = :authorized_state
+        ';
 
-        $row = $this->doFetchOne($sql, ['uuid' => $checkoutSessionUuid]);
+        $row = $this->doFetchOne(
+            $sql,
+            [
+                'checkout_session_uuid' => $checkoutSessionUuid,
+                'authorized_state' => OrderStateManager::STATE_AUTHORIZED,
+            ]
+        );
 
         return $row ? $this->orderFactory->createFromDatabaseRow($row) : null;
     }

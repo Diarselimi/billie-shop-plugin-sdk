@@ -8,6 +8,7 @@ use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderNotification\NotificationScheduler;
+use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntity;
 use Billie\MonitoringBundle\Service\Alerting\Slack\SlackClientAwareInterface;
 use Billie\MonitoringBundle\Service\Alerting\Slack\SlackClientAwareTrait;
 use Billie\MonitoringBundle\Service\Alerting\Slack\SlackMessageAttachmentField;
@@ -93,13 +94,25 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
             OrderEntity::MAX_DURATION_IN_WAITING_STATE
         );
 
+        $failedRiskCheckNames = array_map(
+            function (OrderRiskCheckEntity $orderRiskCheckEntity) {
+                return $orderRiskCheckEntity->getRiskCheckDefinition()->getName();
+            },
+            array_filter(
+                $event->getOrderContainer()->getRiskChecks(),
+                function (OrderRiskCheckEntity $orderRiskCheck) {
+                    return !$orderRiskCheck->isPassed();
+                }
+            )
+        );
+
         $message = $this->getSlackMessageFactory()->createSimple(
             'Order was created in waiting state',
             "Order *{$order->getUuid()}* was created in waiting state because of failed risk checks",
             null,
             new SlackMessageAttachmentField('Merchant ID', $order->getMerchantId()),
             new SlackMessageAttachmentField('Order UUID', $order->getUuid()),
-            new SlackMessageAttachmentField('Failed Risk Checks', implode(', ', $this->orderDeclinedReasonsMapper->mapReasons($order))),
+            new SlackMessageAttachmentField('Failed Risk Checks', implode(', ', $failedRiskCheckNames)),
             new SlackMessageAttachmentField('Environment', str_replace('_', '', getenv('INSTANCE_SUFFIX')))
         );
 

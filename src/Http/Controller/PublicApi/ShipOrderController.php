@@ -3,11 +3,16 @@
 namespace App\Http\Controller\PublicApi;
 
 use App\Application\Exception\OrderNotFoundException;
+use App\Application\Exception\OrderWorkflowException;
+use App\Application\UseCase\ShipOrder\ShipOrderException;
 use App\Application\UseCase\ShipOrder\ShipOrderRequest;
 use App\Application\UseCase\ShipOrder\ShipOrderUseCase;
 use App\DomainModel\OrderResponse\OrderResponse;
 use App\Http\HttpConstantsInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use OpenApi\Annotations as OA;
 
@@ -60,6 +65,10 @@ class ShipOrderController
             return $this->useCase->execute($orderRequest);
         } catch (OrderNotFoundException $e) {
             throw new NotFoundHttpException($e->getMessage());
+        } catch (OrderWorkflowException $e) {
+            throw new BadRequestHttpException($e->getMessage());
+        } catch (ShipOrderException $exception) {
+            throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, "Order can not be shipped", $exception);
         }
     }
 }
