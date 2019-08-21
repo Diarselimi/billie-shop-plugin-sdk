@@ -5,11 +5,14 @@ namespace App\Infrastructure\Repository;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsEntity;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsFactory;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
+use App\DomainModel\OrderRiskCheck\Checker\DeliveryAddressCheck;
 use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class MerchantRiskCheckSettingsRepository extends AbstractPdoRepository implements MerchantRiskCheckSettingsRepositoryInterface
 {
     public const TABLE_NAME = "merchant_risk_check_settings";
+
+    private const DISABLED_BY_DEFAULT_RISK_CHECKS = [DeliveryAddressCheck::NAME];
 
     private $factory;
 
@@ -73,7 +76,7 @@ class MerchantRiskCheckSettingsRepository extends AbstractPdoRepository implemen
                 SELECT 
                     :merchant_id,
                     id,
-                    1,
+                    IF(FIND_IN_SET(name, :disabled_checks), 0, 1),
                     1,
                     now(),
                     now()
@@ -83,6 +86,9 @@ class MerchantRiskCheckSettingsRepository extends AbstractPdoRepository implemen
 	               name <> 'debtor_address'"
         ;
 
-        $this->doExecute($sql, ['merchant_id' => $merchantId]);
+        $this->doExecute($sql, [
+            'merchant_id' => $merchantId,
+            'disabled_checks' => implode(',', self::DISABLED_BY_DEFAULT_RISK_CHECKS),
+        ]);
     }
 }
