@@ -4,7 +4,6 @@ namespace spec\App\Helper\Hasher;
 
 use App\DomainModel\DebtorCompany\IdentifyDebtorRequestDTO;
 use App\Helper\Hasher\ArrayHasherInterface;
-use App\Helper\Hasher\HasherInterface;
 use PhpSpec\ObjectBehavior;
 
 class ArrayHasherSpec extends ObjectBehavior
@@ -25,6 +24,19 @@ class ArrayHasherSpec extends ObjectBehavior
             ->shouldBeEqualTo(md5("randomword"));
     }
 
+    public function it_should_trim_side_special_characters_and_multiple_spaces()
+    {
+        $debtorRequest = new IdentifyDebtorRequestDTO();
+        $debtorRequest
+            ->setLegalForm('123')
+            ->setIsExperimental(false)
+            ->setName('!@#$%^ SOME       NAME')
+            ->setLastName('some       last        name !@#$%$^%$^');
+
+        $this->generateHash($debtorRequest, ['legal_form'])
+            ->shouldBeEqualTo(md5('some name some last name'));
+    }
+
     public function it_should_return_the_correct_hash_also_with_special_characters()
     {
         $debtorRequest = new IdentifyDebtorRequestDTO();
@@ -35,7 +47,7 @@ class ArrayHasherSpec extends ObjectBehavior
             ->setLastName("randomword .randomword?"); //special chars in the last name
 
         $this->generateHash($debtorRequest, ['is_experimental', 'legal_form'])
-            ->shouldBeEqualTo(md5("randomwordrandomwordrandomword"));
+            ->shouldBeEqualTo(md5("randomword randomword .randomword"));
     }
 
     public function it_should_return_the_correct_hash_with_special_chars_and_spaces_()
@@ -49,7 +61,7 @@ class ArrayHasherSpec extends ObjectBehavior
             ->setLastName("Rrandomword .RA"); //special chars in the last name
 
         $this->generateHash($debtorRequest, ['is_experimental', 'legal_form'])
-            ->shouldBeEqualTo(md5("randomword123rrandomwordra"));
+            ->shouldBeEqualTo(md5("rand omwor d 123 rrandomword .ra"));
     }
 
     public function it_should_return_the_correct_hash_with_german_characters_()
@@ -58,11 +70,11 @@ class ArrayHasherSpec extends ObjectBehavior
         $debtorRequest
             ->setLegalForm("test")
             ->setIsExperimental("test")
-            ->setPostalCode("123")
-            ->setName("Jürgen")
+            ->setPostalCode("   123")
+            ->setName("     Jürgen")
             ->setLastName("Rrändömßord .Ré"); //special chars in the last name
 
         $this->generateHash($debtorRequest, ['is_experimental', 'legal_form'])
-            ->shouldBeEqualTo(md5("jürgen123rrändömßordré"));
+            ->shouldBeEqualTo(md5("jürgen 123 rrändömßord .ré"));
     }
 }
