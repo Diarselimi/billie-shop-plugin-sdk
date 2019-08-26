@@ -31,6 +31,7 @@ use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonRepositoryInterface;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntity;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
+use App\Helper\Uuid\DummyUuidGenerator;
 use Behat\Gherkin\Node\TableNode;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
@@ -221,7 +222,7 @@ class PaellaCoreContext extends MinkContext
             ->setExternalComment($comment)
             ->setMerchantDebtorId($merchantDebtor->getId())
             ->setMerchantId('1')
-            ->setPaymentId('1')
+            ->setPaymentId(DummyUuidGenerator::DUMMY_UUID4)
             ->setCreatedAt(new \DateTime('2019-05-20 13:00:00'))
             ->setCheckoutSessionId(1)
             ->setUuid('test-order-uuid');
