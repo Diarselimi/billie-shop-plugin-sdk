@@ -269,7 +269,7 @@ Feature:
      }
     }
     """
-    And the order "A1" has the same hash "testusercompanyva2223333somenumbersomelegalberlin10179heinrichheineplatz10de"
+    And the order "A1" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz 10 de"
 
   Scenario: Successful order creation by not providing billing address, the billing address will be the same as the debtor address
     Given I get from companies service identify match and good decision response
@@ -383,7 +383,7 @@ Feature:
      }
     }
     """
-    And the order "A1" has the same hash "testusercompanyva2223333somenumbersomelegalberlin10179heinrichheineplatz10de"
+    And the order "A1" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz 10 de"
 
   Scenario: Successful order creation by not providing billing address nor the delivery address, as a delivery and billing address I will have the same as debtor address
     Given I get from companies service identify match and good decision response
@@ -490,7 +490,7 @@ Feature:
      }
     }
     """
-    And the order "A1" has the same hash "testusercompanyva2223333somenumbersomelegalberlin10179heinrichheineplatz10de"
+    And the order "A1" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz 10 de"
 
   Scenario: Handle if the billing address is empty and set the debtor address as a billing address
     Given I get from companies service identify match and good decision response
@@ -605,7 +605,7 @@ Feature:
      }
     }
     """
-    And the order "A1" has the same hash "testusercompanyva2223333somenumbersomelegalberlin10179heinrichheineplatz10de"
+    And the order "A1" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz 10 de"
 
   Scenario: Successful order creation by not providing the delivery address, we should get the delivery from the billing address.
     Given I get from companies service identify match and good decision response

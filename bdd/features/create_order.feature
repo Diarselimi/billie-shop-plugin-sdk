@@ -261,7 +261,7 @@ Feature:
      }
     }
     """
-    And the order "A1" has the same hash "testusercompanyva2223333somenumbersomelegalberlin10179heinrichheineplatz10de"
+    And the order "A123" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz 10 de"
     And merchant debtor has financing power 9000
 
   Scenario: Successful order creation without house
@@ -375,7 +375,7 @@ Feature:
      }
     }
     """
-    And the order "A1" has the same hash "testusercompanyva2223333somenumbersomelegalberlin10179heinrichheineplatzde"
+    And the order "A1" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz de"
     And merchant debtor has financing power 9000
 
   Scenario: Successful order creation without delivery_address.house_number
@@ -432,6 +432,7 @@ Feature:
     """
     Then the order A123 is in state created
     And the response status code should be 200
+    And print last JSON response
     And the JSON response should be:
     """
     {
@@ -490,7 +491,7 @@ Feature:
        }
     }
     """
-    And the order "A123" has the same hash "testusercompanyva2223333somenumbersomelegalberlin10179heinrichheineplatz10de"
+    And the order "A123" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz 10 de"
     And merchant debtor has financing power 9956.7
 
   Scenario: Successful order creation using lowercase country
