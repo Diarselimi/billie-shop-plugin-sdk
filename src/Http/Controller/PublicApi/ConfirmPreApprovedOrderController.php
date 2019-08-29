@@ -17,11 +17,11 @@ use OpenApi\Annotations as OA;
  * @OA\Post(
  *     path="/order/{uuid}/confirm",
  *     operationId="order_pre_approve_confirmation",
- *     summary="Pre-approved Order Confirm",
+ *     summary="Pre-approve Order Confirm",
  *     security={{"oauth2"={}}},
  *
- *     tags={"Order Creation"},
- *     x={"groups":{"support"}},
+ *     tags={"Order Pre-approval"},
+ *     x={"groups":{"standard"}},
  *
  *     @OA\Parameter(in="path", name="id", @OA\Schema(oneOf={@OA\Schema(ref="#/components/schemas/UUID"), @OA\Schema(type="string")}), required=true),
  *
