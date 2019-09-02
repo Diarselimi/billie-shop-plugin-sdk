@@ -4,6 +4,7 @@ namespace App\Application\UseCase\OrderOutstandingAmountChange;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\OrderWorkflowException;
+use App\DomainModel\Order\OrderAnnouncer;
 use App\DomainModel\Payment\OrderAmountChangeDTO;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
@@ -37,13 +38,16 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 
     private $orderStateManager;
 
+    private $orderAnnouncer;
+
     public function __construct(
         OrderContainerFactory $orderContainerFactory,
         MerchantRepositoryInterface $merchantRepository,
         NotificationScheduler $notificationScheduler,
         MerchantDebtorLimitsService $limitsService,
         OrderPaymentForgivenessService $paymentForgivenessService,
-        OrderStateManager $orderStateManager
+        OrderStateManager $orderStateManager,
+        OrderAnnouncer $orderAnnouncer
     ) {
         $this->orderContainerFactory = $orderContainerFactory;
         $this->merchantRepository = $merchantRepository;
@@ -51,6 +55,7 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
         $this->limitsService = $limitsService;
         $this->paymentForgivenessService = $paymentForgivenessService;
         $this->orderStateManager = $orderStateManager;
+        $this->orderAnnouncer = $orderAnnouncer;
     }
 
     public function execute(OrderOutstandingAmountChangeRequest $request)
@@ -109,7 +114,8 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
             return;
         }
 
-        $this->scheduleEvent($order, $amountChange);
+        $this->scheduleMerchantNotification($order, $amountChange);
+        $this->orderAnnouncer->orderPaidBack($orderContainer, $amountChange->getAmountChange());
 
         if ($this->paymentForgivenessService->begForgiveness($orderContainer, $amountChange)) {
             $this->logInfo(
@@ -127,7 +133,7 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
         }
     }
 
-    private function scheduleEvent(OrderEntity $order, OrderAmountChangeDTO $amountChange)
+    private function scheduleMerchantNotification(OrderEntity $order, OrderAmountChangeDTO $amountChange)
     {
         $payload = [
             'event' => self::NOTIFICATION_EVENT,

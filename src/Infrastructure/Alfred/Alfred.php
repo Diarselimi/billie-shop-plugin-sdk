@@ -128,10 +128,10 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         return $this->factory->createFromAlfredResponse($decodedResponse);
     }
 
-    public function lockDebtorLimit(string $debtorId, float $amount): void
+    public function lockDebtorLimit(string $debtorUuid, float $amount): void
     {
         try {
-            $this->client->post("/debtor/$debtorId/lock", [
+            $this->client->post("/debtor/$debtorUuid/lock", [
                 'json' => [
                     'amount' => $amount,
                 ],
@@ -144,10 +144,10 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         }
     }
 
-    public function unlockDebtorLimit(string $debtorId, float $amount): void
+    public function unlockDebtorLimit(string $debtorUuid, float $amount): void
     {
         try {
-            $this->client->post("/debtor/$debtorId/unlock", [
+            $this->client->post("/debtor/$debtorUuid/unlock", [
                 'json' => [
                     'amount' => $amount,
                 ],

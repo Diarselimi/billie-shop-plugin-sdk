@@ -1,0 +1,6 @@
+framework:
+    messenger:
+        transports:
+            order.order_paid_back: enqueue://default?topic[name]=order&topic[type]=topic&queue[name]=paella.order.order_paid_back&queue[bindingKey]=order.order_paid_back
+        routing:
+            Ozean12\Transfer\Message\Order\OrderPaidBack: order.order_paid_back

@@ -14,13 +14,13 @@ interface CompaniesServiceInterface
 
     public function getDebtorByUuid(string $debtorCompanyUuid): ? DebtorCompany;
 
+    public function lockDebtorLimit(string $debtorUuid, float $amount): void;
+
+    public function unlockDebtorLimit(string $debtorUuid, float $amount): void;
+
     public function identifyDebtor(IdentifyDebtorRequestDTO $requestDTO): ? DebtorCompany;
 
     public function updateDebtor(int $debtorId, array $updateData): DebtorCompany;
-
-    public function lockDebtorLimit(string $debtorId, float $amount): void;
-
-    public function unlockDebtorLimit(string $debtorId, float $amount): void;
 
     public function isDebtorBlacklisted(string $debtorId): bool;
 

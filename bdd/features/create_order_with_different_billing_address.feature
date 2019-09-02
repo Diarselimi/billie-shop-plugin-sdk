@@ -39,7 +39,7 @@ Feature:
 
   Scenario: Successful order creation
     Given I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 200 and body
     """
     """
     And I get from payments service register debtor positive response
@@ -152,7 +152,7 @@ Feature:
 
   Scenario: Successful order creation by adding the billing address
     Given I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 200 and body
     """
     """
     And I get from payments service register debtor positive response
@@ -273,7 +273,7 @@ Feature:
 
   Scenario: Successful order creation by not providing billing address, the billing address will be the same as the debtor address
     Given I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 200 and body
     """
     """
     And I get from payments service register debtor positive response
@@ -387,7 +387,7 @@ Feature:
 
   Scenario: Successful order creation by not providing billing address nor the delivery address, as a delivery and billing address I will have the same as debtor address
     Given I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 200 and body
     """
     """
     And I get from payments service register debtor positive response
@@ -494,7 +494,7 @@ Feature:
 
   Scenario: Handle if the billing address is empty and set the debtor address as a billing address
     Given I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 200 and body
     """
     """
     And I get from payments service register debtor positive response
@@ -609,7 +609,7 @@ Feature:
 
   Scenario: Successful order creation by not providing the delivery address, we should get the delivery from the billing address.
     Given I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 200 and body
     """
     """
     And I get from payments service register debtor positive response

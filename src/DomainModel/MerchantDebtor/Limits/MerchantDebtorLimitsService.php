@@ -2,8 +2,6 @@
 
 namespace App\DomainModel\MerchantDebtor\Limits;
 
-use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
-use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
 use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderRepositoryInterface;
@@ -15,20 +13,20 @@ class MerchantDebtorLimitsService implements LoggingInterface
 {
     use LoggingTrait;
 
-    private $companyService;
-
     private $merchantDebtorFinancialDetailsRepository;
 
     private $orderRepository;
 
+    private $debtorLimitManager;
+
     public function __construct(
-        CompaniesServiceInterface $companyService,
         MerchantDebtorFinancialDetailsRepositoryInterface $merchantDebtorFinancialDetailsRepository,
-        OrderRepositoryInterface $orderRepository
+        OrderRepositoryInterface $orderRepository,
+        DebtorLimitManagerInterface $debtorLimitManager
     ) {
-        $this->companyService = $companyService;
         $this->merchantDebtorFinancialDetailsRepository = $merchantDebtorFinancialDetailsRepository;
         $this->orderRepository = $orderRepository;
+        $this->debtorLimitManager = $debtorLimitManager;
     }
 
     public function isEnough(OrderContainer $container): bool
@@ -42,34 +40,26 @@ class MerchantDebtorLimitsService implements LoggingInterface
 
     public function lock(OrderContainer $container): void
     {
-        $debtorId = $container->getMerchantDebtor()->getDebtorId();
+        $debtorUuid = $container->getDebtorCompany()->getUuid();
         $financingDetails = $container->getMerchantDebtorFinancialDetails();
         $amount = $container->getOrderFinancialDetails()->getAmountGross();
 
-        try {
-            $this->companyService->lockDebtorLimit($debtorId, $amount);
+        $this->debtorLimitManager->lockDebtorLimit($debtorUuid, $amount);
 
-            $financingDetails->reduceFinancingPower($amount);
-            $this->merchantDebtorFinancialDetailsRepository->insert($financingDetails);
-        } catch (CompaniesServiceRequestException $exception) {
-            throw new MerchantDebtorLimitsException('Lock debtor limit failed: ' . $exception->getMessage());
-        }
+        $financingDetails->reduceFinancingPower($amount);
+        $this->merchantDebtorFinancialDetailsRepository->insert($financingDetails);
     }
 
     public function unlock(OrderContainer $container, float $amount = null): void
     {
-        $debtorId = $container->getMerchantDebtor()->getDebtorId();
         $financingDetails = $container->getMerchantDebtorFinancialDetails();
         $amount = $amount === null ? $container->getOrderFinancialDetails()->getAmountGross() : $amount;
+        $debtorUuid = $container->getDebtorCompany()->getUuid();
 
-        try {
-            $this->companyService->unlockDebtorLimit($debtorId, $amount);
+        $this->debtorLimitManager->unlockDebtorLimit($debtorUuid, $amount);
 
-            $financingDetails->increaseFinancingPower($amount);
-            $this->merchantDebtorFinancialDetailsRepository->insert($financingDetails);
-        } catch (CompaniesServiceRequestException $exception) {
-            throw new MerchantDebtorLimitsException('Unlock debtor limit failed: ' . $exception->getMessage());
-        }
+        $financingDetails->increaseFinancingPower($amount);
+        $this->merchantDebtorFinancialDetailsRepository->insert($financingDetails);
     }
 
     public function recalculate(OrderContainer $orderContainer): void
@@ -107,5 +97,12 @@ class MerchantDebtorLimitsService implements LoggingInterface
         ;
 
         $this->merchantDebtorFinancialDetailsRepository->insert($merchantDebtorFinancialDetails);
+    }
+
+    public function setDebtorLimitManager(DebtorLimitManagerInterface $debtorLimitManager): MerchantDebtorLimitsService
+    {
+        $this->debtorLimitManager = $debtorLimitManager;
+
+        return $this;
     }
 }

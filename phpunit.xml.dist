@@ -24,6 +24,14 @@
         <env name="AWS_SECRET_ACCESS_KEY" value="@@not-a-real-secret"/>
         <env name="RECEIVE_INVOICES_SNS_TOPIC_ARN" value="test-arn"/>
         <!-- ###- aws/aws-sdk-php-symfony ### -->
+
+        <!-- ###+ symfony/messenger ### -->
+        <!-- MESSENGER_TRANSPORT_DSN=amqp://guest:guest@localhost:5672/%2f/messages -->
+        <!-- ###- symfony/messenger ### -->
+
+        <!-- ###+ enqueue/enqueue-bundle ### -->
+        <env name="ENQUEUE_DSN" value="null://"/>
+        <!-- ###- enqueue/enqueue-bundle ### -->
     </php>
 
     <testsuites>

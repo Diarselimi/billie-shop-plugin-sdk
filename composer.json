@@ -13,13 +13,14 @@
         "eightpoints/guzzle-bundle": "^7.3",
         "illuminate/support": "^5.8",
         "ocramius/proxy-manager": "2.2.0",
+        "ozean12/amqp-pack": "^0.3",
         "php-amqplib/rabbitmq-bundle": "^1.14",
         "ramsey/uuid": "^3.7",
         "robmorgan/phinx": "^0.9.2",
         "symfony/console": "*",
-        "symfony/dotenv": "4.2.*",
+        "symfony/dotenv": "*",
         "symfony/flex": "^1.2",
-        "symfony/framework-bundle": "*",
+        "symfony/framework-bundle": "4.3.2",
         "symfony/monolog-bundle": "*",
         "symfony/proxy-manager-bridge": "*",
         "symfony/security-bundle": "*",
@@ -72,6 +73,18 @@
         {
             "type": "vcs",
             "url": "https://github.com/ozean12/PdoBundle"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/ozean12/amqp-pack"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/ozean12/amqp-transfers"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/ozean12/amqp-transfers-serializer"
         }
     ],
     "scripts": {
@@ -93,7 +106,7 @@
         "symfony": {
             "id": "01C94R0H1R4YH60QWA3QWDAG0R",
             "allow-contrib": true,
-            "require": "4.2.*"
+            "require": "4.3.*"
         }
     }
 }

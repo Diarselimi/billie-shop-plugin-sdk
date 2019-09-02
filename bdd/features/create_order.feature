@@ -151,7 +151,7 @@ Feature:
 
   Scenario: Successful order creation
     Given I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 200 and body
     """
     """
     And I get from payments service register debtor positive response
@@ -266,7 +266,7 @@ Feature:
 
   Scenario: Successful order creation without house
     Given I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 200 and body
     """
     """
     And I get from payments service register debtor positive response
@@ -381,7 +381,7 @@ Feature:
   Scenario: Successful order creation without delivery_address.house_number
     Given I get from companies service identify match and good decision response
     And I get from payments service register debtor positive response
-    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 200 and body
     """
     """
     When I send a POST request to "/order" with body:
@@ -496,7 +496,7 @@ Feature:
 
   Scenario: Successful order creation using lowercase country
     Given I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 200 and body
     """
     """
     And I get from payments service register debtor positive response
@@ -935,7 +935,7 @@ Feature:
   Scenario: Use debtor company address as delivery address if no delivery address was provided
     Given I get from companies service identify match and good decision response
     And I get from payments service register debtor positive response
-    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 200 and body
     """
     """
     When I send a POST request to "/order" with body:
@@ -1035,7 +1035,7 @@ Feature:
   Scenario: The order should be on a state created if the previous order was declined because of the amount exceeded
     Given I get from companies service identify match and good decision response
     And I get from payments service register debtor positive response
-    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 200 and body
     """
     """
     And I have a declined order "XF43Y" with amounts 90000/92000/1900, duration 30 and comment "test order"
@@ -1092,7 +1092,7 @@ Feature:
   Scenario: Order stays in state new if debtor limit lock was unsuccessful
     Given I get from companies service identify match and good decision response
     And I get from payments service register debtor positive response
-    And I get from companies service "/debtor/1/lock" endpoint response with status 400 and body
+    And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 400 and body
     """
     """
     When I send a POST request to "/order" with body:
@@ -1147,7 +1147,7 @@ Feature:
 
   Scenario: Successful order creation without providing external code
     Given I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 200 and body
     """
     """
     And I get from payments service register debtor positive response
@@ -1272,7 +1272,7 @@ Feature:
 
   Scenario: Successful order creation without providing industry_sector
     Given I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 200 and body
     """
     """
     And I get from payments service register debtor positive response
