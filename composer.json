@@ -16,7 +16,7 @@
         "ozean12/amqp-pack": "^0.3",
         "php-amqplib/rabbitmq-bundle": "^1.14",
         "ramsey/uuid": "^3.7",
-        "robmorgan/phinx": "^0.9.2",
+        "robmorgan/phinx": "^0.11",
         "symfony/console": "*",
         "symfony/dotenv": "*",
         "symfony/flex": "^1.2",
