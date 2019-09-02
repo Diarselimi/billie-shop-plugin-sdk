@@ -2,8 +2,6 @@
 
 namespace App\Helper\Uuid;
 
-use App\Helper\Uuid\UuidGeneratorInterface;
-
 /**
  * This class is used for Behat tests and acts as a uuid mocker which returns always static valid uuid
  */

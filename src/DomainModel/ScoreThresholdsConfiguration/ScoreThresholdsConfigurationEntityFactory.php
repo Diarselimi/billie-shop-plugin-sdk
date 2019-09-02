@@ -4,7 +4,7 @@ namespace App\DomainModel\ScoreThresholdsConfiguration;
 
 class ScoreThresholdsConfigurationEntityFactory
 {
-    public const DEFAULT_CREFO_LOW = 300;
+    public const DEFAULT_CREFO_LOW = 299;
 
     public const DEFAULT_CREFO_HIGH = 360;
 
@@ -14,7 +14,7 @@ class ScoreThresholdsConfigurationEntityFactory
 
     public const DEFAULT_SCHUFA_HIGH = 360;
 
-    public const DEFAULT_SCHUFA_SOLE_TRADER = 317;
+    public const DEFAULT_SCHUFA_SOLE_TRADER = 316;
 
     public function createFromDatabaseRow(array $row): ScoreThresholdsConfigurationEntity
     {

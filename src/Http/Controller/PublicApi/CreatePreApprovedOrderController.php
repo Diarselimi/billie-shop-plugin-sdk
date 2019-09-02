@@ -12,11 +12,11 @@ use OpenApi\Annotations as OA;
  * @OA\Post(
  *     path="/order/pre-approve",
  *     operationId="pre_approve_create_order",
- *     summary="Pre-approved Order Create",
+ *     summary="Pre-approve Order Create",
  *     security={{"oauth2"={}}},
  *
- *     tags={"Order Creation"},
- *     x={"groups":{"support"}},
+ *     tags={"Order Pre-approval"},
+ *     x={"groups":{"standard"}},
  *
  *     @OA\RequestBody(
  *          required=true,

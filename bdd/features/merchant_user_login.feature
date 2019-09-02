@@ -4,7 +4,7 @@ Feature: Enable merchant users to login
 	Given I add "Content-type" header equal to "application/json"
 	And I add "X-Test" header equal to 1
 
-  Scenario: Invalid request
+  Scenario: Invalid request - empty and invalid values
 	When I send a POST request to "/public/merchant/user/login" with body:
 	"""
 	  {
@@ -20,6 +20,30 @@ Feature: Enable merchant users to login
 		  {
 			"source": "email",
 			"title": "This value is not a valid email address.",
+			"code": "request_validation_error"
+		  },
+		  {
+			"source": "password",
+			"title": "This value should not be blank.",
+			"code": "request_validation_error"
+		  }
+		]
+	  }
+	"""
+
+  Scenario: Invalid request - missing fields
+	When I send a POST request to "/public/merchant/user/login" with body:
+	"""
+	  {}
+	"""
+	Then the response status code should be 400
+	And the JSON response should be:
+	"""
+	  {
+		"errors": [
+		  {
+			"source": "email",
+			"title": "This value should not be blank.",
 			"code": "request_validation_error"
 		  },
 		  {
