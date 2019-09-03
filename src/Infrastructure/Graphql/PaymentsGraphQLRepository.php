@@ -9,7 +9,7 @@ use App\DomainModel\Payment\RequestDTO\SearchPaymentsDTO;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
-class PaymentsGraphqlRepository extends AbstractGraphQLRepository implements PaymentsRepositoryInterface, LoggingInterface
+class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements PaymentsRepositoryInterface, LoggingInterface
 {
     use LoggingTrait;
 
