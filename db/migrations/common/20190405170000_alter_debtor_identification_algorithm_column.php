@@ -19,6 +19,7 @@ class AlterDebtorIdentificationAlgorithmColumn extends AbstractMigration
                     'default' => false,
                 ]
             )
+            ->update()
         ;
 
         $this
