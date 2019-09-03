@@ -97,7 +97,24 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
        "comment":"Some comment",
        "duration":30,
        "dunning_status": null,
-       "order_id":"A1"
+       "order_id":"A1",
+       "line_items": [
+          {
+            "external_id": "SKU111",
+            "title": "Iphone XS Max",
+            "description": "Test test",
+            "quantity": 1,
+            "category": "mobile_phones",
+            "brand": "Apple",
+            "gtin": "test GTIN",
+            "mpn": "test MPN",
+            "amount":{
+              "net":900.00,
+              "gross":1000.00,
+              "tax":100.00
+            }
+          }
+       ]
     }
     """
     And the order A1 is in state declined
@@ -166,7 +183,24 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
        "comment":"Some comment",
        "duration":30,
        "dunning_status": null,
-       "order_id":"A1"
+       "order_id":"A1",
+       "line_items": [
+          {
+            "external_id": "SKU111",
+            "title": "Iphone XS Max",
+            "description": "Test test",
+            "quantity": 1,
+            "category": "mobile_phones",
+            "brand": "Apple",
+            "gtin": "test GTIN",
+            "mpn": "test MPN",
+            "amount":{
+              "net":900.00,
+              "gross":1000.00,
+              "tax":100.00
+            }
+          }
+       ]
     }
     """
     Then the order A1 is in state authorized
@@ -235,7 +269,24 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
        "comment":"Some comment",
        "duration":30,
        "dunning_status": null,
-       "order_id":"A1"
+       "order_id":"A1",
+       "line_items": [
+          {
+            "external_id": "SKU111",
+            "title": "Iphone XS Max",
+            "description": "Test test",
+            "quantity": 1,
+            "category": "mobile_phones",
+            "brand": "Apple",
+            "gtin": "test GTIN",
+            "mpn": "test MPN",
+            "amount":{
+              "net":900.00,
+              "gross":1000.00,
+              "tax":100.00
+            }
+          }
+       ]
     }
     """
     Then the order A1 is in state authorized
@@ -302,7 +353,24 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
        "comment":"Some comment",
        "duration":30,
        "dunning_status": null,
-       "order_id":"A1"
+       "order_id":"A1",
+       "line_items": [
+          {
+            "external_id": "SKU111",
+            "title": "Iphone XS Max",
+            "description": "Test test",
+            "quantity": 1,
+            "category": "mobile_phones",
+            "brand": "Apple",
+            "gtin": "test GTIN",
+            "mpn": "test MPN",
+            "amount":{
+              "net":900.00,
+              "gross":1000.00,
+              "tax":100.00
+            }
+          }
+       ]
     }
     """
     Then the order A1 is in state declined
@@ -370,7 +438,24 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
        "comment":"Some comment",
        "duration":30,
        "dunning_status": null,
-       "order_id":"A1"
+       "order_id":"A1",
+       "line_items": [
+          {
+            "external_id": "SKU111",
+            "title": "Iphone XS Max",
+            "description": "Test test",
+            "quantity": 1,
+            "category": "mobile_phones",
+            "brand": "Apple",
+            "gtin": "test GTIN",
+            "mpn": "test MPN",
+            "amount":{
+              "net":900.00,
+              "gross":1000.00,
+              "tax":100.00
+            }
+          }
+       ]
     }
     """
     And the response status code should be 200
@@ -425,7 +510,24 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
        "comment":"Some comment",
        "duration":30,
        "dunning_status": null,
-       "order_id":"A1"
+       "order_id":"A1",
+       "line_items": [
+          {
+            "external_id": "SKU111",
+            "title": "Iphone XS Max",
+            "description": "Test test",
+            "quantity": 1,
+            "category": "mobile_phones",
+            "brand": "Apple",
+            "gtin": "test GTIN",
+            "mpn": "test MPN",
+            "amount":{
+              "net":900.00,
+              "gross":1000.00,
+              "tax":100.00
+            }
+          }
+       ]
     }
     """
     Then the order A1 is in state authorized
@@ -473,7 +575,24 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
        "comment":"Some comment",
        "duration":30,
        "dunning_status": null,
-       "order_id":"A1"
+       "order_id":"A1",
+       "line_items": [
+          {
+            "external_id": "SKU111",
+            "title": "Iphone XS Max",
+            "description": "Test test",
+            "quantity": 1,
+            "category": "mobile_phones",
+            "brand": "Apple",
+            "gtin": "test GTIN",
+            "mpn": "test MPN",
+            "amount":{
+              "net":900.00,
+              "gross":1000.00,
+              "tax":100.00
+            }
+          }
+       ]
     }
     """
     Then the response status code should be 401
@@ -527,7 +646,24 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
        "comment":"Some comment",
        "duration":30,
        "dunning_status": null,
-       "order_id":"A1"
+       "order_id":"A1",
+       "line_items": [
+          {
+            "external_id": "SKU111",
+            "title": "Iphone XS Max",
+            "description": "Test test",
+            "quantity": 1,
+            "category": "mobile_phones",
+            "brand": "Apple",
+            "gtin": "test GTIN",
+            "mpn": "test MPN",
+            "amount":{
+              "net":900.00,
+              "gross":1000.00,
+              "tax":100.00
+            }
+          }
+       ]
     }
     """
     Then the JSON response should be:
@@ -572,7 +708,24 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
            "amount":{
               "tax":10.10
            },
-           "comment":"Some comment"
+           "comment":"Some comment",
+           "line_items": [
+              {
+                "external_id": "SKU111",
+                "title": "Iphone XS Max",
+                "description": "Test test",
+                "quantity": 1,
+                "category": "mobile_phones",
+                "brand": "Apple",
+                "gtin": "test GTIN",
+                "mpn": "test MPN",
+                "amount":{
+                  "net":900.00,
+                  "gross":1000.00,
+                  "tax":100.00
+                }
+              }
+           ]
         }
       """
     Then the JSON response should be:
@@ -622,11 +775,175 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
        "comment":"Some comment",
        "duration":30,
        "dunning_status": null,
-       "order_id":"A1"
+       "order_id":"A1",
+       "line_items": [
+          {
+            "external_id": "SKU111",
+            "title": "Iphone XS Max",
+            "description": "Test test",
+            "quantity": 1,
+            "category": "mobile_phones",
+            "brand": "Apple",
+            "gtin": "test GTIN",
+            "mpn": "test MPN",
+            "amount":{
+              "net":900.00,
+              "gross":1000.00,
+              "tax":100.00
+            }
+          }
+       ]
     }
     """
     And the JSON response should be:
     """
-    {"errors":[{"source":"amount.net","title":"This value should not be blank.","code":"request_validation_error"},{"source":"amount.gross","title":"This value should not be blank.","code":"request_validation_error"},{"source":"amount.tax","title":"This value should not be blank.","code":"request_validation_error"}]}
+    {
+      "errors": [
+        {
+          "source": "amount.net",
+          "title": "This value should not be blank.",
+          "code": "request_validation_error"
+        },
+        {
+          "source": "amount.gross",
+          "title": "This value should not be blank.",
+          "code": "request_validation_error"
+        },
+        {
+          "source": "amount.tax",
+          "title": "This value should not be blank.",
+          "code": "request_validation_error"
+        }
+      ]
+    }
     """
     And the response status code should be 400
+
+  Scenario: Failed to authorize order - missing line items
+    Given I get from companies service identify match and good decision response
+    And I get from payments service register debtor positive response
+    And I have a checkout_session_id "123123"
+    And I send a PUT request to "/public/checkout-session/123123/authorize" with body:
+    """
+    {
+       "debtor_person":{
+          "salutation":"m",
+          "first_name":"",
+          "last_name":"else",
+          "phone_number":"+491234567",
+          "email":"someone@billie.io"
+       },
+       "debtor_company":{
+          "name":"Test User Company",
+          "address_addition":"left door",
+          "address_house_number":"10",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_city":"Berlin",
+          "address_postal_code":"10179",
+          "address_country":"DE",
+          "tax_id":"VA222",
+          "tax_number":"3333",
+          "registration_court":"",
+          "registration_number":" some number",
+          "industry_sector":"some sector",
+          "subindustry_sector":"some sub",
+          "employees_number":"33",
+          "legal_form":"some legal",
+          "established_customer":1
+       },
+       "delivery_address":{
+          "house_number":"22",
+          "street":"Charlot strasse",
+          "city":"Paris",
+          "postal_code":"98765",
+          "country":"DE"
+       },
+       "amount":{
+          "net":33.2,
+          "gross":43.30,
+          "tax":10.10
+       },
+       "comment":"Some comment",
+       "duration":30,
+       "dunning_status": null,
+       "order_id":"A1"
+    }
+    """
+    Then the response status code should be 400
+    And the JSON response should be:
+    """
+    {
+      "errors": [
+        {
+          "title": "This value should not be blank.",
+          "code": "request_validation_error",
+          "source": "line_items"
+        }
+      ]
+    }
+    """
+
+  Scenario: Failed to authorize order - empty line items provided
+    Given I get from companies service identify match and good decision response
+    And I get from payments service register debtor positive response
+    And I have a checkout_session_id "123123"
+    And I send a PUT request to "/public/checkout-session/123123/authorize" with body:
+    """
+    {
+       "debtor_person":{
+          "salutation":"m",
+          "first_name":"",
+          "last_name":"else",
+          "phone_number":"+491234567",
+          "email":"someone@billie.io"
+       },
+       "debtor_company":{
+          "name":"Test User Company",
+          "address_addition":"left door",
+          "address_house_number":"10",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_city":"Berlin",
+          "address_postal_code":"10179",
+          "address_country":"DE",
+          "tax_id":"VA222",
+          "tax_number":"3333",
+          "registration_court":"",
+          "registration_number":" some number",
+          "industry_sector":"some sector",
+          "subindustry_sector":"some sub",
+          "employees_number":"33",
+          "legal_form":"some legal",
+          "established_customer":1
+       },
+       "delivery_address":{
+          "house_number":"22",
+          "street":"Charlot strasse",
+          "city":"Paris",
+          "postal_code":"98765",
+          "country":"DE"
+       },
+       "amount":{
+          "net":33.2,
+          "gross":43.30,
+          "tax":10.10
+       },
+       "comment":"Some comment",
+       "duration":30,
+       "dunning_status": null,
+       "order_id":"A1",
+       "line_items":[]
+    }
+    """
+    Then the response status code should be 400
+    And the JSON response should be:
+    """
+    {
+      "errors": [
+        {
+          "title": "This value should not be blank.",
+          "code": "request_validation_error",
+          "source": "line_items"
+        }
+      ]
+    }
+    """

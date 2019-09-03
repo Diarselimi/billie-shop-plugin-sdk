@@ -1031,7 +1031,7 @@ components:
         tax:
           type: number
           format: float
-          minimum: 1
+          minimum: 0
           example: 19
       type: object
     PauseOrderDunningRequest:

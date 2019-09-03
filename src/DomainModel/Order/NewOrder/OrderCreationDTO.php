@@ -6,13 +6,14 @@ use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
+use App\DomainModel\OrderLineItem\OrderLineItemEntity;
 use App\DomainModel\Person\PersonEntity;
 
 class OrderCreationDTO
 {
     private $order;
 
-    private $orderFinancialDetailsEntity;
+    private $financialDetails;
 
     private $debtorPerson;
 
@@ -22,20 +23,24 @@ class OrderCreationDTO
 
     private $deliveryAddress;
 
+    private $lineItems;
+
     public function __construct(
         OrderEntity $order,
         OrderFinancialDetailsEntity $orderFinancialDetailsEntity,
         PersonEntity $debtorPerson,
         DebtorExternalDataEntity $debtorExternalData,
         AddressEntity $debtorExternalDataAddress,
-        AddressEntity $deliveryAddress
+        AddressEntity $deliveryAddress,
+        array $lineItems
     ) {
         $this->order = $order;
-        $this->orderFinancialDetailsEntity = $orderFinancialDetailsEntity;
+        $this->financialDetails = $orderFinancialDetailsEntity;
         $this->debtorPerson = $debtorPerson;
         $this->debtorExternalData = $debtorExternalData;
         $this->debtorExternalDataAddress = $debtorExternalDataAddress;
         $this->deliveryAddress = $deliveryAddress;
+        $this->lineItems = $lineItems;
     }
 
     public function getOrder(): OrderEntity
@@ -43,9 +48,9 @@ class OrderCreationDTO
         return $this->order;
     }
 
-    public function getOrderFinancialDetailsEntity(): OrderFinancialDetailsEntity
+    public function getFinancialDetails(): OrderFinancialDetailsEntity
     {
-        return $this->orderFinancialDetailsEntity;
+        return $this->financialDetails;
     }
 
     public function getDebtorPerson(): PersonEntity
@@ -66,5 +71,13 @@ class OrderCreationDTO
     public function getDeliveryAddress(): AddressEntity
     {
         return $this->deliveryAddress;
+    }
+
+    /**
+     * @return OrderLineItemEntity[]
+     */
+    public function getLineItems(): array
+    {
+        return $this->lineItems;
     }
 }

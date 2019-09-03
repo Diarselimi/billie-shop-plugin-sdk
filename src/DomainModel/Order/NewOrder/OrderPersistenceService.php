@@ -4,6 +4,7 @@ namespace App\DomainModel\Order\NewOrder;
 
 use App\Application\UseCase\CreateOrder\CreateOrderRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
+use App\Application\UseCase\CreateOrder\Request\CreateOrderLineItemRequest;
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\Address\AddressEntityFactory;
 use App\DomainModel\Address\AddressRepositoryInterface;
@@ -15,6 +16,9 @@ use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsFactory;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface;
+use App\DomainModel\OrderLineItem\OrderLineItemEntity;
+use App\DomainModel\OrderLineItem\OrderLineItemFactory;
+use App\DomainModel\OrderLineItem\OrderLineItemRepositoryInterface;
 use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonEntityFactory;
 use App\DomainModel\Person\PersonRepositoryInterface;
@@ -44,6 +48,10 @@ class OrderPersistenceService
 
     private $arrayHasher;
 
+    private $orderLineItemFactory;
+
+    private $orderLineItemRepository;
+
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         OrderFinancialDetailsRepositoryInterface  $orderFinancialDetailsRepository,
@@ -55,7 +63,9 @@ class OrderPersistenceService
         AddressEntityFactory $addressFactory,
         DebtorExternalDataEntityFactory $debtorExternalDataFactory,
         OrderFinancialDetailsFactory $orderFinancialDetailsFactory,
-        ArrayHasherInterface $arrayHasher
+        ArrayHasherInterface $arrayHasher,
+        OrderLineItemFactory $orderLineItemFactory,
+        OrderLineItemRepositoryInterface $orderLineItemRepository
     ) {
         $this->orderRepository = $orderRepository;
         $this->orderFinancialDetailsRepository = $orderFinancialDetailsRepository;
@@ -68,6 +78,8 @@ class OrderPersistenceService
         $this->debtorExternalDataFactory = $debtorExternalDataFactory;
         $this->orderFinancialDetailsFactory = $orderFinancialDetailsFactory;
         $this->arrayHasher = $arrayHasher;
+        $this->orderLineItemFactory = $orderLineItemFactory;
+        $this->orderLineItemRepository = $orderLineItemRepository;
     }
 
     public function persistFromRequest(CreateOrderRequest $request): OrderCreationDTO
@@ -90,7 +102,17 @@ class OrderPersistenceService
 
         $orderFinancialDetails = $this->persistOrderFinancialDetails($order->getId(), $request);
 
-        return new OrderCreationDTO($order, $orderFinancialDetails, $debtorPerson, $debtorExternalData, $debtorAddress, $deliveryAddress);
+        $lineItems = $this->persistLineItems($order->getId(), $request->getLineItems());
+
+        return new OrderCreationDTO(
+            $order,
+            $orderFinancialDetails,
+            $debtorPerson,
+            $debtorExternalData,
+            $debtorAddress,
+            $deliveryAddress,
+            $lineItems
+        );
     }
 
     private function persistDebtorPerson(CreateOrderRequest $request): PersonEntity
@@ -145,5 +167,21 @@ class OrderPersistenceService
         $this->orderFinancialDetailsRepository->insert($orderFinancialDetails);
 
         return $orderFinancialDetails;
+    }
+
+    /**
+     * @return OrderLineItemEntity[]
+     */
+    private function persistLineItems(int $orderId, array $lineItems): array
+    {
+        return array_map(
+            function (CreateOrderLineItemRequest $request) use ($orderId) {
+                $orderLineItem = $this->orderLineItemFactory->createFromRequest($orderId, $request);
+                $this->orderLineItemRepository->insert($orderLineItem);
+
+                return $orderLineItem;
+            },
+            $lineItems
+        );
     }
 }

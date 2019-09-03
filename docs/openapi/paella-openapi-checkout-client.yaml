@@ -294,6 +294,11 @@ components:
           $ref: '#/components/schemas/CreateOrderDebtorCompanyRequest'
         debtor_person:
           $ref: '#/components/schemas/CreateOrderDebtorPersonRequest'
+        line_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateOrderLineItemRequest'
+          nullable: true
       type: object
     CreateOrderAddressRequest:
       title: 'Delivery Address'
@@ -341,7 +346,7 @@ components:
         tax:
           type: number
           format: float
-          minimum: 1
+          minimum: 0
           example: 19
       type: object
     CreateOrderDebtorCompanyRequest:
@@ -433,6 +438,43 @@ components:
           type: string
           format: email
           example: james.smith@example.com
+      type: object
+    CreateOrderLineItemRequest:
+      title: 'Order Line Item'
+      required:
+        - external_id
+        - title
+        - quantity
+        - amount_gross
+        - amount_tax
+        - amount_net
+      properties:
+        external_id:
+          $ref: '#/components/schemas/TinyText'
+        title:
+          $ref: '#/components/schemas/TinyText'
+        description:
+          type: string
+          nullable: true
+        quantity:
+          type: number
+          minimum: 1
+        category:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        brand:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        gtin:
+          description: 'Global Trade Item Number'
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        mpn:
+          description: 'Manufacturer Part Numbers'
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        amount:
+          $ref: '#/components/schemas/CreateOrderAmountRequest'
       type: object
     CheckoutSessionAuthorizeResponse:
       title: 'Authorize Checkout Order Response'

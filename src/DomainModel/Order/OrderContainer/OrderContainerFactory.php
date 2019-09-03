@@ -2,7 +2,6 @@
 
 namespace App\DomainModel\Order\OrderContainer;
 
-use App\Application\UseCase\AbstractOrderRequest;
 use App\DomainModel\Order\NewOrder\OrderCreationDTO;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
@@ -56,11 +55,6 @@ class OrderContainerFactory
         return new OrderContainer($order, $this->relationLoader);
     }
 
-    public function loadByOrderRequest(AbstractOrderRequest $request): OrderContainer
-    {
-        return $this->loadByMerchantIdAndExternalId($request->getOrderId(), $request->getMerchantId());
-    }
-
     public function loadByMerchantIdAndExternalId(int $merchantId, string $orderId): OrderContainer
     {
         $order = $this->orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($orderId, $merchantId);
@@ -88,6 +82,8 @@ class OrderContainerFactory
             ->setDebtorExternalData($newOrder->getDebtorExternalData())
             ->setDebtorExternalDataAddress($newOrder->getDebtorExternalDataAddress())
             ->setDeliveryAddress($newOrder->getDeliveryAddress())
+            ->setOrderFinancialDetails($newOrder->getFinancialDetails())
+            ->setLineItems($newOrder->getLineItems())
         ;
     }
 }

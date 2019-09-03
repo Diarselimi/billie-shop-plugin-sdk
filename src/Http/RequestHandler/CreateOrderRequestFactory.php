@@ -7,6 +7,7 @@ use App\Application\UseCase\CreateOrder\Request\AddressRequestFactory;
 use App\Application\UseCase\CreateOrder\Request\AmountRequestFactory;
 use App\Application\UseCase\CreateOrder\Request\DebtorPersonRequestFactory;
 use App\Application\UseCase\CreateOrder\Request\DebtorRequestFactory;
+use App\Application\UseCase\CreateOrder\Request\OrderLineItemsRequestFactory;
 use App\DomainModel\CheckoutSession\CheckoutSessionEntity;
 use App\Http\HttpConstantsInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,16 +22,20 @@ class CreateOrderRequestFactory
 
     private $debtorPersonRequestFactory;
 
+    private $lineItemsRequestFactory;
+
     public function __construct(
         AmountRequestFactory $amountRequestFactory,
         DebtorRequestFactory $debtorRequestFactory,
         DebtorPersonRequestFactory $debtorPersonRequestFactory,
-        AddressRequestFactory $addressRequestFactory
+        AddressRequestFactory $addressRequestFactory,
+        OrderLineItemsRequestFactory $lineItemsRequestFactory
     ) {
         $this->addressRequestFactory = $addressRequestFactory;
         $this->amountRequestFactory = $amountRequestFactory;
         $this->debtorRequestFactory = $debtorRequestFactory;
         $this->debtorPersonRequestFactory = $debtorPersonRequestFactory;
+        $this->lineItemsRequestFactory = $lineItemsRequestFactory;
     }
 
     public function createForCreateOrder(Request $request): CreateOrderRequest
@@ -52,6 +57,10 @@ class CreateOrderRequestFactory
 
         $useCaseRequest->setBillingAddress(
             $this->addressRequestFactory->createFromArray($request->request->get('billing_address', []))
+        );
+
+        $useCaseRequest->setLineItems(
+            $this->lineItemsRequestFactory->createMultipleFromArray($request->request->get('line_items', []))
         );
 
         return $useCaseRequest;
