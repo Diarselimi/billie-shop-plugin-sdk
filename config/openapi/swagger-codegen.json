@@ -1,0 +1,17 @@
+{
+  "sortParamsByRequiredFlag": true,
+  "ensureUniqueParams": true,
+  "allowUnicodeIdentifiers": false,
+  "modelPackage": "Model",
+  "apiPackage": "Api",
+  "variableNamingConvention": "camelCase",
+  "invokerPackage": "Billie\\PadSdk",
+  "packagePath": "swagger-codegen-code",
+  "srcBasePath": "src",
+  "composerVendorName": "billie",
+  "composerProjectName": "pad-sdk",
+  "gitUserId": "ozean12",
+  "gitRepoId": "pad-sdk",
+  "artifactVersion": "2.*",
+  "hideGenerationTimestamp": true
+}

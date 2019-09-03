@@ -12,4 +12,5 @@ return [
     Enqueue\Bundle\EnqueueBundle::class => ['all' => true],
     Enqueue\MessengerAdapter\Bundle\EnqueueAdapterBundle::class => ['all' => true],
     Ozean12\AmqpPackBundle\Ozean12AmqpPackBundle::class => ['all' => true],
+    Ozean12\GraphQLBundle\GraphQLBundle::class => ['all' => true],
 ];

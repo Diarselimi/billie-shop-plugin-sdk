@@ -11,8 +11,6 @@ class GetMerchantDebtorsRequest implements ValidatedRequestInterface, Pagination
 {
     use PaginationAwareTrait;
 
-    const DEFAULT_LIMIT = 10;
-
     const DEFAULT_SORT_FIELD = 'created_at';
 
     const DEFAULT_SORT_DIRECTION = 'DESC';

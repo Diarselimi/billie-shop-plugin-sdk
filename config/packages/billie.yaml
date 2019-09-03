@@ -6,3 +6,7 @@ billie_pdo:
       password: '%env(DATABASE_PASSWORD)%'
       retries: 3
       retry_delay: 100
+
+ozean12_graphql_client:
+  dsn: '%env(GRAPHQL_ENDPOINT)%'
+  api_key: "%env(GRAPHQL_API_KEY)%"
