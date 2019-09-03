@@ -19,6 +19,10 @@ class AlterDebtorIdentificationAlgorithmColumn extends AbstractMigration
                     'default' => false,
                 ]
             )
+        ;
+
+        $this
+            ->table($table)
             ->renameColumn('debtor_identification_algorithm', 'use_experimental_identification')
             ->update()
         ;
