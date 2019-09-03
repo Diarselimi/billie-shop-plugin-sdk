@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cb110171b0563d595d709535abc87814",
+    "content-hash": "e5534a680b7156ea7daa620cd80ebfa0",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -1194,16 +1194,16 @@
         },
         {
             "name": "enqueue/enqueue-bundle",
-            "version": "0.9.12",
+            "version": "0.9.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-enqueue/enqueue-bundle.git",
-                "reference": "06b9876a7d2c5969b4c7ae0ce2753172356bba0e"
+                "reference": "f373c0a99be87e958ff480d5feccc1bf528e2a01"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-enqueue/enqueue-bundle/zipball/06b9876a7d2c5969b4c7ae0ce2753172356bba0e",
-                "reference": "06b9876a7d2c5969b4c7ae0ce2753172356bba0e",
+                "url": "https://api.github.com/repos/php-enqueue/enqueue-bundle/zipball/f373c0a99be87e958ff480d5feccc1bf528e2a01",
+                "reference": "f373c0a99be87e958ff480d5feccc1bf528e2a01",
                 "shasum": ""
             },
             "require": {
@@ -1215,7 +1215,9 @@
                 "symfony/framework-bundle": "^3.4|^4"
             },
             "require-dev": {
+                "alcaeus/mongo-php-adapter": "^1.0",
                 "doctrine/doctrine-bundle": "~1.2",
+                "doctrine/mongodb-odm-bundle": "^3.5",
                 "enqueue/amqp-bunny": "0.9.x-dev",
                 "enqueue/amqp-ext": "0.9.x-dev",
                 "enqueue/amqp-lib": "0.9.x-dev",
@@ -1264,7 +1266,7 @@
                 "queue",
                 "rabbitmq"
             ],
-            "time": "2019-06-07T00:32:02+00:00"
+            "time": "2019-08-20T05:45:20+00:00"
         },
         {
             "name": "enqueue/null",
@@ -2117,7 +2119,7 @@
         },
         {
             "name": "ozean12/graphql-repository-client",
-            "version": "dev-master",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/graphql-repository-client.git",
@@ -2159,8 +2161,7 @@
             ],
             "description": "PHP Library which provides access to the billie data world using graphQL",
             "support": {
-                "source": "https://github.com/ozean12/graphql-repository-client/tree/master",
-                "issues": "https://github.com/ozean12/graphql-repository-client/issues"
+                "source": "https://github.com/ozean12/graphql-repository-client/tree/1.0.0"
             },
             "time": "2019-07-10T07:25:24+00:00"
         },
@@ -9456,9 +9457,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "ozean12/graphql-repository-client": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
