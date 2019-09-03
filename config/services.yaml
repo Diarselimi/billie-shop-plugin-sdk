@@ -85,7 +85,7 @@ services:
       - '@App\Infrastructure\OpenApi\Routing\OpenApiClassLoader'
 
   App\Helper\Uuid\UuidGeneratorInterface: '@App\Helper\Uuid\UuidGenerator'
-  App\DomainModel\Payment\PaymentsRepositoryInterface: '@App\Infrastructure\Graphql\PaymentsGraphqlRepository'
+  App\DomainModel\Payment\PaymentsRepositoryInterface: '@App\Infrastructure\Graphql\PaymentsGraphQLRepository'
 
   App\DomainModel\Order\OrderChecksRunnerService:
     arguments:
