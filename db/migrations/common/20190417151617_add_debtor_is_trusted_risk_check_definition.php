@@ -11,25 +11,25 @@ class AddDebtorIsTrustedRiskCheckDefinition extends AbstractMigration
     public function change()
     {
         $currentDatetime = (new DateTime())->format('Y-m-d H:i:s');
-        $this->insert(RiskCheckDefinitionRepository::TABLE_NAME, [
+        $this->table(RiskCheckDefinitionRepository::TABLE_NAME)->insert([
             'name' => DebtorIsTrusted::NAME,
             'created_at' => $currentDatetime,
             'updated_at' => $currentDatetime,
-        ]);
+        ])->save();
 
         $definitionRow = $this->fetchRow("SELECT * FROM ".RiskCheckDefinitionRepository::TABLE_NAME." WHERE name = '".DebtorIsTrusted::NAME."'");
 
         $merchantIds = $this->fetchAll("SELECT id AS merchant_id FROM ". MerchantRepository::TABLE_NAME);
 
         foreach ($merchantIds as $row) {
-            $this->insert(MerchantRiskCheckSettingsRepository::TABLE_NAME, [
+            $this->table(MerchantRiskCheckSettingsRepository::TABLE_NAME)->insert([
                 'merchant_id' => $row['merchant_id'],
                 'risk_check_definition_id' => $definitionRow['id'],
                 'enabled' => true,
                 'decline_on_failure' => true,
                 'created_at' => $currentDatetime,
                 'updated_at' => $currentDatetime,
-            ]);
+            ])->save();
         }
     }
 }
