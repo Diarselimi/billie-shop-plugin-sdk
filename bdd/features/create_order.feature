@@ -432,7 +432,6 @@ Feature:
     """
     Then the order A123 is in state created
     And the response status code should be 200
-    And print last JSON response
     And the JSON response should be:
     """
     {

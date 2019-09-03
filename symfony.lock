@@ -204,6 +204,9 @@
     "ozean12/amqp-transfers-serializer": {
         "version": "0.1.3"
     },
+    "ozean12/graphql-repository-client": {
+        "version": "dev-master"
+    },
     "paragonie/random_compat": {
         "version": "v2.0.12"
     },

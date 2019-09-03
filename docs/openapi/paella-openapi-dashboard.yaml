@@ -538,6 +538,97 @@ paths:
       security:
         -
           oauth2: []
+  /payments:
+    get:
+      tags:
+        - Payments
+      summary: 'Get Payments'
+      operationId: get_payments
+      parameters:
+        -
+          name: sort_by
+          in: query
+          required: false
+          schema:
+            type: string
+            default: priority
+            enum:
+              - priority
+              - date
+        -
+          name: sort_direction
+          in: query
+          required: false
+          schema:
+            type: string
+            default: desc
+            enum:
+              - desc
+              - asc
+        -
+          name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+        -
+          name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: '\App\Application\UseCase\PaginationAwareInterface::DEFAULT_LIMIT'
+            maximum: 100
+            minimum: 1
+        -
+          name: merchant_debtor_uuid
+          in: query
+          description: 'Merchant Debtor Uuid'
+          required: false
+          schema:
+            $ref: '#/components/schemas/UUID'
+        -
+          name: payment_debtor_uuid
+          in: query
+          description: 'Payment Debtor Uuid'
+          required: false
+          schema:
+            $ref: '#/components/schemas/UUID'
+        -
+          name: transaction_uuid
+          in: query
+          description: 'Transaction Uuid'
+          required: false
+          schema:
+            $ref: '#/components/schemas/UUID'
+        -
+          name: keyword
+          in: query
+          description: 'Search text.'
+          required: false
+          schema:
+            $ref: '#/components/schemas/TinyText'
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMerchantPaymentsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
   /merchant/user:
     get:
       tags:
@@ -959,6 +1050,36 @@ components:
         country:
           $ref: '#/components/schemas/CountryCode'
       type: object
+    GetMerchantPaymentsResponse:
+      title: 'Merchant Payments Response'
+      properties:
+        total:
+          description: 'Total number of results'
+          type: number
+        items:
+          description: 'Merchant payment item'
+          type: array
+          items:
+            properties:
+              transaction_uuid:
+                type: string
+              amount:
+                type: float
+              transaction_date:
+                type: string
+              transaction_counterparty_iban:
+                type: string
+              transaction_counterparty_name:
+                type: string
+              transaction_reference:
+                type: string
+              merchant_debtor:
+                properties:
+                  uuid: { description: Uuid, type: string }
+                  company_name: { description: 'Company Name', type: string }
+                type: object
+            type: object
+      type: object
     GetMerchantUserResponse:
       title: 'Get Merchant User Response'
       properties:
@@ -1295,5 +1416,7 @@ tags:
     name: Authentication
   -
     name: 'Order Management'
+  -
+    name: Payments
   -
     name: Debtors

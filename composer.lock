@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "df236fcdb90e87bde2492343dae67c78",
+    "content-hash": "cb110171b0563d595d709535abc87814",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -2114,6 +2114,55 @@
                 "issues": "https://github.com/ozean12/amqp-transfers-serializer/issues"
             },
             "time": "2019-03-12T17:12:20+00:00"
+        },
+        {
+            "name": "ozean12/graphql-repository-client",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:ozean12/graphql-repository-client.git",
+                "reference": "220ce1a9dcbfc65aa043a136d8d6f2e6496fbd4b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ozean12/graphql-repository-client/zipball/220ce1a9dcbfc65aa043a136d8d6f2e6496fbd4b",
+                "reference": "220ce1a9dcbfc65aa043a136d8d6f2e6496fbd4b",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": ">=6.0",
+                "php": "^7.1",
+                "symfony/config": "^3.4|^4.0",
+                "symfony/console": "^3.4|^4.0",
+                "symfony/dependency-injection": "^3.4|^4.0",
+                "symfony/framework-bundle": "^3.4|^4.0",
+                "symfony/http-kernel": "^3.4|^4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~7.0",
+                "spatie/phpunit-snapshot-assertions": "^1.4",
+                "symfony/phpunit-bridge": "^4.3"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Ozean12\\GraphQLBundle\\": ""
+                }
+            },
+            "scripts": {
+                "test-unit": [
+                    "./vendor/bin/phpunit -c ./phpunit.xml"
+                ]
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "PHP Library which provides access to the billie data world using graphQL",
+            "support": {
+                "source": "https://github.com/ozean12/graphql-repository-client/tree/master",
+                "issues": "https://github.com/ozean12/graphql-repository-client/issues"
+            },
+            "time": "2019-07-10T07:25:24+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -9407,7 +9456,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "ozean12/graphql-repository-client": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
