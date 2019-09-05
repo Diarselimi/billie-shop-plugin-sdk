@@ -3,6 +3,7 @@
 namespace App\DomainModel\Order;
 
 use App\DomainModel\Order\OrderContainer\OrderContainer;
+use App\Helper\Math\MoneyConverter;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Ozean12\Transfer\Message\Order\OrderPaidBack;
@@ -14,9 +15,12 @@ class OrderAnnouncer implements LoggingInterface
 
     private $bus;
 
-    public function __construct(MessageBusInterface $bus)
+    private $moneyConverter;
+
+    public function __construct(MessageBusInterface $bus, MoneyConverter $moneyConverter)
     {
         $this->bus = $bus;
+        $this->moneyConverter = $moneyConverter;
     }
 
     public function orderPaidBack(OrderContainer $orderContainer, float $amountChange)
@@ -24,7 +28,7 @@ class OrderAnnouncer implements LoggingInterface
         $message = (new OrderPaidBack())
             ->setUuid($orderContainer->getOrder()->getUuid())
             ->setDebtorUuid($orderContainer->getDebtorCompany()->getUuid())
-            ->setAmountChange($amountChange)
+            ->setAmountChange($this->moneyConverter->toInt($amountChange))
         ;
 
         $this->bus->dispatch($message);
