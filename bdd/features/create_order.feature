@@ -1776,3 +1776,96 @@ Feature:
       ]
     }
     """
+
+  Scenario: Failed order creation with line items (invalid line item amount)
+    Given I get from companies service identify match and good decision response
+    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
+    """
+    """
+    And I get from payments service register debtor positive response
+    When I send a POST request to "/order" with body:
+    """
+    {
+       "debtor_person":{
+          "salutation":"m",
+          "first_name":"",
+          "last_name":"else",
+          "phone_number":"+491234567",
+          "email":"someone@billie.io"
+       },
+       "debtor_company":{
+          "merchant_customer_id":"12",
+          "name":"Test User Company",
+          "address_addition":"left door",
+          "address_house_number":"10",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_city":"Berlin",
+          "address_postal_code":"10179",
+          "address_country":"DE",
+          "tax_id":"VA222",
+          "tax_number":"3333",
+          "registration_court":"",
+          "registration_number":" some number",
+          "industry_sector":"some sector",
+          "subindustry_sector":"some sub",
+          "employees_number":"33",
+          "legal_form":"some legal",
+          "established_customer":1
+       },
+       "delivery_address":{
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city":"Berlin",
+          "postal_code":"10179",
+          "country":"DE"
+       },
+       "amount":{
+          "net":900.00,
+          "gross":1000.00,
+          "tax":100.00
+       },
+       "comment":"Some comment",
+       "duration":30,
+       "order_id":"A1",
+       "line_items": [
+          {
+            "external_id": "SKU111",
+            "title": "Iphone XS Max",
+            "description": "Test test",
+            "quantity": 1,
+            "category": "mobile_phones",
+            "brand": "Apple",
+            "gtin": "test GTIN",
+            "mpn": "test MPN",
+            "amount":{
+              "net":900.00,
+              "gross":1000.00,
+              "tax":10.0
+            }
+          }
+       ]
+    }
+    """
+    Then the response status code should be 400
+    And the JSON response should be:
+    """
+    {
+      "errors": [
+        {
+          "title": "Invalid amounts",
+          "code": "request_validation_error",
+          "source": "line_items[0].amount.net"
+        },
+        {
+          "title": "Invalid amounts",
+          "code": "request_validation_error",
+          "source": "line_items[0].amount.gross"
+        },
+        {
+          "title": "Invalid amounts",
+          "code": "request_validation_error",
+          "source": "line_items[0].amount.tax"
+        }
+      ]
+    }
+    """
