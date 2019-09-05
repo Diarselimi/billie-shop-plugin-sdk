@@ -53,6 +53,27 @@
     "bunny/bunny": {
         "version": "v0.4.1"
     },
+    "cakephp/cache": {
+        "version": "3.8.3"
+    },
+    "cakephp/collection": {
+        "version": "3.8.3"
+    },
+    "cakephp/core": {
+        "version": "3.8.3"
+    },
+    "cakephp/database": {
+        "version": "3.8.3"
+    },
+    "cakephp/datasource": {
+        "version": "3.8.3"
+    },
+    "cakephp/log": {
+        "version": "3.8.3"
+    },
+    "cakephp/utility": {
+        "version": "3.8.3"
+    },
     "container-interop/container-interop": {
         "version": "1.2.0"
     },

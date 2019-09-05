@@ -27,7 +27,7 @@ class OrderLineItemsRequestFactory
             ->setExternalId($data['external_id'] ?? null)
             ->setTitle($data['title'] ?? null)
             ->setDescription($data['description'] ?? null)
-            ->setQuantity($data['quantity'] ?? null)
+            ->setQuantity((int) $data['quantity'] ?? null)
             ->setCategory($data['category'] ?? null)
             ->setBrand($data['brand'] ?? null)
             ->setGtin($data['gtin'] ?? null)
