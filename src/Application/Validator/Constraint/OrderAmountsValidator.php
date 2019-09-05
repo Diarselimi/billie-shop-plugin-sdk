@@ -2,8 +2,7 @@
 
 namespace App\Application\Validator\Constraint;
 
-use App\Application\UseCase\CreateOrder\CreateOrderRequest;
-use App\Application\UseCase\UpdateOrder\UpdateOrderRequest;
+use App\Application\UseCase\CreateOrder\Request\CreateOrderAmountRequest;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
@@ -11,28 +10,18 @@ class OrderAmountsValidator extends ConstraintValidator
 {
     public function validate($value, Constraint $constraint)
     {
-        $request = $this->context->getRoot();
+        $amountRequest = $this->context->getObject();
 
-        if ($request instanceof CreateOrderRequest) {
-            $amountObj = $request->getAmount();
-
-            if (is_null($amountObj->getGross()) || is_null($amountObj->getNet()) || is_null($amountObj->getTax())) {
-                return;
-            }
-
-            if (!$this->checkAmounts($amountObj->getGross(), $amountObj->getNet(), $amountObj->getTax())) {
-                $this->context->addViolation($constraint->message);
-            }
+        if (!$amountRequest instanceof CreateOrderAmountRequest) {
+            return;
         }
 
-        if ($request instanceof UpdateOrderRequest) {
-            if (is_null($request->getAmount()) || is_null($request->getAmount()->getNet()) || is_null($request->getAmount()->getTax())) {
-                return;
-            }
+        if (is_null($amountRequest->getGross()) || is_null($amountRequest->getNet()) || is_null($amountRequest->getTax())) {
+            return;
+        }
 
-            if (!$this->checkAmounts($request->getAmount()->getGross(), $request->getAmount()->getNet(), $request->getAmount()->getTax())) {
-                $this->context->addViolation($constraint->message);
-            }
+        if (!$this->checkAmounts($amountRequest->getGross(), $amountRequest->getNet(), $amountRequest->getTax())) {
+            $this->context->addViolation($constraint->message);
         }
     }
 

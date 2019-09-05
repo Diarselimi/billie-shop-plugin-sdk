@@ -122,6 +122,7 @@ class PaellaCoreContext extends MinkContext
             TRUNCATE order_identifications;
             TRUNCATE order_risk_checks;
             TRUNCATE order_financial_details;
+            TRUNCATE order_line_items;
             TRUNCATE orders;
             TRUNCATE order_notifications;
             TRUNCATE persons;

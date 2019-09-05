@@ -11,6 +11,7 @@ use App\DomainModel\MerchantDebtor\MerchantDebtorFinancialDetailsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
+use App\DomainModel\OrderLineItem\OrderLineItemEntity;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntity;
 use App\DomainModel\Person\PersonEntity;
 
@@ -43,6 +44,8 @@ class OrderContainer
     private $dunningStatus;
 
     private $riskChecks;
+
+    private $lineItems;
 
     private $relationLoader;
 
@@ -203,5 +206,20 @@ class OrderContainer
     public function getRiskChecks(): array
     {
         return $this->riskChecks ?: $this->riskChecks = $this->relationLoader->loadOrderRiskChecks($this);
+    }
+
+    /**
+     * @return OrderLineItemEntity[]
+     */
+    public function getLineItems(): array
+    {
+        return $this->lineItems ?: $this->lineItems = $this->relationLoader->loadOrderLineItems($this);
+    }
+
+    public function setLineItems(array $lineItems): OrderContainer
+    {
+        $this->lineItems = $lineItems;
+
+        return $this;
     }
 }

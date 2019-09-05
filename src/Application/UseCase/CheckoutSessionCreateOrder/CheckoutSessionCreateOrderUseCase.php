@@ -54,7 +54,7 @@ class CheckoutSessionCreateOrderUseCase implements LoggingInterface, ValidatedUs
 
     public function execute(CreateOrderRequest $request): OrderContainer
     {
-        $this->validateRequest($request);
+        $this->validateRequest($request, null, ['Default', 'AuthorizeOrder']);
 
         $orderRequest = $this->persistNewOrderService->persistFromRequest($request);
         $orderContainer = $this->orderContainerFactory->createFromNewOrderDTO($orderRequest);

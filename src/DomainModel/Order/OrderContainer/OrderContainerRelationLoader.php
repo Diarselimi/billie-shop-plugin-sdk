@@ -18,6 +18,8 @@ use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface;
+use App\DomainModel\OrderLineItem\OrderLineItemEntity;
+use App\DomainModel\OrderLineItem\OrderLineItemRepositoryInterface;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntity;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
 use App\DomainModel\Person\PersonEntity;
@@ -47,6 +49,8 @@ class OrderContainerRelationLoader
 
     private $orderRiskCheckRepository;
 
+    private $orderLineItemRepository;
+
     public function __construct(
         DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
         AddressRepositoryInterface $addressRepository,
@@ -58,7 +62,8 @@ class OrderContainerRelationLoader
         CompaniesServiceInterface $companiesService,
         OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
         OrderDunningStatusService $orderDunningStatusService,
-        OrderRiskCheckRepositoryInterface $orderRiskCheckRepository
+        OrderRiskCheckRepositoryInterface $orderRiskCheckRepository,
+        OrderLineItemRepositoryInterface $orderLineItemRepository
     ) {
         $this->debtorExternalDataRepository = $debtorExternalDataRepository;
         $this->addressRepository = $addressRepository;
@@ -71,6 +76,7 @@ class OrderContainerRelationLoader
         $this->orderFinancialDetailsRepository = $orderFinancialDetailsRepository;
         $this->orderDunningStatusService = $orderDunningStatusService;
         $this->orderRiskCheckRepository = $orderRiskCheckRepository;
+        $this->orderLineItemRepository = $orderLineItemRepository;
     }
 
     public function loadMerchantDebtor(OrderContainer $orderContainer): MerchantDebtorEntity
@@ -141,5 +147,15 @@ class OrderContainerRelationLoader
     public function loadOrderRiskChecks(OrderContainer $orderContainer): array
     {
         return $this->orderRiskCheckRepository->findByOrder($orderContainer->getOrder()->getId());
+    }
+
+    /**
+     * @param OrderContainer $orderContainer
+     *
+     * @return OrderLineItemEntity[]
+     */
+    public function loadOrderLineItems(OrderContainer $orderContainer): array
+    {
+        return $this->orderLineItemRepository->getByOrderId($orderContainer->getOrder()->getId());
     }
 }

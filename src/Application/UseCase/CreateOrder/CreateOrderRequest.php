@@ -9,6 +9,7 @@ use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
 use App\Application\UseCase\ValidatedRequestInterface;
 use App\Application\Validator\Constraint as CustomConstrains;
 use App\DomainModel\ArrayableInterface;
+use App\DomainModel\OrderLineItem\OrderLineItemEntity;
 use OpenApi\Annotations as OA;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -23,6 +24,12 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          @OA\Property(property="billing_address", ref="#/components/schemas/CreateOrderAddressRequest", nullable=true),
  *          @OA\Property(property="debtor_company", ref="#/components/schemas/CreateOrderDebtorCompanyRequest"),
  *          @OA\Property(property="debtor_person", ref="#/components/schemas/CreateOrderDebtorPersonRequest"),
+ *          @OA\Property(
+ *              property="line_items",
+ *              type="array",
+ *              nullable=true,
+ *              @OA\Items(ref="#/components/schemas/CreateOrderLineItemRequest")
+ *          )
  *     }
  * )
  */
@@ -78,6 +85,12 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
      * @Assert\Valid()
      */
     private $billingAddress;
+
+    /**
+     * @Assert\Valid()
+     * @Assert\NotBlank(groups={"AuthorizeOrder"})
+     */
+    private $lineItems;
 
     public function getAmount(): CreateOrderAmountRequest
     {
@@ -195,6 +208,21 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
     public function setBillingAddress(?CreateOrderAddressRequest $billingAddress): CreateOrderRequest
     {
         $this->billingAddress = $billingAddress;
+
+        return $this;
+    }
+
+    /**
+     * @return OrderLineItemEntity[]
+     */
+    public function getLineItems(): array
+    {
+        return $this->lineItems;
+    }
+
+    public function setLineItems(array $lineItems): CreateOrderRequest
+    {
+        $this->lineItems = $lineItems;
 
         return $this;
     }
