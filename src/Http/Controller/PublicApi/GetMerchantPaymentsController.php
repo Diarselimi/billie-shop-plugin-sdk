@@ -31,7 +31,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     @OA\Parameter(in="query", name="merchant_debtor_uuid", @OA\Schema(ref="#/components/schemas/UUID"), description="Merchant Debtor Uuid", required=false),
  *     @OA\Parameter(in="query", name="payment_debtor_uuid", @OA\Schema(ref="#/components/schemas/UUID"), description="Payment Debtor Uuid", required=false),
  *     @OA\Parameter(in="query", name="transaction_uuid", @OA\Schema(ref="#/components/schemas/UUID"), description="Transaction Uuid", required=false),
- *     @OA\Parameter(in="query", name="keyword", description="Search text.",
+ *     @OA\Parameter(in="query", name="search", description="Search text.",
  *          @OA\Schema(ref="#/components/schemas/TinyText"), required=false),
  *
  *     @OA\Response(
@@ -68,7 +68,7 @@ class GetMerchantPaymentsController
             ->setTransactionUuid($data['transaction_uuid'] ?? null)
             ->setSortBy($data['sort_by'] ?? GetMerchantPaymentsRequest::DEFAULT_SORTING_FIELD)
             ->setSortDirection($data['sort_direction'] ?? 'desc')
-            ->setSearchKeyword($data['keyword'] ?? '')
+            ->setSearchKeyword($data['search'] ?? '')
             ->setLimit((int) ($data['limit'] ?? GetMerchantPaymentsRequest::DEFAULT_LIMIT))
             ->setOffset((int) ($data['offset'] ?? 0));
 

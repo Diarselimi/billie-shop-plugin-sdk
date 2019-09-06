@@ -18,8 +18,8 @@ Feature:
         When I send a GET request to "/public/payments?sort_by=transaction_date&sort_direction=asc&external_id=DE123SA"
         Then the response status code should be 200
 
-    Scenario: Get payment list by search with keyword and limit
-        When I send a GET request to "/public/payments?keyword=test&limit=5"
+    Scenario: Get payment list by search with search and limit
+        When I send a GET request to "/public/payments?search=test&limit=5"
         Then the response status code should be 200
 
     Scenario: I fail to get payment list by payment_debtor_uuid which is not valid
