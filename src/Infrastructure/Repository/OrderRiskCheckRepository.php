@@ -41,7 +41,7 @@ class OrderRiskCheckRepository extends AbstractPdoRepository implements OrderRis
             SELECT
             order_risk_checks.id AS  risk_check_id,
             order_risk_checks.order_id,
-            risk_check_definition_id,
+            order_risk_checks.risk_check_definition_id as risk_check_definition_id,
             is_passed,
             order_risk_checks.created_at AS risk_check_created_at,
             order_risk_checks.updated_at AS risk_check_updated_at,
@@ -50,7 +50,9 @@ class OrderRiskCheckRepository extends AbstractPdoRepository implements OrderRis
             risk_check_definitions.updated_at AS risk_check_definitions_updated_at
             FROM order_risk_checks
             INNER JOIN risk_check_definitions ON risk_check_definitions.id = order_risk_checks.risk_check_definition_id
+            INNER JOIN merchant_risk_check_settings ON risk_check_definitions.id = merchant_risk_check_settings.risk_check_definition_id
             WHERE order_id = :order_id
+            ORDER BY is_passed ASC, decline_on_failure DESC
             ',
             ['order_id' => $orderId]
         );

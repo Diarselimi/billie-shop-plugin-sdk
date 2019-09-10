@@ -1081,6 +1081,15 @@ components:
           example: created
           $ref: '#/components/schemas/OrderState'
         reasons:
+          type: string
+          enum:
+            - risk_policy
+            - debtor_not_identified
+            - debtor_address
+            - debtor_limit_exceeded
+          nullable: true
+          deprecated: true
+        decline_reason:
           nullable: true
           $ref: '#/components/schemas/OrderDeclineReason'
         amount:

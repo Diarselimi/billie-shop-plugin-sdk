@@ -39,14 +39,19 @@ class OrderDeclinedReasonsMapper
 
     public function mapReasons(OrderEntity $order): array
     {
-        $checks = $this->riskCheckRepository->findByOrder($order->getId());
+        return [$this->mapReason($order)];
+    }
+
+    public function mapReason(OrderEntity $orderEntity): string
+    {
+        $checks = $this->riskCheckRepository->findByOrder($orderEntity->getId());
 
         foreach ($checks as $check) {
             if (!$check->isPassed()) {
-                return [self::RISK_CHECK_MAPPING[$check->getRiskCheckDefinition()->getName()] ?? self::REASON_RISK_POLICY];
+                return self::RISK_CHECK_MAPPING[$check->getRiskCheckDefinition()->getName()] ?? self::REASON_RISK_POLICY;
             }
         }
 
-        return [self::REASON_RISK_POLICY];
+        return self::REASON_RISK_POLICY;
     }
 }
