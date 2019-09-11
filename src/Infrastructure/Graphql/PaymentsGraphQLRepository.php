@@ -25,7 +25,21 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
             'sortDirection' => $paymentsDTO->getSortDirection(),
             'keyword' => $paymentsDTO->getKeyword(),
         ];
-        $response = $this->executeQuery('get_merchant_payments_by_uuid', $params);
+
+        $countParams = [
+            'merchantUuid' => $paymentsDTO->getMerchantPaymentUuid(),
+            'paymentDebtorUuid' => $paymentsDTO->getPaymentDebtorUuid(),
+            'transactionUuid' => $paymentsDTO->getTransactionUuid(),
+            'keyword' => $paymentsDTO->getKeyword(),
+        ];
+
+        $countResult = $this->executeQuery('get_merchant_payments_by_uuid_count', $countParams);
+
+        $response = [
+            'items' => $this->executeQuery('get_merchant_payments_by_uuid', $params),
+            'total' => $countResult[0]['total'] ?? 0,
+        ];
+
         $this->logInfo('Graphql params, response', [$params, $response]);
 
         return $response;

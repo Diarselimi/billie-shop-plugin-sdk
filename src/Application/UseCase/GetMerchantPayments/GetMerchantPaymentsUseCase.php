@@ -62,8 +62,8 @@ class GetMerchantPaymentsUseCase implements ValidatedUseCaseInterface
 
         $request->setMerchantPaymentUuid($merchant->getPaymentMerchantId());
 
-        $items = $this->paymentsRepository->search($this->paymentsDTOFactory->create($request));
+        $result = $this->paymentsRepository->search($this->paymentsDTOFactory->create($request));
 
-        return $this->paymentFactory->createFromGraphql($items);
+        return $this->paymentFactory->createFromGraphql($result);
     }
 }

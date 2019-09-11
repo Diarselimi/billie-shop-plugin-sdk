@@ -578,20 +578,13 @@ paths:
           required: false
           schema:
             type: integer
-            default: '\App\Application\UseCase\PaginationAwareInterface::DEFAULT_LIMIT'
+            default: 10
             maximum: 100
             minimum: 1
         -
           name: merchant_debtor_uuid
           in: query
           description: 'Merchant Debtor Uuid'
-          required: false
-          schema:
-            $ref: '#/components/schemas/UUID'
-        -
-          name: payment_debtor_uuid
-          in: query
-          description: 'Payment Debtor Uuid'
           required: false
           schema:
             $ref: '#/components/schemas/UUID'

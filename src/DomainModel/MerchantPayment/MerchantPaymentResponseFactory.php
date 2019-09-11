@@ -6,18 +6,16 @@ use App\Application\UseCase\GetMerchantPayments\GetMerchantPaymentsResponse;
 
 class MerchantPaymentResponseFactory
 {
-    public function createFromGraphql(array $data): GetMerchantPaymentsResponse
+    public function createFromGraphql(array $result): GetMerchantPaymentsResponse
     {
-        //TODO: Create the DTO and remove this from here
-        $data = array_map(function (array $data) {
-            $data['is_allocated'] = !!$data['is_allocated'];
+        $result['items'] = array_map(function (array $item) {
+            $item['is_allocated'] = boolval($item['is_allocated']);
 
-            return $data;
-        }, $data);
+            return $item;
+        }, $result['items']);
 
         return (new GetMerchantPaymentsResponse())
-            ->setItems($data)
-            ->setTotal(count($data))
-            ;
+            ->setItems($result['items'])
+            ->setTotal($result['total']);
     }
 }

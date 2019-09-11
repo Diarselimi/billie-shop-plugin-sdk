@@ -26,10 +26,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     @OA\Parameter(in="query", name="sort_direction", @OA\Schema(type="string", enum={"desc", "asc"}, default="desc"), required=false),
  *
  *     @OA\Parameter(in="query", name="offset", @OA\Schema(type="integer", minimum=0), required=false),
- *     @OA\Parameter(in="query", name="limit", @OA\Schema(type="integer", minimum=1, maximum=100, default="\App\Application\UseCase\PaginationAwareInterface::DEFAULT_LIMIT"), required=false),
+ *     @OA\Parameter(in="query", name="limit", @OA\Schema(type="integer", minimum=1, maximum=100, default=\App\Application\UseCase\PaginationAwareInterface::DEFAULT_LIMIT), required=false),
  *
  *     @OA\Parameter(in="query", name="merchant_debtor_uuid", @OA\Schema(ref="#/components/schemas/UUID"), description="Merchant Debtor Uuid", required=false),
- *     @OA\Parameter(in="query", name="payment_debtor_uuid", @OA\Schema(ref="#/components/schemas/UUID"), description="Payment Debtor Uuid", required=false),
  *     @OA\Parameter(in="query", name="transaction_uuid", @OA\Schema(ref="#/components/schemas/UUID"), description="Transaction Uuid", required=false),
  *     @OA\Parameter(in="query", name="search", description="Search text.",
  *          @OA\Schema(ref="#/components/schemas/TinyText"), required=false),
@@ -64,7 +63,6 @@ class GetMerchantPaymentsController
         $useCaseRequest = (new GetMerchantPaymentsRequest())
             ->setMerchantId($merchantId)
             ->setMerchantDebtorUuid($data['merchant_debtor_uuid'] ?? null)
-            ->setPaymentDebtorUuid($data['payment_debtor_uuid'] ?? null)
             ->setTransactionUuid($data['transaction_uuid'] ?? null)
             ->setSortBy($data['sort_by'] ?? GetMerchantPaymentsRequest::DEFAULT_SORTING_FIELD)
             ->setSortDirection($data['sort_direction'] ?? 'desc')
