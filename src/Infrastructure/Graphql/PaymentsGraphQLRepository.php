@@ -33,7 +33,7 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
             'keyword' => $paymentsDTO->getKeyword(),
         ];
 
-        $countResult = $this->executeQuery('get_merchant_payments_by_uuid_count', $countParams);
+        $countResult = $this->executeQuery('get_merchant_payments_by_uuid_total', $countParams);
 
         $response = [
             'items' => $this->executeQuery('get_merchant_payments_by_uuid', $params),
