@@ -146,7 +146,7 @@ class OrderContainerRelationLoader
      */
     public function loadOrderRiskChecks(OrderContainer $orderContainer): array
     {
-        return $this->orderRiskCheckRepository->findByOrder($orderContainer->getOrder()->getId());
+        return $this->orderRiskCheckRepository->findByOrder($orderContainer->getOrder());
     }
 
     /**

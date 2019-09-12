@@ -44,7 +44,7 @@ class OrderDeclinedReasonsMapper
 
     public function mapReason(OrderEntity $orderEntity): string
     {
-        $checks = $this->riskCheckRepository->findByOrder($orderEntity->getId());
+        $checks = $this->riskCheckRepository->findByOrder($orderEntity);
 
         foreach ($checks as $check) {
             if (!$check->isPassed()) {
