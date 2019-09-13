@@ -146,12 +146,9 @@ class OrderResponseFactory
      */
     private function addReasons(OrderEntity $order, $response)
     {
-        if (!method_exists($response, 'setReasons')) {
-            return $response;
-        }
-
         if ($this->orderStateManager->isDeclined($order) || $this->orderStateManager->isWaiting($order)) {
             $response->setReasons($this->declinedReasonsMapper->mapReasons($order));
+            $response->setDeclineReason($this->declinedReasonsMapper->mapReason($order));
         }
 
         return $response;

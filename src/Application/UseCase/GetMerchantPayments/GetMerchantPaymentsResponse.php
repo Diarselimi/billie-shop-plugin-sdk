@@ -12,9 +12,11 @@ use OpenApi\Annotations as OA;
  *          @OA\Property(property="transaction_uuid", type="string"),
  *          @OA\Property(property="amount", type="number", type="float"),
  *          @OA\Property(property="transaction_date", type="string"),
+ *          @OA\Property(property="is_allocated", type="boolean"),
  *          @OA\Property(property="transaction_counterparty_iban", type="string"),
  *          @OA\Property(property="transaction_counterparty_name", type="string"),
  *          @OA\Property(property="transaction_reference", type="string"),
+ *          @OA\Property(property="payment_debtor_uuid", type="string"),
  *          @OA\Property(property="merchant_debtor", type="object", properties={
  *              @OA\Property(property="uuid", type="string", description="Uuid"),
  *              @OA\Property(property="company_name", type="string", description="Company Name")

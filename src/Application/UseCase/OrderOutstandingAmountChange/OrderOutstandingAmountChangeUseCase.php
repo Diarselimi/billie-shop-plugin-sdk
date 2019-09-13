@@ -110,12 +110,13 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
         $merchant->increaseFinancingLimit($amountChange->getAmountChange());
         $this->merchantRepository->update($merchant);
 
+        $this->orderAnnouncer->orderPaidBack($orderContainer, $amountChange->getAmountChange());
+
         if (!$amountChange->isPayment()) {
             return;
         }
 
         $this->scheduleMerchantNotification($order, $amountChange);
-        $this->orderAnnouncer->orderPaidBack($orderContainer, $amountChange->getAmountChange());
 
         if ($this->paymentForgivenessService->begForgiveness($orderContainer, $amountChange)) {
             $this->logInfo(

@@ -137,4 +137,18 @@ class CompaniesServiceContext implements Context
             new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match_trusted_source_is_synchronized.json'))
         ));
     }
+
+    /**
+     * @Given /^I get from companies service identify no match and respond with suggestion$/
+     */
+    public function iGetFromCompaniesServiceIdentifyNoMatchAndRespondWithSuggestion()
+    {
+        $this->mockRequest('/debtor/identify', new ResponseStack(
+            new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_no_match_with_suggestion.json'), [], 404)
+        ));
+
+        $this->mockRequest('/debtor/1/is-eligible-for-pay-after-delivery', new ResponseStack(
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_decision_good.json'))
+        ));
+    }
 }

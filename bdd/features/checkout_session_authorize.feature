@@ -132,7 +132,8 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
         "address_city":"Berlin",
         "address_country":"DE"
       },
-      "reasons":"debtor_limit_exceeded"
+      "reasons":"debtor_limit_exceeded",
+      "decline_reason":"debtor_limit_exceeded"
     }
     """
 
@@ -218,7 +219,8 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
         "address_city":"Berlin",
         "address_country":"DE"
       },
-      "reasons":null
+      "reasons":null,
+      "decline_reason":null
     }
     """
 
@@ -303,7 +305,8 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
         "address_city":"Berlin",
         "address_country":"DE"
       },
-      "reasons":null
+      "reasons":null,
+      "decline_reason":null
     }
     """
 
@@ -387,7 +390,8 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
           "address_city":null,
           "address_country":null
        },
-      "reasons":"debtor_not_identified"
+      "reasons":"debtor_not_identified",
+      "decline_reason":"debtor_not_identified"
     }
     """
 

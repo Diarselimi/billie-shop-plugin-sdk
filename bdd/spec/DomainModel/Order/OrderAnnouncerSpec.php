@@ -6,6 +6,7 @@ use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\Order\OrderAnnouncer;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
+use App\Helper\Math\MoneyConverter;
 use Ozean12\Transfer\Message\Order\OrderPaidBack;
 use PhpSpec\ObjectBehavior;
 use Psr\Log\LoggerInterface;
@@ -20,6 +21,7 @@ class OrderAnnouncerSpec extends ObjectBehavior
 
     public function let(
         MessageBusInterface $bus,
+        MoneyConverter $moneyConverter,
         OrderContainer $orderContainer,
         OrderEntity $order,
         DebtorCompany $debtorCompany,
@@ -36,6 +38,7 @@ class OrderAnnouncerSpec extends ObjectBehavior
 
     public function it_announces_order_paid_back(
         MessageBusInterface $bus,
+        MoneyConverter $moneyConverter,
         OrderContainer $orderContainer,
         OrderEntity $order,
         DebtorCompany $debtorCompany
@@ -48,9 +51,10 @@ class OrderAnnouncerSpec extends ObjectBehavior
         $message = (new OrderPaidBack())
             ->setUuid(self::ORDER_UUID)
             ->setDebtorUuid(self::DEBTOR_UUID)
-            ->setAmountChange(500.60)
+            ->setAmountChange(50060)
         ;
 
+        $moneyConverter->toInt(500.60)->shouldBeCalledOnce()->willReturn(50060);
         $bus->dispatch($message)->shouldBeCalledOnce()->willReturn(new Envelope($message));
         $this->orderPaidBack($orderContainer, 500.60);
     }

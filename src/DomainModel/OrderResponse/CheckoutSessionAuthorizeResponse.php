@@ -9,7 +9,8 @@ use OpenApi\Annotations as OA;
  * @OA\Schema(schema="CheckoutSessionAuthorizeResponse", title="Authorize Checkout Order Response", type="object",
  *     properties={
  *      @OA\Property(property="state", ref="#/components/schemas/OrderState", example="created"),
- *      @OA\Property(property="reasons", ref="#/components/schemas/OrderDeclineReason", nullable=true),
+ *      @OA\Property(property="reasons", enum=\App\DomainModel\Order\OrderDeclinedReasonsMapper::REASONS, type="string", nullable=true, deprecated=true),
+ *      @OA\Property(property="decline_reason", ref="#/components/schemas/OrderDeclineReason", nullable=true),
  *      @OA\Property(property="debtor_company", type="object", description="Identified company", properties={
  *          @OA\Property(property="name", ref="#/components/schemas/TinyText", nullable=true, example="Billie GmbH"),
  *          @OA\Property(property="address_house_number", ref="#/components/schemas/TinyText", nullable=true, example="4"),
@@ -36,7 +37,12 @@ class CheckoutSessionAuthorizeResponse implements ArrayableInterface
 
     private $companyAddressCountry;
 
+    /**
+     * @deprecated
+     */
     private $reasons;
+
+    private $declineReason;
 
     public function getState(): string
     {
@@ -122,14 +128,32 @@ class CheckoutSessionAuthorizeResponse implements ArrayableInterface
         return $this;
     }
 
+    /**
+     * @deprecated
+     */
     public function getReasons(): ?array
     {
         return $this->reasons;
     }
 
+    /**
+     * @deprecated
+     */
     public function setReasons(array $reasons): CheckoutSessionAuthorizeResponse
     {
         $this->reasons = $reasons;
+
+        return $this;
+    }
+
+    public function getDeclineReason(): ?string
+    {
+        return $this->declineReason;
+    }
+
+    public function setDeclineReason(string $declineReason): CheckoutSessionAuthorizeResponse
+    {
+        $this->declineReason = $declineReason;
 
         return $this;
     }
@@ -147,6 +171,7 @@ class CheckoutSessionAuthorizeResponse implements ArrayableInterface
                 'address_country' => $this->getCompanyAddressCountry(),
             ],
             'reasons' => $this->getReasons() ? join(', ', $this->getReasons()) : null,
+            'decline_reason' => $this->getDeclineReason(),
         ];
     }
 }

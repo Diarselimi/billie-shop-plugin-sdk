@@ -2,6 +2,8 @@
 
 namespace App\DomainModel\OrderRiskCheck;
 
+use App\DomainModel\Order\OrderEntity;
+
 interface OrderRiskCheckRepositoryInterface
 {
     public function insert(OrderRiskCheckEntity $riskCheck): void;
@@ -9,7 +11,7 @@ interface OrderRiskCheckRepositoryInterface
     /**
      * @return OrderRiskCheckEntity[]|array
      */
-    public function findByOrder(int $orderId): array;
+    public function findByOrder(OrderEntity $orderEntity): array;
 
     public function findByOrderAndCheckName(int $orderId, string $checkName): ? OrderRiskCheckEntity;
 

@@ -10,7 +10,8 @@ use OpenApi\Annotations as OA;
  *      @OA\Property(property="order_id", type="string", nullable=true, example="C-10123456789-0001"),
  *      @OA\Property(property="uuid", ref="#/components/schemas/UUID"),
  *      @OA\Property(property="state", ref="#/components/schemas/OrderState", example="created"),
- *      @OA\Property(property="reasons", ref="#/components/schemas/OrderDeclineReason", nullable=true),
+ *      @OA\Property(property="reasons", enum=\App\DomainModel\Order\OrderDeclinedReasonsMapper::REASONS, type="string", nullable=true, deprecated=true),
+ *      @OA\Property(property="decline_reason", ref="#/components/schemas/OrderDeclineReason", nullable=true),
  *      @OA\Property(property="amount", type="number", format="float", nullable=false, example=123.45),
  *      @OA\Property(property="amount_tax", type="number", format="float", nullable=false, example=123.45),
  *      @OA\Property(property="amount_net", type="number", format="float", nullable=false, example=123.45),
@@ -113,7 +114,12 @@ class OrderResponse implements ArrayableInterface
 
     private $dueDate;
 
+    /**
+     * @deprecated
+     */
     private $reasons;
+
+    private $declineReason;
 
     private $createdAt;
 
@@ -361,14 +367,32 @@ class OrderResponse implements ArrayableInterface
         return $this;
     }
 
+    /**
+     * @deprecated
+     */
     public function getReasons(): ?array
     {
         return $this->reasons;
     }
 
+    /**
+     * @deprecated
+     */
     public function setReasons(array $reasons): OrderResponse
     {
         $this->reasons = $reasons;
+
+        return $this;
+    }
+
+    public function getDeclineReason(): ?string
+    {
+        return $this->declineReason;
+    }
+
+    public function setDeclineReason(string $declineReason): OrderResponse
+    {
+        $this->declineReason = $declineReason;
 
         return $this;
     }
@@ -668,6 +692,7 @@ class OrderResponse implements ArrayableInterface
             'uuid' => $this->getUuid(),
             'state' => $this->getState(),
             'reasons' => $this->getReasons() ? join(', ', $this->getReasons()) : null,
+            'decline_reason' => $this->getDeclineReason(),
             'amount' => $this->getAmountGross(),
             'amount_net' => $this->getAmountNet(),
             'amount_tax' => $this->getAmountTax(),
