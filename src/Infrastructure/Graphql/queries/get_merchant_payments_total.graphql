@@ -5,10 +5,10 @@ query q(
     $keyword: String
 ){
     getPadPayments(
-        merchant_uuid: $merchantUuid,
-        debtor_uuids: $paymentDebtorUuid,
-        transaction_uuids: $transactionUuid,
-        search_keyword: $keyword,
+        merchant_uuid: $merchantUuid
+        debtor_uuids: $paymentDebtorUuid
+        transaction_uuids: $transactionUuid
+        search_keyword: $keyword
         as_count: "yes"
     ) {
         total: count

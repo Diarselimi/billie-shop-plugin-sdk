@@ -1584,6 +1584,41 @@ paths:
           oauth2: []
       x-groups:
         - dashboard
+  '/payments/{uuid}':
+    get:
+      tags:
+        - Payments
+      summary: 'Get Payment Details'
+      operationId: get_payment_details
+      parameters:
+        -
+          name: uuid
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMerchantPaymentDetailsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+      x-groups:
+        - dashboard
   /payments:
     get:
       tags:
@@ -1631,13 +1666,6 @@ paths:
           name: merchant_debtor_uuid
           in: query
           description: 'Merchant Debtor Uuid'
-          required: false
-          schema:
-            $ref: '#/components/schemas/UUID'
-        -
-          name: transaction_uuid
-          in: query
-          description: 'Transaction Uuid'
           required: false
           schema:
             $ref: '#/components/schemas/UUID'
@@ -2104,6 +2132,13 @@ components:
       maxLength: 2
       pattern: '^(\+|\d|\()[ \-\/0-9()]{5,20}$'
       example: '030 31199251'
+    IBAN:
+      title: IBAN
+      type: string
+      maxLength: 22
+      minLength: 22
+      pattern: '^[A-Z]{2}(?:[ ]?[0-9]){18,20}$'
+      example: DE61500105175136458915
     Date:
       title: Date
       type: string
@@ -2129,7 +2164,7 @@ components:
       type: number
       format: float
       pattern: '^(\d{1,}(.\d{2})?)$'
-      example: 7500
+      example: 99.95
     MerchantUserRoles:
       title: 'Merchant User Roles'
       type: string
@@ -2522,40 +2557,6 @@ components:
               merchant:
                 description: 'The merchant the merchant-debtor belongs to.'
                 $ref: '#/components/schemas/GetDebtorCompanyLimitsMerchant'
-            type: object
-      type: object
-    GetMerchantPaymentsResponse:
-      title: 'Merchant Payments Response'
-      properties:
-        total:
-          description: 'Total number of results'
-          type: number
-        items:
-          description: 'Merchant payment item'
-          type: array
-          items:
-            properties:
-              transaction_uuid:
-                type: string
-              amount:
-                type: float
-              transaction_date:
-                type: string
-              is_allocated:
-                type: boolean
-              transaction_counterparty_iban:
-                type: string
-              transaction_counterparty_name:
-                type: string
-              transaction_reference:
-                type: string
-              payment_debtor_uuid:
-                type: string
-              merchant_debtor:
-                properties:
-                  uuid: { description: Uuid, type: string }
-                  company_name: { description: 'Company Name', type: string }
-                type: object
             type: object
       type: object
     GetMerchantUserResponse:
@@ -3054,6 +3055,72 @@ components:
                 type: string
                 nullable: true
             type: object
+      type: object
+    GetMerchantPaymentDetailsResponse:
+      title: 'Merchant Payments Response'
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        amount:
+          $ref: '#/components/schemas/Money'
+        transaction_date:
+          $ref: '#/components/schemas/Date'
+        is_allocated:
+          type: boolean
+        is_overpaid:
+          type: boolean
+        transaction_counterparty_iban:
+          $ref: '#/components/schemas/IBAN'
+        transaction_counterparty_name:
+          type: string
+        transaction_reference:
+          type: string
+        merchant_debtor_uuid:
+          $ref: '#/components/schemas/UUID'
+        orders:
+          type: array
+          items:
+            properties:
+              uuid:
+                $ref: '#/components/schemas/UUID'
+              amount:
+                $ref: '#/components/schemas/Money'
+              outstanding_amount:
+                $ref: '#/components/schemas/Money'
+              external_id:
+                type: string
+              invoice_number:
+                type: string
+            type: object
+      type: object
+    GetMerchantPaymentsResponse:
+      title: 'Merchant Payments Response'
+      properties:
+        items:
+          description: 'Merchant payment item'
+          type: array
+          items:
+            properties:
+              uuid:
+                $ref: '#/components/schemas/UUID'
+              amount:
+                $ref: '#/components/schemas/Money'
+              transaction_date:
+                $ref: '#/components/schemas/Date'
+              is_allocated:
+                type: boolean
+              transaction_counterparty_iban:
+                $ref: '#/components/schemas/IBAN'
+              transaction_counterparty_name:
+                type: string
+              transaction_reference:
+                type: string
+              merchant_debtor_uuid:
+                $ref: '#/components/schemas/UUID'
+            type: object
+        total:
+          description: 'Total number of results'
+          type: integer
       type: object
   responses:
     HtmlDocument:
