@@ -12,18 +12,17 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Payment\RequestDTO\ConfirmRequestDTO;
 use App\DomainModel\Payment\RequestDTO\CreateRequestDTO;
 use App\DomainModel\Payment\RequestDTO\ModifyRequestDTO;
+use App\Infrastructure\ClientResponseDecodeException;
+use App\Infrastructure\DecodeResponseTrait;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\TransferStats;
-use Psr\Http\Message\ResponseInterface;
 
 class Borscht implements PaymentsServiceInterface, LoggingInterface
 {
-    use LoggingTrait;
-
-    private const ERR_DEFAULT_MESSAGE = 'Payments API call was not successful';
+    use LoggingTrait, DecodeResponseTrait;
 
     private const ERR_BODY_DECODE_MESSAGE = 'Payments API response decode failed';
 
@@ -41,29 +40,34 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
     {
         try {
             $response = $this->client->get("/debtor/$debtorPaymentId.json");
+
+            $decodedResponse = $this->decodeResponse($response);
+
+            return (new DebtorPaymentDetailsDTO())
+                ->setBankAccountBic($decodedResponse['bic'])
+                ->setBankAccountIban($decodedResponse['iban'])
+                ->setOutstandingAmount($decodedResponse['outstanding_amount'])
+                ;
         } catch (TransferException $exception) {
             throw new PaymentsServiceRequestException($exception);
+        } catch (ClientResponseDecodeException $exception) {
+            throw new PaymentsServiceRequestException(null, self::ERR_BODY_DECODE_MESSAGE);
         }
-
-        $decodedResponse = $this->decodeResponse($response);
-
-        return (new DebtorPaymentDetailsDTO())
-            ->setBankAccountBic($decodedResponse['bic'])
-            ->setBankAccountIban($decodedResponse['iban'])
-            ->setOutstandingAmount($decodedResponse['outstanding_amount']);
     }
 
     public function getOrderPaymentDetails(string $orderPaymentId): OrderPaymentDetailsDTO
     {
         try {
             $response = $this->client->get("/order/$orderPaymentId.json");
+
+            $decodedResponse = $this->decodeResponse($response);
+
+            return $this->paymentDetailsFactory->createFromBorschtResponse($decodedResponse);
         } catch (TransferException $exception) {
             throw new PaymentsServiceRequestException($exception);
+        } catch (ClientResponseDecodeException $exception) {
+            throw new PaymentsServiceRequestException(null, self::ERR_BODY_DECODE_MESSAGE);
         }
-
-        $decodedResponse = $this->decodeResponse($response);
-
-        return $this->paymentDetailsFactory->createFromBorschtResponse($decodedResponse);
     }
 
     public function cancelOrder(OrderEntity $order): void
@@ -124,13 +128,15 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
                     $this->logServiceRequestStats($stats, 'create_borscht_ticket');
                 },
             ]);
+
+            $decodedResponse = $this->decodeResponse($response);
+
+            return $this->paymentDetailsFactory->createFromBorschtResponse($decodedResponse);
         } catch (TransferException $exception) {
             throw new PaymentsServiceRequestException($exception);
+        } catch (ClientResponseDecodeException $exception) {
+            throw new PaymentsServiceRequestException(null, self::ERR_BODY_DECODE_MESSAGE);
         }
-
-        $decodedResponse = $this->decodeResponse($response);
-
-        return $this->paymentDetailsFactory->createFromBorschtResponse($decodedResponse);
     }
 
     public function registerDebtor(string $paymentMerchantId): DebtorPaymentRegistrationDTO
@@ -144,13 +150,15 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
                     $this->logServiceRequestStats($stats, 'create_borscht_debtor');
                 },
             ]);
+
+            $decodedResponse = $this->decodeResponse($response);
+
+            return new DebtorPaymentRegistrationDTO($decodedResponse['debtor_id']);
         } catch (TransferException $exception) {
             throw new PaymentsServiceRequestException($exception);
+        } catch (ClientResponseDecodeException $exception) {
+            throw new PaymentsServiceRequestException(null, self::ERR_BODY_DECODE_MESSAGE);
         }
-
-        $decodedResponse = $this->decodeResponse($response);
-
-        return new DebtorPaymentRegistrationDTO($decodedResponse['debtor_id']);
     }
 
     public function createFraudReclaim(string $orderPaymentId): void
@@ -160,17 +168,5 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
         } catch (TransferException $exception) {
             throw new PaymentsServiceRequestException($exception, 'Fraud reclaim request to Payment failed');
         }
-    }
-
-    private function decodeResponse(ResponseInterface $response): array
-    {
-        $response = (string) $response->getBody();
-        $decodedResponse = json_decode($response, true);
-
-        if (!$decodedResponse) {
-            throw new PaymentsServiceRequestException(null, self::ERR_BODY_DECODE_MESSAGE);
-        }
-
-        return $decodedResponse;
     }
 }
