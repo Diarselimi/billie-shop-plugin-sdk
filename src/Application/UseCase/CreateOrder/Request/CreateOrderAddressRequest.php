@@ -8,7 +8,7 @@ use OpenApi\Annotations as OA;
 /**
  * @OA\Schema(
  *     schema="CreateOrderAddressRequest",
- *     title="Delivery Address",
+ *     title="Address",
  *     required={
  *          "street", "city", "postal_code", "country"
  *     },

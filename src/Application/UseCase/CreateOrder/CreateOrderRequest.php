@@ -14,7 +14,7 @@ use OpenApi\Annotations as OA;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @OA\Schema(schema="CreateOrderRequest", title="Order Creation Request", required={"amount", "duration", "delivery_address", "debtor_company", "debtor_person"},
+ * @OA\Schema(schema="CreateOrderRequest", title="Order Creation Request", required={"amount", "duration", "debtor_company", "debtor_person"},
  *     properties={
  *          @OA\Property(property="amount", ref="#/components/schemas/CreateOrderAmountRequest"),
  *          @OA\Property(property="comment", ref="#/components/schemas/TinyText", nullable=true),

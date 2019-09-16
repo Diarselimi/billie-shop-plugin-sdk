@@ -9,8 +9,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @OA\Schema(schema="CreateOrderAmountRequest", title="Order Amount", required={"net", "gross", "tax"},
  *     properties={
- *          @OA\Property(property="net", minimum=1, type="number", format="float", example=119.00),
- *          @OA\Property(property="gross", minimum=1, type="number", format="float", example=100.00),
+ *          @OA\Property(property="net", minimum=1, type="number", format="float", example=100.00),
+ *          @OA\Property(property="gross", minimum=1, type="number", format="float", example=119.00),
  *          @OA\Property(property="tax", minimum=0, type="number", format="float", example=19.00),
  *     }
  * )
