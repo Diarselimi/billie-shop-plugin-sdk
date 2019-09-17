@@ -18,25 +18,6 @@ info:
     If customers get late with paying their outstanding invoices, Billie will also take over reminding customers on your behalf 
     (white label solution). In case of your customer's bankruptcy, Billie fully covers this default for you.
     
-    -----
-    ## Authentication
-    For authentication and authorisation the API requires some requests to include valid API credentials via HTTP headers.
-    Different keys are used for the `sandbox` and `production` environments, which are completely independent
-    meaning that they cannot access or alter data from the other.
-    
-    To obtain your credentials for both environments please contact us or send an email to: pad@billie.io.
-    
-    ## OAuth 2.0
-    The API uses OAuth 2.0 for authentication.
-    
-    This authentication mechanism is based on the OAuth 2.0 prototocol and requires a Client ID, a Client Secret Key and
-    in some flows also a user (email) and password.
-    
-    With these credentials, the client should request a token using the [oauth/token](#operation/oauth_token_create) endpoint,
-    which should be used in the `Authorization` header together with the `Bearer` challenge to authenticate all the requests.
-    
-    > Example: `Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c`.
-    
     ---
     
     ## Order States
@@ -76,72 +57,11 @@ info:
     that are delivered back to the merchant as an answer of a API order creation request. Virtual IBANs are unique for each of 
     your debtor / customer. The virtual IBAN needs to be put on the invoice which the customer receives for the purchase.
     
-    
-    ----
-    
-    ## Incoming Webhooks
-    To send updates on relevant events, Billie PaD sends POST requests to the incoming webhook URL provided by the merchant.
-    The following events can be communicated via webhooks:
-    
-    
-    ### Webhook Authentication
-    The authentication for webhooks sent from Billie to the merchants incoming webhook URL depends on the merchant specifications 
-    and needs, but one possibility is sending the Billie API Key via headers:
-    Examples:
-     - `Authorization: Basic THE_API_KEY`
-     - `X-Api-Key: THE_API_KEY`
-     - `X-Another-Custom-Header: THE_API_KEY`
-    
-    The merchants will need to verify on their server side the authentication mechanism and credentials.
-    
-    ### Webhook Requests
-    
-    A `POST` request is sent to the configured merchant Webhook URL with one of the API Key headers mentioned above,
-    the `application/json` Content-Type and the following body format:
-    ```
-    {
-        event: (string) (event name, -check the following section for more details-)
-        order_id: (string)
-        amount: (string) (optional) (contains sum of paid amounts)
-    	open amount: (string) (optional) (contains sum of outstanding amount)
-        url_notification: (string) (optional)
-    }
-    ```
-    
-    ### Event Names
-    
-    **General**
-    
-    | Event Name      | Description                                                                                                                |
-    |-----------------|----------------------------------------------------------------------------------------------------------------------------|
-    | order\_approved | waiting order approved                                                                                                     |
-    | order\_declined | waiting order declined                                                                                                     |
-    | payment         | The outstanding amount for an order changed. <br><br> This message is sent for full as well as partial payments for orders |
-    
-    <br>
-    
-    **Webhooks for Dunning & Collections**
-    
-    | Event Name       | Description                              |
-    |------------------|------------------------------------------|
-    | reminder_email_1 | 1st Reminder mail was sent               |
-    | dunning_letter_1 | 1st Dunning letter was sent              |
-    | dunning_email_1  | 1st Dunning mail was sent                |
-    | reminder_email_2 | 2nd Reminder mail was sent               |
-    | dunning_letter_2 | 2nd Dunning letter was sent              |
-    | reminder_email_2 | 2nd Dunning email was sent               |
-    | dunning_email_2  | 2nd Dunning email was sent               |
-    | reminder_email_3 | 3rd Reminder email was sent              |
-    | dca_letter       | Debt collection handover letter was sent |
-    | dca_email        | Debt collection handover email was sent  |
-    
-    
-    
   termsOfService: 'https://www.billie.io/agb/'
   license:
     name: '© Billie GmbH, 2019'
     url: 'https://www.billie.io/agb/'
-  version: 2.6.0
+  version: 2.6.2
   x-logo:
     url: 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDIyLjAuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkViZW5lXzJfS29waWUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIKCSB5PSIwcHgiIHZpZXdCb3g9IjAgMCA0OC41IDY3LjYiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDQ4LjUgNjcuNjsiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPgoJLnN0MHtkaXNwbGF5Om5vbmU7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDo3O3N0cm9rZS1taXRlcmxpbWl0OjEwO30KCS5zdDF7ZmlsbDojMUYyNTMwO30KCS5zdDJ7ZmlsbDpub25lO30KCS5zdDN7ZGlzcGxheTpub25lO2VuYWJsZS1iYWNrZ3JvdW5kOm5ldyAgICA7fQoJLnN0NHtmb250LWZhbWlseTonQXZlbmlyTmV4dC1EZW1pQm9sZCc7fQoJLnN0NXtmb250LXNpemU6My4wMzAzcHg7fQoJLnN0NntsZXR0ZXItc3BhY2luZzoyO30KPC9zdHlsZT4KPHBhdGggY2xhc3M9InN0MCIgZD0iTTkuOCw0Ni4xYy0wLjUsMCwyNS4xLTEyLjYsMjUuMS0zMi43YzAtNi45LTUuNi0xMi42LTEyLjYtMTIuNlM5LjcsNi41LDkuNywxMy40TDkuOCw0Ni4xaDE4LjUKCWM2LjksMCwxMi42LTUuNiwxMi42LTEyLjZTMzUuMiwyMSwyOC4yLDIxSDkuNyIvPgo8Zz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0yOC4yLDQ3SDguOHYtMC44YzAtMC4xLDAtMC4yLDAtMC4zVjEzLjVDOC44LDYsMTQuOSwwLDIyLjMsMHMxMy41LDYsMTMuNSwxMy41YzAsMi44LTAuNSw1LjUtMS40LDguMgoJCWM0LjMsMi4yLDcuMyw2LjcsNy4zLDExLjlDNDEuNyw0MSwzNS42LDQ3LDI4LjIsNDd6IE0xMi45LDQ1LjJoMTUuM2M2LjQsMCwxMS43LTUuMywxMS43LTExLjdjMC00LjQtMi41LTguMy02LjEtMTAuMwoJCWMtMS44LDQuNC00LjgsOC43LTksMTIuOEMyMC40LDQwLjQsMTUuOCw0My41LDEyLjksNDUuMnogTTEwLjYsMjEuOXYyMi43YzEzLTcuNywxOC45LTE1LjYsMjEuNS0yMmMtMS4yLTAuNC0yLjUtMC43LTMuOS0wLjdIMTAuNgoJCXogTTEwLjYsMjAuMWgxNy42YzEuNiwwLDMuMSwwLjMsNC41LDAuOGMxLTIuOSwxLjMtNS41LDEuMy03LjRDMzQsNywyOC44LDEuOCwyMi4zLDEuOFMxMC42LDcsMTAuNiwxMy41VjIwLjF6Ii8+CjwvZz4KPHJlY3QgeD0iLTExLjEiIHk9Ii01OC43IiBjbGFzcz0ic3QyIiB3aWR0aD0iODUuNCIgaGVpZ2h0PSI0OS41Ii8+Cjx0ZXh0IHRyYW5zZm9ybT0ibWF0cml4KDEgMCAwIDEgLTEuMDQyNCA2Ny41NzcyKSIgY2xhc3M9InN0MyBzdDQgc3Q1IHN0NiI+QklMTElFPC90ZXh0Pgo8Zz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0wLDU4LjFoMy43YzAuNCwwLDAuNywwLjEsMS4xLDAuMWMwLjQsMC4xLDAuNywwLjIsMC45LDAuNGMwLjMsMC4yLDAuNSwwLjQsMC43LDAuN2MwLjIsMC4zLDAuMywwLjcsMC4zLDEuMQoJCWMwLDAuNS0wLjIsMS0wLjUsMS4zYy0wLjMsMC40LTAuNywwLjYtMS4yLDAuOHYwYzAuNiwwLjEsMS4xLDAuMywxLjUsMC43QzYuOCw2My42LDcsNjQuMiw3LDY0LjhjMCwwLjUtMC4xLDEtMC4zLDEuMwoJCWMtMC4yLDAuNC0wLjUsMC42LTAuOCwwLjljLTAuMywwLjItMC43LDAuNC0xLjIsMC41Yy0wLjQsMC4xLTAuOSwwLjItMS4zLDAuMkgwQzAsNjcuNiwwLDU4LjEsMCw1OC4xeiBNMS43LDYyaDEuNQoJCWMwLjYsMCwxLTAuMSwxLjMtMC4zYzAuMy0wLjIsMC40LTAuNSwwLjQtMWMwLTAuNC0wLjItMC43LTAuNS0wLjljLTAuMy0wLjItMC44LTAuMy0xLjQtMC4zSDEuN0wxLjcsNjJMMS43LDYyeiBNMS43LDY2LjFoMS41CgkJYzAuMiwwLDAuNSwwLDAuNy0wLjFzMC41LTAuMSwwLjctMC4yYzAuMi0wLjEsMC40LTAuMywwLjUtMC40YzAuMS0wLjIsMC4yLTAuNCwwLjItMC44YzAtMC41LTAuMi0wLjktMC41LTEKCQljLTAuMy0wLjItMC45LTAuMy0xLjUtMC4zSDEuN1Y2Ni4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTExLjEsNTguMWgxLjd2OS41aC0xLjdWNTguMXoiLz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0xNy4zLDU4LjFoMS43djhoNHYxLjVoLTUuN1Y1OC4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTI2LjUsNTguMWgxLjd2OGg0djEuNWgtNS43TDI2LjUsNTguMUwyNi41LDU4LjF6Ii8+Cgk8cGF0aCBjbGFzcz0ic3QxIiBkPSJNMzUuNyw1OC4xaDEuN3Y5LjVoLTEuN1Y1OC4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTQxLjksNTguMWg2LjN2MS41aC00LjZWNjJINDh2MS40aC00LjNWNjZoNC44djEuNWgtNi41VjU4LjF6Ii8+CjwvZz4KPC9zdmc+Cg=='
     href: '#'
@@ -157,220 +77,41 @@ paths:
     post:
       tags:
         - Authentication
-      summary: 'Request new OAuth Token'
+      summary: 'Request OAuth Token'
       description: |
         <!-- Grants documentation taken from: https://oauth2.thephpleague.com/ -->
         
-        ### Client credentials grant
-        
-        This grant is suitable for machine-to-machine authentication, for example for use in a cron job which is performing maintenance tasks over an API. Another example would be a client making requests to an API that don’t require user’s permission.
-        
-        #### Flow
+        ### Flow
         
         The client sends a POST request with following body parameters to the authorization server:
         
         * `grant_type` with the value `client_credentials`
         * `client_id` with the client's ID
         * `client_secret` with the client's secret
-        * `scope` with a space-delimited list of requested scope permissions.
         
         The authorization server will respond with a JSON object containing the following properties:
         
         * `token_type` with the value `Bearer`
-        * `expires_in` with an integer representing the TTL of the access token
+        * `expires_in` with an integer representing the TTL (in seconds) of the access token (Default is 8 hours)
         * `access_token` a JWT signed with the authorization server's private key
         
+        The `access_token` should be used in the `Authorization` header together with the `Bearer` challenge to authenticate all the requests.
         
-        ### Authorization code grant
-        
-        The authorization code grant should be very familiar if you've ever signed into a web app using your Facebook or Google account.
-        
-        #### Flow
-        
-        ##### Part One
-        
-        The client will redirect the user to the authorization server with the following parameters in the query string:
-        
-        * `response_type` with the value `code`
-        * `client_id` with the client identifier
-        * `redirect_uri` with the client redirect URI. This parameter is optional, but if not send the user will be redirected to a pre-registered redirect URI.
-        * `scope` a space delimited list of scopes
-        * `state` with a [CSRF](https://en.wikipedia.org/wiki/Cross-site_request_forgery) token. This parameter is optional but highly recommended. You should store the value of the CSRF token in the user's session to be validated when they return.
-        
-        All of these parameters will be validated by the authorization server.
-        
-        The user will then be asked to login to the authorization server and approve the client.
-        
-        If the user approves the client they will be redirected from the authorization server to the client's redirect URI with the following parameters in the query string:
-        
-        * `code` with the authorization code
-        * `state` with the state parameter sent in the original request. You should compare this value with the value stored in the user's session to ensure the authorization code obtained is in response to requests made by this client rather than another client application.
-        
-        ##### Part Two
-        
-        The client will now send a POST request to the authorization server with the following parameters:
-        
-        * `grant_type` with the value of `authorization_code`
-        * `client_id` with the client identifier
-        * `client_secret` with the client secret
-        * `redirect_uri` with the same redirect URI the user was redirect back to
-        * `code` with the authorization code from the query string
-         
-        Note that you need to decode the `code` query string first. You can do that with `urldecode($code)`.
-        
-        The authorization server will respond with a JSON object containing the following properties:
-        
-        * `token_type` with the value `Bearer`
-        * `expires_in` with an integer representing the TTL of the access token
-        * `access_token` a JWT signed with the authorization server's private key
-        * `refresh_token` an encrypted payload that can be used to refresh the access token when it expires.
-        
-        
-        ### Implicit grant
-        
-        The implicit grant is similar to the authorization code grant with two distinct differences.
-        
-        It is **intended to be used for user-agent-based clients (e.g. single page web apps)** that can't keep a client secret because all of the application code and storage is easily accessible.
-        
-        Secondly instead of the authorization server returning an authorization code which is exchanged for an access token, the authorization server returns an access token.
-        
-        #### Flow
-        
-        The client will redirect the user to the authorization server with the following parameters in the query string:
-        
-        * `response_type` with the value `token`
-        * `client_id` with the client identifier
-        * `redirect_uri` with the client redirect URI. This parameter is optional, but if not sent the user will be redirected to a pre-registered redirect URI.
-        * `scope` a space delimited list of scopes
-        * `state` with a [CSRF](https://en.wikipedia.org/wiki/Cross-site_request_forgery) token. This parameter is optional but highly recommended. You should store the value of the CSRF token in the user's session to be validated when they return.
-        
-        All of these parameters will be validated by the authorization server.
-        
-        The user will then be asked to login to the authorization server and approve the client.
-        
-        If the user approves the client they will be redirected back to the authorization server with the following parameters in the query string:
-        
-        * `token_type` with the value `Bearer`
-        * `expires_in` with an integer representing the TTL of the access token
-        * `access_token` a JWT signed with the authorization server's private key
-        * `state` with the state parameter sent in the original request. You should compare this value with the value stored in the user's session to ensure the authorization code obtained is in response to requests made by this client rather than another client application.
-        
-        ****Note**** this grant does <u>not</u> return a refresh token.
-        
-        
-        ### Password credentials grant
-        
-        Also known as the Resource owner password credentials grant.
-        This grant is a great user experience for <u>trusted</u> first party clients both on the web and in native applications.
-        
-        #### Flow
-        
-        The client will ask the user for their authorization credentials (ususally a username and password).
-        
-        The client then sends a POST request with following body parameters to the authorization server:
-        
-        * `grant_type` with the value `password`
-        * `client_id` with the the client's ID
-        * `client_secret` with the client's secret
-        * `scope` with a space-delimited list of requested scope permissions.
-        * `username` with the user's username
-        * `password` with the user's password
-        
-        The authorization server will respond with a JSON object containing the following properties:
-        
-        * `token_type` with the value `Bearer`
-        * `expires_in` with an integer representing the TTL of the access token
-        * `access_token` a JWT signed with the authorization server's private key
-        * `refresh_token` an encrypted payload that can be used to refresh the access token when it expires.
-        
-        
-        ### Refresh token grant
-        
-        Access tokens eventually expire; however some grants respond with a refresh token which enables the client to refresh the access token.
-        
-        #### Flow
-        
-        The client sends a POST request with following body parameters to the authorization server:
-        
-        * `grant_type` with the value `refresh_token`
-        * `refresh_token` with the refresh token
-        * `client_id` with the the client's ID
-        * `client_secret` with the client's secret
-        * `scope` with a space-delimited list of requested scope permissions. This is optional; if not sent the original scopes will be used, otherwise you can request a reduced set of scopes.
-        
-        The authorization server will respond with a JSON object containing the following properties:
-        
-        * `token_type` with the value `Bearer`
-        * `expires_in` with an integer representing the TTL of the access token
-        * `access_token` a new JWT signed with the authorization server's private key
-        * `refresh_token` an encrypted payload that can be used to refresh the access token when it expires
+        > Example: `Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c`.
       operationId: oauth_token_create
-      parameters:
-        -
-          name: response_type
-          in: query
-          description: 'Response type. Required for the Auth Code and Implicit grants.'
-          required: false
-          schema:
-            type: string
-            enum:
-              - code
-              - token
-        -
-          name: client_id
-          in: query
-          description: 'Client ID. Required for the Auth Code and Implicit grants.'
-          required: false
-          schema:
-            $ref: '#/components/schemas/UUID'
-        -
-          name: redirect_uri
-          in: query
-          description: 'Client redirect URI. This parameter is optional, but if not sent the user will be redirected to a pre-defined redirect URI. Used for the Auth Code and Implicit grants.'
-          required: false
-          schema:
-            type: string
-            format: uri
-        -
-          name: scope
-          in: query
-          description: 'A space delimited list of scopes. Required for the Auth Code and Implicit grants.'
-          required: false
-          schema:
-            type: string
-        -
-          name: state
-          in: query
-          description: 'Client-generated CSRF token. This parameter is optional but highly recommended. The OAuth server should return this same value in the final step, so the client can verify it. Used for the Auth Code and Implicit grants.'
-          required: false
-          schema:
-            type: string
       requestBody:
+        required: true
         content:
-          application/x-www-form-urlencoded:
+          application/json:
             schema:
-              $ref: '#/components/schemas/OauthTokenCreateRequestBodyParams'
+              $ref: '#/components/schemas/OauthClientCredentialsGrantRequestBodyParams'
       responses:
         '200':
           description: Successful
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OauthTokenCreateResponseBody'
-        '302':
-          description: 'Redirection for Auth Code and Implicit grants'
-          headers:
-            Location:
-              description: |
-                Redirects to the `redirect_uri` provided location with the following query string parameters, depending on the requested grant type:
-                - _Authorization code grant_: If the user approves the client they will be redirected from the authorization server to the client's redirect URI with the following parameters in the query string:
-                `code` and `state` (CSRF token of the original request).
-                - _Implicit grant_: If the user approves the client they will be redirected from the client back to the authorization server with the following parameters in the query string: `token_type`
-                (always `Bearer`), `expires_in` (TTL), `access_token` (JWT) and `state` (CSRF token of the original request).
-                
-              required: true
-              schema:
-                type: string
+                $ref: '#/components/schemas/OauthTokenResponseBody'
   /oauth/authorization:
     get:
       tags:
@@ -391,7 +132,6 @@ paths:
                   - scopes
                 properties:
                   client_id: { $ref: '#/components/schemas/UUID' }
-                  user_id: { nullable: true, $ref: '#/components/schemas/UUID' }
                   scopes: { type: array, items: { type: string }, default: [] }
                 type: object
         '401':
@@ -538,6 +278,39 @@ paths:
       security:
         -
           oauth2: []
+  '/payments/{uuid}':
+    get:
+      tags:
+        - Payments
+      summary: 'Get Payment Details'
+      operationId: get_payment_details
+      parameters:
+        -
+          name: uuid
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMerchantPaymentDetailsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
   /payments:
     get:
       tags:
@@ -585,13 +358,6 @@ paths:
           name: merchant_debtor_uuid
           in: query
           description: 'Merchant Debtor Uuid'
-          required: false
-          schema:
-            $ref: '#/components/schemas/UUID'
-        -
-          name: transaction_uuid
-          in: query
-          description: 'Transaction Uuid'
           required: false
           schema:
             $ref: '#/components/schemas/UUID'
@@ -913,6 +679,13 @@ components:
       maxLength: 2
       pattern: '^[A-Za-z]{2}$'
       example: DE
+    IBAN:
+      title: IBAN
+      type: string
+      maxLength: 22
+      minLength: 22
+      pattern: '^[A-Z]{2}(?:[ ]?[0-9]){18,20}$'
+      example: DE61500105175136458915
     Date:
       title: Date
       type: string
@@ -927,6 +700,12 @@ components:
       title: string
       type: string
       maxLength: 255
+    Money:
+      title: Money
+      type: number
+      format: float
+      pattern: '^(\d{1,}(.\d{2})?)$'
+      example: 99.95
     MerchantUserRoles:
       title: 'Merchant User Roles'
       type: string
@@ -937,88 +716,39 @@ components:
         - ROLE_CONFIRM_ORDER_PAYMENT
         - ROLE_PAUSE_DUNNING
       example: ROLE_VIEW_ORDERS
-    OauthGrantType:
-      title: 'OAuth Grant Type'
-      type: string
-      enum:
-        - client_credentials
-        - authorization_code
-        - password
-        - refresh_token
-      example: password
     OauthClientCredentialsGrantRequestBodyParams:
-      title: 'Client Credentials Params'
+      title: 'Request OAuth Token'
       required:
         - grant_type
         - client_id
         - client_secret
-        - scope
       properties:
         grant_type:
-          example: client_credentials
-          $ref: '#/components/schemas/OauthGrantType'
+          type: string
+          const: client_credentials
         client_id:
           $ref: '#/components/schemas/UUID'
-        scope:
-          description: 'Space-delimited list of requested scope permissions'
+        client_secret:
           type: string
       type: object
-    OauthClientCredentialsGrantResponseBody:
-      title: 'Client Credentials Response'
-      required:
-        - token_type
-        - expires_in
-        - access_token
+    OauthTokenResponseBody:
+      title: 'Request Oauth Token Response'
       properties:
         token_type:
           type: string
           example: Bearer
+          nullable: false
         expires_in:
-          description: 'TTL of the access token'
+          description: 'TTL of the access token in seconds (Default is 8 hours)'
           type: integer
+          nullable: false
         access_token:
           description: 'JWT signed with the authorization server''s private key'
           type: string
+          nullable: false
       type: object
-    OauthAuthCodeGrantPartTwoRequestBodyParams:
-      title: 'Auth Code Grant (Part Two) Params'
-      required:
-        - grant_type
-        - client_id
-        - client_secret
-        - scope
-      properties:
-        grant_type:
-          example: authorization_code
-          $ref: '#/components/schemas/OauthGrantType'
-        client_id:
-          $ref: '#/components/schemas/UUID'
-        client_secret:
-          $ref: '#/components/schemas/UUID'
-        redirect_uri:
-          description: 'same redirect URI the user was redirected back to'
-          type: string
-          format: uri
-        code:
-          description: 'authorization code got from the query string'
-          type: string
-      type: object
-    OauthTokenCreateRequestBodyParams:
-      title: 'OAuth Token Create Request Body Params'
-      type: object
-      anyOf:
-        -
-          $ref: '#/components/schemas/OauthClientCredentialsGrantRequestBodyParams'
-        -
-          $ref: '#/components/schemas/OauthAuthCodeGrantPartTwoRequestBodyParams'
-    OauthTokenCreateResponseBody:
-      title: 'OAuth Token Create Response Body'
-      type: object
-      anyOf:
-        -
-          $ref: '#/components/schemas/OauthClientCredentialsGrantResponseBody'
     CreateOrderAddressRequest:
-      title: 'Delivery Address'
+      title: Address
       required:
         - street
         - city
@@ -1042,40 +772,6 @@ components:
           $ref: '#/components/schemas/PostalCode'
         country:
           $ref: '#/components/schemas/CountryCode'
-      type: object
-    GetMerchantPaymentsResponse:
-      title: 'Merchant Payments Response'
-      properties:
-        total:
-          description: 'Total number of results'
-          type: number
-        items:
-          description: 'Merchant payment item'
-          type: array
-          items:
-            properties:
-              transaction_uuid:
-                type: string
-              amount:
-                type: float
-              transaction_date:
-                type: string
-              is_allocated:
-                type: boolean
-              transaction_counterparty_iban:
-                type: string
-              transaction_counterparty_name:
-                type: string
-              transaction_reference:
-                type: string
-              payment_debtor_uuid:
-                type: string
-              merchant_debtor:
-                properties:
-                  uuid: { description: Uuid, type: string }
-                  company_name: { description: 'Company Name', type: string }
-                type: object
-            type: object
       type: object
     GetMerchantUserResponse:
       title: 'Get Merchant User Response'
@@ -1370,6 +1066,72 @@ components:
                 nullable: true
             type: object
       type: object
+    GetMerchantPaymentDetailsResponse:
+      title: 'Merchant Payments Response'
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        amount:
+          $ref: '#/components/schemas/Money'
+        transaction_date:
+          $ref: '#/components/schemas/Date'
+        is_allocated:
+          type: boolean
+        is_overpaid:
+          type: boolean
+        transaction_counterparty_iban:
+          $ref: '#/components/schemas/IBAN'
+        transaction_counterparty_name:
+          type: string
+        transaction_reference:
+          type: string
+        merchant_debtor_uuid:
+          $ref: '#/components/schemas/UUID'
+        orders:
+          type: array
+          items:
+            properties:
+              uuid:
+                $ref: '#/components/schemas/UUID'
+              amount:
+                $ref: '#/components/schemas/Money'
+              outstanding_amount:
+                $ref: '#/components/schemas/Money'
+              external_id:
+                type: string
+              invoice_number:
+                type: string
+            type: object
+      type: object
+    GetMerchantPaymentsResponse:
+      title: 'Merchant Payments Response'
+      properties:
+        items:
+          description: 'Merchant payment item'
+          type: array
+          items:
+            properties:
+              uuid:
+                $ref: '#/components/schemas/UUID'
+              amount:
+                $ref: '#/components/schemas/Money'
+              transaction_date:
+                $ref: '#/components/schemas/Date'
+              is_allocated:
+                type: boolean
+              transaction_counterparty_iban:
+                $ref: '#/components/schemas/IBAN'
+              transaction_counterparty_name:
+                type: string
+              transaction_reference:
+                type: string
+              merchant_debtor_uuid:
+                $ref: '#/components/schemas/UUID'
+            type: object
+        total:
+          description: 'Total number of results'
+          type: integer
+      type: object
   responses:
     ServerError:
       description: 'Unexpected Server Error'
@@ -1420,6 +1182,12 @@ components:
 tags:
   -
     name: Authentication
+    description: |
+      For authentication and authorisation the API requires some requests to include valid API credentials via HTTP headers.
+      Different keys are used for the `sandbox` and `production` environments, which are completely independent
+      meaning that they cannot access or alter data from the other.
+      
+      To obtain your credentials for both environments please contact us or send an email to: pad@billie.io.
   -
     name: 'Order Management'
   -

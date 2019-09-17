@@ -6,6 +6,7 @@ namespace App\Infrastructure\Graphql;
 
 use App\DomainModel\Payment\PaymentsRepositoryInterface;
 use App\DomainModel\Payment\RequestDTO\SearchPaymentsDTO;
+use App\Support\PaginatedCollection;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
@@ -13,7 +14,7 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
 {
     use LoggingTrait;
 
-    public function search(SearchPaymentsDTO $paymentsDTO): array
+    public function search(SearchPaymentsDTO $paymentsDTO): PaginatedCollection
     {
         $params = [
             'merchantUuid' => $paymentsDTO->getMerchantPaymentUuid(),
@@ -33,14 +34,29 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
             'keyword' => $paymentsDTO->getKeyword(),
         ];
 
-        $countResult = $this->executeQuery('get_merchant_payments_by_uuid_total', $countParams);
+        $countResult = $this->query('get_merchant_payments_total', $countParams);
+        $total = $countResult[0]['total'] ?? 0;
 
-        $response = [
-            'items' => $this->executeQuery('get_merchant_payments_by_uuid', $params),
-            'total' => $countResult[0]['total'] ?? 0,
+        return new PaginatedCollection($this->query('get_merchant_payments', $params), $total);
+    }
+
+    public function get(string $merchantPaymentUuid, string $transactionUuid): array
+    {
+        $params = [
+            'merchantUuid' => $merchantPaymentUuid,
+            'transactionUuid' => "'{$transactionUuid}'",
         ];
 
-        $this->logInfo('Graphql params, response', [$params, $response]);
+        $response = $this->query('get_merchant_payment_details', $params);
+
+        return empty($response) ? [] : $response[0];
+    }
+
+    private function query(string $name, array $params): array
+    {
+        $response = $this->executeQuery($name, $params);
+        $total = $response['total'] ?? count($response);
+        $this->logInfo('GraphQL "' . $name . '" query', ['params' => $params, 'total_results' => $total]);
 
         return $response;
     }

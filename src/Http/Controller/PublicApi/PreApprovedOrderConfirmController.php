@@ -32,7 +32,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Response(response=500, ref="#/components/responses/ServerError")
  * )
  */
-class ConfirmPreApprovedOrderController
+class PreApprovedOrderConfirmController
 {
     private $useCase;
 

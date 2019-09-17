@@ -11,7 +11,7 @@ use OpenApi\Annotations as OA;
  *     title="Debtor Person",
  *     required={"gender", "email"},
  *     properties={
- *          @OA\Property(property="gender", maxLength=1, enum={"m", "f"}, type="string"),
+ *          @OA\Property(property="salutation", maxLength=1, enum={"m", "f"}, type="string"),
  *          @OA\Property(property="first_name", ref="#/components/schemas/TinyText", example="James"),
  *          @OA\Property(property="last_name", ref="#/components/schemas/TinyText", example="Smith"),
  *          @OA\Property(property="phone_number", ref="#/components/schemas/PhoneNumber"),

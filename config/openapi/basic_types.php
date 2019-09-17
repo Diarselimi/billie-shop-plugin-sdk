@@ -109,6 +109,18 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Schema(
+ *     schema="IBAN",
+ *     title="IBAN",
+ *     type="string",
+ *     minLength=22,
+ *     maxLength=22,
+ *     pattern="^[A-Z]{2}(?:[ ]?[0-9]){18,20}$",
+ *     example="DE61500105175136458915"
+ * )
+ */
+
+/**
+ * @OA\Schema(
  *     schema="Date",
  *     title="Date",
  *     type="string",
@@ -173,7 +185,7 @@ use OpenApi\Annotations as OA;
  *     type="number",
  *     format="float",
  *     pattern="^(\d{1,}(.\d{2})?)$",
- *     example=7500.00
+ *     example=99.95
  * )
  */
 
