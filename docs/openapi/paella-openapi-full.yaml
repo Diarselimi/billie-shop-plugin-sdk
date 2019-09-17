@@ -1608,9 +1608,7 @@ paths:
         -
           oauth2: []
       x-groups:
-        - standard
         - dashboard
-        - checkout-server
   /merchant/user/login:
     post:
       tags:
@@ -1700,8 +1698,6 @@ paths:
         -
           oauth2: []
       x-groups:
-        - standard
-        - checkout-server
         - dashboard
   '/order/{uuid}/confirm':
     post:
