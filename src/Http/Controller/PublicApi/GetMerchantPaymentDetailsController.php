@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *   @OA\Property(property="amount", ref="#/components/schemas/Money"),
  *   @OA\Property(property="transaction_date", ref="#/components/schemas/Date"),
  *   @OA\Property(property="is_allocated", type="boolean"),
- *   @OA\Property(property="is_overpaid", type="boolean"),
+ *   @OA\Property(property="overpaid_amount", ref="#/components/schemas/Money"),
  *   @OA\Property(property="transaction_counterparty_iban", ref="#/components/schemas/IBAN"),
  *   @OA\Property(property="transaction_counterparty_name", type="string"),
  *   @OA\Property(property="transaction_reference", type="string"),

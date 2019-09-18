@@ -74,6 +74,7 @@ class GetMerchantPaymentsController
         $useCaseRequest = (new GetMerchantPaymentsRequest())
             ->setMerchantId($merchantId)
             ->setMerchantDebtorUuid($data['merchant_debtor_uuid'] ?? null)
+            ->setTransactionUuid($data['transaction_uuid'] ?? null)
             ->setSortBy($data['sort_by'] ?? GetMerchantPaymentsRequest::DEFAULT_SORTING_FIELD)
             ->setSortDirection($data['sort_direction'] ?? 'desc')
             ->setSearchKeyword($data['search'] ?? '')

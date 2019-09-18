@@ -1077,8 +1077,8 @@ components:
           $ref: '#/components/schemas/Date'
         is_allocated:
           type: boolean
-        is_overpaid:
-          type: boolean
+        overpaid_amount:
+          $ref: '#/components/schemas/Money'
         transaction_counterparty_iban:
           $ref: '#/components/schemas/IBAN'
         transaction_counterparty_name:
