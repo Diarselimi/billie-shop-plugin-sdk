@@ -16,7 +16,7 @@ class MerchantPaymentResponseTransformer
     public function expandPaymentItem(array $item): array
     {
         $item = $this->addIsAllocated($item);
-        $item = $this->addIsOverpaid($item);
+        $item = $this->addOverpaidAmount($item);
 
         // simplify
         $item['merchant_debtor_uuid'] = $item['merchant_debtor']['uuid'] ?? null;
@@ -34,7 +34,7 @@ class MerchantPaymentResponseTransformer
         return $item;
     }
 
-    public function addIsOverpaid(array $item): array
+    public function addOverpaidAmount(array $item): array
     {
         if (!array_key_exists('orders', $item) || empty($item['orders'])) {
             return $item;
@@ -44,7 +44,8 @@ class MerchantPaymentResponseTransformer
         foreach ($item['orders'] as $order) {
             $ordersAmountTotal += ($order['amount'] ?? 0);
         }
-        $item['is_overpaid'] = ($item['amount'] > $ordersAmountTotal);
+        $paidAmount = $item['amount'];
+        $item['overpaid_amount'] = (float) bcsub($paidAmount, $ordersAmountTotal, 2);
 
         return $item;
     }
