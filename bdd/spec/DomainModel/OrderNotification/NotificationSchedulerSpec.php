@@ -2,6 +2,7 @@
 
 namespace spec\App\DomainModel\OrderNotification;
 
+use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsRepositoryInterface;
 use App\DomainModel\OrderNotification\NotificationPublisherInterface;
 use App\DomainModel\OrderNotification\NotificationScheduler;
 use App\DomainModel\OrderNotification\OrderNotificationDeliveryEntity;
@@ -38,6 +39,7 @@ class NotificationSchedulerSpec extends ObjectBehavior
         NotificationPublisherInterface $orderNotificationFactoryPublisher,
         OrderNotificationFactory $orderNotificationFactory,
         OrderNotificationRepositoryInterface $orderNotificationRepository,
+        MerchantNotificationSettingsRepositoryInterface $notificationSettingsRepository,
         SlackClient $slackClient,
         SlackMessageFactory $slackMessageFactory,
         RavenClient $sentry,
@@ -47,7 +49,8 @@ class NotificationSchedulerSpec extends ObjectBehavior
             $orderNotificationFactoryPublisher,
             $orderNotificationFactory,
             $orderNotificationRepository,
-            $slackMessageFactory
+            $slackMessageFactory,
+            $notificationSettingsRepository
         );
 
         $this->mockOrderNotification($orderNotification);

@@ -5,6 +5,7 @@ namespace spec\App\Application\UseCase\OrderOutstandingAmountChange;
 use App\Application\UseCase\OrderOutstandingAmountChange\OrderOutstandingAmountChangeRequest;
 use App\Application\UseCase\OrderOutstandingAmountChange\OrderOutstandingAmountChangeUseCase;
 use App\DomainModel\Order\OrderAnnouncer;
+use App\DomainModel\OrderNotification\OrderNotificationEntity;
 use App\DomainModel\Payment\OrderAmountChangeDTO;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
@@ -92,7 +93,16 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         $limitsService->unlock($orderContainer, self::AMOUNT_CHANGE)->shouldBeCalledOnce();
         $merchantRepository->update($merchant)->shouldBeCalledOnce();
 
-        $notificationScheduler->createAndSchedule($order, $eventPayload)->shouldBeCalledOnce()->willReturn(true);
+        $notificationScheduler
+            ->createAndSchedule(
+                $order,
+                OrderNotificationEntity::NOTIFICATION_TYPE_PAYMENT,
+                $eventPayload
+            )
+            ->shouldBeCalledOnce()
+            ->willReturn(true)
+        ;
+
         $paymentForgivenessService->begForgiveness($orderContainer, $amountChange)->shouldBeCalledOnce()->willReturn(true);
         $orderStateManager->wasShipped($order)->shouldBeCalledOnce()->willReturn(true);
         $orderStateManager->complete($orderContainer)->shouldNotBeCalled();
@@ -139,7 +149,16 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         $orderStateManager->wasShipped($order)->shouldBeCalledOnce()->willReturn(true);
         $orderStateManager->isCanceled($order)->shouldBeCalledOnce()->willReturn(false);
 
-        $notificationScheduler->createAndSchedule($order, $eventPayload)->shouldBeCalledOnce()->willReturn(true);
+        $notificationScheduler
+            ->createAndSchedule(
+                $order,
+                OrderNotificationEntity::NOTIFICATION_TYPE_PAYMENT,
+                $eventPayload
+            )
+            ->shouldBeCalledOnce()
+            ->willReturn(true)
+        ;
+
         $paymentForgivenessService->begForgiveness($orderContainer, $amountChange)->shouldBeCalledOnce()->willReturn(true);
         $orderStateManager->complete($orderContainer)->shouldBeCalledOnce();
 

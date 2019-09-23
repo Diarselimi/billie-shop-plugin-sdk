@@ -11,7 +11,7 @@ use DateTime;
 
 class OrderNotificationRepository extends AbstractPdoRepository implements OrderNotificationRepositoryInterface
 {
-    private const SELECT_FIELDS = 'id, order_id, payload, is_delivered, created_at, updated_at';
+    private const SELECT_FIELDS = 'id, order_id, notification_type, payload, is_delivered, created_at, updated_at';
 
     private $factory;
 
@@ -29,11 +29,12 @@ class OrderNotificationRepository extends AbstractPdoRepository implements Order
     {
         $id = $this->doInsert('
             INSERT INTO order_notifications
-            (order_id, payload, is_delivered, created_at, updated_at)
+            (order_id, notification_type, payload, is_delivered, created_at, updated_at)
             VALUES
-            (:order_id, :payload, :is_delivered, :created_at, :updated_at)
+            (:order_id, :notification_type, :payload, :is_delivered, :created_at, :updated_at)
         ', [
             'order_id' => $orderNotification->getOrderId(),
+            'notification_type' => $orderNotification->getNotificationType(),
             'payload' => json_encode($orderNotification->getPayload()),
             'is_delivered' => (int) $orderNotification->isDelivered(),
             'created_at' => $orderNotification->getCreatedAt()->format(self::DATE_FORMAT),
@@ -67,20 +68,20 @@ class OrderNotificationRepository extends AbstractPdoRepository implements Order
 
     public function getOneById(int $id): ? OrderNotificationEntity
     {
-        $order = $this->doFetchOne('
+        $row = $this->doFetchOne('
           SELECT ' . self::SELECT_FIELDS . '
           FROM order_notifications
           WHERE id = :id
         ', ['id' => $id]);
 
-        if (!$order) {
+        if (!$row) {
             return null;
         }
 
         $deliveries = $this->deliveryRepository->getAllByNotificationId($id);
 
         return $this->factory
-            ->createFromDatabaseRow($order)
+            ->createFromDatabaseRow($row)
             ->setDeliveries($deliveries)
         ;
     }
@@ -98,5 +99,20 @@ class OrderNotificationRepository extends AbstractPdoRepository implements Order
         );
 
         return $this->factory->createMultipleFromDatabaseRows($notifications);
+    }
+
+    public function getOneByOrderIdAndNotificationType(int $orderId, string $notificationType): ?OrderNotificationEntity
+    {
+        $row = $this->doFetchOne(
+            'SELECT ' . self::SELECT_FIELDS . '
+            FROM order_notifications WHERE order_id = :order_id AND notification_type = :notification_type
+          ',
+            [
+                'order_id' => $orderId,
+                'notification_type' => $notificationType,
+            ]
+        );
+
+        return $row ? $this->factory->createFromDatabaseRow($row) : null;
     }
 }

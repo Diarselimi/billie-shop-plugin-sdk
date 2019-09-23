@@ -6,7 +6,17 @@ use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 
 class OrderNotificationEntity extends AbstractTimestampableEntity
 {
+    const NOTIFICATION_TYPE_ORDER_APPROVED = 'order_approved';
+
+    const NOTIFICATION_TYPE_ORDER_DECLINED = 'order_declined';
+
+    const NOTIFICATION_TYPE_PAYMENT = 'payment';
+
+    const NOTIFICATION_TYPE_DCI_COMMUNICATION = 'dci_communication';
+
     private $orderId;
+
+    private $notificationType;
 
     private $payload;
 
@@ -22,6 +32,18 @@ class OrderNotificationEntity extends AbstractTimestampableEntity
     public function setOrderId(int $orderId): OrderNotificationEntity
     {
         $this->orderId = $orderId;
+
+        return $this;
+    }
+
+    public function getNotificationType(): string
+    {
+        return $this->notificationType;
+    }
+
+    public function setNotificationType(string $notificationType): OrderNotificationEntity
+    {
+        $this->notificationType = $notificationType;
 
         return $this;
     }

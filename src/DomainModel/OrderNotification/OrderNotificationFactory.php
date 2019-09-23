@@ -4,10 +4,11 @@ namespace App\DomainModel\OrderNotification;
 
 class OrderNotificationFactory
 {
-    public function create(int $orderId, array $payload): OrderNotificationEntity
+    public function create(int $orderId, string $notificationType, array $payload): OrderNotificationEntity
     {
         return (new OrderNotificationEntity())
             ->setOrderId($orderId)
+            ->setNotificationType($notificationType)
             ->setPayload($payload)
             ->setIsDelivered(false)
             ->setDeliveries([])
@@ -27,6 +28,7 @@ class OrderNotificationFactory
         return (new OrderNotificationEntity())
             ->setId($row['id'])
             ->setOrderId($row['order_id'])
+            ->setNotificationType($row['notification_type'])
             ->setPayload(json_decode($row['payload'], true))
             ->setIsDelivered(boolval($row['is_delivered']))
             ->setCreatedAt(new \DateTime($row['created_at']))

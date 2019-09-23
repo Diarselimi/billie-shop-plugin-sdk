@@ -7,12 +7,16 @@ use App\Application\UseCase\CreateMerchant\Exception\DuplicateMerchantCompanyExc
 use App\Application\UseCase\CreateMerchant\Exception\MerchantCompanyNotFoundException;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
+use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantEntityFactory;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsFactory;
+use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsRepositoryInterface;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntityFactory;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
+use App\DomainModel\MerchantUser\AuthenticationServiceCreateClientResponseDTO;
 use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
 use App\DomainModel\MerchantUser\AuthenticationServiceRequestException;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntityFactory;
@@ -38,6 +42,10 @@ class CreateMerchantUseCase
 
     private $authenticationService;
 
+    private $notificationSettingsFactory;
+
+    private $notificationSettingsRepository;
+
     public function __construct(
         MerchantRepositoryInterface $merchantRepository,
         CompaniesServiceInterface $companiesService,
@@ -47,7 +55,9 @@ class CreateMerchantUseCase
         ScoreThresholdsConfigurationEntityFactory $scoreThresholdsConfigurationFactory,
         ScoreThresholdsConfigurationRepositoryInterface $scoreThresholdsConfigurationRepository,
         MerchantRiskCheckSettingsRepositoryInterface $merchantRiskCheckSettingsRepository,
-        AuthenticationServiceInterface $authenticationService
+        AuthenticationServiceInterface $authenticationService,
+        MerchantNotificationSettingsFactory $notificationSettingsFactory,
+        MerchantNotificationSettingsRepositoryInterface $notificationSettingsRepository
     ) {
         $this->merchantRepository = $merchantRepository;
         $this->companiesService = $companiesService;
@@ -58,6 +68,8 @@ class CreateMerchantUseCase
         $this->scoreThresholdsConfigurationRepository = $scoreThresholdsConfigurationRepository;
         $this->merchantRiskCheckSettingsRepository = $merchantRiskCheckSettingsRepository;
         $this->authenticationService = $authenticationService;
+        $this->notificationSettingsFactory = $notificationSettingsFactory;
+        $this->notificationSettingsRepository = $notificationSettingsRepository;
     }
 
     public function execute(CreateMerchantRequest $request): CreateMerchantResponse
@@ -79,17 +91,30 @@ class CreateMerchantUseCase
             throw new MerchantCompanyNotFoundException();
         }
 
-        try {
-            $oauthClient = $this->authenticationService->createClient($company->getName());
-        } catch (AuthenticationServiceRequestException $exception) {
-            throw new CreateMerchantException('Failed to create OAuth client for merchant');
-        }
+        $oauthClient = $this->createOauthClient($company->getName());
 
         $merchant = $this->merchantFactory->createFromRequest($request, $company);
         $merchant->setOauthClientId($oauthClient->getClientId());
         $this->merchantRepository->insert($merchant);
 
+        $this->createSettings($request, $merchant);
+
+        return new CreateMerchantResponse($merchant, $oauthClient->getClientId(), $oauthClient->getClientSecret());
+    }
+
+    private function createOauthClient(string $companyName): AuthenticationServiceCreateClientResponseDTO
+    {
+        try {
+            return $this->authenticationService->createClient($companyName);
+        } catch (AuthenticationServiceRequestException $exception) {
+            throw new CreateMerchantException('Failed to create OAuth client for merchant');
+        }
+    }
+
+    private function createSettings(CreateMerchantRequest $request, MerchantEntity $merchant): void
+    {
         $scoreThresholds = $this->scoreThresholdsConfigurationFactory->createDefault();
+
         $this->scoreThresholdsConfigurationRepository->insert($scoreThresholds);
 
         $merchantSettings = $this->merchantSettingsFactory->create(
@@ -101,10 +126,13 @@ class CreateMerchantUseCase
             MerchantSettingsEntity::INVOICE_HANDLING_STRATEGY_NONE,
             MerchantSettingsEntity::DEFAULT_DEBTOR_FORGIVENESS_THRESHOLD
         );
+
         $this->merchantSettingsRepository->insert($merchantSettings);
 
         $this->merchantRiskCheckSettingsRepository->insertMerchantDefaultRiskCheckSettings($merchant->getId());
 
-        return new CreateMerchantResponse($merchant, $oauthClient->getClientId(), $oauthClient->getClientSecret());
+        foreach ($this->notificationSettingsFactory->createDefaults($merchant->getId()) as $notificationSetting) {
+            $this->notificationSettingsRepository->insert($notificationSetting);
+        }
     }
 }

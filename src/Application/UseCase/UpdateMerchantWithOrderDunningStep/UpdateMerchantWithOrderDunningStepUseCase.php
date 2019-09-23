@@ -5,6 +5,7 @@ namespace App\Application\UseCase\UpdateMerchantWithOrderDunningStep;
 use App\Application\Exception\OrderNotFoundException;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderNotification\NotificationScheduler;
+use App\DomainModel\OrderNotification\OrderNotificationEntity;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
@@ -41,11 +42,13 @@ class UpdateMerchantWithOrderDunningStepUseCase implements LoggingInterface
             return;
         }
 
-        $payload = [
-            'event' => $request->getStep(),
-            'order_id' => $order->getExternalCode(),
-        ];
-
-        $this->notificationScheduler->createAndSchedule($order, $payload);
+        $this->notificationScheduler->createAndSchedule(
+            $order,
+            OrderNotificationEntity::NOTIFICATION_TYPE_DCI_COMMUNICATION,
+            [
+                'event' => $request->getStep(),
+                'order_id' => $order->getExternalCode(),
+            ]
+        );
     }
 }

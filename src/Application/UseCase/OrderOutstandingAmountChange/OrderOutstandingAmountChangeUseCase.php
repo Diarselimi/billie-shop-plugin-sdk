@@ -5,6 +5,7 @@ namespace App\Application\UseCase\OrderOutstandingAmountChange;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\OrderWorkflowException;
 use App\DomainModel\Order\OrderAnnouncer;
+use App\DomainModel\OrderNotification\OrderNotificationEntity;
 use App\DomainModel\Payment\OrderAmountChangeDTO;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
@@ -21,8 +22,6 @@ use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 {
     use LoggingTrait;
-
-    private const NOTIFICATION_EVENT = 'payment';
 
     private $orderRepository;
 
@@ -136,13 +135,15 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 
     private function scheduleMerchantNotification(OrderEntity $order, OrderAmountChangeDTO $amountChange)
     {
-        $payload = [
-            'event' => self::NOTIFICATION_EVENT,
-            'order_id' => $order->getExternalCode(),
-            'amount' => $amountChange->getPaidAmount(),
-            'open_amount' => $amountChange->getOutstandingAmount(),
-        ];
-
-        $this->notificationScheduler->createAndSchedule($order, $payload);
+        $this->notificationScheduler->createAndSchedule(
+            $order,
+            OrderNotificationEntity::NOTIFICATION_TYPE_PAYMENT,
+            [
+                'event' => OrderNotificationEntity::NOTIFICATION_TYPE_PAYMENT,
+                'order_id' => $order->getExternalCode(),
+                'amount' => $amountChange->getPaidAmount(),
+                'open_amount' => $amountChange->getOutstandingAmount(),
+            ]
+        );
     }
 }

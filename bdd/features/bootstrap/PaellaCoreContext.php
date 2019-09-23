@@ -12,6 +12,9 @@ use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorFinancialDetailsEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
+use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsEntity;
+use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsFactory;
+use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsRepositoryInterface;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsEntity;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
@@ -23,6 +26,7 @@ use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface;
 use App\DomainModel\OrderIdentification\OrderIdentificationRepositoryInterface;
+use App\DomainModel\OrderNotification\OrderNotificationRepositoryInterface;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntity;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
 use App\DomainModel\OrderRiskCheck\RiskCheckDefinitionEntity;
@@ -132,6 +136,7 @@ class PaellaCoreContext extends MinkContext
             TRUNCATE merchants_debtors;
             TRUNCATE merchant_settings;
             TRUNCATE merchant_risk_check_settings;
+            TRUNCATE merchant_notification_settings;
             TRUNCATE merchant_users;
             TRUNCATE merchants;
             TRUNCATE merchant_debtor_financial_details;
@@ -454,19 +459,40 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
-     * @Given the default risk check setting should be created with :jsonResponseFromMerchant
-     * @param string $jsonResponseFromMerchant
+     * @Given the default risk check setting should be created for merchant with company ID :companyId
      */
-    public function checkMerchantHashTheDefaultRiskCheckSettingsCreated(string $jsonResponseFromMerchant)
+    public function checkMerchantHashTheDefaultRiskCheckSettingsCreated($companyId)
     {
-        $merchantResponse = json_decode($jsonResponseFromMerchant);
+        $merchant = $this->getMerchantRepository()->getOneByCompanyId((int) $companyId);
+
+        Assert::notNull($merchant);
 
         $pdoQuery = $this->getConnection()
             ->prepare("select (select count(*) from merchant_risk_check_settings where merchant_id = :merchant_id) = (select count(*) from risk_check_definitions where name != 'debtor_address') as merchant_has_risk_settings", []);
-        $pdoQuery->execute(['merchant_id' => $merchantResponse['id']]);
+        $pdoQuery->execute(['merchant_id' => $merchant->getId()]);
         $results = $pdoQuery->fetch(PDO::FETCH_ASSOC);
 
-        Assert::eq($results['merchant_has_risk_settings'], 0, 'The default merchant risk settings did not match with the number of risk definitions');
+        Assert::eq($results['merchant_has_risk_settings'], 1);
+    }
+
+    /**
+     * @Given the default notification settings should be created for merchant with company ID :companyId
+     */
+    public function theDefaultNotificationSettingsShouldBeCreatedFor($companyId)
+    {
+        $merchant = $this->getMerchantRepository()->getOneByCompanyId((int) $companyId);
+
+        Assert::notNull($merchant);
+
+        foreach (MerchantNotificationSettingsFactory::DEFAULT_SETTINGS as $notificationType => $enabled) {
+            $setting = $this
+                ->getMerchantNotificationSettingsRepository()
+                ->getByMerchantIdAndNotificationType($merchant->getId(), $notificationType)
+            ;
+
+            Assert::notNull($setting);
+            Assert::eq($setting->isEnabled(), $enabled);
+        }
     }
 
     /**
@@ -601,6 +627,36 @@ class PaellaCoreContext extends MinkContext
         Assert::eq($merchantDebtor->getFinancingPower(), $power);
     }
 
+    /**
+     * @Given The following notification settings exist for merchant :merchantId:
+     */
+    public function theFollowingNotificationSettingsExistForMerchant1($merchantId, TableNode $table)
+    {
+        foreach ($table as $row) {
+            $this->getMerchantNotificationSettingsRepository()->insert(
+                (new MerchantNotificationSettingsEntity())
+                    ->setMerchantId((int) $merchantId)
+                    ->setNotificationType($row['notification_type'])
+                    ->setEnabled($row['enabled'] === '1')
+            );
+        }
+    }
+
+    /**
+     * @Given Order notification should exist for order :orderCode with type :notificationType
+     */
+    public function orderNotificationShouldExistForOrderWithType($orderCode, $notificationType)
+    {
+        $order = $this->getOrderRepository()->getOneByExternalCode($orderCode, $this->merchant->getId());
+
+        $notification = $this
+            ->getOrderNotificationRepository()
+            ->getOneByOrderIdAndNotificationType($order->getId(), $notificationType)
+        ;
+
+        Assert::notNull($notification);
+    }
+
     private function getDebtorExternalDataRepository(): DebtorExternalDataRepositoryInterface
     {
         return $this->get(DebtorExternalDataRepositoryInterface::class);
@@ -679,6 +735,16 @@ class PaellaCoreContext extends MinkContext
     private function getOrderFinancialDetailsRepository(): OrderFinancialDetailsRepositoryInterface
     {
         return $this->get(OrderFinancialDetailsRepositoryInterface::class);
+    }
+
+    private function getMerchantNotificationSettingsRepository(): MerchantNotificationSettingsRepositoryInterface
+    {
+        return $this->get(MerchantNotificationSettingsRepositoryInterface::class);
+    }
+
+    private function getOrderNotificationRepository(): OrderNotificationRepositoryInterface
+    {
+        return $this->get(OrderNotificationRepositoryInterface::class);
     }
 
     private function getConnection(): PdoConnection

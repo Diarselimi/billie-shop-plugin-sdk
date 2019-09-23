@@ -2,6 +2,7 @@
 
 namespace App\DomainModel\OrderNotification;
 
+use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
 use Billie\MonitoringBundle\Service\Alerting\Slack\SlackClientAwareInterface;
 use Billie\MonitoringBundle\Service\Alerting\Slack\SlackClientAwareTrait;
@@ -37,24 +38,45 @@ class NotificationScheduler implements LoggingInterface, SlackClientAwareInterfa
 
     private $slackMessageFactory;
 
+    private $merchantNotificationSettingsRepository;
+
     public function __construct(
         NotificationPublisherInterface $orderNotificationFactoryPublisher,
         OrderNotificationFactory $orderNotificationFactory,
         OrderNotificationRepositoryInterface $orderNotificationRepository,
-        SlackMessageFactory $slackMessageFactory
+        SlackMessageFactory $slackMessageFactory,
+        MerchantNotificationSettingsRepositoryInterface $merchantNotificationSettingsRepository
     ) {
         $this->orderNotificationFactoryPublisher = $orderNotificationFactoryPublisher;
         $this->orderNotificationFactory = $orderNotificationFactory;
         $this->orderNotificationRepository = $orderNotificationRepository;
         $this->slackMessageFactory = $slackMessageFactory;
+        $this->merchantNotificationSettingsRepository = $merchantNotificationSettingsRepository;
     }
 
-    public function createAndSchedule(OrderEntity $order, array $payload): bool
+    public function createAndSchedule(OrderEntity $order, string $notificationType, array $payload): bool
     {
-        $orderNotification = $this->orderNotificationFactory->create($order->getId(), $payload);
+        if (!$this->isNotificationEnabledForMerchant($order->getMerchantId(), $notificationType)) {
+            $this->logInfo(
+                'Skip sending {notification_type} notification for order {order_id}[{order_external_code}]. 
+                It is disabled for merchant {merchant_id}
+                ',
+                [
+                    'notification_type' => $notificationType,
+                    'order_id' => $order->getId(),
+                    'order_external_code' => $order->getExternalCode(),
+                    'merchant_id' => $order->getMerchantId(),
+                ]
+            );
+
+            return false;
+        }
+
+        $orderNotification = $this->orderNotificationFactory->create($order->getId(), $notificationType, $payload);
         $this->orderNotificationRepository->insert($orderNotification);
 
         $this->logInfo('Created notification {notification_id} for order {order_id}[{order_external_code}]', [
+            'notification_type' => $notificationType,
             'notification_id' => $orderNotification->getId(),
             'order_id' => $order->getId(),
             'order_external_code' => $order->getExternalCode(),
@@ -106,5 +128,15 @@ class NotificationScheduler implements LoggingInterface, SlackClientAwareInterfa
         );
 
         $this->getSlackClient()->sendMessage($message);
+    }
+
+    private function isNotificationEnabledForMerchant(int $merchantId, string $notificationType): bool
+    {
+        $setting = $this
+            ->merchantNotificationSettingsRepository
+            ->getByMerchantIdAndNotificationType($merchantId, $notificationType)
+        ;
+
+        return $setting && $setting->isEnabled();
     }
 }

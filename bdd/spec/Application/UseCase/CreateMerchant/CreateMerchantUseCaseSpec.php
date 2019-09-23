@@ -13,6 +13,9 @@ use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantEntityFactory;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsEntity;
+use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsFactory;
+use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsRepositoryInterface;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntityFactory;
@@ -48,6 +51,8 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
         ScoreThresholdsConfigurationRepositoryInterface $scoreThresholdsConfigurationRepository,
         MerchantRiskCheckSettingsRepositoryInterface $merchantRiskCheckSettingsRepository,
         AuthenticationServiceInterface $authenticationService,
+        MerchantNotificationSettingsFactory $notificationSettingsFactory,
+        MerchantNotificationSettingsRepositoryInterface $notificationSettingsRepository,
         CreateMerchantRequest $request
     ) {
         $request->getCompanyId()->willReturn(self::COMPANY_ID);
@@ -61,7 +66,9 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
             $scoreThresholdsConfigurationFactory,
             $scoreThresholdsConfigurationRepository,
             $merchantRiskCheckSettingsRepository,
-            $authenticationService
+            $authenticationService,
+            $notificationSettingsFactory,
+            $notificationSettingsRepository
         );
     }
 
@@ -99,12 +106,15 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
         ScoreThresholdsConfigurationEntityFactory $scoreThresholdsConfigurationFactory,
         ScoreThresholdsConfigurationRepositoryInterface $scoreThresholdsConfigurationRepository,
         MerchantRiskCheckSettingsRepositoryInterface $merchantRiskCheckSettingsRepository,
+        MerchantNotificationSettingsFactory $notificationSettingsFactory,
+        MerchantNotificationSettingsRepositoryInterface $notificationSettingsRepository,
+        AuthenticationServiceInterface $authenticationService,
         CreateMerchantRequest $request,
         DebtorCompany $company,
         MerchantEntity $merchant,
         ScoreThresholdsConfigurationEntity $scoreThresholdsConfiguration,
         MerchantSettingsEntity $merchantSettings,
-        AuthenticationServiceInterface $authenticationService
+        MerchantNotificationSettingsEntity $merchantNotificationSettingsEntity
     ) {
         $company->getName()->willReturn(self::COMPANY_NAME);
         $merchant->getId()->willReturn(self::MERCHANT_ID);
@@ -143,6 +153,13 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
         $merchantSettingsRepository->insert($merchantSettings)->shouldBeCalledOnce();
 
         $merchantRiskCheckSettingsRepository->insertMerchantDefaultRiskCheckSettings(self::MERCHANT_ID)->shouldBeCalledOnce();
+
+        $notificationSettingsFactory
+            ->createDefaults(self::MERCHANT_ID)
+            ->shouldBeCalled()
+            ->willReturn([$merchantNotificationSettingsEntity])
+        ;
+        $notificationSettingsRepository->insert($merchantNotificationSettingsEntity)->shouldBeCalled();
 
         $response = $this->execute($request);
         $response->shouldBeAnInstanceOf(CreateMerchantResponse::class);

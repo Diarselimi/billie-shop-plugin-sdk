@@ -14,4 +14,6 @@ interface OrderNotificationRepositoryInterface
      * @return OrderNotificationEntity[]
      */
     public function getFailedByOrderId(int $orderId): array;
+
+    public function getOneByOrderIdAndNotificationType(int $orderId, string $notificationType): ? OrderNotificationEntity;
 }

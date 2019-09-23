@@ -8,6 +8,7 @@ use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderNotification\NotificationScheduler;
+use App\DomainModel\OrderNotification\OrderNotificationEntity;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntity;
 use Billie\MonitoringBundle\Service\Alerting\Slack\SlackClientAwareInterface;
 use Billie\MonitoringBundle\Service\Alerting\Slack\SlackClientAwareTrait;
@@ -62,7 +63,10 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
     public function onApproved(OrderApprovedEvent $event): void
     {
         if ($event->isNotifyWebhook()) {
-            $this->notifyMerchantWebhook($event->getOrderContainer()->getOrder(), $event::NAME);
+            $this->notifyMerchantWebhook(
+                $event->getOrderContainer()->getOrder(),
+                OrderNotificationEntity::NOTIFICATION_TYPE_ORDER_APPROVED
+            );
         }
 
         $merchantDebtor = $event->getOrderContainer()->getMerchantDebtor();
@@ -78,7 +82,10 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
     public function onDeclined(OrderDeclinedEvent $event): void
     {
         if ($event->isNotifyWebhook()) {
-            $this->notifyMerchantWebhook($event->getOrderContainer()->getOrder(), $event::NAME);
+            $this->notifyMerchantWebhook(
+                $event->getOrderContainer()->getOrder(),
+                OrderNotificationEntity::NOTIFICATION_TYPE_ORDER_DECLINED
+            );
         }
 
         $this->logInfo("Order declined");
@@ -135,11 +142,15 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
         );
     }
 
-    private function notifyMerchantWebhook(OrderEntity $order, string $event): void
+    private function notifyMerchantWebhook(OrderEntity $order, string $notificationType): void
     {
-        $this->notificationScheduler->createAndSchedule($order, [
-            'event' => $event,
-            'order_id' => $order->getExternalCode(),
-        ]);
+        $this->notificationScheduler->createAndSchedule(
+            $order,
+            $notificationType,
+            [
+                'event' => $notificationType,
+                'order_id' => $order->getExternalCode(),
+            ]
+        );
     }
 }

@@ -7,6 +7,7 @@ use App\Application\UseCase\UpdateMerchantWithOrderDunningStep\UpdateMerchantWit
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderNotification\NotificationScheduler;
+use App\DomainModel\OrderNotification\OrderNotificationEntity;
 use Billie\MonitoringBundle\Service\Alerting\Sentry\Raven\RavenClient;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -62,8 +63,13 @@ class UpdateMerchantWithOrderDunningStepUseCaseSpec extends ObjectBehavior
         $orderRepository->getOneByUuid(self::ORDER_UUID)->shouldBeCalled()->willReturn($orderEntity);
 
         $payload = ['event' => 'Dunning', 'order_id' => self::ORDER_EXTENRAL_ID];
+
         $notificationScheduler
-            ->createAndSchedule($orderEntity, $payload)
+            ->createAndSchedule(
+                $orderEntity,
+                OrderNotificationEntity::NOTIFICATION_TYPE_DCI_COMMUNICATION,
+                $payload
+            )
             ->shouldBeCalled()
         ;
 

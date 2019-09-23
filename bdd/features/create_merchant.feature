@@ -95,7 +95,21 @@ Feature: Create a new merchant.
       }
       """
     Then the response status code should be 201
-    And the JSON response should have "id"
-    And the JSON response at "payment_merchant_id" should be an string
-    And I keep the JSON response as "MERCHANT"
-    And the default risk check setting should be created with "{$MERCHANT}"
+    And the JSON response should be:
+    """
+    {
+      "name": "Test User Company",
+      "financing_power": 5000.44,
+      "financing_limit": 5000.44,
+      "api_key": "6d6b4222-be8c-11e9-9cb5-2a2ae2dbcce4",
+      "company_id": "1",
+      "payment_merchant_id": "6d6b4222-be8c-11e9-9cb5-2a2ae2dbcce4",
+      "is_active": true,
+      "webhook_url": "http://billie.md",
+      "webhook_authorization": "X-Api-Key: Hola",
+      "oauth_client_id": "testClientId",
+      "oauth_client_secret": "testClientSecret"
+    }
+    """
+    And the default risk check setting should be created for merchant with company ID 1
+    And the default notification settings should be created for merchant with company ID 1

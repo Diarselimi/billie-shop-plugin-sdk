@@ -59,6 +59,12 @@ services:
   App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface:
     alias: 'App\Infrastructure\Repository\OrderFinancialDetailsRepository'
     public: true
+  App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\MerchantNotificationSettingsRepository'
+    public: true
+  App\DomainModel\OrderNotification\OrderNotificationRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\OrderNotificationRepository'
+    public: true
   App\Helper\Uuid\UuidGeneratorInterface:
     alias: 'App\Helper\Uuid\DummyUuidGenerator'
     public: true
