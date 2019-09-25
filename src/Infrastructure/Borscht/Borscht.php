@@ -26,6 +26,8 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
 
     private const ERR_BODY_DECODE_MESSAGE = 'Payments API response decode failed';
 
+    private const MODIFY_ORDER_REQUEST_TIMEOUT = 1.5;
+
     private $client;
 
     private $paymentDetailsFactory;
@@ -91,6 +93,7 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
     {
         $this->logInfo('Modify borscht ticket', [
             'json' => $requestDTO->toArray(),
+            'timeout' => self::MODIFY_ORDER_REQUEST_TIMEOUT,
         ]);
 
         try {
