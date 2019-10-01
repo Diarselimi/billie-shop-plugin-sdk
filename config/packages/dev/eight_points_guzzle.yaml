@@ -1,0 +1,8 @@
+eight_points_guzzle:
+  clients:
+    borscht:
+      base_url: "%env(string:BORSCHT_URL)%"
+      options:
+        timeout: 5
+        headers:
+          Content-Type: "application/json"
