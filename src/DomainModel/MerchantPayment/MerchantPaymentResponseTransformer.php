@@ -37,6 +37,9 @@ class MerchantPaymentResponseTransformer
     public function addOverpaidAmount(array $item): array
     {
         if (!array_key_exists('orders', $item) || empty($item['orders'])) {
+            // APIS-1447: if there are no mapped orders (tickets) the whole transaction amount is an overpayment
+            $item['overpaid_amount'] = $item['amount'];
+
             return $item;
         }
 
