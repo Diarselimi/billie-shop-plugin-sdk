@@ -85,14 +85,14 @@ class IdentifyAndScoreDebtorUseCase
             throw new DebtorNotIdentifiedException();
         }
 
-        $merchantDebtor = $this->merchantDebtorRepository->getOneByMerchantAndDebtorId(
+        $merchantDebtor = $this->merchantDebtorRepository->getOneByMerchantAndCompanyUuid(
             $merchant->getId(),
-            $identifiedDebtor->getId()
+            $identifiedDebtor->getUuid()
         );
 
         if (!$merchantDebtor) {
             $merchantDebtor = $this->merchantDebtorRegistrationService->registerMerchantDebtor(
-                $identifiedDebtor->getId(),
+                $identifiedDebtor,
                 $merchant
             );
         }

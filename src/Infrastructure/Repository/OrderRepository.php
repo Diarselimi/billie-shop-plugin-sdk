@@ -230,7 +230,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
         $this->eventDispatcher->dispatch(OrderLifecycleEvent::UPDATED, new OrderLifecycleEvent($order));
     }
 
-    public function getDebtorMaximumOverdue(int $debtorId): int
+    public function getDebtorMaximumOverdue(string $companyUuid): int
     {
         $result = $this->doFetchOne(
             '
@@ -238,13 +238,13 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
             FROM merchants_debtors
             INNER JOIN orders ON orders.merchant_debtor_id = merchants_debtors.id
             INNER JOIN order_financial_details ON order_financial_details.order_id = orders.id
-            WHERE merchants_debtors.debtor_id = :debtor_id
+            WHERE merchants_debtors.company_uuid = :company_uuid
             AND state = :state
             AND shipped_at IS NOT NULL
         ',
             [
                 'current_time' => time(),
-                'debtor_id' => $debtorId,
+                'company_uuid' => $companyUuid,
                 'state' => OrderStateManager::STATE_LATE,
             ]
         );
@@ -252,16 +252,16 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
         return $result['max_overdue'] ?: 0;
     }
 
-    public function debtorHasAtLeastOneFullyPaidOrder(int $debtorId): bool
+    public function debtorHasAtLeastOneFullyPaidOrder(string $companyUuid): bool
     {
         $result = $this->doFetchOne(
             'SELECT COUNT(id) as total
               FROM ' . self::TABLE_NAME . '
               WHERE state = :state
-              AND orders.merchant_debtor_id IN (SELECT id FROM merchants_debtors WHERE debtor_id = :debtor_id)',
+              AND orders.merchant_debtor_id IN (SELECT id FROM merchants_debtors WHERE company_uuid = :company_uuid)',
             [
                 'state' => OrderStateManager::STATE_COMPLETE,
-                'debtor_id' => $debtorId,
+                'company_uuid' => $companyUuid,
             ]
         );
 

@@ -2,6 +2,7 @@
 
 namespace App\DomainModel\MerchantDebtor;
 
+use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\Merchant\MerchantEntity;
@@ -37,14 +38,14 @@ class MerchantDebtorRegistrationService
         $this->paymentsService = $paymentsService;
     }
 
-    public function registerMerchantDebtor(string $debtorCompanyId, MerchantEntity $merchant): MerchantDebtorEntity
+    public function registerMerchantDebtor(DebtorCompany $debtorCompany, MerchantEntity $merchant): MerchantDebtorEntity
     {
         $paymentDebtor = $this->paymentsService->registerDebtor($merchant->getPaymentMerchantId());
 
         $merchantSettings = $this->merchantSettingsRepository->getOneByMerchant($merchant->getId());
 
         $merchantDebtor = $this->merchantDebtorEntityFactory->create(
-            $debtorCompanyId,
+            $debtorCompany,
             $merchant->getId(),
             $paymentDebtor->getPaymentDebtorId()
         );

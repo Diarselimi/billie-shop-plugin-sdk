@@ -57,7 +57,7 @@ class DebtorScoreCheck implements CheckInterface
             $debtorId,
             // TODO: refactor to pass the legalForm to this call, so alfred will decide if is sole trader or not. then remove DebtorExternalData\DebtorExternalDataEntity::LEGAL_FORMS_FOR_SOLE_TRADERS
             $orderContainer->getDebtorExternalData()->isLegalFormSoleTrader(),
-            $this->orderRepository->debtorHasAtLeastOneFullyPaidOrder($debtorId),
+            $this->orderRepository->debtorHasAtLeastOneFullyPaidOrder($merchantDebtor->getCompanyUuid()),
             $merchantScoreThresholds,
             $debtorScoreThresholds
         );

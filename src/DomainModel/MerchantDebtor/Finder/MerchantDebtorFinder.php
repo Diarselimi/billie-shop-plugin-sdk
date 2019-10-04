@@ -103,9 +103,9 @@ class MerchantDebtorFinder implements LoggingInterface
 
         $this->logInfo('Debtor identified');
 
-        $merchantDebtor = $this->merchantDebtorRepository->getOneByMerchantAndDebtorId(
+        $merchantDebtor = $this->merchantDebtorRepository->getOneByMerchantAndCompanyUuid(
             $merchantId,
-            $debtorCompany->getId()
+            $debtorCompany->getUuid()
         );
 
         if ($merchantDebtor) {
@@ -114,7 +114,7 @@ class MerchantDebtorFinder implements LoggingInterface
             $this->logInfo('New merchant debtor created');
 
             $merchantDebtor = $this->merchantDebtorRegistrationService->registerMerchantDebtor(
-                $debtorCompany->getId(),
+                $debtorCompany,
                 $orderContainer->getMerchant()
             );
         }

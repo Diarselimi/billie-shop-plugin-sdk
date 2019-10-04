@@ -94,6 +94,7 @@ class GetMerchantDebtorUseCaseSpec extends ObjectBehavior
 
     private function mockMerchantDebtor(MerchantDebtorEntity $merchantDebtor): void
     {
+        $merchantDebtor->getCompanyUuid()->willReturn(self::MERCHANT_DEBTOR_UUID);
         $merchantDebtor->getId()->willReturn(self::MERCHANT_DEBTOR_ID);
         $merchantDebtor->getDebtorId()->willReturn(self::DEBTOR_ID);
         $merchantDebtor->getPaymentDebtorId()->willReturn(self::MERCHANT_DEBTOR_PAYMENT_ID);

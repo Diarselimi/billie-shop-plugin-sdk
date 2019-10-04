@@ -2,6 +2,7 @@
 
 namespace App\DomainModel\MerchantDebtor;
 
+use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\Helper\Uuid\UuidGeneratorInterface;
 
 class MerchantDebtorEntityFactory
@@ -19,6 +20,7 @@ class MerchantDebtorEntityFactory
             ->setId($row['id'])
             ->setMerchantId($row['merchant_id'])
             ->setDebtorId($row['debtor_id'])
+            ->setCompanyUuid($row['company_uuid'])
             ->setUuid($row['uuid'])
             ->setPaymentDebtorId($row['payment_debtor_id'])
             ->setScoreThresholdsConfigurationId($row['score_thresholds_configuration_id'])
@@ -28,7 +30,7 @@ class MerchantDebtorEntityFactory
     }
 
     public function create(
-        string $debtorId,
+        DebtorCompany $debtorCompany,
         string $merchantId,
         string $paymentDebtorId,
         bool $isWhitelisted = false
@@ -37,7 +39,8 @@ class MerchantDebtorEntityFactory
 
         return (new MerchantDebtorEntity())
             ->setMerchantId($merchantId)
-            ->setDebtorId($debtorId)
+            ->setDebtorId($debtorCompany->getId())
+            ->setCompanyUuid($debtorCompany->getUuid())
             ->setUuid($this->uuidGenerator->uuid4())
             ->setPaymentDebtorId($paymentDebtorId)
             ->setIsWhitelisted($isWhitelisted)

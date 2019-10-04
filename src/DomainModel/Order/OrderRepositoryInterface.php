@@ -23,11 +23,11 @@ interface OrderRepositoryInterface
 
     public function getOneByUuid(string $uuid): ?OrderEntity;
 
-    public function getDebtorMaximumOverdue(int $debtorId): int;
+    public function getDebtorMaximumOverdue(string $companyUuid): int;
 
-    public function debtorHasAtLeastOneFullyPaidOrder(int $debtorId): bool;
+    public function debtorHasAtLeastOneFullyPaidOrder(string $companyUuid): bool;
 
-    public function merchantDebtorHasAtLeastOneApprovedOrder(int $debtorId): bool;
+    public function merchantDebtorHasAtLeastOneApprovedOrder(int $merchantDebtorId): bool;
 
     public function countOrdersByState(int $merchantDebtorId): OrderStateCounterDTO;
 

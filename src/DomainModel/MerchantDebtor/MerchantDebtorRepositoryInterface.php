@@ -14,7 +14,7 @@ interface MerchantDebtorRepositoryInterface
 
     public function getOneByUuidAndMerchantId(string $uuid, int $merchantId): ?MerchantDebtorEntity;
 
-    public function getOneByMerchantAndDebtorId(string $merchantId, string $debtorId): ?MerchantDebtorEntity;
+    public function getOneByMerchantAndCompanyUuid(string $merchantId, string $companyUuid): ?MerchantDebtorEntity;
 
     public function getOneByExternalIdAndMerchantId(string $externalMerchantId, string $merchantId, array $excludedOrderStates = []): ?MerchantDebtorEntity;
 

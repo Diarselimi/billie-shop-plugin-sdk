@@ -12,6 +12,8 @@ class MerchantDebtorEntity extends AbstractTimestampableEntity
 
     private $debtorId;
 
+    private $companyUuid;
+
     private $paymentDebtorId;
 
     private $scoreThresholdsConfigurationId;
@@ -50,6 +52,18 @@ class MerchantDebtorEntity extends AbstractTimestampableEntity
     public function setDebtorId(string $debtorId): MerchantDebtorEntity
     {
         $this->debtorId = $debtorId;
+
+        return $this;
+    }
+
+    public function getCompanyUuid(): string
+    {
+        return $this->companyUuid;
+    }
+
+    public function setCompanyUuid(string $companyUuid): MerchantDebtorEntity
+    {
+        $this->companyUuid = $companyUuid;
 
         return $this;
     }

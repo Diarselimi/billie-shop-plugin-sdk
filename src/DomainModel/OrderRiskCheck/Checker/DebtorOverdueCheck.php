@@ -20,7 +20,7 @@ class DebtorOverdueCheck implements CheckInterface
 
     public function check(OrderContainer $orderContainer): CheckResult
     {
-        $debtorMaxOverdue = $this->orderRepository->getDebtorMaximumOverdue($orderContainer->getMerchantDebtor()->getDebtorId());
+        $debtorMaxOverdue = $this->orderRepository->getDebtorMaximumOverdue($orderContainer->getMerchantDebtor()->getCompanyUuid());
 
         return new CheckResult($debtorMaxOverdue <= self::OVERDUE_MAX_DAYS, self::NAME);
     }

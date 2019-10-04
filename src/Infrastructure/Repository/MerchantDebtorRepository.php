@@ -13,7 +13,7 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
 {
     public const TABLE_NAME = "merchants_debtors";
 
-    private const SELECT_FIELDS = 'id, merchant_id, debtor_id, payment_debtor_id, uuid, score_thresholds_configuration_id, is_whitelisted, created_at, updated_at';
+    private const SELECT_FIELDS = 'id, merchant_id, debtor_id, company_uuid, payment_debtor_id, uuid, score_thresholds_configuration_id, is_whitelisted, created_at, updated_at';
 
     private $factory;
 
@@ -26,12 +26,13 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
     {
         $id = $this->doInsert('
             INSERT INTO ' . self::TABLE_NAME . '
-            (merchant_id, debtor_id, payment_debtor_id, uuid, score_thresholds_configuration_id, created_at, updated_at, is_whitelisted)
+            (merchant_id, debtor_id, company_uuid, payment_debtor_id, uuid, score_thresholds_configuration_id, created_at, updated_at, is_whitelisted)
             VALUES
-            (:merchant_id, :debtor_id, :payment_debtor_id, :uuid, :score_thresholds_configuration_id, :created_at, :updated_at, :is_whitelisted)
+            (:merchant_id, :debtor_id, :company_uuid, :payment_debtor_id, :uuid, :score_thresholds_configuration_id, :created_at, :updated_at, :is_whitelisted)
         ', [
             'merchant_id' => $merchantDebtor->getMerchantId(),
             'debtor_id' => $merchantDebtor->getDebtorId(),
+            'company_uuid' => $merchantDebtor->getCompanyUuid(),
             'payment_debtor_id' => $merchantDebtor->getPaymentDebtorId(),
             'uuid' => $merchantDebtor->getUuid(),
             'score_thresholds_configuration_id' => $merchantDebtor->getScoreThresholdsConfigurationId(),
@@ -117,15 +118,15 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
         return $row ? $this->factory->createFromDatabaseRow($row) : null;
     }
 
-    public function getOneByMerchantAndDebtorId(string $merchantId, string $debtorId): ?MerchantDebtorEntity
+    public function getOneByMerchantAndCompanyUuid(string $merchantId, string $companyUuid): ?MerchantDebtorEntity
     {
         $row = $this->doFetchOne('
           SELECT ' . self::SELECT_FIELDS . '
           FROM ' . self::TABLE_NAME . '
           WHERE merchant_id = :merchant_id
-          AND debtor_id = :debtor_id', [
+          AND company_uuid = :company_uuid', [
             'merchant_id' => $merchantId,
-            'debtor_id' => $debtorId,
+            'company_uuid' => $companyUuid,
         ]);
 
         return $row ? $this->factory->createFromDatabaseRow($row) : null;
@@ -221,7 +222,6 @@ SQL;
         while ($stmt && $row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
             yield (new MerchantDebtorIdentifierDTO())
                 ->setMerchantDebtorUuid($row['merchant_debtor_uuid'])
-                ->setMerchantDebtorId($row['merchant_debtor_id'])
                 ->setMerchantDebtorId($row['merchant_debtor_id'])
                 ->setMerchantId($row['merchant_id'])
                 ->setDebtorId((int) $row['debtor_id'])

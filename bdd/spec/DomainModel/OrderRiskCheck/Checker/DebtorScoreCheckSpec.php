@@ -60,6 +60,7 @@ class DebtorScoreCheckSpec extends ObjectBehavior
         $request->getSchufaSoleTraderScoreThreshold()->willReturn(99);
 
         $merchantDebtor->getDebtorId()->willReturn(1);
+        $merchantDebtor->getCompanyUuid()->willReturn('ad74bbc4-509e-47d5-9b50-a0320ce3d715');
         $merchantDebtor->isWhitelisted()->willReturn(false);
         $merchantDebtor->getScoreThresholdsConfigurationId()->willReturn(1);
 

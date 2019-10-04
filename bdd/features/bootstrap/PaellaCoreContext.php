@@ -205,6 +205,7 @@ class PaellaCoreContext extends MinkContext
         $merchantDebtor = (new MerchantDebtorEntity())
             ->setMerchantId($this->merchant->getId())
             ->setDebtorId(1)
+            ->setCompanyUuid(self::DEBTOR_COMPANY_UUID)
             ->setUuid(self::DEBTOR_UUID)
             ->setPaymentDebtorId('test')
             ->setCreatedAt(new \DateTime('2019-01-01 12:00:00'))
