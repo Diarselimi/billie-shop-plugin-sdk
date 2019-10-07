@@ -49,6 +49,8 @@ class RegisterMerchantUserUseCase implements ValidatedUseCaseInterface
         $merchantUser = $this->merchantUserEntityFactory->create(
             $request->getMerchantId(),
             $oauthUser->getUserId(),
+            $request->getFirstName(),
+            $request->getLastName(),
             $request->getRoles()
         );
 

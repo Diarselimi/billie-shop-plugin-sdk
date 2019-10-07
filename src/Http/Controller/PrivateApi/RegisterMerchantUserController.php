@@ -49,6 +49,8 @@ class RegisterMerchantUserController
             $this->useCase->execute(
                 new RegisterMerchantUserRequest(
                     $merchantId,
+                    $request->request->get('first_name'),
+                    $request->request->get('last_name'),
                     $request->request->get('email'),
                     $request->request->get('password'),
                     $request->request->get('roles', MerchantUserEntity::DEFAULT_ROLES)

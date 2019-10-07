@@ -4,6 +4,7 @@ namespace App\DomainModel\Address;
 
 use App\Application\UseCase\CreateOrder\CreateOrderRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
+use App\DomainModel\DebtorCompany\DebtorCompany;
 
 class AddressEntityFactory
 {
@@ -44,5 +45,16 @@ class AddressEntityFactory
             ->setCreatedAt(new \DateTime($row['created_at']))
             ->setUpdatedAt(new \DateTime($row['updated_at']))
         ;
+    }
+
+    public function createFromDebtorCompany(DebtorCompany $debtorCompany): AddressEntity
+    {
+        return (new AddressEntity())
+            ->setHouseNumber($debtorCompany->getAddressHouse())
+            ->setStreet($debtorCompany->getAddressStreet())
+            ->setCity($debtorCompany->getAddressCity())
+            ->setPostalCode($debtorCompany->getAddressPostalCode())
+            ->setCountry($debtorCompany->getAddressCountry())
+            ;
     }
 }

@@ -32,6 +32,10 @@ class MerchantUserEntity extends AbstractTimestampableEntity
 
     private $merchantId;
 
+    private $firstName;
+
+    private $lastName;
+
     private $roles;
 
     public function getUserId(): string
@@ -54,6 +58,30 @@ class MerchantUserEntity extends AbstractTimestampableEntity
     public function setMerchantId(int $merchantId): MerchantUserEntity
     {
         $this->merchantId = $merchantId;
+
+        return $this;
+    }
+
+    public function getFirstName(): string
+    {
+        return $this->firstName;
+    }
+
+    public function setFirstName(string $firstName): MerchantUserEntity
+    {
+        $this->firstName = $firstName;
+
+        return $this;
+    }
+
+    public function getLastName(): string
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName(string $lastName): MerchantUserEntity
+    {
+        $this->lastName = $lastName;
 
         return $this;
     }

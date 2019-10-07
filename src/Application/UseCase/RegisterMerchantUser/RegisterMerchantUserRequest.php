@@ -8,6 +8,8 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Schema(schema="RegisterMerchantUserRequest", title="Register Merchant User", type="object", properties={
+ *     @OA\Property(property="first_name", type="string", nullable=false),
+ *     @OA\Property(property="last_name", type="string", nullable=false),
  *     @OA\Property(property="email", format="email", type="string", nullable=false),
  *     @OA\Property(property="password", format="password", type="string", nullable=false),
  *     @OA\Property(
@@ -28,6 +30,16 @@ class RegisterMerchantUserRequest implements ValidatedRequestInterface
 
     /**
      * @Assert\NotBlank()
+     */
+    private $firstName;
+
+    /**
+     * @Assert\NotBlank()
+     */
+    private $lastName;
+
+    /**
+     * @Assert\NotBlank()
      * @Assert\Email(mode="strict")
      */
     private $userEmail;
@@ -45,12 +57,16 @@ class RegisterMerchantUserRequest implements ValidatedRequestInterface
     private $roles;
 
     public function __construct(
-        int $merchantId,
-        string $userEmail,
-        string $userPassword,
-        array $roles
+        $merchantId,
+        $firstName,
+        $lastName,
+        $userEmail,
+        $userPassword,
+        $roles
     ) {
         $this->merchantId = $merchantId;
+        $this->firstName = $firstName;
+        $this->lastName = $lastName;
         $this->userEmail = $userEmail;
         $this->userPassword = $userPassword;
         $this->roles = $roles;
@@ -59,6 +75,16 @@ class RegisterMerchantUserRequest implements ValidatedRequestInterface
     public function getMerchantId(): int
     {
         return $this->merchantId;
+    }
+
+    public function getFirstName(): string
+    {
+        return $this->firstName;
+    }
+
+    public function getLastName(): string
+    {
+        return $this->lastName;
     }
 
     public function getUserEmail(): string

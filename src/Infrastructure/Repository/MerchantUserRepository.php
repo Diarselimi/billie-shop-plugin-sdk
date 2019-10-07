@@ -11,6 +11,17 @@ class MerchantUserRepository extends AbstractPdoRepository implements MerchantUs
 {
     public const TABLE_NAME = 'merchant_users';
 
+    public const TABLE_FIELDS = [
+        'id',
+        'user_id',
+        'merchant_id',
+        'first_name',
+        'last_name',
+        'roles',
+        'created_at',
+        'updated_at',
+    ];
+
     private $factory;
 
     public function __construct(MerchantUserEntityFactory $factory)
@@ -22,12 +33,14 @@ class MerchantUserRepository extends AbstractPdoRepository implements MerchantUs
     {
         $id = $this->doInsert(
             '
-            INSERT INTO ' . self::TABLE_NAME . ' (`user_id`, `merchant_id`, `roles`, `created_at`, `updated_at`)
-            VALUES (:user_id, :merchant_id, :roles, :created_at, :updated_at)
+            INSERT INTO ' . self::TABLE_NAME . ' (`user_id`, `merchant_id`,`first_name`, `last_name`, `roles`, `created_at`, `updated_at`)
+            VALUES (:user_id, :merchant_id, :first_name, :last_name, :roles, :created_at, :updated_at)
             ',
             [
                 'user_id' => $merchantUserEntity->getUserId(),
                 'merchant_id' => $merchantUserEntity->getMerchantId(),
+                'first_name' => $merchantUserEntity->getFirstName(),
+                'last_name' => $merchantUserEntity->getLastName(),
                 'roles' => json_encode($merchantUserEntity->getRoles()),
                 'created_at' => $merchantUserEntity->getCreatedAt()->format(self::DATE_FORMAT),
                 'updated_at' => $merchantUserEntity->getUpdatedAt()->format(self::DATE_FORMAT),
@@ -40,7 +53,7 @@ class MerchantUserRepository extends AbstractPdoRepository implements MerchantUs
     public function getOneByUserId(string $userId): ? MerchantUserEntity
     {
         $row = $this->doFetchOne(
-            'SELECT * FROM ' . self::TABLE_NAME . ' WHERE user_id = :user_id',
+            'SELECT '.implode(', ', self::TABLE_FIELDS).' FROM ' . self::TABLE_NAME . ' WHERE user_id = :user_id',
             ['user_id' => $userId]
         );
 
