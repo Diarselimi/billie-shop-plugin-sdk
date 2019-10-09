@@ -54,17 +54,17 @@ class OAuthTokenAuthenticator extends AbstractAuthenticator
         }
 
         if ($tokenMetadata->getUserId()) {
-            return $this->authenticateAsMerchantUser($tokenMetadata->getUserId(), $credentials);
+            return $this->authenticateAsMerchantUser($tokenMetadata->getUserId(), $credentials, $tokenMetadata->getEmail());
         }
 
         if ($tokenMetadata->getClientId()) {
-            return $this->authenticateAsMerchantClient($tokenMetadata->getClientId());
+            return $this->authenticateAsMerchantClient($tokenMetadata->getClientId(), $tokenMetadata->getEmail());
         }
 
         throw new AuthenticationException();
     }
 
-    private function authenticateAsMerchantClient(string $oauthClientId): UserInterface
+    private function authenticateAsMerchantClient(string $oauthClientId, string $email): UserInterface
     {
         $merchant = $this->merchantRepository->getOneByOauthClientId($oauthClientId);
 
@@ -76,11 +76,13 @@ class OAuthTokenAuthenticator extends AbstractAuthenticator
             $merchant->getId(),
             $merchant->getName(),
             $merchant->getOauthClientId(),
-            [MerchantUserEntity::ROLE_MERCHANT]
+            [MerchantUserEntity::ROLE_MERCHANT],
+            null,
+            $email
         );
     }
 
-    private function authenticateAsMerchantUser(string $oauthUserId, string $credentials): UserInterface
+    private function authenticateAsMerchantUser(string $oauthUserId, string $credentials, ?string $email): UserInterface
     {
         $merchantUser = $this->merchantUserRepository->getOneByUserId($oauthUserId);
 
@@ -92,7 +94,9 @@ class OAuthTokenAuthenticator extends AbstractAuthenticator
             $merchantUser->getMerchantId(),
             $merchantUser->getUserId(),
             $credentials,
-            $merchantUser->getRoles()
+            $merchantUser->getRoles(),
+            null,
+            $email
         );
     }
 }

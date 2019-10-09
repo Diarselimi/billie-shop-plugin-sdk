@@ -10,6 +10,7 @@ use OpenApi\Annotations as OA;
  * @OA\Schema(schema="GetMerchantUserResponse", title="Get Merchant User Response", type="object", properties={
  *      @OA\Property(property="first_name", type="string", nullable=false),
  *      @OA\Property(property="last_name", type="string", nullable=false),
+ *      @OA\Property(property="email", type="string", format="email", nullable=false),
  *      @OA\Property(property="user_id", type="integer", nullable=false),
  *      @OA\Property(property="merchant_company", type="object", description="Merchant company data.", properties={
  *          @OA\Property(property="name", ref="#/components/schemas/TinyText", nullable=true, example="Billie GmbH"),
@@ -36,6 +37,8 @@ class GetMerchantUserResponse implements ArrayableInterface
     private $firstName;
 
     private $lastName;
+
+    private $email;
 
     private $merchantCompanyName;
 
@@ -113,6 +116,18 @@ class GetMerchantUserResponse implements ArrayableInterface
         return $this;
     }
 
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): GetMerchantUserResponse
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
     public function toArray(): array
     {
         $address = $this->getMerchantCompanyAddress();
@@ -121,6 +136,7 @@ class GetMerchantUserResponse implements ArrayableInterface
             'user_id' => $this->getUserId(),
             'first_name' => $this->getFirstName(),
             'last_name' => $this->getLastName(),
+            'email' => $this->getEmail(),
             'merchant_company' => [
                 'name' => $this->getMerchantCompanyName(),
                 'address_house_number' => $address->getHouseNumber(),

@@ -49,7 +49,8 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
 
             return new AuthenticationServiceAuthorizeTokenResponseDTO(
                 $decodedResponse['client_id'],
-                $decodedResponse['user_id'] ?? null
+                $decodedResponse['user_id'] ?? null,
+                $decodedResponse['email']
             );
         } catch (TransferException $exception) {
             return null;

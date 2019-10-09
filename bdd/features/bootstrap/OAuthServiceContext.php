@@ -51,7 +51,7 @@ class OAuthServiceContext implements Context
     public function iGetFromOauthServiceValidTokenResponse()
     {
         $this->mockRequest('/oauth/authorization', new ResponseStack(
-            new MockResponse(json_encode(['client_id' => 'oauthClientId', 'user_id' => 'oauthUserId']))
+            new MockResponse(json_encode(['client_id' => 'oauthClientId', 'user_id' => 'oauthUserId', 'email' => 'test@billie.dev']))
         ));
     }
 

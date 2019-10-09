@@ -19,13 +19,22 @@ class User implements UserInterface
 
     private $checkoutSession;
 
-    public function __construct(int $merchantId, string $username, string $password, array $roles, ?CheckoutSessionEntity $checkoutSession = null)
-    {
+    private $email;
+
+    public function __construct(
+        int $merchantId,
+        string $username,
+        string $password,
+        array $roles,
+        ?CheckoutSessionEntity $checkoutSession = null,
+        string $email = null
+    ) {
         $this->merchantId = $merchantId;
         $this->username = $username;
         $this->password = $password;
         $this->roles = $roles;
         $this->checkoutSession = $checkoutSession;
+        $this->email = $email;
     }
 
     public function getMerchantId(): int
@@ -49,6 +58,11 @@ class User implements UserInterface
     public function getSalt(): ? string
     {
         return null;
+    }
+
+    public function getEmail(): string
+    {
+        return $this->email;
     }
 
     public function getUsername(): ? string

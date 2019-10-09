@@ -782,6 +782,10 @@ components:
         last_name:
           type: string
           nullable: false
+        email:
+          type: string
+          format: email
+          nullable: false
         user_id:
           type: integer
           nullable: false

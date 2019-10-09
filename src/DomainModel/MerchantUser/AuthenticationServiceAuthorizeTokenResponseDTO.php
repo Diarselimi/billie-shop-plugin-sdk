@@ -8,10 +8,13 @@ class AuthenticationServiceAuthorizeTokenResponseDTO
 
     private $userId;
 
-    public function __construct(string $clientId, string $userId = null)
+    private $email;
+
+    public function __construct(string $clientId, string $userId = null, string $email = null)
     {
         $this->clientId = $clientId;
         $this->userId = $userId;
+        $this->email = $email;
     }
 
     public function getClientId(): string
@@ -22,5 +25,10 @@ class AuthenticationServiceAuthorizeTokenResponseDTO
     public function getUserId(): ? string
     {
         return $this->userId;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
     }
 }

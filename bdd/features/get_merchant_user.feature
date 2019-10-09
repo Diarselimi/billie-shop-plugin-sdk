@@ -28,6 +28,7 @@ Feature: Get current logged in merchant user details
         ],
         "first_name": "test",
         "last_name": "test",
+        "email":"test@billie.dev",
         "merchant_company": {
             "name": "Test User Company",
             "address_street": "Heinrich-Heine-Platz",
