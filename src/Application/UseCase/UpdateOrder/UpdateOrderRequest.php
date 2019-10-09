@@ -5,20 +5,27 @@ namespace App\Application\UseCase\UpdateOrder;
 use App\Application\UseCase\AbstractOrderRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderAmountRequest;
 use App\Application\UseCase\ValidatedRequestInterface;
-use App\Application\Validator\Constraint as OrderConstraint;
-use Symfony\Component\Validator\Constraints as Assert;
+use App\Application\Validator\Constraint as PaellaAssert;
 use OpenApi\Annotations as OA;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @OA\Schema(schema="UpdateOrderRequest", title="Order Update Object", type="object", properties={
  *      @OA\Property(property="duration", ref="#/components/schemas/OrderDuration"),
  *      @OA\Property(property="amount", ref="#/components/schemas/CreateOrderAmountRequest"),
  *      @OA\Property(property="invoice_number", ref="#/components/schemas/TinyText"),
- *      @OA\Property(property="invoice_url", ref="#/components/schemas/TinyText")
+ *      @OA\Property(property="invoice_url", ref="#/components/schemas/TinyText"),
+ *      @OA\Property(property="order_id", ref="#/components/schemas/TinyText", description="Order external code", example="DE123456-1")
  * })
  */
 class UpdateOrderRequest extends AbstractOrderRequest implements ValidatedRequestInterface
 {
+    /**
+     * @PaellaAssert\OrderExternalCode()
+     * @Assert\Length(max=255)
+     */
+    private $externalCode;
+
     /**
      * @Assert\Type(type="string")
      */
@@ -30,13 +37,15 @@ class UpdateOrderRequest extends AbstractOrderRequest implements ValidatedReques
     private $invoiceUrl;
 
     /**
-     * @OrderConstraint\OrderAmounts()
+     * @Assert\Valid()
+     * @PaellaAssert\OrderAmounts()
+     * @var CreateOrderAmountRequest
      */
     private $amount;
 
     /**
      * @Assert\Type(type="int")
-     * @OrderConstraint\OrderDuration
+     * @PaellaAssert\OrderDuration
      */
     private $duration;
 
@@ -69,22 +78,34 @@ class UpdateOrderRequest extends AbstractOrderRequest implements ValidatedReques
         return $this->duration;
     }
 
-    public function setDuration($duration): UpdateOrderRequest
+    public function setDuration(?int $duration): UpdateOrderRequest
     {
         $this->duration = $duration;
 
         return $this;
     }
 
-    public function setAmount(CreateOrderAmountRequest $amountRequest): UpdateOrderRequest
+    public function setAmount(?CreateOrderAmountRequest $amountRequest): UpdateOrderRequest
     {
         $this->amount = $amountRequest;
 
         return $this;
     }
 
-    public function getAmount(): CreateOrderAmountRequest
+    public function getAmount(): ?CreateOrderAmountRequest
     {
         return $this->amount;
+    }
+
+    public function getExternalCode(): ?string
+    {
+        return $this->externalCode;
+    }
+
+    public function setExternalCode(?string $externalCode): UpdateOrderRequest
+    {
+        $this->externalCode = $externalCode;
+
+        return $this;
     }
 }

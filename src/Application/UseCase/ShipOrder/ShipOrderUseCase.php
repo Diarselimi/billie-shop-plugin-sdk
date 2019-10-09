@@ -64,7 +64,7 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface
     public function execute(ShipOrderRequest $request): OrderResponse
     {
         try {
-            $orderContainer = $this->orderContainerFactory->loadByMerchantIdAndExternalId(
+            $orderContainer = $this->orderContainerFactory->loadByMerchantIdAndExternalIdOrUuid(
                 $request->getMerchantId(),
                 $request->getOrderId()
             );

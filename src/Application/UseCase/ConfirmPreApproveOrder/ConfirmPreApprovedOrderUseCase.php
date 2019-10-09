@@ -48,7 +48,7 @@ class ConfirmPreApprovedOrderUseCase implements LoggingInterface, ValidatedUseCa
     public function execute(ConfirmPreApprovedOrderRequest $request): OrderResponse
     {
         try {
-            $orderContainer = $this->orderContainerFactory->loadByMerchantIdAndExternalId($request->getMerchantId(), $request->getOrderId());
+            $orderContainer = $this->orderContainerFactory->loadByMerchantIdAndExternalIdOrUuid($request->getMerchantId(), $request->getOrderId());
         } catch (OrderContainerFactoryException $exception) {
             throw new OrderNotFoundException();
         }

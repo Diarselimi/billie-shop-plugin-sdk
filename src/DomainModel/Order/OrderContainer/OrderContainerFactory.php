@@ -55,7 +55,7 @@ class OrderContainerFactory
         return new OrderContainer($order, $this->relationLoader);
     }
 
-    public function loadByMerchantIdAndExternalId(int $merchantId, string $orderId): OrderContainer
+    public function loadByMerchantIdAndExternalIdOrUuid(int $merchantId, string $orderId): OrderContainer
     {
         $order = $this->orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($orderId, $merchantId);
         if (!$order) {

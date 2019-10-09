@@ -1,4 +1,4 @@
-Feature:
+Feature: APIS-1077
   In order to update an order
   I want to have an end point to update my orders
   And expect empty response
@@ -13,31 +13,13 @@ Feature:
     """
     """
 
-  Scenario: Case 1: Order exists, not yet shipped, due date provided, amount unchanged
-    Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-    When I send a PATCH request to "/order/CO123" with body:
-    """
-        {
-          "duration": 50,
-          "amount": {
-            "gross": 1000,
-            "net": 900,
-            "tax": 100
-          }
-        }
-    """
-    Then the response status code should be 412
-    And the JSON response should be:
-    """
-    {"errors":[{"title":"Update duration not possible","code":"order_duration_update_not_possible"}]}
-    """
-    And merchant debtor has financing power 1000
-
-  Scenario: Case 1.1: Order exists, not yet shipped, due date provided, valid new amount
-    Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-    When I send a PATCH request to "/order/CO123" with body:
+  Scenario Template: Success 1: Partial provided data is OK and update is successful on any non-final state
+    Given I have a "<state>" order with amounts 1000/900/100, duration 30 and comment "test order"
+    When I send a PATCH request to "/order/test-order-uuid" with body:
     """
     {
+      "order_id": "foobar",
+      "duration": 60,
       "amount": {
         "gross": 500,
         "net": 400,
@@ -47,15 +29,25 @@ Feature:
     """
     Then the response status code should be 204
     And the response should be empty
-    And the order "CO123" duration is 30
-    And the order "CO123" amountGross is 500
-    And merchant debtor has financing power 1500
+    Examples:
+      | state        |
+      | created      |
+      | shipped      |
+      | paid_out     |
+      | late         |
+      | pre_approved |
+      | waiting      |
 
-  Scenario: Case 2: Order exists, not yet shipped, due date unchanged/not set, valid new amount
-    Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-    When I send a PATCH request to "/order/CO123" with body:
+
+  Scenario Template: Success 2: Full provided data is OK and update is successful only when state is or was shipped
+    Given I have a "<state>" order with amounts 1000/900/100, duration 30 and comment "test order"
+    When I send a PATCH request to "/order/test-order-uuid" with body:
     """
     {
+      "order_id": "foobar",
+      "invoice_number": "foobar_123",
+      "invoice_url": "/foobar_123-1.pdf",
+      "duration": 60,
       "amount": {
         "gross": 500,
         "net": 400,
@@ -65,232 +57,237 @@ Feature:
     """
     Then the response status code should be 204
     And the response should be empty
-    And the order "CO123" duration is 30
-    And the order "CO123" amountGross is 500
-    And the order "CO123" amountNet is 400
-    And the order "CO123" amountTax is 100
-    And merchant debtor has financing power 1500
+    Examples:
+      | state    |
+      | shipped  |
+      | paid_out |
+      | late     |
 
-  Scenario: Case 3: Order exists, is shipped but not paid back, valid new due date*, amount unchanged
-    Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-    And I get from payments service create ticket response
-    When I send a PATCH request to "/order/CO123" with body:
-        """
-        {
-          "duration": 50,
-          "amount": {
-            "gross": 1000,
-            "net": 900,
-            "tax": 100
-          }
-        }
-        """
-    Then the response status code should be 204
-    And the response should be empty
-    And the order "CO123" duration is 50
-    And the order "CO123" amountGross is 1000
-    And merchant debtor has financing power 1000
-
-  Scenario: Case 3.1: Order exists, is shipped but not paid back, valid new due date*, amount unchanged
-    Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-    When I send a PATCH request to "/order/CO123" with body:
-        """
-        {
-          "duration": 121,
-          "amount": {
-            "gross": 500,
-            "net": 400,
-            "tax": 100
-          }
-        }
-        """
-    Then the response status code should be 400
-    And the JSON response should be:
+  Scenario: Order does not exist
+    When I send a PATCH request to "/order/abc123" with body:
     """
-      {
-       "errors":[
-          {
-            "source":"duration",
-            "title":"This value should be 120 or less.",
-            "code":"request_validation_error"
-          }
-       ]
+    {
+      "duration": 50,
+      "amount": {
+        "net": 500,
+        "gross": 500,
+        "tax": 0
       }
-    """
-    And merchant debtor has financing power 1000
-
-  Scenario: Case 4: Order exists, is shipped but not paid back, due date unchanged, new valid amount
-    Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-    When I send a PATCH request to "/order/CO123" with body:
-        """
-        {
-          "duration": 30,
-          "amount": {
-            "gross": 500,
-            "net": 400,
-            "tax": 100
-          },
-          "invoice_number": "DE12",
-          "invoice_url": "http://google.de"
-        }
-        """
-    Then the response status code should be 204
-    And the response should be empty
-    And the order "CO123" duration is 30
-    And the order "CO123" amountGross is 500
-    And the order "CO123" amountNet is 400
-    And the order "CO123" amountTax is 100
-    And the order "CO123" invoiceNumber is DE12
-    And the order "CO123" invoiceUrl is "http://google.de"
-    And merchant debtor has financing power 1000
-
-  Scenario: Case 5: Order exists, is shipped but not paid back, new duration invalid
-    Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-    When I send a PATCH request to "/order/CO123" with body:
-    """
-    {
-        "duration": "THIS IS NOT A DURATION"
-    }
-    """
-    Then the response status code should be 400
-    And the JSON response should be:
-    """
-    {"errors":[{"source":"duration","title":"This value should be of type int.","code":"request_validation_error"},{"source":"duration","title":"This value should be a valid number.","code":"request_validation_error"}]}
-    """
-    And merchant debtor has financing power 1000
-
-  Scenario: Case 6: Order exists, is shipped but not paid back, new amount invalid
-    Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-    When I send a PATCH request to "/order/CO123" with body:
-        """
-        {
-          "amount": {
-            "gross": 2000,
-            "net": 1800,
-            "tax": 200
-          }
-        }
-        """
-    Then the response status code should be 412
-    And the JSON response should be:
-    """
-    {"errors":[{"title":"Invalid amount","code":"order_validation_failed"}]}
-    """
-    And merchant debtor has financing power 1000
-
-  Scenario: Case 7: Order exists, is shipped but not paid back, valid new due date, valid new amount
-    Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-    And I get from payments service two modify ticket responses
-    When I send a PATCH request to "/order/CO123" with body:
-        """
-        {
-            "invoice_number": "UPDATED_CO123",
-            "invoice_url": "/invoice.pdf",
-            "duration": 50,
-            "amount": {
-                "net": 500,
-                "gross": 500,
-                "tax": 0
-            }
-        }
-        """
-    Then the response status code should be 204
-    And the order "CO123" duration is 50
-    And the order "CO123" amountGross is 500
-    And the order "CO123" amountNet is 500
-    And the order "CO123" amountTax is 0
-    And the order "CO123" invoiceNumber is UPDATED_CO123
-    And the order "CO123" invoiceUrl is "/invoice.pdf"
-    And merchant debtor has financing power 1000
-
-  Scenario: Case 8: Order does not exist
-    When I send a PATCH request to "/order/CO123XX" with body:
-    """
-    {
-        "duration": 50,
-        "amount": {
-            "net": 500,
-            "gross": 500,
-            "tax": 0
-        }
     }
     """
     Then the response status code should be 404
 
-  Scenario: Case 9: Order was marked as fraud
-    Given I have a created order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-    And The order "CO123" was already marked as fraud
-    When I send a PATCH request to "/order/CO123" with body:
+  Scenario: Order is marked as fraud
+    Given I have a created order "abc123" with amounts 1000/900/100, duration 30 and comment "test order"
+    And The order "abc123" was already marked as fraud
+    When I send a PATCH request to "/order/abc123" with body:
     """
-        {
-          "duration": 30,
-          "amount": {
-            "gross": 500,
-            "net": 400,
-            "tax": 100
-          }
-        }
+    {
+      "duration": 30,
+      "amount": {
+        "gross": 500,
+        "net": 400,
+        "tax": 100
+      }
+    }
     """
     Then the response status code should be 403
     And the JSON response should be:
-        """
-        {"errors":[{"title":"Order was marked as fraud","code":"forbidden"}]}
-        """
+    """
+    {"errors":[{"title":"Order was marked as fraud","code":"forbidden"}]}
+    """
 
-  Scenario: Case 10: Order exists, is shipped, valid new invoice number and url
-    Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-    When I send a PATCH request to "/order/CO123" with body:
-        """
-        {
-          "invoice_number": "newInvoiceNumber",
-          "invoice_url": "/newInvoice.pdf"
-        }
-        """
-    Then the response status code should be 204
-    And the response should be empty
-    And the order "CO123" invoiceNumber is "newInvoiceNumber"
-    And the order "CO123" invoiceUrl is "/newInvoice.pdf"
+  Scenario Template: Provided amount is wrong: tax is wrongly calculated
+    Given I have a new order "abc123" with amounts 1000/900/100, duration 30 and comment "test order"
+    When I send a PATCH request to "/order/abc123" with body:
+    """
+    {
+      "amount": {
+        "gross": <gross>,
+        "net": <net>,
+        "tax": <tax>
+      }
+    }
+    """
+    Examples:
+      | gross | net | tax |
+      | 500   | 150 | 100 |
+    Then the response status code should be 400
+    And the response should contain "Invalid amounts"
     And merchant debtor has financing power 1000
 
-  Scenario: Case 11: Order exists, not yet shipped, valid new invoice number and url
-    Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-    When I send a PATCH request to "/order/CO123" with body:
-        """
-        {
-          "invoice_number": "newInvoiceNumber",
-          "invoice_url": "/newInvoice.pdf"
-        }
-        """
-    Then the response status code should be 412
+
+  Scenario Template: Provided amount is wrong: amount is zero or negative
+    Given I have a new order "abc123" with amounts 1000/900/100, duration 30 and comment "test order"
+    When I send a PATCH request to "/order/abc123" with body:
+    """
+    {
+      "amount": {
+        "gross": <gross>,
+        "net": <net>,
+        "tax": <tax>
+      }
+    }
+    """
+    Examples:
+      | gross | net | tax |
+      | 0     | 0   | 0   |
+      | -1    | -1  | 0   |
+    Then the response status code should be 400
+    And the response should contain "This value should be greater than 0"
+    And merchant debtor has financing power 1000
+
+  Scenario Template: Changing amount is not allowed because of order state
+    Given I have a "<state>" order "abc123" with amounts 1000/900/100, duration 30 and comment "test order"
+    When I send a PATCH request to "/order/abc123" with body:
+    """
+    {
+      "amount": {
+        "gross": 500,
+        "net": 400,
+        "tax": 100
+      }
+    }
+    """
+    Then the response status code should be 403
     And the JSON response should be:
     """
-    {"errors":[{"title":"Update invoice is not possible","code":"order_invoice_update_not_possible"}]}
+    {"errors":[{"title":"Order amount cannot be updated","code":"forbidden"}]}
     """
-    And merchant debtor has financing power 1000
+    Examples:
+      | state      |
+      | new        |
+      | authorized |
+      | declined   |
+      | complete   |
+      | canceled   |
 
-  Scenario: Case 12: Order exists, not yet shipped, invalid amounts provided
-    Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-    When I send a PATCH request to "/order/CO123" with body:
-        """
-        {
-          "amount": {
-            "gross": 500,
-            "net": 40,
-            "tax": 10
-          }
-        }
-        """
+  Scenario: Changing amount is not allowed because it is higher than previous
+    Given I have a created order "abc123" with amounts 1000/900/100, duration 30 and comment "test order"
+    When I send a PATCH request to "/order/abc123" with body:
+    """
+    {
+      "amount": {
+        "gross": 2000,
+        "net": 1900,
+        "tax": 100
+      }
+    }
+    """
+    Then the response status code should be 403
+    And the JSON response should be:
+    """
+    {"errors":[{"title":"Order amount cannot be updated","code":"forbidden"}]}
+    """
+
+  Scenario Template: Changing duration is not allowed because of order state
+    Given I have a "<state>" order "abc123" with amounts 1000/900/100, duration 30 and comment "test order"
+    When I send a PATCH request to "/order/abc123" with body:
+    """
+    {
+      "duration": 31
+    }
+    """
+    Then the response status code should be 403
+    And the JSON response should be:
+    """
+    {"errors":[{"title":"Order duration cannot be updated","code":"forbidden"}]}
+    """
+    Examples:
+      | state      |
+      | new        |
+      | authorized |
+      | declined   |
+      | complete   |
+      | canceled   |
+
+  Scenario: Changing duration is not allowed because it is lower than previous
+    Given I have a created order "abc123" with amounts 1000/900/100, duration 30 and comment "test order"
+    When I send a PATCH request to "/order/abc123" with body:
+    """
+    {
+      "duration": 20
+    }
+    """
+    Then the response status code should be 403
+    And the JSON response should be:
+    """
+    {"errors":[{"title":"Order duration cannot be updated","code":"forbidden"}]}
+    """
+
+  Scenario: Changing duration is not allowed because it is higher than 120
+    Given I have a created order "abc123" with amounts 1000/900/100, duration 30 and comment "test order"
+    When I send a PATCH request to "/order/abc123" with body:
+    """
+    {
+      "duration": 121
+    }
+    """
     Then the response status code should be 400
     And the JSON response should be:
-      """
-      {
-        "errors":[
-          {
-             "source":"amount",
-             "title":"Invalid amounts",
-             "code":"request_validation_error"
-          }
-        ]
-      }
-      """
-    And merchant debtor has financing power 1000
+    """
+    {"errors":[{"title":"This value should be 120 or less.","code":"request_validation_error","source":"duration"}]}
+    """
+
+
+  Scenario: Changing external code is not allowed because it was already set
+    Given I have a created order "abc123" with amounts 1000/900/100, duration 30 and comment "test order"
+    When I send a PATCH request to "/order/abc123" with body:
+    """
+    {
+      "order_id": "abcdef456"
+    }
+    """
+    Then the response status code should be 403
+    And the JSON response should be:
+    """
+    {"errors":[{"title":"Order external code cannot be updated","code":"forbidden"}]}
+    """
+
+  Scenario Template: Changing invoice number is not allowed because of order state
+    Given I have a "<state>" order "abc123" with amounts 1000/900/100, duration 30 and comment "test order"
+    When I send a PATCH request to "/order/abc123" with body:
+    """
+    {
+      "invoice_number": "foobar_123"
+    }
+    """
+    Then the response status code should be 403
+    And the JSON response should be:
+    """
+    {"errors":[{"title":"Order invoice number cannot be updated","code":"forbidden"}]}
+    """
+    Examples:
+      | state        |
+      | new          |
+      | authorized   |
+      | declined     |
+      | complete     |
+      | canceled     |
+      | pre_approved |
+      | waiting      |
+      | created      |
+
+  Scenario Template: Changing invoice URL is not allowed because of order state
+    Given I have a "<state>" order "abc123" with amounts 1000/900/100, duration 30 and comment "test order"
+    When I send a PATCH request to "/order/abc123" with body:
+    """
+    {
+      "invoice_url": "/foobar_123-1.pdf"
+    }
+    """
+    Then the response status code should be 403
+    And the JSON response should be:
+    """
+    {"errors":[{"title":"Order invoice URL cannot be updated","code":"forbidden"}]}
+    """
+    Examples:
+      | state        |
+      | new          |
+      | authorized   |
+      | declined     |
+      | complete     |
+      | canceled     |
+      | pre_approved |
+      | waiting      |
+      | created      |

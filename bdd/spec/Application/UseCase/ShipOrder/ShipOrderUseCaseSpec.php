@@ -96,7 +96,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
         ShipOrderRequest $request
     ) {
         $orderContainerFactory
-            ->loadByMerchantIdAndExternalId(self::MERCHANT_ID, self::ID)
+            ->loadByMerchantIdAndExternalIdOrUuid(self::MERCHANT_ID, self::ID)
             ->shouldBeCalled()
             ->willThrow(OrderContainerFactoryException::class)
         ;
@@ -112,7 +112,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
         OrderEntity $order
     ) {
         $orderContainerFactory
-            ->loadByMerchantIdAndExternalId(self::MERCHANT_ID, self::ID)
+            ->loadByMerchantIdAndExternalIdOrUuid(self::MERCHANT_ID, self::ID)
             ->shouldBeCalled()
             ->willReturn($orderContainer)
         ;
@@ -155,7 +155,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
 
         $merchantDebtor->getPaymentDebtorId()->willReturn(self::PAYMENT_DEBTOR_ID);
         $orderContainerFactory
-            ->loadByMerchantIdAndExternalId(self::MERCHANT_ID, self::ID)
+            ->loadByMerchantIdAndExternalIdOrUuid(self::MERCHANT_ID, self::ID)
             ->shouldBeCalled()
             ->willReturn($orderContainer)
         ;

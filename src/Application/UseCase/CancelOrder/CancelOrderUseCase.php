@@ -49,7 +49,7 @@ class CancelOrderUseCase
     public function execute(CancelOrderRequest $request): void
     {
         try {
-            $orderContainer = $this->orderContainerFactory->loadByMerchantIdAndExternalId(
+            $orderContainer = $this->orderContainerFactory->loadByMerchantIdAndExternalIdOrUuid(
                 $request->getMerchantId(),
                 $request->getOrderId()
             );

@@ -25,7 +25,7 @@ class GetOrderUseCase
     public function execute(GetOrderRequest $request): OrderResponse
     {
         try {
-            $orderContainer = $this->orderContainerFactory->loadByMerchantIdAndExternalId(
+            $orderContainer = $this->orderContainerFactory->loadByMerchantIdAndExternalIdOrUuid(
                 $request->getMerchantId(),
                 $request->getOrderId()
             );
