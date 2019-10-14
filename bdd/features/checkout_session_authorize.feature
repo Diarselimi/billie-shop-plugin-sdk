@@ -204,8 +204,8 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
        ]
     }
     """
-    Then the order A1 is in state authorized
-    And the response status code should be 200
+    Then the response status code should be 200
+    And the order A1 is in state authorized
     And the checkout_session_id "123123" should be invalid
     And the JSON response should be:
     """

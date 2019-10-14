@@ -78,6 +78,11 @@ class CompaniesServiceContext implements Context
             new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_match_trusted_source.json')),
             new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_match_trusted_source.json'))
         ));
+
+        $this->mockRequest('/debtor/10', new ResponseStack(
+            new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_match_trusted_source.json')),
+            new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_match_trusted_source.json'))
+        ));
     }
 
     /**

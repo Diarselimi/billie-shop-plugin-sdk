@@ -83,7 +83,7 @@ class PaellaCoreContext extends MinkContext
             ->setFinancingLimit(10000)
             ->setFinancingPower(10000)
             ->setApiKey('test')
-            ->setCompanyId('1')
+            ->setCompanyId('10')
             ->setOauthClientId('oauthClientId');
 
         $this->getMerchantRepository()->insert($this->merchant);

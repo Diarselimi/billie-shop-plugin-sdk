@@ -27,7 +27,7 @@ class User implements UserInterface
         string $password,
         array $roles,
         ?CheckoutSessionEntity $checkoutSession = null,
-        string $email = null
+        ?string $email = null
     ) {
         $this->merchantId = $merchantId;
         $this->username = $username;

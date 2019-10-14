@@ -34,7 +34,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     And I get from payments service get debtor response
 
   Scenario: I successfully confirm the order by sending the same amounts and duration.
-    Given I have a authorized order "CO123" with amounts 10.10/90.0/100.10, duration 30 and comment "test order"
+    Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and comment "test order"
     And I get from companies service identify match response
     And I get from companies service get debtor response
     And I send a PUT request to "/checkout-session/123123/confirm" with body:
@@ -42,14 +42,14 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     {
        "amount":{
           "net":90.0,
-          "gross":10.10,
-          "tax":100.10
+          "gross":100.0,
+          "tax":10.0
        },
        "duration":30
     }
     """
-    Then the order CO123 is in state created
-    And the response status code should be 202
+    Then the response status code should be 202
+    And the order CO123 is in state created
 
   Scenario:
     I fail to confirm the order if I send the wrong confirm request
@@ -107,9 +107,9 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     """
     {
        "amount":{
-          "net":55.2,
-          "gross":43.30,
-          "tax":10.10
+          "net":50.0,
+          "gross":50.0,
+          "tax":0.0
        },
        "duration":31
     }

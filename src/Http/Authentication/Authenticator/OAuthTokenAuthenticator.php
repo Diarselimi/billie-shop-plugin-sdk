@@ -58,13 +58,13 @@ class OAuthTokenAuthenticator extends AbstractAuthenticator
         }
 
         if ($tokenMetadata->getClientId()) {
-            return $this->authenticateAsMerchantClient($tokenMetadata->getClientId(), $tokenMetadata->getEmail());
+            return $this->authenticateAsMerchantClient($tokenMetadata->getClientId());
         }
 
         throw new AuthenticationException();
     }
 
-    private function authenticateAsMerchantClient(string $oauthClientId, string $email): UserInterface
+    private function authenticateAsMerchantClient(string $oauthClientId): UserInterface
     {
         $merchant = $this->merchantRepository->getOneByOauthClientId($oauthClientId);
 
@@ -78,7 +78,7 @@ class OAuthTokenAuthenticator extends AbstractAuthenticator
             $merchant->getOauthClientId(),
             [MerchantUserEntity::ROLE_MERCHANT],
             null,
-            $email
+            null
         );
     }
 
