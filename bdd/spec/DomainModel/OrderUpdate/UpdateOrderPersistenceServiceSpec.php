@@ -48,7 +48,72 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         $this->beConstructedWith(...func_get_args());
     }
 
-    public function it_updates_amount(
+    public function it_updates_amount_but_not_limits_if_order_was_shipped(
+        OrderContainer $orderContainer,
+        UpdateOrderRequest $request,
+        UpdateOrderRequestValidator $updateOrderRequestValidator,
+        MerchantDebtorLimitsService $merchantDebtorLimitsService,
+        MerchantEntity $merchant,
+        MerchantRepositoryInterface $merchantRepository,
+        OrderFinancialDetailsFactory $orderFinancialDetailsFactory,
+        OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
+        OrderRepositoryInterface $orderRepository,
+        OrderInvoiceManager $invoiceManager,
+        OrderStateManager $orderStateManager,
+        PaymentRequestFactory $paymentRequestFactory,
+        PaymentsServiceInterface $paymentsService
+    ) {
+        $changeSet = (new UpdateOrderRequest('order123', 1))->setAmount(
+            (new CreateOrderAmountRequest())->setGross(150)->setNet(150)->setTax(0)
+        );
+        $orderFinancialDetails = (new OrderFinancialDetailsEntity())
+            ->setAmountGross(200)
+            ->setAmountNet(200)
+            ->setAmountTax(0)
+            ->setDuration(30)
+            ->setOrderId(1);
+        $newOrderFinancialDetails = (new OrderFinancialDetailsEntity())
+            ->setAmountGross(150)
+            ->setAmountNet(150)
+            ->setAmountTax(0)
+            ->setDuration(30)
+            ->setOrderId(1);
+
+        $grossDiff = 50;
+        $order = new OrderEntity();
+
+        $orderContainer->getOrder()->shouldBeCalled()->willReturn($order);
+        $updateOrderRequestValidator->getValidatedRequest($orderContainer, $request)->shouldBeCalled()->willReturn($changeSet);
+        $orderContainer->getOrderFinancialDetails()->shouldBeCalled()->willReturn($orderFinancialDetails);
+        $orderContainer->getMerchant()->shouldNotBeCalled();
+
+        // should NOT unlock merchant debtor limit
+        $merchantDebtorLimitsService->unlock($orderContainer, $grossDiff)->shouldNotBeCalled();
+
+        // should NOT unlock merchant limit
+        $merchant->increaseFinancingLimit($grossDiff)->shouldNotBeCalled();
+        $merchantRepository->update($merchant)->shouldNotBeCalled();
+
+        // update financial details
+        $orderFinancialDetailsFactory->create(1, 150, 150, 0, 30)->shouldBeCalled()->willReturn($newOrderFinancialDetails);
+        $orderFinancialDetailsRepository->insert($newOrderFinancialDetails)->shouldBeCalled();
+        $orderContainer->setOrderFinancialDetails($newOrderFinancialDetails)->shouldBeCalled()->willReturn($orderContainer);
+
+        // should NOT update order nor invoice
+        $orderRepository->update(Argument::any())->shouldNotBeCalled();
+        $invoiceManager->upload(Argument::any(), Argument::any())->shouldNotBeCalled();
+
+        // calls payments service
+        $orderStateManager->wasShipped($order)->shouldBeCalled()->willReturn(true);
+        $paymentsModifyRequest = new ModifyRequestDTO();
+        $paymentRequestFactory->createModifyRequestDTO($orderContainer)->shouldBeCalled()->willReturn($paymentsModifyRequest);
+        $paymentsService->modifyOrder($paymentsModifyRequest)->shouldBeCalled();
+
+        // run
+        $this->update($orderContainer, $request)->shouldReturn($changeSet);
+    }
+
+    public function it_updates_amount_and_limits_if_order_was_not_shipped(
         OrderContainer $orderContainer,
         UpdateOrderRequest $request,
         UpdateOrderRequestValidator $updateOrderRequestValidator,
@@ -103,11 +168,10 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         $orderRepository->update(Argument::any())->shouldNotBeCalled();
         $invoiceManager->upload(Argument::any(), Argument::any())->shouldNotBeCalled();
 
-        // calls payments service
-        $orderStateManager->wasShipped($order)->shouldBeCalled()->willReturn(true);
-        $paymentsModifyRequest = new ModifyRequestDTO();
-        $paymentRequestFactory->createModifyRequestDTO($orderContainer)->shouldBeCalled()->willReturn($paymentsModifyRequest);
-        $paymentsService->modifyOrder($paymentsModifyRequest)->shouldBeCalled();
+        // should NOT call payments service
+        $orderStateManager->wasShipped($order)->shouldBeCalled()->willReturn(false);
+        $paymentRequestFactory->createModifyRequestDTO(Argument::any())->shouldNotBeCalled();
+        $paymentsService->modifyOrder(Argument::any())->shouldNotBeCalled();
 
         // run
         $this->update($orderContainer, $request)->shouldReturn($changeSet);

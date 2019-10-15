@@ -75,7 +75,7 @@ class UpdateOrderPersistenceService
 
         // Persist only what was changed:
 
-        if ($amountChanged) {
+        if ($amountChanged && !$this->orderStateManager->wasShipped($order)) {
             $this->unlockLimits($orderContainer, $changeSet);
         }
 
