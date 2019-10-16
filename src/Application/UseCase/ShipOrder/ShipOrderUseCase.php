@@ -41,6 +41,8 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface
 
     private $uuidGenerator;
 
+    private $orderStateManager;
+
     public function __construct(
         Workflow $workflow,
         OrderRepositoryInterface $orderRepository,
@@ -49,7 +51,8 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface
         OrderContainerFactory $orderContainerFactory,
         OrderResponseFactory $orderResponseFactory,
         PaymentRequestFactory $paymentRequestFactory,
-        UuidGeneratorInterface $uuidGenerator
+        UuidGeneratorInterface $uuidGenerator,
+        OrderStateManager $orderStateManager
     ) {
         $this->workflow = $workflow;
         $this->orderRepository = $orderRepository;
@@ -59,6 +62,7 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface
         $this->orderResponseFactory = $orderResponseFactory;
         $this->paymentRequestFactory = $paymentRequestFactory;
         $this->uuidGenerator = $uuidGenerator;
+        $this->orderStateManager = $orderStateManager;
     }
 
     public function execute(ShipOrderRequest $request): OrderResponse
@@ -104,8 +108,7 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface
             throw new ShipOrderException("Payments call unsuccessful", null, $exception);
         }
 
-        $this->workflow->apply($order, OrderStateManager::TRANSITION_SHIP);
-        $this->orderRepository->update($order);
+        $this->orderStateManager->ship($orderContainer);
 
         try {
             $this->invoiceManager->upload($order, InvoiceUploadHandlerInterface::EVENT_SHIPMENT);

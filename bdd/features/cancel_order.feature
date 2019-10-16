@@ -7,6 +7,9 @@ Feature:
         Given I add "Content-type" header equal to "application/json"
         And I add "X-Test" header equal to 1
         And I add "X-Api-Key" header equal to test
+        And The following notification settings exist for merchant 1:
+        | notification_type | enabled |
+        | order_canceled    | 1       |
 
     Scenario: Successful new order cancellation
         Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
@@ -18,6 +21,7 @@ Feature:
         Then the response status code should be 204
         And the response should be empty
         And the order "CO123" is in state canceled
+        And Order notification should exist for order "CO123" with type "order_canceled"
 
     Scenario: Successful created order cancellation
         Given I have a created order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
@@ -29,6 +33,7 @@ Feature:
         Then the response status code should be 204
         And the response should be empty
         And the order "CO123" is in state canceled
+        And Order notification should exist for order "CO123" with type "order_canceled"
 
     Scenario: Successful shipped order cancellation
         Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
@@ -36,6 +41,7 @@ Feature:
         Then the response status code should be 204
         And the response should be empty
         And the order "CO123" is in state canceled
+        And Order notification should exist for order "CO123" with type "order_canceled"
 
     Scenario: Unsuccessful declined order cancellation
         Given I have a declined order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"

@@ -30,13 +30,16 @@ class CancelOrderUseCase
 
     private $merchantRepository;
 
+    private $orderStateManager;
+
     public function __construct(
         Workflow $workflow,
         OrderRepositoryInterface $orderRepository,
         MerchantDebtorLimitsService $limitsService,
         PaymentsServiceInterface $paymentsService,
         OrderContainerFactory $orderContainerFactory,
-        MerchantRepositoryInterface $merchantRepository
+        MerchantRepositoryInterface $merchantRepository,
+        OrderStateManager $orderStateManager
     ) {
         $this->workflow = $workflow;
         $this->orderRepository = $orderRepository;
@@ -44,6 +47,7 @@ class CancelOrderUseCase
         $this->paymentsService = $paymentsService;
         $this->orderContainerFactory = $orderContainerFactory;
         $this->merchantRepository = $merchantRepository;
+        $this->orderStateManager = $orderStateManager;
     }
 
     public function execute(CancelOrderRequest $request): void
@@ -58,6 +62,7 @@ class CancelOrderUseCase
         }
 
         $order = $orderContainer->getOrder();
+
         if ($order->getMarkedAsFraudAt()) {
             throw new FraudOrderException();
         }
@@ -76,10 +81,11 @@ class CancelOrderUseCase
                 );
             }
 
-            $this->workflow->apply($order, OrderStateManager::TRANSITION_CANCEL);
+            $this->orderStateManager->cancel($orderContainer);
         } elseif ($this->workflow->can($order, OrderStateManager::TRANSITION_CANCEL_SHIPPED)) {
             $this->paymentsService->cancelOrder($order);
-            $this->workflow->apply($order, OrderStateManager::TRANSITION_CANCEL_SHIPPED);
+
+            $this->orderStateManager->cancelShipped($orderContainer);
         } else {
             throw new PaellaCoreCriticalException(
                 "Order #{$request->getOrderId()} can not be cancelled",
@@ -87,7 +93,5 @@ class CancelOrderUseCase
                 Response::HTTP_BAD_REQUEST
             );
         }
-
-        $this->orderRepository->update($order);
     }
 }

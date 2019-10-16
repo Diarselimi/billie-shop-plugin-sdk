@@ -52,11 +52,15 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
     public static function getSubscribedEvents()
     {
         return [
-            OrderApprovedEvent::NAME => 'onApproved',
-            OrderDeclinedEvent::NAME => 'onDeclined',
-            OrderInWaitingStateEvent::NAME => 'onWaiting',
-            OrderCompleteEvent::NAME => 'onComplete',
-            OrderPreApprovedEvent::NAME => 'onPreApproved',
+            OrderApprovedEvent::class => 'onApproved',
+            OrderDeclinedEvent::class => 'onDeclined',
+            OrderInWaitingStateEvent::class => 'onWaiting',
+            OrderCompleteEvent::class => 'onComplete',
+            OrderPreApprovedEvent::class => 'onPreApproved',
+            OrderShippedEvent::class => 'onShipped',
+            OrderPaidOutEvent::class => 'onPaidOut',
+            OrderIsLateEvent::class => 'onLate',
+            OrderCanceledEvent::class => 'onCancel',
         ];
     }
 
@@ -101,6 +105,11 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
             OrderEntity::MAX_DURATION_IN_WAITING_STATE
         );
 
+        $this->notifyMerchantWebhook(
+            $event->getOrderContainer()->getOrder(),
+            OrderNotificationEntity::NOTIFICATION_TYPE_ORDER_WAITING
+        );
+
         $failedRiskCheckNames = array_map(
             function (OrderRiskCheckEntity $orderRiskCheckEntity) {
                 return $orderRiskCheckEntity->getRiskCheckDefinition()->getName();
@@ -139,6 +148,38 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
             self::PRE_APPROVED_STATE_QUEUE_ROUTING_KEY,
             ['order_id' => $order->getUuid(), 'merchant_id' => $order->getMerchantId()],
             OrderEntity::MAX_DURATION_IN_PRE_APPROVED_STATE
+        );
+    }
+
+    public function onShipped(OrderShippedEvent $event): void
+    {
+        $this->notifyMerchantWebhook(
+            $event->getOrderContainer()->getOrder(),
+            OrderNotificationEntity::NOTIFICATION_TYPE_ORDER_SHIPPED
+        );
+    }
+
+    public function onLate(OrderIsLateEvent $event): void
+    {
+        $this->notifyMerchantWebhook(
+            $event->getOrderContainer()->getOrder(),
+            OrderNotificationEntity::NOTIFICATION_TYPE_ORDER_LATE
+        );
+    }
+
+    public function onPaidOut(OrderPaidOutEvent $event): void
+    {
+        $this->notifyMerchantWebhook(
+            $event->getOrderContainer()->getOrder(),
+            OrderNotificationEntity::NOTIFICATION_TYPE_ORDER_PAID_OUT
+        );
+    }
+
+    public function onCancel(OrderCanceledEvent $event): void
+    {
+        $this->notifyMerchantWebhook(
+            $event->getOrderContainer()->getOrder(),
+            OrderNotificationEntity::NOTIFICATION_TYPE_ORDER_CANCELED
         );
     }
 

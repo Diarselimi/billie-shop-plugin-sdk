@@ -1,12 +1,14 @@
 Feature:
     In order to ship an order
-    I want to have an end point to ship my orders
-    And expect empty response
+    I want to have an end point to ship my orders And expect empty response
 
     Background:
         Given I add "Content-type" header equal to "application/json"
         And I add "X-Test" header equal to 1
         And I add "X-Api-Key" header equal to test
+        And The following notification settings exist for merchant 1:
+        | notification_type | enabled |
+        | order_shipped     | 1       |
 
     Scenario: Order doesn't exist
         When I send a POST request to "/order/ADDDD/ship" with body:
@@ -99,6 +101,7 @@ Feature:
         }
         """
         And the order "CO123" is in state shipped
+        And Order notification should exist for order "CO123" with type "order_shipped"
 
     Scenario: Order not shipped if no external code exists nor provided
         Given I have a created order with amounts 1000/900/100, duration 30 and comment "test order"
@@ -145,6 +148,7 @@ Feature:
         """
         Then the response status code should be 200
         And the order "DD123" is in state shipped
+        And Order notification should exist for order "DD123" with type "order_shipped"
         And the JSON response should be:
         """
         {

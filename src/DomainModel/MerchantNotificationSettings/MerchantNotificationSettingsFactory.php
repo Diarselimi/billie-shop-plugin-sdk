@@ -11,6 +11,11 @@ class MerchantNotificationSettingsFactory
         OrderNotificationEntity::NOTIFICATION_TYPE_ORDER_APPROVED => true,
         OrderNotificationEntity::NOTIFICATION_TYPE_ORDER_DECLINED => true,
         OrderNotificationEntity::NOTIFICATION_TYPE_DCI_COMMUNICATION => false,
+        OrderNotificationEntity::NOTIFICATION_TYPE_ORDER_WAITING => false,
+        OrderNotificationEntity::NOTIFICATION_TYPE_ORDER_SHIPPED => false,
+        OrderNotificationEntity::NOTIFICATION_TYPE_ORDER_PAID_OUT => false,
+        OrderNotificationEntity::NOTIFICATION_TYPE_ORDER_LATE => false,
+        OrderNotificationEntity::NOTIFICATION_TYPE_ORDER_CANCELED => false,
     ];
 
     /**

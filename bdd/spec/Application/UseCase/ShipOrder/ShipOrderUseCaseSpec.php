@@ -62,6 +62,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
         OrderResponseFactory $orderResponseFactory,
         PaymentRequestFactory $paymentRequestFactory,
         UuidGenerator $uuidGenerator,
+        OrderStateManager $orderStateManager,
         ValidatorInterface $validator,
         OrderContainer $orderContainer,
         OrderEntity $order,
@@ -128,7 +129,6 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
 
     public function it_updates_order_and_create_borscht_order(
         Workflow $workflow,
-        OrderRepositoryInterface $orderRepository,
         PaymentsServiceInterface $paymentsService,
         OrderInvoiceManager $invoiceManager,
         OrderContainerFactory $orderContainerFactory,
@@ -140,7 +140,8 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
         OrderEntity $order,
         OrderResponse $orderResponse,
         OrderFinancialDetailsEntity $orderFinancialDetails,
-        UuidGeneratorInterface $uuidGenerator
+        UuidGeneratorInterface $uuidGenerator,
+        OrderStateManager $orderStateManager
     ) {
         $order->getMerchantDebtorId()->willReturn(self::MERCHANT_DEBTOR_ID);
         $order->getExternalCode()->willReturn(self::EXTERNAL_CODE);
@@ -182,10 +183,9 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
 
         $order->setPaymentId(Argument::any())->shouldBeCalled();
 
-        $workflow->apply($order, OrderStateManager::TRANSITION_SHIP)->shouldBeCalled();
+        $orderStateManager->ship($orderContainer)->shouldBeCalled();
 
         $invoiceManager->upload($order, 'order.shipment')->shouldBeCalledOnce();
-        $orderRepository->update($order)->shouldBeCalled();
 
         $orderResponseFactory->create($orderContainer)->shouldBeCalled();
 

@@ -14,6 +14,16 @@ class OrderNotificationEntity extends AbstractTimestampableEntity
 
     const NOTIFICATION_TYPE_DCI_COMMUNICATION = 'dci_communication';
 
+    const NOTIFICATION_TYPE_ORDER_WAITING = 'order_waiting';
+
+    const NOTIFICATION_TYPE_ORDER_SHIPPED = 'order_shipped';
+
+    const NOTIFICATION_TYPE_ORDER_PAID_OUT = 'order_paid_out';
+
+    const NOTIFICATION_TYPE_ORDER_LATE = 'order_late';
+
+    const NOTIFICATION_TYPE_ORDER_CANCELED = 'order_canceled';
+
     private $orderId;
 
     private $notificationType;

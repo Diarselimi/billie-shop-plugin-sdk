@@ -3,13 +3,16 @@
 namespace App\DomainModel\Order;
 
 use App\Application\Exception\OrderWorkflowException;
+use App\DomainEvent\Order\OrderCanceledEvent;
 use App\DomainEvent\Order\OrderCompleteEvent;
 use App\DomainEvent\Order\OrderApprovedEvent;
 use App\DomainEvent\Order\OrderDeclinedEvent;
 use App\DomainEvent\Order\OrderInWaitingStateEvent;
+use App\DomainEvent\Order\OrderIsLateEvent;
+use App\DomainEvent\Order\OrderPaidOutEvent;
+use App\DomainEvent\Order\OrderShippedEvent;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainEvent\Order\OrderPreApprovedEvent;
-use App\DomainModel\OrderRiskCheck\Checker\LimitCheck;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -55,6 +58,16 @@ class OrderStateManager implements LoggingInterface
         self::STATE_PRE_APPROVED,
     ];
 
+    private const STATE_TRANSITION_EVENTS = [
+        self::STATE_PRE_APPROVED => OrderPreApprovedEvent::class,
+        self::STATE_WAITING => OrderInWaitingStateEvent::class,
+        self::STATE_SHIPPED => OrderShippedEvent::class,
+        self::STATE_PAID_OUT => OrderPaidOutEvent::class,
+        self::STATE_LATE => OrderIsLateEvent::class,
+        self::STATE_CANCELED => OrderCanceledEvent::class,
+        self::STATE_COMPLETE => OrderCompleteEvent::class,
+    ];
+
     public const TRANSITION_NEW = 'new';
 
     public const TRANSITION_AUTHORIZE = 'authorize';
@@ -87,20 +100,16 @@ class OrderStateManager implements LoggingInterface
 
     private $orderCrossChecksService;
 
-    private $orderChecksRunnerService;
-
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         Workflow $workflow,
         CreateOrderCrossChecksService $orderCrossChecksService,
-        EventDispatcherInterface $eventDispatcher,
-        OrderChecksRunnerService $orderChecksRunnerService
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->orderRepository = $orderRepository;
         $this->workflow = $workflow;
         $this->orderCrossChecksService = $orderCrossChecksService;
         $this->eventDispatcher = $eventDispatcher;
-        $this->orderChecksRunnerService = $orderChecksRunnerService;
     }
 
     public function wasShipped(OrderEntity $order): bool
@@ -110,11 +119,6 @@ class OrderStateManager implements LoggingInterface
             self::STATE_PAID_OUT,
             self::STATE_LATE,
         ], true);
-    }
-
-    public function isNew(OrderEntity $order): bool
-    {
-        return $order->getState() === self::STATE_NEW;
     }
 
     public function isLate(OrderEntity $order): bool
@@ -147,11 +151,6 @@ class OrderStateManager implements LoggingInterface
         return $order->getState() === self::STATE_WAITING;
     }
 
-    public function isAuthorized(OrderEntity $order): bool
-    {
-        return $order->getState() === self::STATE_AUTHORIZED;
-    }
-
     public function isPreApproved(OrderEntity $order): bool
     {
         return $order->getState() === self::STATE_PRE_APPROVED;
@@ -173,7 +172,7 @@ class OrderStateManager implements LoggingInterface
         $this->workflow->apply($order, OrderStateManager::TRANSITION_CREATE);
         $this->orderRepository->update($order);
 
-        $this->eventDispatcher->dispatch(OrderApprovedEvent::NAME, new OrderApprovedEvent($orderContainer, $shouldNotifyWebhook));
+        $this->eventDispatcher->dispatch(new OrderApprovedEvent($orderContainer, $shouldNotifyWebhook));
         $this->logInfo("Order approved");
     }
 
@@ -185,47 +184,76 @@ class OrderStateManager implements LoggingInterface
         $this->workflow->apply($order, OrderStateManager::TRANSITION_DECLINE);
         $this->orderRepository->update($order);
 
-        $this->eventDispatcher->dispatch(OrderDeclinedEvent::NAME, new OrderDeclinedEvent($orderContainer, $shouldNotifyWebhook));
+        $this->eventDispatcher->dispatch(new OrderDeclinedEvent($orderContainer, $shouldNotifyWebhook));
         $this->logInfo("Order declined");
     }
 
     public function wait(OrderContainer $orderContainer)
     {
-        $order = $orderContainer->getOrder();
-
-        $this->workflow->apply($order, OrderStateManager::TRANSITION_WAITING);
-        $this->orderRepository->update($order);
-
-        $this->eventDispatcher->dispatch(OrderInWaitingStateEvent::NAME, new OrderInWaitingStateEvent($orderContainer));
-        $this->logInfo("Order was moved to waiting state");
+        $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_WAITING);
+        $this->update($orderContainer);
     }
 
     public function authorize(OrderContainer $orderContainer)
     {
         $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_AUTHORIZE);
-        $this->orderRepository->update($orderContainer->getOrder());
-        $this->logInfo("Order was moved to authorized state");
+        $this->update($orderContainer);
     }
 
     public function preApprove(OrderContainer $orderContainer)
     {
-        $order = $orderContainer->getOrder();
-        $this->workflow->apply($order, OrderStateManager::TRANSITION_PRE_APPROVED);
-        $this->orderRepository->update($order);
-
-        $this->eventDispatcher->dispatch(OrderPreApprovedEvent::NAME, new OrderPreApprovedEvent($orderContainer));
-        $this->logInfo("Order was moved to Pre Approved state");
+        $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_PRE_APPROVED);
+        $this->update($orderContainer);
     }
 
     public function complete(OrderContainer $orderContainer): void
     {
-        $order = $orderContainer->getOrder();
+        $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_COMPLETE);
+        $this->update($orderContainer);
+    }
 
-        $this->workflow->apply($order, OrderStateManager::TRANSITION_COMPLETE);
-        $this->orderRepository->update($order);
+    public function payOut(OrderContainer $orderContainer): void
+    {
+        $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_PAY_OUT);
+        $this->update($orderContainer);
+    }
 
-        $this->eventDispatcher->dispatch(OrderCompleteEvent::NAME, new OrderCompleteEvent($orderContainer));
+    public function ship(OrderContainer $orderContainer): void
+    {
+        $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_SHIP);
+        $this->update($orderContainer);
+    }
 
-        $this->logInfo("Order completed");
+    public function late(OrderContainer $orderContainer): void
+    {
+        $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_LATE);
+
+        $this->update($orderContainer);
+    }
+
+    public function cancel(OrderContainer $orderContainer): void
+    {
+        $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_CANCEL);
+        $this->update($orderContainer);
+    }
+
+    public function cancelShipped(OrderContainer $orderContainer): void
+    {
+        $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_CANCEL_SHIPPED);
+        $this->update($orderContainer);
+    }
+
+    private function update(OrderContainer $orderContainer): void
+    {
+        $this->orderRepository->update($orderContainer->getOrder());
+
+        $state = $orderContainer->getOrder()->getState();
+
+        if (isset(self::STATE_TRANSITION_EVENTS[$state])) {
+            $eventClass = self::STATE_TRANSITION_EVENTS[$state];
+            $this->eventDispatcher->dispatch(new $eventClass($orderContainer));
+        }
+
+        $this->logInfo(sprintf('Order was moved to %s state', $state));
     }
 }

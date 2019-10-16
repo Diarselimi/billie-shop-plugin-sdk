@@ -22,6 +22,9 @@ Feature:
       | delivery_address          |
     And I get from companies service get debtor response
     And I get from payments service get debtor response
+    And The following notification settings exist for merchant 1:
+      | notification_type | enabled |
+      | order_waiting     | 1       |
 
   Scenario: Soft decline is enabled for limit check - all risk checks passed - order created successfully
     Given The following merchant risk check settings exist for merchant 1:
@@ -162,8 +165,9 @@ Feature:
       """
 	Then the response status code should be 200
 	And the order A1 is in state waiting
-  	And the order A1 has risk check limit failed
-    And merchant debtor has financing power 10000
+  And the order A1 has risk check limit failed
+  And merchant debtor has financing power 10000
+  And Order notification should exist for order "A1" with type "order_waiting"
 
   Scenario: [order without external code] Soft decline is enabled for limit check - limit check failed - order in waiting state
     Given The following merchant risk check settings exist for merchant 1:
@@ -300,6 +304,7 @@ Feature:
     And the order A1 has risk check debtor_is_trusted failed
     And the order A1 is in state waiting
     And merchant debtor has financing power 10000
+    And Order notification should exist for order "A1" with type "order_waiting"
 
   Scenario: Soft decline is enabled for delivery_address check - check failed - order in waiting state
     Given The following merchant risk check settings exist for merchant 1:
@@ -371,3 +376,4 @@ Feature:
     Then the response status code should be 200
     And the order A1 has risk check delivery_address failed
     And the order A1 is in state waiting
+    And Order notification should exist for order "A1" with type "order_waiting"
