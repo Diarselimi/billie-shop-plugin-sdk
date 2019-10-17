@@ -32,18 +32,18 @@ class MerchantDebtorContainer
         DebtorCompany $debtorCompany,
         MerchantDebtorFinancialDetailsEntity $financialDetails,
         DebtorPaymentDetailsDTO $paymentDetails,
-        string $externalId,
         float $totalCreatedOrdersAmount,
-        float $totalLateOrdersAmount
+        float $totalLateOrdersAmount,
+        ?string $externalId
     ) {
         $this->merchantDebtor = $merchantDebtor;
         $this->merchant = $merchant;
         $this->debtorCompany = $debtorCompany;
         $this->financialDetails = $financialDetails;
         $this->paymentDetails = $paymentDetails;
-        $this->externalId = $externalId;
         $this->totalCreatedOrdersAmount = $totalCreatedOrdersAmount;
         $this->totalLateOrdersAmount = $totalLateOrdersAmount;
+        $this->externalId = $externalId;
     }
 
     public function getMerchantDebtor(): MerchantDebtorEntity
@@ -71,7 +71,7 @@ class MerchantDebtorContainer
         return $this->paymentDetails;
     }
 
-    public function getExternalId(): string
+    public function getExternalId(): ?string
     {
         return $this->externalId;
     }

@@ -111,7 +111,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
           "gross":50.0,
           "tax":0.0
        },
-       "duration":31
+       "duration":30
     }
     """
     And the response status code should be 404

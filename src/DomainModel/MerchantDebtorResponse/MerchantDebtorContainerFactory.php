@@ -60,9 +60,9 @@ class MerchantDebtorContainerFactory
             $company,
             $financialDetails,
             $paymentsDetails,
-            $externalId,
             $totalCreatedOrdersAmount,
-            $totalLateOrdersAmount
+            $totalLateOrdersAmount,
+            $externalId
         );
     }
 }

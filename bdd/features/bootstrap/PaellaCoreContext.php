@@ -160,9 +160,9 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
-     * @Given I have a(n) :state order :externalCode with amounts :gross/:net/:tax, duration :duration and comment :comment
+     * @Given I have default limits and no order created yet
      */
-    public function iHaveAnOrder($state, $externalCode, $gross, $net, $tax, $duration, $comment)
+    public function iHaveADebtorWithoutOrders()
     {
         $person = (new PersonEntity())
             ->setFirstName('test')
@@ -218,6 +218,16 @@ class PaellaCoreContext extends MinkContext
             ->setFinancingPower(1000)
             ->setCreatedAt(new DateTime());
         $this->getMerchantDebtorFinancialDetailsRepository()->insert($financialDetails);
+
+        return [$person, $deliveryAddress, $debtor, $merchantDebtor];
+    }
+
+    /**
+     * @Given I have a(n) :state order :externalCode with amounts :gross/:net/:tax, duration :duration and comment :comment
+     */
+    public function iHaveAnOrder($state, $externalCode, $gross, $net, $tax, $duration, $comment)
+    {
+        list($person, $deliveryAddress, $debtor, $merchantDebtor) = $this->iHaveADebtorWithoutOrders();
 
         $order = (new OrderEntity())
             ->setExternalCode($externalCode)
