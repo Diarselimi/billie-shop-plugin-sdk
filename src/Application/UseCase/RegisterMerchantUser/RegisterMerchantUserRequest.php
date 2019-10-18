@@ -12,11 +12,13 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="last_name", type="string", nullable=false),
  *     @OA\Property(property="email", format="email", type="string", nullable=false),
  *     @OA\Property(property="password", format="password", type="string", nullable=false),
+ *     @OA\Property(property="role_uuid", type="integer", nullable=false),
  *     @OA\Property(
- *          property="roles",
+ *          property="permissions",
  *          type="array",
  *          nullable=true,
- *          @OA\Items(ref="#/components/schemas/MerchantUserRoles")
+ *          default=null,
+ *          @OA\Items(ref="#/components/schemas/MerchantUserPermissions")
  *      )
  * })
  */
@@ -52,9 +54,14 @@ class RegisterMerchantUserRequest implements ValidatedRequestInterface
 
     /**
      * @Assert\NotBlank()
+     * @Assert\Type(type="string")
+     */
+    private $roleUuid;
+
+    /**
      * @Assert\Type(type="array")
      */
-    private $roles;
+    private $permissions;
 
     public function __construct(
         $merchantId,
@@ -62,14 +69,16 @@ class RegisterMerchantUserRequest implements ValidatedRequestInterface
         $lastName,
         $userEmail,
         $userPassword,
-        $roles
+        $permissions,
+        $roleUuid
     ) {
         $this->merchantId = $merchantId;
         $this->firstName = $firstName;
         $this->lastName = $lastName;
         $this->userEmail = $userEmail;
         $this->userPassword = $userPassword;
-        $this->roles = $roles;
+        $this->permissions = $permissions;
+        $this->roleUuid = $roleUuid;
     }
 
     public function getMerchantId(): int
@@ -97,8 +106,13 @@ class RegisterMerchantUserRequest implements ValidatedRequestInterface
         return $this->userPassword;
     }
 
-    public function getRoles(): array
+    public function getPermissions(): ?array
     {
-        return $this->roles;
+        return $this->permissions;
+    }
+
+    public function getRoleUuid(): string
+    {
+        return $this->roleUuid;
     }
 }

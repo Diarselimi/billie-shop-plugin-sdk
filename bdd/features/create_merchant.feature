@@ -113,3 +113,4 @@ Feature: Create a new merchant.
     """
     And the default risk check setting should be created for merchant with company ID 1
     And the default notification settings should be created for merchant with company ID 1
+    And all the default roles should be created for merchant with company ID 1

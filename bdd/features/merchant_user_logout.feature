@@ -13,7 +13,7 @@ Feature: Enable merchant users to logout
 	"""
 
   Scenario: Successfully logout
-	Given a merchant user exists with role ROLE_MERCHANT
+	Given a merchant user exists with permission AUTHENTICATED_AS_MERCHANT
 	And I get from Oauth service a valid user token
 	And I get from Oauth service revoke token endpoint a successful response
 	And I add "Authorization" header equal to "Bearer SomeTokenHere"

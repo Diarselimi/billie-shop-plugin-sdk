@@ -5,7 +5,7 @@ Feature: As a merchant, i should be able to request pause dunning of an order fo
 	And I add "X-Test" header equal to 1
 	And I add "Authorization" header equal to "Bearer someToken"
 	And I get from Oauth service a valid user token
-	And a merchant user exists with role ROLE_PAUSE_DUNNING
+	And a merchant user exists with permission PAUSE_DUNNING
 
   Scenario: Request pause dunning for not existing order
 	And I send a POST request to "/public/order/wrongOrderCode/pause-dunning" with body:

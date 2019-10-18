@@ -7,8 +7,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class User implements UserInterface
 {
-    private const ROLE_DEFAULT = 'ROLE_USER';
-
     private $merchantId;
 
     private $username;
@@ -44,10 +42,7 @@ class User implements UserInterface
 
     public function getRoles(): array
     {
-        $roles = $this->roles;
-        $roles[] = self::ROLE_DEFAULT;
-
-        return array_unique($roles);
+        return $this->roles;
     }
 
     public function getPassword(): ? string

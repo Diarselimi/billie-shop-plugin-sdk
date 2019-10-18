@@ -7,7 +7,7 @@ Feature:
         And I add "X-Test" header equal to 1
         And I add "Authorization" header equal to "Bearer someToken"
         And I get from Oauth service a valid user token
-        And a merchant user exists with role ROLE_VIEW_DEBTORS
+        And a merchant user exists with permission VIEW_DEBTORS
 
     Scenario: Get merchant debtors overview
         And I have a created order "XF43Y" with amounts 800/800/0, duration 30 and comment "test order"

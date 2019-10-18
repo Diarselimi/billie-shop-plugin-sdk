@@ -4,7 +4,9 @@ Feature:
     Background:
         Given I add "Content-type" header equal to "application/json"
         And I add "X-Test" header equal to 1
-        And I add "X-Api-Key" header equal to test
+        And I add "Authorization" header equal to "Bearer someToken"
+        And I get from Oauth service a valid user token
+        And a merchant user exists with permission VIEW_PAYMENTS
 
     Scenario: Get merchant payments details, extended for support
         When I send a GET request to "/public/payments"

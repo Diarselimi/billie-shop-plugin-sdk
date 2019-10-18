@@ -22,10 +22,15 @@ use App\DomainModel\MerchantSettings\MerchantSettingsEntityFactory;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
 use App\DomainModel\MerchantUser\AuthenticationServiceCreateClientResponseDTO;
 use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
+use App\DomainModel\MerchantUser\MerchantUserDefaultRoles;
+use App\DomainModel\MerchantUser\MerchantUserRoleEntity;
+use App\DomainModel\MerchantUser\MerchantUserRoleEntityFactory;
+use App\DomainModel\MerchantUser\MerchantUserRoleRepositoryInterface;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntity;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntityFactory;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
 use PhpSpec\ObjectBehavior;
+use Prophecy\Argument;
 
 class CreateMerchantUseCaseSpec extends ObjectBehavior
 {
@@ -53,7 +58,9 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
         AuthenticationServiceInterface $authenticationService,
         MerchantNotificationSettingsFactory $notificationSettingsFactory,
         MerchantNotificationSettingsRepositoryInterface $notificationSettingsRepository,
-        CreateMerchantRequest $request
+        CreateMerchantRequest $request,
+        MerchantUserRoleRepositoryInterface $rolesRepository,
+        MerchantUserRoleEntityFactory $rolesFactory
     ) {
         $request->getCompanyId()->willReturn(self::COMPANY_ID);
 
@@ -68,7 +75,9 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
             $merchantRiskCheckSettingsRepository,
             $authenticationService,
             $notificationSettingsFactory,
-            $notificationSettingsRepository
+            $notificationSettingsRepository,
+            $rolesFactory,
+            $rolesRepository
         );
     }
 
@@ -114,7 +123,9 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
         MerchantEntity $merchant,
         ScoreThresholdsConfigurationEntity $scoreThresholdsConfiguration,
         MerchantSettingsEntity $merchantSettings,
-        MerchantNotificationSettingsEntity $merchantNotificationSettingsEntity
+        MerchantNotificationSettingsEntity $merchantNotificationSettingsEntity,
+        MerchantUserRoleRepositoryInterface $rolesRepository,
+        MerchantUserRoleEntityFactory $rolesFactory
     ) {
         $company->getName()->willReturn(self::COMPANY_NAME);
         $merchant->getId()->willReturn(self::MERCHANT_ID);
@@ -123,11 +134,18 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
         $request->getInitialDebtorFinancingLimit()->willReturn(self::INITIAL_DEBTOR_FINANCING_LIMIT);
         $request->getDebtorFinancingLimit()->willReturn(self::DEBTOR_FINANCING_LIMIT);
 
+        $roleExample = new MerchantUserRoleEntity();
+        $rolesFactory
+            ->create(Argument::any(), Argument::any(), Argument::any(), Argument::any())
+            ->shouldBeCalled()
+            ->willReturn($roleExample);
+
+        $rolesRepository->create($roleExample)->shouldBeCalledTimes(count(MerchantUserDefaultRoles::ROLES));
+
         $authenticationService
             ->createClient(self::COMPANY_NAME)
             ->shouldBeCalled()
-            ->willReturn(new AuthenticationServiceCreateClientResponseDTO('oauthClientId', 'oauthClientSecret'))
-        ;
+            ->willReturn(new AuthenticationServiceCreateClientResponseDTO('oauthClientId', 'oauthClientSecret'));
 
         $merchant->setOauthClientId('oauthClientId')->shouldBeCalled();
 
@@ -157,8 +175,7 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
         $notificationSettingsFactory
             ->createDefaults(self::MERCHANT_ID)
             ->shouldBeCalled()
-            ->willReturn([$merchantNotificationSettingsEntity])
-        ;
+            ->willReturn([$merchantNotificationSettingsEntity]);
         $notificationSettingsRepository->insert($merchantNotificationSettingsEntity)->shouldBeCalled();
 
         $response = $this->execute($request);

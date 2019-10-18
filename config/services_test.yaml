@@ -50,6 +50,9 @@ services:
   App\DomainModel\MerchantUser\MerchantUserRepositoryInterface:
     alias: 'App\Infrastructure\Repository\MerchantUserRepository'
     public: true
+  App\DomainModel\MerchantUser\MerchantUserRoleRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\MerchantUserRoleRepository'
+    public: true
   App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface:
     alias: 'App\Infrastructure\Repository\CheckoutSessionRepository'
     public: true

@@ -17,7 +17,8 @@ class MerchantUserRepository extends AbstractPdoRepository implements MerchantUs
         'merchant_id',
         'first_name',
         'last_name',
-        'roles',
+        'role_id',
+        'permissions',
         'created_at',
         'updated_at',
     ];
@@ -33,15 +34,16 @@ class MerchantUserRepository extends AbstractPdoRepository implements MerchantUs
     {
         $id = $this->doInsert(
             '
-            INSERT INTO ' . self::TABLE_NAME . ' (`user_id`, `merchant_id`,`first_name`, `last_name`, `roles`, `created_at`, `updated_at`)
-            VALUES (:user_id, :merchant_id, :first_name, :last_name, :roles, :created_at, :updated_at)
+            INSERT INTO ' . self::TABLE_NAME . ' (`user_id`, `merchant_id`, `role_id`, `first_name`, `last_name`, `permissions`, `created_at`, `updated_at`)
+            VALUES (:user_id, :merchant_id, :role_id, :first_name, :last_name, :permissions, :created_at, :updated_at)
             ',
             [
                 'user_id' => $merchantUserEntity->getUserId(),
                 'merchant_id' => $merchantUserEntity->getMerchantId(),
+                'role_id' => $merchantUserEntity->getRoleId(),
                 'first_name' => $merchantUserEntity->getFirstName(),
                 'last_name' => $merchantUserEntity->getLastName(),
-                'roles' => json_encode($merchantUserEntity->getRoles()),
+                'permissions' => $merchantUserEntity->getPermissions() ? json_encode($merchantUserEntity->getPermissions()) : null,
                 'created_at' => $merchantUserEntity->getCreatedAt()->format(self::DATE_FORMAT),
                 'updated_at' => $merchantUserEntity->getUpdatedAt()->format(self::DATE_FORMAT),
             ]
@@ -50,13 +52,26 @@ class MerchantUserRepository extends AbstractPdoRepository implements MerchantUs
         $merchantUserEntity->setId($id);
     }
 
-    public function getOneByUserId(string $userId): ? MerchantUserEntity
+    private function getOneBy(string $colName, $value, int $merchantId = null): ?MerchantUserEntity
     {
-        $row = $this->doFetchOne(
-            'SELECT '.implode(', ', self::TABLE_FIELDS).' FROM ' . self::TABLE_NAME . ' WHERE user_id = :user_id',
-            ['user_id' => $userId]
-        );
+        $query = 'SELECT ' . implode(', ', self::TABLE_FIELDS) .
+            ' FROM ' . self::TABLE_NAME .
+            ' WHERE ' . $colName . ' = :' . $colName;
+
+        $params = [$colName => $value];
+
+        if ($merchantId !== null) {
+            $query .= ' AND merchant_id = :merchant_id';
+            $params['merchant_id'] = $merchantId;
+        }
+
+        $row = $this->doFetchOne($query, $params);
 
         return $row ? $this->factory->createFromDatabaseRow($row) : null;
+    }
+
+    public function getOneByUserId(string $userId): ?MerchantUserEntity
+    {
+        return $this->getOneBy('user_id', $userId);
     }
 }

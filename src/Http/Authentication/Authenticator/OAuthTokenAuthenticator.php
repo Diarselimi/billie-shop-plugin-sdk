@@ -4,7 +4,7 @@ namespace App\Http\Authentication\Authenticator;
 
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
-use App\DomainModel\MerchantUser\MerchantUserEntity;
+use App\DomainModel\MerchantUser\MerchantUserPermissionsService;
 use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
 use App\Http\Authentication\User;
 use App\Http\HttpConstantsInterface;
@@ -21,14 +21,18 @@ class OAuthTokenAuthenticator extends AbstractAuthenticator
 
     private $merchantUserRepository;
 
+    private $merchantUserPermissionsService;
+
     public function __construct(
         AuthenticationServiceInterface $authenticationService,
         MerchantRepositoryInterface $merchantRepository,
-        MerchantUserRepositoryInterface  $merchantUserRepository
+        MerchantUserRepositoryInterface $merchantUserRepository,
+        MerchantUserPermissionsService $merchantUserPermissionsService
     ) {
         $this->authenticationService = $authenticationService;
         $this->merchantRepository = $merchantRepository;
         $this->merchantUserRepository = $merchantUserRepository;
+        $this->merchantUserPermissionsService = $merchantUserPermissionsService;
     }
 
     public function supports(Request $request)
@@ -76,7 +80,7 @@ class OAuthTokenAuthenticator extends AbstractAuthenticator
             $merchant->getId(),
             $merchant->getName(),
             $merchant->getOauthClientId(),
-            [MerchantUserEntity::ROLE_MERCHANT],
+            [self::MERCHANT_AUTH_ROLE],
             null,
             null
         );
@@ -90,11 +94,16 @@ class OAuthTokenAuthenticator extends AbstractAuthenticator
             throw new AuthenticationException();
         }
 
+        $symfonyRoles = $this->convertMerchantUserPermissionsToSecurityRoles(
+            $this->merchantUserPermissionsService->resolveUserRole($merchantUser)->getPermissions()
+        );
+        $symfonyRoles[] = self::MERCHANT_USER_AUTH_ROLE;
+
         return new User(
             $merchantUser->getMerchantId(),
             $merchantUser->getUserId(),
             $credentials,
-            $merchantUser->getRoles(),
+            $symfonyRoles,
             null,
             $email
         );

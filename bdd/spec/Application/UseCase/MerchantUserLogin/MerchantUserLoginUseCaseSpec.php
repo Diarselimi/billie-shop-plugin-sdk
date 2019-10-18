@@ -67,7 +67,7 @@ class MerchantUserLoginUseCaseSpec extends ObjectBehavior
 
         $authorization->getUserId()->willReturn(self::USER_ID);
 
-        $merchantUser->getRoles()->willReturn(['ROLE']);
+        $merchantUser->getPermissions()->willReturn(['ROLE']);
         $merchantUser->getId()->willReturn(self::MERCHANT_USER_ID);
         $merchantUser->getMerchantId()->willReturn(self::MERCHANT_ID);
 

@@ -13,6 +13,12 @@ use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 
 abstract class AbstractAuthenticator extends AbstractGuardAuthenticator
 {
+    public const MERCHANT_AUTH_ROLE = 'ROLE_AUTHENTICATED_AS_MERCHANT';
+
+    public const MERCHANT_USER_AUTH_ROLE = 'ROLE_AUTHENTICATED_AS_MERCHANT_USER';
+
+    public const CHECKOUT_USER_AUTH_ROLE = 'ROLE_AUTHENTICATED_AS_CHECKOUT_USER';
+
     public function start(Request $request, AuthenticationException $authException = null)
     {
         return new ApiErrorResponse(
@@ -49,5 +55,12 @@ abstract class AbstractAuthenticator extends AbstractGuardAuthenticator
     protected function wasAlreadyAuthenticated(Request $request): bool
     {
         return $request->attributes->has(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID);
+    }
+
+    protected function convertMerchantUserPermissionsToSecurityRoles(array $permissions): array
+    {
+        return array_map(function ($name) {
+            return 'ROLE_' . $name;
+        }, $permissions);
     }
 }

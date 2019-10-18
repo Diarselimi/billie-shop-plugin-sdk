@@ -24,15 +24,16 @@ use OpenApi\Annotations as OA;
  *          property="permissions",
  *          type="array",
  *          nullable=false,
- *          @OA\Items(ref="#/components/schemas/MerchantUserRoles")
- *      )
+ *          @OA\Items(ref="#/components/schemas/MerchantUserPermissions")
+ *      ),
+ *      @OA\Property(property="role", type="string", nullable=false, example="admin", description="Internal role name"),
  * })
  */
 class GetMerchantUserResponse implements ArrayableInterface
 {
     private $userId;
 
-    private $roles;
+    private $permissions;
 
     private $firstName;
 
@@ -43,6 +44,8 @@ class GetMerchantUserResponse implements ArrayableInterface
     private $merchantCompanyName;
 
     private $merchantCompanyAddress;
+
+    private $role;
 
     public function setUserId(int $userId): GetMerchantUserResponse
     {
@@ -56,14 +59,14 @@ class GetMerchantUserResponse implements ArrayableInterface
         return $this->userId;
     }
 
-    public function getRoles(): array
+    public function getPermissions(): array
     {
-        return $this->roles;
+        return $this->permissions;
     }
 
-    public function setRoles(array $roles): GetMerchantUserResponse
+    public function setPermissions(array $permissions): GetMerchantUserResponse
     {
-        $this->roles = $roles;
+        $this->permissions = $permissions;
 
         return $this;
     }
@@ -128,6 +131,18 @@ class GetMerchantUserResponse implements ArrayableInterface
         return $this;
     }
 
+    public function getRole(): string
+    {
+        return $this->role;
+    }
+
+    public function setRole(string $role): GetMerchantUserResponse
+    {
+        $this->role = $role;
+
+        return $this;
+    }
+
     public function toArray(): array
     {
         $address = $this->getMerchantCompanyAddress();
@@ -145,7 +160,8 @@ class GetMerchantUserResponse implements ArrayableInterface
                 'address_postal_code' => $address->getPostalCode(),
                 'address_country' => $address->getCountry(),
             ],
-            'permissions' => $this->getRoles(),
+            'permissions' => $this->getPermissions(),
+            'role' => $this->getRole(),
         ];
     }
 }

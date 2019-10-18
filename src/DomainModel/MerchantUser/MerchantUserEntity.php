@@ -6,37 +6,17 @@ use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 
 class MerchantUserEntity extends AbstractTimestampableEntity
 {
-    const ROLE_MERCHANT = 'ROLE_MERCHANT';
-
-    const ROLE_CHECKOUT_USER = 'ROLE_CHECKOUT_USER';
-
-    const ROLE_VIEW_ORDERS = 'ROLE_VIEW_ORDERS';
-
-    const ROLE_VIEW_DEBTORS = 'ROLE_VIEW_DEBTORS';
-
-    const ROLE_VIEW_PAYMENTS = 'ROLE_VIEW_PAYMENTS';
-
-    const ROLE_CONFIRM_ORDER_PAYMENT = 'ROLE_CONFIRM_ORDER_PAYMENT';
-
-    const ROLE_PAUSE_DUNNING = 'ROLE_PAUSE_DUNNING';
-
-    const DEFAULT_ROLES = [
-        self::ROLE_VIEW_ORDERS,
-        self::ROLE_VIEW_DEBTORS,
-        self::ROLE_VIEW_PAYMENTS,
-        self::ROLE_CONFIRM_ORDER_PAYMENT,
-        self::ROLE_PAUSE_DUNNING,
-    ];
-
     private $userId;
 
     private $merchantId;
+
+    private $roleId;
 
     private $firstName;
 
     private $lastName;
 
-    private $roles;
+    private $permissions;
 
     public function getUserId(): string
     {
@@ -58,6 +38,18 @@ class MerchantUserEntity extends AbstractTimestampableEntity
     public function setMerchantId(int $merchantId): MerchantUserEntity
     {
         $this->merchantId = $merchantId;
+
+        return $this;
+    }
+
+    public function getRoleId(): int
+    {
+        return $this->roleId;
+    }
+
+    public function setRoleId(int $roleId): MerchantUserEntity
+    {
+        $this->roleId = $roleId;
 
         return $this;
     }
@@ -86,14 +78,14 @@ class MerchantUserEntity extends AbstractTimestampableEntity
         return $this;
     }
 
-    public function getRoles(): array
+    public function getPermissions(): array
     {
-        return $this->roles;
+        return $this->permissions;
     }
 
-    public function setRoles(array $roles): MerchantUserEntity
+    public function setPermissions(array $permissions): MerchantUserEntity
     {
-        $this->roles = $roles;
+        $this->permissions = $permissions;
 
         return $this;
     }

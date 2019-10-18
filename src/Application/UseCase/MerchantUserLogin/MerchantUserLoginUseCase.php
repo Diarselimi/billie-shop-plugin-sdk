@@ -58,7 +58,7 @@ class MerchantUserLoginUseCase implements ValidatedUseCaseInterface
         return new MerchantUserLoginResponse(
             $merchantUser->getId(),
             $tokenInfo->getAccessToken(),
-            $merchantUser->getRoles(),
+            $merchantUser->getPermissions(),
             $merchant->getName()
         );
     }

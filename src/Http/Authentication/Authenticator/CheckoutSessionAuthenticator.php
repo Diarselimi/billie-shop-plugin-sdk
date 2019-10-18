@@ -4,7 +4,6 @@ namespace App\Http\Authentication\Authenticator;
 
 use App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
-use App\DomainModel\MerchantUser\MerchantUserEntity;
 use App\Http\Authentication\User;
 use App\Http\HttpConstantsInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -49,7 +48,7 @@ class CheckoutSessionAuthenticator extends AbstractAuthenticator
             $merchant->getId(),
             $merchant->getName(),
             $merchant->getApiKey(),
-            [MerchantUserEntity::ROLE_CHECKOUT_USER],
+            [self::CHECKOUT_USER_AUTH_ROLE],
             $checkoutSession
         );
     }

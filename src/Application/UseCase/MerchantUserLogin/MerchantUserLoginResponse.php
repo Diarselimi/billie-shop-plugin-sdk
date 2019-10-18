@@ -13,7 +13,7 @@ use OpenApi\Annotations as OA;
  *          property="permissions",
  *          type="array",
  *          nullable=false,
- *          @OA\Items(ref="#/components/schemas/MerchantUserRoles")
+ *          @OA\Items(ref="#/components/schemas/MerchantUserPermissions")
  *      ),
  *      @OA\Property(property="merchant_name", type="string", nullable=false, example="Billie GmbH")
  * })

@@ -101,7 +101,8 @@ use OpenApi\Annotations as OA;
  *     schema="PhoneNumber",
  *     title="Phone Number",
  *     type="string",
- *     maxLength=2,
+ *     minLength=5,
+ *     maxLength=20,
  *     pattern="^(\+|\d|\()[ \-\/0-9()]{5,20}$",
  *     example="030 31199251"
  * )
@@ -191,10 +192,10 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Schema(
- *     schema="MerchantUserRoles",
- *     title="Merchant User Roles",
+ *     schema="MerchantUserPermissions",
+ *     title="Merchant User Permissions",
  *     type="string",
- *     enum=\App\DomainModel\MerchantUser\MerchantUserEntity::DEFAULT_ROLES,
- *     example=\App\DomainModel\MerchantUser\MerchantUserEntity::ROLE_VIEW_ORDERS
+ *     enum=\App\DomainModel\MerchantUser\MerchantUserPermissions::ALL_PERMISSIONS,
+ *     example=\App\DomainModel\MerchantUser\MerchantUserPermissions::ALL_PERMISSIONS
  * )
  */

@@ -19,8 +19,11 @@ use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsEntity;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
+use App\DomainModel\MerchantUser\MerchantUserDefaultRoles;
 use App\DomainModel\MerchantUser\MerchantUserEntity;
 use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
+use App\DomainModel\MerchantUser\MerchantUserRoleEntity;
+use App\DomainModel\MerchantUser\MerchantUserRoleRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
@@ -36,6 +39,7 @@ use App\DomainModel\Person\PersonRepositoryInterface;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntity;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
 use App\Helper\Uuid\DummyUuidGenerator;
+use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
@@ -138,6 +142,7 @@ class PaellaCoreContext extends MinkContext
             TRUNCATE merchant_risk_check_settings;
             TRUNCATE merchant_notification_settings;
             TRUNCATE merchant_users;
+            TRUNCATE merchant_user_roles;
             TRUNCATE merchants;
             TRUNCATE merchant_debtor_financial_details;
             TRUNCATE merchants_debtors;
@@ -498,8 +503,7 @@ class PaellaCoreContext extends MinkContext
         foreach (MerchantNotificationSettingsFactory::DEFAULT_SETTINGS as $notificationType => $enabled) {
             $setting = $this
                 ->getMerchantNotificationSettingsRepository()
-                ->getByMerchantIdAndNotificationType($merchant->getId(), $notificationType)
-            ;
+                ->getByMerchantIdAndNotificationType($merchant->getId(), $notificationType);
 
             Assert::notNull($setting);
             Assert::eq($setting->isEnabled(), $enabled);
@@ -585,15 +589,52 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
-     * @Given a merchant user exists with role :role
+     * @Given a merchant user exists with permission :permission
      */
-    public function aMerchantUserExists(string $role)
+    public function aMerchantUserExistsWithPermission(string $permission)
+    {
+        $role = $this->createRole('Test', 'test_role', [$permission]);
+
+        $this->getMerchantUserRepository()->create(
+            (new MerchantUserEntity())
+                ->setUserId('oauthUserId')
+                ->setMerchantId(1)
+                ->setPermissions([])
+                ->setRoleId($role->getId())
+                ->setFirstName('test')
+                ->setLastName('test')
+        );
+    }
+
+    /**
+     * @Given /^a merchant user exists with role_id "([^"]*)" and overridden permission "([^"]*)"$/
+     */
+    public function aMerchantUserExistsWithRoleIdAndPermission($roleId, $permission)
     {
         $this->getMerchantUserRepository()->create(
             (new MerchantUserEntity())
                 ->setUserId('oauthUserId')
                 ->setMerchantId(1)
-                ->setRoles([$role])
+                ->setRoleId($roleId)
+                ->setPermissions([$permission])
+                ->setFirstName('test')
+                ->setLastName('test')
+        );
+    }
+
+    /**
+     * @Given a merchant user exists with overridden permission :permission
+     */
+    public function aMerchantUserExistsWithOverridenPermission(string $permission)
+    {
+        $role = $this->createRole('Test', 'test_role', ['NOTHING']);
+
+        $this->getMerchantUserRepository()->create(
+            (new MerchantUserEntity())
+                ->setUserId('oauthUserId')
+                ->setMerchantId(1)
+                ->setRoleId($role->getId())
+                ->setPermissions([$permission])
                 ->setFirstName('test')
                 ->setLastName('test')
         );
@@ -664,8 +705,7 @@ class PaellaCoreContext extends MinkContext
 
         $notification = $this
             ->getOrderNotificationRepository()
-            ->getOneByOrderIdAndNotificationType($order->getId(), $notificationType)
-        ;
+            ->getOneByOrderIdAndNotificationType($order->getId(), $notificationType);
 
         Assert::notNull($notification);
     }
@@ -740,6 +780,11 @@ class PaellaCoreContext extends MinkContext
         return $this->get(MerchantUserRepositoryInterface::class);
     }
 
+    private function getMerchantUserRoleRepository(): MerchantUserRoleRepositoryInterface
+    {
+        return $this->get(MerchantUserRoleRepositoryInterface::class);
+    }
+
     private function getCheckoutSessionRepository(): CheckoutSessionRepositoryInterface
     {
         return $this->get(CheckoutSessionRepositoryInterface::class);
@@ -768,5 +813,47 @@ class PaellaCoreContext extends MinkContext
     private function get(string $service)
     {
         return $this->getContainer()->get($service);
+    }
+
+    public function createRole($name, $uuid, array $permissions): MerchantUserRoleEntity
+    {
+        $role = (new MerchantUserRoleEntity())
+            ->setPermissions($permissions)
+            ->setUuid($uuid)
+            ->setMerchantId(1)
+            ->setName($name);
+
+        $this->getMerchantUserRoleRepository()->create($role);
+
+        return $role;
+    }
+
+    /**
+     * @Given /^I have a role of name "([^"]*)" with uuid "([^"]*)" and permissions$/
+     */
+    public function iHaveARoleOfNameWithUuidAndPermissions($name, $uuid, PyStringNode $permissions)
+    {
+        $this->createRole($name, $uuid, json_decode($permissions->__toString(), true));
+    }
+
+    /**
+     * @Given /^all the default roles should be created for merchant with company ID (\d+)$/
+     */
+    public function theAllTheDefaultRolesShouldBeCreatedForMerchantWithCompanyID($companyId)
+    {
+        $merchant = $this->getMerchantRepository()->getOneByCompanyId((int) $companyId);
+
+        Assert::notNull($merchant);
+
+        $roles = $this->getMerchantUserRoleRepository()->findAllByMerchantId($merchant->getId());
+        Assert::notEmpty($roles, 'Merchant has no defined roles');
+
+        $roleNames = array_map(function (MerchantUserRoleEntity $role) {
+            return $role->getName();
+        }, iterator_to_array($roles));
+
+        foreach (MerchantUserDefaultRoles::ROLES as $role) {
+            Assert::oneOf($role['name'], $roleNames, "Merchant {$merchant->getId()} has no role with name {$role['name']}");
+        }
     }
 }

@@ -19,8 +19,12 @@ use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
 use App\DomainModel\MerchantUser\AuthenticationServiceCreateClientResponseDTO;
 use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
 use App\DomainModel\MerchantUser\AuthenticationServiceRequestException;
+use App\DomainModel\MerchantUser\MerchantUserDefaultRoles;
+use App\DomainModel\MerchantUser\MerchantUserRoleEntityFactory;
+use App\DomainModel\MerchantUser\MerchantUserRoleRepositoryInterface;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntityFactory;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
+use Ramsey\Uuid\Uuid;
 
 class CreateMerchantUseCase
 {
@@ -46,6 +50,10 @@ class CreateMerchantUseCase
 
     private $notificationSettingsRepository;
 
+    private $rolesRepository;
+
+    private $rolesFactory;
+
     public function __construct(
         MerchantRepositoryInterface $merchantRepository,
         CompaniesServiceInterface $companiesService,
@@ -57,7 +65,9 @@ class CreateMerchantUseCase
         MerchantRiskCheckSettingsRepositoryInterface $merchantRiskCheckSettingsRepository,
         AuthenticationServiceInterface $authenticationService,
         MerchantNotificationSettingsFactory $notificationSettingsFactory,
-        MerchantNotificationSettingsRepositoryInterface $notificationSettingsRepository
+        MerchantNotificationSettingsRepositoryInterface $notificationSettingsRepository,
+        MerchantUserRoleEntityFactory $rolesFactory,
+        MerchantUserRoleRepositoryInterface $rolesRepository
     ) {
         $this->merchantRepository = $merchantRepository;
         $this->companiesService = $companiesService;
@@ -70,6 +80,8 @@ class CreateMerchantUseCase
         $this->authenticationService = $authenticationService;
         $this->notificationSettingsFactory = $notificationSettingsFactory;
         $this->notificationSettingsRepository = $notificationSettingsRepository;
+        $this->rolesRepository = $rolesRepository;
+        $this->rolesFactory = $rolesFactory;
     }
 
     public function execute(CreateMerchantRequest $request): CreateMerchantResponse
@@ -98,8 +110,21 @@ class CreateMerchantUseCase
         $this->merchantRepository->insert($merchant);
 
         $this->createSettings($request, $merchant);
+        $this->createDefaultRoles($merchant->getId());
 
         return new CreateMerchantResponse($merchant, $oauthClient->getClientId(), $oauthClient->getClientSecret());
+    }
+
+    private function createDefaultRoles(int $merchantId): void
+    {
+        foreach (MerchantUserDefaultRoles::ROLES as $role) {
+            $this->rolesRepository->create($this->rolesFactory->create(
+                $merchantId,
+                Uuid::uuid4(),
+                $role['name'],
+                $role['permissions']
+            ));
+        }
     }
 
     private function createOauthClient(string $companyName): AuthenticationServiceCreateClientResponseDTO

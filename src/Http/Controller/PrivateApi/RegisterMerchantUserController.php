@@ -53,7 +53,8 @@ class RegisterMerchantUserController
                     $request->request->get('last_name'),
                     $request->request->get('email'),
                     $request->request->get('password'),
-                    $request->request->get('roles', MerchantUserEntity::DEFAULT_ROLES)
+                    $request->request->get('permissions'),
+                    $request->request->get('role_uuid')
                 )
             );
 
