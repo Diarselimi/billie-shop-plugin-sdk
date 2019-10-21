@@ -89,8 +89,6 @@ Feature: Register merchant user to access dashboard
 	}
     """
 
-  # Check permissions system:
-
   Scenario: Successfully retrieve orders list using role-level permissions for a new merchant user
     Given a merchant user exists with permission VIEW_ORDERS
     And I get from companies service update debtor positive response
@@ -121,3 +119,39 @@ Feature: Register merchant user to access dashboard
 		"items":[]
 	  }
 	"""
+
+  Scenario: merchant does not exist
+    When I send a POST request to "/private/merchant/123/user" with body:
+	"""
+	{
+		"first_name": "name",
+		"last_name": "last",
+		"role_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
+		"email": "test@merchantX.com",
+		"password": "testPassword"
+	}
+	"""
+    Then the response status code should be 404
+    And the JSON response should be:
+    """
+        {"errors":[{"title":"Merchant doesn't exist","code":"resource_not_found"}]}
+    """
+
+
+  Scenario: role does not exist
+    Given I successfully create OAuth client with email "test@merchantX.com" and user id "test-auth-id"
+    When I send a POST request to "/private/merchant/1/user" with body:
+	"""
+	{
+		"first_name": "name",
+		"last_name": "last",
+		"role_uuid": "c1255928-0725-4d9d-93de-22494c2c6e2d",
+		"email": "test@merchantX.com",
+		"password": "testPassword"
+	}
+	"""
+    Then the response status code should be 404
+    And the JSON response should be:
+    """
+        {"errors":[{"title":"Role doesn't exist","code":"resource_not_found"}]}
+    """

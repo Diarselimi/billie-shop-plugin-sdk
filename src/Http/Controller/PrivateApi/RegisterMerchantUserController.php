@@ -5,7 +5,7 @@ namespace App\Http\Controller\PrivateApi;
 use App\Application\UseCase\RegisterMerchantUser\RegisterMerchantUserRequest;
 use App\Application\UseCase\RegisterMerchantUser\RegisterMerchantUserUseCase;
 use App\DomainModel\Merchant\MerchantNotFoundException;
-use App\DomainModel\MerchantUser\MerchantUserEntity;
+use App\DomainModel\MerchantUser\RoleNotFoundException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -61,6 +61,8 @@ class RegisterMerchantUserController
             return new Response('', JsonResponse::HTTP_CREATED);
         } catch (MerchantNotFoundException $exception) {
             throw new NotFoundHttpException("Merchant doesn't exist");
+        } catch (RoleNotFoundException $exception) {
+            throw new NotFoundHttpException("Role doesn't exist");
         }
     }
 }
