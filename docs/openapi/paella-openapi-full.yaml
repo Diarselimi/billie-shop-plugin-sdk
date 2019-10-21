@@ -4,35 +4,34 @@ info:
   description: |
     # Introduction
     
-    The PaD API provides an easy way to integrate both client and server-side 
-    with our __Billie Pay After Delivery (PaD)__ platform.
+    With PayAfterDelivery (PAD) / "Rechnungskauf" Billie offers a convenient, secure and simple way to allow your B2B-customers
+    to pay on invoice. Our solution enables merchants to accept invoice payments from other business customers without waiting for their money,
+    reminding customers about the payment, or assuming credit risk.
     
-    _Billie PaD_ is a Business to Business (B2B) platform that enables you (the merchant) to accept invoice payments from
-    other business customers without having to wait for the money to arrive, caring about reminding customers to pay,
-    or taking over any credit risk.
+    The following documentation describes our RESTFul API, which allows easy integration into your web-shop,
+    eCommerce platform or invoicing back-end.
     
-    Based upon your contractual agreement with Billie, your customers will have 14, 30, 45, 60, 90 or 120 days (payment terms) 
-    to pay your invoices while Billie will transfer the money to you immediately after shipment of product or fulfilment of
-    service obligation.
-    
-    If customers get late with paying their outstanding invoices, Billie will also take over reminding customers on your behalf 
-    (white label solution). In case of your customer's bankruptcy, Billie fully covers this default for you.
+    Based upon your Billie contract, your customers will have between 7 and 120 days (payment term) to pay your invoices, while Billie will 
+    transfer the money to you immediately after shipment of goods or fulfilment of service obligation. For outstanding payments, 
+    Billie takes over reminding customers on your behalf (white-label solution). Additionally, Billie protects you from credit risks 
+    by absorbing any potential debtor defaults.
     
     ---
     
     ## Order States
     
-    | State       | Description                                                                                   |
-    |-------------|-----------------------------------------------------------------------------------------------|
-    | waiting     | The order creation failed and needs a manual operation in order to be approved or declined    |
-    | authorized  | The order is valid but it needs a confirmation from the merchant in order to be approved      |
-    | created     | The order is successfully approved and Billie can offer financing for this transaction        |
-    | declined    | The order was declined and no financing is offered for this transaction                       |
-    | shipped     | The order was successfully shipped by the merchant                                            |
-    | paid_out    | The outstanding amount for the respective order was successfully paid out to the merchant     |
-    | late        | The payment of the outstanding amount is overdue                                              |
-    | complete    | The outstanding amount was successfully paid back by the customer                             |
-    | canceled    | The order was canceled by the merchant       
+    | State         | Description                                                                                   |
+    |---------------|-----------------------------------------------------------------------------------------------|
+    | waiting       | The order creation failed and needs a manual operation in order to be approved or declined    |
+    | authorized    | State of an order after creating it via the checkout widget. For approval, it needs merchant-side confirmation.    |
+    | pre_approved  | State of an order after creating it via the pre-approve API. For approval, it needs a merchant-side confirmation.  |
+    | created       | The order is successfully approved and Billie can offer financing for this transaction        |
+    | declined      | The order was declined and no financing is offered for this transaction                       |
+    | shipped       | The order was successfully shipped by the merchant                                            |
+    | paid_out      | The outstanding amount for the respective order was successfully paid out to the merchant     |
+    | late          | The payment of the outstanding amount is overdue                                              |
+    | complete      | The outstanding amount was successfully paid back by the customer                             |
+    | canceled      | The order was canceled by the merchant       
     
     ## Order State Transitions
     
@@ -52,10 +51,10 @@ info:
     
     ## Usage of Virtual IBANs
     
-    Since the money gets paid out to the merchant directly after shipment of the product or delivery of the agreed service, 
-    customers need to transfer the money directly to Billie when their invoice is due. Therefore Billie is using virtual IBANs 
-    that are delivered back to the merchant as an answer of a API order creation request. Virtual IBANs are unique for each of 
-    your debtor / customer. The virtual IBAN needs to be put on the invoice which the customer receives for the purchase.
+    Since payouts by Billie to the merchant are made immediately after shipment of goods or delivery of the agreed service, customers need to 
+    pay back their invoices directly to Billie upon due date. Therefore, Billie is using so-called virtual IBANs (VIBANs).
+    VIBANs are delivered back to the merchant as response to an (accepted) order creation request. VIBANs are unique for each of your 
+    debtor / customer. The VIBAN needs to be put on the invoice which the customer receives for the purchase.
     
   termsOfService: 'https://www.billie.io/agb/'
   license:
@@ -145,7 +144,7 @@ paths:
   /healthcheck:
     get:
       tags:
-        - Misc.
+        - Support
       summary: 'API Status'
       description: 'Check the status of the API server.'
       operationId: api_status
@@ -156,10 +155,9 @@ paths:
             text/plain:
               schema:
                 type: string
-                default: 'paella is alive'
+                default: 'paella_core is alive'
       x-groups:
-        - support
-        - salesforce
+        - private
   /oauth/token:
     post:
       tags:
@@ -200,10 +198,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/OauthTokenResponseBody'
       x-groups:
-        - standard
-        - checkout-server
-        - dashboard
-        - support
+        - public
+        - private
   /oauth/authorization:
     get:
       tags:
@@ -233,21 +229,19 @@ paths:
         default:
           $ref: '#/components/responses/ServerError'
       x-groups:
-        - standard
-        - checkout-server
-        - dashboard
-        - support
+        - public
+        - private
   /internal-docs:
     get:
       tags:
-        - Docs
+        - 'API Docs'
       summary: 'Internal API Docs (default)'
       operationId: docs_internal_get_default
       parameters:
         -
-          name: noembed
+          name: embed
           in: query
-          description: 'Use spec URL instead of inline JSON'
+          description: 'Use inline JSON instead of the external file'
           required: false
           schema:
             type: boolean
@@ -268,61 +262,15 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
       x-groups:
-        - support
-  '/internal-docs/{apiGroup}':
+        - private
+  /internal-docs/full/billie-pad-openapi.yaml:
     get:
       tags:
-        - Docs
-      summary: 'Internal API Docs'
-      operationId: docs_internal_get_by_group
-      parameters:
-        -
-          name: apiGroup
-          in: path
-          description: 'API group name'
-          required: true
-          schema:
-            $ref: '#/components/schemas/PrivateApiGroup'
-        -
-          name: noembed
-          in: query
-          description: 'Use spec URL instead of inline JSON'
-          required: false
-          schema:
-            type: boolean
-          example: 1
-        -
-          name: nocache
-          in: query
-          description: 'Do not send cache headers to the client'
-          required: false
-          schema:
-            type: boolean
-          example: 1
-      responses:
-        '200':
-          $ref: '#/components/responses/HtmlDocument'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      x-groups:
-        - support
-  '/internal-docs/{apiGroup}/billie-pad-openapi.yaml':
-    get:
-      tags:
-        - Docs
+        - 'API Docs'
       summary: 'Internal API Specs'
       operationId: docs_internal_get_specs
       parameters:
         -
-          name: apiGroup
-          in: path
-          description: 'API group name'
-          required: true
-          schema:
-            $ref: '#/components/schemas/PrivateApiGroup'
-        -
           name: nocache
           in: query
           description: 'Do not send cache headers to the client'
@@ -338,18 +286,18 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
       x-groups:
-        - support
+        - private
   /docs:
     get:
       tags:
-        - Docs
+        - 'API Docs'
       summary: 'Public API Docs (default)'
       operationId: docs_get_default
       parameters:
         -
-          name: noembed
+          name: embed
           in: query
-          description: 'Use spec URL instead of inline JSON'
+          description: 'Use inline JSON instead of the external file'
           required: false
           schema:
             type: boolean
@@ -370,60 +318,14 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
       x-groups:
-        - support
-  '/docs/{apiGroup}':
+        - private
+  /docs/public/billie-pad-openapi.yaml:
     get:
       tags:
-        - Docs
-      summary: 'Public API Docs'
-      operationId: docs_get_by_group
-      parameters:
-        -
-          name: apiGroup
-          in: path
-          description: 'API group name'
-          required: true
-          schema:
-            $ref: '#/components/schemas/PublicApiGroup'
-        -
-          name: noembed
-          in: query
-          description: 'Use spec URL instead of inline JSON'
-          required: false
-          schema:
-            type: boolean
-          example: 1
-        -
-          name: nocache
-          in: query
-          description: 'Do not send cache headers to the client'
-          required: false
-          schema:
-            type: boolean
-          example: 1
-      responses:
-        '200':
-          $ref: '#/components/responses/HtmlDocument'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      x-groups:
-        - support
-  '/docs/{apiGroup}/billie-pad-openapi.yaml':
-    get:
-      tags:
-        - Docs
+        - 'API Docs'
       summary: 'Public API Specs'
       operationId: docs_get_specs
       parameters:
-        -
-          name: apiGroup
-          in: path
-          description: 'API group name'
-          required: true
-          schema:
-            $ref: '#/components/schemas/PublicApiGroup'
         -
           name: nocache
           in: query
@@ -440,11 +342,11 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
       x-groups:
-        - support
+        - private
   '/order/{uuid}/approve':
     post:
       tags:
-        - 'Order Management'
+        - Support
       summary: 'Approve Order in Waiting State'
       description: 'Approves an order manually if it''s in waiting state. Otherwise this call fails.'
       operationId: order_approve
@@ -468,8 +370,7 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
       x-groups:
-        - support
-        - salesforce
+        - private
   /merchant:
     post:
       tags:
@@ -502,14 +403,13 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
       x-groups:
-        - support
+        - private
   '/order/{uuid}/add-invoice':
     post:
       tags:
-        - 'Order Management'
-        - Automated
+        - Support
       summary: 'Create Order Invoice'
-      description: 'Creates a new invoice, linking an order with a file. Called automatically by the invoice uploader Lambda service.'
+      description: '(Automated) Creates a new invoice, linking an order with a file. Called automatically by the invoice uploader Lambda service.'
       operationId: order_create_invoice
       parameters:
         -
@@ -547,12 +447,11 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
       x-groups:
-        - support
-        - automated
+        - private
   '/order/{uuid}/decline':
     post:
       tags:
-        - 'Order Management'
+        - Support
       summary: 'Decline Order in Waiting State'
       operationId: order_decline
       parameters:
@@ -575,12 +474,11 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
       x-groups:
-        - support
-        - salesforce
+        - private
   '/debtor-company/{uuid}/limits':
     get:
       tags:
-        - Debtors
+        - Support
       summary: 'Get Debtor Company Limits'
       operationId: get_debtor_company_limits
       parameters:
@@ -609,8 +507,7 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
       x-groups:
-        - support
-        - salesforce
+        - private
   '/merchant/{id}':
     get:
       tags:
@@ -639,11 +536,11 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
       x-groups:
-        - support
+        - private
   '/merchant-debtor/{debtorUuid}':
     get:
       tags:
-        - Debtors
+        - Support
       summary: 'Get Debtor Details (Extended)'
       operationId: debtor_get_details_extended
       parameters:
@@ -668,11 +565,11 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
       x-groups:
-        - support
+        - private
   /merchant-debtor/mark-duplicates:
     post:
       tags:
-        - Debtors
+        - Support
       summary: 'Mark Merchant Debtor Duplicates'
       operationId: mark_duplicate_debtors
       requestBody:
@@ -694,12 +591,11 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
       x-groups:
-        - support
-        - salesforce
+        - private
   '/order/{uuid}/mark-as-fraud':
     post:
       tags:
-        - 'Order Management'
+        - Support
       summary: 'Mark Order As Fraud'
       operationId: mark_order_as_fraud
       parameters:
@@ -722,12 +618,11 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
       x-groups:
-        - support
-        - salesforce
+        - private
   '/merchant/{merchantId}/user':
     post:
       tags:
-        - Authentication
+        - 'Dashboard Users'
       summary: 'Register Merchant User'
       operationId: register_merchant_user
       parameters:
@@ -752,11 +647,11 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
       x-groups:
-        - support
+        - private
   '/merchant-debtor/{merchantDebtorUuid}/synchronize':
     post:
       tags:
-        - Merchants
+        - Support
       summary: 'Synchronize merchant_debtor address.'
       operationId: synchronize_merchant_debtor
       parameters:
@@ -779,11 +674,11 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
       x-groups:
-        - support
+        - private
   '/order/{uuid}/trigger-failed-notifications':
     post:
       tags:
-        - 'Order Management'
+        - Support
       summary: 'Trigger all failed order notifications'
       operationId: trigger_failed_order_notifications
       parameters:
@@ -802,11 +697,11 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
       x-groups:
-        - support
+        - private
   '/merchant-debtor/{debtorUuid}/update-company':
     post:
       tags:
-        - Debtors
+        - Support
       summary: 'Updat Merchant Debtor Company'
       operationId: update_merchant_debtor_company
       parameters:
@@ -831,11 +726,11 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
       x-groups:
-        - support
+        - private
   '/merchant-debtor/{debtorUuid}/update-limit':
     post:
       tags:
-        - Debtors
+        - Support
       summary: 'Update Merchant Debtor Limit'
       operationId: update_merchant_debtor_limit
       parameters:
@@ -871,12 +766,11 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
       x-groups:
-        - support
-        - salesforce
+        - private
   '/merchant-debtor/{debtorUuid}/whitelist':
     post:
       tags:
-        - Debtors
+        - Support
       summary: 'Whitelist Merchant Debtor'
       operationId: whitelist_merchant_debtor
       parameters:
@@ -905,12 +799,11 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
       x-groups:
-        - support
-        - salesforce
+        - private
   '/checkout-session/{sessionUuid}/authorize':
     put:
       tags:
-        - 'Order Creation'
+        - 'Checkout Client'
       summary: 'Checkout Session Authorize'
       description: 'Authorizes an existing checkout session, completing all missing order data.'
       operationId: checkout_session_authorize
@@ -941,7 +834,7 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
       x-groups:
-        - checkout-client
+        - private
   '/order/{id}/cancel':
     post:
       tags:
@@ -972,12 +865,12 @@ paths:
         -
           oauth2: []
       x-groups:
-        - standard
-        - checkout-server
+        - public
+        - private
   '/checkout-session/{sessionUuid}/confirm':
     put:
       tags:
-        - 'Order Creation'
+        - 'Checkout Server'
       summary: 'Checkout Session Confirm'
       description: 'Confirms the creation of an existing checkout session.'
       operationId: checkout_session_confirm
@@ -1013,7 +906,8 @@ paths:
         -
           oauth2: []
       x-groups:
-        - checkout-server
+        - public
+        - private
   '/order/{id}/confirm-payment':
     post:
       tags:
@@ -1063,13 +957,12 @@ paths:
         -
           oauth2: []
       x-groups:
-        - standard
-        - checkout-server
-        - dashboard
+        - public
+        - private
   /checkout-session:
     post:
       tags:
-        - 'Order Creation'
+        - 'Checkout Server'
       summary: 'Checkout Session Create'
       description: 'Initializes a new Billie Checkout session for the given customer.'
       operationId: checkout_session_create
@@ -1104,11 +997,12 @@ paths:
         -
           oauth2: []
       x-groups:
-        - checkout-server
+        - public
+        - private
   /order:
     post:
       tags:
-        - 'Order Creation'
+        - 'Back-end Order Creation'
       summary: 'Create Order'
       description: |
         Authorization of order financing requests.
@@ -1142,11 +1036,12 @@ paths:
         -
           oauth2: []
       x-groups:
-        - standard
+        - public
+        - private
   /order/pre-approve:
     post:
       tags:
-        - 'Order Pre-approval'
+        - 'Back-end Order Creation'
       summary: 'Pre-approve Order Create'
       operationId: pre_approve_create_order
       requestBody:
@@ -1172,11 +1067,12 @@ paths:
         -
           oauth2: []
       x-groups:
-        - standard
+        - public
+        - private
   /legal-forms:
     get:
       tags:
-        - Misc.
+        - 'Back-end Order Creation'
       summary: 'Get Legal Forms'
       operationId: get_legal_forms
       responses:
@@ -1192,11 +1088,12 @@ paths:
           $ref: '#/components/responses/ServerError'
       security: []
       x-groups:
-        - checkout-client
+        - public
+        - private
   '/debtor/{uuid}':
     get:
       tags:
-        - Debtors
+        - 'Dashboard Debtors'
       summary: 'Get Debtor Details'
       operationId: debtor_get_details
       parameters:
@@ -1225,11 +1122,11 @@ paths:
         -
           oauth2: []
       x-groups:
-        - dashboard
+        - private
   /debtors:
     get:
       tags:
-        - Debtors
+        - 'Dashboard Debtors'
       summary: 'Get Debtors'
       operationId: debtors_get
       parameters:
@@ -1286,11 +1183,11 @@ paths:
         -
           oauth2: []
       x-groups:
-        - dashboard
+        - private
   '/payments/{uuid}':
     get:
       tags:
-        - Payments
+        - 'Dashboard Payments'
       summary: 'Get Payment Details'
       operationId: get_payment_details
       parameters:
@@ -1321,11 +1218,11 @@ paths:
         -
           oauth2: []
       x-groups:
-        - dashboard
+        - private
   /payments:
     get:
       tags:
-        - Payments
+        - 'Dashboard Payments'
       summary: 'Get Payments'
       operationId: get_payments
       parameters:
@@ -1400,11 +1297,11 @@ paths:
         -
           oauth2: []
       x-groups:
-        - dashboard
+        - private
   /merchant/user:
     get:
       tags:
-        - Authentication
+        - 'Dashboard Users'
       summary: 'Get Merchant User'
       operationId: get_merchant_user
       responses:
@@ -1424,7 +1321,7 @@ paths:
         -
           oauth2: []
       x-groups:
-        - dashboard
+        - private
   '/order/{id}':
     get:
       tags:
@@ -1467,9 +1364,8 @@ paths:
         -
           oauth2: []
       x-groups:
-        - standard
-        - dashboard
-        - checkout-server
+        - public
+        - private
     patch:
       tags:
         - 'Order Management'
@@ -1521,12 +1417,12 @@ paths:
         -
           oauth2: []
       x-groups:
-        - standard
-        - checkout-server
+        - public
+        - private
   /orders:
     get:
       tags:
-        - 'Order Management'
+        - 'Dashboard Orders'
       summary: 'Get Orders'
       operationId: orders_get
       parameters:
@@ -1608,11 +1504,11 @@ paths:
         -
           oauth2: []
       x-groups:
-        - dashboard
+        - private
   /merchant/user/login:
     post:
       tags:
-        - Authentication
+        - 'Dashboard Users'
       summary: 'Merchant User Login'
       operationId: merchant_user_login
       requestBody:
@@ -1634,11 +1530,11 @@ paths:
           $ref: '#/components/responses/ServerError'
       security: []
       x-groups:
-        - dashboard
+        - private
   /merchant/user/logout:
     post:
       tags:
-        - Authentication
+        - 'Dashboard Users'
       summary: 'Merchant User Logout'
       operationId: merchant_user_logout
       responses:
@@ -1652,7 +1548,7 @@ paths:
         -
           oauth2: []
       x-groups:
-        - dashboard
+        - private
   '/order/{id}/pause-dunning':
     post:
       tags:
@@ -1698,11 +1594,12 @@ paths:
         -
           oauth2: []
       x-groups:
-        - dashboard
+        - public
+        - private
   '/order/{uuid}/confirm':
     post:
       tags:
-        - 'Order Pre-approval'
+        - 'Back-end Order Creation'
       summary: 'Pre-approve Order Confirm'
       operationId: order_pre_approve_confirmation
       parameters:
@@ -1735,11 +1632,12 @@ paths:
         -
           oauth2: []
       x-groups:
-        - standard
+        - public
+        - private
   '/order/{id}/ship':
     post:
       tags:
-        - 'Order Creation'
+        - 'Order Management'
       summary: 'Ship Order'
       description: |
         Confirm that an order was shipped.
@@ -1781,8 +1679,8 @@ paths:
         -
           oauth2: []
       x-groups:
-        - standard
-        - checkout-server
+        - public
+        - private
 components:
   schemas:
     UUID:
@@ -1816,25 +1714,6 @@ components:
         - debtor_address
         - debtor_limit_exceeded
       example: debtor_not_identified
-    PublicApiGroup:
-      title: 'API Group'
-      type: string
-      enum:
-        - standard
-        - checkout-server
-      example: standard
-    PrivateApiGroup:
-      title: 'API Group'
-      type: string
-      enum:
-        - full
-        - salesforce
-        - support
-        - standard
-        - checkout-server
-        - checkout-client
-        - dashboard
-      example: standard
     OrderDunningStatus:
       title: 'Order Dunning Status'
       type: string
@@ -1865,7 +1744,7 @@ components:
     PhoneNumber:
       title: 'Phone Number'
       type: string
-      maxLength: 20
+      maxLength: 21
       minLength: 5
       pattern: '^(\+|\d|\()[ \-\/0-9()]{5,20}$'
       example: '030 31199251'
@@ -2089,7 +1968,8 @@ components:
         - address_country
       properties:
         merchant_customer_id:
-          example: DE123456
+          description: 'Unique identifier of the customer provided by the merchant side.'
+          example: '128483'
           $ref: '#/components/schemas/TinyText'
         name:
           example: 'Billie GmbH'
@@ -2110,6 +1990,7 @@ components:
           $ref: '#/components/schemas/TinyText'
         industry_sector:
           example: C
+          nullable: true
           $ref: '#/components/schemas/TinyText'
         subindustry_sector:
           nullable: true
@@ -2119,7 +2000,8 @@ components:
           nullable: true
           $ref: '#/components/schemas/TinyText'
         legal_form:
-          example: '10122'
+          description: 'One of the legal form codes available in the `GET /legal-forms` API endpoint.'
+          example: '10001'
           $ref: '#/components/schemas/TinyText'
         established_customer:
           type: boolean
@@ -2138,15 +2020,17 @@ components:
           example: Berlin
           $ref: '#/components/schemas/TinyText'
         address_postal_code:
+          example: '10969'
           $ref: '#/components/schemas/PostalCode'
         address_country:
+          example: DE
           $ref: '#/components/schemas/CountryCode'
       type: object
     CreateOrderDebtorPersonRequest:
       title: 'Debtor Person'
       required:
-        - gender
         - email
+        - salutation
       properties:
         salutation:
           type: string
@@ -2941,54 +2825,261 @@ components:
       name: X-Api-Key
       in: header
       x-groups:
-        - support
+        - internal
 tags:
   -
     name: Authentication
     description: |
-      For authentication and authorisation the API requires some requests to include valid API credentials via HTTP headers.
-      Different keys are used for the `sandbox` and `production` environments, which are completely independent
-      meaning that they cannot access or alter data from the other.
+      This API uses OAuth 2.0 for secure authentication. 
       
-      To obtain your credentials for both environments please contact us or send an email to: pad@billie.io.
+      Different keys are used for the `sandbox` and `production` environments. Both systems operate completely independent, however both show largely 
+      the same response behaviour. The major difference is that sandbox does not trigger any payment events (payout to merchant, repayment 
+      by debtors, etc.). To obtain your credentials for both environments please contact Billie's merchant integration support 
+      via telephone ( [+49-30-120872485](tel:+4930120872485) ) or email ( pad@billie.io ).
+      
+      This authentication mechanism is based on the OAuth 2.0 protocol and requires a Client ID and a Client Secret Key (client credentials).
+      
+      Before triggering any API call, a so called JSON web token (JWT) must be requested through the `oauth/token` endpoint described below
+      by using your client credentials.
+      In all following requests / API calls, this JWT token is used for authorization and must be passed as type "Bearer" token 
+      in the Authorization header. Example: `Authorization: Bearer eyJhbGciOiJIUzI...`
+      
+      Renewal of the bearer token / JWT:
+      
+      Every token expires automatically after 8 hours. After expiration of an existing token a new token must be requested through the 
+      `POST oauth/token` endpoint. Implementation best practice is to always try sending API calls first with the previously stored token. 
+      Sending API calls with an expired token will be answered with an `HTTP 401` (Unauthorized request or invalid credentials) response.
+      
+      After receiving the `401` error you will simply need to request a new token by triggering again the `oauth/token` endpoint. 
+      After receiving the new valid token, resend the previously failed API call. This procedure allows for optimal API interaction, 
+      ensures reduced system load on both ends, and is easy to implement as you don't need to keep track of token expiration times.
+      
+      There is another endpoint available for checking if a token is still valid or not: `GET oauth/token`.
     x-groups:
-      - standard
-      - checkout-server
-      - dashboard
-      - support
+      - public
+      - private
   -
-    name: 'Order Creation'
+    name: 'Checkout Client'
+    description: |
+      # Checkout Widget Integration
+      
+      To integrate the Billie checkout widget, the following steps are required:
+      
+      1. Include Billie checkout widget bundle into your checkout page
+      2. Provide config data _(with `session_id` from server-side integration)_
+      3. Provide order details and call mount method
+      4. Handle widget responses
+      5. Apply customized styling _[optional]_
+      
+      This document will go over details of how to do each step and explain easiest course of action to get the widget working.
+      
+      ### 1. Include Billie Checkout Widget Bundle into your Checkout Page
+      
+      On the checkout page, the following code snippet needs to be included:
+      ```html
+      <script>
+        var bcwSrc = 'https://static-paella-sandbox.billie.io/checkout/billie-checkout.js';
+        (function(w,d,s,o,f,js,fjs){
+          w['BillieCheckoutWidget']=o;w[o]=w[o]||function(){(w[o].q=w[o].q||[]).push(arguments)};
+          w.billieSrc=f;js=d.createElement(s);fjs=d.getElementsByTagName(s)[0];js.id=o;
+          js.src=f;js.charset='utf-8';js.async=1;fjs.parentNode.insertBefore(js,fjs);bcw('init');
+        }(window,document,'script','bcw', bcwSrc));
+      </script>
+      ```
+      
+      URL specified in `bcwSrc` is going to specify if you are using Sandbox or Production environment:
+      
+      Sandbox: https://static-paella-sandbox.billie.io/checkout/billie-checkout.js  
+      Production: https://static.billie.io/checkout/billie-checkout.js   
+      
+      This code snippet will inject our checkout script into the head of the webshop. That will download our widget bundle code and enable function calls to interact with the widget.  
+      
+      It is **highly recommended** to add this code snippet as high as possible in document `head` so that download of the widget bundle is finished as soon as possible in order to ensure smooth user experience.  
+      
+      ### 2. Provide Config Data
+      
+      During initialization of the the widget, we expect to get `session_id`. This can be obtained by calling `Checkout Session Create`LINK with Billie from your backend and exposing it to the frontend. The `session_id` will be unique per order.
+      ```html
+      <script>
+        const billie_config_data = {
+          'session_id': ':YOUR_SESSION_ID',
+          'merchant_name': ':YOUR_NAME'
+        }
+      </script>
+      ```
+      
+      `session_id` is needed to approve the order and should be known before mounting the widget.
+      
+      Ideally if you are using server side rendering, this piece of code can be inserted into the document `head` with prefilled values. Otherwise please ensure there is [XHR request](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest) as soon as possible to your backend to retrieve `session_id`.
+      
+      ### 3. Provide Order Details and Call Mount Method
+      
+      Once the user reviews his checkout basket and is ready to pay, he can click on the **Pay with Billie** button. When that happens we are expecting the `mount` method to be called. Easiest integration would be to inline the call of the function directly on the button, for example:
+      ```html
+      <script>
+        function payWithBillie() {
+          // prepare / get all the data and assign it to billie_order_data, please refer to 3a section
+          BillieCheckoutWidget.mount({
+            billie_config_data: billie_config_data, 
+            billie_order_data: billie_order_data
+          })
+          .then(function success(ao) {
+            // code to execute when approved order
+            // console.log('Approved order', ao);
+          })
+          .catch(function failure(err) {
+            // code to execute when there is an error or when order is rejected
+            // console.log('Error occurred', err);
+          });
+        }
+      </script>
+      <button onclick="payWithBillie()"> Pay with Billie </button>
+      ```
+      
+      `BillieCheckoutWidget` is a promise which can accept optional `then` and `catch` methods. They can be added if the webshop needs to do something with the outcome of the order authorization. 
+      
+      `then` block will receive as parameter the object with the authorised order details. 
+      
+      `catch` block will receive the error object with reasons why the order creation was rejected.
+      
+      
+      #### 3.a Mount Method Parameters
+      
+      `BillieCheckoutWidget.mount` expects two parameters:
+      - `billie_config_data` is object you have from step two which includes the `session_id` and `merchant_name`
+      - `billie_order_data` is collection of order data from user
+      
+      
+      #### 3.b Order Data Object
+      
+      Order data object needs to contain all information about order in following format, required values are bolded:
+      
+      - `amount` **[object]**
+         - `gross` **[float]** `>= 1`
+         - `tax` **[float]** `>= 1`
+         - `next` **[float]** `>= 1`
+      - `duration` **[integer]** `[1...120]`
+      - `delivery_address` **[object]**
+        - `street` **[string]** `<= 255 characters`
+        - `house_number`  _[string]_ `<= 255 characters`
+        - `addition` _[string]_ `<= 255 characters`
+        - `city` **[string]** `<= 255 characters`
+        - `postal_code` **[string]** `<= 5 characters`
+        - `country` **[string]** `2 characters` `^[A-Za-z]{2}$`
+      - `debtor_company` **[object]**
+        - `name` **[string]** `<= 255 characters`
+        - `established_customer` _[boolean]_ 
+        - `address_street` **[string]** `<= 255 characters`
+        - `address_house_number` **[string]** `<= 255 characters`
+        - `address_addition` _[string]_  `<= 255 characters`
+        - `address_city` **[string]** `<= 255 characters`
+        - `address_postal_code` **[string]** `<= 5 characters`
+        - `address_country` **[string]** `2 characters` `^[A-Za-z]{2}$`
+      - `debtor_person`  **[object]**
+        - `salutation` _[string]_ `1 character` `["m" / "f"]`
+        - `first_name` _[string]_ `<= 255 characters`
+        - `last_name` _[string]_ `<= 255 characters`
+        - `phone_number` _[string]_ `>= 5 characters`, `<= 20 characters` `^(\+|\d|\()[ \-\/0-9()]{5,20}$`
+        - `email` **[string]** `<= 255 characters` `valid email`
+      - `line_items` **[array of objects]**
+        - `external_id` **[string]** `<= 255 characters`
+        - `title` **[string]** `<= 255 characters`
+        - `description` _[string]_ `<= 255 characters`
+        - `quantity` **[string]** `>= 1`
+        - `category` _[string]_ `<= 255 characters`
+        - `brand` _[string]_ `<= 255 characters`
+        - `gtin` _[string]_ `<= 255 characters`
+        - `mpn` _[string]_ `<= 255 characters`
+        - `amount` **[object]**
+          - `gross` **[float]** `>= 1`
+          - `tax` **[float]** `>= 1`
+          - `next` **[float]** `>= 1`
+      
+      Below you can find an example of orderData object in javascript
+      
+      ```javascript
+      const orderData = {
+        'amount': { 'gross': 0, 'tax': 0, 'net': 0 },
+        'comment': '',
+        'duration': 0,
+        'delivery_address': {
+          'street': '', 'house_number': '', 'addition': '',
+          'city': '', 'postal_code': '', 'country': ''
+        },
+        'debtor_company': {
+          'name': '', 'established_customer': false,
+          'address_street': '', 'address_house_number': '', 'address_addition': '',
+          'address_city': '', 'address_postal_code': '', 'address_country': ''
+        },
+        'debtor_person': {
+          'salutation': '', 'first_name': '', 'last_name': '', 'phone_number': '', 'email': ''
+        },
+        'line_items': [{ 
+            'external_id': '', 'title': '', 'description': '',
+            'quantity': 0,  'category': '', 'brand': '',
+            'gtin': '', 'mpn': '', 'amount': { 'gross': 0, 'tax': 0, 'net': 0 }
+          }, { 
+            'external_id': '', 'title': '', 'description': '',
+            'quantity': 0,  'category': '', 'brand': '',
+            'gtin': '', 'mpn': '', 'amount': { 'gross': 0, 'tax': 0, 'net': 0 }
+          }, // ... 
+        ] 
+      };
+      ```
+      
+      ### 4. Handle Widget Responses
+      
+      When submitted, the checkout widget will evaluate if an order with the given data can be accepted or not. If an order could not be accepted the widget will return the state `declined` with a specified decline_reason.
+      
+      #### Response
+      After submitting the widget, following data will be returned to either `then` or `catch` block:
+      - `state` **[string]** `<= 255 characters`   
+      &nbsp;&nbsp;&nbsp;&nbsp;Enum: `authorized` `declined`
+      - `decline_reason` **[string]** `<= 255 characters`   
+      &nbsp;&nbsp;&nbsp;&nbsp;Enum: `risk_policy` `debtor_not_identified` `debtor_address` `debtor_limit_exceeded`
+      - `debtor_company` **[object]**  
+        - `name` **[string]** `<= 255 characters`
+        - `address_street` **[string]** `<= 255 characters`
+        - `address_house_number` **[string]** `<= 255 characters`
+        - `address_city` **[string]** `<= 255 characters`
+        - `address_postal_code` **[string]** `<= 5 characters`
+        - `address_country` **[string]** `2 characters` `^[A-Za-z]{2}$`
+        
+      `decline_reason` will be set only when `state` value is `declined`
+      
+      #### 5. Apply Customized Styling
+      It is possible to set some CSS rules to be applied over widget in a simple format. Simply use this snippet:
+      
+      ```html
+      <style>
+        .billie-checkout-modal {
+          --c-primary: #FF4338;
+        }
+      </style>
+      ```
+      
+      Other available options are:
+      - `c-primary` -  color of submit button
+      - `s-font` - font size inside the widget 
+      - `s-font-small` - font size of small text inside the widget
     x-groups:
-      - standard
-      - support
-      - checkout-client
-      - checkout-server
+      - public
+      - private
   -
-    name: 'Order Pre-approval'
+    name: 'Checkout Server'
     x-groups:
-      - standard
+      - public
+      - private
+  -
+    name: 'Back-end Order Creation'
+    x-groups:
+      - public
+      - private
   -
     name: 'Order Management'
     x-groups:
-      - standard
-      - dashboard
-      - support
-      - salesforce
-      - checkout-server
-  -
-    name: Payments
-    x-groups:
-      - dashboard
-  -
-    name: Debtors
-    x-groups:
-      - dashboard
-      - support
-      - salesforce
-  -
-    name: Merchants
-    x-groups:
-      - support
+      - public
+      - private
   -
     name: Webhooks
     description: |
@@ -3048,11 +3139,33 @@ tags:
       | dca_letter       | Debt collection handover letter was sent |
       | dca_email        | Debt collection handover email was sent  |
     x-groups:
-      - standard
-      - checkout-server
-      - support
+      - public
+      - private
   -
-    name: Misc.
+    name: 'Dashboard Orders'
     x-groups:
-      - support
-      - salesforce
+      - private
+  -
+    name: 'Dashboard Debtors'
+    x-groups:
+      - private
+  -
+    name: 'Dashboard Payments'
+    x-groups:
+      - private
+  -
+    name: 'Dashboard Users'
+    x-groups:
+      - private
+  -
+    name: Merchants
+    x-groups:
+      - private
+  -
+    name: Support
+    x-groups:
+      - private
+  -
+    name: 'API Docs'
+    x-groups:
+      - private

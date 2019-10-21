@@ -40,8 +40,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     summary="Get Payment Details",
  *     security={{"oauth2"={}}},
  *
- *     tags={"Payments"},
- *     x={"groups":{"dashboard"}},
+ *     tags={"Dashboard Payments"},
+ *     x={"groups":{"private"}},
  *
  *     @OA\Parameter(in="path", name="uuid", @OA\Schema(ref="#/components/schemas/UUID"), required=true),
  *

@@ -16,8 +16,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     operationId="get_debtor_company_limits",
  *     summary="Get Debtor Company Limits",
  *
- *     tags={"Debtors"},
- *     x={"groups":{"support", "salesforce"}},
+ *     tags={"Support"},
+ *     x={"groups":{"private"}},
  *
  *     @OA\Parameter(
  *          in="path",

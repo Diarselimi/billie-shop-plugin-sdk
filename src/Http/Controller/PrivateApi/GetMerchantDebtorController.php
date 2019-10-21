@@ -16,8 +16,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     operationId="debtor_get_details_extended",
  *     summary="Get Debtor Details (Extended)",
  *
- *     tags={"Debtors"},
- *     x={"groups":{"support"}},
+ *     tags={"Support"},
+ *     x={"groups":{"private"}},
  *
  *     @OA\Parameter(in="path", name="debtorUuid", description="Merchant-Debtor UUID", @OA\Schema(type="string"), required=true),
  *

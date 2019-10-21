@@ -4,19 +4,17 @@ namespace App\Http\Controller\ApiDocs;
 
 use App\Application\UseCase\ApiSpecLoad\ApiSpecLoadUseCase;
 use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @OA\Get(
- *     path="/internal-docs/{apiGroup}/billie-pad-openapi.yaml",
+ *     path="/internal-docs/full/billie-pad-openapi.yaml",
  *     operationId="docs_internal_get_specs",
  *     summary="Internal API Specs",
  *
- *     tags={"Docs"},
- *     x={"groups":{"support"}},
- *
- *     @OA\Parameter(in="path", name="apiGroup", description="API group name", required=true,
- *          @OA\Schema(ref="#/components/schemas/PrivateApiGroup")
- *     ),
+ *     tags={"API Docs"},
+ *     x={"groups":{"private"}},
  *
  *     @OA\Parameter(in="query", name="nocache", description="Do not send cache headers to the client", required=false,
  *          @OA\Schema(type="boolean"), example=1
@@ -29,18 +27,15 @@ use OpenApi\Annotations as OA;
  */
 class PrivateApiSpecController extends AbstractApiSpecController
 {
-    public const API_GROUP_WHITELIST = [
-        'full',
-        'salesforce',
-        'support',
-        'standard',
-        'checkout-server',
-        'checkout-client',
-        'dashboard',
-    ];
+    private const API_GROUP_WHITELIST = ['full'];
 
     public function __construct(ApiSpecLoadUseCase $useCase)
     {
         parent::__construct($useCase, self::API_GROUP_WHITELIST);
+    }
+
+    public function execute(Request $request): Response
+    {
+        return $this->createResponse($request, 'full');
     }
 }

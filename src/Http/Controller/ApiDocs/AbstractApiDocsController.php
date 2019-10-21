@@ -11,8 +11,6 @@ use Symfony\Component\Yaml\Yaml;
 
 abstract class AbstractApiDocsController
 {
-    private $apiGroupWhitelist;
-
     private $docsRenderUseCase;
 
     private $specLoadUseCase;
@@ -21,23 +19,17 @@ abstract class AbstractApiDocsController
 
     public const CACHE_MAX_DAYS_URL_SPEC = (30 * 24 * 60 * 60);
 
-    public function __construct(
-        ApiDocsRenderUseCase $docsRenderUseCase,
-        ApiSpecLoadUseCase $specLoadUseCase,
-        array $apiGroupWhitelist
-    ) {
+    public function __construct(ApiDocsRenderUseCase $docsRenderUseCase, ApiSpecLoadUseCase $specLoadUseCase)
+    {
         $this->docsRenderUseCase = $docsRenderUseCase;
         $this->specLoadUseCase = $specLoadUseCase;
-        $this->apiGroupWhitelist = $apiGroupWhitelist;
     }
 
-    public function execute(Request $request, string $apiGroup = null): Response
-    {
-        if (!$apiGroup || !in_array($apiGroup, $this->apiGroupWhitelist)) {
-            throw new NotFoundHttpException('API specification not found.');
-        }
+    abstract public function execute(Request $request): Response;
 
-        $isInlineSpec = !$request->query->has('noembed');
+    public function createResponse(Request $request, string $apiGroup): Response
+    {
+        $isInlineSpec = $request->query->has('embed');
 
         $spec = $isInlineSpec
             ? $this->getInlineSpec($apiGroup)

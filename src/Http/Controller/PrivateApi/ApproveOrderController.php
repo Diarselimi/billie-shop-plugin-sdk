@@ -16,8 +16,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     operationId="order_approve",
  *     summary="Approve Order in Waiting State",
  *
- *     tags={"Order Management"},
- *     x={"groups":{"support", "salesforce"}},
+ *     tags={"Support"},
+ *     x={"groups":{"private"}},
  *
  *     @OA\Parameter(
  *          in="path",

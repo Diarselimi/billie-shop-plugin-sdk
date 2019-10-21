@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
  *     summary="Create Merchant",
  *
  *     tags={"Merchants"},
- *     x={"groups":{"support"}},
+ *     x={"groups":{"private"}},
  *
  *     @OA\RequestBody(
  *          required=true,

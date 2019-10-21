@@ -16,8 +16,8 @@ use OpenApi\Annotations as OA;
  *     operationId="mark_duplicate_debtors",
  *     summary="Mark Merchant Debtor Duplicates",
  *
- *     tags={"Debtors"},
- *     x={"groups":{"support", "salesforce"}},
+ *     tags={"Support"},
+ *     x={"groups":{"private"}},
  *
  *     @OA\RequestBody(
  *          required=true,

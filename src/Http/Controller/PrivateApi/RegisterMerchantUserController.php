@@ -18,8 +18,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     operationId="register_merchant_user",
  *     summary="Register Merchant User",
  *
- *     tags={"Authentication"},
- *     x={"groups":{"support"}},
+ *     tags={"Dashboard Users"},
+ *     x={"groups":{"private"}},
  *
  *     @OA\Parameter(in="path", name="merchantId", description="Merchant ID", @OA\Schema(type="integer"), required=true),
  *

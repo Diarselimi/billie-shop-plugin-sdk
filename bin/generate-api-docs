@@ -37,12 +37,7 @@ bin/console cache:clear
 rm -rf docs/openapi
 mkdir -p docs/openapi
 
-generate_api_docs full
-generate_api_docs standard
-generate_api_docs support
-generate_api_docs dashboard
-generate_api_docs salesforce
-generate_api_docs checkout-server
-generate_api_docs checkout-client
+generate_api_docs full # special command wildcard to generate the docs for all groups. See GenerateOpenApiSpec::buildProcessors
+generate_api_docs public
 
 echo "DONE."

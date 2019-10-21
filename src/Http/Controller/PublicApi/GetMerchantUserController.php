@@ -17,8 +17,8 @@ use Symfony\Component\Security\Core\Security;
  *     summary="Get Merchant User",
  *     security={{"oauth2"={}}},
  *
- *     tags={"Authentication"},
- *     x={"groups":{"dashboard"}},
+ *     tags={"Dashboard Users"},
+ *     x={"groups":{"private"}},
  *
  *     @OA\Response(response=200, @OA\JsonContent(ref="#/components/schemas/GetMerchantUserResponse"), description="Merchant User details"),
  *     @OA\Response(response=404, ref="#/components/responses/NotFound"),

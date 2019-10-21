@@ -15,8 +15,8 @@ use OpenApi\Annotations as OA;
  *     operationId="update_merchant_debtor_company",
  *     summary="Updat Merchant Debtor Company",
  *
- *     tags={"Debtors"},
- *     x={"groups":{"support"}},
+ *     tags={"Support"},
+ *     x={"groups":{"private"}},
  *
  *     @OA\Parameter(in="path", name="debtorUuid", description="Merchant-Debtor UUID", @OA\Schema(type="string"), required=true),
  *

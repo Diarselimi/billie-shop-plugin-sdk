@@ -19,8 +19,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     summary="Get Debtor Details",
  *     security={{"oauth2"={}}},
  *
- *     tags={"Debtors"},
- *     x={"groups":{"dashboard"}},
+ *     tags={"Dashboard Debtors"},
+ *     x={"groups":{"private"}},
  *
  *     @OA\Parameter(in="path", name="uuid", @OA\Schema(ref="#/components/schemas/UUID"), required=true),
  *

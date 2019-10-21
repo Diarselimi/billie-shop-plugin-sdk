@@ -20,8 +20,8 @@ use OpenApi\Annotations as OA;
  *     summary="Pre-approve Order Confirm",
  *     security={{"oauth2"={}}},
  *
- *     tags={"Order Pre-approval"},
- *     x={"groups":{"standard"}},
+ *     tags={"Back-end Order Creation"},
+ *     x={"groups":{"public", "private"}},
  *
  *     @OA\Parameter(in="path", name="id", @OA\Schema(oneOf={@OA\Schema(ref="#/components/schemas/UUID"), @OA\Schema(type="string")}), required=true),
  *

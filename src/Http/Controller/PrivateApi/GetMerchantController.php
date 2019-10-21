@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     summary="Get Merchant",
  *
  *     tags={"Merchants"},
- *     x={"groups":{"support"}},
+ *     x={"groups":{"private"}},
  *
  *     @OA\Parameter(in="path", name="id", @OA\Schema(type="integer"), required=true, description="Merchant ID"),
  *

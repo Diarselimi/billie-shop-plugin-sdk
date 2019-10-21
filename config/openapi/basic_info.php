@@ -13,12 +13,12 @@ use OpenApi\Annotations as OA;
  *     operationId="api_status",
  *     summary="API Status",
  *     description="Checks the health of the API server",
- *     tags={"Misc."},
- *     x={"groups":{"support", "salesforce"}},
+ *     tags={"Support"},
+ *     x={"groups":{"private"}},
  *     @OA\Response(
  *          response=200,
  *          description="Successful",
- *          content={"text/plain":@OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", default="paella is alive"))}
+ *          content={"text/plain":@OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", default="paella_core is alive"))}
  *     )
  * )
  */

@@ -15,8 +15,8 @@ use OpenApi\Annotations as OA;
  *     summary="Pre-approve Order Create",
  *     security={{"oauth2"={}}},
  *
- *     tags={"Order Pre-approval"},
- *     x={"groups":{"standard"}},
+ *     tags={"Back-end Order Creation"},
+ *     x={"groups":{"public", "private"}},
  *
  *     @OA\RequestBody(
  *          required=true,

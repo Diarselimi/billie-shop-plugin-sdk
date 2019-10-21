@@ -18,8 +18,8 @@ use Symfony\Component\Security\Core\Security;
  *     summary="Checkout Session Authorize",
  *     description="Fills the required order information for the given checkout session. The order will then need to be confirmed by the merchant aftewards.",
  *
- *     tags={"Order Creation"},
- *     x={"groups":{"checkout-client"}},
+ *     tags={"Checkout Client"},
+ *     x={"groups":{"private"}},
  *
  *     @OA\Parameter(in="path", name="sessionUuid", @OA\Schema(ref="#/components/schemas/UUID"), required=true),
  *

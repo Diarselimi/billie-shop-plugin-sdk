@@ -23,8 +23,8 @@ use OpenApi\Annotations as OA;
  *     summary="Ship Order",
  *     security={{"oauth2"={}}},
  *
- *     tags={"Order Creation"},
- *     x={"groups":{"standard", "checkout-server"}},
+ *     tags={"Order Management"},
+ *     x={"groups":{"public", "private"}},
  *
  *     @OA\Parameter(in="path", name="id",
  *          @OA\Schema(oneOf={@OA\Schema(ref="#/components/schemas/UUID"), @OA\Schema(type="string")}),

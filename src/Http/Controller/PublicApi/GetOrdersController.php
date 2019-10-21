@@ -16,8 +16,8 @@ use Symfony\Component\HttpFoundation\Request;
  *     summary="Get Orders",
  *     security={{"oauth2"={}}},
  *
- *     tags={"Order Management"},
- *     x={"groups":{"dashboard"}},
+ *     tags={"Dashboard Orders"},
+ *     x={"groups":{"private"}},
  *
  *     @OA\Parameter(in="query", name="sort_by", @OA\Schema(type="string",
  *          enum={

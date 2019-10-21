@@ -16,8 +16,8 @@ use OpenApi\Annotations as OA;
  *     operationId="whitelist_merchant_debtor",
  *     summary="Whitelist Merchant Debtor",
  *
- *     tags={"Debtors"},
- *     x={"groups":{"support", "salesforce"}},
+ *     tags={"Support"},
+ *     x={"groups":{"private"}},
  *
  *     @OA\Parameter(in="path", name="debtorUuid", description="Merchant-Debtor UUID", @OA\Schema(type="string"), required=true),
  *

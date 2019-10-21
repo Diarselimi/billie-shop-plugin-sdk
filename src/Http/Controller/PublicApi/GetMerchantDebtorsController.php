@@ -16,8 +16,8 @@ use Symfony\Component\HttpFoundation\Request;
  *     summary="Get Debtors",
  *     security={{"oauth2"={}}},
  *
- *     tags={"Debtors"},
- *     x={"groups":{"dashboard"}},
+ *     tags={"Dashboard Debtors"},
+ *     x={"groups":{"private"}},
  *
  *     @OA\Parameter(in="query", name="sort_by", @OA\Schema(type="string",
  *          enum={

@@ -15,10 +15,10 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     path="/order/{uuid}/add-invoice",
  *     operationId="order_create_invoice",
  *     summary="Create Order Invoice",
- *     description="Creates a new invoice, linking an order with a file. Called automatically by the invoice uploader Lambda service.",
+ *     description="(Automated) Creates a new invoice, linking an order with a file. Called automatically by the invoice uploader Lambda service.",
  *
- *     tags={"Order Management", "Automated"},
- *     x={"groups":{"support", "automated"}},
+ *     tags={"Support"},
+ *     x={"groups":{"private"}},
  *
  *     @OA\Parameter(
  *          in="path",

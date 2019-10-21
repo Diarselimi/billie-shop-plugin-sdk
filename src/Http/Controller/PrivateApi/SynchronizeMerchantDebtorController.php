@@ -23,8 +23,8 @@ class SynchronizeMerchantDebtorController
      *     operationId="synchronize_merchant_debtor",
      *     summary="Synchronize merchant_debtor address.",
      *
-     *     tags={"Merchants"},
-     *     x={"groups":{"support"}},
+     *     tags={"Support"},
+     *     x={"groups":{"private"}},
      *
      *     @OA\Parameter(
      *          in="path",

@@ -21,8 +21,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     summary="Checkout Session Confirm",
  *     security={{"oauth2"={}}},
  *
- *     tags={"Order Creation"},
- *     x={"groups":{"checkout-server"}},
+ *     tags={"Checkout Server"},
+ *     x={"groups":{"public", "private"}},
  *
  *     @OA\Parameter(in="path", name="sessionUuid", @OA\Schema(ref="#/components/schemas/UUID"), required=true),
  *

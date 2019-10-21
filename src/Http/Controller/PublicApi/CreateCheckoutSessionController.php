@@ -16,8 +16,8 @@ use Symfony\Component\HttpFoundation\Request;
  *     summary="Checkout Session Create",
  *     security={{"oauth2"={}}},
  *
- *     tags={"Order Creation"},
- *     x={"groups":{"checkout-server"}},
+ *     tags={"Checkout Server"},
+ *     x={"groups":{"public", "private"}},
  *
  *     @OA\RequestBody(
  *          required=true,

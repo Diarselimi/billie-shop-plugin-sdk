@@ -35,26 +35,6 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Schema(
- *     schema="PublicApiGroup",
- *     title="API Group",
- *     type="string",
- *     enum=\App\Http\Controller\ApiDocs\PublicApiSpecController::API_GROUP_WHITELIST,
- *     example="standard"
- * )
- */
-
-/**
- * @OA\Schema(
- *     schema="PrivateApiGroup",
- *     title="API Group",
- *     type="string",
- *     enum=\App\Http\Controller\ApiDocs\PrivateApiSpecController::API_GROUP_WHITELIST,
- *     example="standard"
- * )
- */
-
-/**
- * @OA\Schema(
  *     schema="OrderDunningStatus",
  *     title="Order Dunning Status",
  *     type="string",
@@ -102,7 +82,7 @@ use OpenApi\Annotations as OA;
  *     title="Phone Number",
  *     type="string",
  *     minLength=5,
- *     maxLength=20,
+ *     maxLength=21,
  *     pattern="^(\+|\d|\()[ \-\/0-9()]{5,20}$",
  *     example="030 31199251"
  * )

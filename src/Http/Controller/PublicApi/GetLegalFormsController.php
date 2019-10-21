@@ -12,8 +12,8 @@ use OpenApi\Annotations as OA;
  *     summary="Get Legal Forms",
  *     security={},
  *
- *     tags={"Misc."},
- *     x={"groups":{"checkout-client"}},
+ *     tags={"Back-end Order Creation"},
+ *     x={"groups":{"public", "private"}},
  *
  *     @OA\Response(response=200, @OA\JsonContent(type="object", properties={
  *          @OA\Property(property="items", type="array", @OA\Items(

@@ -34,8 +34,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     summary="Get Payments",
  *     security={{"oauth2"={}}},
  *
- *     tags={"Payments"},
- *     x={"groups":{"dashboard"}},
+ *     tags={"Dashboard Payments"},
+ *     x={"groups":{"private"}},
  *
  *     @OA\Parameter(in="query", name="sort_by", @OA\Schema(type="string", enum={"priority", "date"}, default="priority"), required=false),
  *     @OA\Parameter(in="query", name="sort_direction", @OA\Schema(type="string", enum={"desc", "asc"}, default="desc"), required=false),

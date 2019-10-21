@@ -15,8 +15,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     operationId="update_merchant_debtor_limit",
  *     summary="Update Merchant Debtor Limit",
  *
- *     tags={"Debtors"},
- *     x={"groups":{"support", "salesforce"}},
+ *     tags={"Support"},
+ *     x={"groups":{"private"}},
  *
  *     @OA\Parameter(
  *          in="path",

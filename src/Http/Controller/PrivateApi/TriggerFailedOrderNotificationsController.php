@@ -14,8 +14,8 @@ use OpenApi\Annotations as OA;
  *     operationId="trigger_failed_order_notifications",
  *     summary="Trigger all failed order notifications",
  *
- *     tags={"Order Management"},
- *     x={"groups":{"support"}},
+ *     tags={"Support"},
+ *     x={"groups":{"private"}},
  *
  *     @OA\Parameter(
  *          in="path",

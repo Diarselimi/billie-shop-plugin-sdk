@@ -20,7 +20,7 @@ abstract class AbstractApiSpecController
         $this->apiGroupWhitelist = $apiGroupWhitelist;
     }
 
-    public function execute(Request $request, string $apiGroup): Response
+    public function createResponse(Request $request, string $apiGroup): Response
     {
         if (!in_array($apiGroup, $this->apiGroupWhitelist)) {
             throw new NotFoundHttpException('API specification not found.');

@@ -17,8 +17,8 @@ use OpenApi\Annotations as OA;
  *     operationId="mark_order_as_fraud",
  *     summary="Mark Order As Fraud",
  *
- *     tags={"Order Management"},
- *     x={"groups":{"support", "salesforce"}},
+ *     tags={"Support"},
+ *     x={"groups":{"private"}},
  *
  *     @OA\Parameter(
  *          in="path",
