@@ -50,13 +50,13 @@ class RegisterMerchantUserUseCase implements ValidatedUseCaseInterface
             throw new MerchantNotFoundException();
         }
 
-        $oauthUser = $this->authenticationService->createUser($request->getUserEmail(), $request->getUserPassword());
         $role = $this->merchantUserRoleRepository->getOneByUuid($request->getRoleUuid(), $request->getMerchantId());
 
         if (!$role) {
             throw new RoleNotFoundException();
         }
 
+        $oauthUser = $this->authenticationService->createUser($request->getUserEmail(), $request->getUserPassword());
         $merchantUser = $this->merchantUserEntityFactory->create(
             $request->getMerchantId(),
             $role->getId(),
