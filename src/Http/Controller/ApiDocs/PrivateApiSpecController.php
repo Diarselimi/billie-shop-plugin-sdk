@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @OA\Get(
- *     path="/internal-docs/full/billie-pad-openapi.yaml",
+ *     path="/internal-docs/billie-pad-openapi.yaml",
  *     operationId="docs_internal_get_specs",
  *     summary="Internal API Specs",
  *

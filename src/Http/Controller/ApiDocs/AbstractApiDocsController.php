@@ -6,7 +6,6 @@ use App\Application\UseCase\ApiDocsRender\ApiDocsRenderUseCase;
 use App\Application\UseCase\ApiSpecLoad\ApiSpecLoadUseCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Yaml\Yaml;
 
 abstract class AbstractApiDocsController
@@ -33,7 +32,7 @@ abstract class AbstractApiDocsController
 
         $spec = $isInlineSpec
             ? $this->getInlineSpec($apiGroup)
-            : "'" . $this->getSpecUrl($apiGroup, $request) . "'";
+            : "'" . $this->getSpecUrl($request) . "'";
 
         $headers = ['Content-Type' => 'text/html'];
         if (!$request->query->has('nocache')) {
@@ -54,14 +53,11 @@ abstract class AbstractApiDocsController
         return json_encode($spec, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
     }
 
-    private function getSpecUrl(string $apiGroup, Request $request): string
+    private function getSpecUrl(Request $request): string
     {
-        $basePath = rtrim($request->getPathInfo(), '/');
+        $basePath = explode('/', rtrim($request->getPathInfo(), '/'));
+        $basePath = array_pop($basePath);
 
-        if (!strpos($basePath, 'docs/' . $apiGroup)) {
-            $basePath = "{$basePath}/$apiGroup";
-        }
-
-        return $request->getUriForPath("{$basePath}/billie-pad-openapi.yaml");
+        return ($basePath ? "{$basePath}/" : "") . "billie-pad-openapi.yaml";
     }
 }

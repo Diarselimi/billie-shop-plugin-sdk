@@ -263,7 +263,7 @@ paths:
           $ref: '#/components/responses/ServerError'
       x-groups:
         - private
-  /internal-docs/full/billie-pad-openapi.yaml:
+  /internal-docs/billie-pad-openapi.yaml:
     get:
       tags:
         - 'API Docs'
@@ -319,7 +319,7 @@ paths:
           $ref: '#/components/responses/ServerError'
       x-groups:
         - private
-  /docs/public/billie-pad-openapi.yaml:
+  /docs/billie-pad-openapi.yaml:
     get:
       tags:
         - 'API Docs'
