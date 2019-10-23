@@ -55,7 +55,7 @@ class MigrateRoleIdToMerchantUsers extends TransactionalMigration
 
         // consider it an admin if it has some write permission
         foreach (MerchantUserPermissions::ALL_WRITE_PERMISSIONS as $permissionName) {
-            if (in_array('ROLE_' . $permissionName, $permissions ?: [], true)) {
+            if (in_array($permissionName, $permissions ?: [], true)) {
                 return MerchantUserDefaultRoles::ROLE_SUPPORT['name'];
             }
         }
