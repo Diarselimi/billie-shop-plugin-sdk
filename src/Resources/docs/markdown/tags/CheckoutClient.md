@@ -136,31 +136,48 @@ Below you can find an example of orderData object in javascript
 
 ```javascript
 const orderData = {
-  'amount': { 'gross': 0, 'tax': 0, 'net': 0 },
-  'comment': '',
-  'duration': 0,
-  'delivery_address': {
-    'street': '', 'house_number': '', 'addition': '',
-    'city': '', 'postal_code': '', 'country': ''
+  "amount": { "net": 100, "gross": 100, "tax": 0 },
+  "comment": "string",
+  "duration": 30,
+  "delivery_address": {
+    "house_number": "string",
+    "street": "string",
+    "city": "string",
+    "postal_code": "10000",
+    "country": "DE",
+    "addition": "string"
   },
-  'debtor_company': {
-    'name': '', 'established_customer': false,
-    'address_street': '', 'address_house_number': '', 'address_addition': '',
-    'address_city': '', 'address_postal_code': '', 'address_country': ''
+  "debtor_company": {
+    "name": "string",
+    "established_customer": false,
+    "address_house_number": "string",
+    "address_street": "string",
+    "address_city": "string",
+    "address_postal_code": "10000",
+    "address_country": "DE",
+    "address_addition": "string"
   },
-  'debtor_person': {
-    'salutation': '', 'first_name': '', 'last_name': '', 'phone_number': '', 'email': ''
+  "debtor_person": {
+    "salutation": "m",
+    "first_name": "string",
+    "last_name": "string",
+    "phone_number": "030 31199251",
+    "email": "james.smith@example.com"
   },
-  'line_items': [{ 
-      'external_id': '', 'title': '', 'description': '',
-      'quantity': 0,  'category': '', 'brand': '',
-      'gtin': '', 'mpn': '', 'amount': { 'gross': 0, 'tax': 0, 'net': 0 }
-    }, { 
-      'external_id': '', 'title': '', 'description': '',
-      'quantity': 0,  'category': '', 'brand': '',
-      'gtin': '', 'mpn': '', 'amount': { 'gross': 0, 'tax': 0, 'net': 0 }
-    }, // ... 
-  ] 
+  "line_items": [
+    {
+      "external_id": "string",
+      "title": "string",
+      "description": "string",
+      "quantity": 1,
+      "category": "string",
+      "brand": "string",
+      "gtin": "string",
+      "mpn": "string",
+      "amount": { "net": 100, "gross": 100, "tax": 0 },
+    }
+    // , ...
+  ]
 };
 ```
 

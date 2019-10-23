@@ -29,10 +29,7 @@ abstract class AbstractApiDocsController
     public function createResponse(Request $request, string $apiGroup): Response
     {
         $isInlineSpec = $request->query->has('embed');
-
-        $spec = $isInlineSpec
-            ? $this->getInlineSpec($apiGroup)
-            : "'" . $this->getSpecUrl($request) . "'";
+        $inlineSpec = $isInlineSpec ? $this->getInlineSpec($apiGroup) : "''";
 
         $headers = ['Content-Type' => 'text/html'];
         if (!$request->query->has('nocache')) {
@@ -40,7 +37,7 @@ abstract class AbstractApiDocsController
                 ($isInlineSpec ? self::CACHE_MAX_DAYS_INLINE_SPEC : self::CACHE_MAX_DAYS_URL_SPEC) . ', public';
         }
 
-        $htmlDoc = $this->docsRenderUseCase->execute($spec);
+        $htmlDoc = $this->docsRenderUseCase->execute($inlineSpec);
 
         return new Response($htmlDoc, 200, $headers);
     }
@@ -50,14 +47,6 @@ abstract class AbstractApiDocsController
         $spec = $this->specLoadUseCase->execute($apiGroup);
         $spec = Yaml::parse($spec, Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE);
 
-        return json_encode($spec, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
-    }
-
-    private function getSpecUrl(Request $request): string
-    {
-        $basePath = explode('/', rtrim($request->getPathInfo(), '/'));
-        $basePath = array_pop($basePath);
-
-        return ($basePath ? "{$basePath}/" : "") . "billie-pad-openapi.yaml";
+        return json_encode($spec, JSON_PRETTY_PRINT);
     }
 }

@@ -69,15 +69,15 @@
 <script>
 
 // noinspection JSAnnotator
-const OPENAPI_SPEC = <?php echo str_replace('`', '\\`', $spec); ?>;
+var OPENAPI_SPEC = <?php echo str_replace('`', '\\`', $spec); ?>;
+var OPENAPI_SPEC_URL = [location.protocol, '//', location.host, location.pathname].join('') + '/billie-pad-openapi.yaml';
 
 Redoc.init(
-    OPENAPI_SPEC,
+    OPENAPI_SPEC.length > 0 ? OPENAPI_SPEC : OPENAPI_SPEC_URL,
     <?php /** @noinspection PhpUndefinedVariableInspection */echo $redoc_config_json; ?>,
         document.getElementById('redoc_container')
 );
 
-document.title += ' v' + OPENAPI_SPEC.info.version;
 </script>
 </body>
 </html>
