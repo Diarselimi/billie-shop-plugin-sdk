@@ -35,28 +35,12 @@ class OrderResponseFactory
     public function create(OrderContainer $orderContainer): OrderResponse
     {
         $order = $orderContainer->getOrder();
-        $response = (new OrderResponse())
-            ->setExternalCode($order->getExternalCode())
-            ->setUuid($order->getUuid())
-            ->setState($order->getState())
-            ->setAmountGross($orderContainer->getOrderFinancialDetails()->getAmountGross())
-            ->setAmountNet($orderContainer->getOrderFinancialDetails()->getAmountNet())
-            ->setAmountTax($orderContainer->getOrderFinancialDetails()->getAmountTax())
-            ->setDebtorExternalDataAddressCountry($orderContainer->getDebtorExternalDataAddress()->getCountry())
-            ->setDebtorExternalDataAddressCity($orderContainer->getDebtorExternalDataAddress()->getCity())
-            ->setDebtorExternalDataAddressPostalCode($orderContainer->getDebtorExternalDataAddress()->getPostalCode())
-            ->setDebtorExternalDataAddressStreet($orderContainer->getDebtorExternalDataAddress()->getStreet())
-            ->setDebtorExternalDataAddressHouse($orderContainer->getDebtorExternalDataAddress()->getHouseNumber())
-            ->setDebtorExternalDataCompanyName($orderContainer->getDebtorExternalData()->getName())
-            ->setDebtorExternalDataIndustrySector($orderContainer->getDebtorExternalData()->getIndustrySector())
-            ->setCreatedAt($order->getCreatedAt())
-            ->setDebtorExternalDataCustomerId($orderContainer->getDebtorExternalData()->getMerchantExternalId())
-            ->setDuration($orderContainer->getOrderFinancialDetails()->getDuration())
-            ->setShippedAt($order->getShippedAt())
-        ;
+        $response = new OrderResponse();
 
+        $this->addAmountData($orderContainer, $response);
+        $this->addOrderData($order, $response);
+        $this->addExternalData($orderContainer, $response);
         $this->addDeliveryData($orderContainer, $response);
-
         $this->addBillingAddressData($orderContainer->getBillingAddress(), $response);
 
         if ($order->getMerchantDebtorId()) {
@@ -75,6 +59,52 @@ class OrderResponseFactory
         $response = $this->addReasons($order, $response);
 
         return $response;
+    }
+
+    /**
+     * @param  OrderContainer[] $orderContainers
+     * @return OrderResponse[]
+     */
+    public function createFromOrderContainers(array $orderContainers): array
+    {
+        if (empty($orderContainers)) {
+            return [];
+        }
+
+        $orderResponses = [];
+        $debtorIds = array_map(static function (OrderContainer $orderContainer) {
+            return $orderContainer->getMerchantDebtor()->getDebtorId();
+        }, $orderContainers);
+
+        $debtorCompanies = $this->companiesService->getDebtors($debtorIds);
+        foreach ($orderContainers as $orderContainer) {
+            $key = $orderContainer->getMerchantDebtor()->getId();
+            $orderContainer->setDebtorCompany($debtorCompanies[$key]);
+            $orderResponses[] = $this->create($orderContainer);
+        }
+
+        return $orderResponses;
+    }
+
+    private function addAmountData(OrderContainer $orderContainer, OrderResponse $response): void
+    {
+        $response
+            ->setAmountGross($orderContainer->getOrderFinancialDetails()->getAmountGross())
+            ->setAmountNet($orderContainer->getOrderFinancialDetails()->getAmountNet())
+            ->setAmountTax($orderContainer->getOrderFinancialDetails()->getAmountTax())
+            ->setDuration($orderContainer->getOrderFinancialDetails()->getDuration())
+            ;
+    }
+
+    private function addOrderData(OrderEntity $order, OrderResponse $response): void
+    {
+        $response
+            ->setExternalCode($order->getExternalCode())
+            ->setUuid($order->getUuid())
+            ->setState($order->getState())
+            ->setCreatedAt($order->getCreatedAt())
+            ->setShippedAt($order->getShippedAt())
+            ;
     }
 
     /**
@@ -170,5 +200,22 @@ class OrderResponseFactory
             ->setBillingAddressCity($billingAddress->getCity())
             ->setBillingAddressPostalCode($billingAddress->getPostalCode())
             ->setBillingAddressCountry($billingAddress->getCountry());
+    }
+
+    /**
+     * @param OrderContainer $orderContainer
+     * @param OrderResponse  $response
+     */
+    private function addExternalData(OrderContainer $orderContainer, OrderResponse $response): void
+    {
+        $response
+            ->setDebtorExternalDataAddressCountry($orderContainer->getDebtorExternalDataAddress()->getCountry())
+            ->setDebtorExternalDataAddressCity($orderContainer->getDebtorExternalDataAddress()->getCity())
+            ->setDebtorExternalDataAddressPostalCode($orderContainer->getDebtorExternalDataAddress()->getPostalCode())
+            ->setDebtorExternalDataAddressStreet($orderContainer->getDebtorExternalDataAddress()->getStreet())
+            ->setDebtorExternalDataAddressHouse($orderContainer->getDebtorExternalDataAddress()->getHouseNumber())
+            ->setDebtorExternalDataCompanyName($orderContainer->getDebtorExternalData()->getName())
+            ->setDebtorExternalDataIndustrySector($orderContainer->getDebtorExternalData()->getIndustrySector())
+            ->setDebtorExternalDataCustomerId($orderContainer->getDebtorExternalData()->getMerchantExternalId());
     }
 }

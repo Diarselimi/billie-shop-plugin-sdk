@@ -42,6 +42,21 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         return $this->doGetDebtor($debtorCompanyId);
     }
 
+    /**
+     * @param  array           $debtorIds
+     * @return DebtorCompany[]
+     */
+    public function getDebtors(array $debtorIds): array
+    {
+        try {
+            $response = $this->client->get("/debtors", ['ids' => $debtorIds]);
+        } catch (TransferException $exception) {
+            throw new CompaniesServiceRequestException();
+        }
+
+        return $this->factory->createFromMultipleDebtorCompaniesResponse($this->decodeResponse($response));
+    }
+
     public function getDebtorByUuid(string $debtorCompanyUuid): ?DebtorCompany
     {
         return $this->doGetDebtor($debtorCompanyUuid);
