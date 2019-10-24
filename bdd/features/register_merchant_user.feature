@@ -23,6 +23,37 @@ Feature: Register merchant user to access dashboard
     Then the response status code should be 201
     And merchant user with merchant id 1 and user id "test-auth-id" should be created
 
+  Scenario: duplicated user error
+    Given I successfully create OAuth client with email "test@merchantX.com" and user id "test-auth-id"
+    And I have a role of name "Test" with uuid "c7be46c0-e049-4312-b274-258ec5aeeb70" and permissions
+    """
+      ["TEST"]
+    """
+    When I send a POST request to "/private/merchant/1/user" with body:
+	"""
+	{
+		"first_name": "name",
+		"last_name": "last",
+		"role_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
+		"email": "test@merchantX.com",
+		"password": "testPassword"
+	}
+	"""
+    Then the response status code should be 201
+    And merchant user with merchant id 1 and user id "test-auth-id" should be created
+    When I will get a response from Authentication Service from endpoint "/users" with status code 409
+    When I send a POST request to "/private/merchant/1/user" with body:
+	"""
+	{
+		"first_name": "name",
+		"last_name": "last",
+		"role_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
+		"email": "test@merchantX.com",
+		"password": "testPassword"
+	}
+	"""
+    Then the response status code should be 403
+
   Scenario: validation error
     When I send a POST request to "/private/merchant/1/user" with body:
 	"""

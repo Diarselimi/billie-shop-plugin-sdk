@@ -6,6 +6,7 @@ use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Merchant\MerchantNotFoundException;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\MerchantUser\AuthenticationServiceConflictRequestException;
 use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
 use App\DomainModel\MerchantUser\MerchantUserEntityFactory;
 use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
@@ -56,7 +57,12 @@ class RegisterMerchantUserUseCase implements ValidatedUseCaseInterface
             throw new RoleNotFoundException();
         }
 
-        $oauthUser = $this->authenticationService->createUser($request->getUserEmail(), $request->getUserPassword());
+        try {
+            $oauthUser = $this->authenticationService->createUser($request->getUserEmail(), $request->getUserPassword());
+        } catch (AuthenticationServiceConflictRequestException $exception) {
+            throw new MerchantUserAlreadyExistsException();
+        }
+
         $merchantUser = $this->merchantUserEntityFactory->create(
             $request->getMerchantId(),
             $role->getId(),

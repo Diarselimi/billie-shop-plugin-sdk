@@ -2,16 +2,18 @@
 
 namespace App\Infrastructure\Smaug;
 
+use App\DomainModel\MerchantUser\AuthenticationServiceAuthorizeTokenResponseDTO;
+use App\DomainModel\MerchantUser\AuthenticationServiceConflictRequestException;
 use App\DomainModel\MerchantUser\AuthenticationServiceCreateClientResponseDTO;
 use App\DomainModel\MerchantUser\AuthenticationServiceCreateUserResponseDTO;
 use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
-use App\DomainModel\MerchantUser\AuthenticationServiceAuthorizeTokenResponseDTO;
 use App\DomainModel\MerchantUser\AuthenticationServiceRequestException;
 use App\DomainModel\MerchantUser\AuthenticationServiceTokenResponseDTO;
 use App\Infrastructure\DecodeResponseTrait;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\TransferStats;
 
@@ -32,7 +34,7 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
         $this->smaugClientSecret = $smaugClientSecret;
     }
 
-    public function authorizeToken(string $token): ? AuthenticationServiceAuthorizeTokenResponseDTO
+    public function authorizeToken(string $token): ?AuthenticationServiceAuthorizeTokenResponseDTO
     {
         try {
             $response = $this->client->get(
@@ -78,6 +80,9 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
             );
         } catch (TransferException $exception) {
             $this->logSuppressedException($exception, 'Failed to create OAuth client', ['exception' => $exception]);
+            if ($this->isTransferExceptionStatusCode($exception, 409)) {
+                throw new AuthenticationServiceConflictRequestException($exception);
+            }
 
             throw new AuthenticationServiceRequestException($exception);
         }
@@ -104,6 +109,9 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
             );
         } catch (TransferException $exception) {
             $this->logSuppressedException($exception, 'Failed to create OAuth user', ['exception' => $exception]);
+            if ($this->isTransferExceptionStatusCode($exception, 409)) {
+                throw new AuthenticationServiceConflictRequestException($exception);
+            }
 
             throw new AuthenticationServiceRequestException($exception);
         }
@@ -163,5 +171,12 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
 
             throw new AuthenticationServiceRequestException($exception);
         }
+    }
+
+    private function isTransferExceptionStatusCode(\Throwable $exception, int $statusCode): bool
+    {
+        return ($exception instanceof RequestException)
+            && $exception->getResponse()
+            && $exception->getResponse()->getStatusCode() === $statusCode;
     }
 }
