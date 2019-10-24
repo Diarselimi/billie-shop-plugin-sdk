@@ -49,7 +49,11 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
     public function getDebtors(array $debtorIds): array
     {
         try {
-            $response = $this->client->get("/debtors", ['ids' => $debtorIds]);
+            $response = $this->client->get("/debtors", [
+                'query' => [
+                    'ids' => $debtorIds,
+                ],
+            ]);
         } catch (TransferException $exception) {
             throw new CompaniesServiceRequestException();
         }
