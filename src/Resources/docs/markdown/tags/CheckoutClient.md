@@ -35,7 +35,7 @@ It is **highly recommended** to add this code snippet as high as possible in doc
 
 ### 2. Provide Config Data
 
-During initialization of the the widget, we expect to get `session_id`. This can be obtained by calling `Checkout Session Create`LINK with Billie from your backend and exposing it to the frontend. The `session_id` will be unique per order.
+During initialization of the the widget, we expect to get `session_id`. This can be obtained by calling [Checkout Session Create](#operation/checkout_session_create) with Billie from your backend and exposing it to the frontend. The `session_id` will be unique per order.
 ```html
 <script>
   const billie_config_data = {
@@ -92,10 +92,10 @@ Once the user reviews his checkout basket and is ready to pay, he can click on t
 Order data object needs to contain all information about order in following format, required values are bolded:
 
 - `amount` **[object]**
-   - `gross` **[float]** `>= 1`
-   - `tax` **[float]** `>= 1`
-   - `next` **[float]** `>= 1`
-- `duration` **[integer]** `[1...120]`
+   - `gross` **[float]** `> 0`
+   - `tax` **[float]** `>= 0`
+   - `net` **[float]** `> 0`
+- `duration` **[integer]** `[7...120]`
 - `delivery_address` **[object]**
   - `street` **[string]** `<= 255 characters`
   - `house_number`  _[string]_ `<= 255 characters`
@@ -113,7 +113,7 @@ Order data object needs to contain all information about order in following form
   - `address_postal_code` **[string]** `<= 5 characters`
   - `address_country` **[string]** `2 characters` `^[A-Za-z]{2}$`
 - `debtor_person`  **[object]**
-  - `salutation` _[string]_ `1 character` `["m" / "f"]`
+  - `salutation` **[string]** `1 character` `["m" / "f"]`
   - `first_name` _[string]_ `<= 255 characters`
   - `last_name` _[string]_ `<= 255 characters`
   - `phone_number` _[string]_ `>= 5 characters`, `<= 20 characters` `^(\+|\d|\()[ \-\/0-9()]{5,20}$`
@@ -128,14 +128,14 @@ Order data object needs to contain all information about order in following form
   - `gtin` _[string]_ `<= 255 characters`
   - `mpn` _[string]_ `<= 255 characters`
   - `amount` **[object]**
-    - `gross` **[float]** `>= 1`
-    - `tax` **[float]** `>= 1`
-    - `next` **[float]** `>= 1`
+    - `gross` **[float]** `> 0`
+    - `tax` **[float]** `>= 0`
+    - `net` **[float]** `> 0`
 
 Below you can find an example of orderData object in javascript
 
 ```javascript
-const orderData = {
+const billie_order_data = {
   "amount": { "net": 100, "gross": 100, "tax": 0 },
   "comment": "string",
   "duration": 30,
