@@ -73,13 +73,21 @@ class OrderResponseFactory
 
         $orderResponses = [];
         $debtorIds = array_map(static function (OrderContainer $orderContainer) {
-            return $orderContainer->getMerchantDebtor()->getDebtorId();
+            if ($orderContainer->getOrder()->getMerchantDebtorId() !== null) {
+                return $orderContainer->getMerchantDebtor()->getDebtorId();
+            }
+
+            return null;
         }, $orderContainers);
+        $debtorIds = array_filter($debtorIds);
 
         $debtorCompanies = $this->companiesService->getDebtors($debtorIds);
         foreach ($orderContainers as $orderContainer) {
-            $key = $orderContainer->getMerchantDebtor()->getId();
-            $orderContainer->setDebtorCompany($debtorCompanies[$key]);
+            if ($orderContainer->getOrder()->getMerchantDebtorId() !== null) {
+                $key = $orderContainer->getMerchantDebtor()->getDebtorId();
+                $orderContainer->setDebtorCompany($debtorCompanies[$key]);
+            }
+
             $orderResponses[] = $this->create($orderContainer);
         }
 
