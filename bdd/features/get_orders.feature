@@ -9,7 +9,7 @@ Feature: Retrieve and search all orders of a merchant
 
   Scenario: Successfully retrieve orders that are not in state new
     Given I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
-    And I get from companies service get debtor response
+    And I get from companies service get debtors response
     And I get from payments service get debtor response
     When I send a GET request to "/public/orders"
     Then the response status code should be 200
@@ -23,7 +23,7 @@ Feature: Retrieve and search all orders of a merchant
 
   Scenario: Successfully retrieve orders
     Given I have a created order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
-    And I get from companies service get debtor response
+    And I get from companies service get debtors response
     And I get from payments service get debtor response
     When I send a GET request to "/public/orders"
     Then the response status code should be 200
@@ -96,7 +96,7 @@ Feature: Retrieve and search all orders of a merchant
 
   Scenario: Search orders by external code
     Given I have a created order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
-    And I get from companies service get debtor response
+    And I get from companies service get debtors response
     And I get from payments service get debtor response
     When I send a GET request to "/orders?search=XF43Y"
     Then the response status code should be 200
@@ -169,7 +169,7 @@ Feature: Retrieve and search all orders of a merchant
 
   Scenario: Search orders filtering by state using deepObject param serialization with numeric keys
     Given I have a authorized order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
-    And I get from companies service get debtor response
+    And I get from companies service get debtors response
     And I get from payments service get debtor response
     When I send a GET request to "/orders?filters[state][0]=authorized&filters[state][1]=created"
     Then the response status code should be 200
@@ -242,7 +242,7 @@ Feature: Retrieve and search all orders of a merchant
 
   Scenario: Search orders filtering by state using deepObject param serialization without numeric keys
     Given I have a authorized order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
-    And I get from companies service get debtor response
+    And I get from companies service get debtors response
     And I get from payments service get debtor response
     When I send a GET request to "/orders?filters[state][]=authorized&filters[state][]=created"
     Then the response status code should be 200
@@ -315,7 +315,7 @@ Feature: Retrieve and search all orders of a merchant
 
   Scenario: Search orders filtering by state gives no results
     Given I have a created order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
-    And I get from companies service get debtor response
+    And I get from companies service get debtors response
     And I get from payments service get debtor response
     When I send a GET request to "/orders?filters[state][0]=shipped"
     Then the response status code should be 200
@@ -329,7 +329,7 @@ Feature: Retrieve and search all orders of a merchant
 
   Scenario: Search orders by uuid
     Given I have a created order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
-    And I get from companies service get debtor response
+    And I get from companies service get debtors response
     And I get from payments service get debtor response
     When I send a GET request to "/orders?search=test-order-uuid"
     Then the response status code should be 200
@@ -440,7 +440,7 @@ Feature: Retrieve and search all orders of a merchant
 
   Scenario: Filter by merchant debtor UUID
     Given I have a created order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
-    And I get from companies service get debtor response
+    And I get from companies service get debtors response
     And I get from payments service get debtor response
     When I send a GET request to "/orders?filters[merchant_debtor_id]=ad74bbc4-509e-47d5-9b50-a0320ce3d715"
     Then the response status code should be 200

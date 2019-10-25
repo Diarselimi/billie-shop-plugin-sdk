@@ -133,4 +133,14 @@ class OAuthServiceContext implements Context
             new MockResponse('', [], 200)
         ));
     }
+
+    /**
+     * @When I will get a response from Authentication Service from endpoint :endpoint with status code :code
+     */
+    public function iWillGetAResponseFromAuthenticationServiceWithStatusCode($endpoint, $statusCode)
+    {
+        $this->mockRequest($endpoint, new ResponseStack(
+            new MockResponse('', [], $statusCode)
+        ));
+    }
 }

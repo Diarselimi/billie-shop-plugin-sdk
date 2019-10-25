@@ -144,6 +144,16 @@ class CompaniesServiceContext implements Context
     }
 
     /**
+     * @Given /^I get from companies service get debtors response$/
+     */
+    public function iGetFromCompaniesServiceAsAResponseWithMultipleIds()
+    {
+        $this->mockRequest('/debtors', new ResponseStack(
+            new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_get_multiple_results.json'))
+        ));
+    }
+
+    /**
      * @Given /^I get from companies service identify no match and respond with suggestion$/
      */
     public function iGetFromCompaniesServiceIdentifyNoMatchAndRespondWithSuggestion()

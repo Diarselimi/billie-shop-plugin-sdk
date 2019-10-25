@@ -52,7 +52,7 @@ class MerchantUserLoginController
 
             return new JsonResponse($response->toArray());
         } catch (MerchantUserLoginException $exception) {
-            throw new UnauthorizedHttpException('Bearer');
+            throw new UnauthorizedHttpException('Bearer', 'Wrong credentials');
         }
     }
 }

@@ -43,12 +43,12 @@ class GetOrdersUseCase implements ValidatedUseCaseInterface
             $request->getFilters()
         );
 
-        $orders = array_map(function (OrderEntity $orderEntity) {
-            $orderContainer = $this->orderContainerFactory->createFromOrderEntity($orderEntity);
-
-            return $this->orderResponseFactory->create($orderContainer);
+        $orderContainers = array_map(function (OrderEntity $orderEntity) {
+            return $this->orderContainerFactory->createFromOrderEntity($orderEntity);
         }, $result['orders']);
 
-        return new GetOrdersResponse($result['total'], ...$orders);
+        $orderResponses = $this->orderResponseFactory->createFromOrderContainers($orderContainers);
+
+        return new GetOrdersResponse($result['total'], ...$orderResponses);
     }
 }
