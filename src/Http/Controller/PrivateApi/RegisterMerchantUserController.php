@@ -2,7 +2,6 @@
 
 namespace App\Http\Controller\PrivateApi;
 
-use App\Application\UseCase\RegisterMerchantUser\MerchantUserAlreadyExistsException;
 use App\Application\UseCase\RegisterMerchantUser\RegisterMerchantUserRequest;
 use App\Application\UseCase\RegisterMerchantUser\RegisterMerchantUserUseCase;
 use App\DomainModel\Merchant\MerchantNotFoundException;
@@ -11,7 +10,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use OpenApi\Annotations as OA;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -65,8 +63,6 @@ class RegisterMerchantUserController
             throw new NotFoundHttpException("Merchant doesn't exist");
         } catch (RoleNotFoundException $exception) {
             throw new NotFoundHttpException("Role doesn't exist");
-        } catch (MerchantUserAlreadyExistsException $exception) {
-            throw new AccessDeniedHttpException("This user cannot be created");
         }
     }
 }

@@ -24,19 +24,4 @@ class DebtorCompanyFactory
             ->setIsSynchronized(boolval($data['is_synchronized'] ?? null))
         ;
     }
-
-    /**
-     * @param  array           $debtorCompanies
-     * @return DebtorCompany[]
-     */
-    public function createFromMultipleDebtorCompaniesResponse(array $debtorCompanies): array
-    {
-        $responseData = [];
-        foreach ($debtorCompanies['items'] as $debtorCompanyData) {
-            $debtorCompany = $this->createFromAlfredResponse($debtorCompanyData);
-            $responseData[$debtorCompany->getId()] = $debtorCompany;
-        }
-
-        return $responseData;
-    }
 }

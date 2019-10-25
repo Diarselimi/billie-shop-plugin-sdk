@@ -23,6 +23,4 @@ interface CompaniesServiceInterface
     public function markDuplicates(MerchantDebtorDuplicateDTO ...$duplicates): void;
 
     public function synchronizeDebtor(int $debtorId): DebtorCompany;
-
-    public function getDebtors(array $debtorIds): array;
 }

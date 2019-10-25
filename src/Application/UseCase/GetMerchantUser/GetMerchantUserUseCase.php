@@ -2,7 +2,6 @@
 
 namespace App\Application\UseCase\GetMerchantUser;
 
-use App\Application\UseCase\CreateMerchant\Exception\MerchantCompanyNotFoundException;
 use App\DomainModel\Address\AddressEntityFactory;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
@@ -51,17 +50,12 @@ class GetMerchantUserUseCase
 
         $merchant = $this->merchantRepository->getOneById($merchantUser->getMerchantId());
         $company = $this->companiesService->getDebtor($merchant->getCompanyId());
-
-        if (!$company) {
-            throw new MerchantCompanyNotFoundException();
-        }
-
         /** @var User $user */
         $user = $this->security->getUser();
         $role = $this->merchantUserPermissionsService->resolveUserRole($merchantUser);
 
         return (new GetMerchantUserResponse())
-            ->setUserId($merchantUser->getId())
+            ->setUserId($merchant->getId())
             ->setPermissions($role->getPermissions())
             ->setRole($role->getName())
             ->setFirstName($merchantUser->getFirstName())

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controller\PublicApi;
 
-use App\Application\UseCase\CreateMerchant\Exception\MerchantCompanyNotFoundException;
 use App\Application\UseCase\GetMerchantUser\GetMerchantUserRequest;
 use App\Application\UseCase\GetMerchantUser\GetMerchantUserUseCase;
 use App\Application\UseCase\GetMerchantUser\MerchantUserNotFoundException;
@@ -50,9 +49,7 @@ class GetMerchantUserController
 
             return new JsonResponse($response->toArray());
         } catch (MerchantUserNotFoundException $exception) {
-            throw new NotFoundHttpException('User not found');
-        } catch (MerchantCompanyNotFoundException $exception) {
-            throw new NotFoundHttpException('Merchant company not found');
+            throw new NotFoundHttpException();
         }
     }
 }

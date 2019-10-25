@@ -6,9 +6,3 @@ eight_points_guzzle:
         timeout: 5
         headers:
           Content-Type: "application/json"
-    smaug:
-      base_url: "%env(string:SMAUG_URL)%"
-      options:
-        timeout: 5
-        headers:
-          Content-Type: "application/json"
