@@ -107,12 +107,13 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
         return $row ? $this->factory->createFromDatabaseRow($row) : null;
     }
 
-    public function findWithFinancingPowerBelowPercentage(float $percentage): ?array
+    public function findActiveWithFinancingPowerBelowPercentage(float $percentage): ?array
     {
         $rows = $this->doFetchAll(
             'SELECT '.self::SELECT_FIELDS.
             ' FROM '.self::TABLE_NAME.
             ' WHERE available_financing_limit IS NOT NULL '.
+            ' AND is_active = 1 '.
             ' AND (financing_power / available_financing_limit * 100) < :percentage ',
             [
                 'percentage' => $percentage,

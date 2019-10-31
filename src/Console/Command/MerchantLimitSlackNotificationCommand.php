@@ -54,8 +54,8 @@ class MerchantLimitSlackNotificationCommand extends Command implements LoggingIn
         $limit = $input->getOption('threshold');
 
         $output->writeln('Gathering merchants...');
-        $messageBody = "";
-        $merchants = $this->merchantRepository->findWithFinancingPowerBelowPercentage($limit);
+        $messageBody = '';
+        $merchants = $this->merchantRepository->findActiveWithFinancingPowerBelowPercentage($limit);
 
         if (!$merchants) {
             $output->writeln('No merchants with low power_amount found.');

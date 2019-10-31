@@ -16,5 +16,5 @@ interface MerchantRepositoryInterface
 
     public function getOneByOauthClientId(string $oauthClientId): ? MerchantEntity;
 
-    public function findWithFinancingPowerBelowPercentage(float $percentage): ?array;
+    public function findActiveWithFinancingPowerBelowPercentage(float $percentage): ?array;
 }
