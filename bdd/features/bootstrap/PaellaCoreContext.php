@@ -6,6 +6,8 @@ use App\DomainModel\CheckoutSession\CheckoutSessionEntity;
 use App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
+use App\DomainModel\FraudRules\FraudRuleEntity;
+use App\DomainModel\FraudRules\FraudRuleRepositoryInterface;
 use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
@@ -80,6 +82,13 @@ class PaellaCoreContext extends MinkContext
 
     public function initScenario()
     {
+        $fraudRule = (new FraudRuleEntity())
+            ->setIncludedWords(['Download', 'ESD'])
+            ->setExcludedWords(['Lizenz'])
+            ->setCheckForPublicDomain(true);
+
+        $this->getFraudCheckRulesRepository()->insert($fraudRule);
+
         $this->merchant = (new MerchantEntity())
             ->setName('Behat User')
             ->setIsActive(true)
@@ -149,6 +158,7 @@ class PaellaCoreContext extends MinkContext
             TRUNCATE score_thresholds_configuration;
             TRUNCATE risk_check_definitions;
             TRUNCATE checkout_sessions;
+            TRUNCATE risk_check_rules;
             ALTER TABLE merchants AUTO_INCREMENT = 1;
             ALTER TABLE merchants_debtors AUTO_INCREMENT = 1;
             ALTER TABLE orders AUTO_INCREMENT = 1;
@@ -803,6 +813,11 @@ class PaellaCoreContext extends MinkContext
     private function getOrderNotificationRepository(): OrderNotificationRepositoryInterface
     {
         return $this->get(OrderNotificationRepositoryInterface::class);
+    }
+
+    private function getFraudCheckRulesRepository(): FraudRuleRepositoryInterface
+    {
+        return $this->get(FraudRuleRepositoryInterface::class);
     }
 
     private function getConnection(): PdoConnection

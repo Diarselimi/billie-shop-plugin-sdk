@@ -32,6 +32,9 @@ services:
   App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface:
     alias: 'App\Infrastructure\Repository\MerchantSettingsRepository'
     public: true
+  App\DomainModel\FraudRules\FraudRuleRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\FraudRuleRepository'
+    public: true
   App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface:
     alias: 'App\Infrastructure\Repository\ScoreThresholdsConfigurationRepository'
     public: true
