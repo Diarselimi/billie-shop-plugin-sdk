@@ -38,7 +38,7 @@ class GetMerchantController
     public function execute(string $id): GetMerchantResponse
     {
         try {
-            return $this->useCase->execute(new GetMerchantRequest($id));
+            return $this->useCase->execute(new GetMerchantRequest((int) $id));
         } catch (MerchantNotFoundException $exception) {
             throw new NotFoundHttpException($exception->getMessage());
         }

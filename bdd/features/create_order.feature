@@ -1959,3 +1959,60 @@ Feature:
     """
     Then the order A1 is in state declined
     And the response status code should be 200
+
+  Scenario: Authorised oauth user without a Merchant Api-Key authentication cannot create orders
+    Given a merchant user exists with permission CONFIRM_ORDER_PAYMENT
+    And I get from Oauth service a valid user token
+    And I add "X-Api-Key" header equal to invalid_key
+	And I add "Authorization" header equal to "Bearer someToken"
+    When I send a POST request to "/order" with body:
+    """
+    {
+       "debtor_person":{
+          "salutation":"m",
+          "first_name":"",
+          "last_name":"else",
+          "phone_number":"+491234567",
+          "email":"someone@billie.io"
+       },
+       "debtor_company":{
+          "merchant_customer_id":"12",
+          "name":"Test User Company",
+          "address_addition":"left door",
+          "address_house_number":"10",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_city":"Berlin",
+          "address_postal_code":"10179",
+          "address_country":"DE",
+          "tax_id":"VA222",
+          "tax_number":"3333",
+          "registration_court":"",
+          "registration_number":" some number",
+          "industry_sector":"some sector",
+          "subindustry_sector":"some sub",
+          "employees_number":"33",
+          "legal_form":"some legal",
+          "established_customer":1
+       },
+       "delivery_address":{
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city":"Berlin",
+          "postal_code":"10179",
+          "country":"DE"
+       },
+       "amount":{
+          "net":900.00,
+          "gross":1000.00,
+          "tax":100.00
+       },
+       "comment":"Some comment",
+       "duration":30,
+       "order_id":"A1"
+    }
+    """
+    Then the response status code should be 403
+    And the JSON response should be:
+    """
+      {"errors":[{"title":"Access Denied","code":"forbidden"}]}
+    """

@@ -10,8 +10,10 @@ use App\Http\RequestHandler\CreateOrderRequestFactory;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Security;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 /**
+ * @IsGranted("ROLE_AUTHENTICATED_AS_CHECKOUT_USER")
  * @OA\Put(
  *     path="/checkout-session/{sessionUuid}/authorize",
  *     operationId="checkout_session_authorize",

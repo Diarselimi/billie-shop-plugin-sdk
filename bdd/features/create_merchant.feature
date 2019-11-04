@@ -23,7 +23,7 @@ Feature: Create a new merchant.
     Then the response status code should be 404
     And the JSON response should be:
     """
-    {"errors":[{"title":"Company with the given ID was not found or couldn't be retrieved","code":"resource_not_found"}]}
+    {"errors":[{"title":"Merchant company with the given ID was not found or couldn't be retrieved","code":"resource_not_found"}]}
     """
 
   Scenario: Failed to create a merchant - a merchant already exists with the same company ID

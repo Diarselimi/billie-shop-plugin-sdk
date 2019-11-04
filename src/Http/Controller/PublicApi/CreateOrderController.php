@@ -6,10 +6,12 @@ use App\Application\UseCase\CreateOrder\CreateOrderUseCase;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
 use App\Http\RequestHandler\CreateOrderRequestFactory;
 use OpenApi\Annotations as OA;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
+ * @IsGranted("ROLE_AUTHENTICATED_AS_MERCHANT")
  * @OA\Post(
  *     path="/order",
  *     operationId="order_create",

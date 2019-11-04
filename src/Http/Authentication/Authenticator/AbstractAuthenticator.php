@@ -22,7 +22,7 @@ abstract class AbstractAuthenticator extends AbstractGuardAuthenticator
     public function start(Request $request, AuthenticationException $authException = null)
     {
         return new ApiErrorResponse(
-            [new ApiError('Access denied', ApiError::CODE_FORBIDDEN)],
+            [new ApiError('Access Denied', ApiError::CODE_FORBIDDEN)],
             ApiErrorResponse::HTTP_FORBIDDEN
         );
     }

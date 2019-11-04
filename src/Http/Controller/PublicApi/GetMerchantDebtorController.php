@@ -9,10 +9,12 @@ use App\DomainModel\MerchantDebtorResponse\MerchantDebtor;
 use App\DomainModel\MerchantDebtorResponse\MerchantDebtorResponseFactory;
 use App\Http\HttpConstantsInterface;
 use OpenApi\Annotations as OA;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
+ * @IsGranted({"ROLE_AUTHENTICATED_AS_MERCHANT", "ROLE_VIEW_DEBTORS"})
  * @OA\Get(
  *     path="/debtor/{uuid}",
  *     operationId="debtor_get_details",

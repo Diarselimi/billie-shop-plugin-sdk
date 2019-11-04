@@ -9,12 +9,14 @@ use App\Application\UseCase\ConfirmOrderPayment\ConfirmOrderPaymentRequest;
 use App\Application\UseCase\ConfirmOrderPayment\ConfirmOrderPaymentUseCase;
 use App\Http\HttpConstantsInterface;
 use OpenApi\Annotations as OA;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
+ * @IsGranted({"ROLE_AUTHENTICATED_AS_MERCHANT", "ROLE_CONFIRM_ORDER_PAYMENT"})
  * @OA\Post(
  *     path="/order/{id}/confirm-payment",
  *     operationId="order_payment_confirm",

@@ -6,12 +6,15 @@ use App\Application\UseCase\MerchantUserLogout\MerchantUserLogoutException;
 use App\Application\UseCase\MerchantUserLogout\MerchantUserLogoutRequest;
 use App\Application\UseCase\MerchantUserLogout\MerchantUserLogoutUseCase;
 use App\Http\HttpConstantsInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 /**
+ * @IsGranted("ROLE_AUTHENTICATED_AS_MERCHANT_USER")
+ *
  * @OA\Post(
  *     path="/merchant/user/logout",
  *     operationId="merchant_user_logout",

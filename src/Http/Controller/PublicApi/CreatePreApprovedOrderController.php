@@ -5,10 +5,12 @@ namespace App\Http\Controller\PublicApi;
 use App\Application\UseCase\CreatePreApproveOrder\CreatePreApprovedOrderUseCase;
 use App\DomainModel\OrderResponse\OrderResponse;
 use App\Http\RequestHandler\CreateOrderRequestFactory;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use OpenApi\Annotations as OA;
 
 /**
+ * @IsGranted("ROLE_AUTHENTICATED_AS_MERCHANT")
  * @OA\Post(
  *     path="/order/pre-approve",
  *     operationId="pre_approve_create_order",

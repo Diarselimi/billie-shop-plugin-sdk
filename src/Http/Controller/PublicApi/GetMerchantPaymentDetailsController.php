@@ -9,11 +9,13 @@ use App\Application\UseCase\GetMerchantPaymentDetails\GetMerchantPaymentDetailsU
 use App\Application\UseCase\GetMerchantPaymentDetails\TransactionNotFoundException;
 use App\Http\HttpConstantsInterface;
 use OpenApi\Annotations as OA;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
+ * @IsGranted("ROLE_VIEW_PAYMENTS")
  *
  * @OA\Schema(schema="GetMerchantPaymentDetailsResponse", title="Merchant Payments Response", type="object", properties={
  *   @OA\Property(property="uuid", ref="#/components/schemas/UUID"),
@@ -34,7 +36,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *   })),
  * })
  *
- * @OA\get(
+ * @OA\Get(
  *     path="/payments/{uuid}",
  *     operationId="get_payment_details",
  *     summary="Get Payment Details",

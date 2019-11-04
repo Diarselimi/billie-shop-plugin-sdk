@@ -7,11 +7,14 @@ use App\Application\UseCase\GetMerchantUser\GetMerchantUserRequest;
 use App\Application\UseCase\GetMerchantUser\GetMerchantUserUseCase;
 use App\Application\UseCase\GetMerchantUser\MerchantUserNotFoundException;
 use OpenApi\Annotations as OA;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Security;
 
 /**
+ * @IsGranted("ROLE_AUTHENTICATED_AS_MERCHANT_USER")
+ *
  * @OA\Get(
  *     path="/merchant/user",
  *     operationId="get_merchant_user",

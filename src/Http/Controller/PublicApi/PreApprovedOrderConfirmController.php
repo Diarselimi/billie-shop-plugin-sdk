@@ -7,6 +7,7 @@ use App\Application\Exception\OrderWorkflowException;
 use App\Application\UseCase\ConfirmPreApproveOrder\ConfirmPreApprovedOrderUseCase;
 use App\Application\UseCase\ConfirmPreApproveOrder\ConfirmPreApprovedOrderRequest;
 use App\Http\HttpConstantsInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -14,6 +15,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use OpenApi\Annotations as OA;
 
 /**
+ * @IsGranted("ROLE_AUTHENTICATED_AS_MERCHANT")
+ *
  * @OA\Post(
  *     path="/order/{uuid}/confirm",
  *     operationId="order_pre_approve_confirmation",

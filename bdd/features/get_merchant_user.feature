@@ -9,7 +9,7 @@ Feature: Get current logged in merchant user details
     Then the response status code should be 403
     And the JSON response should be:
 	"""
-	  {"errors":[{"title":"Access denied","code":"forbidden"}]}
+	  {"errors":[{"title":"Access Denied","code":"forbidden"}]}
 	"""
 
   Scenario: Successfully retrieve merchant user details

@@ -7,11 +7,14 @@ use App\Application\UseCase\GetOrder\GetOrderRequest;
 use App\Application\UseCase\GetOrder\GetOrderUseCase;
 use App\DomainModel\OrderResponse\OrderResponse;
 use App\Http\HttpConstantsInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use OpenApi\Annotations as OA;
 
 /**
+ * @IsGranted({"ROLE_AUTHENTICATED_AS_MERCHANT", "ROLE_VIEW_ORDERS"})
+ *
  * @OA\Get(
  *     path="/order/{id}",
  *     operationId="order_get_details",

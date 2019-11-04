@@ -70,7 +70,11 @@
 
 // noinspection JSAnnotator
 var OPENAPI_SPEC = <?php echo str_replace('`', '\\`', $spec); ?>;
-var OPENAPI_SPEC_URL = [location.protocol, '//', location.host, location.pathname].join('') + '/billie-pad-openapi.yaml';
+var OPENAPI_SPEC_URL = [
+    location.protocol, '//',
+    location.host,
+    location.pathname.replace(/\/$/, "")
+].join('') + '/billie-pad-openapi.yaml';
 
 Redoc.init(
     OPENAPI_SPEC.length > 0 ? OPENAPI_SPEC : OPENAPI_SPEC_URL,

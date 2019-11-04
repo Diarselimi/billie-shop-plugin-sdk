@@ -9,7 +9,7 @@ Feature: Enable merchant users to logout
 	Then the response status code should be 403
 	And the JSON response should be:
 	"""
-	  {"errors":[{"title":"Access denied","code":"forbidden"}]}
+	  {"errors":[{"title":"Access Denied","code":"forbidden"}]}
 	"""
 
   Scenario: Successfully logout

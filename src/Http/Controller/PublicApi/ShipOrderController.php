@@ -9,6 +9,7 @@ use App\Application\UseCase\ShipOrder\ShipOrderRequest;
 use App\Application\UseCase\ShipOrder\ShipOrderUseCase;
 use App\DomainModel\OrderResponse\OrderResponse;
 use App\Http\HttpConstantsInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -17,6 +18,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use OpenApi\Annotations as OA;
 
 /**
+ * @IsGranted("ROLE_AUTHENTICATED_AS_MERCHANT")
+ *
  * @OA\Post(
  *     path="/order/{id}/ship",
  *     operationId="order_ship",

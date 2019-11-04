@@ -7,9 +7,11 @@ use App\Application\UseCase\CheckoutSession\CreateCheckoutSessionUseCase;
 use App\Application\UseCase\Response\CheckoutSessionResponse;
 use App\Http\HttpConstantsInterface;
 use OpenApi\Annotations as OA;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
+ * @IsGranted("ROLE_AUTHENTICATED_AS_MERCHANT")
  * @OA\Post(
  *     path="/checkout-session",
  *     operationId="checkout_session_create",

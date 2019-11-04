@@ -71,12 +71,18 @@ class ApiErrorResponseFactory
 
     private function createFromHttpException(HttpException $exception): ApiErrorResponse
     {
+        $message = $exception->getMessage();
+
         switch (true) {
             case $exception instanceof NotFoundHttpException:
                 $errorCode = ApiError::CODE_RESOURCE_NOT_FOUND;
 
                 break;
             case $exception instanceof AccessDeniedHttpException:
+                if (stripos($message, '@IsGranted') !== false) {
+                    // Hide default IsGranted annotation messages
+                    $message = 'Access Denied';
+                }
                 $errorCode = ApiError::CODE_FORBIDDEN;
 
                 break;
@@ -99,7 +105,7 @@ class ApiErrorResponseFactory
         }
 
         return $this->createResponse(
-            [new ApiError($exception->getMessage(), $errorCode)],
+            [new ApiError($message, $errorCode)],
             $exception->getStatusCode(),
             $exception->getHeaders()
         );

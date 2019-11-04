@@ -9,10 +9,12 @@ use App\Application\UseCase\GetMerchantPayments\GetMerchantPaymentsUseCase;
 use App\Http\HttpConstantsInterface;
 use App\Support\PaginatedCollection;
 use OpenApi\Annotations as OA;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
+ * @IsGranted("ROLE_VIEW_PAYMENTS")
  *
  * @OA\Schema(schema="GetMerchantPaymentsResponse", title="Merchant Payments Response", type="object", properties={
  *     @OA\Property(property="items", type="array", description="Merchant payment item", @OA\Items({
@@ -28,7 +30,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     @OA\Property(property="total", type="integer", description="Total number of results"),
  * })
  *
- * @OA\get(
+ * @OA\Get(
  *     path="/payments",
  *     operationId="get_payments",
  *     summary="Get Payments",

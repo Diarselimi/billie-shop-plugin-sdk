@@ -7,12 +7,15 @@ use App\Application\UseCase\PauseOrderDunning\PauseOrderDunningException;
 use App\Application\UseCase\PauseOrderDunning\PauseOrderDunningRequest;
 use App\Application\UseCase\PauseOrderDunning\PauseOrderDunningUseCase;
 use App\Http\HttpConstantsInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use OpenApi\Annotations as OA;
 
 /**
+ * @IsGranted("ROLE_PAUSE_DUNNING")
+ *
  * @OA\Post(
  *     path="/order/{id}/pause-dunning",
  *     operationId="order_pause_dunning",

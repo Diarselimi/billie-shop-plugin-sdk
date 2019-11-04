@@ -7,9 +7,11 @@ use App\Application\UseCase\GetMerchantDebtors\GetMerchantDebtorsUseCase;
 use App\DomainModel\MerchantDebtorResponse\MerchantDebtorList;
 use App\Http\HttpConstantsInterface;
 use OpenApi\Annotations as OA;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
+ * @IsGranted("ROLE_VIEW_DEBTORS")
  * @OA\Get(
  *     path="/debtors",
  *     operationId="debtors_get",

@@ -10,11 +10,14 @@ use App\Application\UseCase\UpdateOrder\UpdateOrderUseCase;
 use App\DomainModel\OrderUpdate\UpdateOrderException;
 use App\Http\HttpConstantsInterface;
 use OpenApi\Annotations as OA;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
+ * @IsGranted("ROLE_AUTHENTICATED_AS_MERCHANT")
+ *
  * @OA\Patch(
  *     path="/order/{id}",
  *     operationId="order_update",

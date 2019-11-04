@@ -6,10 +6,13 @@ use App\Application\UseCase\GetOrders\GetOrdersRequest;
 use App\Application\UseCase\GetOrders\GetOrdersUseCase;
 use App\Http\HttpConstantsInterface;
 use OpenApi\Annotations as OA;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
+ * @IsGranted("ROLE_VIEW_ORDERS")
+ *
  * @OA\Get(
  *     path="/orders",
  *     operationId="orders_get",

@@ -13,6 +13,30 @@ Feature: APIS-1077
     """
     """
 
+  Scenario: Authorised oauth user without a Merchant Api-Key authentication cannot update orders
+    Given a merchant user exists with permission CONFIRM_ORDER_PAYMENT
+    And I get from Oauth service a valid user token
+    And I add "X-Api-Key" header equal to invalid_key
+	And I add "Authorization" header equal to "Bearer someToken"
+    And I have a "created" order with amounts 1000/900/100, duration 30 and comment "test order"
+    When I send a PATCH request to "/order/test-order-uuid" with body:
+    """
+    {
+      "order_id": "foobar",
+      "duration": 60,
+      "amount": {
+        "gross": 500,
+        "net": 400,
+        "tax": 100
+      }
+    }
+    """
+    Then the response status code should be 403
+    And the JSON response should be:
+    """
+      {"errors":[{"title":"Access Denied","code":"forbidden"}]}
+    """
+
   Scenario Template: Success 1: Partial provided data is OK and update is successful on any non-final state
     Given I have a "<state>" order with amounts 1000/900/100, duration 30 and comment "test order"
     When I send a PATCH request to "/order/test-order-uuid" with body:

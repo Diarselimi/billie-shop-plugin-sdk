@@ -9,12 +9,14 @@ use App\Application\UseCase\CheckoutSessionConfirmOrder\CheckoutSessionConfirmUs
 use App\Application\UseCase\CreateOrder\Request\CreateOrderAmountRequest;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use OpenApi\Annotations as OA;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
+ * @IsGranted("ROLE_AUTHENTICATED_AS_MERCHANT")
  * @OA\Put(
  *     path="/checkout-session/{sessionUuid}/confirm",
  *     operationId="checkout_session_confirm",
