@@ -38,7 +38,7 @@ class AddMerchantUserInvitationsTable extends TransactionalMigration
                 'merchant_id' => $user['merchant_id'],
                 'merchant_user_id' => $user['id'],
                 'merchant_user_role_id' => $user['role_id'],
-                'email' => '',
+                'email' => 'migrated@billie.io',
                 'created_at' => $user['created_at'],
                 'expires_at' => $now,
             ])->save();
