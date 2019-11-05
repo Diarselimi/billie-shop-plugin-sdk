@@ -132,8 +132,8 @@ class MerchantUserInvitationRepository extends AbstractPdoRepository implements 
                     OR 
                     ({$table}.revoked_at IS NULL)
                 )
-                AND ({$table}.email, {$table}.created_at) IN (
-                  SELECT email, MAX(created_at) FROM {$table} WHERE merchant_id = :merchant_id2 GROUP BY email
+                AND ({$table}.email, {$table}.id) IN (
+                  SELECT email, MAX(id) FROM {$table} WHERE merchant_id = :merchant_id2 GROUP BY email
                 )
         ";
 
