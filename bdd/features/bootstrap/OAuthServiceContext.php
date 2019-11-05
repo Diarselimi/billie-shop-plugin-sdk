@@ -86,6 +86,16 @@ class OAuthServiceContext implements Context
     }
 
     /**
+     * @Given I get from OAuth client the following list of users:
+     */
+    public function iSuccessfullyGetFromOAuthClientAListOfUsers(PyStringNode $response)
+    {
+        $this->mockRequest('/users', new ResponseStack(
+            new MockResponse($response->__toString())
+        ));
+    }
+
+    /**
      * @Given I get from OAuth service :url endpoint response with status :statusCode and body:
      */
     public function iGetFromOAuthServiceEndpointResponseWithStatusAndBody($url, $statusCode, PyStringNode $response)

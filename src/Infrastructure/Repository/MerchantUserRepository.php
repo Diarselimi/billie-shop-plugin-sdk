@@ -11,7 +11,7 @@ class MerchantUserRepository extends AbstractPdoRepository implements MerchantUs
 {
     public const TABLE_NAME = 'merchant_users';
 
-    public const TABLE_FIELDS = [
+    public const SELECT_FIELDS = [
         'id',
         'user_id',
         'merchant_id',
@@ -38,7 +38,7 @@ class MerchantUserRepository extends AbstractPdoRepository implements MerchantUs
             VALUES (:user_id, :merchant_id, :role_id, :first_name, :last_name, :permissions, :created_at, :updated_at)
             ',
             [
-                'user_id' => $merchantUserEntity->getUserId(),
+                'user_id' => $merchantUserEntity->getUuid(),
                 'merchant_id' => $merchantUserEntity->getMerchantId(),
                 'role_id' => $merchantUserEntity->getRoleId(),
                 'first_name' => $merchantUserEntity->getFirstName(),
@@ -54,7 +54,7 @@ class MerchantUserRepository extends AbstractPdoRepository implements MerchantUs
 
     private function getOneBy(string $colName, $value, int $merchantId = null): ?MerchantUserEntity
     {
-        $query = 'SELECT ' . implode(', ', self::TABLE_FIELDS) .
+        $query = 'SELECT ' . implode(', ', self::SELECT_FIELDS) .
             ' FROM ' . self::TABLE_NAME .
             ' WHERE ' . $colName . ' = :' . $colName;
 
@@ -70,8 +70,8 @@ class MerchantUserRepository extends AbstractPdoRepository implements MerchantUs
         return $row ? $this->factory->createFromDatabaseRow($row) : null;
     }
 
-    public function getOneByUserId(string $userId): ?MerchantUserEntity
+    public function getOneByUuid(string $uuid): ?MerchantUserEntity
     {
-        return $this->getOneBy('user_id', $userId);
+        return $this->getOneBy('user_id', $uuid);
     }
 }

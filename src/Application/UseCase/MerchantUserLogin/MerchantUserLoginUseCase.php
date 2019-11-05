@@ -2,30 +2,40 @@
 
 namespace App\Application\UseCase\MerchantUserLogin;
 
+use App\Application\UseCase\GetMerchantUser\AbstractGetMerchantUserUseCase;
+use App\Application\UseCase\GetMerchantUser\GetMerchantUserRequest;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
+use App\DomainModel\Address\AddressEntityFactory;
+use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
 use App\DomainModel\MerchantUser\AuthenticationServiceRequestException;
+use App\DomainModel\MerchantUser\MerchantUserPermissionsService;
 use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
 
-class MerchantUserLoginUseCase implements ValidatedUseCaseInterface
+class MerchantUserLoginUseCase extends AbstractGetMerchantUserUseCase implements ValidatedUseCaseInterface
 {
     use ValidatedUseCaseTrait;
-
-    private $merchantUserRepository;
-
-    private $merchantRepository;
 
     private $authenticationService;
 
     public function __construct(
         MerchantUserRepositoryInterface $merchantUserRepository,
         MerchantRepositoryInterface $merchantRepository,
+        CompaniesServiceInterface $companiesService,
+        AddressEntityFactory $addressEntityFactory,
+        MerchantUserPermissionsService $merchantUserPermissionsService,
         AuthenticationServiceInterface $authenticationService
     ) {
-        $this->merchantUserRepository = $merchantUserRepository;
-        $this->merchantRepository = $merchantRepository;
+        parent::__construct(
+            $merchantUserRepository,
+            $merchantRepository,
+            $companiesService,
+            $addressEntityFactory,
+            $merchantUserPermissionsService
+        );
+
         $this->authenticationService = $authenticationService;
     }
 
@@ -44,22 +54,11 @@ class MerchantUserLoginUseCase implements ValidatedUseCaseInterface
         );
 
         if (!$tokenMetadata) {
-            throw new MerchantUserLoginException();
+            throw new MerchantUserLoginException("Invalid token metadata");
         }
 
-        $merchantUser = $this->merchantUserRepository->getOneByUserId($tokenMetadata->getUserId());
+        $user = $this->getUser(new GetMerchantUserRequest($tokenMetadata->getUserId()), $tokenMetadata->getEmail());
 
-        if (!$merchantUser) {
-            throw new MerchantUserLoginException();
-        }
-
-        $merchant = $this->merchantRepository->getOneById($merchantUser->getMerchantId());
-
-        return new MerchantUserLoginResponse(
-            $merchantUser->getId(),
-            $tokenInfo->getAccessToken(),
-            $merchantUser->getPermissions(),
-            $merchant->getName()
-        );
+        return new MerchantUserLoginResponse($user, $tokenInfo->getAccessToken());
     }
 }

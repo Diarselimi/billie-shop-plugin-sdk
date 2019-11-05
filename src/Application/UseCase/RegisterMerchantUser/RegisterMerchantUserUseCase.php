@@ -12,6 +12,8 @@ use App\DomainModel\MerchantUser\MerchantUserEntityFactory;
 use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
 use App\DomainModel\MerchantUser\MerchantUserRoleRepositoryInterface;
 use App\DomainModel\MerchantUser\RoleNotFoundException;
+use App\DomainModel\MerchantUserInvitation\MerchantUserInvitationEntityFactory;
+use App\DomainModel\MerchantUserInvitation\MerchantUserInvitationRepositoryInterface;
 
 class RegisterMerchantUserUseCase implements ValidatedUseCaseInterface
 {
@@ -27,18 +29,26 @@ class RegisterMerchantUserUseCase implements ValidatedUseCaseInterface
 
     private $merchantUserRoleRepository;
 
+    private $invitationRepository;
+
+    private $invitationEntityFactory;
+
     public function __construct(
         MerchantRepositoryInterface $merchantRepository,
         MerchantUserRepositoryInterface $merchantUserRepository,
         MerchantUserEntityFactory $merchantUserEntityFactory,
         AuthenticationServiceInterface $authenticationService,
-        MerchantUserRoleRepositoryInterface $merchantUserRoleRepository
+        MerchantUserRoleRepositoryInterface $merchantUserRoleRepository,
+        MerchantUserInvitationRepositoryInterface $invitationRepository,
+        MerchantUserInvitationEntityFactory $invitationEntityFactory
     ) {
         $this->merchantRepository = $merchantRepository;
         $this->merchantUserRepository = $merchantUserRepository;
         $this->merchantUserEntityFactory = $merchantUserEntityFactory;
         $this->authenticationService = $authenticationService;
         $this->merchantUserRoleRepository = $merchantUserRoleRepository;
+        $this->invitationRepository = $invitationRepository;
+        $this->invitationEntityFactory = $invitationEntityFactory;
     }
 
     public function execute(RegisterMerchantUserRequest $request): void
@@ -73,5 +83,14 @@ class RegisterMerchantUserUseCase implements ValidatedUseCaseInterface
         );
 
         $this->merchantUserRepository->create($merchantUser);
+
+        $invitation = $this->invitationEntityFactory->create(
+            $request->getUserEmail(),
+            $request->getMerchantId(),
+            $role->getId(),
+            $merchantUser->getId()
+        )->setExpiresAt(new \DateTime());
+
+        $this->invitationRepository->createIfNotExistsForUser($invitation);
     }
 }

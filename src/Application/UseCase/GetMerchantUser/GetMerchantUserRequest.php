@@ -4,15 +4,15 @@ namespace App\Application\UseCase\GetMerchantUser;
 
 class GetMerchantUserRequest
 {
-    private $userId;
+    private $uuid;
 
-    public function __construct(string $userId)
+    public function __construct(string $uuid)
     {
-        $this->userId = $userId;
+        $this->uuid = $uuid;
     }
 
-    public function getUserId(): string
+    public function getUuid(): string
     {
-        return $this->userId;
+        return $this->uuid;
     }
 }

@@ -36,6 +36,16 @@ interface OrderRepositoryInterface
      */
     public function getOrdersByInvoiceHandlingStrategy(string $strategy): Generator;
 
+    /**
+     * @param  int           $merchantId
+     * @param  int           $offset
+     * @param  int           $limit
+     * @param  string        $sortBy
+     * @param  string        $sortDirection
+     * @param  string|null   $searchString
+     * @param  array         $filters
+     * @return OrderEntity[]
+     */
     public function search(
         int $merchantId,
         int $offset,

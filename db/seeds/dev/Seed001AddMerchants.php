@@ -4,7 +4,7 @@ use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntityFactory;
 use Phinx\Seed\AbstractSeed;
 
-class MerchantsSeeder extends AbstractSeed
+class Seed001AddMerchants extends AbstractSeed
 {
     public function run()
     {

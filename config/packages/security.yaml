@@ -50,3 +50,4 @@ security:
                     - App\Http\Authentication\Authenticator\OAuthTokenAuthenticator
                     - App\Http\Authentication\Authenticator\ApiKeyAuthenticator
                 entry_point: App\Http\Authentication\Authenticator\OAuthTokenAuthenticator
+

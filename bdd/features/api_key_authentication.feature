@@ -9,7 +9,7 @@ Feature: As a merchant, i should be able to access all endpoints by providing AP
     Then the response status code should be 403
     And the JSON response should be:
 	"""
-	{"errors":[{"title":"Access Denied","code":"forbidden"}]}
+	{"errors":[{"title":"Access Denied.","code":"forbidden"}]}
 	"""
 
   Scenario: Providing wrong API key

@@ -6,5 +6,5 @@ interface MerchantUserRepositoryInterface
 {
     public function create(MerchantUserEntity $merchantUserEntity): void;
 
-    public function getOneByUserId(string $userId): ? MerchantUserEntity;
+    public function getOneByUuid(string $uuid): ? MerchantUserEntity;
 }

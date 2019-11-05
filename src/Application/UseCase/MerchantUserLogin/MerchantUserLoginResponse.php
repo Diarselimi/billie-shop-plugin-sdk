@@ -2,67 +2,33 @@
 
 namespace App\Application\UseCase\MerchantUserLogin;
 
+use App\Application\UseCase\GetMerchantUser\GetMerchantUserResponse;
 use App\DomainModel\ArrayableInterface;
 use OpenApi\Annotations as OA;
 
 /**
  * @OA\Schema(schema="MerchantUserLoginResponse", title="Merchant User Login Response", type="object", properties={
- *      @OA\Property(property="user_id", type="integer", nullable=false),
- *      @OA\Property(property="access_token", type="string", nullable=false, example="l387435hzyoc0oo4kokow"),
- *      @OA\Property(
- *          property="permissions",
- *          type="array",
- *          nullable=false,
- *          @OA\Items(ref="#/components/schemas/MerchantUserPermissions")
- *      ),
- *      @OA\Property(property="merchant_name", type="string", nullable=false, example="Billie GmbH")
+ *      @OA\Property(property="access_token", type="string", nullable=false, example="l387435hzyoc0oo4kokow", description="Bearer JWT Token"),
+ *      @OA\Property(property="user", ref="#/components/schemas/GetMerchantUserResponse", nullable=false),
  * })
  */
 class MerchantUserLoginResponse implements ArrayableInterface
 {
-    private $userId;
+    private $userResponse;
 
     private $accessToken;
 
-    private $roles;
-
-    private $merchantName;
-
-    public function __construct(int $userId, string $accessToken, array $roles, string $merchantName)
+    public function __construct(GetMerchantUserResponse $userResponse, string $accessToken)
     {
-        $this->userId = $userId;
+        $this->userResponse = $userResponse;
         $this->accessToken = $accessToken;
-        $this->roles = $roles;
-        $this->merchantName = $merchantName;
-    }
-
-    public function getUserId(): int
-    {
-        return $this->userId;
-    }
-
-    public function getAccessToken(): string
-    {
-        return $this->accessToken;
-    }
-
-    public function getRoles(): array
-    {
-        return $this->roles;
-    }
-
-    public function getMerchantName(): string
-    {
-        return $this->merchantName;
     }
 
     public function toArray(): array
     {
         return [
-            'user_id' => $this->getUserId(),
-            'access_token' => $this->getAccessToken(),
-            'permissions' => $this->getRoles(),
-            'merchant_name' => $this->getMerchantName(),
+            'access_token' => $this->accessToken,
+            'user' => $this->userResponse->toArray(),
         ];
     }
 }

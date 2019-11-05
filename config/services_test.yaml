@@ -6,8 +6,6 @@ services:
   _defaults:
     autowire: true
     public: true
-    bind:
-      $showExtendedErrorInfo: false
 
   App\Http\ApiError\ApiErrorResponseFactory: '@App\Http\ApiError\VerboseApiErrorResponseFactory'
 
@@ -55,6 +53,11 @@ services:
     public: true
   App\DomainModel\MerchantUser\MerchantUserRoleRepositoryInterface:
     alias: 'App\Infrastructure\Repository\MerchantUserRoleRepository'
+    public: true
+  App\DomainModel\MerchantUserInvitation\MerchantUserInvitationRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\MerchantUserInvitationRepository'
+    public: true
+  App\DomainModel\MerchantUserInvitation\MerchantUserInvitationEntityFactory:
     public: true
   App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface:
     alias: 'App\Infrastructure\Repository\CheckoutSessionRepository'

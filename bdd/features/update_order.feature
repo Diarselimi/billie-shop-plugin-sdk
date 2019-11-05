@@ -34,7 +34,7 @@ Feature: APIS-1077
     Then the response status code should be 403
     And the JSON response should be:
     """
-      {"errors":[{"title":"Access Denied","code":"forbidden"}]}
+      {"errors":[{"title":"Access Denied.","code":"forbidden"}]}
     """
 
   Scenario Template: Success 1: Partial provided data is OK and update is successful on any non-final state

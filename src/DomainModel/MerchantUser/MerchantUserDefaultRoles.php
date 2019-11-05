@@ -10,6 +10,7 @@ interface MerchantUserDefaultRoles
     public const ROLES = [
         self::ROLE_NONE,
         self::ROLE_ADMIN,
+        self::ROLE_BILLIE_ADMIN,
         self::ROLE_VIEW_ONLY,
         self::ROLE_SUPPORT,
     ];
@@ -21,6 +22,11 @@ interface MerchantUserDefaultRoles
 
     public const ROLE_ADMIN = [
         'name' => 'admin',
+        'permissions' => MerchantUserPermissions::ALL_PERMISSIONS,
+    ];
+
+    public const ROLE_BILLIE_ADMIN = [
+        'name' => 'billie_admin',
         'permissions' => MerchantUserPermissions::ALL_PERMISSIONS,
     ];
 
@@ -36,6 +42,7 @@ interface MerchantUserDefaultRoles
             MerchantUserPermissions::VIEW_ORDERS,
             MerchantUserPermissions::VIEW_DEBTORS,
             MerchantUserPermissions::VIEW_PAYMENTS,
+            MerchantUserPermissions::VIEW_USERS,
             // write:
             MerchantUserPermissions::CONFIRM_ORDER_PAYMENT,
             MerchantUserPermissions::PAUSE_DUNNING,

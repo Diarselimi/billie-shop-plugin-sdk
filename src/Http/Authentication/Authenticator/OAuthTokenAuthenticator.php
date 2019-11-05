@@ -88,7 +88,7 @@ class OAuthTokenAuthenticator extends AbstractAuthenticator
 
     private function authenticateAsMerchantUser(string $oauthUserId, string $credentials, ?string $email): UserInterface
     {
-        $merchantUser = $this->merchantUserRepository->getOneByUserId($oauthUserId);
+        $merchantUser = $this->merchantUserRepository->getOneByUuid($oauthUserId);
 
         if (!$merchantUser) {
             throw new AuthenticationException();
@@ -101,7 +101,7 @@ class OAuthTokenAuthenticator extends AbstractAuthenticator
 
         return new User(
             $merchantUser->getMerchantId(),
-            $merchantUser->getUserId(),
+            $merchantUser->getUuid(),
             $credentials,
             $symfonyRoles,
             null,

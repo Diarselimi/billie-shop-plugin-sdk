@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\Repository;
 
+use App\DomainModel\MerchantUser\MerchantUserDefaultRoles;
 use App\DomainModel\MerchantUser\MerchantUserRoleEntity;
 use App\DomainModel\MerchantUser\MerchantUserRoleEntityFactory;
 use App\DomainModel\MerchantUser\MerchantUserRoleRepositoryInterface;
@@ -84,10 +85,15 @@ class MerchantUserRoleRepository extends AbstractPdoRepository implements Mercha
     {
         $query = 'SELECT ' . implode(', ', self::TABLE_FIELDS) .
             ' FROM ' . self::TABLE_NAME .
-            ' WHERE ' . $colName . ' = :' . $colName .
+            ' WHERE ' . self::TABLE_NAME . '.name != :billie_role_name' .
+            ' AND ' . $colName . ' = :' . $colName .
             ' ORDER BY created_at';
 
-        $params = [$colName => $value];
+        $params = [
+            // never show the internal billie role
+            'billie_role_name' => MerchantUserDefaultRoles::ROLE_BILLIE_ADMIN['name'],
+            $colName => $value,
+        ];
 
         $stmt = $this->doExecute($query, $params);
         $count = 0;

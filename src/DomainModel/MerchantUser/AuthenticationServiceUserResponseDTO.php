@@ -2,7 +2,7 @@
 
 namespace App\DomainModel\MerchantUser;
 
-class AuthenticationServiceCreateUserResponseDTO
+class AuthenticationServiceUserResponseDTO
 {
     private $userId;
 

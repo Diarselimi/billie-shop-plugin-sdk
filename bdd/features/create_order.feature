@@ -2014,5 +2014,5 @@ Feature:
     Then the response status code should be 403
     And the JSON response should be:
     """
-      {"errors":[{"title":"Access Denied","code":"forbidden"}]}
+      {"errors":[{"title":"Access Denied.","code":"forbidden"}]}
     """

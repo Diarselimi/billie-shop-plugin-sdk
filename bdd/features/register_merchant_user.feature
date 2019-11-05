@@ -11,15 +11,15 @@ Feature: Register merchant user to access dashboard
       ["TEST"]
     """
     When I send a POST request to "/private/merchant/1/user" with body:
-	"""
-	{
-		"first_name": "name",
-		"last_name": "last",
-		"role_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
-		"email": "test@merchantX.com",
-		"password": "testPassword"
-	}
-	"""
+    """
+    {
+        "first_name": "name",
+        "last_name": "last",
+        "role_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
+        "email": "test@merchantX.com",
+        "password": "testPassword"
+    }
+    """
     Then the response status code should be 201
     And merchant user with merchant id 1 and user id "test-auth-id" should be created
 
@@ -30,62 +30,62 @@ Feature: Register merchant user to access dashboard
       ["TEST"]
     """
     When I send a POST request to "/private/merchant/1/user" with body:
-	"""
-	{
-		"first_name": "name",
-		"last_name": "last",
-		"role_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
-		"email": "test@merchantX.com",
-		"password": "testPassword"
-	}
-	"""
+    """
+    {
+        "first_name": "name",
+        "last_name": "last",
+        "role_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
+        "email": "test@merchantX.com",
+        "password": "testPassword"
+    }
+    """
     Then the response status code should be 201
     And merchant user with merchant id 1 and user id "test-auth-id" should be created
     When I will get a response from Authentication Service from endpoint "/users" with status code 409
     When I send a POST request to "/private/merchant/1/user" with body:
-	"""
-	{
-		"first_name": "name",
-		"last_name": "last",
-		"role_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
-		"email": "test@merchantX.com",
-		"password": "testPassword"
-	}
-	"""
+    """
+    {
+        "first_name": "name",
+        "last_name": "last",
+        "role_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
+        "email": "test@merchantX.com",
+        "password": "testPassword"
+    }
+    """
     Then the response status code should be 403
 
   Scenario: validation error
     When I send a POST request to "/private/merchant/1/user" with body:
-	"""
-	{
-		"first_name": "name",
-		"last_name": "last",
-		"email": "test@.com",
-		"password": ""
-	}
-	"""
+    """
+    {
+        "first_name": "name",
+        "last_name": "last",
+        "email": "test@.com",
+        "password": ""
+    }
+    """
     Then the response status code should be 400
     And the JSON response should be:
     """
     {
-	   "errors":[
-		  {
-			 "source":"user_email",
-			 "title":"This value is not a valid email address.",
-			 "code":"request_validation_error"
-		  },
-		  {
-			 "source":"user_password",
-			 "title":"This value should not be blank.",
-			 "code":"request_validation_error"
-		  },
-		  {
-			 "source":"role_uuid",
-			 "title":"This value should not be blank.",
-			 "code":"request_validation_error"
-		  }
-	   ]
-	}
+       "errors":[
+          {
+             "source":"user_email",
+             "title":"This value is not a valid email address.",
+             "code":"request_validation_error"
+          },
+          {
+             "source":"user_password",
+             "title":"This value should not be blank.",
+             "code":"request_validation_error"
+          },
+          {
+             "source":"role_uuid",
+             "title":"This value should not be blank.",
+             "code":"request_validation_error"
+          }
+       ]
+    }
     """
 
   Scenario: validation error first and last name not provided
@@ -94,30 +94,30 @@ Feature: Register merchant user to access dashboard
       ["TEST"]
     """
     When I send a POST request to "/private/merchant/1/user" with body:
-	"""
-	{
-		"email": "test@merchantX.com",
-		"password": "testPassword",
-		"role_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70"
-	}
-	"""
+    """
+    {
+        "email": "test@merchantX.com",
+        "password": "testPassword",
+        "role_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70"
+    }
+    """
     Then the response status code should be 400
     And the JSON response should be:
     """
     {
-	   "errors":[
-		  {
-			 "source":"first_name",
-			 "title":"This value should not be blank.",
-			 "code":"request_validation_error"
-		  },
-		  {
-			 "source":"last_name",
-			 "title":"This value should not be blank.",
-			 "code":"request_validation_error"
-		  }
-	   ]
-	}
+       "errors":[
+          {
+             "source":"first_name",
+             "title":"This value should not be blank.",
+             "code":"request_validation_error"
+          },
+          {
+             "source":"last_name",
+             "title":"This value should not be blank.",
+             "code":"request_validation_error"
+          }
+       ]
+    }
     """
 
   Scenario: Successfully retrieve orders list using role-level permissions for a new merchant user
@@ -129,12 +129,12 @@ Feature: Register merchant user to access dashboard
     When I send a GET request to "/public/orders"
     Then the response status code should be 200
     And the JSON response should be:
-	"""
-	  {
-		"total": 0,
-		"items":[]
-	  }
-	"""
+    """
+      {
+        "total": 0,
+        "items":[]
+      }
+    """
   Scenario: Successfully retrieve orders list using overridden user-level permissions for a new merchant user
     Given a merchant user exists with overridden permission VIEW_ORDERS
     And I get from companies service update debtor positive response
@@ -144,24 +144,24 @@ Feature: Register merchant user to access dashboard
     When I send a GET request to "/public/orders"
     Then the response status code should be 200
     And the JSON response should be:
-	"""
-	  {
-		"total": 0,
-		"items":[]
-	  }
-	"""
+    """
+      {
+        "total": 0,
+        "items":[]
+      }
+    """
 
   Scenario: merchant does not exist
     When I send a POST request to "/private/merchant/123/user" with body:
-	"""
-	{
-		"first_name": "name",
-		"last_name": "last",
-		"role_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
-		"email": "test@merchantX.com",
-		"password": "testPassword"
-	}
-	"""
+    """
+    {
+        "first_name": "name",
+        "last_name": "last",
+        "role_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
+        "email": "test@merchantX.com",
+        "password": "testPassword"
+    }
+    """
     Then the response status code should be 404
     And the JSON response should be:
     """
@@ -172,15 +172,15 @@ Feature: Register merchant user to access dashboard
   Scenario: role does not exist
     Given I successfully create OAuth client with email "test@merchantX.com" and user id "test-auth-id"
     When I send a POST request to "/private/merchant/1/user" with body:
-	"""
-	{
-		"first_name": "name",
-		"last_name": "last",
-		"role_uuid": "c1255928-0725-4d9d-93de-22494c2c6e2d",
-		"email": "test@merchantX.com",
-		"password": "testPassword"
-	}
-	"""
+    """
+    {
+        "first_name": "name",
+        "last_name": "last",
+        "role_uuid": "c1255928-0725-4d9d-93de-22494c2c6e2d",
+        "email": "test@merchantX.com",
+        "password": "testPassword"
+    }
+    """
     Then the response status code should be 404
     And the JSON response should be:
     """

@@ -26,6 +26,10 @@ use App\DomainModel\MerchantUser\MerchantUserEntity;
 use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
 use App\DomainModel\MerchantUser\MerchantUserRoleEntity;
 use App\DomainModel\MerchantUser\MerchantUserRoleRepositoryInterface;
+use App\DomainModel\MerchantUserInvitation\MerchantInvitedUserDTO;
+use App\DomainModel\MerchantUserInvitation\MerchantUserInvitationEntity;
+use App\DomainModel\MerchantUserInvitation\MerchantUserInvitationEntityFactory;
+use App\DomainModel\MerchantUserInvitation\MerchantUserInvitationRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
@@ -152,6 +156,7 @@ class PaellaCoreContext extends MinkContext
             TRUNCATE merchant_notification_settings;
             TRUNCATE merchant_users;
             TRUNCATE merchant_user_roles;
+            TRUNCATE merchant_user_invitations;
             TRUNCATE merchants;
             TRUNCATE merchant_debtor_financial_details;
             TRUNCATE merchants_debtors;
@@ -599,37 +604,30 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
+     * @Given a merchant user exists with role :role and permission :permission
+     */
+    public function aMerchantUserExistsWithRoleAndPermission(string $roleName, string $permission)
+    {
+        $role = $this->createRole($roleName, $roleName . '_uuid', [$permission]);
+        $this->createUser($role);
+    }
+
+    /**
      * @Given a merchant user exists with permission :permission
      */
     public function aMerchantUserExistsWithPermission(string $permission)
     {
-        $role = $this->createRole('Test', 'test_role', [$permission]);
-
-        $this->getMerchantUserRepository()->create(
-            (new MerchantUserEntity())
-                ->setUserId('oauthUserId')
-                ->setMerchantId(1)
-                ->setPermissions([])
-                ->setRoleId($role->getId())
-                ->setFirstName('test')
-                ->setLastName('test')
-        );
+        $role = $this->createRole('test', 'test_uuid', [$permission]);
+        $this->createUser($role);
     }
 
     /**
-     * @Given /^a merchant user exists with role_id "([^"]*)" and overridden permission "([^"]*)"$/
+     * @Given a merchant user exists with a role with permission :permission and overridden permission :overridden
      */
-    public function aMerchantUserExistsWithRoleIdAndPermission($roleId, $permission)
+    public function aMerchantUserExistsWithRoleAndCustomPermission($rolePermission, $overriddenPermission)
     {
-        $this->getMerchantUserRepository()->create(
-            (new MerchantUserEntity())
-                ->setUserId('oauthUserId')
-                ->setMerchantId(1)
-                ->setRoleId($roleId)
-                ->setPermissions([$permission])
-                ->setFirstName('test')
-                ->setLastName('test')
-        );
+        $role = $this->createRole('test', 'test_uuid', [$rolePermission]);
+        $this->createUser($role, [$overriddenPermission]);
     }
 
     /**
@@ -637,17 +635,47 @@ class PaellaCoreContext extends MinkContext
      */
     public function aMerchantUserExistsWithOverridenPermission(string $permission)
     {
-        $role = $this->createRole('Test', 'test_role', ['NOTHING']);
+        $role = $this->createRole('test', 'test_uuid', ['NOTHING']);
+        $this->createUser($role, [$permission]);
+    }
 
-        $this->getMerchantUserRepository()->create(
-            (new MerchantUserEntity())
-                ->setUserId('oauthUserId')
-                ->setMerchantId(1)
-                ->setRoleId($role->getId())
-                ->setPermissions([$permission])
-                ->setFirstName('test')
-                ->setLastName('test')
-        );
+    /**
+     * @Given a merchant user exists with uuid :userUuid, role ID :role and :invitationStatus invitation
+     */
+    public function iAMerchantUserExistsWithUuidAndInvitation($userUuid, $roleId, $invitationStatus)
+    {
+        $role = (new MerchantUserRoleEntity())
+            ->setId($roleId)
+            ->setName('test')
+            ->setUuid('test_uuid')
+            ->setMerchantId(1)
+            ->setPermissions(['TEST']);
+        $this->createUser($role, [], $userUuid, $invitationStatus);
+    }
+
+    /**
+     * @Given an invitation exists for email :email, role ID :role and :invitationStatus invitation
+     */
+    public function iAnInvitationExistsWithData($email, $roleId, $invitationStatus)
+    {
+        $this->createInvitation($email, 1, $roleId, null, $invitationStatus);
+    }
+
+    private function createUser(
+        MerchantUserRoleEntity $role,
+        array $userPermissions = [],
+        $userUuid = 'oauthUserId',
+        string $invitationStatus = 'complete'
+    ) {
+        $user = (new MerchantUserEntity())
+            ->setUuid($userUuid)
+            ->setMerchantId(1)
+            ->setPermissions($userPermissions)
+            ->setRoleId($role->getId())
+            ->setFirstName('test')
+            ->setLastName('test');
+        $this->getMerchantUserRepository()->create($user);
+        $this->createInvitation('test@billie.dev', 1, $role->getId(), $user->getId(), $invitationStatus);
     }
 
     /**
@@ -673,11 +701,11 @@ class PaellaCoreContext extends MinkContext
      */
     public function merchantUserWithMerchantIdAndUserIdShouldBeCreated(string $merchantId, string $userId)
     {
-        $user = $this->getMerchantUserRepository()->getOneByUserId($userId);
+        $user = $this->getMerchantUserRepository()->getOneByUuid($userId);
 
         Assert::notNull($user);
         Assert::eq($user->getMerchantId(), $merchantId);
-        Assert::eq($user->getUserId(), $userId);
+        Assert::eq($user->getUuid(), $userId);
     }
 
     /**
@@ -795,6 +823,16 @@ class PaellaCoreContext extends MinkContext
         return $this->get(MerchantUserRoleRepositoryInterface::class);
     }
 
+    private function getMerchantUserInvitationRepository(): MerchantUserInvitationRepositoryInterface
+    {
+        return $this->get(MerchantUserInvitationRepositoryInterface::class);
+    }
+
+    private function getMerchantUserInvitationFactory(): MerchantUserInvitationEntityFactory
+    {
+        return $this->get(MerchantUserInvitationEntityFactory::class);
+    }
+
     private function getCheckoutSessionRepository(): CheckoutSessionRepositoryInterface
     {
         return $this->get(CheckoutSessionRepositoryInterface::class);
@@ -830,19 +868,6 @@ class PaellaCoreContext extends MinkContext
         return $this->getContainer()->get($service);
     }
 
-    public function createRole($name, $uuid, array $permissions): MerchantUserRoleEntity
-    {
-        $role = (new MerchantUserRoleEntity())
-            ->setPermissions($permissions)
-            ->setUuid($uuid)
-            ->setMerchantId(1)
-            ->setName($name);
-
-        $this->getMerchantUserRoleRepository()->create($role);
-
-        return $role;
-    }
-
     /**
      * @Given /^I have a role of name "([^"]*)" with uuid "([^"]*)" and permissions$/
      */
@@ -870,5 +895,47 @@ class PaellaCoreContext extends MinkContext
         foreach (MerchantUserDefaultRoles::ROLES as $role) {
             Assert::oneOf($role['name'], $roleNames, "Merchant {$merchant->getId()} has no role with name {$role['name']}");
         }
+    }
+
+    public function createRole($name, $uuid, array $permissions): MerchantUserRoleEntity
+    {
+        $role = (new MerchantUserRoleEntity())
+            ->setPermissions($permissions)
+            ->setUuid($uuid)
+            ->setMerchantId(1)
+            ->setName($name);
+
+        $this->getMerchantUserRoleRepository()->create($role);
+
+        return $role;
+    }
+
+    public function createInvitation(
+        string $email,
+        int $merchantId,
+        int $roleId,
+        int $merchantUserId = null,
+        string $invitationStatus = null
+    ): MerchantUserInvitationEntity {
+        $invitation = $this->getMerchantUserInvitationFactory()
+            ->create($email, $merchantId, $roleId);
+
+        switch ($invitationStatus) {
+            case MerchantInvitedUserDTO::INVITATION_STATUS_PENDING:
+                $invitation->setExpiresAt((new \DateTime())->modify('+1 day'));
+
+                break;
+            case MerchantInvitedUserDTO::INVITATION_STATUS_EXPIRED:
+                $invitation->setExpiresAt((new \DateTime())->modify('-1 day'));
+
+                break;
+            default:
+                $invitation->setMerchantUserId($merchantUserId);
+        }
+
+        $invitation->setUuid('test_uuid-' . $email);
+        $this->getMerchantUserInvitationRepository()->create($invitation);
+
+        return $invitation;
     }
 }

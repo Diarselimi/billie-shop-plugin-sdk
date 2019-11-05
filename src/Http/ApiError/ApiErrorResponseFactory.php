@@ -81,7 +81,7 @@ class ApiErrorResponseFactory
             case $exception instanceof AccessDeniedHttpException:
                 if (stripos($message, '@IsGranted') !== false) {
                     // Hide default IsGranted annotation messages
-                    $message = 'Access Denied';
+                    $message = 'Access Denied.';
                 }
                 $errorCode = ApiError::CODE_FORBIDDEN;
 

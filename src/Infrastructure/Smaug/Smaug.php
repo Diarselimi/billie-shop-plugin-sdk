@@ -5,10 +5,10 @@ namespace App\Infrastructure\Smaug;
 use App\DomainModel\MerchantUser\AuthenticationServiceAuthorizeTokenResponseDTO;
 use App\DomainModel\MerchantUser\AuthenticationServiceConflictRequestException;
 use App\DomainModel\MerchantUser\AuthenticationServiceCreateClientResponseDTO;
-use App\DomainModel\MerchantUser\AuthenticationServiceCreateUserResponseDTO;
 use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
 use App\DomainModel\MerchantUser\AuthenticationServiceRequestException;
 use App\DomainModel\MerchantUser\AuthenticationServiceTokenResponseDTO;
+use App\DomainModel\MerchantUser\AuthenticationServiceUserResponseDTO;
 use App\Infrastructure\DecodeResponseTrait;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -88,7 +88,7 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
         }
     }
 
-    public function createUser(string $email, string $password): AuthenticationServiceCreateUserResponseDTO
+    public function createUser(string $email, string $password): AuthenticationServiceUserResponseDTO
     {
         try {
             $response = $this->client->post(
@@ -103,7 +103,7 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
 
             $decodedResponse = $this->decodeResponse($response);
 
-            return new AuthenticationServiceCreateUserResponseDTO(
+            return new AuthenticationServiceUserResponseDTO(
                 $decodedResponse['user_id'],
                 $decodedResponse['user_email']
             );
@@ -178,5 +178,41 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
         return ($exception instanceof RequestException)
             && $exception->getResponse()
             && $exception->getResponse()->getStatusCode() === $statusCode;
+    }
+
+    public function getUsersByUuids(array $uuids): array
+    {
+        if (empty($uuids)) {
+            throw new AuthenticationServiceRequestException(null, 'User UUIDs cannot be empty');
+        }
+
+        try {
+            $response = $this->client->request(
+                'get',
+                '/users',
+                [
+                    'query' => ['uuids' => $uuids],
+                    'on_stats' => function (TransferStats $stats) {
+                        $this->logServiceRequestStats($stats, 'get_oauth_users');
+                    },
+                ]
+            );
+
+            $decodedResponse = $this->decodeResponse($response);
+
+            $dtos = [];
+            foreach ($decodedResponse as $userData) {
+                $dtos[$userData['user_id']] = new AuthenticationServiceUserResponseDTO(
+                    $userData['user_id'],
+                    $userData['user_email']
+                );
+            }
+
+            return $dtos;
+        } catch (TransferException $exception) {
+            $this->logSuppressedException($exception, 'Failed to get OAuth users', ['exception' => $exception]);
+
+            throw new AuthenticationServiceRequestException($exception);
+        }
     }
 }

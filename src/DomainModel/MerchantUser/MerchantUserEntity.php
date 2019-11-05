@@ -6,7 +6,7 @@ use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 
 class MerchantUserEntity extends AbstractTimestampableEntity
 {
-    private $userId;
+    private $uuid;
 
     private $merchantId;
 
@@ -18,14 +18,18 @@ class MerchantUserEntity extends AbstractTimestampableEntity
 
     private $permissions;
 
-    public function getUserId(): string
+    public function getUuid(): string
     {
-        return $this->userId;
+        return $this->uuid;
     }
 
-    public function setUserId(string $userId): MerchantUserEntity
+    /**
+     * @param  string $uuid
+     * @return $this
+     */
+    public function setUuid(string $uuid): MerchantUserEntity
     {
-        $this->userId = $userId;
+        $this->uuid = $uuid;
 
         return $this;
     }
@@ -35,6 +39,10 @@ class MerchantUserEntity extends AbstractTimestampableEntity
         return $this->merchantId;
     }
 
+    /**
+     * @param  int   $merchantId
+     * @return $this
+     */
     public function setMerchantId(int $merchantId): MerchantUserEntity
     {
         $this->merchantId = $merchantId;
@@ -47,6 +55,10 @@ class MerchantUserEntity extends AbstractTimestampableEntity
         return $this->roleId;
     }
 
+    /**
+     * @param  int   $roleId
+     * @return $this
+     */
     public function setRoleId(int $roleId): MerchantUserEntity
     {
         $this->roleId = $roleId;
@@ -59,6 +71,10 @@ class MerchantUserEntity extends AbstractTimestampableEntity
         return $this->firstName;
     }
 
+    /**
+     * @param  string $firstName
+     * @return $this
+     */
     public function setFirstName(string $firstName): MerchantUserEntity
     {
         $this->firstName = $firstName;
@@ -71,6 +87,10 @@ class MerchantUserEntity extends AbstractTimestampableEntity
         return $this->lastName;
     }
 
+    /**
+     * @param  string $lastName
+     * @return $this
+     */
     public function setLastName(string $lastName): MerchantUserEntity
     {
         $this->lastName = $lastName;
@@ -83,6 +103,10 @@ class MerchantUserEntity extends AbstractTimestampableEntity
         return $this->permissions;
     }
 
+    /**
+     * @param  array $permissions
+     * @return $this
+     */
     public function setPermissions(array $permissions): MerchantUserEntity
     {
         $this->permissions = $permissions;
