@@ -5,7 +5,7 @@ use Phinx\Migration\AbstractMigration;
 
 class AddCancelOrderPermission extends AbstractMigration
 {
-    protected function migrate()
+    public function up()
     {
         $role = MerchantUserPermissions::CANCEL_ORDERS;
 
