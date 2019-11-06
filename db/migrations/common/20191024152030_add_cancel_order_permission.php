@@ -12,7 +12,7 @@ class AddCancelOrderPermission extends AbstractMigration
         // add it to all the write roles
         $this->execute("
             UPDATE merchant_user_roles
-            SET permissions = JSON_SET(permissions, '$', '$role')
+            SET permissions = JSON_ARRAY_APPEND(permissions, '$', '$role')
             WHERE name IN ('admin', 'support')
             AND permissions IS NOT NULL
             AND NOT JSON_CONTAINS(permissions, '\"$role\"')
@@ -22,7 +22,7 @@ class AddCancelOrderPermission extends AbstractMigration
         $this->execute("
             UPDATE merchant_users
             INNER JOIN merchant_user_roles ON merchant_users.role_id = merchant_user_roles.id
-            SET merchant_users.permissions = JSON_SET(merchant_users.permissions, '$', '$role')
+            SET merchant_users.permissions = JSON_ARRAY_APPEND(merchant_users.permissions, '$', '$role')
             WHERE name IN ('admin', 'support')
             AND merchant_users.permissions IS NOT NULL
             AND NOT JSON_CONTAINS(merchant_users.permissions, '\"$role\"')
