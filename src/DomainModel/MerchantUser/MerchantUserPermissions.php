@@ -18,6 +18,8 @@ interface MerchantUserPermissions
 
     public const MANAGE_USERS = 'MANAGE_USERS';
 
+    public const CANCEL_ORDERS = 'CANCEL_ORDERS';
+
     public const ALL_PERMISSIONS = [
         // read:
         self::VIEW_ORDERS,
@@ -28,6 +30,7 @@ interface MerchantUserPermissions
         self::CONFIRM_ORDER_PAYMENT,
         self::PAUSE_DUNNING,
         // self::MANAGE_USERS, // TODO: enable MANAGE_USERS
+        self::CANCEL_ORDERS,
     ];
 
     public const ALL_READ_PERMISSIONS = [
@@ -41,5 +44,6 @@ interface MerchantUserPermissions
         self::CONFIRM_ORDER_PAYMENT,
         self::PAUSE_DUNNING,
        // self::MANAGE_USERS, // TODO: enable MANAGE_USERS
+        self::CANCEL_ORDERS,
     ];
 }

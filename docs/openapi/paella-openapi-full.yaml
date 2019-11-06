@@ -1298,6 +1298,28 @@ paths:
           oauth2: []
       x-groups:
         - private
+  /merchant/roles:
+    get:
+      tags:
+        - 'User Management'
+      summary: 'List of available roles for this merchant'
+      operationId: get_merchant_roles
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMerchantRolesResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+      x-groups:
+        - dashboard
   /merchant/user:
     get:
       tags:
@@ -1313,6 +1335,60 @@ paths:
                 $ref: '#/components/schemas/GetMerchantUserResponse'
         '404':
           $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+      x-groups:
+        - private
+  /merchant/users:
+    get:
+      tags:
+        - 'Dashboard Users'
+      summary: 'Get Merchant Users'
+      operationId: get_merchant_users
+      parameters:
+        -
+          name: sort_by
+          in: query
+          required: false
+          schema:
+            type: string
+            default: invitation_status
+            enum:
+              - invitation_status
+              - 'invitation_status,desc'
+              - 'invitation_status,asc'
+              - created_at
+              - 'created_at,desc'
+              - 'created_at,asc'
+        -
+          name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+        -
+          name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            maximum: 100
+            minimum: 1
+      responses:
+        '200':
+          description: 'Users list'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMerchantUsersResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '500':
@@ -1788,14 +1864,18 @@ components:
         - VIEW_ORDERS
         - VIEW_DEBTORS
         - VIEW_PAYMENTS
+        - VIEW_USERS
         - CONFIRM_ORDER_PAYMENT
         - PAUSE_DUNNING
+        - CANCEL_ORDERS
       example:
         - VIEW_ORDERS
         - VIEW_DEBTORS
         - VIEW_PAYMENTS
+        - VIEW_USERS
         - CONFIRM_ORDER_PAYMENT
         - PAUSE_DUNNING
+        - CANCEL_ORDERS
     OauthClientCredentialsGrantRequestBodyParams:
       title: 'Request OAuth Token'
       required:
@@ -2141,9 +2221,24 @@ components:
                 $ref: '#/components/schemas/GetDebtorCompanyLimitsMerchant'
             type: object
       type: object
+    GetMerchantRolesResponse:
+      title: GetMerchantRolesResponse
+      type: array
+      items:
+        properties:
+          uuid:
+            $ref: '#/components/schemas/UUID'
+          name:
+            $ref: '#/components/schemas/TinyText'
+        type: object
+      x-groups:
+        - dashboard
     GetMerchantUserResponse:
-      title: 'Get Merchant User Response'
+      title: 'Merchant User'
       properties:
+        uuid:
+          nullable: false
+          $ref: '#/components/schemas/UUID'
         first_name:
           type: string
           nullable: false
@@ -2154,11 +2249,22 @@ components:
           type: string
           format: email
           nullable: false
-        user_id:
-          type: integer
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/MerchantUserPermissions'
           nullable: false
+        role:
+          properties:
+            uuid:
+              $ref: '#/components/schemas/UUID'
+            name:
+              description: 'Role internal name'
+              example: Support
+              $ref: '#/components/schemas/TinyText'
+          type: object
         merchant_company:
-          description: 'Merchant company data.'
+          description: 'Merchant the user is logged in to'
           properties:
             name:
               example: 'Billie GmbH'
@@ -2186,15 +2292,52 @@ components:
               maxLength: 2
               nullable: true
           type: object
-        permissions:
+        tracking_id:
+          description: 'ID used for tracking the user for support.'
+          type: integer
+          nullable: false
+      type: object
+    GetMerchantUsersResponse:
+      title: 'Merchant Users List'
+      properties:
+        total:
+          type: integer
+          nullable: false
+        items:
           type: array
           items:
-            $ref: '#/components/schemas/MerchantUserPermissions'
-          nullable: false
-        role:
-          description: 'Internal role name'
-          type: string
-          example: admin
+            properties:
+              uuid:
+                allOf:
+                  - { $ref: '#/components/schemas/UUID' }
+                  - { nullable: true }
+              first_name:
+                type: string
+                nullable: true
+              last_name:
+                type: string
+                nullable: true
+              email:
+                type: string
+                format: email
+                nullable: false
+              role:
+                properties:
+                  uuid: { $ref: '#/components/schemas/UUID' }
+                  name: { description: 'Role internal name', example: Support, $ref: '#/components/schemas/TinyText' }
+                type: object
+                nullable: false
+              invitation_uuid:
+                nullable: true
+                $ref: '#/components/schemas/UUID'
+              invitation_status:
+                type: string
+                enum:
+                  - pending
+                  - expired
+                  - complete
+                nullable: false
+            type: object
           nullable: false
       type: object
     MarkDuplicateDebtorItem:
@@ -2222,22 +2365,14 @@ components:
     MerchantUserLoginResponse:
       title: 'Merchant User Login Response'
       properties:
-        user_id:
-          type: integer
-          nullable: false
         access_token:
+          description: 'Bearer JWT Token'
           type: string
           example: l387435hzyoc0oo4kokow
           nullable: false
-        permissions:
-          type: array
-          items:
-            $ref: '#/components/schemas/MerchantUserPermissions'
+        user:
           nullable: false
-        merchant_name:
-          type: string
-          example: 'Billie GmbH'
-          nullable: false
+          $ref: '#/components/schemas/GetMerchantUserResponse'
       type: object
     PauseOrderDunningRequest:
       title: 'Pause Order Dunning'

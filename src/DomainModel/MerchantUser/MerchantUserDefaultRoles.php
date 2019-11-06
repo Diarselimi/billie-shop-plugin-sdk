@@ -46,6 +46,7 @@ interface MerchantUserDefaultRoles
             // write:
             MerchantUserPermissions::CONFIRM_ORDER_PAYMENT,
             MerchantUserPermissions::PAUSE_DUNNING,
+            MerchantUserPermissions::CANCEL_ORDERS,
         ],
     ];
 }
