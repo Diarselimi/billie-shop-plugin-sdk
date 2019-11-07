@@ -2,9 +2,9 @@
 
 namespace App\Http\Controller\PublicApi;
 
+use App\Application\UseCase\CheckoutSession\CheckoutSessionResponse;
 use App\Application\UseCase\CheckoutSession\CreateCheckoutSessionRequest;
 use App\Application\UseCase\CheckoutSession\CreateCheckoutSessionUseCase;
-use App\Application\UseCase\Response\CheckoutSessionResponse;
 use App\Http\HttpConstantsInterface;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;

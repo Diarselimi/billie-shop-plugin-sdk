@@ -29,7 +29,6 @@ class IdentifyAndTriggerAsyncIdentification implements LoggingInterface
     {
         $debtorFinderResult = $this->debtorFinderService->findDebtor($orderContainer);
 
-        //TODO: event
         if (!$orderContainer->getMerchantSettings()->useExperimentalDebtorIdentification()) {
             $this->triggerV2DebtorIdentificationAsync(
                 $orderContainer->getOrder(),

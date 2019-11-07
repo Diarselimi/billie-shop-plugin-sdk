@@ -999,6 +999,42 @@ paths:
       x-groups:
         - public
         - private
+  /merchant/users/invitations:
+    post:
+      tags:
+        - 'Dashboard Users'
+      summary: 'Invite Merchant User'
+      operationId: invite_merchant_user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMerchantUserInvitationRequest'
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateMerchantUserInvitationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/ResourceConflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+      x-groups:
+        - private
   /order:
     post:
       tags:
@@ -1710,6 +1746,74 @@ paths:
       x-groups:
         - public
         - private
+  '/merchant/users/invitations/{uuid}/resend':
+    post:
+      tags:
+        - 'Dashboard Users'
+      summary: 'Resend User Invitation'
+      operationId: resend_user_invitation
+      parameters:
+        -
+          name: uuid
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateMerchantUserInvitationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/ResourceConflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+      x-groups:
+        - private
+  '/merchant/users/invitations/{uuid}':
+    delete:
+      tags:
+        - 'Dashboard Users'
+      summary: 'Revoke User Invitation'
+      operationId: revoke_user_invitation
+      parameters:
+        -
+          name: uuid
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '204':
+          description: 'Successful response'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+      x-groups:
+        - private
   '/order/{id}/ship':
     post:
       tags:
@@ -1958,6 +2062,32 @@ components:
       allOf:
         -
           $ref: '#/components/schemas/MerchantEntity'
+    CreateMerchantUserInvitationRequest:
+      required:
+        - email
+        - role_uuid
+      properties:
+        email:
+          type: string
+          format: email
+        role_uuid:
+          $ref: '#/components/schemas/UUID'
+      type: object
+      x-groups:
+        - private
+    CreateMerchantUserInvitationResponse:
+      required:
+        - invitation_uuid
+        - invitation_token
+      properties:
+        invitation_uuid:
+          $ref: '#/components/schemas/UUID'
+        invitation_token:
+          description: 'Token to be used in the invitation link'
+          type: string
+      type: object
+      x-groups:
+        - private
     CreateOrderRequest:
       title: 'Order Creation Request'
       required:
@@ -2936,6 +3066,12 @@ components:
             $ref: '#/components/schemas/ErrorsObject'
     BadRequest:
       description: 'Invalid Request Data'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorsObject'
+    ResourceConflict:
+      description: 'Resource Already Exists'
       content:
         application/json:
           schema:

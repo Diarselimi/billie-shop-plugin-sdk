@@ -91,6 +91,8 @@ class RegisterMerchantUserUseCase implements ValidatedUseCaseInterface
             $merchantUser->getId()
         )->setExpiresAt(new \DateTime());
 
-        $this->invitationRepository->createIfNotExistsForUser($invitation);
+        if (!$this->invitationRepository->existsForUser($merchantUser->getId())) {
+            $this->invitationRepository->create($invitation);
+        }
     }
 }

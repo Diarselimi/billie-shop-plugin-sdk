@@ -13,7 +13,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 
-// TODO: move to new ApiBundle or OpenApiBundle
 class GenerateOpenApiSpec extends Command
 {
     private const NAME = 'paella:openapi:generate';

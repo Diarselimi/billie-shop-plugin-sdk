@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\UseCase\Response;
+namespace App\Application\UseCase\CheckoutSession;
 
 use App\DomainModel\ArrayableInterface;
 use App\DomainModel\CheckoutSession\CheckoutSessionEntity;

@@ -12,7 +12,7 @@ Feature: Get current logged in merchant user details
       {"errors":[{"title":"Access Denied.","code":"forbidden"}]}
     """
 
-  Scenario: Authorised user without VIEW_USERS permission cannot get users list
+  Scenario: Authenticated user without VIEW_USERS permission cannot get users list
     Given a merchant user exists with permission FOO_BAR
     And I get from Oauth service a valid user token
 	And I add "Authorization" header equal to "Bearer someToken"
@@ -72,7 +72,7 @@ Feature: Get current logged in merchant user details
           "uuid": "oauthUserId",
           "first_name": "test",
           "last_name": "test",
-          "email": "test+smaug@billie.dev",
+          "email": "test@billie.dev",
           "role": {
             "uuid": "test_uuid",
             "name": "test"

@@ -16,6 +16,7 @@ use OpenApi\Annotations as OA;
  *          @OA\Response(response="Unauthorized", description="Unauthorized request or invalid credentials", @OA\JsonContent(ref="#/components/schemas/ErrorsObject")),
  *          @OA\Response(response="Forbidden", description="Forbidden Request. The operation cannot be completed.", @OA\JsonContent(ref="#/components/schemas/ErrorsObject")),
  *          @OA\Response(response="BadRequest", description="Invalid Request Data", @OA\JsonContent(ref="#/components/schemas/ErrorsObject")),
+ *          @OA\Response(response="ResourceConflict", description="Resource Already Exists", @OA\JsonContent(ref="#/components/schemas/ErrorsObject")),
  *     }
  * )
  */

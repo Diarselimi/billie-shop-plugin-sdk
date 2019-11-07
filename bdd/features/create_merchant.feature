@@ -42,7 +42,7 @@ Feature: Create a new merchant.
     Then the response status code should be 409
     And the JSON response should be:
     """
-    {"errors":[{"title":"Merchant with the same company ID already exists","code":"operation_failed"}]}
+    {"errors":[{"title":"Merchant with the same company ID already exists","code":"resource_already_exists"}]}
     """
 
   Scenario: Failed to create a merchant - Failed to create OAuth client

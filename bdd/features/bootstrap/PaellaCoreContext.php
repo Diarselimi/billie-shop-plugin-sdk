@@ -609,7 +609,7 @@ class PaellaCoreContext extends MinkContext
     public function aMerchantUserExistsWithRoleAndPermission(string $roleName, string $permission)
     {
         $role = $this->createRole($roleName, $roleName . '_uuid', [$permission]);
-        $this->createUser($role);
+        $this->createUser($role->getId());
     }
 
     /**
@@ -618,7 +618,7 @@ class PaellaCoreContext extends MinkContext
     public function aMerchantUserExistsWithPermission(string $permission)
     {
         $role = $this->createRole('test', 'test_uuid', [$permission]);
-        $this->createUser($role);
+        $this->createUser($role->getId());
     }
 
     /**
@@ -627,7 +627,7 @@ class PaellaCoreContext extends MinkContext
     public function aMerchantUserExistsWithRoleAndCustomPermission($rolePermission, $overriddenPermission)
     {
         $role = $this->createRole('test', 'test_uuid', [$rolePermission]);
-        $this->createUser($role, [$overriddenPermission]);
+        $this->createUser($role->getId(), [$overriddenPermission]);
     }
 
     /**
@@ -636,7 +636,7 @@ class PaellaCoreContext extends MinkContext
     public function aMerchantUserExistsWithOverridenPermission(string $permission)
     {
         $role = $this->createRole('test', 'test_uuid', ['NOTHING']);
-        $this->createUser($role, [$permission]);
+        $this->createUser($role->getId(), [$permission]);
     }
 
     /**
@@ -650,7 +650,7 @@ class PaellaCoreContext extends MinkContext
             ->setUuid('test_uuid')
             ->setMerchantId(1)
             ->setPermissions(['TEST']);
-        $this->createUser($role, [], $userUuid, $invitationStatus);
+        $this->createUser($role->getId(), [], $userUuid, $invitationStatus);
     }
 
     /**
@@ -661,21 +661,39 @@ class PaellaCoreContext extends MinkContext
         $this->createInvitation($email, 1, $roleId, null, $invitationStatus);
     }
 
+    /**
+     * @Given an invitation with uuid :uuid and status :status exists for email :email and role ID :role
+     */
+    public function iAnInvitationExistWithUuidStatusAndData($uuid, $invitationStatus, $email, $roleId)
+    {
+        $this->createInvitation($email, 1, $roleId, null, $invitationStatus, $uuid);
+    }
+
+    /**
+     * @Given a complete invitation with uuid :uuid exists for user :userId, email :email and role ID :role
+     */
+    public function iACompleteInvitationExistWithUuidAndData($uuid, $userId, $email, $roleId)
+    {
+        $this->createInvitation($email, 1, $roleId, $userId, 'complete', $uuid);
+    }
+
     private function createUser(
-        MerchantUserRoleEntity $role,
+        int $roleId,
         array $userPermissions = [],
         $userUuid = 'oauthUserId',
         string $invitationStatus = 'complete'
-    ) {
+    ): MerchantUserEntity {
         $user = (new MerchantUserEntity())
             ->setUuid($userUuid)
             ->setMerchantId(1)
             ->setPermissions($userPermissions)
-            ->setRoleId($role->getId())
+            ->setRoleId($roleId)
             ->setFirstName('test')
             ->setLastName('test');
         $this->getMerchantUserRepository()->create($user);
-        $this->createInvitation('test@billie.dev', 1, $role->getId(), $user->getId(), $invitationStatus);
+        $this->createInvitation('test@billie.dev', 1, $roleId, $user->getId(), $invitationStatus);
+
+        return $user;
     }
 
     /**
@@ -869,7 +887,7 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
-     * @Given /^I have a role of name "([^"]*)" with uuid "([^"]*)" and permissions$/
+     * @Given I have a role of name :name with uuid :uuid and permissions
      */
     public function iHaveARoleOfNameWithUuidAndPermissions($name, $uuid, PyStringNode $permissions)
     {
@@ -893,6 +911,9 @@ class PaellaCoreContext extends MinkContext
         }, iterator_to_array($roles));
 
         foreach (MerchantUserDefaultRoles::ROLES as $role) {
+            if ($role['name'] == MerchantUserDefaultRoles::ROLE_BILLIE_ADMIN['name']) {
+                continue;
+            }
             Assert::oneOf($role['name'], $roleNames, "Merchant {$merchant->getId()} has no role with name {$role['name']}");
         }
     }
@@ -915,12 +936,19 @@ class PaellaCoreContext extends MinkContext
         int $merchantId,
         int $roleId,
         int $merchantUserId = null,
-        string $invitationStatus = null
+        string $invitationStatus = null,
+        string $uuid = null
     ): MerchantUserInvitationEntity {
         $invitation = $this->getMerchantUserInvitationFactory()
             ->create($email, $merchantId, $roleId);
 
+        $shouldRevoke = false;
         switch ($invitationStatus) {
+            case 'revoked':
+                $invitation->setExpiresAt((new \DateTime())->modify('+1 day'));
+                $shouldRevoke = true;
+
+                break;
             case MerchantInvitedUserDTO::INVITATION_STATUS_PENDING:
                 $invitation->setExpiresAt((new \DateTime())->modify('+1 day'));
 
@@ -933,9 +961,23 @@ class PaellaCoreContext extends MinkContext
                 $invitation->setMerchantUserId($merchantUserId);
         }
 
-        $invitation->setUuid('test_uuid-' . $email);
+        $invitation->setUuid($uuid ?: 'test_uuid-' . $email);
         $this->getMerchantUserInvitationRepository()->create($invitation);
 
+        if ($shouldRevoke) {
+            $this->getMerchantUserInvitationRepository()
+                ->revokeValidByEmailAndMerchant($invitation->getEmail(), $invitation->getMerchantId());
+            $invitation->setRevokedAt(new \DateTime());
+        }
+
         return $invitation;
+    }
+
+    /**
+     * @Then /^the response status code should be "([^"]*)"$/
+     */
+    public function theResponseStatusCodeShouldBe($code)
+    {
+        $this->getMink()->assertSession()->statusCodeEquals((int) $code);
     }
 }

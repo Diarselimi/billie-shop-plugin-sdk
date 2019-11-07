@@ -2,7 +2,6 @@
 
 namespace App\Application\UseCase\CheckoutSession;
 
-use App\Application\UseCase\Response\CheckoutSessionResponse;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\CheckoutSession\CheckoutSessionFactory;

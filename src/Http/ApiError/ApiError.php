@@ -22,6 +22,8 @@ class ApiError implements ArrayableInterface, \JsonSerializable
 
     public const CODE_SERVICE_UNAVAILABLE = 'service_unavailable';
 
+    public const CODE_RESOURCE_CONFLICT = 'resource_already_exists';
+
     private $title;
 
     private $code;

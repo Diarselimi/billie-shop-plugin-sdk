@@ -2,6 +2,7 @@
 
 use App\Infrastructure\Phinx\TransactionalMigration;
 use App\Infrastructure\Repository\MerchantUserRepository;
+use App\Support\TokenGenerator;
 use Ramsey\Uuid\Uuid;
 
 class AddMerchantUserInvitationsTable extends TransactionalMigration
@@ -31,10 +32,12 @@ class AddMerchantUserInvitationsTable extends TransactionalMigration
         $now = (new DateTime())->format('Y-m-d H:i:s');
         $table = $this->table($tableName);
 
+        $tokenGenerator = new TokenGenerator();
+
         foreach ($users as $user) {
             $table->insert([
                 'uuid' => Uuid::uuid4(),
-                'token' => Uuid::uuid4(),
+                'token' => $tokenGenerator->generate(),
                 'merchant_id' => $user['merchant_id'],
                 'merchant_user_id' => $user['id'],
                 'merchant_user_role_id' => $user['role_id'],

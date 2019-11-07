@@ -5,6 +5,7 @@ namespace App\Infrastructure\Repository;
 use App\DomainModel\MerchantUser\MerchantUserDefaultRoles;
 use App\DomainModel\MerchantUserInvitation\MerchantInvitedUserDTOFactory;
 use App\DomainModel\MerchantUserInvitation\MerchantUserInvitationEntity;
+use App\DomainModel\MerchantUserInvitation\MerchantUserInvitationEntityFactory;
 use App\DomainModel\MerchantUserInvitation\MerchantUserInvitationRepositoryInterface;
 use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
@@ -27,8 +28,11 @@ class MerchantUserInvitationRepository extends AbstractPdoRepository implements 
 
     private $invitedUserFactory;
 
-    public function __construct(MerchantInvitedUserDTOFactory $invitedUserFactory)
+    private $factory;
+
+    public function __construct(MerchantUserInvitationEntityFactory $factory, MerchantInvitedUserDTOFactory $invitedUserFactory)
     {
+        $this->factory = $factory;
         $this->invitedUserFactory = $invitedUserFactory;
     }
 
@@ -54,22 +58,56 @@ class MerchantUserInvitationRepository extends AbstractPdoRepository implements 
         $invitation->setId($id);
     }
 
-    public function createIfNotExistsForUser(MerchantUserInvitationEntity $invitation): void
+    public function existsForUser(int $merchantUserId): bool
     {
-        if (!$invitation->getMerchantUserId()) {
-            throw new \LogicException("User ID is not set");
-        }
-
         $total = $this->fetchCount(
             "SELECT COUNT(id) AS total FROM " . self::TABLE_NAME . " WHERE merchant_user_id = :user_id",
-            ['user_id' => $invitation->getMerchantUserId()]
+            ['user_id' => $merchantUserId]
         );
 
-        if ($total > 0) {
-            return;
-        }
+        return $total > 0;
+    }
 
-        $this->create($invitation);
+    public function revokeValidByEmailAndMerchant(string $email, int $merchantId): void
+    {
+        $now = (new \DateTime())->format(self::DATE_FORMAT);
+        $query = 'UPDATE ' . self::TABLE_NAME .
+            " SET revoked_at = :now1 
+            WHERE revoked_at IS NULL AND email = :email AND merchant_id = :merchant_id
+            AND expires_at > :now2
+            ";
+
+        $params = ['email' => $email, 'merchant_id' => $merchantId, 'now1' => $now, 'now2' => $now];
+
+        $this->doExecute($query, $params);
+    }
+
+    public function findValidByEmailAndMerchant(string $email, int $merchantId): ?MerchantUserInvitationEntity
+    {
+        $now = (new \DateTime())->format(self::DATE_FORMAT);
+        $query = 'SELECT ' . implode(', ', self::SELECT_FIELDS) .
+            ' FROM ' . self::TABLE_NAME .
+            " WHERE email = :email AND revoked_at IS NULL AND expires_at > :now
+              AND merchant_id = :merchant_id ";
+
+        $params = ['email' => $email, 'merchant_id' => $merchantId, 'now' => $now];
+
+        $row = $this->doFetchOne($query, $params);
+
+        return $row ? $this->factory->createFromArray($row) : null;
+    }
+
+    public function findNonRevokedByUuidAndMerchant(string $uuid, int $merchantId): ?MerchantUserInvitationEntity
+    {
+        $query = 'SELECT ' . implode(', ', self::SELECT_FIELDS) .
+            ' FROM ' . self::TABLE_NAME .
+            " WHERE uuid = :uuid AND merchant_id = :merchant_id AND revoked_at IS NULL";
+
+        $params = ['uuid' => $uuid, 'merchant_id' => $merchantId];
+
+        $row = $this->doFetchOne($query, $params);
+
+        return $row ? $this->factory->createFromArray($row) : null;
     }
 
     public function searchInvitedUsers(int $merchantId, int $offset, int $limit, string $sortBy, string $sortDirection): SearchResultIterator

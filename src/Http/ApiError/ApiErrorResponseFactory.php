@@ -6,6 +6,7 @@ use App\Application\Exception\RequestValidationException;
 use App\Application\PaellaCoreCriticalException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
@@ -100,6 +101,10 @@ class ApiErrorResponseFactory
                 break;
             default:
                 $errorCode = ApiError::CODE_OPERATION_FAILED;
+
+                break;
+            case $exception instanceof ConflictHttpException:
+                $errorCode = ApiError::CODE_RESOURCE_CONFLICT;
 
                 break;
         }

@@ -22,7 +22,7 @@ class MerchantInvitedUserDTOFactory extends AbstractFactory
             ->setLastName($row['last_name'] ?: null)
             ->setEmail($row['invitation_email'])
             ->setCreatedAt(new \DateTime($row['invitation_created_at']))
-            ->setInvitationUuid($row['invitation_uuid'] ?: null)
-            ->setInvitationStatus($row['invitation_status'] ? explode(',', $row['invitation_status'])[1] : null);
+            ->setInvitationUuid($row['invitation_uuid'])
+            ->setInvitationStatus(explode(',', $row['invitation_status'])[1]);
     }
 }

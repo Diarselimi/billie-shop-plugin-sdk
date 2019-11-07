@@ -110,6 +110,11 @@ class MerchantUserInvitationEntity extends AbstractEntity implements CreatedAtAw
         return $this;
     }
 
+    public function isExpired(): bool
+    {
+        return $this->getExpiresAt() <= new \DateTime();
+    }
+
     public function getRevokedAt(): ?\DateTime
     {
         return $this->revokedAt;

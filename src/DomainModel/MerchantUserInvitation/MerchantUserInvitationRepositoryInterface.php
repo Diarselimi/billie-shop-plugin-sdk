@@ -24,5 +24,11 @@ interface MerchantUserInvitationRepositoryInterface
 
     public function create(MerchantUserInvitationEntity $invitation): void;
 
-    public function createIfNotExistsForUser(MerchantUserInvitationEntity $invitation): void;
+    public function existsForUser(int $merchantUserId): bool;
+
+    public function findValidByEmailAndMerchant(string $email, int $merchantId): ?MerchantUserInvitationEntity;
+
+    public function findNonRevokedByUuidAndMerchant(string $uuid, int $merchantId): ?MerchantUserInvitationEntity;
+
+    public function revokeValidByEmailAndMerchant(string $email, int $merchantId): void;
 }
