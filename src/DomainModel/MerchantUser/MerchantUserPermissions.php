@@ -29,7 +29,7 @@ interface MerchantUserPermissions
         // write:
         self::CONFIRM_ORDER_PAYMENT,
         self::PAUSE_DUNNING,
-        // self::MANAGE_USERS, // TODO: enable MANAGE_USERS
+        self::MANAGE_USERS,
         self::CANCEL_ORDERS,
     ];
 
@@ -43,7 +43,7 @@ interface MerchantUserPermissions
     public const ALL_WRITE_PERMISSIONS = [
         self::CONFIRM_ORDER_PAYMENT,
         self::PAUSE_DUNNING,
-       // self::MANAGE_USERS, // TODO: enable MANAGE_USERS
+        self::MANAGE_USERS,
         self::CANCEL_ORDERS,
     ];
 }
