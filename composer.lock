@@ -144,16 +144,16 @@
         },
         {
             "name": "billie/monitoring-bundle",
-            "version": "2.6.2",
+            "version": "2.6.3",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/MonitoringBundle.git",
-                "reference": "fc2389eb68d47ff912f1e37052527b36e7440211"
+                "reference": "021cbc31df2bc383b0c2366c7020163f57eba9a7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/MonitoringBundle/zipball/fc2389eb68d47ff912f1e37052527b36e7440211",
-                "reference": "fc2389eb68d47ff912f1e37052527b36e7440211",
+                "url": "https://api.github.com/repos/ozean12/MonitoringBundle/zipball/021cbc31df2bc383b0c2366c7020163f57eba9a7",
+                "reference": "021cbc31df2bc383b0c2366c7020163f57eba9a7",
                 "shasum": ""
             },
             "require": {
@@ -181,9 +181,9 @@
                 }
             ],
             "support": {
-                "source": "https://github.com/ozean12/MonitoringBundle/tree/2.6.2"
+                "source": "https://github.com/ozean12/MonitoringBundle/tree/2.6.3"
             },
-            "time": "2019-11-11T13:47:58+00:00"
+            "time": "2019-11-12T11:25:17+00:00"
         },
         {
             "name": "billie/pdo-bundle",
