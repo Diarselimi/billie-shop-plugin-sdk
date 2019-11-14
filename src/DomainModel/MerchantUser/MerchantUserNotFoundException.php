@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\UseCase\GetMerchantUser;
+namespace App\DomainModel\MerchantUser;
 
 class MerchantUserNotFoundException extends \RuntimeException
 {

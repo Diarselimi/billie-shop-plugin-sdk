@@ -58,16 +58,6 @@ class MerchantUserInvitationRepository extends AbstractPdoRepository implements 
         $invitation->setId($id);
     }
 
-    public function existsForUser(int $merchantUserId): bool
-    {
-        $total = $this->fetchCount(
-            "SELECT COUNT(id) AS total FROM " . self::TABLE_NAME . " WHERE merchant_user_id = :user_id",
-            ['user_id' => $merchantUserId]
-        );
-
-        return $total > 0;
-    }
-
     public function revokeValidByEmailAndMerchant(string $email, int $merchantId): void
     {
         $now = (new \DateTime())->format(self::DATE_FORMAT);
@@ -80,6 +70,22 @@ class MerchantUserInvitationRepository extends AbstractPdoRepository implements 
         $params = ['email' => $email, 'merchant_id' => $merchantId, 'now1' => $now, 'now2' => $now];
 
         $this->doExecute($query, $params);
+    }
+
+    public function registerToMerchantUser(MerchantUserInvitationEntity $invitation): void
+    {
+        $now = (new \DateTime())->format(self::DATE_FORMAT);
+        $query = '
+            UPDATE ' . self::TABLE_NAME . ' 
+            SET
+                merchant_user_id = :merchant_user_id,
+                expires_at = :now
+            WHERE id = :id';
+
+        $this->doExecute(
+            $query,
+            ['id' => $invitation->getId(), 'merchant_user_id' => $invitation->getMerchantUserId(), 'now' => $now]
+        );
     }
 
     public function findValidByEmailAndMerchant(string $email, int $merchantId): ?MerchantUserInvitationEntity
@@ -197,5 +203,17 @@ class MerchantUserInvitationRepository extends AbstractPdoRepository implements 
         }
 
         return (int) $totalCount[$countColumn];
+    }
+
+    public function findValidByToken(string $token): ?MerchantUserInvitationEntity
+    {
+        $now = (new \DateTime())->format(self::DATE_FORMAT);
+        $query = 'SELECT ' . implode(', ', self::SELECT_FIELDS) .
+            ' FROM ' . self::TABLE_NAME .
+            ' WHERE token = :token AND revoked_at IS NULL AND expires_at > :now';
+        $params = ['token' => $token, 'now' => $now];
+        $row = $this->doFetchOne($query, $params);
+
+        return $row ? $this->factory->createFromArray($row) : null;
     }
 }

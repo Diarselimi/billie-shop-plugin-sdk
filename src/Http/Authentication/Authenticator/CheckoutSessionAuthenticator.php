@@ -4,7 +4,7 @@ namespace App\Http\Authentication\Authenticator;
 
 use App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
-use App\Http\Authentication\User;
+use App\Http\Authentication\CheckoutUser;
 use App\Http\HttpConstantsInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -14,14 +14,12 @@ class CheckoutSessionAuthenticator extends AbstractAuthenticator
 {
     private $checkoutSessionRepository;
 
-    private $merchantRepository;
-
     public function __construct(
         CheckoutSessionRepositoryInterface $checkoutSessionRepository,
         MerchantRepositoryInterface $merchantRepository
     ) {
         $this->checkoutSessionRepository = $checkoutSessionRepository;
-        $this->merchantRepository = $merchantRepository;
+        parent::__construct($merchantRepository);
     }
 
     public function supports(Request $request)
@@ -42,14 +40,8 @@ class CheckoutSessionAuthenticator extends AbstractAuthenticator
             throw new AuthenticationException();
         }
 
-        $merchant = $this->merchantRepository->getOneById($checkoutSession->getMerchantId());
+        $merchant = $this->getActiveMerchantOrFail($checkoutSession->getMerchantId());
 
-        return new User(
-            $merchant->getId(),
-            $merchant->getName(),
-            $merchant->getApiKey(),
-            [self::CHECKOUT_USER_AUTH_ROLE],
-            $checkoutSession
-        );
+        return new CheckoutUser($merchant, $checkoutSession);
     }
 }

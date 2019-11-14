@@ -1105,6 +1105,37 @@ paths:
       x-groups:
         - public
         - private
+  '/merchant/users/invitations/{token}/details':
+    get:
+      tags:
+        - 'Dashboard Users'
+      summary: 'Get Invited User'
+      operationId: get_invited_user_details
+      parameters:
+        -
+          name: token
+          in: path
+          description: 'Invitation Token'
+          required: true
+          schema:
+            type: string
+            maxLength: 36
+            example: 689e71e69zk8484k0k0cckkgs08cogk4w0ko
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetInvitedMerchantUserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      x-groups:
+        - private
   /legal-forms:
     get:
       tags:
@@ -1368,7 +1399,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetMerchantUserResponse'
+                $ref: '#/components/schemas/MerchantUserDTO'
         '404':
           $ref: '#/components/responses/NotFound'
         '401':
@@ -1746,6 +1777,43 @@ paths:
       x-groups:
         - public
         - private
+  '/merchant/users/invitations/{token}/signup':
+    post:
+      tags:
+        - 'Dashboard Users'
+      summary: 'Register Invited User'
+      operationId: register_invited_user
+      parameters:
+        -
+          name: token
+          in: path
+          description: 'Invitation Token'
+          required: true
+          schema:
+            type: string
+            maxLength: 36
+            example: 689e71e69zk8484k0k0cckkgs08cogk4w0ko
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterInvitedMerchantUserRequest'
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantUserLoginResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      x-groups:
+        - private
   '/merchant/users/invitations/{uuid}/resend':
     post:
       tags:
@@ -2078,13 +2146,9 @@ components:
     CreateMerchantUserInvitationResponse:
       required:
         - invitation_uuid
-        - invitation_token
       properties:
         invitation_uuid:
           $ref: '#/components/schemas/UUID'
-        invitation_token:
-          description: 'Token to be used in the invitation link'
-          type: string
       type: object
       x-groups:
         - private
@@ -2351,6 +2415,13 @@ components:
                 $ref: '#/components/schemas/GetDebtorCompanyLimitsMerchant'
             type: object
       type: object
+    GetInvitedMerchantUserResponse:
+      properties:
+        email:
+          type: string
+          format: email
+          nullable: false
+      type: object
     GetMerchantRolesResponse:
       title: GetMerchantRolesResponse
       type: array
@@ -2363,70 +2434,6 @@ components:
         type: object
       x-groups:
         - dashboard
-    GetMerchantUserResponse:
-      title: 'Merchant User'
-      properties:
-        uuid:
-          nullable: false
-          $ref: '#/components/schemas/UUID'
-        first_name:
-          type: string
-          nullable: false
-        last_name:
-          type: string
-          nullable: false
-        email:
-          type: string
-          format: email
-          nullable: false
-        permissions:
-          type: array
-          items:
-            $ref: '#/components/schemas/MerchantUserPermissions'
-          nullable: false
-        role:
-          properties:
-            uuid:
-              $ref: '#/components/schemas/UUID'
-            name:
-              description: 'Role internal name'
-              example: Support
-              $ref: '#/components/schemas/TinyText'
-          type: object
-        merchant_company:
-          description: 'Merchant the user is logged in to'
-          properties:
-            name:
-              example: 'Billie GmbH'
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            address_house_number:
-              example: '4'
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            address_street:
-              example: Charlottenstr.
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            address_city:
-              example: Berlin
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            address_postal_code:
-              type: string
-              maxLength: 5
-              example: '10969'
-              nullable: true
-            address_country:
-              type: string
-              maxLength: 2
-              nullable: true
-          type: object
-        tracking_id:
-          description: 'ID used for tracking the user for support.'
-          type: integer
-          nullable: false
-      type: object
     GetMerchantUsersResponse:
       title: 'Merchant Users List'
       properties:
@@ -2482,6 +2489,9 @@ components:
       type: object
     MerchantUserLoginRequest:
       title: 'Merchant User Login'
+      required:
+        - email
+        - password
       properties:
         email:
           type: string
@@ -2502,7 +2512,7 @@ components:
           nullable: false
         user:
           nullable: false
-          $ref: '#/components/schemas/GetMerchantUserResponse'
+          $ref: '#/components/schemas/MerchantUserDTO'
       type: object
     PauseOrderDunningRequest:
       title: 'Pause Order Dunning'
@@ -2512,8 +2522,30 @@ components:
           minimum: 1
           nullable: false
       type: object
+    RegisterInvitedMerchantUserRequest:
+      required:
+        - first_name
+        - last_name
+        - password
+      properties:
+        first_name:
+          $ref: '#/components/schemas/TinyText'
+        last_name:
+          $ref: '#/components/schemas/TinyText'
+        password:
+          minLength: 6
+          $ref: '#/components/schemas/TinyText'
+      type: object
+      x-groups:
+        - private
     RegisterMerchantUserRequest:
       title: 'Register Merchant User'
+      required:
+        - first_name
+        - last_name
+        - email
+        - password
+        - role_uuid
       properties:
         first_name:
           type: string
@@ -2738,6 +2770,70 @@ components:
         is_updated:
           type: boolean
           example: 'true'
+      type: object
+    MerchantUserDTO:
+      title: 'Merchant User'
+      properties:
+        uuid:
+          nullable: false
+          $ref: '#/components/schemas/UUID'
+        first_name:
+          type: string
+          nullable: false
+        last_name:
+          type: string
+          nullable: false
+        email:
+          type: string
+          format: email
+          nullable: false
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/MerchantUserPermissions'
+          nullable: false
+        role:
+          properties:
+            uuid:
+              $ref: '#/components/schemas/UUID'
+            name:
+              description: 'Role internal name'
+              example: Support
+              $ref: '#/components/schemas/TinyText'
+          type: object
+        merchant_company:
+          description: 'Merchant the user is logged in to'
+          properties:
+            name:
+              example: 'Billie GmbH'
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_house_number:
+              example: '4'
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_street:
+              example: Charlottenstr.
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_city:
+              example: Berlin
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_postal_code:
+              type: string
+              maxLength: 5
+              example: '10969'
+              nullable: true
+            address_country:
+              type: string
+              maxLength: 2
+              nullable: true
+          type: object
+        tracking_id:
+          description: 'ID used for tracking the user for support.'
+          type: integer
+          nullable: false
       type: object
     CheckoutSessionAuthorizeResponse:
       title: 'Authorize Checkout Order Response'

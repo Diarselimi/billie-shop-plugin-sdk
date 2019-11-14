@@ -1,16 +1,13 @@
 <?php
 
-namespace App\Application\UseCase\GetMerchantUser;
+namespace App\DomainModel\MerchantUser;
 
-use App\Application\UseCase\CreateMerchant\Exception\MerchantCompanyNotFoundException;
-use App\Application\UseCase\MerchantUserLogin\MerchantUserLoginException;
 use App\DomainModel\Address\AddressEntityFactory;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
+use App\DomainModel\Merchant\MerchantCompanyNotFoundException;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
-use App\DomainModel\MerchantUser\MerchantUserPermissionsService;
-use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
 
-abstract class AbstractGetMerchantUserUseCase
+class MerchantUserService
 {
     protected $merchantUserRepository;
 
@@ -36,12 +33,12 @@ abstract class AbstractGetMerchantUserUseCase
         $this->merchantUserPermissionsService = $merchantUserPermissionsService;
     }
 
-    protected function getUser(GetMerchantUserRequest $request, string $userEmail): GetMerchantUserResponse
+    public function getUser(string $uuid, string $email): MerchantUserDTO
     {
-        $merchantUser = $this->merchantUserRepository->getOneByUuid($request->getUuid());
+        $merchantUser = $this->merchantUserRepository->getOneByUuid($uuid);
 
         if (!$merchantUser) {
-            throw new MerchantUserLoginException("Merchant user not found");
+            throw new MerchantUserNotFoundException("Merchant user not found");
         }
 
         $merchant = $this->merchantRepository->getOneById($merchantUser->getMerchantId());
@@ -53,7 +50,7 @@ abstract class AbstractGetMerchantUserUseCase
 
         $role = $this->merchantUserPermissionsService->resolveUserRole($merchantUser);
 
-        return (new GetMerchantUserResponse($merchantUser, $userEmail, $role))
+        return (new MerchantUserDTO($merchantUser, $email, $role))
             ->setMerchantCompanyName($company->getName())
             ->setMerchantCompanyAddress($this->addressEntityFactory->createFromDebtorCompany($company));
     }

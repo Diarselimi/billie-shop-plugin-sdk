@@ -5,12 +5,11 @@ namespace App\Http\Controller\PublicApi;
 use App\Application\UseCase\CheckoutSessionCreateOrder\CheckoutSessionCreateOrderUseCase;
 use App\DomainModel\OrderResponse\CheckoutSessionAuthorizeResponse;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
-use App\Http\Authentication\User;
+use App\Http\Authentication\UserProvider;
 use App\Http\RequestHandler\CreateOrderRequestFactory;
 use OpenApi\Annotations as OA;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Security;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @IsGranted("ROLE_AUTHENTICATED_AS_CHECKOUT_USER")
@@ -41,7 +40,7 @@ class AuthorizeCheckoutSessionController
 {
     private $useCase;
 
-    private $security;
+    private $userProvider;
 
     private $orderRequestFactory;
 
@@ -49,22 +48,20 @@ class AuthorizeCheckoutSessionController
 
     public function __construct(
         CheckoutSessionCreateOrderUseCase $useCase,
-        Security $security,
+        UserProvider $userProvider,
         CreateOrderRequestFactory $orderRequestFactory,
         OrderResponseFactory $responseFactory
     ) {
         $this->useCase = $useCase;
-        $this->security = $security;
+        $this->userProvider = $userProvider;
         $this->orderRequestFactory = $orderRequestFactory;
         $this->responseFactory = $responseFactory;
     }
 
     public function execute(Request $request): CheckoutSessionAuthorizeResponse
     {
-        /** @var User $user */
-        $user = $this->security->getUser();
-
-        $useCaseRequest = $this->orderRequestFactory->createForAuthorizeCheckoutSession($request, $user->getCheckoutSession());
+        $checkoutSession = $this->userProvider->getCheckoutUser()->getCheckoutSession();
+        $useCaseRequest = $this->orderRequestFactory->createForAuthorizeCheckoutSession($request, $checkoutSession);
         $orderContainer = $this->useCase->execute($useCaseRequest);
 
         return $this->responseFactory->createAuthorizeResponse($orderContainer);

@@ -4,9 +4,9 @@ namespace App\Application\UseCase\CreateMerchant;
 
 use App\Application\UseCase\CreateMerchant\Exception\CreateMerchantException;
 use App\Application\UseCase\CreateMerchant\Exception\DuplicateMerchantCompanyException;
-use App\Application\UseCase\CreateMerchant\Exception\MerchantCompanyNotFoundException;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
+use App\DomainModel\Merchant\MerchantCompanyNotFoundException;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantEntityFactory;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;

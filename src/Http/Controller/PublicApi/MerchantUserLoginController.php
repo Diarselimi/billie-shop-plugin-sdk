@@ -2,12 +2,12 @@
 
 namespace App\Http\Controller\PublicApi;
 
-use App\Application\UseCase\MerchantUserLogin\MerchantUserLoginException;
 use App\Application\UseCase\MerchantUserLogin\MerchantUserLoginRequest;
 use App\Application\UseCase\MerchantUserLogin\MerchantUserLoginUseCase;
+use App\DomainModel\MerchantUser\MerchantUserLoginException;
+use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use OpenApi\Annotations as OA;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 /**

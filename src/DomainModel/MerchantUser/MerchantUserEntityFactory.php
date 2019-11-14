@@ -22,19 +22,22 @@ class MerchantUserEntityFactory
             ->setLastName($row['last_name'])
             ->setPermissions($this->roleEntityFactory->decodePermissions($row))
             ->setCreatedAt(new \DateTime($row['created_at']))
-            ->setUpdatedAt(new \DateTime($row['updated_at']))
-        ;
+            ->setUpdatedAt(new \DateTime($row['updated_at']));
     }
 
-    public function create(int $merchantId, int $roleId, string $uuid, string $firstName, string $lastName, array $permissions): MerchantUserEntity
+    public function create(int $merchantId, int $roleId, string $firstName, string $lastName, array $permissions = [], ?string $uuid = null): MerchantUserEntity
     {
-        return (new MerchantUserEntity())
+        $user = (new MerchantUserEntity())
             ->setFirstName($firstName)
             ->setLastName($lastName)
-            ->setUuid($uuid)
             ->setMerchantId($merchantId)
             ->setRoleId($roleId)
-            ->setPermissions($permissions)
-        ;
+            ->setPermissions($permissions);
+
+        if ($uuid !== null) {
+            $user->setUuid($uuid);
+        }
+
+        return $user;
     }
 }

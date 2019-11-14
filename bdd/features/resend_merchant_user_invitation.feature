@@ -50,7 +50,6 @@ Feature: APIS-1443 - Resend user invitation
     When I send a POST request to "/merchant/users/invitations/4b4e2b8b-859a-45be-bfe0-ae88b58c333b/resend"
     Then the response status code should be 200
     And the JSON response should have "invitation_uuid"
-    And the JSON response should have "invitation_token"
 
   Scenario: Resend invitation fails if it does not exist
     Given a merchant user exists with permission MANAGE_USERS

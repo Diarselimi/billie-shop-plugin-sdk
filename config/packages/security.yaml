@@ -42,6 +42,15 @@ security:
                 authenticators:
                     - App\Http\Authentication\Authenticator\CheckoutSessionAuthenticator
 
+        invited_user:
+            pattern: ^/(public/)?merchant/users/invitations/([a-z0-9])+/(signup|details)$
+            methods: [GET, POST, OPTIONS]
+            anonymous: false
+            stateless: true
+            guard:
+                authenticators:
+                    - App\Http\Authentication\Authenticator\InvitedUserTokenAuthenticator
+
         default_security:
             anonymous: false
             stateless: true

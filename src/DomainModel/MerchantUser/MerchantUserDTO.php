@@ -1,15 +1,13 @@
 <?php
 
-namespace App\Application\UseCase\GetMerchantUser;
+namespace App\DomainModel\MerchantUser;
 
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\ArrayableInterface;
-use App\DomainModel\MerchantUser\MerchantUserEntity;
-use App\DomainModel\MerchantUser\MerchantUserRoleEntity;
 use OpenApi\Annotations as OA;
 
 /**
- * @OA\Schema(schema="GetMerchantUserResponse", title="Merchant User", type="object", properties={
+ * @OA\Schema(schema="MerchantUserDTO", title="Merchant User", type="object", properties={
  *      @OA\Property(property="uuid", nullable=false, ref="#/components/schemas/UUID"),
  *      @OA\Property(property="first_name", type="string", nullable=false),
  *      @OA\Property(property="last_name", type="string", nullable=false),
@@ -35,7 +33,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="tracking_id", nullable=false, type="integer", description="ID used for tracking the user for support.")
  * })
  */
-class GetMerchantUserResponse implements ArrayableInterface
+class MerchantUserDTO implements ArrayableInterface
 {
     private $user;
 
@@ -74,7 +72,7 @@ class GetMerchantUserResponse implements ArrayableInterface
         return $this->merchantCompanyName;
     }
 
-    public function setMerchantCompanyName(string $merchantCompanyName): GetMerchantUserResponse
+    public function setMerchantCompanyName(string $merchantCompanyName): MerchantUserDTO
     {
         $this->merchantCompanyName = $merchantCompanyName;
 
@@ -86,7 +84,7 @@ class GetMerchantUserResponse implements ArrayableInterface
         return $this->merchantCompanyAddress;
     }
 
-    public function setMerchantCompanyAddress(AddressEntity $merchantCompanyAddress): GetMerchantUserResponse
+    public function setMerchantCompanyAddress(AddressEntity $merchantCompanyAddress): MerchantUserDTO
     {
         $this->merchantCompanyAddress = $merchantCompanyAddress;
 

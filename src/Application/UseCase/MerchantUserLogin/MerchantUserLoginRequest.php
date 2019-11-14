@@ -10,7 +10,7 @@ use OpenApi\Annotations as OA;
  * @OA\Schema(schema="MerchantUserLoginRequest", title="Merchant User Login", type="object", properties={
  *     @OA\Property(property="email", format="email", type="string", nullable=false),
  *     @OA\Property(property="password", format="password", type="string", nullable=false)
- * })
+ * }, required={"email", "password"})
  */
 class MerchantUserLoginRequest implements ValidatedRequestInterface
 {
@@ -26,7 +26,7 @@ class MerchantUserLoginRequest implements ValidatedRequestInterface
      */
     private $password;
 
-    public function __construct(?string $email, ?string $password)
+    public function __construct($email, $password)
     {
         $this->email = $email;
         $this->password = $password;

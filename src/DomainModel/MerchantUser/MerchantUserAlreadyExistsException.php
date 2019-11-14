@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\UseCase\RegisterMerchantUser;
+namespace App\DomainModel\MerchantUser;
 
 class MerchantUserAlreadyExistsException extends \RuntimeException
 {

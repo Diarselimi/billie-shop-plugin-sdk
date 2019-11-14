@@ -6,7 +6,8 @@ use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
 use App\DomainModel\MerchantUser\MerchantUserPermissionsService;
 use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
-use App\Http\Authentication\User;
+use App\Http\Authentication\MerchantApiUser;
+use App\Http\Authentication\MerchantUser;
 use App\Http\HttpConstantsInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -16,8 +17,6 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 class OAuthTokenAuthenticator extends AbstractAuthenticator
 {
     private $authenticationService;
-
-    private $merchantRepository;
 
     private $merchantUserRepository;
 
@@ -30,9 +29,10 @@ class OAuthTokenAuthenticator extends AbstractAuthenticator
         MerchantUserPermissionsService $merchantUserPermissionsService
     ) {
         $this->authenticationService = $authenticationService;
-        $this->merchantRepository = $merchantRepository;
         $this->merchantUserRepository = $merchantUserRepository;
         $this->merchantUserPermissionsService = $merchantUserPermissionsService;
+
+        parent::__construct($merchantRepository);
     }
 
     public function supports(Request $request)
@@ -58,7 +58,7 @@ class OAuthTokenAuthenticator extends AbstractAuthenticator
         }
 
         if ($tokenMetadata->getUserId()) {
-            return $this->authenticateAsMerchantUser($tokenMetadata->getUserId(), $credentials, $tokenMetadata->getEmail());
+            return $this->authenticateAsMerchantUser($tokenMetadata->getUserId(), $tokenMetadata->getEmail());
         }
 
         if ($tokenMetadata->getClientId()) {
@@ -70,42 +70,22 @@ class OAuthTokenAuthenticator extends AbstractAuthenticator
 
     private function authenticateAsMerchantClient(string $oauthClientId): UserInterface
     {
-        $merchant = $this->merchantRepository->getOneByOauthClientId($oauthClientId);
+        $merchant = $this->getActiveMerchantOrFail(null, null, $oauthClientId);
 
-        if (!$merchant) {
-            throw new AuthenticationException();
-        }
-
-        return new User(
-            $merchant->getId(),
-            $merchant->getName(),
-            $merchant->getOauthClientId(),
-            [self::MERCHANT_AUTH_ROLE],
-            null,
-            null
-        );
+        return new MerchantApiUser($merchant);
     }
 
-    private function authenticateAsMerchantUser(string $oauthUserId, string $credentials, ?string $email): UserInterface
+    private function authenticateAsMerchantUser(string $oauthUserId, ?string $email): UserInterface
     {
-        $merchantUser = $this->merchantUserRepository->getOneByUuid($oauthUserId);
+        $userEntity = $this->merchantUserRepository->getOneByUuid($oauthUserId);
 
-        if (!$merchantUser) {
+        if (!$userEntity) {
             throw new AuthenticationException();
         }
 
-        $symfonyRoles = $this->convertMerchantUserPermissionsToSecurityRoles(
-            $this->merchantUserPermissionsService->resolveUserRole($merchantUser)->getPermissions()
-        );
-        $symfonyRoles[] = self::MERCHANT_USER_AUTH_ROLE;
+        $merchant = $this->getActiveMerchantOrFail($userEntity->getMerchantId());
+        $permissions = $this->merchantUserPermissionsService->resolveUserRole($userEntity)->getPermissions();
 
-        return new User(
-            $merchantUser->getMerchantId(),
-            $merchantUser->getUuid(),
-            $credentials,
-            $symfonyRoles,
-            null,
-            $email
-        );
+        return new MerchantUser($merchant, $email, $userEntity, $permissions);
     }
 }

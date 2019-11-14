@@ -20,7 +20,7 @@ use OpenApi\Annotations as OA;
  *          default=null,
  *          @OA\Items(ref="#/components/schemas/MerchantUserPermissions")
  *      )
- * })
+ * }, required={"first_name", "last_name", "email", "password", "role_uuid"})
  */
 class RegisterMerchantUserRequest implements ValidatedRequestInterface
 {
@@ -48,6 +48,7 @@ class RegisterMerchantUserRequest implements ValidatedRequestInterface
 
     /**
      * @Assert\NotBlank()
+     * @Assert\Length(min=6)
      * @Assert\Type(type="string")
      */
     private $userPassword;

@@ -6,14 +6,10 @@ use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Merchant\MerchantNotFoundException;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
-use App\DomainModel\MerchantUser\AuthenticationServiceConflictRequestException;
-use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
 use App\DomainModel\MerchantUser\MerchantUserEntityFactory;
-use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
+use App\DomainModel\MerchantUser\MerchantUserRegistrationService;
 use App\DomainModel\MerchantUser\MerchantUserRoleRepositoryInterface;
 use App\DomainModel\MerchantUser\RoleNotFoundException;
-use App\DomainModel\MerchantUserInvitation\MerchantUserInvitationEntityFactory;
-use App\DomainModel\MerchantUserInvitation\MerchantUserInvitationRepositoryInterface;
 
 class RegisterMerchantUserUseCase implements ValidatedUseCaseInterface
 {
@@ -21,34 +17,22 @@ class RegisterMerchantUserUseCase implements ValidatedUseCaseInterface
 
     private $merchantRepository;
 
-    private $merchantUserRepository;
-
     private $merchantUserEntityFactory;
-
-    private $authenticationService;
 
     private $merchantUserRoleRepository;
 
-    private $invitationRepository;
-
-    private $invitationEntityFactory;
+    private $registrationService;
 
     public function __construct(
         MerchantRepositoryInterface $merchantRepository,
-        MerchantUserRepositoryInterface $merchantUserRepository,
         MerchantUserEntityFactory $merchantUserEntityFactory,
-        AuthenticationServiceInterface $authenticationService,
         MerchantUserRoleRepositoryInterface $merchantUserRoleRepository,
-        MerchantUserInvitationRepositoryInterface $invitationRepository,
-        MerchantUserInvitationEntityFactory $invitationEntityFactory
+        MerchantUserRegistrationService $registrationService
     ) {
         $this->merchantRepository = $merchantRepository;
-        $this->merchantUserRepository = $merchantUserRepository;
         $this->merchantUserEntityFactory = $merchantUserEntityFactory;
-        $this->authenticationService = $authenticationService;
         $this->merchantUserRoleRepository = $merchantUserRoleRepository;
-        $this->invitationRepository = $invitationRepository;
-        $this->invitationEntityFactory = $invitationEntityFactory;
+        $this->registrationService = $registrationService;
     }
 
     public function execute(RegisterMerchantUserRequest $request): void
@@ -67,32 +51,18 @@ class RegisterMerchantUserUseCase implements ValidatedUseCaseInterface
             throw new RoleNotFoundException();
         }
 
-        try {
-            $oauthUser = $this->authenticationService->createUser($request->getUserEmail(), $request->getUserPassword());
-        } catch (AuthenticationServiceConflictRequestException $exception) {
-            throw new MerchantUserAlreadyExistsException();
-        }
-
         $merchantUser = $this->merchantUserEntityFactory->create(
             $request->getMerchantId(),
             $role->getId(),
-            $oauthUser->getUserId(),
             $request->getFirstName(),
             $request->getLastName(),
             $request->getPermissions() ?: []
         );
 
-        $this->merchantUserRepository->create($merchantUser);
-
-        $invitation = $this->invitationEntityFactory->create(
+        $this->registrationService->registerUser(
+            $merchantUser,
             $request->getUserEmail(),
-            $request->getMerchantId(),
-            $role->getId(),
-            $merchantUser->getId()
-        )->setExpiresAt(new \DateTime());
-
-        if (!$this->invitationRepository->existsForUser($merchantUser->getId())) {
-            $this->invitationRepository->create($invitation);
-        }
+            $request->getUserPassword()
+        );
     }
 }

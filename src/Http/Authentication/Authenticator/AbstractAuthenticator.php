@@ -2,8 +2,11 @@
 
 namespace App\Http\Authentication\Authenticator;
 
+use App\DomainModel\Merchant\MerchantEntity;
+use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\Http\ApiError\ApiError;
 use App\Http\ApiError\ApiErrorResponse;
+use App\Http\Authentication\AbstractUser;
 use App\Http\HttpConstantsInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -13,11 +16,12 @@ use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 
 abstract class AbstractAuthenticator extends AbstractGuardAuthenticator
 {
-    public const MERCHANT_AUTH_ROLE = 'ROLE_AUTHENTICATED_AS_MERCHANT';
+    private $merchantRepository;
 
-    public const MERCHANT_USER_AUTH_ROLE = 'ROLE_AUTHENTICATED_AS_MERCHANT_USER';
-
-    public const CHECKOUT_USER_AUTH_ROLE = 'ROLE_AUTHENTICATED_AS_CHECKOUT_USER';
+    public function __construct(MerchantRepositoryInterface $merchantRepository)
+    {
+        $this->merchantRepository = $merchantRepository;
+    }
 
     public function start(Request $request, AuthenticationException $authException = null)
     {
@@ -37,7 +41,10 @@ abstract class AbstractAuthenticator extends AbstractGuardAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
-        $request->attributes->set(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID, $token->getUser()->getMerchantId());
+        /** @var AbstractUser $user */
+        $user = $token->getUser();
+
+        $request->attributes->set(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID, $user->getMerchant()->getId());
 
         return null;
     }
@@ -57,10 +64,22 @@ abstract class AbstractAuthenticator extends AbstractGuardAuthenticator
         return $request->attributes->has(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID);
     }
 
-    protected function convertMerchantUserPermissionsToSecurityRoles(array $permissions): array
-    {
-        return array_map(function ($name) {
-            return 'ROLE_' . $name;
-        }, $permissions);
+    protected function getActiveMerchantOrFail(
+        ?int $merchantId = null,
+        ?string $apiKey = null,
+        ?string $oauthClientId = null
+    ): MerchantEntity {
+        $merchant = $merchantId !== null ? $this->merchantRepository->getOneById($merchantId) :
+            (
+                $apiKey !== null ?
+                $this->merchantRepository->getOneByApiKey($apiKey) :
+                $this->merchantRepository->getOneByOauthClientId($oauthClientId)
+            );
+
+        if (!$merchant || !$merchant->isActive()) {
+            throw new AuthenticationException();
+        }
+
+        return $merchant;
     }
 }

@@ -6,7 +6,7 @@ use App\Application\UseCase\CreateMerchant\CreateMerchantRequest;
 use App\Application\UseCase\CreateMerchant\CreateMerchantUseCase;
 use App\Application\UseCase\CreateMerchant\Exception\CreateMerchantException;
 use App\Application\UseCase\CreateMerchant\Exception\DuplicateMerchantCompanyException;
-use App\Application\UseCase\CreateMerchant\Exception\MerchantCompanyNotFoundException;
+use App\DomainModel\Merchant\MerchantCompanyNotFoundException;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;

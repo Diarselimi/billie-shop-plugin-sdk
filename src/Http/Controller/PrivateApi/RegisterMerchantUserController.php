@@ -2,15 +2,15 @@
 
 namespace App\Http\Controller\PrivateApi;
 
-use App\Application\UseCase\RegisterMerchantUser\MerchantUserAlreadyExistsException;
 use App\Application\UseCase\RegisterMerchantUser\RegisterMerchantUserRequest;
 use App\Application\UseCase\RegisterMerchantUser\RegisterMerchantUserUseCase;
 use App\DomainModel\Merchant\MerchantNotFoundException;
+use App\DomainModel\MerchantUser\MerchantUserAlreadyExistsException;
 use App\DomainModel\MerchantUser\RoleNotFoundException;
+use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use OpenApi\Annotations as OA;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 

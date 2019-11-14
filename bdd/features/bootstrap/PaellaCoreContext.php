@@ -656,7 +656,7 @@ class PaellaCoreContext extends MinkContext
     /**
      * @Given an invitation exists for email :email, role ID :role and :invitationStatus invitation
      */
-    public function iAnInvitationExistsWithData($email, $roleId, $invitationStatus)
+    public function anInvitationExistsWithData($email, $roleId, $invitationStatus)
     {
         $this->createInvitation($email, 1, $roleId, null, $invitationStatus);
     }
@@ -664,7 +664,7 @@ class PaellaCoreContext extends MinkContext
     /**
      * @Given an invitation with uuid :uuid and status :status exists for email :email and role ID :role
      */
-    public function iAnInvitationExistWithUuidStatusAndData($uuid, $invitationStatus, $email, $roleId)
+    public function anInvitationExistWithUuidStatusAndData($uuid, $invitationStatus, $email, $roleId)
     {
         $this->createInvitation($email, 1, $roleId, null, $invitationStatus, $uuid);
     }
@@ -672,9 +672,17 @@ class PaellaCoreContext extends MinkContext
     /**
      * @Given a complete invitation with uuid :uuid exists for user :userId, email :email and role ID :role
      */
-    public function iACompleteInvitationExistWithUuidAndData($uuid, $userId, $email, $roleId)
+    public function aCompleteInvitationExistWithUuidAndData($uuid, $userId, $email, $roleId)
     {
         $this->createInvitation($email, 1, $roleId, $userId, 'complete', $uuid);
+    }
+
+    /**
+     * @Given an invitation with token :token and status :status exists for email :email and role ID :role
+     */
+    public function anInvitationExistWithTokenStatusAndData($token, $invitationStatus, $email, $roleId)
+    {
+        $this->createInvitation($email, 1, $roleId, null, $invitationStatus, null, $token);
     }
 
     private function createUser(
@@ -937,7 +945,8 @@ class PaellaCoreContext extends MinkContext
         int $roleId,
         int $merchantUserId = null,
         string $invitationStatus = null,
-        string $uuid = null
+        ?string $uuid = null,
+        ?string $token = null
     ): MerchantUserInvitationEntity {
         $invitation = $this->getMerchantUserInvitationFactory()
             ->create($email, $merchantId, $roleId);
@@ -945,23 +954,31 @@ class PaellaCoreContext extends MinkContext
         $shouldRevoke = false;
         switch ($invitationStatus) {
             case 'revoked':
-                $invitation->setExpiresAt((new \DateTime())->modify('+1 day'));
+                $invitation->setExpiresAt(new \DateTime('+1 day'));
                 $shouldRevoke = true;
 
                 break;
             case MerchantInvitedUserDTO::INVITATION_STATUS_PENDING:
-                $invitation->setExpiresAt((new \DateTime())->modify('+1 day'));
+                $invitation->setExpiresAt(new \DateTime('+1 day'));
 
                 break;
             case MerchantInvitedUserDTO::INVITATION_STATUS_EXPIRED:
-                $invitation->setExpiresAt((new \DateTime())->modify('-1 day'));
+                $invitation->setExpiresAt(new \DateTime('-1 day'));
 
                 break;
             default:
-                $invitation->setMerchantUserId($merchantUserId);
+                $invitation
+                    ->setExpiresAt(new \DateTime('-1 second'))
+                    ->setMerchantUserId($merchantUserId)
+                ;
         }
 
         $invitation->setUuid($uuid ?: 'test_uuid-' . $email);
+
+        if ($token !== null) {
+            $invitation->setToken($token);
+        }
+
         $this->getMerchantUserInvitationRepository()->create($invitation);
 
         if ($shouldRevoke) {

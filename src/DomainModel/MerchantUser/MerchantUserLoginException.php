@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\UseCase\MerchantUserLogin;
+namespace App\DomainModel\MerchantUser;
 
 class MerchantUserLoginException extends \RuntimeException
 {

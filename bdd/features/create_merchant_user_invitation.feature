@@ -75,7 +75,6 @@ Feature: APIS-1443 - Invite user by email and role
     """
     Then the response status code should be 200
     And the JSON response should have "invitation_uuid"
-    And the JSON response should have "invitation_token"
 
   Scenario: Create invitation succeeds if already exists for same email but is not valid anymore
     Given a merchant user exists with permission MANAGE_USERS
@@ -92,7 +91,6 @@ Feature: APIS-1443 - Invite user by email and role
     """
     Then the response status code should be 200
     And the JSON response should have "invitation_uuid"
-    And the JSON response should have "invitation_token"
 
 
   Scenario: Create invitation fails if already exists for same email and is still valid

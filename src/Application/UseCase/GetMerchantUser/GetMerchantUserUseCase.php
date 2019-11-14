@@ -2,41 +2,27 @@
 
 namespace App\Application\UseCase\GetMerchantUser;
 
-use App\DomainModel\Address\AddressEntityFactory;
-use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
-use App\DomainModel\MerchantUser\MerchantUserPermissionsService;
-use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
-use App\Http\Authentication\User;
-use Symfony\Component\Security\Core\Security;
+use App\DomainModel\MerchantUser\MerchantUserDTO;
+use App\DomainModel\MerchantUser\MerchantUserService;
+use App\Http\Authentication\UserProvider;
 
-class GetMerchantUserUseCase extends AbstractGetMerchantUserUseCase
+class GetMerchantUserUseCase
 {
-    private $security;
+    private $merchantUserService;
 
-    public function __construct(
-        MerchantUserRepositoryInterface $merchantUserRepository,
-        MerchantRepositoryInterface $merchantRepository,
-        CompaniesServiceInterface $companiesService,
-        AddressEntityFactory $addressEntityFactory,
-        MerchantUserPermissionsService $merchantUserPermissionsService,
-        Security $security
-    ) {
-        parent::__construct(
-            $merchantUserRepository,
-            $merchantRepository,
-            $companiesService,
-            $addressEntityFactory,
-            $merchantUserPermissionsService
-        );
-        $this->security = $security;
+    private $userProvider;
+
+    public function __construct(MerchantUserService $merchantUserService, UserProvider $userProvider)
+    {
+        $this->merchantUserService = $merchantUserService;
+        $this->userProvider = $userProvider;
     }
 
-    public function execute(GetMerchantUserRequest $request): GetMerchantUserResponse
+    public function execute(GetMerchantUserRequest $request): MerchantUserDTO
     {
-        /** @var User $user */
-        $user = $this->security->getUser();
-
-        return $this->getUser($request, $user->getEmail());
+        return $this->merchantUserService->getUser(
+            $request->getUuid(),
+            $this->userProvider->getMerchantUser()->getEmail()
+        );
     }
 }
