@@ -30,6 +30,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *   @OA\Property(property="orders", type="array", @OA\Items(type="object", properties={
  *      @OA\Property(property="uuid", ref="#/components/schemas/UUID"),
  *      @OA\Property(property="amount", ref="#/components/schemas/Money"),
+ *      @OA\Property(property="mapped_amount", ref="#/components/schemas/Money"),
  *      @OA\Property(property="outstanding_amount", ref="#/components/schemas/Money"),
  *      @OA\Property(property="external_id", type="string"),
  *      @OA\Property(property="invoice_number", type="string")
@@ -63,9 +64,8 @@ class GetMerchantPaymentDetailsController
 {
     private $useCase;
 
-    public function __construct(
-        GetMerchantPaymentDetailsUseCase $useCase
-    ) {
+    public function __construct(GetMerchantPaymentDetailsUseCase $useCase)
+    {
         $this->useCase = $useCase;
     }
 

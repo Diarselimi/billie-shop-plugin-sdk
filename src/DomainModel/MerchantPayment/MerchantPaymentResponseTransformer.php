@@ -45,7 +45,7 @@ class MerchantPaymentResponseTransformer
 
         $ordersAmountTotal = 0;
         foreach ($item['orders'] as $order) {
-            $ordersAmountTotal += ($order['amount'] ?? 0);
+            $ordersAmountTotal += ($order['mapped_amount'] ?? 0);
         }
         $paidAmount = $item['amount'];
         $item['overpaid_amount'] = (float) bcsub($paidAmount, $ordersAmountTotal, 2);

@@ -19,6 +19,7 @@ query q(
         orders: sub_items {
             uuid: order_uuid
             amount
+            mapped_amount
             outstanding_amount
             external_id: order_external_id
             invoice_number
