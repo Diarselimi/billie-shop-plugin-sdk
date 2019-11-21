@@ -39,9 +39,8 @@ Feature:
 
   Scenario: Successfully create an order in pre-approved state
     Given I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 200 and body
-    """
-    """
+    And Debtor has sufficient limit
+    And Debtor lock limit call succeeded
     And I send a POST request to "/order/pre-approve" with body:
     """
     {
@@ -95,9 +94,8 @@ Feature:
 
   Scenario: Successfully create an order in pre-approved state without house
     Given I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 200 and body
-    """
-    """
+    And Debtor has sufficient limit
+    And Debtor lock limit call succeeded
     And I send a POST request to "/order/pre-approve" with body:
     """
     {
@@ -151,9 +149,8 @@ Feature:
 
   Scenario: Debtor identification failed
     Given I get from companies service identify match and bad decision response
-    And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 200 and body
-    """
-    """
+    And Debtor has sufficient limit
+    And Debtor lock limit call succeeded
     And I send a POST request to "/order/pre-approve" with body:
     """
     {

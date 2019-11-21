@@ -4,7 +4,6 @@ namespace spec\App\Application\UseCase\OrderOutstandingAmountChange;
 
 use App\Application\UseCase\OrderOutstandingAmountChange\OrderOutstandingAmountChangeRequest;
 use App\Application\UseCase\OrderOutstandingAmountChange\OrderOutstandingAmountChangeUseCase;
-use App\DomainModel\Order\OrderAnnouncer;
 use App\DomainModel\OrderNotification\OrderNotificationEntity;
 use App\DomainModel\Payment\OrderAmountChangeDTO;
 use App\DomainModel\Merchant\MerchantEntity;
@@ -40,7 +39,6 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         MerchantDebtorLimitsService $limitsService,
         OrderPaymentForgivenessService $paymentForgivenessService,
         OrderStateManager $orderStateManager,
-        OrderAnnouncer $orderAnnouncer,
         OrderContainer $orderContainer,
         OrderEntity $order,
         OrderAmountChangeDTO $amountChange,

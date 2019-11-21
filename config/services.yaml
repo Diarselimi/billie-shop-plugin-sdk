@@ -12,7 +12,6 @@ services:
     autoconfigure: true
     public: false
     bind:
-      $debtorLimitManager: '@App\DomainModel\MerchantDebtor\Limits\RestDebtorLimitManager'
       $producer: '@old_sound_rabbit_mq.paella_events_producer'
       $delayedProducer: '@old_sound_rabbit_mq.paella_delayed_events_producer'
       $invoiceUploadHandlers:
@@ -25,6 +24,7 @@ services:
       $borschtClient: '@eight_points_guzzle.client.borscht'
       $smaugClient: '@eight_points_guzzle.client.smaug'
       $nachosClient: '@eight_points_guzzle.client.nachos'
+      $limesClient: '@eight_points_guzzle.client.limes'
       $notificationSenderClient: '@eight_points_guzzle.client.webhook'
       $salesforceClient: '@eight_points_guzzle.client.salesforce'
       $projectRootDir: '%kernel.root_dir%/..'
@@ -124,19 +124,3 @@ services:
             debtor_identified_strict: '@App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedStrictCheck'
             debtor_is_trusted: '@App\DomainModel\OrderRiskCheck\Checker\DebtorIsTrusted'
             delivery_address: '@App\DomainModel\OrderRiskCheck\Checker\DeliveryAddressCheck'
-
-  experimental_limits_service:
-    class: App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService
-    arguments:
-      - '@App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface'
-      - '@App\DomainModel\Order\OrderRepositoryInterface'
-      - '@App\DomainModel\MerchantDebtor\Limits\AmqpDebtorLimitManager'
-
-  App\Application\UseCase\OrderOutstandingAmountChange\OrderOutstandingAmountChangeUseCase:
-    arguments:
-      - '@App\DomainModel\Order\OrderContainer\OrderContainerFactory'
-      - '@App\DomainModel\Merchant\MerchantRepositoryInterface'
-      - '@App\DomainModel\OrderNotification\NotificationScheduler'
-      - '@experimental_limits_service'
-      - '@App\DomainModel\OrderPayment\OrderPaymentForgivenessService'
-      - '@App\DomainModel\Order\OrderStateManager'

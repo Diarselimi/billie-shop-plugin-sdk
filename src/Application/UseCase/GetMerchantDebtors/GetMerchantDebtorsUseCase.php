@@ -28,7 +28,6 @@ class GetMerchantDebtorsUseCase implements ValidatedUseCaseInterface
     ) {
         $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->merchantDebtorContainerFactory = $merchantDebtorContainerFactory;
-
         $this->responseFactory = $responseFactory;
     }
 

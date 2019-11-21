@@ -12,6 +12,5 @@
     "address_country": "DE",
     "address_addition": null,
     "is_blacklisted": 0,
-    "is_from_trusted_source": 1,
-    "financing_power": 1000
+    "is_from_trusted_source": 1
 }

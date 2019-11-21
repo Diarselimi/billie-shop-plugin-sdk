@@ -10,6 +10,7 @@ Feature:
         And I have a created order "XF43Y" with amounts 800/800/0, duration 30 and comment "test order"
         And I get from payments service get debtor response
         And I get from companies service get debtor response
+        And I get from limit service get debtor limit successful response for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
         And I add "X-Api-Key" header equal to test
         When I send a GET request to "/public/debtor/ad74bbc4-509e-47d5-9b50-a0320ce3d715"
         Then the response status code should be 200
@@ -38,6 +39,7 @@ Feature:
         And I have a created order "XF43Y" with amounts 800/800/0, duration 30 and comment "test order"
         And I get from payments service get debtor response
         And I get from companies service get debtor response
+        And I get from limit service get debtor limit successful response for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
         When I send a GET request to "/private/merchant-debtor/ad74bbc4-509e-47d5-9b50-a0320ce3d715"
         Then the response status code should be 200
         And the JSON response should be:

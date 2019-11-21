@@ -138,35 +138,6 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         }
     }
 
-    public function lockDebtorLimit(string $debtorUuid, float $amount): void
-    {
-        try {
-            $this->client->post("/debtor/$debtorUuid/lock", [
-                'json' => [
-                    'amount' => $amount,
-                ],
-                'on_stats' => function (TransferStats $stats) {
-                    $this->logServiceRequestStats($stats, 'debtor_lock_limit');
-                },
-            ]);
-        } catch (TransferException $exception) {
-            throw new CompaniesServiceRequestException($exception);
-        }
-    }
-
-    public function unlockDebtorLimit(string $debtorUuid, float $amount): void
-    {
-        try {
-            $this->client->post("/debtor/$debtorUuid/unlock", [
-                'json' => [
-                    'amount' => $amount,
-                ],
-            ]);
-        } catch (TransferException $exception) {
-            throw new CompaniesServiceRequestException($exception);
-        }
-    }
-
     public function isEligibleForPayAfterDelivery(IsEligibleForPayAfterDeliveryRequestDTO $requestDTO): bool
     {
         try {

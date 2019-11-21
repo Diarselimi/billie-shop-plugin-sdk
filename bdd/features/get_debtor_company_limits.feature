@@ -10,6 +10,7 @@ Feature:
     And I have a created order "XF43Y" with amounts 800/800/0, duration 30 and comment "test order"
     And I get from payments service get debtor response
     And I get from companies service get debtor response
+    And I get from limit service get debtor limit successful response for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     When I send a GET request to "/private/debtor-company/c7be46c0-e049-4312-b274-258ec5aeeb70/limits"
     Then the response status code should be 200
     And the JSON response should be:
@@ -37,6 +38,7 @@ Feature:
     Given I have default limits and no order created yet
     And I get from payments service get debtor response
     And I get from companies service get debtor response
+    And I get from limit service get debtor limit successful response for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     When I send a GET request to "/private/debtor-company/c7be46c0-e049-4312-b274-258ec5aeeb70/limits"
     Then the response status code should be 200
     And the JSON response should be:

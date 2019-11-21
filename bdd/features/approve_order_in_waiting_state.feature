@@ -90,6 +90,7 @@ Feature: Endpoint to approve an order in waiting state
 			| debtor_overdue            | 1         |
 			| company_b2b_score         | 1         |
 		And I get from companies service get debtor response
+		And Debtor has sufficient limit
 		When I send a POST request to "/private/order/test-order-uuid/approve"
 		Then the response status code should be 204
 		And the order CO123 is in state created
@@ -110,9 +111,7 @@ Feature: Endpoint to approve an order in waiting state
 			| debtor_overdue            | 1         |
 			| company_b2b_score         | 1         |
 		And I get from companies service get debtor response
-		And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 400 and body
-    """
-    """
+		And Debtor has insufficient limit
 		When I send a POST request to "/private/order/test-order-uuid/approve"
 		Then the response status code should be 403
 		And the order CO123 is in state waiting
@@ -133,9 +132,8 @@ Feature: Endpoint to approve an order in waiting state
 			| debtor_overdue            | 1         |
 			| company_b2b_score         | 1         |
 		And I get from companies service get debtor response
-		And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 200 and body
-    """
-    """
+		And Debtor has sufficient limit
+		And Debtor lock limit call succeeded
 		When I send a POST request to "/private/order/test-order-uuid/approve"
 		Then the response status code should be 204
 		And the order CO123 is in state created
@@ -182,9 +180,8 @@ Feature: Endpoint to approve an order in waiting state
 			| debtor_overdue            | 1         |
 			| company_b2b_score         | 1         |
 		And I get from companies service get debtor response
-		And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
-    """
-    """
+		And Debtor has sufficient limit
+		And Debtor lock limit call succeeded
 		When I send a POST request to "/private/order/test-order-uuid/approve"
 		Then the response status code should be 204
 		And the order CO123 is in state created

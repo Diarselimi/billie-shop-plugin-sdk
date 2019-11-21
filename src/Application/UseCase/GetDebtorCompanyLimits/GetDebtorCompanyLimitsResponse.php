@@ -86,7 +86,7 @@ class GetDebtorCompanyLimitsResponse implements ArrayableInterface
         return [
             'company_id' => $this->getCompany()->getId(),
             'company_uuid' => $this->getCompany()->getUuid(),
-            'company_financing_power' => $this->getCompany()->getFinancingPower(),
+            'company_financing_power' => reset($this->getMerchantDebtors())->getDebtorLimit()->getGlobalAvailableFinancingLimit(),
             'merchant_debtors' => $merchantDebtors,
         ];
     }

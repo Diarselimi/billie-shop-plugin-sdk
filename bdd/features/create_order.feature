@@ -154,9 +154,8 @@ Feature:
 
   Scenario: Successful order creation
     Given I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 200 and body
-    """
-    """
+    And Debtor has sufficient limit
+    And Debtor lock limit call succeeded
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
     """
@@ -270,9 +269,8 @@ Feature:
 
   Scenario: Successful order creation without house
     Given I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 200 and body
-    """
-    """
+    And Debtor has sufficient limit
+    And Debtor lock limit call succeeded
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
     """
@@ -386,9 +384,8 @@ Feature:
   Scenario: Successful order creation without delivery_address.house_number
     Given I get from companies service identify match and good decision response
     And I get from payments service register debtor positive response
-    And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 200 and body
-    """
-    """
+    And Debtor has sufficient limit
+    And Debtor lock limit call succeeded
     When I send a POST request to "/order" with body:
     """
     {
@@ -501,9 +498,8 @@ Feature:
 
   Scenario: Successful order creation using lowercase country
     Given I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 200 and body
-    """
-    """
+    And Debtor has sufficient limit
+    And Debtor lock limit call succeeded
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
     """
@@ -942,9 +938,8 @@ Feature:
   Scenario: Use debtor company address as delivery address if no delivery address was provided
     Given I get from companies service identify match and good decision response
     And I get from payments service register debtor positive response
-    And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 200 and body
-    """
-    """
+    And Debtor has sufficient limit
+    And Debtor lock limit call succeeded
     When I send a POST request to "/order" with body:
       """
       {
@@ -1042,9 +1037,8 @@ Feature:
   Scenario: The order should be on a state created if the previous order was declined because of the amount exceeded
     Given I get from companies service identify match and good decision response
     And I get from payments service register debtor positive response
-    And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 200 and body
-    """
-    """
+    And Debtor has sufficient limit
+    And Debtor lock limit call succeeded
     And I have a declined order "XF43Y" with amounts 90000/92000/1900, duration 30 and comment "test order"
     When I send a POST request to "/order" with body:
     """
@@ -1096,67 +1090,10 @@ Feature:
     And the response status code should be 200
     And merchant debtor has financing power 0
 
-  Scenario: Order stays in state new if debtor limit lock was unsuccessful
-    Given I get from companies service identify match and good decision response
-    And I get from payments service register debtor positive response
-    And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 400 and body
-    """
-    """
-    When I send a POST request to "/order" with body:
-    """
-    {
-         "debtor_person":{
-            "salutation":"m",
-            "first_name":"",
-            "last_name":"else",
-            "phone_number":"+491234567",
-            "email":"someone@billie.io"
-         },
-         "debtor_company":{
-            "merchant_customer_id":"12",
-            "name":"Test User Company",
-            "address_addition":"left door",
-            "address_house_number":"10",
-            "address_street":"Heinrich-Heine-Platz",
-            "address_city":"Berlin",
-            "address_postal_code":"10179",
-            "address_country":"DE",
-            "tax_id":"VA222",
-            "tax_number":"3333",
-            "registration_court":"",
-            "registration_number":" some number",
-            "industry_sector":"some sector",
-            "subindustry_sector":"some sub",
-            "employees_number":"33",
-            "legal_form":"some legal",
-            "established_customer":1
-         },
-         "delivery_address":{
-            "house_number":"22",
-            "street":"Charlot strasse",
-            "city":"Paris",
-            "postal_code":"98765",
-            "country":"DE"
-         },
-         "amount":{
-            "net":33.2,
-            "gross":43.30,
-            "tax":10.10
-         },
-         "comment":"Some comment",
-         "duration":30,
-         "order_id":"A3"
-    }
-    """
-    Then the response status code should be 500
-    And the order A3 is in state new
-    And merchant debtor has financing power 10000
-
   Scenario: Successful order creation without providing external code
     Given I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 200 and body
-    """
-    """
+    And Debtor has sufficient limit
+    And Debtor lock limit call succeeded
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
     """
@@ -1279,9 +1216,8 @@ Feature:
 
   Scenario: Successful order creation without providing industry_sector
     Given I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70/lock" endpoint response with status 200 and body
-    """
-    """
+    And Debtor has sufficient limit
+    And Debtor lock limit call succeeded
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
     """
@@ -1332,9 +1268,8 @@ Feature:
 
   Scenario: Successful order creation (delivery and company address mismatch and Order amount < 250)
     Given I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
-    """
-    """
+    And Debtor has sufficient limit
+    And Debtor lock limit call succeeded
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
     """
@@ -1387,9 +1322,6 @@ Feature:
 
   Scenario: Order declined (delivery and company address mismatch and Order amount > 250)
     Given I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
-    """
-    """
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
     """
@@ -1442,9 +1374,8 @@ Feature:
 
   Scenario: Successful order creation with line items
     Given I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
-    """
-    """
+    And Debtor has sufficient limit
+    And Debtor lock limit call succeeded
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
     """
@@ -1514,9 +1445,8 @@ Feature:
 
   Scenario: Successful order creation with line items (missing optional line item fields)
     Given I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
-    """
-    """
+    And Debtor has sufficient limit
+    And Debtor lock limit call succeeded
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
     """
@@ -1596,9 +1526,6 @@ Feature:
 
   Scenario: Failed order creation with line items (missing required line item fields and invalid data)
     Given I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
-    """
-    """
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
     """
@@ -1699,9 +1626,6 @@ Feature:
 
   Scenario: Failed order creation with line items (invalid data)
     Given I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
-    """
-    """
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
     """
@@ -1787,9 +1711,6 @@ Feature:
 
   Scenario: Failed order creation with line items (invalid line item amount)
     Given I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
-    """
-    """
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
     """
@@ -1880,9 +1801,6 @@ Feature:
 
   Scenario: Fail to create a good order if I have a public domain email and the line items contain a public domain
     Given I get from companies service identify match and good decision response
-    And I get from companies service "/debtor/1/lock" endpoint response with status 200 and body
-    """
-    """
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
     """

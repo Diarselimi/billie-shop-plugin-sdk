@@ -4,7 +4,6 @@ namespace App\Application\UseCase\OrderOutstandingAmountChange;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\OrderWorkflowException;
-use App\DomainModel\Order\OrderAnnouncer;
 use App\DomainModel\OrderNotification\OrderNotificationEntity;
 use App\DomainModel\Payment\OrderAmountChangeDTO;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
@@ -23,8 +22,6 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 {
     use LoggingTrait;
 
-    private $orderRepository;
-
     private $merchantRepository;
 
     private $orderContainerFactory;
@@ -37,16 +34,13 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 
     private $orderStateManager;
 
-    private $orderAnnouncer;
-
     public function __construct(
         OrderContainerFactory $orderContainerFactory,
         MerchantRepositoryInterface $merchantRepository,
         NotificationScheduler $notificationScheduler,
         MerchantDebtorLimitsService $limitsService,
         OrderPaymentForgivenessService $paymentForgivenessService,
-        OrderStateManager $orderStateManager,
-        OrderAnnouncer $orderAnnouncer
+        OrderStateManager $orderStateManager
     ) {
         $this->orderContainerFactory = $orderContainerFactory;
         $this->merchantRepository = $merchantRepository;
@@ -54,7 +48,6 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
         $this->limitsService = $limitsService;
         $this->paymentForgivenessService = $paymentForgivenessService;
         $this->orderStateManager = $orderStateManager;
-        $this->orderAnnouncer = $orderAnnouncer;
     }
 
     public function execute(OrderOutstandingAmountChangeRequest $request)
@@ -108,8 +101,6 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 
         $merchant->increaseFinancingLimit($amountChange->getAmountChange());
         $this->merchantRepository->update($merchant);
-
-        $this->orderAnnouncer->orderPaidBack($orderContainer, $amountChange->getAmountChange());
 
         if (!$amountChange->isPayment()) {
             return;

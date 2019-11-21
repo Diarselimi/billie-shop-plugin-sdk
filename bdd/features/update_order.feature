@@ -39,6 +39,7 @@ Feature: APIS-1077
 
   Scenario Template: Success 1: Partial provided data is OK and update is successful on any non-final state
     Given I have a "<state>" order with amounts 1000/900/100, duration 30 and comment "test order"
+    And Debtor release limit call succeeded
     When I send a PATCH request to "/order/test-order-uuid" with body:
     """
     {

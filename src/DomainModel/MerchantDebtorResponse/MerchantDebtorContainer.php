@@ -2,6 +2,7 @@
 
 namespace App\DomainModel\MerchantDebtorResponse;
 
+use App\DomainModel\DebtorLimit\DebtorLimit;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Payment\DebtorPaymentDetailsDTO;
 use App\DomainModel\DebtorCompany\DebtorCompany;
@@ -15,6 +16,8 @@ class MerchantDebtorContainer
     private $merchant;
 
     private $debtorCompany;
+
+    private $debtorLimit;
 
     private $financialDetails;
 
@@ -30,6 +33,7 @@ class MerchantDebtorContainer
         MerchantDebtorEntity $merchantDebtor,
         MerchantEntity $merchant,
         DebtorCompany $debtorCompany,
+        DebtorLimit $debtorLimit,
         MerchantDebtorFinancialDetailsEntity $financialDetails,
         DebtorPaymentDetailsDTO $paymentDetails,
         float $totalCreatedOrdersAmount,
@@ -39,6 +43,7 @@ class MerchantDebtorContainer
         $this->merchantDebtor = $merchantDebtor;
         $this->merchant = $merchant;
         $this->debtorCompany = $debtorCompany;
+        $this->debtorLimit = $debtorLimit;
         $this->financialDetails = $financialDetails;
         $this->paymentDetails = $paymentDetails;
         $this->totalCreatedOrdersAmount = $totalCreatedOrdersAmount;
@@ -59,6 +64,11 @@ class MerchantDebtorContainer
     public function getDebtorCompany(): DebtorCompany
     {
         return $this->debtorCompany;
+    }
+
+    public function getDebtorLimit(): DebtorLimit
+    {
+        return $this->debtorLimit;
     }
 
     public function getFinancialDetails(): MerchantDebtorFinancialDetailsEntity

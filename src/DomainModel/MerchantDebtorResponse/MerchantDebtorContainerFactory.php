@@ -3,6 +3,7 @@
 namespace App\DomainModel\MerchantDebtorResponse;
 
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
+use App\DomainModel\DebtorLimit\DebtorLimitServiceInterface;
 use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
@@ -22,18 +23,22 @@ class MerchantDebtorContainerFactory
 
     private $financialDetailsRepository;
 
+    private $debtorLimitService;
+
     public function __construct(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         MerchantRepositoryInterface $merchantRepository,
         PaymentsServiceInterface $paymentService,
         CompaniesServiceInterface $companiesService,
-        MerchantDebtorFinancialDetailsRepositoryInterface $financialDetailsRepository
+        MerchantDebtorFinancialDetailsRepositoryInterface $financialDetailsRepository,
+        DebtorLimitServiceInterface $debtorLimitService
     ) {
         $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->merchantRepository = $merchantRepository;
         $this->paymentService = $paymentService;
         $this->companiesService = $companiesService;
         $this->financialDetailsRepository = $financialDetailsRepository;
+        $this->debtorLimitService = $debtorLimitService;
     }
 
     public function create(MerchantDebtorEntity $merchantDebtor): MerchantDebtorContainer
@@ -45,6 +50,8 @@ class MerchantDebtorContainerFactory
         $financialDetails = $this->financialDetailsRepository->getCurrentByMerchantDebtorId($merchantDebtor->getId());
 
         $company = $this->companiesService->getDebtor($merchantDebtor->getDebtorId());
+
+        $limit = $this->debtorLimitService->retrieve($company->getUuid());
 
         $paymentsDetails = $this->paymentService->getDebtorPaymentDetails($merchantDebtor->getPaymentDebtorId());
 
@@ -58,6 +65,7 @@ class MerchantDebtorContainerFactory
             $merchantDebtor,
             $merchant,
             $company,
+            $limit,
             $financialDetails,
             $paymentsDetails,
             $totalCreatedOrdersAmount,

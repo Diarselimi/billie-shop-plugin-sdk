@@ -40,6 +40,7 @@ Feature:
       | debtor_overdue            | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
     And I get from companies service identify match and bad decision response
+    And Debtor has insufficient limit
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
     """
@@ -108,6 +109,7 @@ Feature:
       | debtor_overdue            | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
     And I get from companies service identify match and good decision response
+    And Debtor has insufficient limit
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
     """
@@ -176,6 +178,7 @@ Feature:
       | debtor_overdue            | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
     And I get from companies service identify no match and respond with suggestion
+    And Debtor has insufficient limit
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
     """

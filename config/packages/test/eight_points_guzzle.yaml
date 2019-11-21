@@ -24,3 +24,9 @@ eight_points_guzzle:
         debug: false
         query:
           app: salesforce
+    limes:
+      base_url: "%behat_mock_server_url%:8025"
+      options:
+        debug: false
+        query:
+          app: limes

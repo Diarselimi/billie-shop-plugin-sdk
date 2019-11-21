@@ -3,6 +3,7 @@
 namespace App\DomainModel\MerchantDebtorResponse;
 
 use App\DomainModel\DebtorCompany\DebtorCompany;
+use App\DomainModel\DebtorLimit\DebtorLimit;
 use App\DomainModel\MerchantDebtor\MerchantDebtorFinancialDetailsEntity;
 
 class MerchantDebtorResponseFactory
@@ -19,7 +20,7 @@ class MerchantDebtorResponseFactory
             ->setAddressCity($container->getDebtorCompany()->getAddressCity())
             ->setAddressCountry($container->getDebtorCompany()->getAddressCountry())
             ->setFinancingLimit($container->getFinancialDetails()->getFinancingLimit())
-            ->setFinancingPower($this->calculateFinancingPower($container->getDebtorCompany(), $container->getFinancialDetails()))
+            ->setFinancingPower($this->calculateFinancingPower($container->getDebtorLimit(), $container->getFinancialDetails()))
             ->setOutstandingAmount($container->getPaymentDetails()->getOutstandingAmount())
             ->setOutstandingAmountCreated($container->getTotalCreatedOrdersAmount())
             ->setOutstandingAmountLate($container->getTotalLateOrdersAmount())
@@ -50,7 +51,7 @@ class MerchantDebtorResponseFactory
             ->setAddressCity($container->getDebtorCompany()->getAddressCity())
             ->setAddressCountry($container->getDebtorCompany()->getAddressCountry())
             ->setFinancingLimit($container->getFinancialDetails()->getFinancingLimit())
-            ->setFinancingPower($this->calculateFinancingPower($container->getDebtorCompany(), $container->getFinancialDetails()))
+            ->setFinancingPower($this->calculateFinancingPower($container->getDebtorLimit(), $container->getFinancialDetails()))
             ->setOutstandingAmount($container->getPaymentDetails()->getOutstandingAmount())
             ->setOutstandingAmountCreated($container->getTotalCreatedOrdersAmount())
             ->setOutstandingAmountLate($container->getTotalLateOrdersAmount())
@@ -67,7 +68,7 @@ class MerchantDebtorResponseFactory
             ->setExternalCode($container->getExternalId())
             ->setName($container->getDebtorCompany()->getName())
             ->setFinancingLimit($container->getFinancialDetails()->getFinancingLimit())
-            ->setFinancingPower($this->calculateFinancingPower($container->getDebtorCompany(), $container->getFinancialDetails()))
+            ->setFinancingPower($this->calculateFinancingPower($container->getDebtorLimit(), $container->getFinancialDetails()))
             ->setBankAccountIban($container->getPaymentDetails()->getBankAccountIban())
             ->setBankAccountBic($container->getPaymentDetails()->getBankAccountBic())
             ->setCreatedAt($container->getMerchantDebtor()->getCreatedAt())
@@ -87,10 +88,10 @@ class MerchantDebtorResponseFactory
     }
 
     private function calculateFinancingPower(
-        DebtorCompany $debtorCompany,
+        DebtorLimit $debtorLimit,
         MerchantDebtorFinancialDetailsEntity $merchantDebtorFinancialDetails
     ): float {
-        return min($merchantDebtorFinancialDetails->getFinancingPower(), $debtorCompany->getFinancingPower());
+        return min($merchantDebtorFinancialDetails->getFinancingPower(), $debtorLimit->getGlobalAvailableFinancingLimit());
     }
 
     public function createFromDebtorCompany(DebtorCompany $debtorCompany): MerchantDebtorSynchronizationResponse

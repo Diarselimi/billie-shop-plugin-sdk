@@ -37,6 +37,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and comment "test order"
     And I get from companies service identify match response
     And I get from companies service get debtor response
+    And Debtor lock limit call succeeded
     And I send a PUT request to "/checkout-session/123123/confirm" with body:
     """
     {
