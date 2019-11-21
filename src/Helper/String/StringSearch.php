@@ -4,7 +4,7 @@ namespace App\Helper\String;
 
 class StringSearch
 {
-    public function searchWordsInString(array $needles, string $haystack): bool
+    public function isAnyWordsInString(array $needles, string $haystack): bool
     {
         foreach ($needles as $needle) {
             $result = mb_stripos($haystack, $needle);
@@ -14,5 +14,17 @@ class StringSearch
         }
 
         return false;
+    }
+
+    public function areAllWordsInString(array $needles, string $haystack): bool
+    {
+        foreach ($needles as $needle) {
+            $result = mb_stripos($haystack, $needle);
+            if ($result === false) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

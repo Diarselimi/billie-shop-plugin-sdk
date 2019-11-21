@@ -1,0 +1,13 @@
+[
+  {
+    "uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
+    "first_name": "name",
+    "last_name": "billie",
+    "additional_signatories_required": 1,
+    "address_house":"Any house number",
+    "address_street":"Any street",
+    "address_city":"Any city",
+    "address_postal_code":"Any postal code",
+    "address_country":"DE"
+  }
+]

@@ -3,6 +3,7 @@
 namespace App\DomainModel\DebtorCompany;
 
 use App\DomainModel\SignatoryPowersSelection\SignatoryPowerDTO;
+use App\DomainModel\GetSignatoryPowers\GetSignatoryPowerDTO;
 use App\DomainModel\MerchantDebtor\MerchantDebtorDuplicateDTO;
 
 interface CompaniesServiceInterface

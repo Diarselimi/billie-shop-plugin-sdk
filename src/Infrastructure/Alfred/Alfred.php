@@ -9,6 +9,8 @@ use App\DomainModel\DebtorCompany\DebtorCompanyFactory;
 use App\DomainModel\DebtorCompany\IdentifyDebtorRequestDTO;
 use App\DomainModel\DebtorCompany\IsEligibleForPayAfterDeliveryRequestDTO;
 use App\DomainModel\SignatoryPowersSelection\SignatoryPowerDTO;
+use App\DomainModel\GetSignatoryPowers\GetSignatoryPowerDTO;
+use App\DomainModel\GetSignatoryPowers\SignatoryPowerDTOFactory;
 use App\DomainModel\MerchantDebtor\MerchantDebtorDuplicateDTO;
 use App\Infrastructure\ClientResponseDecodeException;
 use App\Infrastructure\DecodeResponseTrait;
@@ -32,10 +34,16 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
 
     private $factory;
 
-    public function __construct(Client $alfredClient, DebtorCompanyFactory $debtorFactory)
-    {
+    private $signatoryPowersDTOFactory;
+
+    public function __construct(
+        Client $alfredClient,
+        DebtorCompanyFactory $debtorFactory,
+        SignatoryPowerDTOFactory $signatoryPowersDTOFactory
+    ) {
         $this->client = $alfredClient;
         $this->factory = $debtorFactory;
+        $this->signatoryPowersDTOFactory = $signatoryPowersDTOFactory;
     }
 
     public function getDebtor(int $debtorCompanyId): ?DebtorCompany
@@ -186,6 +194,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
     }
 
     /**
+     * @return GetSignatoryPowerDTO[]
      * @throws CompaniesServiceRequestException
      */
     public function getSignatoryPowers(string $companyIdentifier): array

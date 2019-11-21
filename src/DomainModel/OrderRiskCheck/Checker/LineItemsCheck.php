@@ -58,8 +58,8 @@ class LineItemsCheck implements CheckInterface
 
     private function isBreakingTheRule(array $excludedWords, array $includedWords, string $text): bool
     {
-        $includedWordsFound = $this->stringHelper->searchWordsInString($includedWords, $text);
-        $excludedWordsFound = $this->stringHelper->searchWordsInString($excludedWords, $text);
+        $includedWordsFound = $this->stringHelper->isAnyWordsInString($includedWords, $text);
+        $excludedWordsFound = $this->stringHelper->isAnyWordsInString($excludedWords, $text);
 
         return $includedWordsFound && !$excludedWordsFound;
     }

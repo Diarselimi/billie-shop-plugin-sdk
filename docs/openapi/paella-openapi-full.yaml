@@ -1648,6 +1648,28 @@ paths:
           oauth2: []
       x-groups:
         - private
+  /merchant/signatory-powers:
+    get:
+      tags:
+        - 'Dashboard Merchants'
+      summary: 'Get signatory powers'
+      operationId: signatory_powers_get
+      responses:
+        '200':
+          description: 'Signatory Powers List'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetSignatoryPowersResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+      x-groups:
+        - private
   /merchant/user/login:
     post:
       tags:
@@ -2655,6 +2677,48 @@ components:
           description: 'Order external code'
           example: DE123456-1
           $ref: '#/components/schemas/TinyText'
+      type: object
+    GetSignatoryPowersResponse:
+      title: 'Signatory Powers Response'
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        first_name:
+          example: 'Person Name'
+          $ref: '#/components/schemas/TinyText'
+        last_name:
+          example: 'Last name'
+          $ref: '#/components/schemas/TinyText'
+        additional_signatories_required:
+          type: int
+          example: 2
+        address_house:
+          example: '4'
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        address_street:
+          example: Charlottenstr.
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        address_city:
+          example: Berlin
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        address_postal_code:
+          type: string
+          maxLength: 5
+          example: '10969'
+          nullable: true
+        address_country:
+          type: string
+          maxLength: 2
+          example: DE
+          nullable: true
+        automatically_identified_as_user:
+          type: boolean
+          maxLength: 2
+          example: 'false'
+          nullable: true
       type: object
     MerchantEntity:
       properties:

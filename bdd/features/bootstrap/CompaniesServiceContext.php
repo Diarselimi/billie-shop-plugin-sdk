@@ -154,6 +154,36 @@ class CompaniesServiceContext implements Context
     }
 
     /**
+     * @Given I get from companies service a list of signatory-powers one signatory
+     */
+    public function iGetFromCompaniesServiceAListOfSignatoryPowersOneSignatory()
+    {
+        $this->mockRequest('/debtor/10/signatory-powers', new ResponseStack(
+            new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_signatory_powers_one_signatory.json'))
+        ));
+    }
+
+    /**
+     * @Given I get from companies service a list of signatory-powers
+     */
+    public function iGetFromCompaniesServiceAListOfSignatoryPowers()
+    {
+        $this->mockRequest('/debtor/10/signatory-powers', new ResponseStack(
+            new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_signatory_powers_list.json'))
+        ));
+    }
+
+    /**
+     * @Given I get from companies service a empty list of signatory-powers
+     */
+    public function iGetFromCompaniesServiceAEmptyListOfSignatoryPowers()
+    {
+        $this->mockRequest('/debtor/10/signatory-powers', new ResponseStack(
+            new MockResponse("{}", [], 200)
+        ));
+    }
+
+    /**
      * @Given /^I get from companies service identify no match and respond with suggestion$/
      */
     public function iGetFromCompaniesServiceIdentifyNoMatchAndRespondWithSuggestion()

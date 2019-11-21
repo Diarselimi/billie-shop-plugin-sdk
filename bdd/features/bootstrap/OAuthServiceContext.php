@@ -76,7 +76,7 @@ class OAuthServiceContext implements Context
     }
 
     /**
-     * @Given I successfully create OAuth client with email :email and user id :userId
+     * @Given I successfully create OAuth client with email :email and user id :userUuid
      */
     public function iSuccessfullyCreateOAuthClientWithEmailAndUserIdTestSecret($email, $userId)
     {

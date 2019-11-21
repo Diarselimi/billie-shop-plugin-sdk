@@ -709,17 +709,18 @@ class PaellaCoreContext extends MinkContext
      */
     public function aMerchantExistsWithCompanyID($companyId)
     {
-        $this->getMerchantRepository()->insert(
-            (new MerchantEntity())
-                ->setName('test merchant')
-                ->setIsActive(true)
-                ->setPaymentMerchantId('any-payment-id')
-                ->setFinancingPower(10000)
-                ->setFinancingLimit(10000)
-                ->setApiKey('testMerchantApiKey')
-                ->setCompanyId((int) $companyId)
-                ->setOauthClientId('testMerchantOauthClientId')
-        );
+        $merchant = (new MerchantEntity())
+            ->setName('test merchant')
+            ->setIsActive(true)
+            ->setPaymentMerchantId('any-payment-id')
+            ->setFinancingPower(10000)
+            ->setFinancingLimit(10000)
+            ->setApiKey('testMerchantApiKey')
+            ->setCompanyId((int) $companyId)
+            ->setOauthClientId('testMerchantOauthClientId');
+        $this->getMerchantRepository()->insert($merchant);
+
+        return $merchant;
     }
 
     /**
