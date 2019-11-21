@@ -2,6 +2,7 @@
 
 namespace App\DomainModel\DebtorCompany;
 
+use App\DomainModel\SignatoryPowersSelection\SignatoryPowerDTO;
 use App\DomainModel\MerchantDebtor\MerchantDebtorDuplicateDTO;
 
 interface CompaniesServiceInterface
@@ -21,4 +22,11 @@ interface CompaniesServiceInterface
     public function synchronizeDebtor(int $debtorId): DebtorCompany;
 
     public function getDebtors(array $debtorIds): array;
+
+    /**
+     * @return SignatoryPowerDTO[]
+     */
+    public function getSignatoryPowers(string $companyIdentifier): array;
+
+    public function saveSelectedSignatoryPowers(string $companyIdentifier, SignatoryPowerDTO ...$signatoryPowerDTOs);
 }

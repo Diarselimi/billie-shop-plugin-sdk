@@ -1929,6 +1929,32 @@ paths:
       x-groups:
         - public
         - private
+  /merchant/signatory-powers-selection:
+    post:
+      tags:
+        - 'Dashboard Merchant'
+      summary: 'Signatory powers selection'
+      operationId: signatory_powers_selection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignatoryPowersSelectionRequest'
+      responses:
+        '204':
+          description: 'Signatory powers saved successfully.'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+      x-groups:
+        - private
 components:
   schemas:
     UUID:
@@ -2587,6 +2613,15 @@ components:
         shipping_document_url:
           $ref: '#/components/schemas/URL'
       type: object
+    SignatoryPowersSelectionRequest:
+      title: 'Signatory powers selection request'
+      properties:
+        signatory_powers:
+          type: array
+          items:
+            $ref: '#/components/schemas/SignatoryPowerDTO'
+          nullable: false
+      type: object
     UpdateMerchantDebtorCompanyRequest:
       properties:
         name:
@@ -3035,6 +3070,17 @@ components:
           $ref: '#/components/schemas/DateTime'
         shipped_at:
           $ref: '#/components/schemas/DateTime'
+      type: object
+    SignatoryPowerDTO:
+      title: 'Signatory Power Data transfer object'
+      properties:
+        uuid:
+          type: string
+        email:
+          type: string
+          nullable: true
+        is_identified_as_user:
+          type: bool
       type: object
     ErrorsObject:
       title: 'API Errors'

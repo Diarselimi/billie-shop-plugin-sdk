@@ -8,6 +8,7 @@ use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorCompany\DebtorCompanyFactory;
 use App\DomainModel\DebtorCompany\IdentifyDebtorRequestDTO;
 use App\DomainModel\DebtorCompany\IsEligibleForPayAfterDeliveryRequestDTO;
+use App\DomainModel\SignatoryPowersSelection\SignatoryPowerDTO;
 use App\DomainModel\MerchantDebtor\MerchantDebtorDuplicateDTO;
 use App\Infrastructure\ClientResponseDecodeException;
 use App\Infrastructure\DecodeResponseTrait;
@@ -178,6 +179,35 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         try {
             $this->client->post("/debtor/mark-duplicates", [
                 'json' => $payload,
+            ]);
+        } catch (TransferException $exception) {
+            throw new CompaniesServiceRequestException($exception);
+        }
+    }
+
+    /**
+     * @throws CompaniesServiceRequestException
+     */
+    public function getSignatoryPowers(string $companyIdentifier): array
+    {
+        try {
+            $response = $this->client->get("/debtor/{$companyIdentifier}/signatory-powers");
+        } catch (TransferException $exception) {
+            throw new CompaniesServiceRequestException($exception);
+        }
+
+        return $this->signatoryPowersDTOFactory->createFromArrayCollection($this->decodeResponse($response));
+    }
+
+    public function saveSelectedSignatoryPowers(string $companyIdentifier, SignatoryPowerDTO ...$signatoryPowerDTOs)
+    {
+        $requestData = array_map(function (SignatoryPowerDTO $signatoryPowerDTO) {
+            return $signatoryPowerDTO->toArray();
+        }, $signatoryPowerDTOs);
+
+        try {
+            $this->client->post("/debtor/{$companyIdentifier}/signatory-powers-selection", [
+                'json' => $requestData,
             ]);
         } catch (TransferException $exception) {
             throw new CompaniesServiceRequestException($exception);
