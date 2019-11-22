@@ -36,8 +36,8 @@ class MerchantDebtorLimitsService implements LoggingInterface
         $debtorCompanyUuid = $container->getDebtorCompany()->getUuid();
         $amount = $container->getOrderFinancialDetails()->getAmountGross();
 
-        return $container->getMerchantDebtorFinancialDetails()->getFinancingPower() >= $amount
-            && $this->debtorLimitService->check($debtorCompanyUuid, $amount)
+        return $this->debtorLimitService->check($debtorCompanyUuid, $amount)
+            && $container->getMerchantDebtorFinancialDetails()->getFinancingPower() >= $amount
         ;
     }
 
