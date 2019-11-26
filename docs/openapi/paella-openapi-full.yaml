@@ -619,6 +619,36 @@ paths:
           $ref: '#/components/responses/ServerError'
       x-groups:
         - private
+  /merchant/registration:
+    post:
+      tags:
+        - 'Dashboard Merchants'
+      summary: 'Merchant Registration'
+      operationId: merchant_registration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterMerchantRequest'
+      responses:
+        '201':
+          description: 'Merchant registered successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterMerchantResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: 'Company not found'
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      x-groups:
+        - private
   '/merchant/{merchantId}/user':
     post:
       tags:
@@ -795,6 +825,58 @@ paths:
         '204':
           description: 'Merchant debtor is whitelisted'
         '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      x-groups:
+        - private
+  '/merchant/{uuid}/onboarding-step/state':
+    post:
+      tags:
+        - 'Dashboard Merchants'
+      summary: 'Update Merchant Onboarding step state'
+      operationId: merchant_onboarding_step_state_update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMerchantOnboardingStepStateRequest'
+      responses:
+        '204':
+          description: 'State changed successfully.'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: 'Merchant not found'
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      x-groups:
+        - private
+  '/merchant/{uuid}/state':
+    post:
+      tags:
+        - 'Dashboard Merchants'
+      summary: 'Update Merchant State'
+      operationId: merchant_state_transition_update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMerchantStateRequest'
+      responses:
+        '204':
+          description: 'State changed successfully.'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: 'Merchant not found'
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
@@ -2588,6 +2670,23 @@ components:
       type: object
       x-groups:
         - private
+    RegisterMerchantRequest:
+      properties:
+        crefo_id:
+          type: string
+        email:
+          type: string
+          format: email
+      type: object
+    RegisterMerchantResponse:
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        name:
+          $ref: '#/components/schemas/TinyText'
+        invitation_token:
+          $ref: '#/components/schemas/TinyText'
+      type: object
     RegisterMerchantUserRequest:
       title: 'Register Merchant User'
       required:
@@ -2661,6 +2760,18 @@ components:
         address_postal_code:
           example: '10969'
           $ref: '#/components/schemas/TinyText'
+      type: object
+    UpdateMerchantOnboardingStepStateRequest:
+      properties:
+        step:
+          type: string
+        state:
+          type: string
+      type: object
+    UpdateMerchantStateRequest:
+      properties:
+        state:
+          type: string
       type: object
     UpdateOrderRequest:
       title: 'Order Update Object'
