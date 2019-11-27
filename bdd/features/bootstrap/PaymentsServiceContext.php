@@ -1,6 +1,5 @@
 <?php
 
-use App\Helper\Uuid\DummyUuidGenerator;
 use Behat\Behat\Context\Context;
 use donatj\MockWebServer\Response as MockResponse;
 use donatj\MockWebServer\ResponseStack;
@@ -59,7 +58,7 @@ class PaymentsServiceContext implements Context
      */
     public function iGetFromPaymentsServiceGetOrderDetailsResponse()
     {
-        $this->mockRequest('/order/' . DummyUuidGenerator::DUMMY_UUID4 . '.json', new MockResponse(
+        $this->mockRequest('/order/' . PaellaCoreContext::DUMMY_UUID4 . '.json', new MockResponse(
             file_get_contents(__DIR__ . '/../resources/payments_service_order_details.json')
         ));
     }

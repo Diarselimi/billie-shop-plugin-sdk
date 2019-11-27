@@ -32,7 +32,7 @@ function generate_api_docs {
 
 echo "Generating OpenAPI 3.0 YAML specifications (Paella API v${SPEC_VERSION}):"
 
-bin/console cache:clear
+bin/console cache:clear -vvvv
 
 rm -rf docs/openapi
 mkdir -p docs/openapi

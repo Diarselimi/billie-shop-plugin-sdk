@@ -11,15 +11,12 @@ use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsException;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
-use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Workflow\Workflow;
 
 class CancelOrderUseCase
 {
-    private $orderRepository;
-
     private $limitsService;
 
     private $paymentsService;
@@ -33,16 +30,14 @@ class CancelOrderUseCase
     private $orderStateManager;
 
     public function __construct(
-        Workflow $workflow,
-        OrderRepositoryInterface $orderRepository,
+        Workflow $orderWorkflow,
         MerchantDebtorLimitsService $limitsService,
         PaymentsServiceInterface $paymentsService,
         OrderContainerFactory $orderContainerFactory,
         MerchantRepositoryInterface $merchantRepository,
         OrderStateManager $orderStateManager
     ) {
-        $this->workflow = $workflow;
-        $this->orderRepository = $orderRepository;
+        $this->workflow = $orderWorkflow;
         $this->limitsService = $limitsService;
         $this->paymentsService = $paymentsService;
         $this->orderContainerFactory = $orderContainerFactory;

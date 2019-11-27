@@ -40,8 +40,7 @@ Feature:
             "shipping_document_url": "http://example.com/proove/is/here"
         }
         """
-        Then the response status code should be 200
-        And the JSON response should be:
+        Then the JSON response should be:
         """
         {
           "order_id": "CO123",
@@ -100,6 +99,7 @@ Feature:
           }
         }
         """
+        And the response status code should be 200
         And the order "CO123" is in state shipped
         And Order notification should exist for order "CO123" with type "order_shipped"
 

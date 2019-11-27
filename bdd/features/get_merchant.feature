@@ -19,7 +19,7 @@ Feature: An endpoint to retrieve merchant data
         """
         {
            "id":1,
-           "name":"Behat User",
+           "name":"Behat Merchant",
            "financing_power":10000,
            "financing_limit":10000,
            "api_key":"test",

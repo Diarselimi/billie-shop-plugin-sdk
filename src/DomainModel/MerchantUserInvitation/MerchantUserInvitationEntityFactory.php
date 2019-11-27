@@ -8,14 +8,14 @@ use Ramsey\Uuid\Uuid;
 
 class MerchantUserInvitationEntityFactory extends AbstractFactory
 {
+    private const DEFAULT_INVITATION_EXPIRATION_TIME = '+1 day';
+
     private $tokenGenerator;
 
     public function __construct(TokenGenerator $tokenGenerator)
     {
         $this->tokenGenerator = $tokenGenerator;
     }
-
-    private const DEFAULT_INVITATION_EXPIRATION_TIME = '+1 day';
 
     public function createFromArray(array $data): MerchantUserInvitationEntity
     {

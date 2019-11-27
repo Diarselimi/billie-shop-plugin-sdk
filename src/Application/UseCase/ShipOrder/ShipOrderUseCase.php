@@ -44,7 +44,7 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface
     private $orderStateManager;
 
     public function __construct(
-        Workflow $workflow,
+        Workflow $orderWorkflow,
         OrderRepositoryInterface $orderRepository,
         PaymentsServiceInterface $paymentsService,
         OrderInvoiceManager $invoiceManager,
@@ -54,7 +54,7 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface
         UuidGeneratorInterface $uuidGenerator,
         OrderStateManager $orderStateManager
     ) {
-        $this->workflow = $workflow;
+        $this->workflow = $orderWorkflow;
         $this->orderRepository = $orderRepository;
         $this->paymentsService = $paymentsService;
         $this->invoiceManager = $invoiceManager;
@@ -96,7 +96,9 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface
             $order->setExternalCode($request->getExternalCode());
         }
 
-        $order->setPaymentId($this->uuidGenerator->uuid4());
+        if (!$order->getPaymentId()) {
+            $order->setPaymentId($this->uuidGenerator->uuid4());
+        }
 
         try {
             $this->paymentsService->createOrder(

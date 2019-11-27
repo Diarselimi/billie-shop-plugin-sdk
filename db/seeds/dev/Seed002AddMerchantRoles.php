@@ -8,19 +8,29 @@ use Ramsey\Uuid\Uuid;
 
 class Seed002AddMerchantRoles extends AbstractSeed
 {
+    private const FIRST_ADMIN_ROLE_UUID = '4c3fbc94-79bc-48ca-be55-b93d6cd833bd';
+
     public function run()
     {
         $merchants = $this->fetchAll('SELECT * FROM ' . MerchantRepository::TABLE_NAME);
         $now = (new DateTime())->format('Y-m-d H:i:s');
         $table = $this->table(MerchantUserRoleRepository::TABLE_NAME);
 
+        $firstAdminUuid = self::FIRST_ADMIN_ROLE_UUID;
         foreach ($merchants as $merchant) {
             if ($this->merchantHasRoles($merchant['id'])) {
                 continue;
             }
             foreach (MerchantUserDefaultRoles::ROLES as $role) {
+                if ($firstAdminUuid && $role['name'] === 'admin') {
+                    $uuid = $firstAdminUuid;
+                    $firstAdminUuid = null;
+                } else {
+                    $uuid = Uuid::uuid4();
+                }
+
                 $table->insert([
-                    'uuid' => Uuid::uuid4(),
+                    'uuid' => $uuid,
                     'merchant_id' => $merchant['id'],
                     'name' => $role['name'],
                     'permissions' => json_encode($role['permissions']),

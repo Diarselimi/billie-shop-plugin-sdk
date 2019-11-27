@@ -12,6 +12,7 @@ use App\DomainModel\Merchant\MerchantEntityFactory;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsFactory;
 use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsRepositoryInterface;
+use App\DomainModel\MerchantOnboarding\MerchantOnboardingPersistenceService;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntityFactory;
@@ -54,6 +55,8 @@ class CreateMerchantUseCase
 
     private $rolesFactory;
 
+    private $onboardingPersistenceService;
+
     public function __construct(
         MerchantRepositoryInterface $merchantRepository,
         CompaniesServiceInterface $companiesService,
@@ -67,8 +70,10 @@ class CreateMerchantUseCase
         MerchantNotificationSettingsFactory $notificationSettingsFactory,
         MerchantNotificationSettingsRepositoryInterface $notificationSettingsRepository,
         MerchantUserRoleEntityFactory $rolesFactory,
-        MerchantUserRoleRepositoryInterface $rolesRepository
+        MerchantUserRoleRepositoryInterface $rolesRepository,
+        MerchantOnboardingPersistenceService $onboardingPersistenceService
     ) {
+        // TODO: refactor CreateMerchantUseCase into smaller pieces / services
         $this->merchantRepository = $merchantRepository;
         $this->companiesService = $companiesService;
         $this->merchantFactory = $merchantEntityFactory;
@@ -82,6 +87,7 @@ class CreateMerchantUseCase
         $this->notificationSettingsRepository = $notificationSettingsRepository;
         $this->rolesRepository = $rolesRepository;
         $this->rolesFactory = $rolesFactory;
+        $this->onboardingPersistenceService = $onboardingPersistenceService;
     }
 
     public function execute(CreateMerchantRequest $request): CreateMerchantResponse
@@ -111,6 +117,7 @@ class CreateMerchantUseCase
 
         $this->createSettings($request, $merchant);
         $this->createDefaultRoles($merchant->getId());
+        $this->onboardingPersistenceService->createWithSteps($merchant->getId());
 
         return new CreateMerchantResponse($merchant, $oauthClient->getClientId(), $oauthClient->getClientSecret());
     }

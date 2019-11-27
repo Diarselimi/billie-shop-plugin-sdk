@@ -54,7 +54,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
     private const AMOUNT_GROSS = 1500.25;
 
     public function let(
-        Workflow $workflow,
+        Workflow $orderWorkflow,
         OrderRepositoryInterface $orderRepository,
         PaymentsServiceInterface $paymentsService,
         OrderInvoiceManager $invoiceManager,
@@ -106,7 +106,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
     }
 
     public function it_throws_exception_if_order_was_not_in_state_for_shipping(
-        Workflow $workflow,
+        Workflow $orderWorkflow,
         OrderContainerFactory $orderContainerFactory,
         ShipOrderRequest $request,
         OrderContainer $orderContainer,
@@ -118,7 +118,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
             ->willReturn($orderContainer)
         ;
 
-        $workflow
+        $orderWorkflow
             ->can($order, OrderStateManager::TRANSITION_SHIP)
             ->shouldBeCalled()
             ->willReturn(false)
@@ -128,7 +128,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
     }
 
     public function it_updates_order_and_create_borscht_order(
-        Workflow $workflow,
+        Workflow $orderWorkflow,
         PaymentsServiceInterface $paymentsService,
         OrderInvoiceManager $invoiceManager,
         OrderContainerFactory $orderContainerFactory,
@@ -162,7 +162,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
         ;
 
         $orderResponseFactory->create($orderContainer)->willReturn($orderResponse);
-        $workflow
+        $orderWorkflow
             ->can($order, OrderStateManager::TRANSITION_SHIP)
             ->shouldBeCalled()
             ->willReturn(true)
@@ -181,6 +181,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
             ->willReturn($paymentDetailsDTO)
         ;
 
+        $order->getPaymentId()->shouldBeCalled()->willReturn(null);
         $order->setPaymentId(Argument::any())->shouldBeCalled();
 
         $orderStateManager->ship($orderContainer)->shouldBeCalled();

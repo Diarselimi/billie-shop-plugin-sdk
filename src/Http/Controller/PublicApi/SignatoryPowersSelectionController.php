@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  *     summary="Signatory powers selection",
  *     security={{"oauth2"={}}},
  *
- *     tags={"Dashboard Merchant"},
+ *     tags={"Dashboard Merchants"},
  *     x={"groups":{"private"}},
  *
  *     @OA\RequestBody(

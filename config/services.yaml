@@ -32,6 +32,7 @@ services:
       $smaugClientSecret: '%smaug_client_secret%'
       $resourcesFileReader: '@resources_file_reader'
       $apiSpecFileReader: '@api_spec_file_reader'
+      $orderWorkflow: '@state_machine.order'
 
   _instanceof:
     App\Application\UseCase\ValidatedUseCaseInterface:
@@ -45,8 +46,6 @@ services:
   App\Http\Controller\:
     resource: '../src/Http/Controller'
     tags: ['controller.service_arguments']
-
-  Symfony\Component\Workflow\Workflow: '@state_machine.order'
 
   Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter: '@serializer.name_converter.camel_case_to_snake_case'
 
@@ -124,3 +123,15 @@ services:
             debtor_identified_strict: '@App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedStrictCheck'
             debtor_is_trusted: '@App\DomainModel\OrderRiskCheck\Checker\DebtorIsTrusted'
             delivery_address: '@App\DomainModel\OrderRiskCheck\Checker\DeliveryAddressCheck'
+
+  App\Infrastructure\Repository\OrderStateTransitionRepository:
+    tags:
+      - { name: billie_pdo.state_transition_repository, entity: App\DomainModel\Order\OrderStateTransitionEntity }
+
+  App\Infrastructure\Repository\MerchantOnboarding\MerchantOnboardingTransitionRepository:
+    tags:
+      - { name: billie_pdo.state_transition_repository, entity: App\DomainModel\MerchantOnboarding\MerchantOnboardingTransitionEntity }
+
+  App\Infrastructure\Repository\MerchantOnboarding\MerchantOnboardingStepTransitionRepository:
+    tags:
+      - { name: billie_pdo.state_transition_repository, entity: App\DomainModel\MerchantOnboarding\MerchantOnboardingStepTransitionEntity }

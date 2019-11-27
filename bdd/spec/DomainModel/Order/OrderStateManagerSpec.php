@@ -16,7 +16,7 @@ class OrderStateManagerSpec extends ObjectBehavior
 {
     public function let(
         OrderRepositoryInterface $orderRepository,
-        Workflow $workflow,
+        Workflow $orderWorkflow,
         CreateOrderCrossChecksService $approveCrossChecksService,
         EventDispatcherInterface $eventDispatcher,
         OrderChecksRunnerService $orderChecksRunnerService,

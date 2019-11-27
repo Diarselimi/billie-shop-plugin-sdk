@@ -74,9 +74,8 @@ services:
   App\DomainModel\OrderNotification\OrderNotificationRepositoryInterface:
     alias: 'App\Infrastructure\Repository\OrderNotificationRepository'
     public: true
-  App\Helper\Uuid\UuidGeneratorInterface:
-    alias: 'App\Helper\Uuid\DummyUuidGenerator'
-    public: true
   App\DomainModel\Payment\PaymentsRepositoryInterface:
     alias: 'App\DomainModel\Payment\EmptyPaymentsRepository'
+    public: true
+  App\DomainModel\MerchantOnboarding\MerchantOnboardingPersistenceService:
     public: true

@@ -43,6 +43,7 @@ interface MerchantUserDefaultRoles
             MerchantUserPermissions::VIEW_DEBTORS,
             MerchantUserPermissions::VIEW_PAYMENTS,
             MerchantUserPermissions::VIEW_USERS,
+            MerchantUserPermissions::VIEW_ONBOARDING,
             // write:
             MerchantUserPermissions::CONFIRM_ORDER_PAYMENT,
             MerchantUserPermissions::PAUSE_DUNNING,

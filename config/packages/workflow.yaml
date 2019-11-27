@@ -53,3 +53,42 @@ framework:
         pre_approve:
           from: new
           to: pre_approved
+    merchant_onboarding:
+      type: state_machine
+      marking_store:
+        type: single_state
+        arguments:
+          - state
+      supports: App\DomainModel\MerchantOnboarding\MerchantOnboardingEntity
+      places:
+        - new
+        - complete
+        - canceled
+      transitions:
+        complete:
+          from: new
+          to: complete
+        cancel:
+          from: new
+          to: canceled
+    merchant_onboarding_step:
+      type: state_machine
+      marking_store:
+        type: single_state
+        arguments:
+          - state
+      supports: App\DomainModel\MerchantOnboarding\MerchantOnboardingStepEntity
+      places:
+        - new
+        - confirmation_pending
+        - complete
+      transitions: # as defined in APIS-1611
+        confirmation_pending:
+          from: [new, complete]
+          to: confirmation_pending
+        complete:
+          from: [new, confirmation_pending]
+          to: complete
+        reset:
+          from: [complete, confirmation_pending]
+          to: new

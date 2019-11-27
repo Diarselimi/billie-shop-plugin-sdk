@@ -4,20 +4,22 @@ namespace App\Infrastructure\Repository;
 
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderEntityFactory;
-use App\DomainModel\Order\OrderLifecycleEvent;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateCounterDTO;
 use App\DomainModel\Order\OrderStateManager;
 use Billie\MonitoringBundle\Service\RidProvider;
+use Billie\PdoBundle\DomainModel\StatefulEntity\StatefulEntityRepositoryInterface;
+use Billie\PdoBundle\DomainModel\StatefulEntity\StatefulEntityRepositoryTrait;
 use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 use Billie\PdoBundle\Infrastructure\Pdo\PdoConnection;
 use Generator;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class OrderRepository extends AbstractPdoRepository implements OrderRepositoryInterface
+class OrderRepository extends AbstractPdoRepository implements OrderRepositoryInterface, StatefulEntityRepositoryInterface
 {
-    const TABLE_NAME = 'orders';
+    use StatefulEntityRepositoryTrait;
+
+    public const TABLE_NAME = 'orders';
 
     private const SELECT_FIELDS = [
         'id',
@@ -43,15 +45,12 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
         'checkout_session_id',
     ];
 
-    private $eventDispatcher;
-
     private $orderFactory;
 
     private $ridProvider;
 
-    public function __construct(EventDispatcherInterface $eventDispatcher, OrderEntityFactory $orderFactory, RidProvider $ridProvider)
+    public function __construct(OrderEntityFactory $orderFactory, RidProvider $ridProvider)
     {
-        $this->eventDispatcher = $eventDispatcher;
         $this->orderFactory = $orderFactory;
         $this->ridProvider = $ridProvider;
     }
@@ -124,8 +123,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
         ]);
 
         $order->setId($id);
-
-        $this->eventDispatcher->dispatch(OrderLifecycleEvent::CREATED, new OrderLifecycleEvent($order));
+        $this->dispatchCreatedEvent($order);
     }
 
     public function getOneByExternalCode(string $externalCode, int $merchantId): ?OrderEntity
@@ -226,8 +224,6 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
                 : null,
             'id' => $order->getId(),
         ]);
-
-        $this->eventDispatcher->dispatch(OrderLifecycleEvent::UPDATED, new OrderLifecycleEvent($order));
     }
 
     public function getDebtorMaximumOverdue(string $companyUuid): int

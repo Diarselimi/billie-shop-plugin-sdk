@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-echo "Generating Orders Workflow SVG Diagram:"
-php bin/console workflow:dump order declined complete canceled  | dot -Tsvg -o src/Resources/docs/orders-workflow.svg
+echo "Generating Paella Workflow Diagrams:"
 php bin/console workflow:dump order declined complete canceled  | dot -Tpng -o src/Resources/docs/orders-workflow.png
+php bin/console workflow:dump merchant_onboarding complete canceled  | dot -Tpng -o src/Resources/docs/merchant_onboarding-workflow.png
+php bin/console workflow:dump merchant_onboarding_step complete  | dot -Tpng -o src/Resources/docs/merchant_onboarding_step-workflow.png
 echo "DONE."

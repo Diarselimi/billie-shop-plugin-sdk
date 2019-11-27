@@ -3,22 +3,26 @@
 namespace App\DomainModel\Order;
 
 use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
+use Billie\PdoBundle\DomainModel\StatefulEntity\StatefulEntityInterface;
+use Billie\PdoBundle\DomainModel\StatefulEntity\StatefulEntityTrait;
 
-class OrderEntity extends AbstractTimestampableEntity
+class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityInterface
 {
+    use StatefulEntityTrait;
+
     private const STATE_LATE = 'late';
 
-    const MAX_DURATION_IN_WAITING_STATE = '9 days';
+    public const MAX_DURATION_IN_WAITING_STATE = '9 days';
 
-    const MAX_DURATION_IN_PRE_APPROVED_STATE = '30 days';
+    public const MAX_DURATION_IN_PRE_APPROVED_STATE = '30 days';
+
+    private const STATE_TRANSITION_ENTITY_CLASS = OrderStateTransitionEntity::class;
 
     private $uuid;
 
     private $amountForgiven;
 
     private $externalCode;
-
-    private $state;
 
     private $externalComment;
 
@@ -82,23 +86,6 @@ class OrderEntity extends AbstractTimestampableEntity
         $this->externalCode = $externalCode;
 
         return $this;
-    }
-
-    public function getState(): string
-    {
-        return $this->state;
-    }
-
-    public function setState(string $state): OrderEntity
-    {
-        $this->state = $state;
-
-        return $this;
-    }
-
-    public function isLate(): bool
-    {
-        return $this->getState() === self::STATE_LATE;
     }
 
     public function getExternalComment(): ?string
@@ -267,5 +254,10 @@ class OrderEntity extends AbstractTimestampableEntity
         $this->checkoutSessionId = $checkoutSessionId;
 
         return $this;
+    }
+
+    public function getStateTransitionEntityClass(): string
+    {
+        return self::STATE_TRANSITION_ENTITY_CLASS;
     }
 }

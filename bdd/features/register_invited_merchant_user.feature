@@ -115,7 +115,8 @@ Feature: Register merchant user to access dashboard
                 "address_house_number": "10",
                 "address_city": "Berlin"
             },
-            "tracking_id": 1
+            "tracking_id": 1,
+            "onboarding_state": "new"
         }
       }
     """

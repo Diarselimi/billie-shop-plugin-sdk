@@ -16,6 +16,8 @@ use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsEntity;
 use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsFactory;
 use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsRepositoryInterface;
+use App\DomainModel\MerchantOnboarding\MerchantOnboardingContainer;
+use App\DomainModel\MerchantOnboarding\MerchantOnboardingPersistenceService;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntityFactory;
@@ -60,9 +62,12 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
         MerchantNotificationSettingsRepositoryInterface $notificationSettingsRepository,
         CreateMerchantRequest $request,
         MerchantUserRoleRepositoryInterface $rolesRepository,
-        MerchantUserRoleEntityFactory $rolesFactory
+        MerchantUserRoleEntityFactory $rolesFactory,
+        MerchantOnboardingPersistenceService $onboardingPersistenceService,
+        MerchantOnboardingContainer $onboardingContainer
     ) {
         $request->getCompanyId()->willReturn(self::COMPANY_ID);
+        $onboardingPersistenceService->createWithSteps(Argument::any())->willReturn($onboardingContainer);
 
         $this->beConstructedWith(
             $merchantRepository,
@@ -77,7 +82,8 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
             $notificationSettingsFactory,
             $notificationSettingsRepository,
             $rolesFactory,
-            $rolesRepository
+            $rolesRepository,
+            $onboardingPersistenceService
         );
     }
 
@@ -88,9 +94,11 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
 
     public function it_throws_exception_if_merchant_exists(
         MerchantRepositoryInterface $merchantRepository,
-        CreateMerchantRequest $request
+        CreateMerchantRequest $request,
+        MerchantOnboardingPersistenceService $onboardingPersistenceService
     ) {
         $merchantRepository->getOneByCompanyId(self::COMPANY_ID)->shouldBeCalled()->willReturn(new MerchantEntity());
+        $onboardingPersistenceService->createWithSteps(Argument::any())->shouldNotBeCalled();
 
         $this->shouldThrow(DuplicateMerchantCompanyException::class)->during('execute', [$request]);
     }
@@ -98,10 +106,12 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
     public function it_throws_exception_if_company_was_not_found(
         MerchantRepositoryInterface $merchantRepository,
         CompaniesServiceInterface $companiesService,
-        CreateMerchantRequest $request
+        CreateMerchantRequest $request,
+        MerchantOnboardingPersistenceService $onboardingPersistenceService
     ) {
         $merchantRepository->getOneByCompanyId(self::COMPANY_ID)->shouldBeCalled()->willReturn(null);
         $companiesService->getDebtor(self::COMPANY_ID)->shouldBeCalled()->willThrow(CompaniesServiceRequestException::class);
+        $onboardingPersistenceService->createWithSteps(Argument::any())->shouldNotBeCalled();
 
         $this->shouldThrow(MerchantCompanyNotFoundException::class)->during('execute', [$request]);
     }
@@ -125,7 +135,8 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
         MerchantSettingsEntity $merchantSettings,
         MerchantNotificationSettingsEntity $merchantNotificationSettingsEntity,
         MerchantUserRoleRepositoryInterface $rolesRepository,
-        MerchantUserRoleEntityFactory $rolesFactory
+        MerchantUserRoleEntityFactory $rolesFactory,
+        MerchantOnboardingPersistenceService $onboardingPersistenceService
     ) {
         $company->getName()->willReturn(self::COMPANY_NAME);
         $merchant->getId()->willReturn(self::MERCHANT_ID);
@@ -133,6 +144,7 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
 
         $request->getInitialDebtorFinancingLimit()->willReturn(self::INITIAL_DEBTOR_FINANCING_LIMIT);
         $request->getDebtorFinancingLimit()->willReturn(self::DEBTOR_FINANCING_LIMIT);
+        $onboardingPersistenceService->createWithSteps(Argument::any())->shouldBeCalled();
 
         $roleExample = new MerchantUserRoleEntity();
         $rolesFactory

@@ -1333,6 +1333,32 @@ paths:
           oauth2: []
       x-groups:
         - private
+  /merchant/onboarding:
+    get:
+      tags:
+        - 'Dashboard Merchants'
+      summary: 'Get Merchant Onboarding'
+      operationId: get_merchant_onboarding
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMerchantOnboardingResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+      x-groups:
+        - private
   '/payments/{uuid}':
     get:
       tags:
@@ -2036,7 +2062,7 @@ paths:
   /merchant/signatory-powers-selection:
     post:
       tags:
-        - 'Dashboard Merchant'
+        - 'Dashboard Merchants'
       summary: 'Signatory powers selection'
       operationId: signatory_powers_selection
       requestBody:
@@ -2083,6 +2109,32 @@ components:
         - canceled
         - pre_approved
       example: created
+    OnboardingState:
+      title: 'Onboarding State'
+      type: string
+      enum:
+        - new
+        - complete
+        - canceled
+      example: new
+    OnboardingStepState:
+      title: 'Onboarding Step State'
+      type: string
+      enum:
+        - new
+        - confirmation_pending
+        - complete
+      example: new
+    OnboardingStepName:
+      title: 'Onboarding Step Name'
+      type: string
+      enum:
+        - financial_assessment
+        - signatory_confirmation
+        - identity_verification
+        - technical_integration
+        - sepa_mandate_confirmation
+      example: financial_assessment
     OrderDeclineReason:
       title: 'Order Decline Reason'
       type: string
@@ -2167,19 +2219,23 @@ components:
         - VIEW_DEBTORS
         - VIEW_PAYMENTS
         - VIEW_USERS
+        - VIEW_ONBOARDING
         - CONFIRM_ORDER_PAYMENT
         - PAUSE_DUNNING
         - MANAGE_USERS
         - CANCEL_ORDERS
+        - MANAGE_ONBOARDING
       example:
         - VIEW_ORDERS
         - VIEW_DEBTORS
         - VIEW_PAYMENTS
         - VIEW_USERS
+        - VIEW_ONBOARDING
         - CONFIRM_ORDER_PAYMENT
         - PAUSE_DUNNING
         - MANAGE_USERS
         - CANCEL_ORDERS
+        - MANAGE_ONBOARDING
     OauthClientCredentialsGrantRequestBodyParams:
       title: 'Request OAuth Token'
       required:
@@ -2554,6 +2610,25 @@ components:
           format: email
           nullable: false
       type: object
+    GetMerchantOnboardingResponse:
+      title: GetMerchantOnboardingResponse
+      properties:
+        onboarding_state:
+          $ref: '#/components/schemas/OnboardingState'
+        onboarding_steps:
+          type: array
+          items:
+            properties:
+              uuid:
+                $ref: '#/components/schemas/UUID'
+              name:
+                $ref: '#/components/schemas/OnboardingStepName'
+              state:
+                $ref: '#/components/schemas/OnboardingStepState'
+            type: object
+      type: object
+      x-groups:
+        - private
     GetMerchantRolesResponse:
       title: GetMerchantRolesResponse
       type: array
@@ -3046,6 +3121,8 @@ components:
           description: 'ID used for tracking the user for support.'
           type: integer
           nullable: false
+        onboarding_state:
+          $ref: '#/components/schemas/OnboardingState'
       type: object
     CheckoutSessionAuthorizeResponse:
       title: 'Authorize Checkout Order Response'

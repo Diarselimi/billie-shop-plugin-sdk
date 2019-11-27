@@ -68,8 +68,6 @@ class OrderStateManager implements LoggingInterface
         self::STATE_COMPLETE => OrderCompleteEvent::class,
     ];
 
-    public const TRANSITION_NEW = 'new';
-
     public const TRANSITION_AUTHORIZE = 'authorize';
 
     public const TRANSITION_WAITING = 'waiting';
@@ -102,12 +100,12 @@ class OrderStateManager implements LoggingInterface
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
-        Workflow $workflow,
+        Workflow $orderWorkflow,
         CreateOrderCrossChecksService $orderCrossChecksService,
         EventDispatcherInterface $eventDispatcher
     ) {
         $this->orderRepository = $orderRepository;
-        $this->workflow = $workflow;
+        $this->workflow = $orderWorkflow;
         $this->orderCrossChecksService = $orderCrossChecksService;
         $this->eventDispatcher = $eventDispatcher;
     }

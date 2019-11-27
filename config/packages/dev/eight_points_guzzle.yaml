@@ -1,5 +1,11 @@
 eight_points_guzzle:
   clients:
+    alfred:
+      base_url: "%env(string:ALFRED_URL)%"
+      options:
+        timeout: 5
+        headers:
+          Content-Type: "application/json"
     borscht:
       base_url: "%env(string:BORSCHT_URL)%"
       options:

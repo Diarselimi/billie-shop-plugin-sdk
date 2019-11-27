@@ -30,7 +30,8 @@ use OpenApi\Annotations as OA;
  *          @OA\Property(property="address_postal_code", type="string", nullable=true, maxLength=5, example="10969"),
  *          @OA\Property(property="address_country", type="string", nullable=true, maxLength=2),
  *      }),
- *     @OA\Property(property="tracking_id", nullable=false, type="integer", description="ID used for tracking the user for support.")
+ *     @OA\Property(property="tracking_id", nullable=false, type="integer", description="ID used for tracking the user for support."),
+ *     @OA\Property(property="onboarding_state", ref="#/components/schemas/OnboardingState")
  * })
  */
 class MerchantUserDTO implements ArrayableInterface
@@ -45,11 +46,14 @@ class MerchantUserDTO implements ArrayableInterface
 
     private $merchantCompanyAddress;
 
-    public function __construct(MerchantUserEntity $user, string $email, MerchantUserRoleEntity $role)
+    private $onboardingState;
+
+    public function __construct(MerchantUserEntity $user, string $email, MerchantUserRoleEntity $role, string $onboardingState)
     {
         $this->user = $user;
         $this->email = $email;
         $this->role = $role;
+        $this->onboardingState = $onboardingState;
     }
 
     public function getEmail(): string
@@ -114,6 +118,7 @@ class MerchantUserDTO implements ArrayableInterface
                 'address_country' => $address->getCountry(),
             ],
             'tracking_id' => $this->getUser()->getId(),
+            'onboarding_state' => $this->onboardingState,
         ];
     }
 }

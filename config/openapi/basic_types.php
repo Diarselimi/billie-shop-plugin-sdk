@@ -25,6 +25,36 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Schema(
+ *     schema="OnboardingState",
+ *     title="Onboarding State",
+ *     type="string",
+ *     example="new",
+ *     enum=\App\DomainModel\MerchantOnboarding\MerchantOnboardingEntity::ALL_STATES
+ * )
+ */
+
+/**
+ * @OA\Schema(
+ *     schema="OnboardingStepState",
+ *     title="Onboarding Step State",
+ *     type="string",
+ *     example="new",
+ *     enum=\App\DomainModel\MerchantOnboarding\MerchantOnboardingStepEntity::ALL_STATES
+ * )
+ */
+
+/**
+ * @OA\Schema(
+ *     schema="OnboardingStepName",
+ *     title="Onboarding Step Name",
+ *     type="string",
+ *     example="financial_assessment",
+ *     enum=\App\DomainModel\MerchantOnboarding\MerchantOnboardingStepEntity::ALL_PUBLIC_STEPS
+ * )
+ */
+
+/**
+ * @OA\Schema(
  *     schema="OrderDeclineReason",
  *     title="Order Decline Reason",
  *     type="string",

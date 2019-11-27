@@ -17,6 +17,7 @@ use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsEntity;
 use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsFactory;
 use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsRepositoryInterface;
+use App\DomainModel\MerchantOnboarding\MerchantOnboardingPersistenceService;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsEntity;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
@@ -44,7 +45,6 @@ use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonRepositoryInterface;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntity;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
-use App\Helper\Uuid\DummyUuidGenerator;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\MinkExtension\Context\MinkContext;
@@ -65,6 +65,8 @@ class PaellaCoreContext extends MinkContext
      * @var MerchantEntity
      */
     private $merchant;
+
+    public const DUMMY_UUID4 = '6d6b4222-be8c-11e9-9cb5-2a2ae2dbcce4';
 
     public const DEBTOR_UUID = 'ad74bbc4-509e-47d5-9b50-a0320ce3d715';
 
@@ -92,9 +94,14 @@ class PaellaCoreContext extends MinkContext
             ->setCheckForPublicDomain(true);
 
         $this->getFraudCheckRulesRepository()->insert($fraudRule);
+        $this->merchant = $this->createMerchant();
+    }
 
-        $this->merchant = (new MerchantEntity())
-            ->setName('Behat User')
+    private function createMerchant(): MerchantEntity
+    {
+        $now = new \DateTime();
+        $merchant = (new MerchantEntity())
+            ->setName('Behat Merchant')
             ->setIsActive(true)
             ->setPaymentMerchantId('f2ec4d5e-79f4-40d6-b411-31174b6519ac')
             ->setFinancingLimit(10000)
@@ -103,7 +110,7 @@ class PaellaCoreContext extends MinkContext
             ->setCompanyId('10')
             ->setOauthClientId('oauthClientId');
 
-        $this->getMerchantRepository()->insert($this->merchant);
+        $this->getMerchantRepository()->insert($merchant);
 
         $scoreThreshold = (new ScoreThresholdsConfigurationEntity())
             ->setCrefoLowScoreThreshold(350)
@@ -112,13 +119,13 @@ class PaellaCoreContext extends MinkContext
             ->setSchufaAverageScoreThreshold(220)
             ->setSchufaHighScoreThreshold(260)
             ->setSchufaSoleTraderScoreThreshold(235)
-            ->setCreatedAt(new \DateTime())
-            ->setUpdatedAt(new \DateTime());
+            ->setCreatedAt($now)
+            ->setUpdatedAt($now);
         $this->getScoreThresholdsConfigurationRepository()->insert($scoreThreshold);
 
         $this->getMerchantSettingsRepository()->insert(
             (new MerchantSettingsEntity())
-                ->setMerchantId($this->merchant->getId())
+                ->setMerchantId($merchant->getId())
                 ->setInitialDebtorFinancingLimit(10000)
                 ->setDebtorFinancingLimit(10000)
                 ->setMinOrderAmount(0)
@@ -126,9 +133,13 @@ class PaellaCoreContext extends MinkContext
                 ->setUseExperimentalDebtorIdentification(false)
                 ->setDebtorForgivenessThreshold(1.0)
                 ->setInvoiceHandlingStrategy('http')
-                ->setCreatedAt(new \DateTime())
-                ->setUpdatedAt(new \DateTime())
+                ->setCreatedAt($now)
+                ->setUpdatedAt($now)
         );
+
+        $this->getMerchantOnboardingPersistenceService()->createWithSteps($merchant->getId());
+
+        return $merchant;
     }
 
     /**
@@ -164,8 +175,13 @@ class PaellaCoreContext extends MinkContext
             TRUNCATE risk_check_definitions;
             TRUNCATE checkout_sessions;
             TRUNCATE risk_check_rules;
+            TRUNCATE merchant_onboardings;
+            TRUNCATE merchant_onboarding_transitions;
+            TRUNCATE merchant_onboarding_steps;
+            TRUNCATE merchant_onboarding_step_transitions;
             ALTER TABLE merchants AUTO_INCREMENT = 1;
             ALTER TABLE merchants_debtors AUTO_INCREMENT = 1;
+            ALTER TABLE merchants_users AUTO_INCREMENT = 1;
             ALTER TABLE orders AUTO_INCREMENT = 1;
             SET FOREIGN_KEY_CHECKS = 1;
         ');
@@ -259,7 +275,7 @@ class PaellaCoreContext extends MinkContext
             ->setExternalComment($comment)
             ->setMerchantDebtorId($merchantDebtor->getId())
             ->setMerchantId('1')
-            ->setPaymentId(DummyUuidGenerator::DUMMY_UUID4)
+            ->setPaymentId(self::DUMMY_UUID4)
             ->setCreatedAt(new \DateTime('2019-05-20 13:00:00'))
             ->setCheckoutSessionId(1)
             ->setUuid('test-order-uuid');
@@ -885,6 +901,11 @@ class PaellaCoreContext extends MinkContext
         return $this->get(FraudRuleRepositoryInterface::class);
     }
 
+    private function getMerchantOnboardingPersistenceService(): MerchantOnboardingPersistenceService
+    {
+        return $this->get(MerchantOnboardingPersistenceService::class);
+    }
+
     private function getConnection(): PdoConnection
     {
         return $this->connection;
@@ -970,8 +991,7 @@ class PaellaCoreContext extends MinkContext
             default:
                 $invitation
                     ->setExpiresAt(new \DateTime('-1 second'))
-                    ->setMerchantUserId($merchantUserId)
-                ;
+                    ->setMerchantUserId($merchantUserId);
         }
 
         $invitation->setUuid($uuid ?: 'test_uuid-' . $email);

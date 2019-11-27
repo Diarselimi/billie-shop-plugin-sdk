@@ -101,9 +101,7 @@ Feature: Create a new merchant.
       "name": "Test User Company",
       "financing_power": 5000.44,
       "financing_limit": 5000.44,
-      "api_key": "6d6b4222-be8c-11e9-9cb5-2a2ae2dbcce4",
       "company_id": "1",
-      "payment_merchant_id": "6d6b4222-be8c-11e9-9cb5-2a2ae2dbcce4",
       "is_active": true,
       "webhook_url": "http://billie.md",
       "webhook_authorization": "X-Api-Key: Hola",
@@ -111,6 +109,8 @@ Feature: Create a new merchant.
       "oauth_client_secret": "testClientSecret"
     }
     """
+    And the JSON should have "api_key"
+    And the JSON should have "payment_merchant_id"
     And the default risk check setting should be created for merchant with company ID 1
     And the default notification settings should be created for merchant with company ID 1
     And all the default roles should be created for merchant with company ID 1

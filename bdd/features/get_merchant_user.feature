@@ -39,7 +39,8 @@ Feature: Get current logged in merchant user details
         "role": {"uuid": "test_uuid", "name":"test"},
         "permissions": [
             "FOO_BAR"
-        ]
+        ],
+        "onboarding_state": "new"
     }
     """
 
@@ -70,6 +71,7 @@ Feature: Get current logged in merchant user details
         "role": {"uuid": "test_uuid", "name":"test"},
         "permissions": [
             "THIS_IS_OVERRIDDEN"
-        ]
+        ],
+        "onboarding_state": "new"
     }
     """

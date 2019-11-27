@@ -60,7 +60,7 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
     public function getOrderPaymentDetails(string $orderPaymentId): OrderPaymentDetailsDTO
     {
         try {
-            $response = $this->client->get("/order/$orderPaymentId.json");
+            $response = $this->client->get("/order/{$orderPaymentId}.json");
 
             $decodedResponse = $this->decodeResponse($response);
 
