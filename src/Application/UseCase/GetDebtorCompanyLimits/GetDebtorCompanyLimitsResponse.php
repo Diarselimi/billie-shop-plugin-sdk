@@ -78,7 +78,7 @@ class GetDebtorCompanyLimitsResponse implements ArrayableInterface
                 'financing_power' => $container->getFinancialDetails()->getFinancingPower(),
                 'merchant' => [
                     'id' => $container->getMerchant()->getId(),
-                    'payment_uuid' => $container->getMerchant()->getPaymentMerchantId(),
+                    'payment_uuid' => $container->getMerchant()->getPaymentUuid(),
                 ],
             ];
         }

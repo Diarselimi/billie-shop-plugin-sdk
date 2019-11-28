@@ -33,6 +33,7 @@ services:
       $resourcesFileReader: '@resources_file_reader'
       $apiSpecFileReader: '@api_spec_file_reader'
       $orderWorkflow: '@state_machine.order'
+      $investorUuid: '%env(string:INVESTOR_UUID)%'
 
   _instanceof:
     App\Application\UseCase\ValidatedUseCaseInterface:

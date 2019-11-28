@@ -39,7 +39,7 @@ class GetMerchantPaymentDetailsUseCase implements ValidatedUseCaseInterface
             throw new MerchantNotFoundException();
         }
 
-        $result = $this->paymentsRepository->get($merchant->getPaymentMerchantId(), $request->getTransactionUuid());
+        $result = $this->paymentsRepository->get($merchant->getPaymentUuid(), $request->getTransactionUuid());
 
         if (empty($result)) {
             throw new TransactionNotFoundException("Transaction {$request->getTransactionUuid()} was not found.");

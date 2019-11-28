@@ -24,7 +24,7 @@ class MerchantEntityFactory
             ->setFinancingPower($row['financing_power'])
             ->setFinancingLimit($row['available_financing_limit'])
             ->setCompanyId($row['company_id'])
-            ->setPaymentMerchantId($row['payment_merchant_id'])
+            ->setPaymentUuid($row['payment_merchant_id'])
             ->setIsActive((bool) $row['is_active'])
             ->setWebhookUrl($row['webhook_url'])
             ->setWebhookAuthorization($row['webhook_authorization'])
@@ -44,7 +44,7 @@ class MerchantEntityFactory
             ->setWebhookAuthorization($request->getWebhookAuthorization())
             ->setName($company->getName())
             ->setApiKey($this->uuidGenerator->uuid4())
-            ->setPaymentMerchantId($this->uuidGenerator->uuid4())
+            ->setPaymentUuid($this->uuidGenerator->uuid4())
             ->setIsActive(true)
         ;
     }

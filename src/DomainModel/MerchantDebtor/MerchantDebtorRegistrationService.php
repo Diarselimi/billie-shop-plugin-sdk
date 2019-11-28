@@ -40,7 +40,7 @@ class MerchantDebtorRegistrationService
 
     public function registerMerchantDebtor(DebtorCompany $debtorCompany, MerchantEntity $merchant): MerchantDebtorEntity
     {
-        $paymentDebtor = $this->paymentsService->registerDebtor($merchant->getPaymentMerchantId());
+        $paymentDebtor = $this->paymentsService->registerDebtor($merchant->getPaymentUuid());
 
         $merchantSettings = $this->merchantSettingsRepository->getOneByMerchant($merchant->getId());
 

@@ -35,7 +35,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
             'financing_power' => $merchant->getFinancingPower(),
             'available_financing_limit' => $merchant->getFinancingPower(),
             'company_id' => $merchant->getCompanyId(),
-            'payment_merchant_id' => $merchant->getPaymentMerchantId(),
+            'payment_merchant_id' => $merchant->getPaymentUuid(),
             'webhook_url' => $merchant->getWebhookUrl(),
             'webhook_authorization' => $merchant->getWebhookAuthorization(),
             'created_at' => $merchant->getCreatedAt()->format(self::DATE_FORMAT),

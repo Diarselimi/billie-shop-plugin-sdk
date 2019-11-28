@@ -7,6 +7,7 @@ use App\Application\UseCase\CreateMerchant\Exception\DuplicateMerchantCompanyExc
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
 use App\DomainModel\Merchant\MerchantCompanyNotFoundException;
+use App\DomainModel\Merchant\MerchantAnnouncer;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantEntityFactory;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
@@ -55,6 +56,8 @@ class CreateMerchantUseCase
 
     private $rolesFactory;
 
+    private $merchantAnnouncer;
+
     private $onboardingPersistenceService;
 
     public function __construct(
@@ -71,7 +74,8 @@ class CreateMerchantUseCase
         MerchantNotificationSettingsRepositoryInterface $notificationSettingsRepository,
         MerchantUserRoleEntityFactory $rolesFactory,
         MerchantUserRoleRepositoryInterface $rolesRepository,
-        MerchantOnboardingPersistenceService $onboardingPersistenceService
+        MerchantOnboardingPersistenceService $onboardingPersistenceService,
+        MerchantAnnouncer $merchantAnnouncer
     ) {
         // TODO: refactor CreateMerchantUseCase into smaller pieces / services
         $this->merchantRepository = $merchantRepository;
@@ -88,6 +92,7 @@ class CreateMerchantUseCase
         $this->rolesRepository = $rolesRepository;
         $this->rolesFactory = $rolesFactory;
         $this->onboardingPersistenceService = $onboardingPersistenceService;
+        $this->merchantAnnouncer = $merchantAnnouncer;
     }
 
     public function execute(CreateMerchantRequest $request): CreateMerchantResponse
@@ -118,6 +123,12 @@ class CreateMerchantUseCase
         $this->createSettings($request, $merchant);
         $this->createDefaultRoles($merchant->getId());
         $this->onboardingPersistenceService->createWithSteps($merchant->getId());
+
+        $this->merchantAnnouncer->customerCreated(
+            $company->getUuid(),
+            $company->getName(),
+            $merchant->getPaymentUuid()
+        );
 
         return new CreateMerchantResponse($merchant, $oauthClient->getClientId(), $oauthClient->getClientSecret());
     }

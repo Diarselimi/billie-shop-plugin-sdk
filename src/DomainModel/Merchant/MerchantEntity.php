@@ -34,7 +34,7 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
 
     private $companyId;
 
-    private $paymentMerchantId;
+    private $paymentUuid;
 
     private $isActive;
 
@@ -158,14 +158,14 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
         return $this;
     }
 
-    public function getPaymentMerchantId(): ?string
+    public function getPaymentUuid(): ?string
     {
-        return $this->paymentMerchantId;
+        return $this->paymentUuid;
     }
 
-    public function setPaymentMerchantId(?string $paymentMerchantId): MerchantEntity
+    public function setPaymentUuid(?string $paymentUuid): MerchantEntity
     {
-        $this->paymentMerchantId = $paymentMerchantId;
+        $this->paymentUuid = $paymentUuid;
 
         return $this;
     }
@@ -191,7 +191,7 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
             'financing_limit' => $this->getFinancingLimit(),
             'api_key' => $this->getApiKey(),
             'company_id' => $this->getCompanyId(),
-            'payment_merchant_id' => $this->getPaymentMerchantId(),
+            'payment_merchant_id' => $this->getPaymentUuid(),
             'is_active' => $this->isActive(),
             'webhook_url' => $this->getWebhookUrl(),
             'webhook_authorization' => $this->getWebhookAuthorization(),

@@ -10,3 +10,7 @@ billie_pdo:
 ozean12_graphql_client:
   dsn: '%env(GRAPHQL_ENDPOINT)%'
   api_key: "%env(GRAPHQL_API_KEY)%"
+
+ozean12_amqp_pack:
+  publish:
+    customer.customer_created: Ozean12\Transfer\Message\Customer\CustomerCreated

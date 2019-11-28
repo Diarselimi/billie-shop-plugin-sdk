@@ -9,6 +9,7 @@ use App\Application\UseCase\CreateMerchant\Exception\DuplicateMerchantCompanyExc
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
 use App\DomainModel\DebtorCompany\DebtorCompany;
+use App\DomainModel\Merchant\MerchantAnnouncer;
 use App\DomainModel\Merchant\MerchantCompanyNotFoundException;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantEntityFactory;
@@ -33,6 +34,7 @@ use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEnt
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class CreateMerchantUseCaseSpec extends ObjectBehavior
 {
@@ -47,6 +49,10 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
     const COMPANY_ID = '561';
 
     const COMPANY_NAME = 'HolaAmigo Company';
+
+    const COMPANY_UUID = 'c7be46c0-e049-4312-b274-258ec5aeeb70';
+
+    const PAYMENT_UUID = 'c7be46c0-e049-4312-b274-258ec5aeeb70';
 
     public function let(
         MerchantRepositoryInterface $merchantRepository,
@@ -64,7 +70,8 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
         MerchantUserRoleRepositoryInterface $rolesRepository,
         MerchantUserRoleEntityFactory $rolesFactory,
         MerchantOnboardingPersistenceService $onboardingPersistenceService,
-        MerchantOnboardingContainer $onboardingContainer
+        MerchantOnboardingContainer $onboardingContainer,
+        MerchantAnnouncer $merchantAnnouncer
     ) {
         $request->getCompanyId()->willReturn(self::COMPANY_ID);
         $onboardingPersistenceService->createWithSteps(Argument::any())->willReturn($onboardingContainer);
@@ -83,7 +90,8 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
             $notificationSettingsRepository,
             $rolesFactory,
             $rolesRepository,
-            $onboardingPersistenceService
+            $onboardingPersistenceService,
+            $merchantAnnouncer
         );
     }
 
@@ -136,10 +144,14 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
         MerchantNotificationSettingsEntity $merchantNotificationSettingsEntity,
         MerchantUserRoleRepositoryInterface $rolesRepository,
         MerchantUserRoleEntityFactory $rolesFactory,
-        MerchantOnboardingPersistenceService $onboardingPersistenceService
+        MerchantOnboardingPersistenceService $onboardingPersistenceService,
+        MerchantAnnouncer $merchantAnnouncer,
+        MessageBusInterface $bus
     ) {
         $company->getName()->willReturn(self::COMPANY_NAME);
+        $company->getUuid()->willReturn(self::COMPANY_UUID);
         $merchant->getId()->willReturn(self::MERCHANT_ID);
+        $merchant->getPaymentUuid()->willReturn(self::PAYMENT_UUID);
         $scoreThresholdsConfiguration->getId()->willReturn(self::SCORE_CONFIGURATION_ID);
 
         $request->getInitialDebtorFinancingLimit()->willReturn(self::INITIAL_DEBTOR_FINANCING_LIMIT);
@@ -189,6 +201,8 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn([$merchantNotificationSettingsEntity]);
         $notificationSettingsRepository->insert($merchantNotificationSettingsEntity)->shouldBeCalled();
+
+        $merchantAnnouncer->customerCreated(Argument::any(), Argument::any(), Argument::any())->shouldBeCalled();
 
         $response = $this->execute($request);
         $response->shouldBeAnInstanceOf(CreateMerchantResponse::class);

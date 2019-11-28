@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b1200c8394545f14612bbe2511929fc8",
+    "content-hash": "54d837215851488a342b69804d8d1f07",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -1976,16 +1976,16 @@
         },
         {
             "name": "ozean12/amqp-pack",
-            "version": "0.3.1",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/amqp-pack.git",
-                "reference": "7d2db307bb25528391720e75fb5c3bbccfdd3b71"
+                "reference": "424d39c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/amqp-pack/zipball/7d2db307bb25528391720e75fb5c3bbccfdd3b71",
-                "reference": "7d2db307bb25528391720e75fb5c3bbccfdd3b71",
+                "url": "https://api.github.com/repos/ozean12/amqp-pack/zipball/424d39c",
+                "reference": "424d39c",
                 "shasum": ""
             },
             "require": {
@@ -9532,7 +9532,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "ozean12/amqp-pack": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
