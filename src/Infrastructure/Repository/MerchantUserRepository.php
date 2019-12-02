@@ -15,6 +15,7 @@ class MerchantUserRepository extends AbstractPdoRepository implements MerchantUs
         'id',
         'user_id',
         'merchant_id',
+        'signatory_power_uuid',
         'first_name',
         'last_name',
         'role_id',
@@ -73,5 +74,22 @@ class MerchantUserRepository extends AbstractPdoRepository implements MerchantUs
     public function getOneByUuid(string $uuid): ?MerchantUserEntity
     {
         return $this->getOneBy('user_id', $uuid);
+    }
+
+    public function assignSignatoryPowerToUser(int $id, string $signatoryPowerUuid): void
+    {
+        $this->update($id, ['signatory_power_uuid' => $signatoryPowerUuid]);
+    }
+
+    private function update(int $id, array $columnValuePairs): void
+    {
+        $intersectedKeysWithTableColumns = array_intersect(array_keys($columnValuePairs), self::SELECT_FIELDS);
+        if (count($intersectedKeysWithTableColumns) !== count($columnValuePairs)) {
+            throw new \InvalidArgumentException('There are arguments that do not exists in the table');
+        }
+
+        $sql = $this->generateUpdateQuery(self::TABLE_NAME, array_keys($columnValuePairs)). ' WHERE id = :id';
+
+        $this->doExecute($sql, array_merge(['id' => $id], $columnValuePairs));
     }
 }

@@ -7,7 +7,7 @@ use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
 use App\DomainModel\GetSignatoryPowers\GetSignatoryPowersResponse;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
-use App\Helper\String\StringSearch;
+use App\DomainModel\SignatoryPowersSelection\UserSignatoryPowerMatcher;
 
 class GetSignatoryPowersUseCase
 {
@@ -17,18 +17,18 @@ class GetSignatoryPowersUseCase
 
     private $merchantRepository;
 
-    private $stringSearch;
+    private $signatoryPowerMatcher;
 
     public function __construct(
         CompaniesServiceInterface $companiesService,
         MerchantUserRepositoryInterface $merchantUserRepository,
         MerchantRepositoryInterface $merchantRepository,
-        StringSearch $stringSearch
+        UserSignatoryPowerMatcher $signatoryPowerMatcher
     ) {
         $this->companiesService = $companiesService;
         $this->merchantUserRepository = $merchantUserRepository;
         $this->merchantRepository = $merchantRepository;
-        $this->stringSearch = $stringSearch;
+        $this->signatoryPowerMatcher = $signatoryPowerMatcher;
     }
 
     public function execute(GetSignatoryPowersRequest $request): GetSignatoryPowersResponse
@@ -42,18 +42,7 @@ class GetSignatoryPowersUseCase
             throw new GetSignatoryPowersUseCaseException($exception->getMessage());
         }
 
-        foreach ($signatoryPowersDTOs as $signatoryPowersDTO) {
-            $isIdentifiedAsUser = $this->stringSearch->areAllWordsInString(
-                [$merchantUser->getFirstName(), $merchantUser->getLastName()],
-                "{$signatoryPowersDTO->getFirstName()} {$signatoryPowersDTO->getLastName()}"
-            );
-
-            if ($isIdentifiedAsUser) {
-                $signatoryPowersDTO->setAutomaticallyIdentifiedAsUser($isIdentifiedAsUser);
-
-                break;
-            }
-        }
+        $this->signatoryPowerMatcher->identify($merchantUser, ...$signatoryPowersDTOs);
 
         return new GetSignatoryPowersResponse($signatoryPowersDTOs);
     }

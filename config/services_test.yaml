@@ -79,3 +79,5 @@ services:
     public: true
   App\DomainModel\MerchantOnboarding\MerchantOnboardingPersistenceService:
     public: true
+  App\DomainModel\SignatoryPowersSelection\SignatoryPowerAutoIdentifyUserService:
+    public: true

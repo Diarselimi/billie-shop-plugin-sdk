@@ -10,6 +10,8 @@ class MerchantUserEntity extends AbstractTimestampableEntity
 
     private $merchantId;
 
+    private $signatoryPowerUuid;
+
     private $roleId;
 
     private $firstName;
@@ -46,6 +48,18 @@ class MerchantUserEntity extends AbstractTimestampableEntity
     public function setMerchantId(int $merchantId): MerchantUserEntity
     {
         $this->merchantId = $merchantId;
+
+        return $this;
+    }
+
+    public function getSignatoryPowerUuid(): ?string
+    {
+        return $this->signatoryPowerUuid;
+    }
+
+    public function setSignatoryPowerUuid(?string $signatoryPowerUuid): MerchantUserEntity
+    {
+        $this->signatoryPowerUuid = $signatoryPowerUuid;
 
         return $this;
     }

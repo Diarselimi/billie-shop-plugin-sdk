@@ -25,7 +25,7 @@ interface CompaniesServiceInterface
     public function getDebtors(array $debtorIds): array;
 
     /**
-     * @return SignatoryPowerDTO[]
+     * @return GetSignatoryPowerDTO[]
      */
     public function getSignatoryPowers(string $companyIdentifier): array;
 

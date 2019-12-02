@@ -210,7 +210,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
 
     public function saveSelectedSignatoryPowers(string $companyIdentifier, SignatoryPowerDTO ...$signatoryPowerDTOs)
     {
-        $requestData = array_map(function (SignatoryPowerDTO $signatoryPowerDTO) {
+        $requestData['signatory_powers'] = array_map(function (SignatoryPowerDTO $signatoryPowerDTO) {
             return $signatoryPowerDTO->toArray();
         }, $signatoryPowerDTOs);
 

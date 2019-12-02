@@ -58,9 +58,10 @@ class SignatoryPowersSelectionController
         }, $request->request->get('signatory_powers', []));
 
         $companyId = $this->userProvider->getMerchantUser()->getMerchant()->getCompanyId();
+        $merchantUserId = $this->userProvider->getMerchantUser()->getUserEntity()->getId();
 
         try {
-            $this->useCase->execute(new SignatoryPowersSelectionRequest($companyId, ...$requestDTOs));
+            $this->useCase->execute(new SignatoryPowersSelectionRequest($merchantUserId, $companyId, ...$requestDTOs));
         } catch (SignatoryPowersSelectionException $exception) {
             throw new BadRequestHttpException();
         }

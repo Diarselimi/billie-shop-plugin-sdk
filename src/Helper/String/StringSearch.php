@@ -19,8 +19,7 @@ class StringSearch
     public function areAllWordsInString(array $needles, string $haystack): bool
     {
         foreach ($needles as $needle) {
-            $result = mb_stripos($haystack, $needle);
-            if ($result === false) {
+            if (mb_stripos($haystack, $needle) === false) {
                 return false;
             }
         }
