@@ -4,7 +4,6 @@ namespace App\Application\UseCase\CancelOrder;
 
 use App\Application\Exception\FraudOrderException;
 use App\Application\Exception\OrderNotFoundException;
-use App\Application\PaellaCoreCriticalException;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsException;
@@ -12,7 +11,6 @@ use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderStateManager;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Workflow\Workflow;
 
 class CancelOrderUseCase
@@ -69,11 +67,7 @@ class CancelOrderUseCase
             try {
                 $this->limitsService->unlock($orderContainer);
             } catch (MerchantDebtorLimitsException $exception) {
-                throw new PaellaCoreCriticalException(
-                    "Merchant debtor limits can't be unlocked",
-                    PaellaCoreCriticalException::CODE_ORDER_CANT_BE_CANCELLED,
-                    Response::HTTP_BAD_REQUEST
-                );
+                throw new LimitUnlockException("Limits cannot be unlocked for merchant #{$orderContainer->getMerchantDebtor()->getId()}");
             }
 
             $this->orderStateManager->cancel($orderContainer);
@@ -82,11 +76,7 @@ class CancelOrderUseCase
 
             $this->orderStateManager->cancelShipped($orderContainer);
         } else {
-            throw new PaellaCoreCriticalException(
-                "Order #{$request->getOrderId()} can not be cancelled",
-                PaellaCoreCriticalException::CODE_ORDER_CANT_BE_CANCELLED,
-                Response::HTTP_BAD_REQUEST
-            );
+            throw new CancelOrderException("Order #{$request->getOrderId()} can not be cancelled");
         }
     }
 }

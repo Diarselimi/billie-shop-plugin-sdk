@@ -4,8 +4,17 @@ namespace App\Http\ApiError;
 
 class VerboseApiErrorResponseFactory extends ApiErrorResponseFactory
 {
-    protected function createResponse(array $errors, int $statusCode, array $headers = []): ApiErrorResponse
+    protected function createGenericError(?\Exception $exception = null): ApiError
     {
-        return new ApiErrorResponse($errors, $statusCode, $headers);
+        $additionalData = [
+            'stack_trace' => $exception->getTraceAsString(),
+        ];
+
+        return new ApiError(
+            $exception->getMessage(),
+            get_class($exception) . ':' . $exception->getCode(),
+            $exception->getFile() . ':' . $exception->getLine(),
+            $additionalData
+        );
     }
 }

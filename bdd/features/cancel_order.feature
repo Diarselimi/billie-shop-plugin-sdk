@@ -42,19 +42,19 @@ Feature:
     Scenario: Unsuccessful declined order cancellation
         Given I have a declined order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
         When I send a POST request to "/order/CO123/cancel"
-        Then the response status code should be 400
+        Then the response status code should be 403
         And the JSON response should be:
         """
-        {"errors":[{"title":"Order #CO123 can not be cancelled","code":"order_cancel_failed"}]}
+        {"errors":[{"title":"Order #CO123 can not be cancelled","code":"forbidden"}]}
         """
 
     Scenario: Unsuccessful canceled order cancellation
         Given I have a canceled order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
         When I send a POST request to "/order/CO123/cancel"
-        Then the response status code should be 400
+        Then the response status code should be 403
         And the JSON response should be:
         """
-        {"errors":[{"title":"Order #CO123 can not be cancelled","code":"order_cancel_failed"}]}
+        {"errors":[{"title":"Order #CO123 can not be cancelled","code":"forbidden"}]}
         """
 
     Scenario: Not existing order cancellation

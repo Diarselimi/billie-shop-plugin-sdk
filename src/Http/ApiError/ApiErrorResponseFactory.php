@@ -3,7 +3,6 @@
 namespace App\Http\ApiError;
 
 use App\Application\Exception\RequestValidationException;
-use App\Application\PaellaCoreCriticalException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
@@ -30,28 +29,17 @@ class ApiErrorResponseFactory
                 return $this->createFromRequestValidationException($exception);
             case $exception instanceof HttpException:
                 return $this->createFromHttpException($exception);
-            case $exception instanceof PaellaCoreCriticalException:
-                return $this->createFromPaellaCriticalException($exception);
             default:
                 return $this->createResponse(
-                    [$this->createDebugError($exception)],
+                    [$this->createGenericError($exception)],
                     ApiErrorResponse::HTTP_INTERNAL_SERVER_ERROR
                 );
         }
     }
 
-    private function createDebugError(\Exception $exception): ApiError
+    protected function createGenericError(?\Exception $exception = null): ApiError
     {
-        $additionalData = [
-            'stack_trace' => $exception->getTraceAsString(),
-        ];
-
-        return new ApiError(
-            $exception->getMessage(),
-            get_class($exception) . ':' . $exception->getCode(),
-            $exception->getFile() . ':' . $exception->getLine(),
-            $additionalData
-        );
+        return new ApiError('Something went wrong.', ApiError::CODE_INTERNAL_ERROR);
     }
 
     private function createFromRequestValidationException(RequestValidationException $exception): ApiErrorResponse
@@ -116,24 +104,8 @@ class ApiErrorResponseFactory
         );
     }
 
-    private function createFromPaellaCriticalException(PaellaCoreCriticalException $exception)
+    private function createResponse(array $errors, int $statusCode, array $headers = []): ApiErrorResponse
     {
-        $statusCode = $exception->getResponseCode() ? $exception->getResponseCode() : ApiErrorResponse::HTTP_INTERNAL_SERVER_ERROR;
-
-        return $this->createResponse([new ApiError($exception->getMessage(), $exception->getErrorCode())], $statusCode);
-    }
-
-    protected function createResponse(array $errors, int $statusCode, array $headers = []): ApiErrorResponse
-    {
-        if ($statusCode === 500) {
-            // hide real message of uncaught exceptions
-            return new ApiErrorResponse(
-                [new ApiError('Unexpected Internal Error', ApiError::CODE_INTERNAL_ERROR)],
-                $statusCode,
-                $headers
-            );
-        }
-
         return new ApiErrorResponse($errors, $statusCode, $headers);
     }
 }
