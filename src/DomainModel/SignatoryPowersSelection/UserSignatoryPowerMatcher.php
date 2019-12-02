@@ -18,9 +18,9 @@ class UserSignatoryPowerMatcher
     public function identify(MerchantUserEntity $merchantUser, GetSignatoryPowerDTO ...$signatoryPowerDTOs)
     {
         if ($merchantUser->getSignatoryPowerUuid()) {
-            $this->identifyByUuid($merchantUser->getSignatoryPowerUuid(), $signatoryPowerDTOs);
+            $this->identifyByUuid($merchantUser->getSignatoryPowerUuid(), ...$signatoryPowerDTOs);
         } else {
-            $this->identifyByFullName($merchantUser, $signatoryPowerDTOs);
+            $this->identifyByFullName($merchantUser, ...$signatoryPowerDTOs);
         }
     }
 
