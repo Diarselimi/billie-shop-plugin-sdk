@@ -57,4 +57,37 @@ class MerchantOnboardingRepository extends AbstractPdoRepository implements
 
         return $row ? $this->factory->createFromArray($row) : null;
     }
+
+    public function findNewestByPaymentUuid(string $paymentUuid): ?MerchantOnboardingEntity
+    {
+        $fields = array_map(
+            static function (string $field) {
+                return self::TABLE_NAME . '.' . $field;
+            },
+            self::SELECT_FIELDS
+        );
+
+        $table = self::TABLE_NAME;
+        $query = $this->generateSelectQuery($table, $fields)
+            . " INNER JOIN merchants ON merchants.id = {$table}.merchant_id 
+                WHERE merchants.payment_merchant_id = :merchant_payment_uuid 
+                ORDER BY {$table}.id DESC LIMIT 1"
+        ;
+
+        $row = $this->doFetchOne($query, ['merchant_payment_uuid' => $paymentUuid]);
+
+        return $row ? $this->factory->createFromArray($row) : null;
+    }
+
+    public function update(MerchantOnboardingEntity $entity): void
+    {
+        $this->doUpdate('
+            UPDATE ' . self::TABLE_NAME . '
+            SET state = :state
+            WHERE id = :id
+        ', [
+            'state' => $entity->getState(),
+            'id' => $entity->getId(),
+        ]);
+    }
 }

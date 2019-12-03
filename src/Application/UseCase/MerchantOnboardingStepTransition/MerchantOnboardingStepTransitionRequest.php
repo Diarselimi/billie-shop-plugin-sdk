@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\UseCase\UpdateMerchantOnboardingStepState;
+namespace App\Application\UseCase\MerchantOnboardingStepTransition;
 
 use App\Application\UseCase\ValidatedRequestInterface;
 use OpenApi\Annotations as OA;
@@ -8,15 +8,15 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @OA\Schema(
- *      schema="UpdateMerchantOnboardingStepStateRequest",
+ *      schema="MerchantOnboardingStepTransitionRequest",
  *      type="object",
  *      properties={
- *          @OA\Property(property="step", type="string"),
- *          @OA\Property(property="state", type="string")
+ *          @OA\Property(property="step", ref="#/components/schemas/OnboardingStepName"),
+ *          @OA\Property(property="transition", ref="#/components/schemas/OnboardingStepTransition")
  *      }
  * )
  */
-class UpdateMerchantOnboardingStepStateRequest implements ValidatedRequestInterface
+class MerchantOnboardingStepTransitionRequest implements ValidatedRequestInterface
 {
     /**
      * @Assert\NotBlank()
@@ -27,22 +27,20 @@ class UpdateMerchantOnboardingStepStateRequest implements ValidatedRequestInterf
     /**
      * @Assert\NotBlank()
      * @Assert\Type("string")
-     */ // TODO: validate choice list, add enum to the OA docs
-
+     */
     private $step;
 
     /**
      * @Assert\NotBlank()
      * @Assert\Type("string")
-     */ // TODO: validate choice list, add enum to the OA docs
-
-    private $state;
+     */
+    private $transition;
 
     public function __construct(string $merchantPaymentUuid, $step, $state)
     {
         $this->merchantPaymentUuid = $merchantPaymentUuid;
         $this->step = $step;
-        $this->state = $state;
+        $this->transition = $state;
     }
 
     public function getMerchantPaymentUuid(): string
@@ -55,8 +53,8 @@ class UpdateMerchantOnboardingStepStateRequest implements ValidatedRequestInterf
         return $this->step;
     }
 
-    public function getState(): string
+    public function getTransition(): string
     {
-        return $this->state;
+        return $this->transition;
     }
 }

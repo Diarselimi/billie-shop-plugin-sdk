@@ -3,7 +3,7 @@
 namespace App\Application\UseCase\DeclineOrder;
 
 use App\Application\Exception\OrderNotFoundException;
-use App\Application\Exception\OrderWorkflowException;
+use App\Application\Exception\WorkflowException;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderStateManager;
@@ -33,7 +33,7 @@ class DeclineOrderUseCase
         $order = $orderContainer->getOrder();
 
         if (!$this->orderStateManager->isWaiting($order) && !$this->orderStateManager->isPreApproved($order)) {
-            throw new OrderWorkflowException('Cannot decline the order. Order is not in waiting/pre_approved state.');
+            throw new WorkflowException('Cannot decline the order. Order is not in waiting/pre_approved state.');
         }
 
         $this->orderStateManager->decline($orderContainer);

@@ -2,7 +2,7 @@
 
 namespace App\Amqp\Consumer;
 
-use App\Application\Exception\OrderWorkflowException;
+use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\DeclineOrder\DeclineOrderRequest;
 use App\Application\UseCase\DeclineOrder\DeclineOrderUseCase;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
@@ -30,7 +30,7 @@ class OrderInWaitingStateConsumer implements ConsumerInterface, LoggingInterface
 
         try {
             $this->useCase->execute($request);
-        } catch (OrderWorkflowException $exception) {
+        } catch (WorkflowException $exception) {
             return; // order was already manually approved/declined
         } catch (\Exception $exception) {
             $this->logSuppressedException(

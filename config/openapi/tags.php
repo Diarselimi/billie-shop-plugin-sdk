@@ -16,8 +16,8 @@ use OpenApi\Annotations as OA;
  *          @OA\Tag(name="Dashboard Debtors", x={"groups":{"private"}}),
  *          @OA\Tag(name="Dashboard Payments", x={"groups":{"private"}}),
  *          @OA\Tag(name="Dashboard Users", x={"groups":{"private"}}),
+ *          @OA\Tag(name="Dashboard Merchants", x={"groups":{"private"}}),
  *
- *          @OA\Tag(name="Merchants", x={"groups":{"private"}}),
  *          @OA\Tag(name="Support", x={"groups":{"private"}}),
  *          @OA\Tag(name="API Docs", x={"groups":{"private"}}),
  *     }

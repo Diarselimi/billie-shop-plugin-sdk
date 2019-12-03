@@ -3,7 +3,7 @@
 namespace spec\App\Application\UseCase\ShipOrder;
 
 use App\Application\Exception\OrderNotFoundException;
-use App\Application\Exception\OrderWorkflowException;
+use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\ShipOrder\ShipOrderRequest;
 use App\Application\UseCase\ShipOrder\ShipOrderUseCase;
 use App\DomainModel\Payment\PaymentRequestFactory;
@@ -124,7 +124,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
             ->willReturn(false)
         ;
 
-        $this->shouldThrow(OrderWorkflowException::class)->during('execute', [$request]);
+        $this->shouldThrow(WorkflowException::class)->during('execute', [$request]);
     }
 
     public function it_updates_order_and_create_borscht_order(

@@ -3,7 +3,7 @@
 namespace App\Application\UseCase\ApproveOrder;
 
 use App\Application\Exception\OrderNotFoundException;
-use App\Application\Exception\OrderWorkflowException;
+use App\Application\Exception\WorkflowException;
 use App\DomainModel\Order\OrderChecksRunnerService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderDeclinedReasonsMapper;
@@ -43,15 +43,15 @@ class ApproveOrderUseCase
         }
 
         if (!$this->orderStateManager->isWaiting($orderContainer->getOrder())) {
-            throw new OrderWorkflowException("Cannot approve the order. Order is not in waiting state.");
+            throw new WorkflowException("Cannot approve the order. Order is not in waiting state.");
         }
 
         if (!$this->rerunLimitCheck($orderContainer)) {
-            throw new OrderWorkflowException("Cannot approve the order. Limit check failed");
+            throw new WorkflowException("Cannot approve the order. Limit check failed");
         }
 
         if (!$this->orderChecksRunnerService->rerunFailedChecks($orderContainer)) {
-            throw new OrderWorkflowException(
+            throw new WorkflowException(
                 sprintf(
                     "Cannot approve the order. failed risk checks: %s",
                     implode(', ', $this->declinedReasonsMapper->mapReasons($orderContainer->getOrder()))

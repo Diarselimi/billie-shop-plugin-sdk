@@ -3,7 +3,7 @@
 namespace App\Http\Controller\PrivateApi;
 
 use App\Application\Exception\OrderNotFoundException;
-use App\Application\Exception\OrderWorkflowException;
+use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\DeclineOrder\DeclineOrderRequest;
 use App\Application\UseCase\DeclineOrder\DeclineOrderUseCase;
 use OpenApi\Annotations as OA;
@@ -49,7 +49,7 @@ class DeclineOrderController
             $this->useCase->execute(new DeclineOrderRequest($uuid));
         } catch (OrderNotFoundException $e) {
             throw new NotFoundHttpException($e->getMessage());
-        } catch (OrderWorkflowException $e) {
+        } catch (WorkflowException $e) {
             throw new AccessDeniedHttpException($e->getMessage());
         }
     }

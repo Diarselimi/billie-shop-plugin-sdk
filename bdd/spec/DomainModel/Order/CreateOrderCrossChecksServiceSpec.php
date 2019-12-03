@@ -2,7 +2,7 @@
 
 namespace spec\App\DomainModel\Order;
 
-use App\Application\Exception\OrderWorkflowException;
+use App\Application\Exception\WorkflowException;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsException;
@@ -54,7 +54,7 @@ class CreateOrderCrossChecksServiceSpec extends ObjectBehavior
         $merchantDebtorLimitsService->lock($orderContainer)->shouldBeCalledOnce()->willThrow(MerchantDebtorLimitsException::class);
         $merchant->reduceFinancingLimit(self::AMOUNT)->shouldNotBeCalled();
 
-        $this->shouldThrow(OrderWorkflowException::class)->during('run', [$orderContainer]);
+        $this->shouldThrow(WorkflowException::class)->during('run', [$orderContainer]);
     }
 
     public function it_throws_exception_on_merchant_limit_lock_failure(
@@ -68,7 +68,7 @@ class CreateOrderCrossChecksServiceSpec extends ObjectBehavior
 
         $merchantRepository->update($merchant)->shouldNotBeCalled();
 
-        $this->shouldThrow(OrderWorkflowException::class)->during('run', [$orderContainer]);
+        $this->shouldThrow(WorkflowException::class)->during('run', [$orderContainer]);
     }
 
     public function it_locks_the_limit(

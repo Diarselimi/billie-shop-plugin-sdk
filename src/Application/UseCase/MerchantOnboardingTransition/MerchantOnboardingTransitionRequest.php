@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\UseCase\UpdateMerchantState;
+namespace App\Application\UseCase\MerchantOnboardingTransition;
 
 use App\Application\UseCase\ValidatedRequestInterface;
 use OpenApi\Annotations as OA;
@@ -8,14 +8,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @OA\Schema(
- *      schema="UpdateMerchantStateRequest",
+ *      schema="MerchantOnboardingTransitionRequest",
  *      type="object",
  *      properties={
- *          @OA\Property(property="state", type="string")
+ *          @OA\Property(property="transition", ref="#/components/schemas/OnboardingStateTransition")
  *      }
  * )
  */
-class UpdateMerchantStateRequest implements ValidatedRequestInterface
+class MerchantOnboardingTransitionRequest implements ValidatedRequestInterface
 {
     /**
      * @Assert\NotBlank()
@@ -26,14 +26,13 @@ class UpdateMerchantStateRequest implements ValidatedRequestInterface
     /**
      * @Assert\NotBlank()
      * @Assert\Type("string")
-     */ // TODO: validate choice list, add enum to the OA docs
+     */
+    private $transition;
 
-    private $state;
-
-    public function __construct(string $merchantPaymentUuid, $state)
+    public function __construct(string $merchantPaymentUuid, $transition)
     {
         $this->merchantPaymentUuid = $merchantPaymentUuid;
-        $this->state = $state;
+        $this->transition = $transition;
     }
 
     public function getMerchantPaymentUuid(): string
@@ -41,8 +40,8 @@ class UpdateMerchantStateRequest implements ValidatedRequestInterface
         return $this->merchantPaymentUuid;
     }
 
-    public function getState(): string
+    public function getTransition(): string
     {
-        return $this->state;
+        return $this->transition;
     }
 }

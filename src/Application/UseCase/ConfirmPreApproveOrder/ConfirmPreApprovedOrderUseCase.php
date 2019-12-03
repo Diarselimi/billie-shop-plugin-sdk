@@ -4,7 +4,7 @@ namespace App\Application\UseCase\ConfirmPreApproveOrder;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\OrderNotPreApprovedException;
-use App\Application\Exception\OrderWorkflowException;
+use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Order\NewOrder\OrderPersistenceService;
@@ -54,7 +54,7 @@ class ConfirmPreApprovedOrderUseCase implements LoggingInterface, ValidatedUseCa
         }
 
         if (!$this->stateManager->isPreApproved($orderContainer->getOrder())) {
-            throw new OrderWorkflowException();
+            throw new WorkflowException();
         }
 
         $this->stateManager->approve($orderContainer);

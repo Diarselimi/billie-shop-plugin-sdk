@@ -3,7 +3,7 @@
 namespace App\Application\UseCase\ShipOrder;
 
 use App\Application\Exception\OrderNotFoundException;
-use App\Application\Exception\OrderWorkflowException;
+use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Payment\PaymentRequestFactory;
@@ -82,7 +82,7 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface
         $this->validateRequest($request, null, $groups);
 
         if (!$this->workflow->can($order, OrderStateManager::TRANSITION_SHIP)) {
-            throw new OrderWorkflowException("Order state does not support shipment");
+            throw new WorkflowException("Order state does not support shipment");
         }
 
         $order

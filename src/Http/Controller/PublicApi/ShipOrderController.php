@@ -3,7 +3,7 @@
 namespace App\Http\Controller\PublicApi;
 
 use App\Application\Exception\OrderNotFoundException;
-use App\Application\Exception\OrderWorkflowException;
+use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\ShipOrder\ShipOrderException;
 use App\Application\UseCase\ShipOrder\ShipOrderRequest;
 use App\Application\UseCase\ShipOrder\ShipOrderUseCase;
@@ -68,7 +68,7 @@ class ShipOrderController
             return $this->useCase->execute($orderRequest);
         } catch (OrderNotFoundException $e) {
             throw new NotFoundHttpException($e->getMessage());
-        } catch (OrderWorkflowException $e) {
+        } catch (WorkflowException $e) {
             throw new BadRequestHttpException($e->getMessage());
         } catch (ShipOrderException $exception) {
             throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, "Order can not be shipped", $exception);

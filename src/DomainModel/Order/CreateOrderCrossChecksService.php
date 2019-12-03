@@ -2,7 +2,7 @@
 
 namespace App\DomainModel\Order;
 
-use App\Application\Exception\OrderWorkflowException;
+use App\Application\Exception\WorkflowException;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsException;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
@@ -39,7 +39,7 @@ class CreateOrderCrossChecksService implements LoggingInterface
                 'order_id' => $orderContainer->getOrder()->getId(),
             ]);
 
-            throw new OrderWorkflowException("Create order cross checks failed", null, $exception);
+            throw new WorkflowException("Create order cross checks failed", null, $exception);
         }
 
         $this->merchantRepository->update($merchant);

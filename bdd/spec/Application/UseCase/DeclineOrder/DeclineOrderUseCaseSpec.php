@@ -3,7 +3,7 @@
 namespace spec\App\Application\UseCase\DeclineOrder;
 
 use App\Application\Exception\OrderNotFoundException;
-use App\Application\Exception\OrderWorkflowException;
+use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\DeclineOrder\DeclineOrderRequest;
 use App\Application\UseCase\DeclineOrder\DeclineOrderUseCase;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
@@ -73,7 +73,7 @@ class DeclineOrderUseCaseSpec extends ObjectBehavior
             ->willReturn(false)
         ;
 
-        $this->shouldThrow(OrderWorkflowException::class)->during('execute', [$request]);
+        $this->shouldThrow(WorkflowException::class)->during('execute', [$request]);
     }
 
     public function it_successfully_declines_the_order_if_in_waiting_state(

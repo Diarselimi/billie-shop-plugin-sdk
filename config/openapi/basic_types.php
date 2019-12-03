@@ -35,6 +35,16 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Schema(
+ *     schema="OnboardingStateTransition",
+ *     title="Onboarding State",
+ *     type="string",
+ *     example="complete",
+ *     enum={"complete", "cancel"}
+ * )
+ */
+
+/**
+ * @OA\Schema(
  *     schema="OnboardingStepState",
  *     title="Onboarding Step State",
  *     type="string",
@@ -50,6 +60,16 @@ use OpenApi\Annotations as OA;
  *     type="string",
  *     example="financial_assessment",
  *     enum=\App\DomainModel\MerchantOnboarding\MerchantOnboardingStepEntity::ALL_PUBLIC_STEPS
+ * )
+ */
+
+/**
+ * @OA\Schema(
+ *     schema="OnboardingStepTransition",
+ *     title="Merchant User Onboarding steps transitions",
+ *     type="string",
+ *     enum=\App\DomainModel\MerchantOnboarding\MerchantOnboardingStepEntity::ALL_STATES,
+ *     example="complete"
  * )
  */
 

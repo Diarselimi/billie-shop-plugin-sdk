@@ -32,8 +32,10 @@ services:
       $smaugClientSecret: '%smaug_client_secret%'
       $resourcesFileReader: '@resources_file_reader'
       $apiSpecFileReader: '@api_spec_file_reader'
-      $orderWorkflow: '@state_machine.order'
       $investorUuid: '%env(string:INVESTOR_UUID)%'
+      $orderWorkflow: '@state_machine.order'
+      $onboardingStepWorkflow: '@state_machine.merchant_onboarding_step'
+      $onboardingWorkflow: '@state_machine.merchant_onboarding'
 
   _instanceof:
     App\Application\UseCase\ValidatedUseCaseInterface:

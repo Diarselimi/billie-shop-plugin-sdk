@@ -3,7 +3,7 @@
 namespace App\Http\Controller\PublicApi;
 
 use App\Application\Exception\OrderNotFoundException;
-use App\Application\Exception\OrderWorkflowException;
+use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\ConfirmPreApproveOrder\ConfirmPreApprovedOrderUseCase;
 use App\Application\UseCase\ConfirmPreApproveOrder\ConfirmPreApprovedOrderRequest;
 use App\Http\HttpConstantsInterface;
@@ -55,7 +55,7 @@ class PreApprovedOrderConfirmController
             $response = $this->useCase->execute($orderRequest);
         } catch (OrderNotFoundException $exception) {
             throw new NotFoundHttpException($exception->getMessage(), $exception);
-        } catch (OrderWorkflowException $exception) {
+        } catch (WorkflowException $exception) {
             throw new BadRequestHttpException("The order is not in pre approved state to be confirmed", $exception);
         }
 

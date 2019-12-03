@@ -35,6 +35,39 @@ class MerchantOnboardingStepRepository extends AbstractPdoRepository implements
         $this->factory = $factory;
     }
 
+    public function getOneByNameAndMerchant(string $name, string $merchantPaymentUuid): ?MerchantOnboardingStepEntity
+    {
+        $fields = array_map(
+            static function (string $field) {
+                return self::TABLE_NAME . '.' . $field;
+            },
+            self::SELECT_FIELDS
+        );
+
+        $query = $this->generateSelectQuery(self::TABLE_NAME, $fields)
+            . ' INNER JOIN merchant_onboardings ON merchant_onboardings.id = merchant_onboarding_id
+                INNER JOIN merchants ON merchant_onboardings.merchant_id = merchants.id
+                WHERE merchants.payment_merchant_id = :merchant_payment_uuid AND ' . self::TABLE_NAME . '.name = :name'
+        ;
+
+        $row = $this->doFetchOne($query, [
+            'name' => $name,
+            'merchant_payment_uuid' => $merchantPaymentUuid,
+        ]);
+
+        return $row ? $this->factory->createFromArray($row) : null;
+    }
+
+    public function findByMerchantOnboardingId(int $merchantOnboardingId): array
+    {
+        $query = $this->generateSelectQuery(self::TABLE_NAME, self::SELECT_FIELDS)
+            . ' WHERE merchant_onboarding_id = :merchant_onboarding_id AND is_internal=0 ORDER BY id'
+        ;
+        $rows = $this->doFetchAll($query, ['merchant_onboarding_id' => $merchantOnboardingId]);
+
+        return $this->factory->createFromArrayCollection($rows);
+    }
+
     public function insert(MerchantOnboardingStepEntity $entity): void
     {
         $data = [
@@ -49,16 +82,19 @@ class MerchantOnboardingStepRepository extends AbstractPdoRepository implements
         $sql = $this->generateInsertQuery(self::TABLE_NAME, array_keys($data));
         $id = $this->doInsert($sql, $data);
         $entity->setId($id);
+
         $this->dispatchCreatedEvent($entity);
     }
 
-    public function findByMerchantOnboardingId(int $merchantOnboardingId): array
+    public function update(MerchantOnboardingStepEntity $entity): void
     {
-        $query = $this->generateSelectQuery(self::TABLE_NAME, self::SELECT_FIELDS) . ' ' .
-            "WHERE merchant_onboarding_id = :merchant_onboarding_id AND is_internal=0 ORDER BY id";
-        $params = ['merchant_onboarding_id' => $merchantOnboardingId];
-        $rows = $this->doFetchAll($query, $params);
-
-        return $this->factory->createFromArrayCollection($rows);
+        $this->doUpdate('
+            UPDATE ' . self::TABLE_NAME . '
+            SET state = :state
+            WHERE id = :id
+        ', [
+            'state' => $entity->getState(),
+            'id' => $entity->getId(),
+        ]);
     }
 }

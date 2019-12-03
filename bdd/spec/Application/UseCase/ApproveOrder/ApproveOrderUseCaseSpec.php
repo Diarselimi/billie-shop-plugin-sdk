@@ -3,7 +3,7 @@
 namespace spec\App\Application\UseCase\ApproveOrder;
 
 use App\Application\Exception\OrderNotFoundException;
-use App\Application\Exception\OrderWorkflowException;
+use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\ApproveOrder\ApproveOrderRequest;
 use App\Application\UseCase\ApproveOrder\ApproveOrderUseCase;
 use App\DomainModel\Order\OrderChecksRunnerService;
@@ -72,7 +72,7 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
             ->willReturn(false)
         ;
 
-        $this->shouldThrow(OrderWorkflowException::class)->during('execute', [$request]);
+        $this->shouldThrow(WorkflowException::class)->during('execute', [$request]);
     }
 
     public function it_throws_exception_if_limit_check_fails(
@@ -101,7 +101,7 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
             ->willReturn(false)
         ;
 
-        $this->shouldThrow(OrderWorkflowException::class)->during('execute', [$request]);
+        $this->shouldThrow(WorkflowException::class)->during('execute', [$request]);
     }
 
     public function it_successfully_approves_the_order(
@@ -175,6 +175,6 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
 
         $declinedReasonsMapper->mapReasons($order)->shouldBeCalled()->willReturn([]);
 
-        $this->shouldThrow(OrderWorkflowException::class)->during('execute', [$request]);
+        $this->shouldThrow(WorkflowException::class)->during('execute', [$request]);
     }
 }

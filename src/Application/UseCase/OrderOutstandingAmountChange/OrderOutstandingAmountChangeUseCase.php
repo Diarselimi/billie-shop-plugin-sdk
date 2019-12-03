@@ -3,7 +3,7 @@
 namespace App\Application\UseCase\OrderOutstandingAmountChange;
 
 use App\Application\Exception\OrderNotFoundException;
-use App\Application\Exception\OrderWorkflowException;
+use App\Application\Exception\WorkflowException;
 use App\DomainModel\OrderNotification\OrderNotificationEntity;
 use App\DomainModel\Payment\OrderAmountChangeDTO;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
@@ -70,7 +70,7 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 
         if (!$this->orderStateManager->wasShipped($order) && !$this->orderStateManager->isCanceled($order)) {
             $this->logSuppressedException(
-                new OrderWorkflowException('Order amount change not possible'),
+                new WorkflowException('Order amount change not possible'),
                 '[suppressed] Outstanding amount change not possible for order {order_id}',
                 [
                     'order_id' => $order->getId(),

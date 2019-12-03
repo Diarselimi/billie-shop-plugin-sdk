@@ -3,7 +3,7 @@
 namespace App\Http\Controller\PrivateApi;
 
 use App\Application\Exception\OrderNotFoundException;
-use App\Application\Exception\OrderWorkflowException;
+use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\ApproveOrder\ApproveOrderRequest;
 use App\Application\UseCase\ApproveOrder\ApproveOrderUseCase;
 use OpenApi\Annotations as OA;
@@ -49,7 +49,7 @@ class ApproveOrderController
             $this->useCase->execute(new ApproveOrderRequest($uuid));
         } catch (OrderNotFoundException $e) {
             throw new NotFoundHttpException($e->getMessage());
-        } catch (OrderWorkflowException $e) {
+        } catch (WorkflowException $e) {
             throw new AccessDeniedHttpException($e->getMessage());
         }
     }

@@ -34,6 +34,8 @@ class MerchantOnboardingStepEntity extends AbstractTimestampableEntity implement
 
     public const STEP_SEPA_MANDATE_CONFIRMATION = 'sepa_mandate_confirmation';
 
+    public const STEP_SALES_CONFIRMATION = 'sales_confirmation';
+
     public const ALL_STEPS = [
         self::STEP_FINANCIAL_ASSESSMENT,
         self::STEP_SIGNATORY_CONFIRMATION,
@@ -41,6 +43,7 @@ class MerchantOnboardingStepEntity extends AbstractTimestampableEntity implement
         self::STEP_UBO_PEPSANCTIONS_ASSESSMENT,
         self::STEP_TECHNICAL_INTEGRATION,
         self::STEP_SEPA_MANDATE_CONFIRMATION,
+        self::STEP_SALES_CONFIRMATION,
     ];
 
     public const ALL_PUBLIC_STEPS = [
@@ -53,6 +56,7 @@ class MerchantOnboardingStepEntity extends AbstractTimestampableEntity implement
 
     public const ALL_INTERNAL_STEPS = [
         self::STEP_UBO_PEPSANCTIONS_ASSESSMENT,
+        self::STEP_SALES_CONFIRMATION,
     ];
 
     private const STATE_TRANSITION_ENTITY_CLASS = MerchantOnboardingStepTransitionEntity::class;
@@ -102,5 +106,10 @@ class MerchantOnboardingStepEntity extends AbstractTimestampableEntity implement
     public function getStateTransitionEntityClass(): string
     {
         return self::STATE_TRANSITION_ENTITY_CLASS;
+    }
+
+    public function isComplete(): bool
+    {
+        return $this->getState() === self::STATE_COMPLETE;
     }
 }

@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
  *     operationId="merchant_create",
  *     summary="Create Merchant",
  *
- *     tags={"Merchants"},
+ *     tags={"Support"},
  *     x={"groups":{"private"}},
  *
  *     @OA\RequestBody(

@@ -53,6 +53,7 @@ framework:
         pre_approve:
           from: new
           to: pre_approved
+
     merchant_onboarding:
       type: state_machine
       marking_store:
@@ -68,9 +69,10 @@ framework:
         complete:
           from: new
           to: complete
-        cancel:
+        canceled:
           from: new
           to: canceled
+
     merchant_onboarding_step:
       type: state_machine
       marking_store:
@@ -89,6 +91,6 @@ framework:
         complete:
           from: [new, confirmation_pending]
           to: complete
-        reset:
+        new:
           from: [complete, confirmation_pending]
           to: new

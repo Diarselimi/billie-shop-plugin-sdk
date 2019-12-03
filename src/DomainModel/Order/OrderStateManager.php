@@ -2,7 +2,7 @@
 
 namespace App\DomainModel\Order;
 
-use App\Application\Exception\OrderWorkflowException;
+use App\Application\Exception\WorkflowException;
 use App\DomainEvent\Order\OrderCanceledEvent;
 use App\DomainEvent\Order\OrderCompleteEvent;
 use App\DomainEvent\Order\OrderApprovedEvent;
@@ -161,10 +161,10 @@ class OrderStateManager implements LoggingInterface
 
         try {
             $this->orderCrossChecksService->run($orderContainer);
-        } catch (OrderWorkflowException $exception) {
+        } catch (WorkflowException $exception) {
             $this->logSuppressedException($exception, 'Order approve failed because of cross checks');
 
-            throw new OrderWorkflowException('Order cannot be approved', null, $exception);
+            throw new WorkflowException('Order cannot be approved', null, $exception);
         }
 
         $this->workflow->apply($order, OrderStateManager::TRANSITION_CREATE);
