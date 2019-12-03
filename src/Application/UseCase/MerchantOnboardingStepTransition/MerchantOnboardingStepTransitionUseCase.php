@@ -38,6 +38,7 @@ class MerchantOnboardingStepTransitionUseCase implements ValidatedUseCaseInterfa
             throw new WorkflowException("Onboarding Step Transition '{$request->getTransition()}' is not supported.");
         }
 
+        $this->workflow->apply($step, $request->getTransition());
         $this->repository->update($step);
     }
 }
