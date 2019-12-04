@@ -69,7 +69,7 @@ framework:
         complete:
           from: new
           to: complete
-        canceled:
+        cancel:
           from: new
           to: canceled
 
@@ -84,8 +84,8 @@ framework:
         - new
         - confirmation_pending
         - complete
-      transitions: # as defined in APIS-1611
-        confirmation_pending:
+      transitions:
+        request_confirmation:
           from: [new, complete]
           to: confirmation_pending
         complete:

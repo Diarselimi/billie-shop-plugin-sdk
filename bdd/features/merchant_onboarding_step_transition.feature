@@ -6,12 +6,22 @@ Feature:
         Given I add "Content-type" header equal to "application/json"
         And I add "X-Test" header equal to 1
 
-    Scenario: Merchant onboarding step transition succeeded
+    Scenario: Merchant onboarding step transition complete succeeded
         When I send a POST request to "/private/merchant/f2ec4d5e-79f4-40d6-b411-31174b6519ac/onboarding-step/transition" with body:
         """
         {
             "step": "identity_verification",
             "transition": "complete"
+        }
+        """
+        Then the response status code should be 204
+
+    Scenario: Merchant onboarding step transition request_confirmation succeeded
+        When I send a POST request to "/private/merchant/f2ec4d5e-79f4-40d6-b411-31174b6519ac/onboarding-step/transition" with body:
+        """
+        {
+            "step": "identity_verification",
+            "transition": "request_confirmation"
         }
         """
         Then the response status code should be 204

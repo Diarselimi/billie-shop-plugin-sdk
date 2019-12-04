@@ -7,8 +7,10 @@ namespace App\Application\UseCase\MerchantOnboardingTransition;
 use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
+use App\DomainModel\MerchantOnboarding\MerchantOnboardingEntity;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingRepositoryInterface;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepRepositoryInterface;
+use App\DomainModel\MerchantOnboarding\MerchantOnboardingTransitionEntity;
 use Symfony\Component\Workflow\Workflow;
 
 class MerchantOnboardingTransitionUseCase implements ValidatedUseCaseInterface
@@ -41,11 +43,10 @@ class MerchantOnboardingTransitionUseCase implements ValidatedUseCaseInterface
             throw new MerchantOnboardingNotFoundException();
         }
 
-        $steps = $this->stepRepository->findByMerchantOnboardingId($onboarding->getId());
-        foreach ($steps as $step) {
-            if (!$step->isComplete()) {
-                throw new MerchantOnboardingStepsIncompleteException();
-            }
+        if ($request->getTransition() === MerchantOnboardingTransitionEntity::TRANSITION_COMPLETE
+            && !$this->allStepsAreComplete($onboarding)
+        ) {
+            throw new MerchantOnboardingStepsIncompleteException();
         }
 
         if (!$this->workflow->can($onboarding, $request->getTransition())) {
@@ -54,5 +55,17 @@ class MerchantOnboardingTransitionUseCase implements ValidatedUseCaseInterface
 
         $this->workflow->apply($onboarding, $request->getTransition());
         $this->repository->update($onboarding);
+    }
+
+    private function allStepsAreComplete(MerchantOnboardingEntity $onboarding): bool
+    {
+        $steps = $this->stepRepository->findByMerchantOnboardingId($onboarding->getId());
+        foreach ($steps as $step) {
+            if (!$step->isComplete()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

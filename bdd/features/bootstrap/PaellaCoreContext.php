@@ -18,6 +18,7 @@ use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsEnt
 use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsFactory;
 use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsRepositoryInterface;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingPersistenceService;
+use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepRepositoryInterface;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsEntity;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
@@ -901,6 +902,11 @@ class PaellaCoreContext extends MinkContext
         return $this->get(FraudRuleRepositoryInterface::class);
     }
 
+    private function getMerchantOnboardingStepRepository(): MerchantOnboardingStepRepositoryInterface
+    {
+        return $this->get(MerchantOnboardingStepRepositoryInterface::class);
+    }
+
     private function getMerchantOnboardingPersistenceService(): MerchantOnboardingPersistenceService
     {
         return $this->get(MerchantOnboardingPersistenceService::class);
@@ -945,6 +951,18 @@ class PaellaCoreContext extends MinkContext
                 continue;
             }
             Assert::oneOf($role['name'], $roleNames, "Merchant {$merchant->getId()} has no role with name {$role['name']}");
+        }
+    }
+
+    /**
+     * @Given The following onboarding steps are in states for merchant :merchantId:
+     */
+    public function theFollowingOnboardingStepsAreInStates(TableNode $table, $merchantId)
+    {
+        foreach ($table as $row) {
+            $step = $this->getMerchantOnboardingStepRepository()->getOneByNameAndMerchant($row['name'], $merchantId);
+            $step->setState($row['state']);
+            $this->getMerchantOnboardingStepRepository()->update($step);
         }
     }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controller\PrivateApi;
 
 use App\Application\Exception\WorkflowException;
+use App\Application\UseCase\MerchantOnboardingTransition\MerchantOnboardingNotFoundException;
 use App\Application\UseCase\MerchantOnboardingTransition\MerchantOnboardingStepsIncompleteException;
 use App\Application\UseCase\MerchantOnboardingTransition\MerchantOnboardingTransitionRequest;
 use App\Application\UseCase\MerchantOnboardingTransition\MerchantOnboardingTransitionUseCase;
@@ -48,8 +49,10 @@ class MerchantOnboardingTransitionController
 
         try {
             $this->useCase->execute($useCaseRequest);
-        } catch (MerchantOnboardingStepsIncompleteException $exception) {
+        } catch (MerchantOnboardingNotFoundException $exception) {
             throw new NotFoundHttpException('Merchant onboarding not found', $exception);
+        } catch (MerchantOnboardingStepsIncompleteException $exception) {
+            throw new BadRequestHttpException('Merchant has incomplete steps', $exception);
         } catch (WorkflowException $exception) {
             throw new BadRequestHttpException('Transition not supported', $exception);
         }

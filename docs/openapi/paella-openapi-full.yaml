@@ -646,6 +646,33 @@ paths:
           $ref: '#/components/responses/ServerError'
       x-groups:
         - private
+  '/merchant/{uuid}/onboarding/transition':
+    post:
+      tags:
+        - 'Dashboard Merchants'
+      summary: 'Merchant Onboarding Transition'
+      operationId: merchant_onboarding_transition_change
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantOnboardingTransitionRequest'
+      responses:
+        '204':
+          description: 'Onboarding state changed successfully.'
+        '400':
+          description: 'Transition not supported'
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: 'Merchant not found'
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      x-groups:
+        - private
   /merchant/registration:
     post:
       tags:
@@ -852,32 +879,6 @@ paths:
         '204':
           description: 'Merchant debtor is whitelisted'
         '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
-  '/merchant/{uuid}/state':
-    post:
-      tags:
-        - 'Dashboard Merchants'
-      summary: 'Update Merchant State'
-      operationId: merchant_state_transition_update
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateMerchantStateRequest'
-      responses:
-        '204':
-          description: 'State changed successfully.'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          description: 'Merchant not found'
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
@@ -2118,6 +2119,13 @@ components:
         - complete
         - canceled
       example: new
+    OnboardingStateTransition:
+      title: 'Onboarding State'
+      type: string
+      enum:
+        - complete
+        - cancel
+      example: complete
     OnboardingStepState:
       title: 'Onboarding Step State'
       type: string
@@ -2140,9 +2148,9 @@ components:
       title: 'Merchant User Onboarding steps transitions'
       type: string
       enum:
-        - new
-        - confirmation_pending
+        - request_confirmation
         - complete
+        - cancel
       example: complete
     OrderDeclineReason:
       title: 'Order Decline Reason'
@@ -2710,6 +2718,11 @@ components:
         transition:
           $ref: '#/components/schemas/OnboardingStepTransition'
       type: object
+    MerchantOnboardingTransitionRequest:
+      properties:
+        transition:
+          $ref: '#/components/schemas/OnboardingStateTransition'
+      type: object
     MerchantUserLoginRequest:
       title: 'Merchant User Login'
       required:
@@ -2851,11 +2864,6 @@ components:
         address_postal_code:
           example: '10969'
           $ref: '#/components/schemas/TinyText'
-      type: object
-    UpdateMerchantStateRequest:
-      properties:
-        state:
-          type: string
       type: object
     UpdateOrderRequest:
       title: 'Order Update Object'

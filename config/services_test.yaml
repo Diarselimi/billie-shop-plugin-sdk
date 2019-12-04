@@ -77,6 +77,9 @@ services:
   App\DomainModel\Payment\PaymentsRepositoryInterface:
     alias: 'App\DomainModel\Payment\EmptyPaymentsRepository'
     public: true
+  App\DomainModel\MerchantOnboarding\MerchantOnboardingStepRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\MerchantOnboarding\MerchantOnboardingStepRepository'
+    public: true
   App\DomainModel\MerchantOnboarding\MerchantOnboardingPersistenceService:
     public: true
   App\DomainModel\SignatoryPowersSelection\SignatoryPowerAutoIdentifyUserService:

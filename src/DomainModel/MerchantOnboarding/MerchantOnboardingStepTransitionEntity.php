@@ -6,6 +6,14 @@ use Billie\PdoBundle\DomainModel\StateTransitionEntity\AbstractStateTransitionEn
 
 class MerchantOnboardingStepTransitionEntity extends AbstractStateTransitionEntity
 {
+    public const TRANSITION_REQUEST_CONFIRMATION = 'request_confirmation';
+
+    public const TRANSITION_COMPLETE = 'complete';
+
+    public const TRANSITION_CANCEL = 'cancel';
+
+    public const ALL_TRANSITIONS = [self::TRANSITION_REQUEST_CONFIRMATION, self::TRANSITION_COMPLETE, self::TRANSITION_CANCEL];
+
     private $merchantOnboardingStepId;
 
     public function getMerchantOnboardingStepId(): int

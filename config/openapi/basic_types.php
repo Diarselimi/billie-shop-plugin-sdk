@@ -39,7 +39,7 @@ use OpenApi\Annotations as OA;
  *     title="Onboarding State",
  *     type="string",
  *     example="complete",
- *     enum={"complete", "cancel"}
+ *     enum=\App\DomainModel\MerchantOnboarding\MerchantOnboardingTransitionEntity::ALL_TRANSITIONS
  * )
  */
 
@@ -68,8 +68,8 @@ use OpenApi\Annotations as OA;
  *     schema="OnboardingStepTransition",
  *     title="Merchant User Onboarding steps transitions",
  *     type="string",
- *     enum=\App\DomainModel\MerchantOnboarding\MerchantOnboardingStepEntity::ALL_STATES,
- *     example="complete"
+ *     example="complete",
+ *     enum=\App\DomainModel\MerchantOnboarding\MerchantOnboardingStepTransitionEntity::ALL_TRANSITIONS
  * )
  */
 
