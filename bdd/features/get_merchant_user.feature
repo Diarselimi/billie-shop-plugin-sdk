@@ -40,7 +40,8 @@ Feature: Get current logged in merchant user details
         "permissions": [
             "FOO_BAR"
         ],
-        "onboarding_state": "new"
+        "onboarding_state": "new",
+        "onboarding_complete_at": null
     }
     """
 
@@ -72,6 +73,7 @@ Feature: Get current logged in merchant user details
         "permissions": [
             "THIS_IS_OVERRIDDEN"
         ],
-        "onboarding_state": "new"
+        "onboarding_state": "new",
+        "onboarding_complete_at": null
     }
     """

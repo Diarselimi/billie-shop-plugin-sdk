@@ -3140,6 +3140,11 @@ components:
           nullable: false
         onboarding_state:
           $ref: '#/components/schemas/OnboardingState'
+        onboarding_complete_at:
+          type: string
+          format: date
+          example: '2019-03-20'
+          nullable: true
       type: object
     CheckoutSessionAuthorizeResponse:
       title: 'Authorize Checkout Order Response'

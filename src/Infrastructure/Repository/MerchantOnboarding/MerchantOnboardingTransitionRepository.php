@@ -14,4 +14,12 @@ class MerchantOnboardingTransitionRepository extends AbstractStateTransitionRepo
     {
         $this->insertStateTransition($entity, self::TABLE_NAME, 'merchant_onboarding_id');
     }
+
+    /**
+     * @return MerchantOnboardingTransitionEntity[]
+     */
+    public function findByOnboarding(int $onboardingId): array
+    {
+        return $this->findByReferenceId(self::TABLE_NAME, 'merchant_onboarding_id', MerchantOnboardingTransitionEntity::class, $onboardingId);
+    }
 }

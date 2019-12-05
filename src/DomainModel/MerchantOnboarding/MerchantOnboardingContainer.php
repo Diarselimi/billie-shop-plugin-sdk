@@ -8,19 +8,25 @@ class MerchantOnboardingContainer
 
     private $onboardingRepository;
 
+    private $onboardingTransitionRepository;
+
     private $onboardingStepRepository;
 
     private $onboardingEntity;
 
-    private $onboardingStepsEntities;
+    private $onboardingTransitions;
+
+    private $onboardingSteps;
 
     public function __construct(
         int $merchantId,
         MerchantOnboardingRepositoryInterface $onboardingRepository,
+        MerchantOnboardingTransitionRepositoryInterface $onboardingTransitionRepository,
         MerchantOnboardingStepRepositoryInterface $onboardingStepRepository
     ) {
         $this->merchantId = $merchantId;
         $this->onboardingRepository = $onboardingRepository;
+        $this->onboardingTransitionRepository = $onboardingTransitionRepository;
         $this->onboardingStepRepository = $onboardingStepRepository;
     }
 
@@ -45,19 +51,36 @@ class MerchantOnboardingContainer
     }
 
     /**
+     * @return MerchantOnboardingTransitionEntity[]
+     */
+    public function getOnboardingTransitions(): array
+    {
+        if (is_array($this->onboardingTransitions)) {
+            return $this->onboardingTransitions;
+        }
+
+        $this->onboardingTransitions = $this->onboardingTransitionRepository->findByOnboarding(
+            $this->getOnboarding()->getId()
+        );
+
+        return $this->onboardingTransitions;
+    }
+
+    /**
      * @return MerchantOnboardingStepEntity[]
      */
     public function getOnboardingSteps(): array
     {
-        if (is_array($this->onboardingStepsEntities)) {
-            return $this->onboardingStepsEntities;
+        if (is_array($this->onboardingSteps)) {
+            return $this->onboardingSteps;
         }
 
-        $this->onboardingStepsEntities = $this->onboardingStepRepository->findByMerchantOnboardingId(
-            $this->getOnboarding()->getId()
+        $this->onboardingSteps = $this->onboardingStepRepository->findByMerchantOnboardingId(
+            $this->getOnboarding()->getId(),
+            false
         );
 
-        return $this->onboardingStepsEntities;
+        return $this->onboardingSteps;
     }
 
     public function setOnboarding(MerchantOnboardingEntity $onboardingEntity): MerchantOnboardingContainer
@@ -69,7 +92,7 @@ class MerchantOnboardingContainer
 
     public function setOnboardingSteps(MerchantOnboardingStepEntity ... $onboardingStepEntities): MerchantOnboardingContainer
     {
-        $this->onboardingStepsEntities = $onboardingStepEntities;
+        $this->onboardingSteps = $onboardingStepEntities;
 
         return $this;
     }

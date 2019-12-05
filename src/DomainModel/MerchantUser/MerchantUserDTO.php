@@ -31,7 +31,8 @@ use OpenApi\Annotations as OA;
  *          @OA\Property(property="address_country", type="string", nullable=true, maxLength=2),
  *      }),
  *     @OA\Property(property="tracking_id", nullable=false, type="integer", description="ID used for tracking the user for support."),
- *     @OA\Property(property="onboarding_state", ref="#/components/schemas/OnboardingState")
+ *     @OA\Property(property="onboarding_state", ref="#/components/schemas/OnboardingState"),
+ *     @OA\Property(property="onboarding_complete_at", type="string", format="date", nullable=true, example="2019-03-20")
  * })
  */
 class MerchantUserDTO implements ArrayableInterface
@@ -48,17 +49,18 @@ class MerchantUserDTO implements ArrayableInterface
 
     private $onboardingState;
 
-    public function __construct(MerchantUserEntity $user, string $email, MerchantUserRoleEntity $role, string $onboardingState)
-    {
-        $this->user = $user;
-        $this->email = $email;
-        $this->role = $role;
-        $this->onboardingState = $onboardingState;
-    }
+    private $onboardingCompleteAt;
 
     public function getEmail(): string
     {
         return $this->email;
+    }
+
+    public function setEmail(string $email): MerchantUserDTO
+    {
+        $this->email = $email;
+
+        return $this;
     }
 
     public function getRole(): MerchantUserRoleEntity
@@ -66,9 +68,47 @@ class MerchantUserDTO implements ArrayableInterface
         return $this->role;
     }
 
+    public function setRole(MerchantUserRoleEntity $role): MerchantUserDTO
+    {
+        $this->role = $role;
+
+        return $this;
+    }
+
     public function getUser(): MerchantUserEntity
     {
         return $this->user;
+    }
+
+    public function setUser(MerchantUserEntity $user): MerchantUserDTO
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getOnboardingState(): string
+    {
+        return $this->onboardingState;
+    }
+
+    public function setOnboardingState(string $onboardingState): MerchantUserDTO
+    {
+        $this->onboardingState = $onboardingState;
+
+        return $this;
+    }
+
+    public function getOnboardingCompleteAt(): ?\DateTime
+    {
+        return $this->onboardingCompleteAt;
+    }
+
+    public function setOnboardingCompleteAt(?\DateTime $onboardingCompleteAt): MerchantUserDTO
+    {
+        $this->onboardingCompleteAt = $onboardingCompleteAt;
+
+        return $this;
     }
 
     public function getMerchantCompanyName(): string
@@ -118,7 +158,8 @@ class MerchantUserDTO implements ArrayableInterface
                 'address_country' => $address->getCountry(),
             ],
             'tracking_id' => $this->getUser()->getId(),
-            'onboarding_state' => $this->onboardingState,
+            'onboarding_state' => $this->getOnboardingState(),
+            'onboarding_complete_at' => $this->getOnboardingCompleteAt() ? $this->getOnboardingCompleteAt()->format('Y-m-d') : null,
         ];
     }
 }

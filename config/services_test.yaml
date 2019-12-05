@@ -77,8 +77,14 @@ services:
   App\DomainModel\Payment\PaymentsRepositoryInterface:
     alias: 'App\DomainModel\Payment\EmptyPaymentsRepository'
     public: true
+  App\DomainModel\MerchantOnboarding\MerchantOnboardingRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\MerchantOnboarding\MerchantOnboardingRepository'
+    public: true
   App\DomainModel\MerchantOnboarding\MerchantOnboardingStepRepositoryInterface:
     alias: 'App\Infrastructure\Repository\MerchantOnboarding\MerchantOnboardingStepRepository'
+    public: true
+  App\DomainModel\MerchantOnboarding\MerchantOnboardingTransitionRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\MerchantOnboarding\MerchantOnboardingTransitionRepository'
     public: true
   App\DomainModel\MerchantOnboarding\MerchantOnboardingPersistenceService:
     public: true

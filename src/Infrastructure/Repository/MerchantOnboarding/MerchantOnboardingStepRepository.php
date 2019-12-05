@@ -58,11 +58,18 @@ class MerchantOnboardingStepRepository extends AbstractPdoRepository implements
         return $row ? $this->factory->createFromArray($row) : null;
     }
 
-    public function findByMerchantOnboardingId(int $merchantOnboardingId): array
+    public function findByMerchantOnboardingId(int $merchantOnboardingId, bool $includeInternalSteps): array
     {
         $query = $this->generateSelectQuery(self::TABLE_NAME, self::SELECT_FIELDS)
-            . ' WHERE merchant_onboarding_id = :merchant_onboarding_id AND is_internal=0 ORDER BY id'
+            . ' WHERE merchant_onboarding_id = :merchant_onboarding_id'
         ;
+
+        if (!$includeInternalSteps) {
+            $query .= ' AND is_internal = 0';
+        }
+
+        $query .= ' ORDER BY id';
+
         $rows = $this->doFetchAll($query, ['merchant_onboarding_id' => $merchantOnboardingId]);
 
         return $this->factory->createFromArrayCollection($rows);

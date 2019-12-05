@@ -59,7 +59,7 @@ class MerchantOnboardingTransitionUseCase implements ValidatedUseCaseInterface
 
     private function allStepsAreComplete(MerchantOnboardingEntity $onboarding): bool
     {
-        $steps = $this->stepRepository->findByMerchantOnboardingId($onboarding->getId());
+        $steps = $this->stepRepository->findByMerchantOnboardingId($onboarding->getId(), true);
         foreach ($steps as $step) {
             if (!$step->isComplete()) {
                 return false;

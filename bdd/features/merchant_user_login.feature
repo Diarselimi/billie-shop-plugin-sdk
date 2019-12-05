@@ -66,7 +66,7 @@ Feature: Enable merchant users to login
     """
     Then the response status code should be 401
 
-  Scenario: Valid credentials - successful login
+  Scenario: Valid credentials - successful login of an incomplete merchant user
     Given a merchant user exists with overridden permission VIEW_DEBTORS
     And I successfully obtain token from oauth service
     And I get from companies service update debtor positive response
@@ -104,7 +104,54 @@ Feature: Enable merchant users to login
                 "address_city": "Berlin"
             },
             "tracking_id": 1,
-            "onboarding_state": "new"
+            "onboarding_state": "new",
+            "onboarding_complete_at": null
+        }
+      }
+    """
+
+
+  Scenario: Valid credentials - successful login of an complete merchant user
+    Given a merchant user exists with overridden permission VIEW_DEBTORS
+    And a merchant "f2ec4d5e-79f4-40d6-b411-31174b6519ac" is complete at "2018-05-16"
+    And I successfully obtain token from oauth service
+    And I get from companies service update debtor positive response
+    And I get from Oauth service a valid user token
+    When I send a POST request to "/merchant/user/login" with body:
+    """
+      {
+        "email": "testUser@merchant.com",
+        "password": "testPassword"
+      }
+    """
+    Then the response status code should be 200
+    And the JSON response should be:
+    """
+      {
+        "access_token": "testToken",
+        "user": {
+            "uuid": "oauthUserId",
+            "first_name": "test",
+            "last_name": "test",
+            "email":"test@billie.dev",
+            "role": {
+              "uuid": "test_uuid",
+              "name": "test"
+            },
+            "permissions": [
+                "VIEW_DEBTORS"
+            ],
+            "merchant_company": {
+                "name": "Test User Company",
+                "address_street": "Heinrich-Heine-Platz",
+                "address_postal_code": "10179",
+                "address_country": "DE",
+                "address_house_number": "10",
+                "address_city": "Berlin"
+            },
+            "tracking_id": 1,
+            "onboarding_state": "complete",
+            "onboarding_complete_at": "2018-05-16"
         }
       }
     """

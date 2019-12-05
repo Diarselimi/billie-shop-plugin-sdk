@@ -7,7 +7,9 @@ use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
 use App\DomainModel\Merchant\MerchantCompanyNotFoundException;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\MerchantOnboarding\MerchantOnboardingContainer;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingContainerFactory;
+use App\DomainModel\MerchantOnboarding\MerchantOnboardingTransitionEntity;
 
 class MerchantUserService
 {
@@ -60,10 +62,27 @@ class MerchantUserService
         }
 
         $role = $this->merchantUserPermissionsService->resolveUserRole($merchantUser);
-        $onboardingFactory = $this->onboardingContainerFactory->create($merchant->getId());
+        $onboardingContainer = $this->onboardingContainerFactory->create($merchant->getId());
 
-        return (new MerchantUserDTO($merchantUser, $email, $role, $onboardingFactory->getOnboarding()->getState()))
+        return (new MerchantUserDTO())
+            ->setUser($merchantUser)
+            ->setEmail($email)
+            ->setRole($role)
+            ->setOnboardingState($onboardingContainer->getOnboarding()->getState())
+            ->setOnboardingCompleteAt($this->getOnboardingCompleteAt($onboardingContainer))
             ->setMerchantCompanyName($company->getName())
-            ->setMerchantCompanyAddress($this->addressEntityFactory->createFromDebtorCompany($company));
+            ->setMerchantCompanyAddress($this->addressEntityFactory->createFromDebtorCompany($company))
+        ;
+    }
+
+    private function getOnboardingCompleteAt(MerchantOnboardingContainer $onboardingContainer): ?\DateTime
+    {
+        foreach ($onboardingContainer->getOnboardingTransitions() as $onboardingTransition) {
+            if ($onboardingTransition->getTransition() === MerchantOnboardingTransitionEntity::TRANSITION_COMPLETE) {
+                return  $onboardingTransition->getTransitedAt();
+            }
+        }
+
+        return null;
     }
 }

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "54d837215851488a342b69804d8d1f07",
+    "content-hash": "bb8e84f1c551a525697b30a285e3e191",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -187,16 +187,16 @@
         },
         {
             "name": "billie/pdo-bundle",
-            "version": "1.4.0",
+            "version": "1.4.1",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/PdoBundle.git",
-                "reference": "9a633a3e5edca8fbc185d07fd6a692416942ca16"
+                "reference": "61a248e825484c760a9014b546307576e5b543d8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/PdoBundle/zipball/9a633a3e5edca8fbc185d07fd6a692416942ca16",
-                "reference": "9a633a3e5edca8fbc185d07fd6a692416942ca16",
+                "url": "https://api.github.com/repos/ozean12/PdoBundle/zipball/61a248e825484c760a9014b546307576e5b543d8",
+                "reference": "61a248e825484c760a9014b546307576e5b543d8",
                 "shasum": ""
             },
             "require": {
@@ -238,9 +238,9 @@
             ],
             "description": "Minimal ORM built on top of PDO",
             "support": {
-                "source": "https://github.com/ozean12/PdoBundle/tree/1.4.0"
+                "source": "https://github.com/ozean12/PdoBundle/tree/1.4.1"
             },
-            "time": "2019-11-19T13:37:31+00:00"
+            "time": "2019-12-05T10:57:58+00:00"
         },
         {
             "name": "bunny/bunny",

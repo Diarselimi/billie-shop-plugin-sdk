@@ -18,7 +18,10 @@ use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsEnt
 use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsFactory;
 use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsRepositoryInterface;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingPersistenceService;
+use App\DomainModel\MerchantOnboarding\MerchantOnboardingRepositoryInterface;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepRepositoryInterface;
+use App\DomainModel\MerchantOnboarding\MerchantOnboardingTransitionEntity;
+use App\DomainModel\MerchantOnboarding\MerchantOnboardingTransitionRepositoryInterface;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsEntity;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
@@ -657,9 +660,28 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
+     * @Given a merchant :merchantId is complete at :date
+     */
+    public function aMerchantIsCompleteAt(string $merchantId, string $date)
+    {
+        $onboarding = $this->getMerchantOnboardingRepository()->findNewestByPaymentUuid($merchantId);
+        $onboarding->setState('complete');
+        $this->getMerchantOnboardingRepository()->update($onboarding);
+
+        $transition = (new MerchantOnboardingTransitionEntity())
+            ->setReferenceId($onboarding->getId())
+            ->setFrom('new')
+            ->setTo('complete')
+            ->setTransition('complete')
+            ->setTransitedAt(new \DateTime($date))
+        ;
+        $this->getMerchantOnboardingTransitionRepository()->insert($transition);
+    }
+
+    /**
      * @Given a merchant user exists with uuid :userUuid, role ID :role and :invitationStatus invitation
      */
-    public function iAMerchantUserExistsWithUuidAndInvitation($userUuid, $roleId, $invitationStatus)
+    public function aMerchantUserExistsWithUuidAndInvitation($userUuid, $roleId, $invitationStatus)
     {
         $role = (new MerchantUserRoleEntity())
             ->setId($roleId)
@@ -900,6 +922,16 @@ class PaellaCoreContext extends MinkContext
     private function getFraudCheckRulesRepository(): FraudRuleRepositoryInterface
     {
         return $this->get(FraudRuleRepositoryInterface::class);
+    }
+
+    private function getMerchantOnboardingRepository(): MerchantOnboardingRepositoryInterface
+    {
+        return $this->get(MerchantOnboardingRepositoryInterface::class);
+    }
+
+    private function getMerchantOnboardingTransitionRepository(): MerchantOnboardingTransitionRepositoryInterface
+    {
+        return $this->get(MerchantOnboardingTransitionRepositoryInterface::class);
     }
 
     private function getMerchantOnboardingStepRepository(): MerchantOnboardingStepRepositoryInterface

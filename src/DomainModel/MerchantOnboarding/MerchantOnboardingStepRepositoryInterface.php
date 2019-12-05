@@ -7,10 +7,9 @@ interface MerchantOnboardingStepRepositoryInterface
     public function getOneByNameAndMerchant(string $name, string $merchantPaymentUuid): ?MerchantOnboardingStepEntity;
 
     /**
-     * @param  int                            $merchantOnboardingId
      * @return MerchantOnboardingStepEntity[]
      */
-    public function findByMerchantOnboardingId(int $merchantOnboardingId): array;
+    public function findByMerchantOnboardingId(int $merchantOnboardingId, bool $includeInternalSteps): array;
 
     public function insert(MerchantOnboardingStepEntity $entity): void;
 
