@@ -474,6 +474,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     Given I get from companies service identify match and good decision response
     And I get from payments service register debtor positive response
     And I have a checkout_session_id "123123"
+    And Debtor has sufficient limit
     And I send a PUT request to "/checkout-session/123123/authorize" with body:
     """
     {

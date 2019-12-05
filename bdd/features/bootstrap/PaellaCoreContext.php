@@ -1068,4 +1068,26 @@ class PaellaCoreContext extends MinkContext
     {
         $this->getMink()->assertSession()->statusCodeEquals((int) $code);
     }
+
+    /**
+     * @Given a user invitation with role :roleName and email :email should have been created for merchant with company ID :id
+     */
+    public function aUserInvitationForShouldBeCreatedForMerchantWithCompanyID($roleName, $email, $id)
+    {
+        $merchant = $this->getMerchantRepository()->getOneByCompanyId((int) $id);
+        Assert::notNull($merchant, 'Merchant was null');
+
+        $role = $this->getMerchantUserRoleRepository()->getOneByName($roleName, $merchant->getId());
+        Assert::notNull($role, 'Role was null');
+
+        $pdoQuery = $this->getConnection()->prepare(
+            "SELECT COUNT(*) as total FROM merchant_user_invitations 
+              WHERE merchant_id = :merchant_id AND email = :email AND merchant_user_role_id = :role_id",
+            []
+        );
+        $pdoQuery->execute(['merchant_id' => $merchant->getId(), 'email' => $email, 'role_id' => $role->getId()]);
+        $results = $pdoQuery->fetch(PDO::FETCH_ASSOC);
+
+        Assert::eq($results['total'], 1);
+    }
 }

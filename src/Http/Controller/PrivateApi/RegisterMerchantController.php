@@ -6,9 +6,15 @@ namespace App\Http\Controller\PrivateApi;
 
 use App\Application\UseCase\RegisterMerchant\RegisterMerchantRequest;
 use App\Application\UseCase\RegisterMerchant\RegisterMerchantUseCase;
+use App\DomainModel\Merchant\CreateMerchantException;
+use App\DomainModel\Merchant\DuplicateMerchantCompanyException;
+use App\DomainModel\Merchant\MerchantCompanyNotFoundException;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 /**
  * @OA\Post(
@@ -28,6 +34,7 @@ use Symfony\Component\HttpFoundation\Request;
  *     @OA\Response(response=201, description="Merchant registered successfully", @OA\JsonContent(ref="#/components/schemas/RegisterMerchantResponse")),
  *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),
  *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+ *     @OA\Response(response=409, ref="#/components/responses/ResourceConflict"),
  *     @OA\Response(response=404, ref="#/components/responses/NotFound", description="Company not found"),
  *     @OA\Response(response=500, ref="#/components/responses/ServerError")
  * )
@@ -48,8 +55,15 @@ class RegisterMerchantController
             $request->get('email')
         );
 
-        // TODO: handle exceptions
-        $useCaseResponse = $this->useCase->execute($useCaseRequest);
+        try {
+            $useCaseResponse = $this->useCase->execute($useCaseRequest);
+        } catch (MerchantCompanyNotFoundException $e) {
+            throw new NotFoundHttpException($e->getMessage());
+        } catch (DuplicateMerchantCompanyException $e) {
+            throw new ConflictHttpException($e->getMessage());
+        } catch (CreateMerchantException $e) {
+            throw new ServiceUnavailableHttpException(null, $e->getMessage());
+        }
 
         return new JsonResponse($useCaseResponse->toArray(), JsonResponse::HTTP_CREATED);
     }

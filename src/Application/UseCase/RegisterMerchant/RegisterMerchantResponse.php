@@ -3,6 +3,8 @@
 namespace App\Application\UseCase\RegisterMerchant;
 
 use App\DomainModel\ArrayableInterface;
+use App\DomainModel\Merchant\MerchantEntity;
+use App\DomainModel\MerchantUserInvitation\MerchantUserInvitationEntity;
 
 /**
  * @OA\Schema(
@@ -17,13 +19,22 @@ use App\DomainModel\ArrayableInterface;
  */
 class RegisterMerchantResponse implements ArrayableInterface
 {
+    private $merchant;
+
+    private $invitation;
+
+    public function __construct(MerchantEntity $merchant, MerchantUserInvitationEntity $invitation)
+    {
+        $this->merchant = $merchant;
+        $this->invitation = $invitation;
+    }
+
     public function toArray(): array
     {
-        // TODO: implement RegisterMerchantResponse
         return [
-            'uuid' => '0dd6686e-b6d5-4d2a-84f1-d43c66970b30',
-            'name' => 'Fake Merchant',
-            'invitation_token' => 'f50e26cda7c276e179a8482338a6481a',
+            'uuid' => $this->merchant->getPaymentUuid(),
+            'name' => $this->merchant->getName(),
+            'invitation_token' => $this->invitation->getToken(),
         ];
     }
 }

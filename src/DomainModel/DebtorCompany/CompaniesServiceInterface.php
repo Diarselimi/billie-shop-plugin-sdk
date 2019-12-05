@@ -8,11 +8,17 @@ use App\DomainModel\MerchantDebtor\MerchantDebtorDuplicateDTO;
 
 interface CompaniesServiceInterface
 {
-    public function getDebtor(int $debtorCompanyId): ? DebtorCompany;
+    public function getDebtor(int $debtorCompanyId): ?DebtorCompany;
 
-    public function getDebtorByUuid(string $debtorCompanyUuid): ? DebtorCompany;
+    public function getDebtorByUuid(string $debtorCompanyUuid): ?DebtorCompany;
 
-    public function identifyDebtor(IdentifyDebtorRequestDTO $requestDTO): ? DebtorCompany;
+    /**
+     * @param  string          $crefoId
+     * @return DebtorCompany[]
+     */
+    public function getDebtorsByCrefoId(string $crefoId): array;
+
+    public function identifyDebtor(IdentifyDebtorRequestDTO $requestDTO): ?DebtorCompany;
 
     public function updateDebtor(int $debtorId, array $updateData): DebtorCompany;
 
@@ -22,9 +28,14 @@ interface CompaniesServiceInterface
 
     public function synchronizeDebtor(int $debtorId): DebtorCompany;
 
+    /**
+     * @param  int[]|string[]  $debtorIds
+     * @return DebtorCompany[]
+     */
     public function getDebtors(array $debtorIds): array;
 
     /**
+     * @param  string                 $companyIdentifier
      * @return GetSignatoryPowerDTO[]
      */
     public function getSignatoryPowers(string $companyIdentifier): array;

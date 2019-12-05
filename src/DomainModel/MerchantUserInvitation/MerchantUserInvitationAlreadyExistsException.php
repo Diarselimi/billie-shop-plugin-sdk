@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\UseCase\CreateMerchantUserInvitation;
+namespace App\DomainModel\MerchantUserInvitation;
 
 class MerchantUserInvitationAlreadyExistsException extends \RuntimeException
 {

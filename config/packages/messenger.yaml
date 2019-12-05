@@ -1,2 +1,4 @@
 framework:
-    messenger: ~
+    messenger:
+      transports: ~
+      routing: ~

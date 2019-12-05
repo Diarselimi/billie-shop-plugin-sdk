@@ -153,15 +153,16 @@ Feature: Endpoint to approve an order in waiting state
 			| debtor_blacklisted        | 0         |
 			| debtor_overdue            | 1         |
 			| company_b2b_score         | 1         |
+		And Debtor has sufficient limit
 		And I get from companies service get debtor response
 		When I send a POST request to "/private/order/test-order-uuid/approve"
-		Then the response status code should be 403
-		And the order CO123 is in state waiting
-		And the order CO123 has risk check limit failed
-		And the JSON response should be:
+		Then the JSON response should be:
     """
     {"errors":[{"title":"Cannot approve the order. Limit check failed","code":"forbidden"}]}
     """
+		And the response status code should be 403
+		And the order CO123 is in state waiting
+		And the order CO123 has risk check limit failed
 
 	Scenario: Order in waiting state because of delivery_address check - approve order and override delivery_address check
 		Given I have a waiting order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"

@@ -42,7 +42,7 @@ class MerchantAnnouncerSpec extends ObjectBehavior
 
         $bus->dispatch($message)->shouldBeCalledOnce()->willReturn(new Envelope($message));
 
-        $this->customerCreated(
+        $this->announceCustomerCreated(
             self::COMPANY_UUID,
             self::COMPANY_NAME,
             self::PAYMENT_UUID

@@ -2,180 +2,65 @@
 
 namespace App\Application\UseCase\CreateMerchant;
 
-use App\Application\UseCase\CreateMerchant\Exception\CreateMerchantException;
-use App\Application\UseCase\CreateMerchant\Exception\DuplicateMerchantCompanyException;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
-use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
+use App\DomainModel\Merchant\DuplicateMerchantCompanyException;
 use App\DomainModel\Merchant\MerchantCompanyNotFoundException;
-use App\DomainModel\Merchant\MerchantAnnouncer;
-use App\DomainModel\Merchant\MerchantEntity;
-use App\DomainModel\Merchant\MerchantEntityFactory;
+use App\DomainModel\Merchant\MerchantCreationDTO;
+use App\DomainModel\Merchant\MerchantCreationService;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
-use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsFactory;
-use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsRepositoryInterface;
-use App\DomainModel\MerchantOnboarding\MerchantOnboardingPersistenceService;
-use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
-use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
-use App\DomainModel\MerchantSettings\MerchantSettingsEntityFactory;
-use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
-use App\DomainModel\MerchantUser\AuthenticationServiceCreateClientResponseDTO;
-use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
-use App\DomainModel\MerchantUser\AuthenticationServiceRequestException;
-use App\DomainModel\MerchantUser\MerchantUserDefaultRoles;
-use App\DomainModel\MerchantUser\MerchantUserRoleEntityFactory;
-use App\DomainModel\MerchantUser\MerchantUserRoleRepositoryInterface;
-use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntityFactory;
-use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
-use Ramsey\Uuid\Uuid;
+use App\Helper\Uuid\UuidGeneratorInterface;
 
 class CreateMerchantUseCase
 {
+    private $uuidGenerator;
+
     private $merchantRepository;
 
     private $companiesService;
 
-    private $merchantFactory;
-
-    private $merchantSettingsFactory;
-
-    private $merchantSettingsRepository;
-
-    private $scoreThresholdsConfigurationFactory;
-
-    private $scoreThresholdsConfigurationRepository;
-
-    private $merchantRiskCheckSettingsRepository;
-
-    private $authenticationService;
-
-    private $notificationSettingsFactory;
-
-    private $notificationSettingsRepository;
-
-    private $rolesRepository;
-
-    private $rolesFactory;
-
-    private $merchantAnnouncer;
-
-    private $onboardingPersistenceService;
+    private $merchantCreationService;
 
     public function __construct(
+        UuidGeneratorInterface $uuidGenerator,
         MerchantRepositoryInterface $merchantRepository,
         CompaniesServiceInterface $companiesService,
-        MerchantEntityFactory $merchantEntityFactory,
-        MerchantSettingsEntityFactory $merchantSettingsFactory,
-        MerchantSettingsRepositoryInterface $merchantSettingsRepository,
-        ScoreThresholdsConfigurationEntityFactory $scoreThresholdsConfigurationFactory,
-        ScoreThresholdsConfigurationRepositoryInterface $scoreThresholdsConfigurationRepository,
-        MerchantRiskCheckSettingsRepositoryInterface $merchantRiskCheckSettingsRepository,
-        AuthenticationServiceInterface $authenticationService,
-        MerchantNotificationSettingsFactory $notificationSettingsFactory,
-        MerchantNotificationSettingsRepositoryInterface $notificationSettingsRepository,
-        MerchantUserRoleEntityFactory $rolesFactory,
-        MerchantUserRoleRepositoryInterface $rolesRepository,
-        MerchantOnboardingPersistenceService $onboardingPersistenceService,
-        MerchantAnnouncer $merchantAnnouncer
+        MerchantCreationService $merchantCreationService
     ) {
-        // TODO: refactor CreateMerchantUseCase into smaller pieces / services
+        $this->uuidGenerator = $uuidGenerator;
         $this->merchantRepository = $merchantRepository;
         $this->companiesService = $companiesService;
-        $this->merchantFactory = $merchantEntityFactory;
-        $this->merchantSettingsFactory = $merchantSettingsFactory;
-        $this->merchantSettingsRepository = $merchantSettingsRepository;
-        $this->scoreThresholdsConfigurationFactory = $scoreThresholdsConfigurationFactory;
-        $this->scoreThresholdsConfigurationRepository = $scoreThresholdsConfigurationRepository;
-        $this->merchantRiskCheckSettingsRepository = $merchantRiskCheckSettingsRepository;
-        $this->authenticationService = $authenticationService;
-        $this->notificationSettingsFactory = $notificationSettingsFactory;
-        $this->notificationSettingsRepository = $notificationSettingsRepository;
-        $this->rolesRepository = $rolesRepository;
-        $this->rolesFactory = $rolesFactory;
-        $this->onboardingPersistenceService = $onboardingPersistenceService;
-        $this->merchantAnnouncer = $merchantAnnouncer;
+        $this->merchantCreationService = $merchantCreationService;
     }
 
     public function execute(CreateMerchantRequest $request): CreateMerchantResponse
     {
-        $companyId = $request->getCompanyId();
-        $merchant = $this->merchantRepository->getOneByCompanyId($companyId);
-
-        if ($merchant) {
+        if ($this->merchantRepository->getOneByCompanyId($request->getCompanyId())) {
             throw new DuplicateMerchantCompanyException();
         }
 
-        try {
-            $company = $this->companiesService->getDebtor($companyId);
-        } catch (CompaniesServiceRequestException $exception) {
-            $company = null;
-        }
+        $company = $this->companiesService->getDebtor($request->getCompanyId());
 
         if (!$company) {
             throw new MerchantCompanyNotFoundException();
         }
 
-        $oauthClient = $this->createOauthClient($company->getName());
-
-        $merchant = $this->merchantFactory->createFromRequest($request, $company);
-        $merchant->setOauthClientId($oauthClient->getClientId());
-        $this->merchantRepository->insert($merchant);
-
-        $this->createSettings($request, $merchant);
-        $this->createDefaultRoles($merchant->getId());
-        $this->onboardingPersistenceService->createWithSteps($merchant->getId());
-
-        $this->merchantAnnouncer->customerCreated(
-            $company->getUuid(),
-            $company->getName(),
-            $merchant->getPaymentUuid()
+        $creationDTO = $this->merchantCreationService->create(
+            (new MerchantCreationDTO(
+                $company,
+                $this->uuidGenerator->uuid4(),
+                $this->uuidGenerator->uuid4(),
+                $request->getMerchantFinancingLimit(),
+                $request->getInitialDebtorFinancingLimit(),
+                $request->getDebtorFinancingLimit()
+            ))
+                ->setWebhookUrl($request->getWebhookUrl())
+                ->setWebhookAuthorization($request->getWebhookAuthorization())
         );
 
-        return new CreateMerchantResponse($merchant, $oauthClient->getClientId(), $oauthClient->getClientSecret());
-    }
-
-    private function createDefaultRoles(int $merchantId): void
-    {
-        foreach (MerchantUserDefaultRoles::ROLES as $role) {
-            $this->rolesRepository->create($this->rolesFactory->create(
-                $merchantId,
-                Uuid::uuid4(),
-                $role['name'],
-                $role['permissions']
-            ));
-        }
-    }
-
-    private function createOauthClient(string $companyName): AuthenticationServiceCreateClientResponseDTO
-    {
-        try {
-            return $this->authenticationService->createClient($companyName);
-        } catch (AuthenticationServiceRequestException $exception) {
-            throw new CreateMerchantException('Failed to create OAuth client for merchant');
-        }
-    }
-
-    private function createSettings(CreateMerchantRequest $request, MerchantEntity $merchant): void
-    {
-        $scoreThresholds = $this->scoreThresholdsConfigurationFactory->createDefault();
-
-        $this->scoreThresholdsConfigurationRepository->insert($scoreThresholds);
-
-        $merchantSettings = $this->merchantSettingsFactory->create(
-            $merchant->getId(),
-            $request->getInitialDebtorFinancingLimit(),
-            $request->getDebtorFinancingLimit(),
-            $scoreThresholds->getId(),
-            false,
-            MerchantSettingsEntity::INVOICE_HANDLING_STRATEGY_NONE,
-            MerchantSettingsEntity::DEFAULT_DEBTOR_FORGIVENESS_THRESHOLD
+        return new CreateMerchantResponse(
+            $creationDTO->getMerchant(),
+            $creationDTO->getOauthClient()->getClientId(),
+            $creationDTO->getOauthClient()->getClientSecret()
         );
-
-        $this->merchantSettingsRepository->insert($merchantSettings);
-
-        $this->merchantRiskCheckSettingsRepository->insertMerchantDefaultRiskCheckSettings($merchant->getId());
-
-        foreach ($this->notificationSettingsFactory->createDefaults($merchant->getId()) as $notificationSetting) {
-            $this->notificationSettingsRepository->insert($notificationSetting);
-        }
     }
 }

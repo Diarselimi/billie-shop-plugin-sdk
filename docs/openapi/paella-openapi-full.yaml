@@ -696,6 +696,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/ResourceConflict'
         '404':
           description: 'Company not found'
           $ref: '#/components/responses/NotFound'

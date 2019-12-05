@@ -10,6 +10,8 @@ interface MerchantUserRoleRepositoryInterface
 
     public function getOneById(int $id, int $merchantId = null): ?MerchantUserRoleEntity;
 
+    public function getOneByName(string $name, int $merchantId): ?MerchantUserRoleEntity;
+
     /**
      * @param  int                                 $merchantId
      * @return \Generator|MerchantUserRoleEntity[]

@@ -49,7 +49,24 @@ class MerchantEntityFactory
         ;
     }
 
+    public function createFromCreationDTO(MerchantCreationDTO $creationDTO): MerchantEntity
+    {
+        return (new MerchantEntity())
+            ->setCompanyId($creationDTO->getCompany()->getId())
+            ->setFinancingPower($creationDTO->getMerchantFinancingLimit())
+            ->setFinancingLimit($creationDTO->getMerchantFinancingLimit())
+            ->setName($creationDTO->getCompany()->getName())
+            ->setApiKey($creationDTO->getApiKey())
+            ->setPaymentUuid($creationDTO->getPaymentUuid())
+            ->setWebhookUrl($creationDTO->getWebhookUrl())
+            ->setWebhookAuthorization($creationDTO->getWebhookAuthorization())
+            ->setOauthClientId($creationDTO->getOauthClient()->getClientId())
+            ->setIsActive(true)
+        ;
+    }
+
     /**
+     * @param  array[]          $rows
      * @return MerchantEntity[]
      */
     public function createFromDatabaseRows(array $rows)

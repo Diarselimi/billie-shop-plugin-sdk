@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\UseCase\CreateMerchant\Exception;
+namespace App\DomainModel\Merchant;
 
 class DuplicateMerchantCompanyException extends \RuntimeException
 {

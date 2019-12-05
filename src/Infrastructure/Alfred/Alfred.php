@@ -8,10 +8,10 @@ use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorCompany\DebtorCompanyFactory;
 use App\DomainModel\DebtorCompany\IdentifyDebtorRequestDTO;
 use App\DomainModel\DebtorCompany\IsEligibleForPayAfterDeliveryRequestDTO;
-use App\DomainModel\SignatoryPowersSelection\SignatoryPowerDTO;
 use App\DomainModel\GetSignatoryPowers\GetSignatoryPowerDTO;
 use App\DomainModel\GetSignatoryPowers\SignatoryPowerDTOFactory;
 use App\DomainModel\MerchantDebtor\MerchantDebtorDuplicateDTO;
+use App\DomainModel\SignatoryPowersSelection\SignatoryPowerDTO;
 use App\Infrastructure\ClientResponseDecodeException;
 use App\Infrastructure\DecodeResponseTrait;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
@@ -73,6 +73,21 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
     public function getDebtorByUuid(string $debtorCompanyUuid): ?DebtorCompany
     {
         return $this->doGetDebtor($debtorCompanyUuid);
+    }
+
+    public function getDebtorsByCrefoId(string $crefoId): array
+    {
+        try {
+            $response = $this->client->get("/debtor/crefo/{$crefoId}");
+
+            return $this->factory->createFromMultipleDebtorCompaniesResponse($this->decodeResponse($response));
+        } catch (TransferException | ClientResponseDecodeException $exception) {
+            if ($exception->getCode() === Response::HTTP_NOT_FOUND) {
+                return [];
+            }
+
+            throw new CompaniesServiceRequestException($exception);
+        }
     }
 
     private function doGetDebtor($identifier): ?DebtorCompany

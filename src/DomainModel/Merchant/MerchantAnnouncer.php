@@ -23,7 +23,7 @@ class MerchantAnnouncer implements LoggingInterface
         $this->investorUuid = $investorUuid;
     }
 
-    public function customerCreated(
+    public function announceCustomerCreated(
         string $companyUuid,
         string $companyName,
         string $paymentUuid

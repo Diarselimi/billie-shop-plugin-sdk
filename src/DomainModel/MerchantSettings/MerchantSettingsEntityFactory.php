@@ -23,7 +23,7 @@ class MerchantSettingsEntityFactory
     public function create(
         int $merchantId,
         float $initialDebtorFinancingLimit,
-        float $financingLimit,
+        float $debtorFinancingLimit,
         int $scoreThresholdsConfigurationId,
         bool $useExperimentalDebtorIdentification,
         string $invoiceHandlingStrategy,
@@ -32,7 +32,7 @@ class MerchantSettingsEntityFactory
         return (new MerchantSettingsEntity())
             ->setMerchantId($merchantId)
             ->setInitialDebtorFinancingLimit($initialDebtorFinancingLimit)
-            ->setDebtorFinancingLimit($financingLimit)
+            ->setDebtorFinancingLimit($debtorFinancingLimit)
             ->setMinOrderAmount(MerchantSettingsEntity::DEFAULT_MIN_ORDER_AMOUNT)
             ->setScoreThresholdsConfigurationId($scoreThresholdsConfigurationId)
             ->setUseExperimentalDebtorIdentification($useExperimentalDebtorIdentification)

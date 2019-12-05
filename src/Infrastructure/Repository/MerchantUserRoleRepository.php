@@ -122,4 +122,9 @@ class MerchantUserRoleRepository extends AbstractPdoRepository implements Mercha
             yield $value;
         }
     }
+
+    public function getOneByName(string $name, int $merchantId): ?MerchantUserRoleEntity
+    {
+        return $this->getOneBy('name', $name, $merchantId);
+    }
 }

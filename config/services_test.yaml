@@ -7,6 +7,9 @@ services:
     autowire: true
     public: true
 
+  App\Http\ApiError\VerboseApiErrorResponseFactory: ~
+  App\Test\TestMessageBus: ~
+  Symfony\Component\Messenger\MessageBusInterface: '@App\Test\TestMessageBus'
   App\Http\ApiError\ApiErrorResponseFactory: '@App\Http\ApiError\VerboseApiErrorResponseFactory'
 
   App\DomainModel\Order\OrderRepositoryInterface:
