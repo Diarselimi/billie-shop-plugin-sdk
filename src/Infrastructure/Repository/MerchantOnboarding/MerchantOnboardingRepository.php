@@ -81,13 +81,16 @@ class MerchantOnboardingRepository extends AbstractPdoRepository implements
 
     public function update(MerchantOnboardingEntity $entity): void
     {
+        $entity->setUpdatedAt(new \DateTime());
+
         $this->doUpdate('
             UPDATE ' . self::TABLE_NAME . '
-            SET state = :state
+            SET state = :state, updated_at = :updated_at
             WHERE id = :id
         ', [
             'state' => $entity->getState(),
             'id' => $entity->getId(),
+            'updated_at' => $entity->getUpdatedAt()->format(self::DATE_FORMAT),
         ]);
     }
 }
