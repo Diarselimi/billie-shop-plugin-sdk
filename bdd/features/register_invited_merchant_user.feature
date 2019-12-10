@@ -73,7 +73,27 @@ Feature: Register merchant user to access dashboard
       {"errors":[{"title":"Merchant user with the same login already exists","code":"resource_already_exists"}]}
     """
 
-  Scenario: Successfully register merchant user via invitation
+  Scenario: Request for an admin without accepting T&C
+    Given I have a role of name "admin" with uuid "c7be46c0-e049-4312-b274-258ec5aeeb70" and permissions
+    """
+      ["TEST"]
+    """
+    And an invitation with token "4b4e2b8b859a45bebfe0ae88b58c333b" and status "pending" exists for email "dev@billie.dev" and role ID 1
+    When I send a POST request to "/public/merchant/users/invitations/4b4e2b8b859a45bebfe0ae88b58c333b/signup" with body:
+    """
+    {
+        "first_name": "Cool",
+        "last_name": "Alex",
+        "password": "this.is.the.end.1234"
+    }
+    """
+    Then the response status code should be 400
+    And the JSON response should be:
+    """
+      {"errors":[{"title":"Terms & Conditions should be accepted","code":"request_validation_error","source":"tc_accepted"}]}
+    """
+
+  Scenario: Successfully register non-admin merchant user via invitation
     Given I successfully create OAuth client with email "dev@billie.dev" and user id "oauthUserId"
     And I successfully obtain token from oauth service
     And I get from companies service get debtor response
@@ -103,6 +123,58 @@ Feature: Register merchant user to access dashboard
             "role": {
               "uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
               "name": "Test"
+            },
+            "permissions": [
+                "TEST"
+            ],
+            "merchant_company": {
+                "name": "Test User Company",
+                "address_street": "Heinrich-Heine-Platz",
+                "address_postal_code": "10179",
+                "address_country": "DE",
+                "address_house_number": "10",
+                "address_city": "Berlin"
+            },
+            "tracking_id": 1,
+            "onboarding_state": "new",
+            "onboarding_complete_at": null
+        }
+      }
+    """
+    And the response status code should be 200
+    And merchant user with merchant id 1 and user id "oauthUserId" should be created
+
+  Scenario: Successfully register admin merchant user via invitation
+    Given I successfully create OAuth client with email "dev@billie.dev" and user id "oauthUserId"
+    And I successfully obtain token from oauth service
+    And I get from companies service update debtor positive response
+    And I get from Oauth service a valid user token
+    And I have a role of name "admin" with uuid "c7be46c0-e049-4312-b274-258ec5aeeb70" and permissions
+    """
+      ["TEST"]
+    """
+    And an invitation with token "4b4e2b8b859a45bebfe0ae88b58c333b" and status "pending" exists for email "dev@billie.dev" and role ID 1
+    When I send a POST request to "/public/merchant/users/invitations/4b4e2b8b859a45bebfe0ae88b58c333b/signup" with body:
+    """
+    {
+        "first_name": "Cool",
+        "last_name": "Alex",
+        "password": "this.is.the.end.1234",
+        "tc_accepted": true
+    }
+    """
+    Then the JSON response should be:
+    """
+      {
+        "access_token": "testToken",
+        "user": {
+            "uuid": "oauthUserId",
+            "first_name": "Cool",
+            "last_name": "Alex",
+            "email":"dev@billie.dev",
+            "role": {
+              "uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
+              "name": "admin"
             },
             "permissions": [
                 "TEST"

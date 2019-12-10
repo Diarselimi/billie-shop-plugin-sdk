@@ -2628,6 +2628,9 @@ components:
           type: string
           format: email
           nullable: false
+        should_accept_tc:
+          type: boolean
+          nullable: false
       type: object
     GetMerchantOnboardingResponse:
       title: GetMerchantOnboardingResponse
@@ -2773,6 +2776,8 @@ components:
         password:
           minLength: 6
           $ref: '#/components/schemas/TinyText'
+        tc_acepted:
+          type: boolean
       type: object
       x-groups:
         - private

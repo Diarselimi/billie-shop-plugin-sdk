@@ -8,26 +8,26 @@ use OpenApi\Annotations as OA;
 /**
  * @OA\Schema(schema="GetInvitedMerchantUserResponse", type="object", properties={
  *      @OA\Property(property="email", type="string", format="email", nullable=false),
+ *      @OA\Property(property="should_accept_tc", type="boolean", nullable=false)
  * })
  */
 class GetInvitedMerchantUserResponse implements ArrayableInterface
 {
     private $email;
 
-    public function __construct(string $email)
+    private $shouldAcceptTc;
+
+    public function __construct(string $email, bool $shouldAcceptTc)
     {
         $this->email = $email;
-    }
-
-    public function getEmail(): string
-    {
-        return $this->email;
+        $this->shouldAcceptTc = $shouldAcceptTc;
     }
 
     public function toArray(): array
     {
         return [
-            'email' => $this->getEmail(),
+            'email' => $this->email,
+            'should_accept_tc' => $this->shouldAcceptTc,
         ];
     }
 }

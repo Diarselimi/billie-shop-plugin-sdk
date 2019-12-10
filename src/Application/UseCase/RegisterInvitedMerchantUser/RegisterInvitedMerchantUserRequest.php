@@ -3,6 +3,7 @@
 namespace App\Application\UseCase\RegisterInvitedMerchantUser;
 
 use App\Application\UseCase\ValidatedRequestInterface;
+use App\Application\Validator\Constraint as PaellaAssert;
 use App\DomainModel\MerchantUserInvitation\MerchantUserInvitationEntity;
 use OpenApi\Annotations as OA;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -16,6 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          @OA\Property(property="first_name", ref="#/components/schemas/TinyText"),
  *          @OA\Property(property="last_name", ref="#/components/schemas/TinyText"),
  *          @OA\Property(property="password", ref="#/components/schemas/TinyText", minLength=6),
+ *          @OA\Property(property="tc_acepted", type="boolean"),
  *      },
  *      required={"first_name", "last_name", "password"}
  * )
@@ -43,12 +45,18 @@ class RegisterInvitedMerchantUserRequest implements ValidatedRequestInterface
      */
     private $password;
 
-    public function __construct(MerchantUserInvitationEntity $invitation, $firstName, $lastName, $password)
+    /**
+     * @PaellaAssert\InvitedUserTcAccepted()
+     */
+    private $tcAccepted;
+
+    public function __construct(MerchantUserInvitationEntity $invitation, $firstName, $lastName, $password, $tcAccepted)
     {
         $this->invitation = $invitation;
         $this->firstName = $firstName;
         $this->lastName = $lastName;
         $this->password = $password;
+        $this->tcAccepted = $tcAccepted;
     }
 
     public function getFirstName(): string
@@ -69,5 +77,10 @@ class RegisterInvitedMerchantUserRequest implements ValidatedRequestInterface
     public function getInvitation(): MerchantUserInvitationEntity
     {
         return $this->invitation;
+    }
+
+    public function isTcAccepted(): ?bool
+    {
+        return $this->tcAccepted;
     }
 }

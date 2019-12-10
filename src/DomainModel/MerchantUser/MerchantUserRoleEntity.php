@@ -61,4 +61,9 @@ class MerchantUserRoleEntity extends AbstractTimestampableEntity
 
         return $this;
     }
+
+    public function isTcAcceptanceRequired(): bool
+    {
+        return $this->getName() === MerchantUserDefaultRoles::ROLE_ADMIN['name'];
+    }
 }

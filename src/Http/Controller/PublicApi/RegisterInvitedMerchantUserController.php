@@ -59,7 +59,8 @@ class RegisterInvitedMerchantUserController
             $this->userProvider->getInvitedUser()->getInvitation(),
             $request->request->get('first_name'),
             $request->request->get('last_name'),
-            $request->request->get('password')
+            $request->request->get('password'),
+            $request->request->get('tc_accepted')
         );
 
         try {
