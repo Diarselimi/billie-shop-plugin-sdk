@@ -20,6 +20,8 @@ class UpdateMerchantDebtorCompanyUseCaseSpec extends ObjectBehavior
 {
     private const DEBTOR_ID = 5000;
 
+    private const DEBTOR_UUID = 'aaaa-bbbb-0000';
+
     private const MERCHANT_ID = 100;
 
     private const MERCHANT_DEBTOR_ID = 15;
@@ -70,7 +72,7 @@ class UpdateMerchantDebtorCompanyUseCaseSpec extends ObjectBehavior
         $validator->validate($request, Argument::any(), Argument::any())->shouldBeCalledOnce()->willReturn(new ConstraintViolationList());
         $merchantDebtorRepository->getOneByUuid(self::MERCHANT_DEBTOR_UUID)->shouldBeCalledOnce()->willReturn($merchantDebtor);
         $companiesService->getDebtor(self::DEBTOR_ID)->shouldBeCalledOnce()->willReturn($debtorCompany);
-        $companiesService->updateDebtor(self::DEBTOR_ID, [
+        $companiesService->updateDebtor(self::DEBTOR_UUID, [
             'name' => 'Billie1',
             'address_house' => 'House1',
             'address_street' => 'Street1',
@@ -96,7 +98,7 @@ class UpdateMerchantDebtorCompanyUseCaseSpec extends ObjectBehavior
         $validator->validate($request, Argument::any(), Argument::any())->shouldBeCalledOnce()->willReturn(new ConstraintViolationList());
         $merchantDebtorRepository->getOneByUuid(self::MERCHANT_DEBTOR_UUID)->shouldBeCalledOnce()->willReturn($merchantDebtor);
         $companiesService->getDebtor(self::DEBTOR_ID)->shouldBeCalledOnce()->willReturn($debtorCompany);
-        $companiesService->updateDebtor(self::DEBTOR_ID, [
+        $companiesService->updateDebtor(self::DEBTOR_UUID, [
             'name' => 'Billie1',
             'address_house' => 'House1',
             'address_street' => 'Street1',
@@ -112,6 +114,7 @@ class UpdateMerchantDebtorCompanyUseCaseSpec extends ObjectBehavior
         $merchantDebtor->getId()->willReturn(self::MERCHANT_DEBTOR_ID);
         $merchantDebtor->getUuid()->willReturn(self::MERCHANT_DEBTOR_UUID);
         $merchantDebtor->getDebtorId()->willReturn(self::DEBTOR_ID);
+        $merchantDebtor->getCompanyUuid()->willReturn(self::DEBTOR_UUID);
         $merchantDebtor->getMerchantId()->willReturn(self::MERCHANT_ID);
     }
 

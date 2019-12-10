@@ -17,8 +17,7 @@ Feature:
 
     Scenario: Successful order retrieval
       Given I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
-      And I get from companies service identify match and good decision response
-      And I get from companies service update debtor positive response
+      And I get from companies service get debtor response
       And I get from payments service get debtor response
       When I send a GET request to "/order/XF43Y"
       Then the response status code should be 200

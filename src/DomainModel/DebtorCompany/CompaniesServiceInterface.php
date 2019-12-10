@@ -20,7 +20,7 @@ interface CompaniesServiceInterface
 
     public function identifyDebtor(IdentifyDebtorRequestDTO $requestDTO): ?DebtorCompany;
 
-    public function updateDebtor(int $debtorId, array $updateData): DebtorCompany;
+    public function updateDebtor(string $debtorUuid, array $updateData): DebtorCompany;
 
     public function isEligibleForPayAfterDelivery(IsEligibleForPayAfterDeliveryRequestDTO $requestDTO): bool;
 

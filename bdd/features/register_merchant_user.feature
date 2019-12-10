@@ -122,7 +122,6 @@ Feature: Register merchant user to access dashboard
 
   Scenario: Successfully retrieve orders list using role-level permissions for a new merchant user
     Given a merchant user exists with permission VIEW_ORDERS
-    And I get from companies service update debtor positive response
     And I get from Oauth service a valid user token
     And I get from Oauth service revoke token endpoint a successful response
     And I add "Authorization" header equal to "Bearer SomeTokenHere"
@@ -137,7 +136,6 @@ Feature: Register merchant user to access dashboard
     """
   Scenario: Successfully retrieve orders list using overridden user-level permissions for a new merchant user
     Given a merchant user exists with overridden permission VIEW_ORDERS
-    And I get from companies service update debtor positive response
     And I get from Oauth service a valid user token
     And I get from Oauth service revoke token endpoint a successful response
     And I add "Authorization" header equal to "Bearer SomeTokenHere"

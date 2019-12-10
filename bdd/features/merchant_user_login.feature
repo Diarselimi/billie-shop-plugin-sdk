@@ -69,7 +69,7 @@ Feature: Enable merchant users to login
   Scenario: Valid credentials - successful login of an incomplete merchant user
     Given a merchant user exists with overridden permission VIEW_DEBTORS
     And I successfully obtain token from oauth service
-    And I get from companies service update debtor positive response
+    And I get from companies service get debtor response
     And I get from Oauth service a valid user token
     When I send a POST request to "/merchant/user/login" with body:
     """
@@ -115,7 +115,7 @@ Feature: Enable merchant users to login
     Given a merchant user exists with overridden permission VIEW_DEBTORS
     And a merchant "f2ec4d5e-79f4-40d6-b411-31174b6519ac" is complete at "2018-05-16"
     And I successfully obtain token from oauth service
-    And I get from companies service update debtor positive response
+    And I get from companies service get debtor response
     And I get from Oauth service a valid user token
     When I send a POST request to "/merchant/user/login" with body:
     """

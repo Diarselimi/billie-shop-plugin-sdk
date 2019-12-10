@@ -14,7 +14,7 @@ Feature: Get current logged in merchant user details
 
   Scenario: Successfully retrieve merchant user details
     Given a merchant user exists with overridden permission FOO_BAR
-    And I get from companies service update debtor positive response
+    And I get from companies service get debtor response
     And I get from Oauth service a valid user token
     And I get from Oauth service revoke token endpoint a successful response
     And I add "Authorization" header equal to "Bearer SomeTokenHere"
@@ -47,7 +47,7 @@ Feature: Get current logged in merchant user details
 
   Scenario: Successfully retrieve merchant user details with overridden permissions
     Given a merchant user exists with a role with permission "TEST" and overridden permission "THIS_IS_OVERRIDDEN"
-    And I get from companies service update debtor positive response
+    And I get from companies service get debtor response
     And I get from Oauth service a valid user token
     And I get from Oauth service revoke token endpoint a successful response
     And I add "Authorization" header equal to "Bearer SomeTokenHere"

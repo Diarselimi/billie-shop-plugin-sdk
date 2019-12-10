@@ -105,10 +105,10 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         }
     }
 
-    public function updateDebtor(int $debtorId, array $updateData): DebtorCompany
+    public function updateDebtor(string $debtorUuid, array $updateData): DebtorCompany
     {
         try {
-            $response = $this->client->put("/debtor/$debtorId", [
+            $response = $this->client->put("/debtor/{$debtorUuid}", [
                 'json' => $updateData,
             ]);
 

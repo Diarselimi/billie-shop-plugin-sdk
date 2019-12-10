@@ -76,7 +76,7 @@ Feature: Register merchant user to access dashboard
   Scenario: Successfully register merchant user via invitation
     Given I successfully create OAuth client with email "dev@billie.dev" and user id "oauthUserId"
     And I successfully obtain token from oauth service
-    And I get from companies service update debtor positive response
+    And I get from companies service get debtor response
     And I get from Oauth service a valid user token
     And I have a role of name "Test" with uuid "c7be46c0-e049-4312-b274-258ec5aeeb70" and permissions
     """
@@ -116,7 +116,8 @@ Feature: Register merchant user to access dashboard
                 "address_city": "Berlin"
             },
             "tracking_id": 1,
-            "onboarding_state": "new"
+            "onboarding_state": "new",
+            "onboarding_complete_at": null
         }
       }
     """

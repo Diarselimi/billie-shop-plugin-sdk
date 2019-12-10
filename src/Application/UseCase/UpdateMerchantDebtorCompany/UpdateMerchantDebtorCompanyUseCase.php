@@ -41,7 +41,7 @@ class UpdateMerchantDebtorCompanyUseCase implements LoggingInterface, ValidatedU
         $originalDebtor = $this->companiesService->getDebtor($merchantDebtor->getDebtorId());
 
         $updateData = $this->prepareUpdateData($request);
-        $updatedDebtor = $this->companiesService->updateDebtor($merchantDebtor->getDebtorId(), $updateData);
+        $updatedDebtor = $this->companiesService->updateDebtor($merchantDebtor->getCompanyUuid(), $updateData);
 
         $this->logUpdateDetails($merchantDebtor, $originalDebtor, $updatedDebtor);
     }
