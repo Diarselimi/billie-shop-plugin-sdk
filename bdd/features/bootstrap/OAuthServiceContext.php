@@ -36,6 +36,16 @@ class OAuthServiceContext implements Context
     }
 
     /**
+     * @Given I get from Oauth service the merchant credentials
+     */
+    public function iGetFromOauthServiceTheMerchantCredentials()
+    {
+        $this->mockRequest("/client/oauthClientId/credentials", new ResponseStack(
+            new MockResponse(json_encode(['client_id' => 'some_dummy_client_id', 'secret' => 'anotherRand0mStr1ng']), [], Response::HTTP_OK)
+        ));
+    }
+
+    /**
      * @Given /^I get from Oauth service invalid token response$/
      */
     public function iGetFromOauthServiceInvalidTokenResponse()

@@ -12,6 +12,10 @@ interface MerchantUserPermissions
 
     public const VIEW_USERS = 'VIEW_USERS';
 
+    public const VIEW_ONBOARDING = 'VIEW_ONBOARDING';
+
+    public const VIEW_CREDENTIALS = 'VIEW_CREDENTIALS';
+
     public const CONFIRM_ORDER_PAYMENT = 'CONFIRM_ORDER_PAYMENT';
 
     public const PAUSE_DUNNING = 'PAUSE_DUNNING';
@@ -19,8 +23,6 @@ interface MerchantUserPermissions
     public const MANAGE_USERS = 'MANAGE_USERS';
 
     public const CANCEL_ORDERS = 'CANCEL_ORDERS';
-
-    public const VIEW_ONBOARDING = 'VIEW_ONBOARDING';
 
     public const MANAGE_ONBOARDING = 'MANAGE_ONBOARDING';
 
@@ -31,6 +33,8 @@ interface MerchantUserPermissions
         self::VIEW_PAYMENTS,
         self::VIEW_USERS,
         self::VIEW_ONBOARDING,
+        // read (special):
+        self::VIEW_CREDENTIALS,
         // write:
         self::CONFIRM_ORDER_PAYMENT,
         self::PAUSE_DUNNING,
@@ -39,6 +43,10 @@ interface MerchantUserPermissions
         self::MANAGE_ONBOARDING,
     ];
 
+    /**
+     * All read permissions suitable for all "read only" users.
+     * This does not include sensitive permissions like VIEW_CREDENTIALS.
+     */
     public const ALL_READ_PERMISSIONS = [
         self::VIEW_ORDERS,
         self::VIEW_DEBTORS,

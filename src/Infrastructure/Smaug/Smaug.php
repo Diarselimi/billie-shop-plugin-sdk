@@ -9,6 +9,7 @@ use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
 use App\DomainModel\MerchantUser\AuthenticationServiceRequestException;
 use App\DomainModel\MerchantUser\AuthenticationServiceTokenResponseDTO;
 use App\DomainModel\MerchantUser\AuthenticationServiceUserResponseDTO;
+use App\DomainModel\MerchantUser\GetMerchantCredentialsDTO;
 use App\Infrastructure\DecodeResponseTrait;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -178,6 +179,23 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
         return ($exception instanceof RequestException)
             && $exception->getResponse()
             && $exception->getResponse()->getStatusCode() === $statusCode;
+    }
+
+    public function getCredentials(string $clientId): GetMerchantCredentialsDTO
+    {
+        try {
+            $response = $this->client->get("/client/{$clientId}/credentials", [
+                'on_stats' => function (TransferStats $stats) {
+                    $this->logServiceRequestStats($stats, 'get_client_credentials');
+                },
+            ]);
+
+            $decodedResponse = $this->decodeResponse($response);
+
+            return new GetMerchantCredentialsDTO($decodedResponse['client_id'], $decodedResponse['secret']);
+        } catch (TransferException $exception) {
+            throw new AuthenticationServiceRequestException($exception);
+        }
     }
 
     public function getUsersByUuids(array $uuids): array

@@ -17,6 +17,7 @@ use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsEntity;
 use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsFactory;
 use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsRepositoryInterface;
+use App\DomainModel\MerchantOnboarding\MerchantOnboardingEntity;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingPersistenceService;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingRepositoryInterface;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepRepositoryInterface;
@@ -62,6 +63,8 @@ use Webmozart\Assert\Assert;
 class PaellaCoreContext extends MinkContext
 {
     use KernelDictionary;
+
+    public const TEST_MERCHANT_OAUTH_CLIENT_ID = 'testMerchantOauthClientId';
 
     private $connection;
 
@@ -318,8 +321,8 @@ class PaellaCoreContext extends MinkContext
             ->setMerchantDebtorExternalId($arg1)
             ->setUuid("123123")
             ->setIsActive($active)
-            ->setCreatedAt(new DateTime('now'))
-            ->setUpdatedAt(new DateTime('now'));
+            ->setCreatedAt(new DateTime())
+            ->setUpdatedAt(new DateTime());
         $this->getCheckoutSessionRepository()->create($checkoutSession);
     }
 
@@ -660,20 +663,23 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
-     * @Given a merchant :merchantId is complete at :date
+     * @Given I have the onboarding for merchant :merchantId with status :status
      */
-    public function aMerchantIsCompleteAt(string $merchantId, string $date)
+    public function iHaveTheOnboardingForMerchantWithStatus(string $merchantId, string $status)
     {
-        $onboarding = $this->getMerchantOnboardingRepository()->findNewestByPaymentUuid($merchantId);
-        $onboarding->setState('complete');
-        $this->getMerchantOnboardingRepository()->update($onboarding);
+        $merchantOnboard = (new MerchantOnboardingEntity())
+            ->setState($status)
+            ->setUuid(self::DUMMY_UUID4)
+            ->setMerchantId((int) $merchantId);
+
+        $this->getMerchantOnboardingRepository()->insert($merchantOnboard);
 
         $transition = (new MerchantOnboardingTransitionEntity())
-            ->setReferenceId($onboarding->getId())
+            ->setReferenceId($merchantOnboard->getId())
             ->setFrom('new')
             ->setTo('complete')
             ->setTransition('complete')
-            ->setTransitedAt(new \DateTime($date))
+            ->setTransitedAt(new \DateTime())
         ;
         $this->getMerchantOnboardingTransitionRepository()->insert($transition);
     }
@@ -756,7 +762,7 @@ class PaellaCoreContext extends MinkContext
             ->setFinancingLimit(10000)
             ->setApiKey('testMerchantApiKey')
             ->setCompanyId((int) $companyId)
-            ->setOauthClientId('testMerchantOauthClientId');
+            ->setOauthClientId(self::TEST_MERCHANT_OAUTH_CLIENT_ID);
         $this->getMerchantRepository()->insert($merchant);
 
         return $merchant;

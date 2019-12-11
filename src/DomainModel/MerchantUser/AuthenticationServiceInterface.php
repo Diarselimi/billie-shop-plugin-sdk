@@ -19,4 +19,6 @@ interface AuthenticationServiceInterface
      * @return AuthenticationServiceUserResponseDTO[]
      */
     public function getUsersByUuids(array $uuids): array;
+
+    public function getCredentials(string $clientId): GetMerchantCredentialsDTO;
 }
