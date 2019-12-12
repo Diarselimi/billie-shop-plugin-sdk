@@ -1805,6 +1805,26 @@ paths:
           oauth2: []
       x-groups:
         - private
+  /merchant/finish-integration:
+    post:
+      tags:
+        - 'Dashboard Merchants'
+      summary: 'Finish Technical Integration'
+      operationId: merchant_finish_integration
+      responses:
+        '204':
+          description: 'Step successfully updated.'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+      x-groups:
+        - private
   /merchant/user/login:
     post:
       tags:
