@@ -1360,6 +1360,57 @@ paths:
           oauth2: []
       x-groups:
         - private
+  /merchant/financial-assessment:
+    get:
+      tags:
+        - 'Dashboard Merchants'
+      summary: 'Get Merchant Financial Assessment'
+      operationId: get_merchant_financial_assessment
+      responses:
+        '200':
+          description: 'Merchant financial assessment'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMerchantFinancialAssessmentResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+      x-groups:
+        - private
+    post:
+      tags:
+        - 'Dashboard Merchants'
+      summary: 'Save merchant financial assessment.'
+      operationId: save_merchant_financial_assessment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaveMerchantFinancialAssessmentRequest'
+      responses:
+        '204':
+          description: 'Financial Assessment saved.'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/ResourceConflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+      x-groups:
+        - private
   /merchant/onboarding:
     get:
       tags:
@@ -2700,6 +2751,33 @@ components:
           type: object
           nullable: true
       type: object
+    GetMerchantFinancialAssessmentResponse:
+      title: 'Financial Assessment Response'
+      properties:
+        yearly_transaction_volume:
+          type: number
+          format: float
+          example: 22.33
+        mean_invoice_number:
+          type: number
+          format: float
+          example: 233.44
+        cancellation_rate:
+          type: number
+          format: float
+          example: 23.3
+        invoice_duration:
+          type: integer
+          example: 100
+        returning_order_rate:
+          type: number
+          format: float
+          example: 90
+        default_rate:
+          type: number
+          format: float
+          example: 50
+      type: object
     GetMerchantOnboardingResponse:
       title: GetMerchantOnboardingResponse
       properties:
@@ -2898,6 +2976,38 @@ components:
             $ref: '#/components/schemas/MerchantUserPermissions'
           default: null
           nullable: true
+      type: object
+    SaveMerchantFinancialAssessmentRequest:
+      title: 'Request for submitting finnancial assessment'
+      required:
+        - yearly_transaction_volume
+        - mean_invoice_number
+        - cancellation_rate
+        - invoice_duration
+      properties:
+        yearly_transaction_volume:
+          type: number
+          format: float
+          example: 22.33
+        mean_invoice_number:
+          type: number
+          format: float
+          example: 233.44
+        cancellation_rate:
+          type: number
+          format: float
+          example: 23.3
+        invoice_duration:
+          type: integer
+          example: 100
+        returning_order_rate:
+          type: number
+          format: float
+          example: 90
+        default_rate:
+          type: number
+          format: float
+          example: 50
       type: object
     ShipOrderRequest:
       title: 'Order Shipping Object'

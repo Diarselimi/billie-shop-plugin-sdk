@@ -4,7 +4,7 @@ namespace App\DomainModel\MerchantOnboarding;
 
 interface MerchantOnboardingStepRepositoryInterface
 {
-    public function getOneByNameAndMerchant(string $name, string $merchantPaymentUuid): ?MerchantOnboardingStepEntity;
+    public function getOneByStepNameAndPaymentUuid(string $name, string $merchantPaymentUuid): ?MerchantOnboardingStepEntity;
 
     /**
      * @return MerchantOnboardingStepEntity[]
@@ -14,4 +14,6 @@ interface MerchantOnboardingStepRepositoryInterface
     public function insert(MerchantOnboardingStepEntity $entity): void;
 
     public function update(MerchantOnboardingStepEntity $entity): void;
+
+    public function findByOnboardingStepAndMerchant(string $step, int $merchantId): ?MerchantOnboardingStepEntity;
 }

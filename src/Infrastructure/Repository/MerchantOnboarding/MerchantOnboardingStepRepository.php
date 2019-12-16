@@ -35,7 +35,7 @@ class MerchantOnboardingStepRepository extends AbstractPdoRepository implements
         $this->factory = $factory;
     }
 
-    public function getOneByNameAndMerchant(string $name, string $merchantPaymentUuid): ?MerchantOnboardingStepEntity
+    public function getOneByStepNameAndPaymentUuid(string $name, string $merchantPaymentUuid): ?MerchantOnboardingStepEntity
     {
         $fields = array_map(
             static function (string $field) {
@@ -106,5 +106,21 @@ class MerchantOnboardingStepRepository extends AbstractPdoRepository implements
             'id' => $entity->getId(),
             'updated_at' => $entity->getUpdatedAt()->format(self::DATE_FORMAT),
         ]);
+    }
+
+    public function findByOnboardingStepAndMerchant(string $step, int $merchantId): ?MerchantOnboardingStepEntity
+    {
+        $fields = array_map(function (string $field) {
+            return self::TABLE_NAME.'.'.$field;
+        }, self::SELECT_FIELDS);
+
+        $query = $this->generateSelectQuery(self::TABLE_NAME, $fields).
+            " INNER JOIN merchant_onboardings ON merchant_onboardings.id = merchant_onboarding_steps.merchant_onboarding_id ".
+            " WHERE merchant_onboardings.merchant_id = :merchant AND merchant_onboarding_steps.name = :step_name ".
+            " ORDER BY `merchant_onboarding_steps`.id DESC ";
+
+        $row = $this->doFetchOne($query, ['merchant' => $merchantId, 'step_name' => $step]);
+
+        return $row ? $this->factory->createFromArray($row) : null;
     }
 }

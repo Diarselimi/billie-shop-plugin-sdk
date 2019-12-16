@@ -14,6 +14,8 @@ use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorFinancialDetailsEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
+use App\DomainModel\MerchantFinancialAssessment\MerchantFinancialAssessmentEntity;
+use App\DomainModel\MerchantFinancialAssessment\MerchantFinancialAssessmentRepositoryInterface;
 use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsEntity;
 use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsFactory;
 use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsRepositoryInterface;
@@ -169,6 +171,7 @@ class PaellaCoreContext extends MinkContext
             TRUNCATE checkout_sessions;
             TRUNCATE addresses;
             TRUNCATE merchants_debtors;
+            TRUNCATE merchant_financial_assessments;
             TRUNCATE merchant_settings;
             TRUNCATE merchant_risk_check_settings;
             TRUNCATE merchant_notification_settings;
@@ -792,6 +795,22 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
+     * @Given I have the following Financial Assessment Data:
+     */
+    public function iHaveTheFollowingFinancialAssessmentData(PyStringNode $node): void
+    {
+        $now = (new \DateTime());
+        $entity = (new MerchantFinancialAssessmentEntity())
+            ->setMerchantId(1)
+            ->setData(json_decode($node->getRaw(), true))
+            ->setCreatedAt($now)
+            ->setUpdatedAt($now);
+
+        $this->getMerchantFinancialAssessmentRepository()
+            ->insert($entity);
+    }
+
+    /**
      * @Given The following notification settings exist for merchant :merchantId:
      */
     public function theFollowingNotificationSettingsExistForMerchant1($merchantId, TableNode $table)
@@ -950,6 +969,11 @@ class PaellaCoreContext extends MinkContext
         return $this->get(MerchantOnboardingPersistenceService::class);
     }
 
+    private function getMerchantFinancialAssessmentRepository(): MerchantFinancialAssessmentRepositoryInterface
+    {
+        return $this->get(MerchantFinancialAssessmentRepositoryInterface::class);
+    }
+
     private function getConnection(): PdoConnection
     {
         return $this->connection;
@@ -993,12 +1017,12 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
-     * @Given The following onboarding steps are in states for merchant :merchantId:
+     * @Given The following onboarding steps are in states for merchant :merchantPaymentUuid:
      */
-    public function theFollowingOnboardingStepsAreInStates(TableNode $table, $merchantId)
+    public function theFollowingOnboardingStepsAreInStates(TableNode $table, $merchantPaymentUuid)
     {
         foreach ($table as $row) {
-            $step = $this->getMerchantOnboardingStepRepository()->getOneByNameAndMerchant($row['name'], $merchantId);
+            $step = $this->getMerchantOnboardingStepRepository()->getOneByStepNameAndPaymentUuid($row['name'], $merchantPaymentUuid);
             $step->setState($row['state']);
             $this->getMerchantOnboardingStepRepository()->update($step);
         }

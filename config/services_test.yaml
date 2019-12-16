@@ -93,3 +93,6 @@ services:
     public: true
   App\DomainModel\SignatoryPowersSelection\SignatoryPowerAutoIdentifyUserService:
     public: true
+  App\DomainModel\MerchantFinancialAssessment\MerchantFinancialAssessmentRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\MerchantFinancialAssessmentRepository'
+    public: true

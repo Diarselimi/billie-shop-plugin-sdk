@@ -3,9 +3,9 @@
 namespace App\Http\Controller\PrivateApi;
 
 use App\Application\Exception\WorkflowException;
-use App\Application\UseCase\MerchantOnboardingStepTransition\MerchantOnboardingStepNotFoundException;
 use App\Application\UseCase\MerchantOnboardingStepTransition\MerchantOnboardingStepTransitionRequest;
 use App\Application\UseCase\MerchantOnboardingStepTransition\MerchantOnboardingStepTransitionUseCase;
+use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepNotFoundException;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
