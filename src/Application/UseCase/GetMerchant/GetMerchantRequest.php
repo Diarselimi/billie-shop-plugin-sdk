@@ -2,17 +2,32 @@
 
 namespace App\Application\UseCase\GetMerchant;
 
+use Ramsey\Uuid\Uuid;
+
 class GetMerchantRequest
 {
-    private $id;
+    private $merchantId;
 
-    public function __construct(int $id)
+    private $merchantPaymentUuid;
+
+    public function __construct($identifier)
     {
-        $this->id = $id;
+        $this->merchantId = is_numeric($identifier) ? $identifier : null;
+        $this->merchantPaymentUuid = Uuid::isValid($identifier) ? $identifier : null;
     }
 
-    public function getId(): int
+    public function getMerchantId(): ?int
     {
-        return $this->id;
+        return $this->merchantId;
+    }
+
+    public function getMerchantPaymentUuid(): ?string
+    {
+        return $this->merchantPaymentUuid;
+    }
+
+    public function getIdentifier()
+    {
+        return $this->getMerchantId() ?? $this->getMerchantPaymentUuid();
     }
 }

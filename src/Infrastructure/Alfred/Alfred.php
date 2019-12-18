@@ -6,6 +6,7 @@ use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorCompany\DebtorCompanyFactory;
+use App\DomainModel\DebtorCompany\DebtorCreationDTO;
 use App\DomainModel\DebtorCompany\IdentifyDebtorRequestDTO;
 use App\DomainModel\DebtorCompany\IsEligibleForPayAfterDeliveryRequestDTO;
 use App\DomainModel\GetSignatoryPowers\GetSignatoryPowerDTO;
@@ -110,6 +111,19 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         try {
             $response = $this->client->put("/debtor/{$debtorUuid}", [
                 'json' => $updateData,
+            ]);
+
+            return $this->factory->createFromAlfredResponse($this->decodeResponse($response));
+        } catch (TransferException | ClientResponseDecodeException $exception) {
+            throw new CompaniesServiceRequestException($exception);
+        }
+    }
+
+    public function createDebtor(DebtorCreationDTO $debtorCreationDTO): DebtorCompany
+    {
+        try {
+            $response = $this->client->post("/debtors", [
+                'json' => $debtorCreationDTO->toArray(),
             ]);
 
             return $this->factory->createFromAlfredResponse($this->decodeResponse($response));

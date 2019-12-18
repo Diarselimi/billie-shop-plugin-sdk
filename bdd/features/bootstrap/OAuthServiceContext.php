@@ -126,6 +126,29 @@ class OAuthServiceContext implements Context
     }
 
     /**
+     * @Given I get from Oauth service a not valid credentials response
+     */
+    public function iGetFromOauthServiceANotValidCredentialsResponse()
+    {
+        $this->mockRequest('/client/oauthClientId/credentials', new ResponseStack(
+            new MockResponse('', [], 404)
+        ));
+    }
+
+    /**
+     * @Given I get from Oauth service a valid credentials response
+     */
+    public function iGetFromOauthServiceAValidCredentialsResponse()
+    {
+        $this->mockRequest('/client/oauthClientId/credentials', new ResponseStack(
+            new MockResponse(json_encode([
+                'client_id' => '1234-1244-4122-asd123',
+                'secret' => '21ergfhgferetr3425tregdf',
+            ]), [], 200)
+        ));
+    }
+
+    /**
      * @Given /^I successfully obtain token from oauth service$/
      */
     public function andIGetFromOauthServiceValidTokenResponse()
@@ -155,12 +178,10 @@ class OAuthServiceContext implements Context
     }
 
     /**
-     * @When I will get a response from Authentication Service from endpoint :endpoint with status code :code
+     * @When I get a response from Authentication Service from endpoint :endpoint with status code :code
      */
-    public function iWillGetAResponseFromAuthenticationServiceWithStatusCode($endpoint, $statusCode)
+    public function iGetAResponseFromAuthenticationServiceWithStatusCode($endpoint, $statusCode)
     {
-        $this->mockRequest($endpoint, new ResponseStack(
-            new MockResponse('', [], $statusCode)
-        ));
+        $this->mockRequest($endpoint, new MockResponse('{}', [], $statusCode));
     }
 }

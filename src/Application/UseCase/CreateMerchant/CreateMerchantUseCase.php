@@ -50,11 +50,11 @@ class CreateMerchantUseCase
                 $this->uuidGenerator->uuid4(),
                 $this->uuidGenerator->uuid4(),
                 $request->getMerchantFinancingLimit(),
-                $request->getInitialDebtorFinancingLimit(),
-                $request->getDebtorFinancingLimit()
+                $request->getInitialDebtorFinancingLimit()
             ))
                 ->setWebhookUrl($request->getWebhookUrl())
                 ->setWebhookAuthorization($request->getWebhookAuthorization())
+                ->setIsOnboardingComplete(false)
         );
 
         return new CreateMerchantResponse(

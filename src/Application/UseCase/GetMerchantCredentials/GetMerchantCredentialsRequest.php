@@ -8,10 +8,13 @@ class GetMerchantCredentialsRequest
 
     private $clientPublicId;
 
-    public function __construct(int $merchantId, string $clientPublicId)
+    private $sandboxMerchantPaymentUuid;
+
+    public function __construct(int $merchantId, string $clientPublicId, ?string $sandboxMerchantPaymentUuid)
     {
         $this->merchantId = $merchantId;
         $this->clientPublicId = $clientPublicId;
+        $this->sandboxMerchantPaymentUuid = $sandboxMerchantPaymentUuid;
     }
 
     public function getMerchantId(): int
@@ -22,5 +25,10 @@ class GetMerchantCredentialsRequest
     public function getClientPublicId(): string
     {
         return $this->clientPublicId;
+    }
+
+    public function getSandboxMerchantPaymentUuid(): ?string
+    {
+        return $this->sandboxMerchantPaymentUuid;
     }
 }

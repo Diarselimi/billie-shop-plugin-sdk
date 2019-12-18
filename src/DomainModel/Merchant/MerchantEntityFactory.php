@@ -2,8 +2,6 @@
 
 namespace App\DomainModel\Merchant;
 
-use App\Application\UseCase\CreateMerchant\CreateMerchantRequest;
-use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\Helper\Uuid\UuidGeneratorInterface;
 
 class MerchantEntityFactory
@@ -25,6 +23,7 @@ class MerchantEntityFactory
             ->setFinancingLimit($row['available_financing_limit'])
             ->setCompanyId($row['company_id'])
             ->setPaymentUuid($row['payment_merchant_id'])
+            ->setSandboxPaymentUuid($row['sandbox_payment_merchant_id'])
             ->setIsActive((bool) $row['is_active'])
             ->setWebhookUrl($row['webhook_url'])
             ->setWebhookAuthorization($row['webhook_authorization'])
@@ -34,18 +33,22 @@ class MerchantEntityFactory
         ;
     }
 
-    public function createFromRequest(CreateMerchantRequest $request, DebtorCompany $company): MerchantEntity
+    public function createFromMerchantCreationResponse(array $payload): MerchantEntity
     {
         return (new MerchantEntity())
-            ->setCompanyId($request->getCompanyId())
-            ->setFinancingPower($request->getMerchantFinancingLimit())
-            ->setFinancingLimit($request->getMerchantFinancingLimit())
-            ->setWebhookUrl($request->getWebhookUrl())
-            ->setWebhookAuthorization($request->getWebhookAuthorization())
-            ->setName($company->getName())
-            ->setApiKey($this->uuidGenerator->uuid4())
-            ->setPaymentUuid($this->uuidGenerator->uuid4())
-            ->setIsActive(true)
+            ->setId($payload['id'])
+            ->setName($payload['name'])
+            ->setFinancingPower($payload['financing_power'])
+            ->setFinancingLimit($payload['financing_limit'])
+            ->setApiKey($payload['api_key'])
+            ->setCompanyId($payload['company_id'])
+            ->setPaymentUuid($payload['payment_merchant_id'])
+            ->setIsActive((bool) $payload['is_active'])
+            ->setWebhookUrl($payload['webhook_url'])
+            ->setWebhookAuthorization($payload['webhook_authorization'])
+            ->setOauthClientId($payload['oauth_client_id'])
+            ->setCreatedAt(new \DateTime($payload['created_at']))
+            ->setUpdatedAt(new \DateTime($payload['updated_at']))
         ;
     }
 

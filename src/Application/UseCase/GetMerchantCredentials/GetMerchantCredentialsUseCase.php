@@ -7,19 +7,29 @@ namespace App\Application\UseCase\GetMerchantCredentials;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingEntity;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingRepositoryInterface;
 use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
+use App\DomainModel\Sandbox\SandboxClientInterface;
+use App\DomainModel\Sandbox\SandboxServiceRequestException;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
-class GetMerchantCredentialsUseCase
+class GetMerchantCredentialsUseCase implements LoggingInterface
 {
+    use LoggingTrait;
+
     private $merchantOnboardingRepository;
 
     private $authenticationService;
 
+    private $sandboxClient;
+
     public function __construct(
         MerchantOnboardingRepositoryInterface $merchantOnboardingRepository,
-        AuthenticationServiceInterface $authenticationService
+        AuthenticationServiceInterface $authenticationService,
+        SandboxClientInterface $sandboxClient
     ) {
         $this->merchantOnboardingRepository = $merchantOnboardingRepository;
         $this->authenticationService = $authenticationService;
+        $this->sandboxClient = $sandboxClient;
     }
 
     public function execute(GetMerchantCredentialsRequest $request): GetMerchantCredentialsResponse
@@ -27,12 +37,33 @@ class GetMerchantCredentialsUseCase
         $merchantOnboarding = $this->merchantOnboardingRepository->findNewestByMerchant($request->getMerchantId());
         $response = new GetMerchantCredentialsResponse();
 
-        if (!$merchantOnboarding || $merchantOnboarding->getState() !== MerchantOnboardingEntity::STATE_COMPLETE) {
-            return $response;
+        if ($merchantOnboarding->getState() === MerchantOnboardingEntity::STATE_COMPLETE) {
+            $this->addProductionCredentialsToResponse($request, $response);
         }
+        $this->addSandboxCredentialsToResponse($request, $response);
 
-        $credentialsDTO = $this->authenticationService->getCredentials($request->getClientPublicId());
+        return $response;
+    }
 
-        return $response->setProduction($credentialsDTO->getClientId(), $credentialsDTO->getSecret());
+    private function addProductionCredentialsToResponse(GetMerchantCredentialsRequest $request, GetMerchantCredentialsResponse $response): void
+    {
+        $prodCredentials = $this->authenticationService->getCredentials($request->getClientPublicId());
+        if ($prodCredentials) {
+            $response->setProduction($prodCredentials->getClientId(), $prodCredentials->getSecret());
+        }
+    }
+
+    private function addSandboxCredentialsToResponse(GetMerchantCredentialsRequest $request, GetMerchantCredentialsResponse $response): void
+    {
+        try {
+            if ($request->getSandboxMerchantPaymentUuid()) {
+                $credentialsDTO = $this->sandboxClient->getMerchantCredentials($request->getSandboxMerchantPaymentUuid());
+                if ($credentialsDTO->getClientId() !== null) {
+                    $response->setSandbox($credentialsDTO->getClientId(), $credentialsDTO->getSecret());
+                }
+            }
+        } catch (SandboxServiceRequestException $e) {
+            $this->logSuppressedException($e, 'Failed to get sandbox credentials.');
+        }
     }
 }

@@ -50,7 +50,7 @@ class CompaniesServiceContext implements Context
     public function iGetFromCompaniesServiceIdentifyMatchResponse()
     {
         $this->mockRequest('/debtor/identify', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_match_trusted_source.json'))
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match_trusted_source.json'))
         ));
     }
 
@@ -60,7 +60,7 @@ class CompaniesServiceContext implements Context
     public function iGetFromCompaniesServiceGetDebtorResponse()
     {
         $this->mockRequest('/debtor/1', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_match_trusted_source.json')),
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match_trusted_source.json')),
             new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match_trusted_source.json'))
         ));
 
@@ -97,7 +97,7 @@ class CompaniesServiceContext implements Context
     public function iGetFromCompaniesServiceIdentifyMatchAndGoodDecisionResponse()
     {
         $this->mockRequest('/debtor/identify', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_match_trusted_source.json'))
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match_trusted_source.json'))
         ));
 
         $this->mockRequest('/debtor/1/is-eligible-for-pay-after-delivery', new ResponseStack(
@@ -111,7 +111,7 @@ class CompaniesServiceContext implements Context
     public function iGetFromCompaniesServiceIdentifyMatchAndBadDecisionResponse()
     {
         $this->mockRequest('/debtor/identify', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_match_trusted_source.json'))
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match_trusted_source.json'))
         ));
 
         $this->mockRequest('/debtor/1/is-eligible-for-pay-after-delivery', new ResponseStack(
@@ -135,7 +135,7 @@ class CompaniesServiceContext implements Context
     public function iGetFromCompaniesServiceIdentifyMatchFromUntrustedSource()
     {
         $this->mockRequest('/debtor/identify', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_match_untrusted_source.json'))
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match_untrusted_source.json'))
         ));
     }
 
@@ -155,7 +155,7 @@ class CompaniesServiceContext implements Context
     public function iGetFromCompaniesServiceAsAResponseWithMultipleIds()
     {
         $this->mockRequest('/debtors', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_get_multiple_results.json'))
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_get_multiple_results.json'))
         ));
     }
 
@@ -165,7 +165,7 @@ class CompaniesServiceContext implements Context
     public function iGetFromCompaniesServiceAListOfSignatoryPowersOneSignatory()
     {
         $this->mockRequest('/debtor/10/signatory-powers', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_signatory_powers_one_signatory.json'))
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_signatory_powers_one_signatory.json'))
         ));
     }
 
@@ -175,7 +175,7 @@ class CompaniesServiceContext implements Context
     public function iGetFromCompaniesServiceAListOfSignatoryPowers()
     {
         $this->mockRequest('/debtor/10/signatory-powers', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_signatory_powers_list.json'))
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_signatory_powers_list.json'))
         ));
     }
 
@@ -195,11 +195,19 @@ class CompaniesServiceContext implements Context
     public function iGetFromCompaniesServiceIdentifyNoMatchAndRespondWithSuggestion()
     {
         $this->mockRequest('/debtor/identify', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_no_match_with_suggestion.json'), [], 404)
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_no_match_with_suggestion.json'), [], 404)
         ));
 
         $this->mockRequest('/debtor/1/is-eligible-for-pay-after-delivery', new ResponseStack(
             new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_decision_good.json'))
         ));
+    }
+
+    /**
+     * @Given /^I get from companies service a successful response on create debtor call with body:$/
+     */
+    public function iGetFromCompaniesServiceASuccessfulResponseOnCreateDebtorCallWithBody(PyStringNode $body)
+    {
+        $this->mockRequest('/debtors', new MockResponse($body->__toString()));
     }
 }

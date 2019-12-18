@@ -15,7 +15,6 @@ Feature: Create a new merchant.
         "company_id": "1",
         "merchant_financing_limit": 5000.44,
         "initial_debtor_financing_limit": 500.00,
-        "debtor_financing_limit": 700.77,
         "webhook_url": "http://billie.md",
         "webhook_authorization": "X-Api-Key: key"
       }
@@ -34,7 +33,6 @@ Feature: Create a new merchant.
         "company_id": "1",
         "merchant_financing_limit": 5000.44,
         "initial_debtor_financing_limit": 500.00,
-        "debtor_financing_limit": 700.77,
         "webhook_url": "http://billie.md",
         "webhook_authorization": "X-Api-Key: key"
       }
@@ -56,7 +54,6 @@ Feature: Create a new merchant.
         "company_id": "1",
         "merchant_financing_limit": 5000.44,
         "initial_debtor_financing_limit": 500.00,
-        "debtor_financing_limit": 700.77,
         "webhook_url": "http://billie.md",
         "webhook_authorization": "X-Api-Key: key"
       }
@@ -89,7 +86,6 @@ Feature: Create a new merchant.
         "company_id": "1",
         "merchant_financing_limit": 5000.44,
         "initial_debtor_financing_limit": 500.00,
-        "debtor_financing_limit": 700.77,
         "webhook_url": "http://billie.md",
         "webhook_authorization": "X-Api-Key: Hola"
       }

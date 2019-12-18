@@ -49,12 +49,11 @@ class CreateMerchantController
     {
         try {
             $request = (new CreateMerchantRequest())
-                ->setCompanyId($request->request->get('company_id'))
-                ->setMerchantFinancingLimit($request->request->get('merchant_financing_limit'))
-                ->setInitialDebtorFinancingLimit($request->request->get('initial_debtor_financing_limit'))
-                ->setDebtorFinancingLimit($request->request->get('debtor_financing_limit'))
-                ->setWebhookUrl($request->request->get('webhook_url'))
-                ->setWebhookAuthorization($request->request->get('webhook_authorization'));
+                ->setCompanyId($request->get('company_id'))
+                ->setMerchantFinancingLimit($request->get('merchant_financing_limit'))
+                ->setInitialDebtorFinancingLimit($request->get('initial_debtor_financing_limit'))
+                ->setWebhookUrl($request->get('webhook_url'))
+                ->setWebhookAuthorization($request->get('webhook_authorization'));
 
             $response = $this->useCase->execute($request);
 

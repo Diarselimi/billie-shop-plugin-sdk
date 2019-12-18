@@ -20,5 +20,5 @@ interface AuthenticationServiceInterface
      */
     public function getUsersByUuids(array $uuids): array;
 
-    public function getCredentials(string $clientId): GetMerchantCredentialsDTO;
+    public function getCredentials(string $clientId): ?GetMerchantCredentialsDTO;
 }

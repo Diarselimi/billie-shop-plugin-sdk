@@ -17,6 +17,7 @@ default:
         - SalesforceContext
         - CustomRestContext
         - LimitServiceContext
+        - SandboxServiceContext
 
   extensions:
     Behatch\Extension: ~

@@ -1,5 +1,7 @@
 eight_points_guzzle:
   clients:
+    webhook:
+    invoice_download:
     alfred:
       base_url: "%env(string:ALFRED_URL)%"
       options:
@@ -32,5 +34,10 @@ eight_points_guzzle:
         headers:
           Content-Type: "application/json"
           X-Api-Key: "%env(string:SALESFORCE_API_KEY)%"
-    webhook:
-    invoice_download:
+    paella_sandbox:
+      base_url: "%env(string:PAELLA_SANDBOX_URL)%"
+      options:
+        timeout: 2
+        headers:
+          Content-Type: "application/json"
+          X-Api-Key: "%env(string:PAELLA_SANDBOX_API_KEY)%"

@@ -26,8 +26,6 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
 
     const INITIAL_DEBTOR_FINANCING_LIMIT = 200.00;
 
-    const DEBTOR_FINANCING_LIMIT = 500.34;
-
     const COMPANY_ID = '561';
 
     public function let(
@@ -40,7 +38,6 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
         $request->getCompanyId()->willReturn(self::COMPANY_ID);
         $request->getMerchantFinancingLimit()->willReturn(self::MERCHANT_FINANCING_LIMIT);
         $request->getInitialDebtorFinancingLimit()->willReturn(self::INITIAL_DEBTOR_FINANCING_LIMIT);
-        $request->getDebtorFinancingLimit()->willReturn(self::DEBTOR_FINANCING_LIMIT);
         $request->getWebhookUrl()->willReturn(null);
         $request->getWebhookAuthorization()->willReturn(null);
 
@@ -93,9 +90,9 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
         $companiesService->getDebtor(self::COMPANY_ID)->shouldBeCalled()->willReturn(new DebtorCompany());
         $uuidGenerator->uuid4()->shouldBeCalled()->willReturn('9dec0d0c-06c7-4e0f-86ea-856ca77bd07c');
         $request->getInitialDebtorFinancingLimit()->shouldBeCalled()->willReturn(self::INITIAL_DEBTOR_FINANCING_LIMIT);
-        $request->getDebtorFinancingLimit()->shouldBeCalled()->willReturn(self::DEBTOR_FINANCING_LIMIT);
 
-        $creationDTO = (new MerchantCreationDTO(new DebtorCompany(), 'api-key', 'payment-uuid', 0, 0, 0));
+        $creationDTO = (new MerchantCreationDTO(new DebtorCompany(), 'api-key', 'payment-uuid', 0, 0));
+        $creationDTO->setIsOnboardingComplete(false);
         $creationDTO->setMerchant((new MerchantEntity())->setId(1));
         $creationDTO->setOauthClient(new AuthenticationServiceCreateClientResponseDTO('test-id', 'test-secret'));
 

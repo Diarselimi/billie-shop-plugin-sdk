@@ -3,6 +3,8 @@
 namespace App\Application\UseCase;
 
 use App\Application\Exception\RequestValidationException;
+use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 trait ValidatedUseCaseTrait
@@ -25,6 +27,18 @@ trait ValidatedUseCaseTrait
             return;
         }
 
-        throw new RequestValidationException($validationErrors);
+        $addedValidationErrors = [];
+        $nonDuplicatedValidationErrors = new ConstraintViolationList();
+        foreach ($validationErrors as $validationError) {
+            /** @var ConstraintViolationInterface $validationError */
+            $errorKey = $validationError->getPropertyPath() . '=' . $validationError->getMessage();
+            if (isset($addedValidationErrors[$errorKey])) {
+                continue;
+            }
+            $addedValidationErrors[$errorKey] = true;
+            $nonDuplicatedValidationErrors->add($validationError);
+        }
+
+        throw new RequestValidationException($nonDuplicatedValidationErrors);
     }
 }

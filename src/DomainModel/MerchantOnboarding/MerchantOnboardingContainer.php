@@ -83,6 +83,17 @@ class MerchantOnboardingContainer
         return $this->onboardingSteps;
     }
 
+    public function getOnboardingStep(string $name): MerchantOnboardingStepEntity
+    {
+        foreach ($this->getOnboardingSteps() as $step) {
+            if ($step->getName() === $name) {
+                return $step;
+            }
+        }
+
+        throw new MerchantOnboardingStepNotFoundException("Onboarding Step {$name} not found for merchant {$this->merchantId}");
+    }
+
     public function setOnboarding(MerchantOnboardingEntity $onboardingEntity): MerchantOnboardingContainer
     {
         $this->onboardingEntity = $onboardingEntity;

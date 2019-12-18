@@ -20,6 +20,10 @@ use OpenApi\Annotations as OA;
  *      @OA\Property(property="is_active", type="boolean"),
  *      @OA\Property(property="webhook_url", type="string", format="uri", nullable=true),
  *      @OA\Property(property="webhook_authorization", type="string", nullable=true, example="Authorization: Basic test"),
+ *      @OA\Property(property="credentials", type="object", nullable=true, properties={
+ *          @OA\Property(property="client_id", ref="#/components/schemas/UUID"),
+ *          @OA\Property(property="secret", type="string", example="234ty5uykjhfgeqw343ytreg")
+ *      }),
  * })
  */
 class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInterface
@@ -35,6 +39,8 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
     private $companyId;
 
     private $paymentUuid;
+
+    private $sandboxPaymentUuid;
 
     private $isActive;
 
@@ -178,6 +184,18 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
     public function setOauthClientId(?string $oauthClientId): MerchantEntity
     {
         $this->oauthClientId = $oauthClientId;
+
+        return $this;
+    }
+
+    public function getSandboxPaymentUuid(): ?string
+    {
+        return $this->sandboxPaymentUuid;
+    }
+
+    public function setSandboxPaymentUuid(?string $sandboxPaymentUuid): MerchantEntity
+    {
+        $this->sandboxPaymentUuid = $sandboxPaymentUuid;
 
         return $this;
     }

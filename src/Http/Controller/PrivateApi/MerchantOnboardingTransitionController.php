@@ -3,10 +3,10 @@
 namespace App\Http\Controller\PrivateApi;
 
 use App\Application\Exception\WorkflowException;
-use App\Application\UseCase\MerchantOnboardingTransition\MerchantOnboardingNotFoundException;
 use App\Application\UseCase\MerchantOnboardingTransition\MerchantOnboardingStepsIncompleteException;
 use App\Application\UseCase\MerchantOnboardingTransition\MerchantOnboardingTransitionRequest;
 use App\Application\UseCase\MerchantOnboardingTransition\MerchantOnboardingTransitionUseCase;
+use App\DomainModel\MerchantOnboarding\MerchantOnboardingNotFoundException;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;

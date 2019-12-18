@@ -41,7 +41,7 @@ Feature: Register merchant user to access dashboard
     """
     Then the response status code should be 201
     And merchant user with merchant id 1 and user id "test-auth-id" should be created
-    When I will get a response from Authentication Service from endpoint "/users" with status code 409
+    When I get a response from Authentication Service from endpoint "/users" with status code 409
     When I send a POST request to "/private/merchant/1/user" with body:
     """
     {

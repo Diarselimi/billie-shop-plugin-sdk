@@ -70,14 +70,15 @@ class RegisterMerchantUseCase implements ValidatedUseCaseInterface
             throw new DuplicateMerchantCompanyException();
         }
 
-        $creationDTO = $this->merchantCreationService->create(new MerchantCreationDTO(
+        $creationDTO = new MerchantCreationDTO(
             $company,
             $this->uuidGenerator->uuid4(),
             $this->uuidGenerator->uuid4(),
             self::INITIAL_MERCHANT_LIMIT,
-            self::INITIAL_DEBTOR_LIMIT,
             self::INITIAL_DEBTOR_LIMIT
-        ));
+        );
+        $creationDTO->setIsOnboardingComplete(false);
+        $this->merchantCreationService->create($creationDTO);
 
         $invitation = $this->invitationPersistenceService->createInvitationByRoleName(
             MerchantUserDefaultRoles::ROLE_ADMIN['name'],

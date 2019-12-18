@@ -48,7 +48,8 @@ class GetMerchantCredentialsController
         $merchant = $this->userProvider->getUser()->getMerchant();
         $useCaseRequest = new GetMerchantCredentialsRequest(
             $merchant->getId(),
-            $merchant->getOauthClientId()
+            $merchant->getOauthClientId(),
+            $merchant->getSandboxPaymentUuid()
         );
 
         return $this->useCase->execute($useCaseRequest);

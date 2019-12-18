@@ -10,7 +10,7 @@ class RequestValidationException extends \RuntimeException
 
     protected $validationErrors;
 
-    public function __construct(ConstraintViolationListInterface $validationErrors = null)
+    public function __construct(ConstraintViolationListInterface $validationErrors)
     {
         $this->validationErrors = $validationErrors;
 

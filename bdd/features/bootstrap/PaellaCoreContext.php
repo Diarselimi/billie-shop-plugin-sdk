@@ -81,6 +81,8 @@ class PaellaCoreContext extends MinkContext
 
     public const DEBTOR_COMPANY_UUID = 'c7be46c0-e049-4312-b274-258ec5aeeb70';
 
+    public const SANDBOX_MERCHANT_PAYMENT_UUID = '1ac823bd-2a3e-48b0-aa61-3b95962922eb';
+
     public function __construct(KernelInterface $kernel, PdoConnection $connection)
     {
         $this->kernel = $kernel;
@@ -191,7 +193,7 @@ class PaellaCoreContext extends MinkContext
             TRUNCATE merchant_onboarding_step_transitions;
             ALTER TABLE merchants AUTO_INCREMENT = 1;
             ALTER TABLE merchants_debtors AUTO_INCREMENT = 1;
-            ALTER TABLE merchants_users AUTO_INCREMENT = 1;
+            ALTER TABLE merchant_users AUTO_INCREMENT = 1;
             ALTER TABLE orders AUTO_INCREMENT = 1;
             SET FOREIGN_KEY_CHECKS = 1;
         ');
@@ -304,6 +306,21 @@ class PaellaCoreContext extends MinkContext
                 ->setCreatedAt(new DateTime())
                 ->setUpdatedAt(new DateTime())
         );
+    }
+
+    /**
+     * @Given The merchant have sandbox credentials created
+     */
+    public function iHaveTheMerchantWithSandboxCredentialsCreated()
+    {
+        $merchant = (new MerchantEntity())
+            ->setId(1)
+            ->setSandboxPaymentUuid(self::SANDBOX_MERCHANT_PAYMENT_UUID)
+            ->setFinancingPower(1111)
+            ->setFinancingLimit(22222)
+            ->setUpdatedAt(new \DateTime())
+            ;
+        $this->getMerchantRepository()->update($merchant);
     }
 
     /**
@@ -1119,5 +1136,24 @@ class PaellaCoreContext extends MinkContext
         $results = $pdoQuery->fetch(PDO::FETCH_ASSOC);
 
         Assert::eq($results['total'], 1);
+    }
+
+    /**
+     * @Given a merchant exists with company ID :id and sandbox merchant payment UUID :uuid
+     */
+    public function aMerchantExistsWithCompanyIDAndSandboxMerchantPaymentUUID($id, $uuid)
+    {
+        $merchant = $this->getMerchantRepository()->getOneByCompanyId((int) $id);
+        Assert::notNull($merchant);
+        Assert::same($merchant->getSandboxPaymentUuid(), $uuid);
+    }
+
+    /**
+     * @Given /^the sandbox merchant payment UUID is already set$/
+     */
+    public function theSandboxMerchantPaymentUUIDIsSet()
+    {
+        $this->merchant->setSandboxPaymentUuid(self::SANDBOX_MERCHANT_PAYMENT_UUID);
+        $this->getMerchantRepository()->update($this->merchant);
     }
 }

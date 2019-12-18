@@ -181,7 +181,7 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
             && $exception->getResponse()->getStatusCode() === $statusCode;
     }
 
-    public function getCredentials(string $clientId): GetMerchantCredentialsDTO
+    public function getCredentials(string $clientId): ?GetMerchantCredentialsDTO
     {
         try {
             $response = $this->client->get("/client/{$clientId}/credentials", [
@@ -192,7 +192,10 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
 
             $decodedResponse = $this->decodeResponse($response);
 
-            return new GetMerchantCredentialsDTO($decodedResponse['client_id'], $decodedResponse['secret']);
+            $clientId = $decodedResponse['client_id'] ?? null;
+            $secret = $decodedResponse['secret'] ?? null;
+
+            return $clientId ? (new GetMerchantCredentialsDTO($clientId, $secret)) : null;
         } catch (TransferException $exception) {
             throw new AuthenticationServiceRequestException($exception);
         }

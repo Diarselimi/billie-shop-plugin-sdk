@@ -4,14 +4,18 @@ namespace App\Application\UseCase\GetMerchant;
 
 use App\DomainModel\ArrayableInterface;
 use App\DomainModel\Merchant\MerchantEntity;
+use App\DomainModel\MerchantUser\GetMerchantCredentialsDTO;
 
 class GetMerchantResponse implements ArrayableInterface
 {
     private $merchant;
 
-    public function __construct(MerchantEntity $merchant)
+    private $credentialsDTO;
+
+    public function __construct(MerchantEntity $merchant, ?GetMerchantCredentialsDTO $credentialsDTO)
     {
         $this->merchant = $merchant;
+        $this->credentialsDTO = $credentialsDTO;
     }
 
     public function getMerchant(): MerchantEntity
@@ -21,6 +25,11 @@ class GetMerchantResponse implements ArrayableInterface
 
     public function toArray(): array
     {
-        return $this->merchant->toArray();
+        return array_merge(
+            $this->merchant->toArray(),
+            [
+                'credentials' => $this->credentialsDTO ? $this->credentialsDTO->toArray() : null,
+            ]
+        );
     }
 }

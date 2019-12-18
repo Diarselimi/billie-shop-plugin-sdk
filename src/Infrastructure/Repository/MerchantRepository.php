@@ -11,7 +11,10 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
 {
     public const TABLE_NAME = "merchants";
 
-    private const SELECT_FIELDS = 'id, name, api_key, oauth_client_id, company_id, payment_merchant_id, is_active, financing_power, available_financing_limit, webhook_url, webhook_authorization, created_at, updated_at';
+    private const SELECT_FIELDS = [
+        'id', 'name', 'api_key', 'oauth_client_id', 'company_id', 'payment_merchant_id', 'sandbox_payment_merchant_id',
+        'is_active', 'financing_power', 'available_financing_limit', 'webhook_url', 'webhook_authorization', 'created_at', 'updated_at',
+    ];
 
     private $factory;
 
@@ -23,10 +26,12 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
     public function insert(MerchantEntity $merchant): void
     {
         $id = $this->doInsert('
-            INSERT INTO '.self::TABLE_NAME.'
-            (name, api_key, oauth_client_id, is_active, financing_power, available_financing_limit, company_id, payment_merchant_id, webhook_url, webhook_authorization, created_at, updated_at)
+            INSERT INTO ' . self::TABLE_NAME . '
+            (name, api_key, oauth_client_id, is_active, financing_power, available_financing_limit, 
+                company_id, payment_merchant_id, webhook_url, webhook_authorization, created_at, updated_at)
             VALUES
-            (:name, :api_key, :oauth_client_id, :is_active, :financing_power, :available_financing_limit, :company_id, :payment_merchant_id, :webhook_url, :webhook_authorization, :created_at, :updated_at)
+            (:name, :api_key, :oauth_client_id, :is_active, :financing_power, :available_financing_limit, 
+                :company_id, :payment_merchant_id, :webhook_url, :webhook_authorization, :created_at, :updated_at)
         ', [
             'name' => $merchant->getName(),
             'api_key' => $merchant->getApiKey(),
@@ -49,36 +54,45 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
     {
         $merchant->setUpdatedAt(new \DateTime());
         $this->doUpdate('
-            UPDATE '.self::TABLE_NAME.'
+            UPDATE ' . self::TABLE_NAME . '
             SET 
               financing_power = :financing_power, 
               available_financing_limit = :available_financing_limit, 
+              sandbox_payment_merchant_id = :sandbox_payment_merchant_id,
               updated_at = :updated_at
             WHERE id = :id
         ', [
             'id' => $merchant->getId(),
             'financing_power' => $merchant->getFinancingPower(),
             'available_financing_limit' => $merchant->getFinancingLimit(),
+            'sandbox_payment_merchant_id' => $merchant->getSandboxPaymentUuid(),
             'updated_at' => $merchant->getUpdatedAt()->format(self::DATE_FORMAT),
         ]);
     }
 
     public function getOneById(int $id): ?MerchantEntity
     {
-        $row = $this->doFetchOne('
-          SELECT ' . self::SELECT_FIELDS . '
-          FROM '.self::TABLE_NAME.'
+        $row = $this->doFetchOne($this->generateSelectQuery(self::TABLE_NAME, self::SELECT_FIELDS) . '
           WHERE id = :id
         ', ['id' => $id]);
 
         return $row ? $this->factory->createFromDatabaseRow($row) : null;
     }
 
+    public function getOneByUuid(string $paymentUuid): ?MerchantEntity
+    {
+        $row = $this->doFetchOne(
+            $this->generateSelectQuery(self::TABLE_NAME, self::SELECT_FIELDS) .
+            ' WHERE payment_merchant_id = :payment_merchant_uuid ',
+            ['payment_merchant_uuid' => $paymentUuid]
+        );
+
+        return $row ? $this->factory->createFromDatabaseRow($row) : null;
+    }
+
     public function getOneByCompanyId(int $companyId): ?MerchantEntity
     {
-        $row = $this->doFetchOne('
-          SELECT ' . self::SELECT_FIELDS . '
-          FROM '.self::TABLE_NAME.'
+        $row = $this->doFetchOne($this->generateSelectQuery(self::TABLE_NAME, self::SELECT_FIELDS) . '
           WHERE company_id = :company_id
         ', ['company_id' => $companyId]);
 
@@ -87,20 +101,16 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
 
     public function getOneByApiKey(string $apiKey): ?MerchantEntity
     {
-        $row = $this->doFetchOne('
-          SELECT ' . self::SELECT_FIELDS . '
-          FROM '.self::TABLE_NAME.'
+        $row = $this->doFetchOne($this->generateSelectQuery(self::TABLE_NAME, self::SELECT_FIELDS) . '
           WHERE api_key = :api_key
         ', ['api_key' => $apiKey]);
 
         return $row ? $this->factory->createFromDatabaseRow($row) : null;
     }
 
-    public function getOneByOauthClientId(string $oauthClientId): ? MerchantEntity
+    public function getOneByOauthClientId(string $oauthClientId): ?MerchantEntity
     {
-        $row = $this->doFetchOne('
-          SELECT ' . self::SELECT_FIELDS . '
-          FROM merchants
+        $row = $this->doFetchOne($this->generateSelectQuery(self::TABLE_NAME, self::SELECT_FIELDS) . '
           WHERE oauth_client_id = :oauth_client_id
         ', ['oauth_client_id' => $oauthClientId]);
 
@@ -110,10 +120,9 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
     public function findActiveWithFinancingPowerBelowPercentage(float $percentage): ?array
     {
         $rows = $this->doFetchAll(
-            'SELECT '.self::SELECT_FIELDS.
-            ' FROM '.self::TABLE_NAME.
-            ' WHERE available_financing_limit IS NOT NULL '.
-            ' AND is_active = 1 '.
+            $this->generateSelectQuery(self::TABLE_NAME, self::SELECT_FIELDS) .
+            ' WHERE available_financing_limit IS NOT NULL ' .
+            ' AND is_active = 1 ' .
             ' AND (financing_power / available_financing_limit * 100) < :percentage ',
             [
                 'percentage' => $percentage,

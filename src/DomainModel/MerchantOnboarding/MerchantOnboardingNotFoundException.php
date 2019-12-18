@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\UseCase\MerchantOnboardingTransition;
+namespace App\DomainModel\MerchantOnboarding;
 
 class MerchantOnboardingNotFoundException extends \Exception
 {

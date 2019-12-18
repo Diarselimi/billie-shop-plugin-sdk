@@ -53,7 +53,7 @@ Feature: Register merchant user to access dashboard
     """
 
   Scenario: Request for an existing user email
-    Given I will get a response from Authentication Service from endpoint "users" with status code "409"
+    Given I get a response from Authentication Service from endpoint "users" with status code "409"
     And I have a role of name "Test" with uuid "c7be46c0-e049-4312-b274-258ec5aeeb70" and permissions
     """
       ["TEST"]

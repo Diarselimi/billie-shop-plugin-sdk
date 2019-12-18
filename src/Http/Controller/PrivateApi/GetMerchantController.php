@@ -11,14 +11,14 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @OA\Get(
- *     path="/merchant/{id}",
+ *     path="/merchant/{identifier}",
  *     operationId="merchant_get",
  *     summary="Get Merchant",
  *
  *     tags={"Support"},
  *     x={"groups":{"private"}},
  *
- *     @OA\Parameter(in="path", name="id", @OA\Schema(type="integer"), required=true, description="Merchant ID"),
+ *     @OA\Parameter(in="path", name="identifier", @OA\Schema(type="string"), required=true, description="Merchant ID or Merchant Payment Uuid"),
  *
  *     @OA\Response(response=200, @OA\JsonContent(ref="#/components/schemas/MerchantEntity"), description="Merchant Entity"),
  *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),
@@ -35,10 +35,10 @@ class GetMerchantController
         $this->useCase = $useCase;
     }
 
-    public function execute(string $id): GetMerchantResponse
+    public function execute(string $identifier): GetMerchantResponse
     {
         try {
-            return $this->useCase->execute(new GetMerchantRequest((int) $id));
+            return $this->useCase->execute(new GetMerchantRequest($identifier));
         } catch (MerchantNotFoundException $exception) {
             throw new NotFoundHttpException($exception->getMessage());
         }

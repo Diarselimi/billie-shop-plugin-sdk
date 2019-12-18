@@ -8,6 +8,7 @@ use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingEntity;
+use App\DomainModel\MerchantOnboarding\MerchantOnboardingNotFoundException;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingRepositoryInterface;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepRepositoryInterface;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingTransitionEntity;

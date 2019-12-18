@@ -32,6 +32,8 @@ class DebtorCompany
 
     private $isSynchronized;
 
+    private $legalForm;
+
     public function getId(): int
     {
         return $this->id;
@@ -196,6 +198,18 @@ class DebtorCompany
     public function setIsSynchronized(?bool $isSynchronized): DebtorCompany
     {
         $this->isSynchronized = $isSynchronized;
+
+        return $this;
+    }
+
+    public function getLegalForm(): ?string
+    {
+        return $this->legalForm;
+    }
+
+    public function setLegalForm(?string $legalForm): DebtorCompany
+    {
+        $this->legalForm = $legalForm;
 
         return $this;
     }

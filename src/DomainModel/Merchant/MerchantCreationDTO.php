@@ -17,8 +17,6 @@ class MerchantCreationDTO
 
     private $initialDebtorFinancingLimit;
 
-    private $debtorFinancingLimit;
-
     private $webhookUrl;
 
     private $webhookAuthorization;
@@ -27,20 +25,20 @@ class MerchantCreationDTO
 
     private $oauthClient;
 
+    private $isOnboardingComplete;
+
     public function __construct(
         DebtorCompany $company,
         string $apiKey,
         string $paymentUuid,
         float $merchantFinancingLimit,
-        float $initialDebtorFinancingLimit,
-        float $debtorFinancingLimit
+        float $initialDebtorFinancingLimit
     ) {
         $this->company = $company;
         $this->apiKey = $apiKey;
         $this->paymentUuid = $paymentUuid;
         $this->merchantFinancingLimit = $merchantFinancingLimit;
         $this->initialDebtorFinancingLimit = $initialDebtorFinancingLimit;
-        $this->debtorFinancingLimit = $debtorFinancingLimit;
     }
 
     public function getCompany(): DebtorCompany
@@ -66,11 +64,6 @@ class MerchantCreationDTO
     public function getInitialDebtorFinancingLimit(): float
     {
         return $this->initialDebtorFinancingLimit;
-    }
-
-    public function getDebtorFinancingLimit(): float
-    {
-        return $this->debtorFinancingLimit;
     }
 
     public function getWebhookUrl(): ?string
@@ -117,6 +110,18 @@ class MerchantCreationDTO
     public function setOauthClient(AuthenticationServiceCreateClientResponseDTO $oauthClient): MerchantCreationDTO
     {
         $this->oauthClient = $oauthClient;
+
+        return $this;
+    }
+
+    public function isOnboardComplete(): bool
+    {
+        return $this->isOnboardingComplete;
+    }
+
+    public function setIsOnboardingComplete(bool $isOnboardingComplete): MerchantCreationDTO
+    {
+        $this->isOnboardingComplete = $isOnboardingComplete;
 
         return $this;
     }

@@ -113,13 +113,12 @@ class MerchantCreationService
         $this->createDefaultSettings(
             $merchantId,
             $scoringThresholdId,
-            $creationDTO->getInitialDebtorFinancingLimit(),
-            $creationDTO->getDebtorFinancingLimit()
+            $creationDTO->getInitialDebtorFinancingLimit()
         );
         $this->createDefaultRiskChecks($merchantId);
         $this->createDefaultNotificationSettings($merchantId);
         $this->createDefaultRoles($merchantId);
-        $this->createOnboarding($merchantId);
+        $this->createOnboarding($merchantId, $creationDTO->isOnboardComplete());
     }
 
     private function createOauthClient(string $companyName): AuthenticationServiceCreateClientResponseDTO
@@ -139,12 +138,12 @@ class MerchantCreationService
         return $scoreThresholds;
     }
 
-    private function createDefaultSettings(int $merchantId, int $scoreThresholdsId, float $initialDebtorLimit, float $debtorLimit): void
+    private function createDefaultSettings(int $merchantId, int $scoreThresholdsId, float $initialDebtorLimit): void
     {
         $merchantSettings = $this->merchantSettingsFactory->create(
             $merchantId,
             $initialDebtorLimit,
-            $debtorLimit,
+            $initialDebtorLimit,
             $scoreThresholdsId,
             false,
             MerchantSettingsEntity::INVOICE_HANDLING_STRATEGY_NONE,
@@ -177,8 +176,13 @@ class MerchantCreationService
         }
     }
 
-    private function createOnboarding(int $merchantId): void
+    private function createOnboarding(int $merchantId, bool $isComplete): void
     {
+        if ($isComplete) {
+            $this->onboardingPersistenceService->createOnboarded($merchantId);
+
+            return;
+        }
         $this->onboardingPersistenceService->createWithSteps($merchantId);
     }
 }

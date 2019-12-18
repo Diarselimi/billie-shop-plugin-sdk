@@ -46,4 +46,12 @@ class MerchantOnboardingPersistenceService
 
         return $this->onboardingContainerFactory->createWithData($merchantId, $onboardingEntity, ...$onboardingSteps);
     }
+
+    public function createOnboarded(int $merchantId): MerchantOnboardingContainer
+    {
+        $onboardingEntity = $this->onboardingEntityFactory->create(MerchantOnboardingEntity::STATE_COMPLETE, $merchantId);
+        $this->onboardingRepository->insert($onboardingEntity);
+
+        return $this->onboardingContainerFactory->createWithData($merchantId, $onboardingEntity);
+    }
 }

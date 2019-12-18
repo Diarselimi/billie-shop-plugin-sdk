@@ -27,6 +27,7 @@ services:
       $limesClient: '@eight_points_guzzle.client.limes'
       $notificationSenderClient: '@eight_points_guzzle.client.webhook'
       $salesforceClient: '@eight_points_guzzle.client.salesforce'
+      $paellaSandboxClient: '@eight_points_guzzle.client.paella_sandbox'
       $projectRootDir: '%kernel.root_dir%/..'
       $smaugClientId: '%smaug_client_id%'
       $smaugClientSecret: '%smaug_client_secret%'

@@ -30,3 +30,9 @@ eight_points_guzzle:
         debug: false
         query:
           app: limes
+    paella_sandbox:
+      base_url: "%behat_mock_server_url%:8026"
+      options:
+        debug: false
+        query:
+          app: paella_sandbox
