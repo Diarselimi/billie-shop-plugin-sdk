@@ -4,6 +4,7 @@ namespace App\DomainModel\Merchant;
 
 use App\DomainModel\ArrayableInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsException;
+use App\Support\DateFormat;
 use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 use OpenApi\Annotations as OA;
 
@@ -213,8 +214,8 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
             'is_active' => $this->isActive(),
             'webhook_url' => $this->getWebhookUrl(),
             'webhook_authorization' => $this->getWebhookAuthorization(),
-            'created_at' => $this->getCreatedAt()->format('Y-m-d H:i:s'), // TODO: constant somewhere?
-            'updated_at' => $this->getUpdatedAt()->format('Y-m-d H:i:s'),
+            'created_at' => $this->getCreatedAt()->format(DateFormat::FORMAT_YMD_HIS),
+            'updated_at' => $this->getUpdatedAt()->format(DateFormat::FORMAT_YMD_HIS),
         ];
     }
 }

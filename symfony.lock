@@ -153,6 +153,9 @@
     "fesor/json_matcher": {
         "version": "0.2.3"
     },
+    "globalcitizen/php-iban": {
+        "version": "v2.7.2"
+    },
     "gnugat/redaktilo": {
         "version": "v1.7.3"
     },

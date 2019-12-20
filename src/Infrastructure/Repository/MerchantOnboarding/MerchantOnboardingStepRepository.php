@@ -47,12 +47,36 @@ class MerchantOnboardingStepRepository extends AbstractPdoRepository implements
         $query = $this->generateSelectQuery(self::TABLE_NAME, $fields)
             . ' INNER JOIN merchant_onboardings ON merchant_onboardings.id = merchant_onboarding_id
                 INNER JOIN merchants ON merchant_onboardings.merchant_id = merchants.id
-                WHERE merchants.payment_merchant_id = :merchant_payment_uuid AND ' . self::TABLE_NAME . '.name = :name'
+                WHERE merchants.payment_merchant_id = :merchant_payment_uuid AND ' . self::TABLE_NAME . '.name = :name 
+                ORDER BY ' . self::TABLE_NAME . '.id DESC LIMIT 1'
         ;
 
         $row = $this->doFetchOne($query, [
             'name' => $name,
             'merchant_payment_uuid' => $merchantPaymentUuid,
+        ]);
+
+        return $row ? $this->factory->createFromArray($row) : null;
+    }
+
+    public function getOneByStepNameAndMerchant(string $name, int $merchantId): ?MerchantOnboardingStepEntity
+    {
+        $fields = array_map(
+            static function (string $field) {
+                return self::TABLE_NAME . '.' . $field;
+            },
+            self::SELECT_FIELDS
+        );
+
+        $query = $this->generateSelectQuery(self::TABLE_NAME, $fields)
+            . ' INNER JOIN merchant_onboardings ON merchant_onboardings.id = merchant_onboarding_id
+                WHERE merchant_onboardings.merchant_id = :merchant_id AND ' . self::TABLE_NAME . '.name = :name 
+                ORDER BY ' . self::TABLE_NAME . '.id DESC LIMIT 1'
+        ;
+
+        $row = $this->doFetchOne($query, [
+            'name' => $name,
+            'merchant_id' => $merchantId,
         ]);
 
         return $row ? $this->factory->createFromArray($row) : null;

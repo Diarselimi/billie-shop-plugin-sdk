@@ -4,6 +4,7 @@ namespace App\DomainModel\MerchantUser;
 
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\ArrayableInterface;
+use App\Support\DateFormat;
 use OpenApi\Annotations as OA;
 
 /**
@@ -159,7 +160,8 @@ class MerchantUserDTO implements ArrayableInterface
             ],
             'tracking_id' => $this->getUser()->getId(),
             'onboarding_state' => $this->getOnboardingState(),
-            'onboarding_complete_at' => $this->getOnboardingCompleteAt() ? $this->getOnboardingCompleteAt()->format('Y-m-d') : null,
+            'onboarding_complete_at' => $this->getOnboardingCompleteAt() ?
+                $this->getOnboardingCompleteAt()->format(DateFormat::FORMAT_YMD) : null,
         ];
     }
 }

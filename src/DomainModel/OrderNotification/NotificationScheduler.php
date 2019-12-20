@@ -4,6 +4,7 @@ namespace App\DomainModel\OrderNotification;
 
 use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
+use App\Support\DateFormat;
 use Billie\MonitoringBundle\Service\Alerting\Slack\SlackClientAwareInterface;
 use Billie\MonitoringBundle\Service\Alerting\Slack\SlackClientAwareTrait;
 use Billie\MonitoringBundle\Service\Alerting\Slack\SlackMessageAttachmentField;
@@ -103,7 +104,7 @@ class NotificationScheduler implements LoggingInterface, SlackClientAwareInterfa
 
         $this->logInfo('Scheduling notification {notification_id} for execution at {datetime}', [
             'notification_id' => $orderNotification->getId(),
-            'datetime' => (new \DateTime(self::DELAY_MATRIX[$attemptNumber]))->format('Y-m-d H:i:d'),
+            'datetime' => (new \DateTime(self::DELAY_MATRIX[$attemptNumber]))->format(DateFormat::FORMAT_YMD_HIS),
             'attempt' => $attemptNumber,
             'payload' => json_encode($payload),
         ]);

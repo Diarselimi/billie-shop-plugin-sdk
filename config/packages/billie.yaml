@@ -14,3 +14,4 @@ ozean12_graphql_client:
 ozean12_amqp_pack:
   publish:
     customer.customer_created: Ozean12\Transfer\Message\Customer\CustomerCreated
+    bank_account.bank_account_core_accepted: Ozean12\Transfer\Message\BankAccount\BankAccountCoreAccepted

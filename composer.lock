@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bb8e84f1c551a525697b30a285e3e191",
+    "content-hash": "e918ba53474388578b540ea915a00925",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -1320,6 +1320,34 @@
             "time": "2019-05-27T13:12:22+00:00"
         },
         {
+            "name": "globalcitizen/php-iban",
+            "version": "v2.7.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/globalcitizen/php-iban.git",
+                "reference": "516f43bd3f71c31963726652a11986b3aca83c5a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/globalcitizen/php-iban/zipball/516f43bd3f71c31963726652a11986b3aca83c5a",
+                "reference": "516f43bd3f71c31963726652a11986b3aca83c5a",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "oophp-iban.php",
+                    "php-iban.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0-only"
+            ],
+            "description": "php-iban is a library for parsing and validating IBAN (and IIBAN) bank account information.",
+            "time": "2019-11-13T04:37:56+00:00"
+        },
+        {
             "name": "google/protobuf",
             "version": "v3.10.0",
             "source": {
@@ -1976,16 +2004,16 @@
         },
         {
             "name": "ozean12/amqp-pack",
-            "version": "dev-master",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/amqp-pack.git",
-                "reference": "424d39c"
+                "reference": "0bd35c966f2f7eb9b9b3b4756de0db37379843a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/amqp-pack/zipball/424d39c",
-                "reference": "424d39c",
+                "url": "https://api.github.com/repos/ozean12/amqp-pack/zipball/0bd35c966f2f7eb9b9b3b4756de0db37379843a9",
+                "reference": "0bd35c966f2f7eb9b9b3b4756de0db37379843a9",
                 "shasum": ""
             },
             "require": {
@@ -2020,10 +2048,10 @@
             ],
             "description": "A pack for using the AMQP transport within Billie",
             "support": {
-                "source": "https://github.com/ozean12/amqp-pack/tree/0.3.1",
+                "source": "https://github.com/ozean12/amqp-pack/tree/1.0.0",
                 "issues": "https://github.com/ozean12/amqp-pack/issues"
             },
-            "time": "2019-10-14T06:51:20+00:00"
+            "time": "2019-12-05T14:12:16+00:00"
         },
         {
             "name": "ozean12/amqp-transfers",
@@ -7068,6 +7096,7 @@
             ],
             "description": "Promoting the interoperability of container objects (DIC, SL, etc.)",
             "homepage": "https://github.com/container-interop/container-interop",
+            "abandoned": "psr/container",
             "time": "2017-02-14T19:40:03+00:00"
         },
         {
@@ -9532,9 +9561,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "ozean12/amqp-pack": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

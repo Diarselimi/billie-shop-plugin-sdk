@@ -2172,6 +2172,36 @@ paths:
           oauth2: []
       x-groups:
         - private
+  /merchant/bank-account:
+    post:
+      tags:
+        - 'Dashboard Merchants'
+      summary: 'Setup Bank Account'
+      operationId: setup_merchant_bank_account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetupMerchantBankAccountRequest'
+      responses:
+        '204':
+          description: 'Successful response'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+      x-groups:
+        - private
   '/order/{id}/ship':
     post:
       tags:
@@ -3148,6 +3178,18 @@ components:
           format: float
           example: 50
       type: object
+    SetupMerchantBankAccountRequest:
+      required:
+        - iban
+        - tc_accepted
+      properties:
+        iban:
+          $ref: '#/components/schemas/IBAN'
+        tc_accepted:
+          type: boolean
+      type: object
+      x-groups:
+        - private
     ShipOrderRequest:
       title: 'Order Shipping Object'
       properties:

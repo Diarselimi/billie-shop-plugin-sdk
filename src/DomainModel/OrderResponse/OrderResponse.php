@@ -3,6 +3,7 @@
 namespace App\DomainModel\OrderResponse;
 
 use App\DomainModel\ArrayableInterface;
+use App\Support\DateFormat;
 use OpenApi\Annotations as OA;
 
 /**
@@ -716,7 +717,7 @@ class OrderResponse implements ArrayableInterface
                 'outstanding_amount' => $this->getOutstandingAmount(),
                 'fee_amount' => $this->getFeeAmount(),
                 'fee_rate' => $this->getFeeRate(),
-                'due_date' => $this->getDueDate() ? $this->getDueDate()->format('Y-m-d') : null,
+                'due_date' => $this->getDueDate() ? $this->getDueDate()->format(DateFormat::FORMAT_YMD) : null,
             ],
             'debtor_external_data' => [
                 'merchant_customer_id' => $this->getDebtorExternalDataCustomerId(),

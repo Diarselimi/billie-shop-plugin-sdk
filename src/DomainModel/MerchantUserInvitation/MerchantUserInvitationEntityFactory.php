@@ -3,7 +3,7 @@
 namespace App\DomainModel\MerchantUserInvitation;
 
 use App\Support\AbstractFactory;
-use App\Support\TokenGenerator;
+use App\Support\RandomStringGenerator;
 use Ramsey\Uuid\Uuid;
 
 class MerchantUserInvitationEntityFactory extends AbstractFactory
@@ -12,7 +12,7 @@ class MerchantUserInvitationEntityFactory extends AbstractFactory
 
     private $tokenGenerator;
 
-    public function __construct(TokenGenerator $tokenGenerator)
+    public function __construct(RandomStringGenerator $tokenGenerator)
     {
         $this->tokenGenerator = $tokenGenerator;
     }
@@ -40,7 +40,7 @@ class MerchantUserInvitationEntityFactory extends AbstractFactory
             ->setMerchantUserRoleId($roleId)
             ->setMerchantUserId($merchantUserId)
             ->setUuid(Uuid::uuid4())
-            ->setToken($this->tokenGenerator->generate())
+            ->setToken($this->tokenGenerator->generateHexToken())
             ->setExpiresAt((new \DateTime())->modify(self::DEFAULT_INVITATION_EXPIRATION_TIME))
             ->setCreatedAt(new \DateTime());
     }

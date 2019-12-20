@@ -41,3 +41,8 @@ eight_points_guzzle:
         headers:
           Content-Type: "application/json"
           X-Api-Key: "%env(string:PAELLA_SANDBOX_API_KEY)%"
+    fintech_toolbox:
+      base_url: "%env(string:FINTECH_TOOLBOX_API_URL)%"
+      options:
+        headers:
+          Authorization: "token %env(string:FINTECH_TOOLBOX_API_KEY)%"

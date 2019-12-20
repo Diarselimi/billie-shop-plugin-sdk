@@ -6,6 +6,8 @@ interface MerchantOnboardingStepRepositoryInterface
 {
     public function getOneByStepNameAndPaymentUuid(string $name, string $merchantPaymentUuid): ?MerchantOnboardingStepEntity;
 
+    public function getOneByStepNameAndMerchant(string $name, int $merchantId): ?MerchantOnboardingStepEntity;
+
     /**
      * @return MerchantOnboardingStepEntity[]
      */

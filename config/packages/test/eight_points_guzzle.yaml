@@ -36,3 +36,9 @@ eight_points_guzzle:
         debug: false
         query:
           app: paella_sandbox
+    fintech_toolbox:
+      base_url: "%behat_mock_server_url%:8027"
+      options:
+        debug: false
+        query:
+          app: bic_lookup
