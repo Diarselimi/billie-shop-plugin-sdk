@@ -1,7 +1,5 @@
-## Incoming Webhooks
 To send updates on relevant events, Billie PaD sends POST requests to the incoming webhook URL provided by the merchant.
-The following events can be communicated via webhooks:
-
+See "Event Names" section for the list of events that can be communicated via webhooks
 
 ### Webhook Authentication
 The authentication for webhooks sent from Billie to the merchants incoming webhook URL depends on the merchant specifications 
@@ -44,14 +42,12 @@ the `application/json` Content-Type and the following body format:
 | Event Name       | Description                              |
 |------------------|------------------------------------------|
 | reminder_email_1 | 1st Reminder mail was sent               |
+| reminder_email_2 | 2nd Reminder mail was sent               |
 | dunning_letter_1 | 1st Dunning letter was sent              |
 | dunning_email_1  | 1st Dunning mail was sent                |
-| reminder_email_2 | 2nd Reminder mail was sent               |
-| dunning_letter_2 | 2nd Dunning letter was sent              |
-| reminder_email_2 | 2nd Dunning email was sent               |
-| dunning_email_2  | 2nd Dunning email was sent               |
 | reminder_email_3 | 3rd Reminder email was sent              |
-| dca_letter       | Debt collection handover letter was sent |
-| dca_email        | Debt collection handover email was sent  |
+| dunning_letter_2 | 2nd Dunning letter was sent              |
+| dunning_email_2  | 2nd Dunning email was sent               |
+| reminder_email_4 | Debt collection handover letter was sent |
 
 
