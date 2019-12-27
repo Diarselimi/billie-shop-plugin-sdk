@@ -48,6 +48,6 @@ the `application/json` Content-Type and the following body format:
 | reminder_email_3 | 3rd Reminder email was sent              |
 | dunning_letter_2 | 2nd Dunning letter was sent              |
 | dunning_email_2  | 2nd Dunning email was sent               |
-| reminder_email_4 | Debt collection handover letter was sent |
+| reminder_email_4 | 4th Reminder email was sent              |
 
 
