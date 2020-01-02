@@ -35,10 +35,13 @@ class SignatoryPowersSelectionRequest implements ValidatedRequestInterface
 
     private $merchantUserId;
 
-    public function __construct(int $merchantUserId, string $companyId, SignatoryPowerDTO ...$signatoryPowers)
+    private $merchantPaymentUuid;
+
+    public function __construct(int $merchantUserId, string $companyId, string $merchantPaymentUuid, SignatoryPowerDTO ...$signatoryPowers)
     {
         $this->merchantUserId = $merchantUserId;
         $this->companyId = $companyId;
+        $this->merchantPaymentUuid = $merchantPaymentUuid;
         $this->signatoryPowers = $signatoryPowers;
     }
 
@@ -58,6 +61,11 @@ class SignatoryPowersSelectionRequest implements ValidatedRequestInterface
     public function getMerchantUserId(): int
     {
         return $this->merchantUserId;
+    }
+
+    public function getMerchantPaymentUuid(): string
+    {
+        return $this->merchantPaymentUuid;
     }
 
     public function findSelectedAsLoggedInSignatory(): ?SignatoryPowerDTO

@@ -7,6 +7,33 @@ Feature: I should be able to save the selected Signatory Powers that I send to p
     And I get from Oauth service a valid user token
     And a merchant user exists with permission MANAGE_ONBOARDING
 
+  Scenario: Failed call when step is not new
+    And The following onboarding steps are in states for merchant "f2ec4d5e-79f4-40d6-b411-31174b6519ac":
+      | name                   | state     |
+      | signatory_confirmation |  confirmation_pending |
+    When I send a POST request to "/merchant/signatory-powers-selection" with body:
+    """
+    {
+      "signatory_powers": [
+        {
+          "uuid": "6d6b4222-be8c-11e9-9cb5-2a2ae2dbcce4",
+          "is_identified_as_user": false,
+          "email": "billie@dev.io"
+        },
+        {
+          "uuid": "6d6b4222-be8c-11e9-9cb5-2a2ae2dbcce3",
+          "is_identified_as_user": true,
+          "email": "dev@billie.io"
+        }
+
+      ]
+    }
+    """
+    Then the JSON response should be:
+    """
+      {"errors":[{"title":"Merchant Onboarding Step transition is not possible.","code":"forbidden"}]}
+    """
+    And the response status code should be 403
 
   Scenario: If I send a valid request and I get back the good response from companies service
     When I send a POST request to "/merchant/signatory-powers-selection" with body:

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controller\PublicApi;
 
+use App\Application\Exception\MerchantOnboardingStepTransitionException;
 use App\Application\UseCase\SignatoryPowersSelection\SignatoryPowersSelectionException;
 use App\Application\UseCase\SignatoryPowersSelection\SignatoryPowersSelectionRequest;
 use App\Application\UseCase\SignatoryPowersSelection\SignatoryPowersSelectionUseCase;
@@ -10,6 +11,7 @@ use App\Http\Authentication\UserProvider;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
@@ -57,13 +59,16 @@ class SignatoryPowersSelectionController
                 ->setIsIdentifiedAsUser($data['is_identified_as_user'] ?? false);
         }, $request->request->get('signatory_powers', []));
 
+        $merchantPaymentUuid = $this->userProvider->getMerchantUser()->getMerchant()->getPaymentUuid();
         $companyId = $this->userProvider->getMerchantUser()->getMerchant()->getCompanyId();
         $merchantUserId = $this->userProvider->getMerchantUser()->getUserEntity()->getId();
 
         try {
-            $this->useCase->execute(new SignatoryPowersSelectionRequest($merchantUserId, $companyId, ...$requestDTOs));
+            $this->useCase->execute(new SignatoryPowersSelectionRequest($merchantUserId, $companyId, $merchantPaymentUuid, ...$requestDTOs));
         } catch (SignatoryPowersSelectionException $exception) {
             throw new BadRequestHttpException();
+        } catch (MerchantOnboardingStepTransitionException $exception) {
+            throw new AccessDeniedHttpException($exception->getMessage());
         }
     }
 }
