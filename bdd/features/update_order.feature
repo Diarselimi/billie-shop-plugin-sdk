@@ -139,8 +139,6 @@ Feature: APIS-1077
       | 500   | 150 | 100 |
     Then the response status code should be 400
     And the response should contain "Invalid amounts"
-    And merchant debtor has financing power 1000
-
 
   Scenario Template: Provided amount is wrong: amount is zero or negative
     Given I have a new order "abc123" with amounts 1000/900/100, duration 30 and comment "test order"
@@ -160,7 +158,6 @@ Feature: APIS-1077
       | -1    | -1  | 0   |
     Then the response status code should be 400
     And the response should contain "This value should be greater than 0"
-    And merchant debtor has financing power 1000
 
   Scenario Template: Changing amount is not allowed because of order state
     Given I have a "<state>" order "abc123" with amounts 1000/900/100, duration 30 and comment "test order"

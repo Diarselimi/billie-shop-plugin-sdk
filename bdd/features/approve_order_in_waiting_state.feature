@@ -153,7 +153,7 @@ Feature: Endpoint to approve an order in waiting state
 			| debtor_blacklisted        | 0         |
 			| debtor_overdue            | 1         |
 			| company_b2b_score         | 1         |
-		And Debtor has sufficient limit
+		And Debtor has insufficient limit
 		And I get from companies service get debtor response
 		When I send a POST request to "/private/order/test-order-uuid/approve"
 		Then the JSON response should be:

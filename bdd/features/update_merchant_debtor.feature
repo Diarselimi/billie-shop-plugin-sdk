@@ -23,11 +23,11 @@ Feature:
 
     Scenario: Update merchant debtor limit
         And I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
-        And I get from payments service get debtor response
+        And Debtor update limit call succeeded
         When I send a POST request to "/private/merchant-debtor/ad74bbc4-509e-47d5-9b50-a0320ce3d715/update-limit" with body:
         """
         {
-            "financing_limit": "500"
+            "financing_limit": 7500
         }
         """
         Then the response status code should be 204

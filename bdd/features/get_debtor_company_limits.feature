@@ -18,13 +18,13 @@ Feature:
     {
       "company_id": 1,
       "company_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
-      "company_financing_power": 1000,
+      "company_financing_power": 22000,
       "merchant_debtors": [
         {
           "id": 1,
           "uuid": "ad74bbc4-509e-47d5-9b50-a0320ce3d715",
-          "financing_limit": 2000,
-          "financing_power": 1000,
+          "financing_limit": 7500,
+          "financing_power": 4500,
           "merchant": {
             "id": 1,
             "payment_uuid": "f2ec4d5e-79f4-40d6-b411-31174b6519ac"
@@ -45,7 +45,7 @@ Feature:
     """
     {
         "company_id": 1,
-        "company_financing_power": 1000,
+        "company_financing_power": 22000,
         "merchant_debtors": [
             {
                 "merchant": {
@@ -53,15 +53,30 @@ Feature:
                     "payment_uuid": "f2ec4d5e-79f4-40d6-b411-31174b6519ac"
                 },
                 "uuid": "ad74bbc4-509e-47d5-9b50-a0320ce3d715",
-                "financing_limit": 2000,
+                "financing_limit": 7500,
                 "id": 1,
-                "financing_power": 1000
+                "financing_power": 4500
             }
         ],
         "company_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70"
     }
     """
 
+  Scenario: Company with no merchant debtors
+    And I get from payments service get debtor response
+    And I get from companies service get debtor response
+    And I get from limit service get debtor limit successful response for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
+    When I send a GET request to "/private/debtor-company/c7be46c0-e049-4312-b274-258ec5aeeb70/limits"
+    Then the response status code should be 200
+    And the JSON response should be:
+    """
+    {
+      "company_id": 1,
+      "company_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
+      "company_financing_power": 22000,
+      "merchant_debtors": []
+    }
+    """
 
   Scenario: Get merchant debtor details - not found error
     And I get from companies service "/debtor/944c4cf4-3eb8-4ff3-872e-961deac79702" endpoint response with status 404 and body

@@ -83,7 +83,7 @@ abstract class AbstractMerchantDebtor implements ArrayableInterface
         return $this;
     }
 
-    public function getFinancingLimit(): float
+    public function getFinancingLimit(): ? float
     {
         return $this->financingLimit;
     }
@@ -92,14 +92,14 @@ abstract class AbstractMerchantDebtor implements ArrayableInterface
      * @param  float                         $financingLimit
      * @return AbstractMerchantDebtor|static
      */
-    public function setFinancingLimit(float $financingLimit): AbstractMerchantDebtor
+    public function setFinancingLimit(?float $financingLimit): AbstractMerchantDebtor
     {
         $this->financingLimit = $financingLimit;
 
         return $this;
     }
 
-    public function getFinancingPower(): float
+    public function getFinancingPower(): ? float
     {
         return $this->financingPower;
     }
@@ -108,7 +108,7 @@ abstract class AbstractMerchantDebtor implements ArrayableInterface
      * @param  float                         $financingPower
      * @return AbstractMerchantDebtor|static
      */
-    public function setFinancingPower(float $financingPower): AbstractMerchantDebtor
+    public function setFinancingPower(?float $financingPower): AbstractMerchantDebtor
     {
         $this->financingPower = $financingPower;
 

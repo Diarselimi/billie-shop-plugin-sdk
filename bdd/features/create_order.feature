@@ -265,7 +265,6 @@ Feature:
     }
     """
     And the order "A1" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz 10 de"
-    And merchant debtor has financing power 9000
 
   Scenario: Successful order creation without house
     Given I get from companies service identify match and good decision response
@@ -379,7 +378,6 @@ Feature:
     }
     """
     And the order "A1" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz de"
-    And merchant debtor has financing power 9000
 
   Scenario: Successful order creation without delivery_address.house_number
     Given I get from companies service identify match and good decision response
@@ -494,7 +492,6 @@ Feature:
     }
     """
     And the order "A123" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz 10 de"
-    And merchant debtor has financing power 9956.7
 
   Scenario: Successful order creation using lowercase country
     Given I get from companies service identify match and good decision response
@@ -608,7 +605,6 @@ Feature:
        "shipped_at":null
     }
     """
-    And merchant debtor has financing power 9000
 
   Scenario: Debtor is not eligible for Point Of Sale
     Given I get from companies service identify match and bad decision response
@@ -721,7 +717,6 @@ Feature:
 
     }
     """
-    And merchant debtor has financing power 10000
 
   Scenario: Missing required fields
     When I send a POST request to "/order" with body:
@@ -981,7 +976,6 @@ Feature:
       """
     Then the response status code should be 200
     And the order A1 is in state created
-    And merchant debtor has financing power 9000
 
   Scenario: Order exceeds the merchant available financing limit
     Given I get from companies service identify match response
@@ -1088,7 +1082,6 @@ Feature:
     """
     Then the order A3 is in state created
     And the response status code should be 200
-    And merchant debtor has financing power 0
 
   Scenario: Successful order creation without providing external code
     Given I get from companies service identify match and good decision response
@@ -1141,7 +1134,6 @@ Feature:
     }
     """
     Then the response status code should be 200
-    And merchant debtor has financing power 9000
 
   Scenario: Invalid order amounts, gross != net + tax
     When I send a POST request to "/order" with body:

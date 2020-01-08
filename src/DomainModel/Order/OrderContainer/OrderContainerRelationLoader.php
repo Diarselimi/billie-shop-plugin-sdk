@@ -8,11 +8,9 @@ use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
-use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
-use App\DomainModel\MerchantDebtor\MerchantDebtorFinancialDetailsEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
@@ -39,8 +37,6 @@ class OrderContainerRelationLoader
 
     private $merchantDebtorRepository;
 
-    private $merchantDebtorFinancialDetailsRepository;
-
     private $companyService;
 
     private $orderFinancialDetailsRepository;
@@ -58,7 +54,6 @@ class OrderContainerRelationLoader
         MerchantRepositoryInterface $merchantRepository,
         MerchantSettingsRepositoryInterface $merchantSettingsRepository,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
-        MerchantDebtorFinancialDetailsRepositoryInterface $merchantDebtorFinancialDetailsRepository,
         CompaniesServiceInterface $companiesService,
         OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
         OrderDunningStatusService $orderDunningStatusService,
@@ -71,7 +66,6 @@ class OrderContainerRelationLoader
         $this->merchantRepository = $merchantRepository;
         $this->merchantSettingsRepository = $merchantSettingsRepository;
         $this->merchantDebtorRepository = $merchantDebtorRepository;
-        $this->merchantDebtorFinancialDetailsRepository = $merchantDebtorFinancialDetailsRepository;
         $this->companyService = $companiesService;
         $this->orderFinancialDetailsRepository = $orderFinancialDetailsRepository;
         $this->orderDunningStatusService = $orderDunningStatusService;
@@ -82,11 +76,6 @@ class OrderContainerRelationLoader
     public function loadMerchantDebtor(OrderContainer $orderContainer): MerchantDebtorEntity
     {
         return $this->merchantDebtorRepository->getOneById($orderContainer->getOrder()->getMerchantDebtorId());
-    }
-
-    public function loadMerchantDebtorFinancialDetails(OrderContainer $orderContainer): MerchantDebtorFinancialDetailsEntity
-    {
-        return $this->merchantDebtorFinancialDetailsRepository->getCurrentByMerchantDebtorId($orderContainer->getOrder()->getMerchantDebtorId());
     }
 
     public function loadDebtorPerson(OrderContainer $orderContainer): PersonEntity

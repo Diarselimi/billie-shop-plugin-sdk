@@ -8,11 +8,9 @@ use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\FraudRules\FraudRuleEntity;
 use App\DomainModel\FraudRules\FraudRuleRepositoryInterface;
-use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
-use App\DomainModel\MerchantDebtor\MerchantDebtorFinancialDetailsEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\MerchantFinancialAssessment\MerchantFinancialAssessmentEntity;
 use App\DomainModel\MerchantFinancialAssessment\MerchantFinancialAssessmentRepositoryInterface;
@@ -83,6 +81,8 @@ class PaellaCoreContext extends MinkContext
 
     public const SANDBOX_MERCHANT_PAYMENT_UUID = '1ac823bd-2a3e-48b0-aa61-3b95962922eb';
 
+    public const MERCHANT_COMPANY_UUID = 'c7be46c0-e049-4312-b274-258ec5aeeb70';
+
     public function __construct(KernelInterface $kernel, PdoConnection $connection)
     {
         $this->kernel = $kernel;
@@ -113,6 +113,7 @@ class PaellaCoreContext extends MinkContext
         $now = new \DateTime();
         $merchant = (new MerchantEntity())
             ->setName('Behat Merchant')
+            ->setCompanyUuid(self::MERCHANT_COMPANY_UUID)
             ->setIsActive(true)
             ->setPaymentUuid('f2ec4d5e-79f4-40d6-b411-31174b6519ac')
             ->setFinancingLimit(10000)
@@ -259,13 +260,6 @@ class PaellaCoreContext extends MinkContext
             ->setCreatedAt(new \DateTime('2019-01-01 12:00:00'))
             ->setIsWhitelisted(false);
         $this->getMerchantDebtorRepository()->insert($merchantDebtor);
-
-        $financialDetails = (new MerchantDebtorFinancialDetailsEntity())
-            ->setMerchantDebtorId($merchantDebtor->getId())
-            ->setFinancingLimit(2000)
-            ->setFinancingPower(1000)
-            ->setCreatedAt(new DateTime());
-        $this->getMerchantDebtorFinancialDetailsRepository()->insert($financialDetails);
 
         return [$person, $deliveryAddress, $debtor, $merchantDebtor];
     }
@@ -782,6 +776,7 @@ class PaellaCoreContext extends MinkContext
             ->setFinancingLimit(10000)
             ->setApiKey('testMerchantApiKey')
             ->setCompanyId((int) $companyId)
+            ->setCompanyUuid(self::MERCHANT_COMPANY_UUID)
             ->setOauthClientId(self::TEST_MERCHANT_OAUTH_CLIENT_ID);
         $this->getMerchantRepository()->insert($merchant);
 
@@ -798,17 +793,6 @@ class PaellaCoreContext extends MinkContext
         Assert::notNull($user);
         Assert::eq($user->getMerchantId(), $merchantId);
         Assert::eq($user->getUuid(), $userId);
-    }
-
-    /**
-     * @Given merchant debtor has financing power :power
-     */
-    public function merchantDebtorHasFinancingPower(string $power)
-    {
-        $merchantDebtor = $this->getMerchantDebtorFinancialDetailsRepository()->getCurrentByMerchantDebtorId(1);
-
-        Assert::notNull($merchantDebtor);
-        Assert::eq($merchantDebtor->getFinancingPower(), $power);
     }
 
     /**
@@ -889,11 +873,6 @@ class PaellaCoreContext extends MinkContext
     private function getMerchantDebtorRepository(): MerchantDebtorRepositoryInterface
     {
         return $this->get(MerchantDebtorRepositoryInterface::class);
-    }
-
-    private function getMerchantDebtorFinancialDetailsRepository(): MerchantDebtorFinancialDetailsRepositoryInterface
-    {
-        return $this->get(MerchantDebtorFinancialDetailsRepositoryInterface::class);
     }
 
     private function getScoreThresholdsConfigurationRepository(): ScoreThresholdsConfigurationRepositoryInterface

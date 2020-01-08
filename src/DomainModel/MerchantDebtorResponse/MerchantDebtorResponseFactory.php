@@ -3,8 +3,8 @@
 namespace App\DomainModel\MerchantDebtorResponse;
 
 use App\DomainModel\DebtorCompany\DebtorCompany;
-use App\DomainModel\DebtorLimit\DebtorLimit;
-use App\DomainModel\MerchantDebtor\MerchantDebtorFinancialDetailsEntity;
+use App\DomainModel\DebtorLimit\DebtorCustomerLimitDTO;
+use App\DomainModel\DebtorLimit\DebtorLimitDTO;
 
 class MerchantDebtorResponseFactory
 {
@@ -19,8 +19,8 @@ class MerchantDebtorResponseFactory
             ->setAddressPostalCode($container->getDebtorCompany()->getAddressPostalCode())
             ->setAddressCity($container->getDebtorCompany()->getAddressCity())
             ->setAddressCountry($container->getDebtorCompany()->getAddressCountry())
-            ->setFinancingLimit($container->getFinancialDetails()->getFinancingLimit())
-            ->setFinancingPower($this->calculateFinancingPower($container->getDebtorLimit(), $container->getFinancialDetails()))
+            ->setFinancingLimit($container->getDebtorCustomerLimit()->getFinancingLimit())
+            ->setFinancingPower($this->calculateFinancingPower($container->getDebtorLimit(), $container->getDebtorCustomerLimit()))
             ->setOutstandingAmount($container->getPaymentDetails()->getOutstandingAmount())
             ->setOutstandingAmountCreated($container->getTotalCreatedOrdersAmount())
             ->setOutstandingAmountLate($container->getTotalLateOrdersAmount())
@@ -50,8 +50,8 @@ class MerchantDebtorResponseFactory
             ->setAddressPostalCode($container->getDebtorCompany()->getAddressPostalCode())
             ->setAddressCity($container->getDebtorCompany()->getAddressCity())
             ->setAddressCountry($container->getDebtorCompany()->getAddressCountry())
-            ->setFinancingLimit($container->getFinancialDetails()->getFinancingLimit())
-            ->setFinancingPower($this->calculateFinancingPower($container->getDebtorLimit(), $container->getFinancialDetails()))
+            ->setFinancingLimit($container->getDebtorCustomerLimit()->getFinancingLimit())
+            ->setFinancingPower($this->calculateFinancingPower($container->getDebtorLimit(), $container->getDebtorCustomerLimit()))
             ->setOutstandingAmount($container->getPaymentDetails()->getOutstandingAmount())
             ->setOutstandingAmountCreated($container->getTotalCreatedOrdersAmount())
             ->setOutstandingAmountLate($container->getTotalLateOrdersAmount())
@@ -67,8 +67,8 @@ class MerchantDebtorResponseFactory
             ->setUuid($container->getMerchantDebtor()->getUuid())
             ->setExternalCode($container->getExternalId())
             ->setName($container->getDebtorCompany()->getName())
-            ->setFinancingLimit($container->getFinancialDetails()->getFinancingLimit())
-            ->setFinancingPower($this->calculateFinancingPower($container->getDebtorLimit(), $container->getFinancialDetails()))
+            ->setFinancingLimit($container->getDebtorCustomerLimit()->getFinancingLimit())
+            ->setFinancingPower($this->calculateFinancingPower($container->getDebtorLimit(), $container->getDebtorCustomerLimit()))
             ->setBankAccountIban($container->getPaymentDetails()->getBankAccountIban())
             ->setBankAccountBic($container->getPaymentDetails()->getBankAccountBic())
             ->setCreatedAt($container->getMerchantDebtor()->getCreatedAt())
@@ -87,11 +87,9 @@ class MerchantDebtorResponseFactory
             ->setItems(...$items);
     }
 
-    private function calculateFinancingPower(
-        DebtorLimit $debtorLimit,
-        MerchantDebtorFinancialDetailsEntity $merchantDebtorFinancialDetails
-    ): float {
-        return min($merchantDebtorFinancialDetails->getFinancingPower(), $debtorLimit->getGlobalAvailableFinancingLimit());
+    private function calculateFinancingPower(DebtorLimitDTO $debtorLimit, DebtorCustomerLimitDTO $debtorCustomerLimit): float
+    {
+        return min($debtorCustomerLimit->getAvailableFinancingLimit(), $debtorLimit->getGlobalAvailableFinancingLimit());
     }
 
     public function createFromDebtorCompany(DebtorCompany $debtorCompany): MerchantDebtorSynchronizationResponse

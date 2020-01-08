@@ -2,6 +2,8 @@
 
 namespace App\DomainModel\Merchant;
 
+use App\DomainModel\DebtorLimit\DebtorLimitServiceInterface;
+use App\DomainModel\DebtorLimit\DebtorLimitServiceRequestException;
 use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsFactory;
 use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsRepositoryInterface;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingPersistenceService;
@@ -52,6 +54,8 @@ class MerchantCreationService
 
     private $merchantAnnouncer;
 
+    private $debtorLimitService;
+
     public function __construct(
         UuidGeneratorInterface $uuidGenerator,
         MerchantRepositoryInterface $merchantRepository,
@@ -67,7 +71,8 @@ class MerchantCreationService
         MerchantUserRoleEntityFactory $rolesFactory,
         MerchantUserRoleRepositoryInterface $rolesRepository,
         MerchantOnboardingPersistenceService $onboardingPersistenceService,
-        MerchantAnnouncer $merchantAnnouncer
+        MerchantAnnouncer $merchantAnnouncer,
+        DebtorLimitServiceInterface $debtorLimitService
     ) {
         $this->uuidGenerator = $uuidGenerator;
         $this->merchantRepository = $merchantRepository;
@@ -84,6 +89,7 @@ class MerchantCreationService
         $this->rolesFactory = $rolesFactory;
         $this->onboardingPersistenceService = $onboardingPersistenceService;
         $this->merchantAnnouncer = $merchantAnnouncer;
+        $this->debtorLimitService = $debtorLimitService;
     }
 
     public function create(MerchantCreationDTO $creationDTO): MerchantCreationDTO
@@ -119,6 +125,7 @@ class MerchantCreationService
         $this->createDefaultNotificationSettings($merchantId);
         $this->createDefaultRoles($merchantId);
         $this->createOnboarding($merchantId, $creationDTO->isOnboardComplete());
+        $this->createDefaultDebtorLimit($creationDTO);
     }
 
     private function createOauthClient(string $companyName): AuthenticationServiceCreateClientResponseDTO
@@ -184,5 +191,19 @@ class MerchantCreationService
             return;
         }
         $this->onboardingPersistenceService->createWithSteps($merchantId);
+    }
+
+    private function createDefaultDebtorLimit(MerchantCreationDTO $creationDTO): void
+    {
+        try {
+            $this->debtorLimitService->createDefaultDebtorCustomerLimit(
+                $creationDTO->getCompany()->getUuid(),
+                $creationDTO->getInitialDebtorFinancingLimit()
+            );
+        } catch (DebtorLimitServiceRequestException $e) {
+            throw new CreateMerchantException(
+                "Failed to create default debtor-customer limit in Limits service with error {$e->getMessage()}"
+            );
+        }
     }
 }

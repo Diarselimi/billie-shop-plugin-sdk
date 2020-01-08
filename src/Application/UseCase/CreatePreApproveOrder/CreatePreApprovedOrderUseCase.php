@@ -34,8 +34,6 @@ class CreatePreApprovedOrderUseCase implements LoggingInterface, ValidatedUseCas
 
     private $orderStateManager;
 
-    private $merchantDebtorFinancialDetailsRepository;
-
     private $identifyAndTriggerAsyncIdentification;
 
     public function __construct(

@@ -17,6 +17,7 @@ use OpenApi\Annotations as OA;
  *      @OA\Property(property="available_financing_limit", type="number", format="float"),
  *      @OA\Property(property="api_key", ref="#/components/schemas/TinyText"),
  *      @OA\Property(property="company_id", ref="#/components/schemas/TinyText"),
+ *      @OA\Property(property="company_uuid", ref="#/components/schemas/UUID"),
  *      @OA\Property(property="payment_merchant_id", ref="#/components/schemas/UUID"),
  *      @OA\Property(property="is_active", type="boolean"),
  *      @OA\Property(property="webhook_url", type="string", format="uri", nullable=true),
@@ -30,6 +31,8 @@ use OpenApi\Annotations as OA;
 class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInterface
 {
     private $name;
+
+    private $companyUuid;
 
     private $financingPower;
 
@@ -59,6 +62,18 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
     public function setName(string $name): MerchantEntity
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getCompanyUuid(): string
+    {
+        return $this->companyUuid;
+    }
+
+    public function setCompanyUuid(string $companyUuid): MerchantEntity
+    {
+        $this->companyUuid = $companyUuid;
 
         return $this;
     }
@@ -210,6 +225,7 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
             'financing_limit' => $this->getFinancingLimit(),
             'api_key' => $this->getApiKey(),
             'company_id' => $this->getCompanyId(),
+            'company_uuid' => $this->getCompanyUuid(),
             'payment_merchant_id' => $this->getPaymentUuid(),
             'is_active' => $this->isActive(),
             'webhook_url' => $this->getWebhookUrl(),

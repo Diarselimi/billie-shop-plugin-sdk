@@ -6,6 +6,7 @@ use App\Application\Exception\MerchantDebtorNotFoundException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
+use App\DomainModel\DebtorLimit\DebtorLimitServiceInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\MerchantDebtorResponse\MerchantDebtorContainerFactory;
@@ -20,14 +21,18 @@ class GetDebtorCompanyLimitsUseCase implements ValidatedUseCaseInterface
 
     private $merchantDebtorContainerFactory;
 
+    private $debtorLimitService;
+
     public function __construct(
         CompaniesServiceInterface $companiesService,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
-        MerchantDebtorContainerFactory $merchantDebtorContainerFactory
+        MerchantDebtorContainerFactory $merchantDebtorContainerFactory,
+        DebtorLimitServiceInterface $debtorLimitService
     ) {
         $this->companiesService = $companiesService;
         $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->merchantDebtorContainerFactory = $merchantDebtorContainerFactory;
+        $this->debtorLimitService = $debtorLimitService;
     }
 
     public function execute(GetDebtorCompanyLimitsRequest $request): GetDebtorCompanyLimitsResponse
@@ -46,6 +51,9 @@ class GetDebtorCompanyLimitsUseCase implements ValidatedUseCaseInterface
             return $this->merchantDebtorContainerFactory->create($merchantDebtor);
         }, $merchantDebtors);
 
-        return new GetDebtorCompanyLimitsResponse($company, ...$merchantDebtorContainers);
+        $limit = (!empty($merchantDebtors)) ? reset($merchantDebtorContainers)->getDebtorLimit() :
+            $this->debtorLimitService->retrieve($company->getUuid());
+
+        return new GetDebtorCompanyLimitsResponse($company, $limit, ...$merchantDebtorContainers);
     }
 }

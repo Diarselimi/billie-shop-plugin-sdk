@@ -98,4 +98,28 @@ class LimitServiceContext implements Context
             )
         ));
     }
+
+    /**
+     * @Given /^Debtor update limit call succeeded$/
+     */
+    public function debtorUpdateLimitCallSucceeded()
+    {
+        $this->mockRequest('/debtor-limit/update', new ResponseStack(
+            new MockResponse(
+                file_get_contents(__DIR__ . '/../resources/limit_service_get_debtor_limit.json'),
+                [],
+                200
+            )
+        ));
+    }
+
+    /**
+     * @Given /^I get from limit service create default debtor\-customer limit successful response$/
+     */
+    public function iGetFromLimitServiceCreateDefaultDebtorCustomerLimitSuccessfulResponse()
+    {
+        $this->mockRequest('/debtor-limit/default-customer-limit', new ResponseStack(
+            new MockResponse('', [], 200)
+        ));
+    }
 }

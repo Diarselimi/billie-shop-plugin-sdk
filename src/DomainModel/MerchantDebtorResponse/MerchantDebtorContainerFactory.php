@@ -4,7 +4,6 @@ namespace App\DomainModel\MerchantDebtorResponse;
 
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorLimit\DebtorLimitServiceInterface;
-use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
@@ -21,8 +20,6 @@ class MerchantDebtorContainerFactory
 
     private $companiesService;
 
-    private $financialDetailsRepository;
-
     private $debtorLimitService;
 
     public function __construct(
@@ -30,14 +27,12 @@ class MerchantDebtorContainerFactory
         MerchantRepositoryInterface $merchantRepository,
         PaymentsServiceInterface $paymentService,
         CompaniesServiceInterface $companiesService,
-        MerchantDebtorFinancialDetailsRepositoryInterface $financialDetailsRepository,
         DebtorLimitServiceInterface $debtorLimitService
     ) {
         $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->merchantRepository = $merchantRepository;
         $this->paymentService = $paymentService;
         $this->companiesService = $companiesService;
-        $this->financialDetailsRepository = $financialDetailsRepository;
         $this->debtorLimitService = $debtorLimitService;
     }
 
@@ -47,11 +42,9 @@ class MerchantDebtorContainerFactory
 
         $externalId = $this->merchantDebtorRepository->findExternalId($merchantDebtor->getId());
 
-        $financialDetails = $this->financialDetailsRepository->getCurrentByMerchantDebtorId($merchantDebtor->getId());
-
         $company = $this->companiesService->getDebtor($merchantDebtor->getDebtorId());
 
-        $limit = $this->debtorLimitService->retrieve($company->getUuid());
+        $debtorLimit = $this->debtorLimitService->retrieve($company->getUuid());
 
         $paymentsDetails = $this->paymentService->getDebtorPaymentDetails($merchantDebtor->getPaymentDebtorId());
 
@@ -65,8 +58,7 @@ class MerchantDebtorContainerFactory
             $merchantDebtor,
             $merchant,
             $company,
-            $limit,
-            $financialDetails,
+            $debtorLimit,
             $paymentsDetails,
             $totalCreatedOrdersAmount,
             $totalLateOrdersAmount,

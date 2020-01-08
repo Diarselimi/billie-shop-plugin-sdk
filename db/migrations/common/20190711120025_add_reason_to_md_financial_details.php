@@ -1,6 +1,5 @@
 <?php
 
-use App\Infrastructure\Repository\MerchantDebtorFinancialDetailsRepository;
 use Phinx\Migration\AbstractMigration;
 
 class AddReasonToMdFinancialDetails extends AbstractMigration
@@ -8,7 +7,7 @@ class AddReasonToMdFinancialDetails extends AbstractMigration
     public function change()
     {
         $this
-            ->table(MerchantDebtorFinancialDetailsRepository::TABLE_NAME)
+            ->table('merchant_debtor_financial_details')
             ->addColumn(
                 'reason',
                 'string',

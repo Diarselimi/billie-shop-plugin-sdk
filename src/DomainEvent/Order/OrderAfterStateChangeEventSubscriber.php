@@ -3,7 +3,6 @@
 namespace App\DomainEvent\Order;
 
 use App\Amqp\Producer\DelayedMessageProducer;
-use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
@@ -33,20 +32,16 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
 
     private $orderDeclinedReasonsMapper;
 
-    private $merchantDebtorLimitsService;
-
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         NotificationScheduler $notificationScheduler,
         DelayedMessageProducer $delayedMessageProducer,
-        OrderDeclinedReasonsMapper $orderDeclinedReasonsMapper,
-        MerchantDebtorLimitsService $merchantDebtorLimitsService
+        OrderDeclinedReasonsMapper $orderDeclinedReasonsMapper
     ) {
         $this->orderRepository = $orderRepository;
         $this->notificationScheduler = $notificationScheduler;
         $this->delayedMessageProducer = $delayedMessageProducer;
         $this->orderDeclinedReasonsMapper = $orderDeclinedReasonsMapper;
-        $this->merchantDebtorLimitsService = $merchantDebtorLimitsService;
     }
 
     public static function getSubscribedEvents()
@@ -55,7 +50,6 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
             OrderApprovedEvent::class => 'onApproved',
             OrderDeclinedEvent::class => 'onDeclined',
             OrderInWaitingStateEvent::class => 'onWaiting',
-            OrderCompleteEvent::class => 'onComplete',
             OrderPreApprovedEvent::class => 'onPreApproved',
             OrderShippedEvent::class => 'onShipped',
             OrderPaidOutEvent::class => 'onPaidOut',
@@ -133,11 +127,6 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
         );
 
         $this->getSlackClient()->sendMessage($message);
-    }
-
-    public function onComplete(OrderCompleteEvent $event): void
-    {
-        $this->merchantDebtorLimitsService->recalculate($event->getOrderContainer());
     }
 
     public function onPreApproved(OrderPreApprovedEvent $event): void

@@ -23,6 +23,7 @@ class Seed001AddMerchants extends AbstractSeed
             'api_key' => $testApiKey,
             'is_active' => true,
             'company_id' => 4,
+            'company_uuid' => 'b825f0a8-7248-477f-b827-88eb927fb7c1',
             'oauth_client_id' => '02706840-e7ef-48ef-8576-bcfec20b4458',
             'payment_merchant_id' => 'b95adad7-f747-45b9-b3cb-7851c4b90fac',
             'created_at' => $now,

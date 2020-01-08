@@ -80,6 +80,7 @@ Feature: Create a new merchant.
       | debtor_overdue            |
       | company_b2b_score         |
     And I successfully create OAuth client with id testClientId and secret testClientSecret
+    And I get from limit service create default debtor-customer limit successful response
     When I send a POST request to "/private/merchant" with body:
       """
       {
@@ -98,6 +99,7 @@ Feature: Create a new merchant.
       "financing_power": 5000.44,
       "financing_limit": 5000.44,
       "company_id": "1",
+      "company_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
       "is_active": true,
       "webhook_url": "http://billie.md",
       "webhook_authorization": "X-Api-Key: Hola",

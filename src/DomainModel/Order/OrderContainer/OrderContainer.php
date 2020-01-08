@@ -7,7 +7,6 @@ use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
-use App\DomainModel\MerchantDebtor\MerchantDebtorFinancialDetailsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
@@ -22,8 +21,6 @@ class OrderContainer
     private $orderFinancialDetails;
 
     private $merchantDebtor;
-
-    private $merchantDebtorFinancialDetails;
 
     private $debtorPerson;
 
@@ -71,13 +68,6 @@ class OrderContainer
     {
         return $this->merchantDebtor
             ?: $this->merchantDebtor = $this->relationLoader->loadMerchantDebtor($this)
-        ;
-    }
-
-    public function getMerchantDebtorFinancialDetails(): MerchantDebtorFinancialDetailsEntity
-    {
-        return $this->merchantDebtorFinancialDetails
-            ?: $this->merchantDebtorFinancialDetails = $this->relationLoader->loadMerchantDebtorFinancialDetails($this)
         ;
     }
 

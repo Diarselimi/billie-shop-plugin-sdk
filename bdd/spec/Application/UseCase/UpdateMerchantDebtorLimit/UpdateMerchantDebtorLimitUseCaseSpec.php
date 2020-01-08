@@ -6,11 +6,10 @@ use App\Application\Exception\MerchantDebtorNotFoundException;
 use App\Application\Exception\RequestValidationException;
 use App\Application\UseCase\UpdateMerchantDebtorLimit\UpdateMerchantDebtorLimitRequest;
 use App\Application\UseCase\UpdateMerchantDebtorLimit\UpdateMerchantDebtorLimitUseCase;
-use App\DomainModel\Payment\PaymentsServiceInterface;
-use App\DomainModel\Payment\DebtorPaymentDetailsDTO;
-use App\DomainModel\Merchant\MerchantDebtorFinancialDetailsRepositoryInterface;
+use App\DomainModel\DebtorLimit\DebtorLimitServiceInterface;
+use App\DomainModel\Merchant\MerchantEntity;
+use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
-use App\DomainModel\MerchantDebtor\MerchantDebtorFinancialDetailsEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -25,6 +24,8 @@ class UpdateMerchantDebtorLimitUseCaseSpec extends ObjectBehavior
 
     private const MERCHANT_ID = 100;
 
+    private const MERCHANT_UUID = 'merchant-uuid';
+
     private const MERCHANT_DEBTOR_ID = 15;
 
     private const MERCHANT_DEBTOR_PAYMENT_ID = 'uuid123';
@@ -33,12 +34,12 @@ class UpdateMerchantDebtorLimitUseCaseSpec extends ObjectBehavior
 
     public function let(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
-        MerchantDebtorFinancialDetailsRepositoryInterface $merchantDebtorFinancialDetailsRepository,
-        PaymentsServiceInterface $paymentsService,
+        MerchantRepositoryInterface $merchantRepository,
+        DebtorLimitServiceInterface $debtorLimitService,
         ValidatorInterface $validator,
         LoggerInterface $logger
     ) {
-        $this->beConstructedWith($merchantDebtorRepository, $merchantDebtorFinancialDetailsRepository, $paymentsService);
+        $this->beConstructedWith($merchantDebtorRepository, $merchantRepository, $debtorLimitService);
         $this->setLogger($logger);
         $this->setValidator($validator);
     }
@@ -75,34 +76,37 @@ class UpdateMerchantDebtorLimitUseCaseSpec extends ObjectBehavior
 
     public function it_sets_the_new_limit(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
-        MerchantDebtorFinancialDetailsRepositoryInterface $merchantDebtorFinancialDetailsRepository,
+        MerchantRepositoryInterface $merchantRepository,
+        DebtorLimitServiceInterface $debtorLimitService,
         ValidatorInterface $validator,
         UpdateMerchantDebtorLimitRequest $request,
-        PaymentsServiceInterface $paymentsService,
         MerchantDebtorEntity $merchantDebtor,
-        MerchantDebtorFinancialDetailsEntity $financialDetails,
-        DebtorPaymentDetailsDTO $debtorPaymentDetails
+        MerchantEntity $merchant
     ) {
-        $this->mockMerchantDebtor($merchantDebtor);
-        $this->mockDebtorPaymentDetails($debtorPaymentDetails);
-
         $request->getMerchantDebtorUuid()->willReturn(self::MERCHANT_DEBTOR_UUID);
         $request->getLimit()->willReturn(1000);
 
-        $merchantDebtor->getId()->willReturn(self::MERCHANT_DEBTOR_ID);
-        $financialDetails->getFinancingLimit()->shouldBeCalledOnce()->willReturn(500);
-        $financialDetails->setFinancingPower(249.45)->shouldBeCalledOnce();
-        $financialDetails->setFinancingLimit(1000)->shouldBeCalledOnce()->willReturn($financialDetails);
+        $this->mockMerchantDebtor($merchantDebtor);
+        $this->mockMerchant($merchant);
 
         $validator->validate($request, Argument::any(), Argument::any())->shouldBeCalledOnce()->willReturn(new ConstraintViolationList());
 
-        $merchantDebtorRepository->getOneByUuid(self::MERCHANT_DEBTOR_UUID)->shouldBeCalledOnce()->willReturn($merchantDebtor);
-        $merchantDebtorRepository->getMerchantDebtorCreatedOrdersAmount(self::MERCHANT_DEBTOR_ID)->shouldBeCalledOnce()->willReturn(150.55);
+        $merchantDebtorRepository
+            ->getOneByUuid(self::MERCHANT_DEBTOR_UUID)
+            ->shouldBeCalledOnce()
+            ->willReturn($merchantDebtor)
+        ;
 
-        $merchantDebtorFinancialDetailsRepository->getCurrentByMerchantDebtorId(self::MERCHANT_DEBTOR_ID)->willReturn($financialDetails);
-        $merchantDebtorFinancialDetailsRepository->insert($financialDetails)->shouldBeCalledOnce();
+        $merchantRepository
+            ->getOneById(self::MERCHANT_ID)
+            ->shouldBeCalled()
+            ->willReturn($merchant)
+        ;
 
-        $paymentsService->getDebtorPaymentDetails(self::MERCHANT_DEBTOR_PAYMENT_ID)->shouldBeCalledOnce()->willReturn($debtorPaymentDetails);
+        $debtorLimitService
+            ->update(self::MERCHANT_DEBTOR_UUID, self::MERCHANT_UUID, 1000)
+            ->shouldBeCalled()
+        ;
 
         $this->execute($request);
     }
@@ -113,10 +117,12 @@ class UpdateMerchantDebtorLimitUseCaseSpec extends ObjectBehavior
         $merchantDebtor->getPaymentDebtorId()->willReturn(self::MERCHANT_DEBTOR_PAYMENT_ID);
         $merchantDebtor->getDebtorId()->willReturn(self::DEBTOR_ID);
         $merchantDebtor->getMerchantId()->willReturn(self::MERCHANT_ID);
+        $merchantDebtor->getCompanyUuid()->willReturn(self::MERCHANT_DEBTOR_UUID);
     }
 
-    private function mockDebtorPaymentDetails(DebtorPaymentDetailsDTO $debtorPaymentDetails): void
+    private function mockMerchant(MerchantEntity $merchant)
     {
-        $debtorPaymentDetails->getOutstandingAmount()->willReturn(600);
+        $merchant->getId()->willReturn(self::MERCHANT_ID);
+        $merchant->getCompanyUuid()->willReturn(self::MERCHANT_UUID);
     }
 }

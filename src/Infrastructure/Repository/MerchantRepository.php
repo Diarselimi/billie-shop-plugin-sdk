@@ -12,7 +12,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
     public const TABLE_NAME = "merchants";
 
     private const SELECT_FIELDS = [
-        'id', 'name', 'api_key', 'oauth_client_id', 'company_id', 'payment_merchant_id', 'sandbox_payment_merchant_id',
+        'id', 'name', 'api_key', 'oauth_client_id', 'company_id', 'company_uuid', 'payment_merchant_id', 'sandbox_payment_merchant_id',
         'is_active', 'financing_power', 'available_financing_limit', 'webhook_url', 'webhook_authorization', 'created_at', 'updated_at',
     ];
 
@@ -28,12 +28,13 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
         $id = $this->doInsert('
             INSERT INTO ' . self::TABLE_NAME . '
             (name, api_key, oauth_client_id, is_active, financing_power, available_financing_limit, 
-                company_id, payment_merchant_id, webhook_url, webhook_authorization, created_at, updated_at)
+                company_id, company_uuid, payment_merchant_id, webhook_url, webhook_authorization, created_at, updated_at)
             VALUES
             (:name, :api_key, :oauth_client_id, :is_active, :financing_power, :available_financing_limit, 
-                :company_id, :payment_merchant_id, :webhook_url, :webhook_authorization, :created_at, :updated_at)
+                :company_id, :company_uuid, :payment_merchant_id, :webhook_url, :webhook_authorization, :created_at, :updated_at)
         ', [
             'name' => $merchant->getName(),
+            'company_uuid' => $merchant->getCompanyUuid(),
             'api_key' => $merchant->getApiKey(),
             'oauth_client_id' => $merchant->getOauthClientId(),
             'is_active' => $merchant->isActive(),
@@ -76,7 +77,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
           WHERE id = :id
         ', ['id' => $id]);
 
-        return $row ? $this->factory->createFromDatabaseRow($row) : null;
+        return $row ? $this->factory->createFromArray($row) : null;
     }
 
     public function getOneByUuid(string $paymentUuid): ?MerchantEntity
@@ -96,7 +97,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
           WHERE company_id = :company_id
         ', ['company_id' => $companyId]);
 
-        return $row ? $this->factory->createFromDatabaseRow($row) : null;
+        return $row ? $this->factory->createFromArray($row) : null;
     }
 
     public function getOneByApiKey(string $apiKey): ?MerchantEntity
@@ -105,7 +106,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
           WHERE api_key = :api_key
         ', ['api_key' => $apiKey]);
 
-        return $row ? $this->factory->createFromDatabaseRow($row) : null;
+        return $row ? $this->factory->createFromArray($row) : null;
     }
 
     public function getOneByOauthClientId(string $oauthClientId): ?MerchantEntity
@@ -114,7 +115,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
           WHERE oauth_client_id = :oauth_client_id
         ', ['oauth_client_id' => $oauthClientId]);
 
-        return $row ? $this->factory->createFromDatabaseRow($row) : null;
+        return $row ? $this->factory->createFromArray($row) : null;
     }
 
     public function findActiveWithFinancingPowerBelowPercentage(float $percentage): ?array
@@ -129,6 +130,6 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
             ]
         );
 
-        return $rows ? $this->factory->createFromDatabaseRows($rows) : null;
+        return $rows ? $this->factory->createFromArrayCollection($rows) : null;
     }
 }

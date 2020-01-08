@@ -1,4 +1,12 @@
 {
-  "financing_limit": 1500.00,
-  "available_financing_limit": 1000.00
+  "debtor_company_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
+  "financing_limit": 25000,
+  "available_financing_limit": 22000,
+  "debtor_customer_limits": [
+    {
+      "customer_company_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
+      "financing_limit": 7500,
+      "available_financing_limit": 4500
+    }
+  ]
 }

@@ -106,7 +106,6 @@ Feature: APIS-1443 - Invite user by email and role
     """
       {"email": "dev@billie.dev", "role_uuid": "d57dcd58-6f88-42fc-8f14-6b8c4af8a29b"}
     """
-    Then print last response
     Then the response status code should be 409
 
 

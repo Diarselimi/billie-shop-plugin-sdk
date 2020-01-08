@@ -2,12 +2,12 @@
 
 namespace App\DomainModel\MerchantDebtorResponse;
 
-use App\DomainModel\DebtorLimit\DebtorLimit;
+use App\DomainModel\DebtorLimit\DebtorCustomerLimitDTO;
+use App\DomainModel\DebtorLimit\DebtorLimitDTO;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Payment\DebtorPaymentDetailsDTO;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
-use App\DomainModel\MerchantDebtor\MerchantDebtorFinancialDetailsEntity;
 
 class MerchantDebtorContainer
 {
@@ -19,7 +19,7 @@ class MerchantDebtorContainer
 
     private $debtorLimit;
 
-    private $financialDetails;
+    private $debtorCustomerLimit;
 
     private $paymentDetails;
 
@@ -33,8 +33,7 @@ class MerchantDebtorContainer
         MerchantDebtorEntity $merchantDebtor,
         MerchantEntity $merchant,
         DebtorCompany $debtorCompany,
-        DebtorLimit $debtorLimit,
-        MerchantDebtorFinancialDetailsEntity $financialDetails,
+        DebtorLimitDTO $debtorLimit,
         DebtorPaymentDetailsDTO $paymentDetails,
         float $totalCreatedOrdersAmount,
         float $totalLateOrdersAmount,
@@ -44,7 +43,6 @@ class MerchantDebtorContainer
         $this->merchant = $merchant;
         $this->debtorCompany = $debtorCompany;
         $this->debtorLimit = $debtorLimit;
-        $this->financialDetails = $financialDetails;
         $this->paymentDetails = $paymentDetails;
         $this->totalCreatedOrdersAmount = $totalCreatedOrdersAmount;
         $this->totalLateOrdersAmount = $totalLateOrdersAmount;
@@ -66,14 +64,19 @@ class MerchantDebtorContainer
         return $this->debtorCompany;
     }
 
-    public function getDebtorLimit(): DebtorLimit
+    public function getDebtorLimit(): DebtorLimitDTO
     {
         return $this->debtorLimit;
     }
 
-    public function getFinancialDetails(): MerchantDebtorFinancialDetailsEntity
+    public function getDebtorCustomerLimit(): ? DebtorCustomerLimitDTO
     {
-        return $this->financialDetails;
+        return $this->debtorCustomerLimit = reset(array_filter(
+            $this->debtorLimit->getDebtorCustomerLimits(),
+            function (DebtorCustomerLimitDTO $debtorCustomerLimit) {
+                return $debtorCustomerLimit->getCustomerCompanyUuid() === $this->merchant->getCompanyUuid();
+            }
+        ));
     }
 
     public function getPaymentDetails(): DebtorPaymentDetailsDTO

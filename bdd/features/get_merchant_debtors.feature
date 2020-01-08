@@ -25,8 +25,8 @@ Feature:
                     "id":"ad74bbc4-509e-47d5-9b50-a0320ce3d715",
                     "external_code":"ext_id",
                     "name":"Test User Company",
-                    "financing_limit":2000,
-                    "financing_power":1000,
+                    "financing_limit":7500,
+                    "financing_power":4500,
                     "bank_account_iban":"DE1234",
                     "bank_account_bic":"BICISHERE",
                     "created_at":"2019-01-01T12:00:00+0100"
@@ -51,8 +51,8 @@ Feature:
                     "id":"ad74bbc4-509e-47d5-9b50-a0320ce3d715",
                     "external_code":"ext_id",
                     "name":"Test User Company",
-                    "financing_limit":2000,
-                    "financing_power":1000,
+                    "financing_limit":7500,
+                    "financing_power":4500,
                     "bank_account_iban":"DE1234",
                     "bank_account_bic":"BICISHERE",
                     "created_at":"2019-01-01T12:00:00+0100"

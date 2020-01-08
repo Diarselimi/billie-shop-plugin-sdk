@@ -9,7 +9,7 @@ Feature: An endpoint to retrieve merchant data
     Then the response status code should be 404
     And the JSON response should be:
     """
-    {"errors":[{"title":"Merchant with id 100 not found","code":"resource_not_found"}]}
+    {"errors":[{"title":"Merchant with id or uuid 100 not found","code":"resource_not_found"}]}
     """
 
   Scenario: Successful merchant retrieve
@@ -25,6 +25,7 @@ Feature: An endpoint to retrieve merchant data
        "financing_limit":10000,
        "api_key":"test",
        "company_id":"10",
+       "company_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
        "payment_merchant_id":"f2ec4d5e-79f4-40d6-b411-31174b6519ac",
        "is_active":true,
        "webhook_url":null,
@@ -49,6 +50,7 @@ Feature: An endpoint to retrieve merchant data
        "financing_limit":10000,
        "api_key":"test",
        "company_id":"10",
+       "company_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
        "payment_merchant_id":"f2ec4d5e-79f4-40d6-b411-31174b6519ac",
        "is_active":true,
        "webhook_url":null,

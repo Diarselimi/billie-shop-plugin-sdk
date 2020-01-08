@@ -18,6 +18,7 @@ Feature: As a merchant that is in the onboarding process, I want start the techn
         "financing_power": 5000.44,
         "financing_limit": 5000.44,
         "company_id": "2",
+        "company_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
         "is_active": true,
         "webhook_url": "http://billie.md",
         "webhook_authorization": "X-Api-Key: hola",
