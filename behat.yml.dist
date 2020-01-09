@@ -18,6 +18,7 @@ default:
         - CustomRestContext
         - LimitServiceContext
         - SandboxServiceContext
+        - WebappServiceContext
         - BicLookupServiceContext
 
   extensions:

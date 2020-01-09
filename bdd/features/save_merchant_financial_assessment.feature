@@ -39,7 +39,7 @@ Feature: When I send a request to save I should be able to save financial data f
     {"errors":[{"title":"The number should have have maximum 1 numbers after decimal.","code":"request_validation_error","source":"cancellation_rate"}]}
     """
 
-  Scenario: Fail to save financial data if they already exists for the same merchant which should throw a conflict http error
+  Scenario: Fail to save financial data if they already exists for the same merchant which should throw an access denied
     Given I have the following Financial Assessment Data:
     """
     {
@@ -65,7 +65,11 @@ Feature: When I send a request to save I should be able to save financial data f
       "default_rate": 50.0
     }
     """
-    Then the response status code should be 409
+    Then the JSON response should be:
+    """
+      {"errors":[{"title":"Merchant Onboarding Step transition is not possible.","code":"forbidden"}]}
+    """
+    And the response status code should be 403
 
 
   Scenario: The request validation fails because of the bad data provided in the request.

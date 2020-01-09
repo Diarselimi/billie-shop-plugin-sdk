@@ -11,6 +11,7 @@ use App\Http\Authentication\UserProvider;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use OpenApi\Annotations as OA;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 /**
@@ -53,11 +54,7 @@ class SaveMerchantFinancialAssessmentController
     public function execute(Request $request): void
     {
         $merchant = $this->userProvider->getUser()->getMerchant();
-        $useCaseRequest = (new SaveMerchantFinancialAssessmentRequest(
-            $merchant->getId(),
-            $merchant->getPaymentUuid()
-                )
-            )
+        $useCaseRequest = (new SaveMerchantFinancialAssessmentRequest($merchant->getId(), $merchant->getPaymentUuid()))
             ->setYearlyTransactionVolume($request->get('yearly_transaction_volume'))
             ->setMeanInvoiceAmount($request->get('mean_invoice_amount'))
             ->setCancellationRate($request->get('cancellation_rate'))
@@ -69,7 +66,7 @@ class SaveMerchantFinancialAssessmentController
         try {
             $this->useCase->execute($useCaseRequest);
         } catch (MerchantOnboardingStepTransitionException $exception) {
-            throw new ConflictHttpException('Not acceptable request.');
+            throw new AccessDeniedHttpException($exception->getMessage());
         }
     }
 }

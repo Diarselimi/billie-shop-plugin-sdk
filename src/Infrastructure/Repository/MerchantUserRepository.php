@@ -81,15 +81,14 @@ class MerchantUserRepository extends AbstractPdoRepository implements MerchantUs
         $this->update($id, ['signatory_power_uuid' => $signatoryPowerUuid]);
     }
 
+    public function assignIdentityVerificationCaseToUser(int $id, string $identityVerificationCaseUuid): void
+    {
+        $this->update($id, ['identity_verification_case_uuid' => $identityVerificationCaseUuid]);
+    }
+
     private function update(int $id, array $columnValuePairs): void
     {
-        $intersectedKeysWithTableColumns = array_intersect(array_keys($columnValuePairs), self::SELECT_FIELDS);
-        if (count($intersectedKeysWithTableColumns) !== count($columnValuePairs)) {
-            throw new \InvalidArgumentException('There are arguments that do not exists in the table');
-        }
-
         $sql = $this->generateUpdateQuery(self::TABLE_NAME, array_keys($columnValuePairs)). ' WHERE id = :id';
-
         $this->doExecute($sql, array_merge(['id' => $id], $columnValuePairs));
     }
 }

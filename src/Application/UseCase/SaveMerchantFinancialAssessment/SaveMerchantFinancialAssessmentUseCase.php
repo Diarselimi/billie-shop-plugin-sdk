@@ -49,9 +49,7 @@ class SaveMerchantFinancialAssessmentUseCase implements ValidatedUseCaseInterfac
             throw new MerchantOnboardingStepTransitionException();
         }
 
-        $entity = $this->entityFactory
-            ->createFromDataAndMerchant($request->toArray(), $request->getMerchantId());
-
+        $entity = $this->entityFactory->createFromDataAndMerchant($request->toArray(), $request->getMerchantId());
         $this->repository->insert($entity);
     }
 }
