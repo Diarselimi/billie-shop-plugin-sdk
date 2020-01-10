@@ -49,5 +49,6 @@ the `application/json` Content-Type and the following body format:
 | dunning_letter_2 | 2nd Dunning letter was sent              |
 | dunning_email_2  | 2nd Dunning email was sent               |
 | reminder_email_4 | 4th Reminder email was sent              |
+| dca_email        | Handover to collections email was sent   |
 
 

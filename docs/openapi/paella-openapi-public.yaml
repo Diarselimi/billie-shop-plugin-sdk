@@ -1222,7 +1222,7 @@ tags:
   -
     name: 'Checkout Client'
     description: |
-      # Checkout Widget Integration
+      ## Checkout Widget Integration
       
       To integrate the Billie checkout widget, the following steps are required:
       
@@ -1500,3 +1500,4 @@ tags:
       | dunning_letter_2 | 2nd Dunning letter was sent              |
       | dunning_email_2  | 2nd Dunning email was sent               |
       | reminder_email_4 | 4th Reminder email was sent              |
+      | dca_email        | Handover to collections email was sent   |

@@ -1,4 +1,4 @@
-# Checkout Widget Integration
+## Checkout Widget Integration
 
 To integrate the Billie checkout widget, the following steps are required:
 
