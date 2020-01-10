@@ -1,5 +1,3 @@
-## Checkout Widget Integration
-
 To integrate the Billie checkout widget, the following steps are required:
 
 1. Include Billie checkout widget bundle into your checkout page
