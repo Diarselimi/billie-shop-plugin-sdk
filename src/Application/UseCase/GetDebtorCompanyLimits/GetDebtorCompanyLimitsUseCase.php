@@ -6,7 +6,7 @@ use App\Application\Exception\MerchantDebtorNotFoundException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
-use App\DomainModel\DebtorLimit\DebtorLimitServiceInterface;
+use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\MerchantDebtorResponse\MerchantDebtorContainerFactory;
@@ -21,18 +21,18 @@ class GetDebtorCompanyLimitsUseCase implements ValidatedUseCaseInterface
 
     private $merchantDebtorContainerFactory;
 
-    private $debtorLimitService;
+    private $merchantDebtorLimitsService;
 
     public function __construct(
         CompaniesServiceInterface $companiesService,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         MerchantDebtorContainerFactory $merchantDebtorContainerFactory,
-        DebtorLimitServiceInterface $debtorLimitService
+        MerchantDebtorLimitsService $merchantDebtorLimitsService
     ) {
         $this->companiesService = $companiesService;
         $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->merchantDebtorContainerFactory = $merchantDebtorContainerFactory;
-        $this->debtorLimitService = $debtorLimitService;
+        $this->merchantDebtorLimitsService = $merchantDebtorLimitsService;
     }
 
     public function execute(GetDebtorCompanyLimitsRequest $request): GetDebtorCompanyLimitsResponse
@@ -52,7 +52,7 @@ class GetDebtorCompanyLimitsUseCase implements ValidatedUseCaseInterface
         }, $merchantDebtors);
 
         $limit = (!empty($merchantDebtors)) ? reset($merchantDebtorContainers)->getDebtorLimit() :
-            $this->debtorLimitService->retrieve($company->getUuid());
+            $this->merchantDebtorLimitsService->retrieve($company->getUuid());
 
         return new GetDebtorCompanyLimitsResponse($company, $limit, ...$merchantDebtorContainers);
     }

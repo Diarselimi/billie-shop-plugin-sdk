@@ -2,6 +2,7 @@
 
 namespace App\DomainModel\MerchantDebtor\Limits;
 
+use App\DomainModel\DebtorLimit\DebtorLimitDTO;
 use App\DomainModel\DebtorLimit\DebtorLimitServiceInterface;
 use App\DomainModel\DebtorLimit\DebtorLimitServiceRequestException;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
@@ -51,6 +52,15 @@ class MerchantDebtorLimitsService implements LoggingInterface
             $this->debtorLimitService->release($debtorCompanyUuid, $customerCompanyUuid, $amount);
         } catch (DebtorLimitServiceRequestException $exception) {
             throw new MerchantDebtorLimitsException("Limit service call was unsuccessful", null, $exception);
+        }
+    }
+
+    public function retrieve(string $debtorCompanyUuid): ? DebtorLimitDTO
+    {
+        try {
+            return $this->debtorLimitService->retrieve($debtorCompanyUuid);
+        } catch (DebtorLimitServiceRequestException $exception) {
+            return null;
         }
     }
 }
