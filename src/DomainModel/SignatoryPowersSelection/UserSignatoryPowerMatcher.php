@@ -4,17 +4,9 @@ namespace App\DomainModel\SignatoryPowersSelection;
 
 use App\DomainModel\GetSignatoryPowers\GetSignatoryPowerDTO;
 use App\DomainModel\MerchantUser\MerchantUserEntity;
-use App\Helper\String\StringSearch;
 
 class UserSignatoryPowerMatcher
 {
-    private $stringSearch;
-
-    public function __construct(StringSearch $stringSearch)
-    {
-        $this->stringSearch = $stringSearch;
-    }
-
     public function identify(MerchantUserEntity $merchantUser, GetSignatoryPowerDTO ...$signatoryPowerDTOs)
     {
         if ($merchantUser->getSignatoryPowerUuid()) {
@@ -27,10 +19,8 @@ class UserSignatoryPowerMatcher
     private function identifyByFullName(MerchantUserEntity $merchantUser, GetSignatoryPowerDTO ...$signatoryPowerDTOs): void
     {
         foreach ($signatoryPowerDTOs as $signatoryPowersDTO) {
-            $isIdentifiedAsUser = $this->stringSearch->areAllWordsInString(
-                [$merchantUser->getFirstName(), $merchantUser->getLastName()],
-                "{$signatoryPowersDTO->getFirstName()} {$signatoryPowersDTO->getLastName()}"
-            );
+            $isIdentifiedAsUser = mb_strtolower($merchantUser->getFirstName()) === mb_strtolower($signatoryPowersDTO->getFirstName())
+                && mb_strtolower($merchantUser->getLastName()) === mb_strtolower($signatoryPowersDTO->getLastName());
 
             if ($isIdentifiedAsUser) {
                 $signatoryPowersDTO->setAutomaticallyIdentifiedAsUser($isIdentifiedAsUser);

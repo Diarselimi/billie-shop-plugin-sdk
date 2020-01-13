@@ -50,8 +50,8 @@ Feature: Get list of signatory-powers from alfred and send response.
       },
       {
         "uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
-        "first_name": "diar test",
-        "last_name": "test diar",
+        "first_name": "Test",
+        "last_name": "Test",
         "additional_signatories_required": 1,
         "address_house":"Any house number",
         "address_street":"Any street",
