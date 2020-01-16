@@ -25,6 +25,7 @@ class MerchantEntityFactory extends AbstractFactory
             ->setFinancingLimit($data['available_financing_limit'])
             ->setCompanyId($data['company_id'])
             ->setPaymentUuid($data['payment_merchant_id'])
+            ->setSepaB2BDocumentUuid($data['sepa_b2b_document_uuid'])
             ->setIsActive((bool) $data['is_active'])
             ->setWebhookUrl($data['webhook_url'])
             ->setWebhookAuthorization($data['webhook_authorization'])

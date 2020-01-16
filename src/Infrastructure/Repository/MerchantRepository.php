@@ -12,8 +12,8 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
     public const TABLE_NAME = "merchants";
 
     private const SELECT_FIELDS = [
-        'id', 'name', 'api_key', 'oauth_client_id', 'company_id', 'company_uuid', 'payment_merchant_id', 'sandbox_payment_merchant_id',
-        'is_active', 'financing_power', 'available_financing_limit', 'webhook_url', 'webhook_authorization', 'created_at', 'updated_at',
+        'id', 'name', 'api_key', 'oauth_client_id', 'company_id', 'company_uuid', 'payment_merchant_id', 'sandbox_payment_merchant_id', 'sepa_b2b_document_uuid',
+        'is_active', 'sepa_b2b_document_uuid', 'financing_power', 'available_financing_limit', 'webhook_url', 'webhook_authorization', 'created_at', 'updated_at',
     ];
 
     private $factory;
@@ -28,10 +28,10 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
         $id = $this->doInsert('
             INSERT INTO ' . self::TABLE_NAME . '
             (name, api_key, oauth_client_id, is_active, financing_power, available_financing_limit, 
-                company_id, company_uuid, payment_merchant_id, webhook_url, webhook_authorization, created_at, updated_at)
+                company_id, company_uuid, sepa_b2b_document_uuid, payment_merchant_id, webhook_url, webhook_authorization, created_at, updated_at)
             VALUES
             (:name, :api_key, :oauth_client_id, :is_active, :financing_power, :available_financing_limit, 
-                :company_id, :company_uuid, :payment_merchant_id, :webhook_url, :webhook_authorization, :created_at, :updated_at)
+                :company_id, :company_uuid, :sepa_b2b_document_uuid, :payment_merchant_id, :webhook_url, :webhook_authorization, :created_at, :updated_at)
         ', [
             'name' => $merchant->getName(),
             'company_uuid' => $merchant->getCompanyUuid(),
@@ -42,6 +42,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
             'available_financing_limit' => $merchant->getFinancingPower(),
             'company_id' => $merchant->getCompanyId(),
             'payment_merchant_id' => $merchant->getPaymentUuid(),
+            'sepa_b2b_document_uuid' => $merchant->getSepaB2BDocumentUuid(),
             'webhook_url' => $merchant->getWebhookUrl(),
             'webhook_authorization' => $merchant->getWebhookAuthorization(),
             'created_at' => $merchant->getCreatedAt()->format(self::DATE_FORMAT),
@@ -60,6 +61,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
               financing_power = :financing_power, 
               available_financing_limit = :available_financing_limit, 
               sandbox_payment_merchant_id = :sandbox_payment_merchant_id,
+              sepa_b2b_document_uuid = :document_uuid,
               updated_at = :updated_at
             WHERE id = :id
         ', [
@@ -67,6 +69,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
             'financing_power' => $merchant->getFinancingPower(),
             'available_financing_limit' => $merchant->getFinancingLimit(),
             'sandbox_payment_merchant_id' => $merchant->getSandboxPaymentUuid(),
+            'document_uuid' => $merchant->getSepaB2BDocumentUuid(),
             'updated_at' => $merchant->getUpdatedAt()->format(self::DATE_FORMAT),
         ]);
     }

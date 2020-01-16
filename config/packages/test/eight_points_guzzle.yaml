@@ -48,3 +48,15 @@ eight_points_guzzle:
         debug: false
         query:
           app: bic_lookup
+    nachos:
+      base_url: "%behat_mock_server_url%:8029"
+      options:
+        debug: false
+        query:
+          app: file_manager
+    document_generator:
+      base_url: "%behat_mock_server_url%:8030"
+      options:
+        debug: false
+        query:
+          app: document_generator

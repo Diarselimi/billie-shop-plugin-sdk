@@ -84,13 +84,17 @@ Feature: API endpoint for "POST /merchant/bank-account" (ticket APIS-1727)
     Given a merchant user exists with permission MANAGE_ONBOARDING
     And I get from Oauth service a valid user token
     And I get from Oauth service revoke token endpoint a successful response
+    And I get from companies service get debtor response
+    And I successfully create sepa B2B document
+    And I get from files service a good response
     And I add "Authorization" header equal to "Bearer SomeTokenHere"
     And I get from BIC lookup service call to "/bankcodes/50010517.json" a response with status 200 and body:
     """
-      {"bank_code":{"bic":"INGDDEFFXXX"}}
+      {"bank_code":{"bic":"INGDDEFFXXX", "bank_name": "commerzz"}}
     """
     When I send a POST request to "/merchant/bank-account" with body:
     """
       {"iban":"DE42500105171514412424", "tc_accepted":true}
     """
     Then the response status code should be 204
+    And the sepa mandate document should exist for merchant

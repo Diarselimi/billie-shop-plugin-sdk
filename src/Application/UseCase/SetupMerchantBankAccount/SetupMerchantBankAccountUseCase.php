@@ -7,15 +7,19 @@ namespace App\Application\UseCase\SetupMerchantBankAccount;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\BankAccount\BankAccountCoreAcceptedAnnouncer;
-use App\DomainModel\BankAccount\BankAccountDTO;
 use App\DomainModel\BankAccount\BankAccountDTOFactory;
+use App\DomainModel\BankAccount\BicLookupServiceInterface;
 use App\DomainModel\BankAccount\BicLookupServiceRequestException;
 use App\DomainModel\BankAccount\BicNotFoundException;
+use App\DomainModel\BankAccount\IbanDTOFactory;
+use App\DomainModel\BankAccount\InvalidIbanException;
+use App\DomainModel\BankAccount\SepaMandateReferenceGenerator;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepEntity;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepRepositoryInterface;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepTransitionEntity;
 use App\DomainModel\MerchantOnboarding\MerchantStepTransitionService;
+use App\Infrastructure\SepaB2BGenerator\SepaB2BGeneratorService;
 
 class SetupMerchantBankAccountUseCase implements ValidatedUseCaseInterface
 {
@@ -31,18 +35,34 @@ class SetupMerchantBankAccountUseCase implements ValidatedUseCaseInterface
 
     private $stepTransitionService;
 
+    private $sepaB2BGeneratorService;
+
+    private $ibanDTOFactory;
+
+    private $bicLookupService;
+
+    private $mandateReferenceGenerator;
+
     public function __construct(
         MerchantOnboardingStepRepositoryInterface $stepRepository,
         BankAccountDTOFactory $bankAccountDTOFactory,
         MerchantRepositoryInterface $merchantRepository,
         BankAccountCoreAcceptedAnnouncer $announcer,
-        MerchantStepTransitionService $stepTransitionService
+        MerchantStepTransitionService $stepTransitionService,
+        SepaB2BGeneratorService $sepaB2BGeneratorService,
+        IbanDTOFactory $ibanDTOFactory,
+        BicLookupServiceInterface $bicLookupService,
+        SepaMandateReferenceGenerator $mandateReferenceGenerator
     ) {
         $this->stepRepository = $stepRepository;
         $this->bankAccountDTOFactory = $bankAccountDTOFactory;
         $this->merchantRepository = $merchantRepository;
         $this->announcer = $announcer;
         $this->stepTransitionService = $stepTransitionService;
+        $this->sepaB2BGeneratorService = $sepaB2BGeneratorService;
+        $this->ibanDTOFactory = $ibanDTOFactory;
+        $this->bicLookupService = $bicLookupService;
+        $this->mandateReferenceGenerator = $mandateReferenceGenerator;
     }
 
     public function execute(SetupMerchantBankAccountRequest $request): void
@@ -58,23 +78,29 @@ class SetupMerchantBankAccountUseCase implements ValidatedUseCaseInterface
             throw new SetupMerchantBankAccountException();
         }
 
-        $bankAccount = $this->buildBankAccountDTO($request);
-        $this->announcer->announce($bankAccount);
-        $this->stepTransitionService->transitionStepEntity($step, MerchantOnboardingStepTransitionEntity::TRANSITION_REQUEST_CONFIRMATION);
-    }
-
-    private function buildBankAccountDTO(SetupMerchantBankAccountRequest $request): BankAccountDTO
-    {
         $merchant = $this->merchantRepository->getOneById($request->getMerchantId());
 
         try {
-            return $this->bankAccountDTOFactory->create(
-                $merchant->getName(),
-                $request->getIban(),
-                $merchant->getPaymentUuid()
-            );
-        } catch (BicNotFoundException | BicLookupServiceRequestException $exception) {
+            $iban = $this->ibanDTOFactory->createFromString($request->getIban());
+            $bankData = $this->bicLookupService->lookup($iban);
+        } catch (InvalidIbanException | BicNotFoundException | BicLookupServiceRequestException $exception) {
             throw new SetupMerchantBankAccountMissingBicException();
         }
+
+        $this->stepTransitionService->transitionStepEntity($step, MerchantOnboardingStepTransitionEntity::TRANSITION_REQUEST_CONFIRMATION);
+
+        $bankAccount = $this->bankAccountDTOFactory->create(
+            $merchant->getName(),
+            $iban,
+            $bankData->getBic(),
+            $merchant->getPaymentUuid()
+        );
+
+        $mandateReference = $this->mandateReferenceGenerator->generate();
+        $this->announcer->announce($bankAccount, $mandateReference);
+        $fileResponseDTO = $this->sepaB2BGeneratorService->generate($merchant->getCompanyUuid(), $bankAccount, $bankData, $mandateReference);
+
+        $merchant->setSepaB2BDocumentUuid($fileResponseDTO->getUuid());
+        $this->merchantRepository->update($merchant);
     }
 }

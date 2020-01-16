@@ -19,6 +19,6 @@ class IbanDTOFactory
             ->setCountry($ibanObject->Country())
             ->setBankCode($ibanObject->Bank())
             ->setAccount($ibanObject->Account())
-            ;
+        ;
     }
 }

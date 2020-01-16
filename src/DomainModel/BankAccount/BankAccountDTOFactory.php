@@ -15,20 +15,13 @@ class BankAccountDTOFactory
     private $uuidGenerator;
 
     public function __construct(
-        IbanDTOFactory $ibanDTOFactory,
-        BicLookupServiceInterface $bicLookupService,
         UuidGeneratorInterface $uuidGenerator
     ) {
-        $this->ibanDTOFactory = $ibanDTOFactory;
-        $this->bicLookupService = $bicLookupService;
         $this->uuidGenerator = $uuidGenerator;
     }
 
-    public function create(string $name, string $iban, string $paymentUuid): BankAccountDTO
+    public function create(string $name, IbanDTO $iban, string $bic, string $paymentUuid): BankAccountDTO
     {
-        $iban = $this->ibanDTOFactory->createFromString($iban);
-        $bic = $this->bicLookupService->lookup($iban);
-
         return (new BankAccountDTO())
             ->setUuid($this->uuidGenerator->uuid4())
             ->setIban($iban)

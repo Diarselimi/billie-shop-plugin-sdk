@@ -20,6 +20,8 @@ default:
         - SandboxServiceContext
         - WebappServiceContext
         - BicLookupServiceContext
+        - DocumentGeneratorContext
+        - NachosContext
 
   extensions:
     Behatch\Extension: ~

@@ -1607,6 +1607,31 @@ paths:
           oauth2: []
       x-groups:
         - dashboard
+  /merchant/bank-account/sepa-mandate-document:
+    get:
+      tags:
+        - 'Dashboard Merchants'
+      summary: 'Get Sepa B2B Mandate'
+      operationId: get_sepa_b2b_document
+      responses:
+        '200':
+          description: 'Successful response'
+          content: {  }
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+      x-groups:
+        - private
   /merchant/user:
     get:
       tags:
@@ -3366,6 +3391,8 @@ components:
         company_uuid:
           $ref: '#/components/schemas/UUID'
         payment_merchant_id:
+          $ref: '#/components/schemas/UUID'
+        sepa_b2b_document_uuid:
           $ref: '#/components/schemas/UUID'
         is_active:
           type: boolean

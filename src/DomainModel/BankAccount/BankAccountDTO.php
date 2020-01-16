@@ -10,6 +10,8 @@ class BankAccountDTO
 
     private $name;
 
+    private $bankName;
+
     private $iban;
 
     private $bic;
@@ -72,6 +74,18 @@ class BankAccountDTO
     public function setPaymentUuid(string $paymentUuid): BankAccountDTO
     {
         $this->paymentUuid = $paymentUuid;
+
+        return $this;
+    }
+
+    public function getBankName(): string
+    {
+        return $this->bankName;
+    }
+
+    public function setBankName(string $bankName): BankAccountDTO
+    {
+        $this->bankName = $bankName;
 
         return $this;
     }

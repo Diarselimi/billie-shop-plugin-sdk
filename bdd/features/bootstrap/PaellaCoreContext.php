@@ -117,6 +117,7 @@ class PaellaCoreContext extends MinkContext
             ->setIsActive(true)
             ->setPaymentUuid('f2ec4d5e-79f4-40d6-b411-31174b6519ac')
             ->setFinancingLimit(10000)
+            ->setSepaB2BDocumentUuid('c7be46c0-e049-4312-b274-258ec5aeeb70')
             ->setFinancingPower(10000)
             ->setApiKey('test')
             ->setCompanyId('10')
@@ -1134,5 +1135,15 @@ class PaellaCoreContext extends MinkContext
     {
         $this->merchant->setSandboxPaymentUuid(self::SANDBOX_MERCHANT_PAYMENT_UUID);
         $this->getMerchantRepository()->update($this->merchant);
+    }
+
+    /**
+     * @Given /^the sepa mandate document should exist for merchant$/
+     */
+    public function theSepaMandateDocumentShouldExistForMerchant()
+    {
+        $merchant = $this->getMerchantRepository()->getOneById($this->merchant->getId());
+
+        Assert::notNull($merchant->getSepaB2BDocumentUuid(), 'There is no file.');
     }
 }

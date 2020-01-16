@@ -30,6 +30,7 @@ services:
       $paellaSandboxClient: '@eight_points_guzzle.client.paella_sandbox'
       $webappClient: '@eight_points_guzzle.client.webapp'
       $bicLookupClient: '@eight_points_guzzle.client.fintech_toolbox'
+      $documentGeneratorClient: '@eight_points_guzzle.client.document_generator'
       $projectRootDir: '%kernel.root_dir%/..'
       $smaugClientId: '%smaug_client_id%'
       $smaugClientSecret: '%smaug_client_secret%'

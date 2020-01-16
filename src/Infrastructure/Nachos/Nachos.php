@@ -9,6 +9,7 @@ use App\DomainModel\FileService\FileServiceResponseFactory;
 use App\Infrastructure\DecodeResponseTrait;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
+use Psr\Http\Message\StreamInterface;
 
 class Nachos implements FileServiceInterface
 {
@@ -44,5 +45,16 @@ class Nachos implements FileServiceInterface
         }
 
         return $this->factory->createFromArray($this->decodeResponse($response));
+    }
+
+    public function download(string $fileUuid): StreamInterface
+    {
+        try {
+            $response = $this->client->get("/files/{$fileUuid}/raw", ['stream' => true]);
+        } catch (TransferException $exception) {
+            throw new FileServiceRequestException($exception);
+        }
+
+        return $response->getBody();
     }
 }

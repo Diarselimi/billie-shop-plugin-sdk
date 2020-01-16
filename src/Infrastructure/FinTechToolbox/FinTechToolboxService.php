@@ -26,7 +26,7 @@ class FinTechToolboxService implements BicLookupServiceInterface, LoggingInterfa
         $this->client = $bicLookupClient;
     }
 
-    public function lookup(IbanDTO $iban): string
+    public function lookup(IbanDTO $iban): FinTechToolboxResponseDTO
     {
         try {
             $response = $this->client->get('/bankcodes/' . $iban->getBankCode() . '.json', [
@@ -36,16 +36,20 @@ class FinTechToolboxService implements BicLookupServiceInterface, LoggingInterfa
             ]);
 
             $decodedResponse = $this->decodeResponse($response);
+            $decodedResponse = $decodedResponse['bank_code'] ?? null;
 
-            if (
-                !isset($decodedResponse['bank_code']['bic']) ||
-                !$decodedResponse['bank_code']['bic'] ||
-                !is_string($decodedResponse['bank_code']['bic'])
-            ) {
+            if (!$decodedResponse) {
                 throw new BicNotFoundException();
             }
 
-            return $decodedResponse['bank_code']['bic'];
+            $bankData = (new FinTechToolboxResponseDTO())
+                ->setBankName($decodedResponse['bank_name'] ?? null)
+                ->setCode($decodedResponse['code'] ?? null)
+                ->setBic($decodedResponse['bic'] ?? null)
+                ->setCity($decodedResponse['city'] ?? null)
+                ->setPostalCode($decodedResponse['postal_code'] ?? null);
+
+            return $bankData;
         } catch (TransferException $exception) {
             $this->logError('Request to FinTech Toolbox failed: ' . $exception->getMessage());
 

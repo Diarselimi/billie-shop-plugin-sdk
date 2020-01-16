@@ -4,22 +4,25 @@ namespace App\DomainModel\FileService;
 
 class FileServiceResponseDTO
 {
-    private $fileId;
+    private $id;
 
     private $fileName;
 
     private $filePath;
 
-    public function __construct(int $fileId, string $fileName, string $filePath)
+    private $uuid;
+
+    public function __construct(int $id, string $uuid, string $fileName, string $filePath)
     {
-        $this->fileId = $fileId;
+        $this->id = $id;
+        $this->uuid = $uuid;
         $this->fileName = $fileName;
         $this->filePath = $filePath;
     }
 
     public function getFileId(): int
     {
-        return $this->fileId;
+        return $this->id;
     }
 
     public function getFileName(): string
@@ -30,5 +33,10 @@ class FileServiceResponseDTO
     public function getFilePath(): string
     {
         return $this->filePath;
+    }
+
+    public function getUuid(): string
+    {
+        return $this->uuid;
     }
 }

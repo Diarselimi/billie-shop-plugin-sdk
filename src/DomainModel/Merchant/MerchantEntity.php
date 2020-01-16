@@ -19,6 +19,7 @@ use OpenApi\Annotations as OA;
  *      @OA\Property(property="company_id", ref="#/components/schemas/TinyText"),
  *      @OA\Property(property="company_uuid", ref="#/components/schemas/UUID"),
  *      @OA\Property(property="payment_merchant_id", ref="#/components/schemas/UUID"),
+ *      @OA\Property(property="sepa_b2b_document_uuid", ref="#/components/schemas/UUID"),
  *      @OA\Property(property="is_active", type="boolean"),
  *      @OA\Property(property="webhook_url", type="string", format="uri", nullable=true),
  *      @OA\Property(property="webhook_authorization", type="string", nullable=true, example="Authorization: Basic test"),
@@ -43,6 +44,8 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
     private $companyId;
 
     private $paymentUuid;
+
+    private $sepaB2BDocumentUuid;
 
     private $sandboxPaymentUuid;
 
@@ -140,6 +143,18 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
     public function setCompanyId(string $companyId): MerchantEntity
     {
         $this->companyId = $companyId;
+
+        return $this;
+    }
+
+    public function getSepaB2BDocumentUuid(): ?string
+    {
+        return $this->sepaB2BDocumentUuid;
+    }
+
+    public function setSepaB2BDocumentUuid(?string $sepaB2BDocumentUuid): MerchantEntity
+    {
+        $this->sepaB2BDocumentUuid = $sepaB2BDocumentUuid;
 
         return $this;
     }
