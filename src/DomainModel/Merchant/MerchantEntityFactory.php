@@ -2,18 +2,10 @@
 
 namespace App\DomainModel\Merchant;
 
-use App\Helper\Uuid\UuidGeneratorInterface;
 use App\Support\AbstractFactory;
 
 class MerchantEntityFactory extends AbstractFactory
 {
-    private $uuidGenerator;
-
-    public function __construct(UuidGeneratorInterface $uuidGenerator)
-    {
-        $this->uuidGenerator = $uuidGenerator;
-    }
-
     public function createFromArray(array $data): MerchantEntity
     {
         return (new MerchantEntity())

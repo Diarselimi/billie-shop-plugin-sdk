@@ -91,7 +91,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
             ['payment_merchant_uuid' => $paymentUuid]
         );
 
-        return $row ? $this->factory->createFromDatabaseRow($row) : null;
+        return $row ? $this->factory->createFromArray($row) : null;
     }
 
     public function getOneByCompanyId(int $companyId): ?MerchantEntity
