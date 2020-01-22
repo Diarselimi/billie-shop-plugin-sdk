@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e918ba53474388578b540ea915a00925",
+    "content-hash": "fc9ba0aab4252576cfbdd3a955385c5a",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -144,16 +144,16 @@
         },
         {
             "name": "billie/monitoring-bundle",
-            "version": "2.6.4",
+            "version": "dev-fix-missing-logs",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/MonitoringBundle.git",
-                "reference": "d6349f69140daabb3a73659c9a1f47ea5ad26f84"
+                "reference": "1c44d73979925ec0c82a640e09ef660709c2ce99"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/MonitoringBundle/zipball/d6349f69140daabb3a73659c9a1f47ea5ad26f84",
-                "reference": "d6349f69140daabb3a73659c9a1f47ea5ad26f84",
+                "url": "https://api.github.com/repos/ozean12/MonitoringBundle/zipball/1c44d73979925ec0c82a640e09ef660709c2ce99",
+                "reference": "1c44d73979925ec0c82a640e09ef660709c2ce99",
                 "shasum": ""
             },
             "require": {
@@ -181,9 +181,9 @@
                 }
             ],
             "support": {
-                "source": "https://github.com/ozean12/MonitoringBundle/tree/2.6.4"
+                "source": "https://github.com/ozean12/MonitoringBundle/tree/fix-missing-logs"
             },
-            "time": "2019-11-13T09:40:48+00:00"
+            "time": "2020-01-22T10:59:46+00:00"
         },
         {
             "name": "billie/pdo-bundle",
@@ -6419,6 +6419,7 @@
                 "code",
                 "zf"
             ],
+            "abandoned": "laminas/laminas-code",
             "time": "2019-10-05T23:18:22+00:00"
         },
         {
@@ -6473,6 +6474,7 @@
                 "events",
                 "zf2"
             ],
+            "abandoned": "laminas/laminas-eventmanager",
             "time": "2018-04-25T15:33:34+00:00"
         },
         {
@@ -9561,7 +9563,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "billie/monitoring-bundle": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
