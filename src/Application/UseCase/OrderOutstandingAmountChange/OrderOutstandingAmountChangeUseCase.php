@@ -4,6 +4,7 @@ namespace App\Application\UseCase\OrderOutstandingAmountChange;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\WorkflowException;
+use App\DomainEvent\Order\OrderEventPayloadFactory;
 use App\DomainModel\OrderNotification\OrderNotificationEntity;
 use App\DomainModel\Payment\OrderAmountChangeDTO;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
@@ -34,13 +35,16 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 
     private $orderStateManager;
 
+    private $orderEventPayloadFactory;
+
     public function __construct(
         OrderContainerFactory $orderContainerFactory,
         MerchantRepositoryInterface $merchantRepository,
         NotificationScheduler $notificationScheduler,
         MerchantDebtorLimitsService $limitsService,
         OrderPaymentForgivenessService $paymentForgivenessService,
-        OrderStateManager $orderStateManager
+        OrderStateManager $orderStateManager,
+        OrderEventPayloadFactory $orderEventPayloadFactory
     ) {
         $this->orderContainerFactory = $orderContainerFactory;
         $this->merchantRepository = $merchantRepository;
@@ -48,6 +52,7 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
         $this->limitsService = $limitsService;
         $this->paymentForgivenessService = $paymentForgivenessService;
         $this->orderStateManager = $orderStateManager;
+        $this->orderEventPayloadFactory = $orderEventPayloadFactory;
     }
 
     public function execute(OrderOutstandingAmountChangeRequest $request)
@@ -124,17 +129,19 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
         }
     }
 
-    private function scheduleMerchantNotification(OrderEntity $order, OrderAmountChangeDTO $amountChange)
+    private function scheduleMerchantNotification(OrderEntity $order, OrderAmountChangeDTO $amountChange): void
     {
         $this->notificationScheduler->createAndSchedule(
             $order,
             OrderNotificationEntity::NOTIFICATION_TYPE_PAYMENT,
-            [
-                'event' => OrderNotificationEntity::NOTIFICATION_TYPE_PAYMENT,
-                'order_id' => $order->getExternalCode(),
-                'amount' => $amountChange->getPaidAmount(),
-                'open_amount' => $amountChange->getOutstandingAmount(),
-            ]
+            $this->orderEventPayloadFactory->create(
+                $order,
+                OrderNotificationEntity::NOTIFICATION_TYPE_PAYMENT,
+                [
+                    'amount' => $amountChange->getPaidAmount(),
+                    'open_amount' => $amountChange->getOutstandingAmount(),
+                ]
+            )
         );
     }
 }

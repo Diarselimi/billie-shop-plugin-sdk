@@ -93,12 +93,6 @@ class NotificationDeliveryUseCase implements LoggingInterface
             return;
         }
 
-        if (!$this->isFirstOnOrderPendingNotificationsList($notification)) {
-            $this->notificationScheduler->schedule($notification);
-
-            return;
-        }
-
         try {
             $deliveryResult = $this->notificationSender->send(
                 $url,

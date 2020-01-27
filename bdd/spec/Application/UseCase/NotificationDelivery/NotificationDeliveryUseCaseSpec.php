@@ -153,12 +153,6 @@ class NotificationDeliveryUseCaseSpec extends ObjectBehavior
 
         $merchantRepository->getOneById(self::MERCHANT_ID)->shouldBeCalledOnce()->willReturn($merchant);
 
-        $notificationRepository
-            ->getFailedByOrderId(self::ORDER_ID)
-            ->shouldBeCalled()
-            ->willReturn([$notification])
-        ;
-
         $notificationSender
             ->send(
                 self::MERCHANT_URL,
@@ -182,44 +176,6 @@ class NotificationDeliveryUseCaseSpec extends ObjectBehavior
         $notification->addDelivery($notificationDelivery)->shouldNotBeCalled();
 
         $notification->setIsDelivered(true)->shouldNotBeCalled();
-
-        $this->execute($request);
-    }
-
-    public function it_reschedules_notification_if_other_pending_notifications_exits_for_the_same_order(
-        OrderNotificationRepositoryInterface $notificationRepository,
-        OrderRepositoryInterface $orderRepository,
-        MerchantRepositoryInterface $merchantRepository,
-        NotificationScheduler $notificationScheduler,
-        OrderNotificationEntity $notification,
-        OrderNotificationEntity $otherPendingNotification,
-        OrderEntity $order,
-        MerchantEntity $merchant,
-        NotificationDeliveryResultDTO $deliveryResult,
-        OrderNotificationDeliveryEntity $notificationDelivery
-    ) {
-        $this->mockDeliveryResult($deliveryResult);
-        $this->mockNotification($notification);
-        $this->mockOrder($order);
-        $this->mockMerchant($merchant);
-        $this->mockNotificationDelivery($notificationDelivery, true);
-        $otherPendingNotification->getId()->willReturn(1111);
-
-        $request = new NotificationDeliveryRequest(self::NOTIFICATION_ID);
-
-        $notificationRepository->getOneById(self::NOTIFICATION_ID)->shouldBeCalledOnce()->willReturn($notification);
-
-        $orderRepository->getOneById(self::ORDER_ID)->shouldBeCalledOnce()->willReturn($order);
-
-        $merchantRepository->getOneById(self::MERCHANT_ID)->shouldBeCalledOnce()->willReturn($merchant);
-
-        $notificationRepository
-            ->getFailedByOrderId(self::ORDER_ID)
-            ->shouldBeCalled()
-            ->willReturn([$otherPendingNotification, $notification])
-        ;
-
-        $notificationScheduler->schedule($notification)->shouldBeCalled();
 
         $this->execute($request);
     }
@@ -250,12 +206,6 @@ class NotificationDeliveryUseCaseSpec extends ObjectBehavior
         $orderRepository->getOneById(self::ORDER_ID)->shouldBeCalledOnce()->willReturn($order);
 
         $merchantRepository->getOneById(self::MERCHANT_ID)->shouldBeCalledOnce()->willReturn($merchant);
-
-        $notificationRepository
-            ->getFailedByOrderId(self::ORDER_ID)
-            ->shouldBeCalled()
-            ->willReturn([$notification])
-        ;
 
         $notificationSender
             ->send(

@@ -4,6 +4,7 @@ namespace spec\App\Application\UseCase\UpdateMerchantWithOrderDunningStep;
 
 use App\Application\UseCase\UpdateMerchantWithOrderDunningStep\UpdateMerchantWithOrderDunningStepRequest;
 use App\Application\UseCase\UpdateMerchantWithOrderDunningStep\UpdateMerchantWithOrderDunningStepUseCase;
+use App\DomainEvent\Order\OrderEventPayloadFactory;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderNotification\NotificationScheduler;
@@ -17,18 +18,17 @@ class UpdateMerchantWithOrderDunningStepUseCaseSpec extends ObjectBehavior
 {
     const ORDER_UUID = 'dwokwdowdo22ok2ok2o2k';
 
-    const ORDER_EXTENRAL_ID = 'test';
+    const ORDER_EXTERNAL_ID = 'test';
 
     const MERCHANT_ID = 1;
-
-    const INVALID_STEP = 'invalid dunning step';
 
     public function let(
         OrderRepositoryInterface $orderRepository,
         NotificationScheduler $notificationScheduler,
+        OrderEventPayloadFactory $orderEventPayloadFactory,
         RavenClient $sentry
     ) {
-        $this->beConstructedWith($orderRepository, $notificationScheduler);
+        $this->beConstructedWith($orderRepository, $notificationScheduler, $orderEventPayloadFactory);
 
         $this->setLogger(new NullLogger())->setSentry($sentry);
     }
@@ -54,15 +54,17 @@ class UpdateMerchantWithOrderDunningStepUseCaseSpec extends ObjectBehavior
     public function it_sends_notification_to_merchant_webhook_with_dunning_step(
         OrderRepositoryInterface $orderRepository,
         NotificationScheduler $notificationScheduler,
-        OrderEntity $orderEntity
+        OrderEntity $orderEntity,
+        OrderEventPayloadFactory $orderEventPayloadFactory
     ) {
         $request = new UpdateMerchantWithOrderDunningStepRequest(self::ORDER_UUID, 'Dunning');
 
-        $orderEntity->getExternalCode()->willReturn(self::ORDER_EXTENRAL_ID);
+        $orderEntity->getExternalCode()->willReturn(self::ORDER_EXTERNAL_ID);
         $orderEntity->getMerchantId()->willReturn(self::MERCHANT_ID);
         $orderRepository->getOneByUuid(self::ORDER_UUID)->shouldBeCalled()->willReturn($orderEntity);
 
-        $payload = ['event' => 'Dunning', 'order_id' => self::ORDER_EXTENRAL_ID];
+        $payload = ['event' => 'Dunning', 'order_id' => self::ORDER_EXTERNAL_ID];
+        $orderEventPayloadFactory->create($orderEntity, OrderNotificationEntity::NOTIFICATION_TYPE_DCI_COMMUNICATION)->willReturn($payload);
 
         $notificationScheduler
             ->createAndSchedule(

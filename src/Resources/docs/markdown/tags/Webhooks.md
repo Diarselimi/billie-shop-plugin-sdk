@@ -17,11 +17,12 @@ A `POST` request is sent to the configured merchant Webhook URL with one of the 
 the `application/json` Content-Type and the following body format:
 ```
 {
+    created_at: (datetime)
     event: (string) (event name, -check the following section for more details-)
     order_id: (string)
+    order_uuid: (string)
     amount: (string) (optional) (contains sum of paid amounts)
-	open amount: (string) (optional) (contains sum of outstanding amount)
-    url_notification: (string) (optional)
+    open_amount: (string) (optional) (contains sum of outstanding amount)
 }
 ```
 

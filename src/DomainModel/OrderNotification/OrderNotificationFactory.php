@@ -7,6 +7,7 @@ class OrderNotificationFactory
     public function create(int $orderId, string $notificationType, array $payload): OrderNotificationEntity
     {
         return (new OrderNotificationEntity())
+            ->setCreatedAt(new \DateTime($payload['created_at']))
             ->setOrderId($orderId)
             ->setNotificationType($notificationType)
             ->setPayload($payload)

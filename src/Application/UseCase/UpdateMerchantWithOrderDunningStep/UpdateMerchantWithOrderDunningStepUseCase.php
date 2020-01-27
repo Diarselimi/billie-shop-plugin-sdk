@@ -3,6 +3,7 @@
 namespace App\Application\UseCase\UpdateMerchantWithOrderDunningStep;
 
 use App\Application\Exception\OrderNotFoundException;
+use App\DomainEvent\Order\OrderEventPayloadFactory;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderNotification\NotificationScheduler;
 use App\DomainModel\OrderNotification\OrderNotificationEntity;
@@ -17,12 +18,16 @@ class UpdateMerchantWithOrderDunningStepUseCase implements LoggingInterface
 
     private $notificationScheduler;
 
+    private $orderEventPayloadFactory;
+
     public function __construct(
         OrderRepositoryInterface $orderRepository,
-        NotificationScheduler $notificationScheduler
+        NotificationScheduler $notificationScheduler,
+        OrderEventPayloadFactory $orderEventPayloadFactory
     ) {
         $this->orderRepository = $orderRepository;
         $this->notificationScheduler = $notificationScheduler;
+        $this->orderEventPayloadFactory = $orderEventPayloadFactory;
     }
 
     public function execute(UpdateMerchantWithOrderDunningStepRequest $request): void
@@ -45,10 +50,7 @@ class UpdateMerchantWithOrderDunningStepUseCase implements LoggingInterface
         $this->notificationScheduler->createAndSchedule(
             $order,
             OrderNotificationEntity::NOTIFICATION_TYPE_DCI_COMMUNICATION,
-            [
-                'event' => $request->getStep(),
-                'order_id' => $order->getExternalCode(),
-            ]
+            $this->orderEventPayloadFactory->create($order, OrderNotificationEntity::NOTIFICATION_TYPE_DCI_COMMUNICATION)
         );
     }
 }

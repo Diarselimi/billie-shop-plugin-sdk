@@ -3,7 +3,6 @@
 namespace App\DomainEvent\Order;
 
 use App\Amqp\Producer\DelayedMessageProducer;
-use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderNotification\NotificationScheduler;
@@ -30,18 +29,18 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
 
     private $delayedMessageProducer;
 
-    private $orderDeclinedReasonsMapper;
+    private $orderEventPayloadFactory;
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         NotificationScheduler $notificationScheduler,
         DelayedMessageProducer $delayedMessageProducer,
-        OrderDeclinedReasonsMapper $orderDeclinedReasonsMapper
+        OrderEventPayloadFactory $orderEventPayloadFactory
     ) {
         $this->orderRepository = $orderRepository;
         $this->notificationScheduler = $notificationScheduler;
         $this->delayedMessageProducer = $delayedMessageProducer;
-        $this->orderDeclinedReasonsMapper = $orderDeclinedReasonsMapper;
+        $this->orderEventPayloadFactory = $orderEventPayloadFactory;
     }
 
     public static function getSubscribedEvents()
@@ -177,10 +176,7 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
         $this->notificationScheduler->createAndSchedule(
             $order,
             $notificationType,
-            [
-                'event' => $notificationType,
-                'order_id' => $order->getExternalCode(),
-            ]
+            $this->orderEventPayloadFactory->create($order, $notificationType)
         );
     }
 }

@@ -4,8 +4,7 @@ namespace spec\App\Application\UseCase\OrderOutstandingAmountChange;
 
 use App\Application\UseCase\OrderOutstandingAmountChange\OrderOutstandingAmountChangeRequest;
 use App\Application\UseCase\OrderOutstandingAmountChange\OrderOutstandingAmountChangeUseCase;
-use App\DomainModel\OrderNotification\OrderNotificationEntity;
-use App\DomainModel\Payment\OrderAmountChangeDTO;
+use App\DomainEvent\Order\OrderEventPayloadFactory;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
@@ -15,7 +14,9 @@ use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderNotification\NotificationScheduler;
+use App\DomainModel\OrderNotification\OrderNotificationEntity;
 use App\DomainModel\OrderPayment\OrderPaymentForgivenessService;
+use App\DomainModel\Payment\OrderAmountChangeDTO;
 use Billie\MonitoringBundle\Service\Alerting\Sentry\Raven\RavenClient;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -39,6 +40,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         MerchantDebtorLimitsService $limitsService,
         OrderPaymentForgivenessService $paymentForgivenessService,
         OrderStateManager $orderStateManager,
+        OrderEventPayloadFactory $orderEventPayloadFactory,
         OrderContainer $orderContainer,
         OrderEntity $order,
         OrderAmountChangeDTO $amountChange,
@@ -69,22 +71,29 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         OrderEntity $order,
         OrderAmountChangeDTO $amountChange,
         OrderContainer $orderContainer,
-        OrderOutstandingAmountChangeRequest $request
+        OrderOutstandingAmountChangeRequest $request,
+        OrderEventPayloadFactory $orderEventPayloadFactory
     ) {
         $amountChange->isPayment()->shouldBeCalledOnce()->willReturn(true);
         $eventPayload = [
             'event' => 'payment',
             'order_id' => 'ABCD123',
+            'order_uuid' => 'ABCD123123',
             'amount' => 75,
             'open_amount' => 25,
         ];
+
+        $orderEventPayloadFactory->create(
+            $order,
+            OrderNotificationEntity::NOTIFICATION_TYPE_PAYMENT,
+            ['amount' => 75, 'open_amount' => 25]
+        )->willReturn($eventPayload);
 
         $order->getAmountForgiven()->shouldBeCalledOnce()->willReturn(0);
         $orderContainerFactory
             ->createFromPaymentId(self::TICKET_ID)
             ->shouldBeCalled()
-            ->willReturn($orderContainer)
-        ;
+            ->willReturn($orderContainer);
 
         $orderContainer->getMerchant()->shouldBeCalledOnce()->willReturn($merchant);
 
@@ -98,8 +107,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
                 $eventPayload
             )
             ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
 
         $paymentForgivenessService->begForgiveness($orderContainer, $amountChange)->shouldBeCalledOnce()->willReturn(true);
         $orderStateManager->wasShipped($order)->shouldBeCalledOnce()->willReturn(true);
@@ -120,13 +128,13 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         OrderEntity $order,
         OrderAmountChangeDTO $amountChange,
         OrderContainer $orderContainer,
-        OrderOutstandingAmountChangeRequest $request
+        OrderOutstandingAmountChangeRequest $request,
+        OrderEventPayloadFactory $orderEventPayloadFactory
     ) {
         $orderContainerFactory
             ->createFromPaymentId(self::TICKET_ID)
             ->shouldBeCalled()
-            ->willReturn($orderContainer)
-        ;
+            ->willReturn($orderContainer);
 
         $amountChange->isPayment()->shouldBeCalledOnce()->willReturn(true);
         $amountChange->getOutstandingAmount()->willReturn(0);
@@ -137,6 +145,12 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
             'amount' => 75,
             'open_amount' => 0,
         ];
+
+        $orderEventPayloadFactory->create(
+            $order,
+            OrderNotificationEntity::NOTIFICATION_TYPE_PAYMENT,
+            ['amount' => 75, 'open_amount' => 0]
+        )->willReturn($eventPayload);
 
         $order->getAmountForgiven()->shouldBeCalledOnce()->willReturn(0);
         $orderContainer->getMerchant()->shouldBeCalledOnce()->willReturn($merchant);
@@ -154,8 +168,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
                 $eventPayload
             )
             ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
 
         $paymentForgivenessService->begForgiveness($orderContainer, $amountChange)->shouldBeCalledOnce()->willReturn(true);
         $orderStateManager->complete($orderContainer)->shouldBeCalledOnce();
@@ -179,8 +192,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         $orderContainerFactory
             ->createFromPaymentId(self::TICKET_ID)
             ->shouldBeCalled()
-            ->willReturn($orderContainer)
-        ;
+            ->willReturn($orderContainer);
 
         $order->getState()->willReturn('complete');
         $orderStateManager->wasShipped($order)->shouldBeCalledOnce()->willReturn(false);
@@ -211,8 +223,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         $orderContainerFactory
             ->createFromPaymentId(self::TICKET_ID)
             ->shouldBeCalled()
-            ->willThrow(OrderContainerFactoryException::class)
-        ;
+            ->willThrow(OrderContainerFactoryException::class);
 
         $limitsService->unlock($orderContainer, self::AMOUNT_CHANGE)->shouldNotBeCalled();
         $merchantRepository->update($orderContainer->getMerchant())->shouldNotBeCalled();
@@ -240,8 +251,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         $orderContainerFactory
             ->createFromPaymentId(self::TICKET_ID)
             ->shouldBeCalled()
-            ->willReturn($orderContainer)
-        ;
+            ->willReturn($orderContainer);
 
         $order->getAmountForgiven()->shouldBeCalledTimes(2)->willReturn(0.01);
 
@@ -276,8 +286,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         $orderContainerFactory
             ->createFromPaymentId(self::TICKET_ID)
             ->shouldBeCalled()
-            ->willReturn($orderContainer)
-        ;
+            ->willReturn($orderContainer);
 
         $orderContainer->getMerchant()->shouldBeCalledOnce()->willReturn($merchant);
 
