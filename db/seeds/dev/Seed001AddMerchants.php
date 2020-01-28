@@ -1,7 +1,9 @@
 <?php
 
+use App\DomainModel\MerchantOnboarding\MerchantOnboardingEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntityFactory;
+use App\Infrastructure\Repository\MerchantOnboarding\MerchantOnboardingRepository;
 use Phinx\Seed\AbstractSeed;
 
 class Seed001AddMerchants extends AbstractSeed
@@ -35,6 +37,7 @@ class Seed001AddMerchants extends AbstractSeed
         $scoreThresholdsId = $this->createDefaultScoreSettings($now);
         $this->createDefaultSettingsForAllMerchants($now, $scoreThresholdsId);
         $this->createRiskCheckSettings($now, $merchantId);
+        $this->createDefaultOnboarding($merchantId, MerchantOnboardingEntity::STATE_COMPLETE);
     }
 
     private function createRiskCheckSettings(string $now, int $merchantId)
@@ -103,5 +106,16 @@ class Seed001AddMerchants extends AbstractSeed
         $result = $stmt ? $stmt->fetch() : null;
 
         return !!$result;
+    }
+
+    private function createDefaultOnboarding(int $merchantId, string $state)
+    {
+        $table = MerchantOnboardingRepository::TABLE_NAME;
+        $dateTime = (new DateTime())->format('Y-m-d H:i:s');
+
+        $this->execute("
+            INSERT INTO {$table} (`uuid`, `merchant_id`, `state`, `created_at`, `updated_at`)
+                VALUES (UUID(), {$merchantId}, '{$state}', '{$dateTime}', '{$dateTime}');
+        ");
     }
 }
