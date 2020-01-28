@@ -1893,6 +1893,36 @@ paths:
           oauth2: []
       x-groups:
         - private
+  '/merchant/signatory-powers/{token}':
+    get:
+      tags:
+        - 'Dashboard Merchants'
+      summary: 'Get Signatory Power Details'
+      operationId: get_signatory_power_details
+      parameters:
+        -
+          name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetSignatoryPowerDetailsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      x-groups:
+        - private
   /merchant/signatory-powers:
     get:
       tags:
@@ -2300,6 +2330,42 @@ paths:
           oauth2: []
       x-groups:
         - private
+  '/merchant/signatory-powers/{token}/start-identity-verification':
+    post:
+      tags:
+        - 'Dashboard Merchants'
+      summary: 'Start External Identity Verification'
+      operationId: start_external_identity_verification
+      parameters:
+        -
+          name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartIdentityVerificationRedirects'
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartIdentityVerificationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      x-groups:
+        - private
   /merchant/user/start-identity-verification:
     post:
       tags:
@@ -2311,7 +2377,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/StartIdentityVerificationRequest'
+              $ref: '#/components/schemas/StartIdentityVerificationRedirects'
       responses:
         '200':
           description: 'Successful response'
@@ -3064,6 +3130,57 @@ components:
             type: object
           nullable: false
       type: object
+    GetSignatoryPowerDetailsResponse:
+      properties:
+        merchant_name:
+          type: string
+          example: 'Example GmbH'
+        identity_verification_url:
+          type: string
+          format: url
+      type: object
+    GetSignatoryPowersResponse:
+      title: 'Signatory Powers Response'
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        first_name:
+          example: 'Person Name'
+          $ref: '#/components/schemas/TinyText'
+        last_name:
+          example: 'Last name'
+          $ref: '#/components/schemas/TinyText'
+        additional_signatories_required:
+          type: int
+          example: 2
+        address_house:
+          example: '4'
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        address_street:
+          example: Charlottenstr.
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        address_city:
+          example: Berlin
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        address_postal_code:
+          type: string
+          maxLength: 5
+          example: '10969'
+          nullable: true
+        address_country:
+          type: string
+          maxLength: 2
+          example: DE
+          nullable: true
+        automatically_identified_as_user:
+          type: boolean
+          maxLength: 2
+          example: 'false'
+          nullable: true
+      type: object
     MarkDuplicateDebtorItem:
       required:
         - debtor_id
@@ -3273,7 +3390,7 @@ components:
             $ref: '#/components/schemas/SignatoryPowerDTO'
           nullable: false
       type: object
-    StartIdentityVerificationRequest:
+    StartIdentityVerificationRedirects:
       required:
         - redirect_url_coupon_requested
         - redirect_url_review_pending
@@ -3328,48 +3445,6 @@ components:
           description: 'Order external code'
           example: DE123456-1
           $ref: '#/components/schemas/TinyText'
-      type: object
-    GetSignatoryPowersResponse:
-      title: 'Signatory Powers Response'
-      properties:
-        uuid:
-          $ref: '#/components/schemas/UUID'
-        first_name:
-          example: 'Person Name'
-          $ref: '#/components/schemas/TinyText'
-        last_name:
-          example: 'Last name'
-          $ref: '#/components/schemas/TinyText'
-        additional_signatories_required:
-          type: int
-          example: 2
-        address_house:
-          example: '4'
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        address_street:
-          example: Charlottenstr.
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        address_city:
-          example: Berlin
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        address_postal_code:
-          type: string
-          maxLength: 5
-          example: '10969'
-          nullable: true
-        address_country:
-          type: string
-          maxLength: 2
-          example: DE
-          nullable: true
-        automatically_identified_as_user:
-          type: boolean
-          maxLength: 2
-          example: 'false'
-          nullable: true
       type: object
     MerchantEntity:
       properties:

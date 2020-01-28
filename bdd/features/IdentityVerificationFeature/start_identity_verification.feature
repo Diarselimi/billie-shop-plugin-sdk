@@ -16,6 +16,7 @@ Feature: API endpoint for "POST /merchant/user/start-identity-verification" (tic
     Given a merchant user exists with permission FOOBAR
     And I get from Oauth service a valid user token
     And I add "Authorization" header equal to "Bearer someToken"
+    And I get from companies service an HTTP 204 response from POST "/signatory-powers/assign-identity-verification"
     When I send a POST request to "/merchant/user/start-identity-verification"
     Then the JSON response should be:
     """
@@ -28,6 +29,7 @@ Feature: API endpoint for "POST /merchant/user/start-identity-verification" (tic
     And I get from Oauth service a valid user token
     And I get from Oauth service revoke token endpoint a successful response
     And I add "Authorization" header equal to "Bearer SomeTokenHere"
+    And I get from companies service an HTTP 204 response from POST "/signatory-powers/assign-identity-verification"
     When I send a POST request to "/merchant/user/start-identity-verification" with body:
     """
      {}
@@ -61,6 +63,7 @@ Feature: API endpoint for "POST /merchant/user/start-identity-verification" (tic
     And I get from Oauth service a valid user token
     And I get from Oauth service revoke token endpoint a successful response
     And I add "Authorization" header equal to "Bearer SomeTokenHere"
+    And I get from companies service an HTTP 204 response from POST "/signatory-powers/assign-identity-verification"
     When I send a POST request to "/merchant/user/start-identity-verification" with body:
     """
      {
@@ -98,7 +101,8 @@ Feature: API endpoint for "POST /merchant/user/start-identity-verification" (tic
     And I get from Oauth service a valid user token
     And I get from Oauth service revoke token endpoint a successful response
     And I add "Authorization" header equal to "Bearer SomeTokenHere"
-    And I get from webapp API an HTTP 500 call to POST "/sdk/identity-verification" with body:
+    And I get from companies service an HTTP 204 response from POST "/signatory-powers/assign-identity-verification"
+    And I get from webapp API an HTTP 500 call to POST "/sdk/identity-verification.json" with body:
     """
      {"error":"whatever"}
     """
@@ -117,7 +121,8 @@ Feature: API endpoint for "POST /merchant/user/start-identity-verification" (tic
     And I get from Oauth service a valid user token
     And I get from Oauth service revoke token endpoint a successful response
     And I add "Authorization" header equal to "Bearer SomeTokenHere"
-    And I get from webapp API an HTTP 200 call to POST "/sdk/identity-verification" with body:
+    And I get from companies service an HTTP 204 response from POST "/signatory-powers/assign-identity-verification"
+    And I get from webapp API an HTTP 200 call to POST "/sdk/identity-verification.json" with body:
     """
      {"foo":"bar"}
     """
@@ -158,7 +163,8 @@ Feature: API endpoint for "POST /merchant/user/start-identity-verification" (tic
     And I get from Oauth service a valid user token
     And I get from Oauth service revoke token endpoint a successful response
     And I add "Authorization" header equal to "Bearer SomeTokenHere"
-    And I get from webapp API an HTTP 200 call to POST "/sdk/identity-verification" with body:
+    And I get from companies service an HTTP 204 response from POST "/signatory-powers/assign-identity-verification"
+    And I get from webapp API an HTTP 200 call to POST "/sdk/identity-verification.json" with body:
     """
      {"data":{"uuid":"a9062fa9-053e-455f-9908-f92bffe48b65", "url":"http://localhost/postident"}}
     """

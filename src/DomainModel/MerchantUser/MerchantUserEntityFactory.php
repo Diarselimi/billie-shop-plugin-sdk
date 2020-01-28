@@ -18,6 +18,7 @@ class MerchantUserEntityFactory
             ->setUuid($row['user_id'])
             ->setMerchantId($row['merchant_id'])
             ->setSignatoryPowerUuid($row['signatory_power_uuid'])
+            ->setIdentityVerificationCaseUuid($row['identity_verification_case_uuid'])
             ->setRoleId($row['role_id'])
             ->setFirstName($row['first_name'])
             ->setLastName($row['last_name'])

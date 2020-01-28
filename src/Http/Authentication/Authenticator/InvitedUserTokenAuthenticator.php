@@ -39,7 +39,7 @@ class InvitedUserTokenAuthenticator extends AbstractAuthenticator
             throw new AuthenticationException();
         }
 
-        $merchant = $this->getActiveMerchantOrFail($invitation->getMerchantId());
+        $merchant = $this->assertValidMerchant($this->merchantRepository->getOneById($invitation->getMerchantId()));
 
         return new InvitedUser($merchant, $invitation);
     }

@@ -210,4 +210,20 @@ class CompaniesServiceContext implements Context
     {
         $this->mockRequest('/debtors', new MockResponse($body->__toString()));
     }
+
+    /**
+     * @Given I get from companies service an HTTP :status response from :method :endpoint with body:
+     */
+    public function iGetFromCompaniesASuccessfulResponseWithBody($status, $method, $endpoint, PyStringNode $body)
+    {
+        $this->mockRequest($endpoint, new MockResponse($body->__toString(), [], (int) $status));
+    }
+
+    /**
+     * @Given I get from companies service an HTTP :status response from :method :endpoint
+     */
+    public function iGetFromCompaniesASuccessfulResponse($status, $method, $endpoint)
+    {
+        $this->mockRequest($endpoint, new MockResponse('{}', [], (int) $status));
+    }
 }

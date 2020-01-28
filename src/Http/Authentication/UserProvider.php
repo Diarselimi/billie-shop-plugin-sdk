@@ -57,4 +57,9 @@ class UserProvider
     {
         return $this->getUserOfType(MerchantUser::class);
     }
+
+    public function getSignatoryPowerTokenUser(): ?SignatoryPowerTokenUser
+    {
+        return $this->getUserOfType(SignatoryPowerTokenUser::class);
+    }
 }

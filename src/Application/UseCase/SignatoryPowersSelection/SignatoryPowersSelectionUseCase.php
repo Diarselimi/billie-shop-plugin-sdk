@@ -60,9 +60,24 @@ class SignatoryPowersSelectionUseCase implements ValidatedUseCaseInterface
         $loggedInSignatory = $selectionsRequest->findSelectedAsLoggedInSignatory();
         if ($loggedInSignatory) {
             $this->merchantUserRepository->assignSignatoryPowerToUser(
-                $selectionsRequest->getMerchantUserId(),
+                $selectionsRequest->getMerchantUser()->getId(),
                 $loggedInSignatory->getUuid()
             );
+
+            if ($selectionsRequest->getMerchantUser()->getIdentityVerificationCaseUuid()) {
+                $this->companiesService->assignIdentityVerificationCase(
+                    $selectionsRequest->getMerchantUser()->getIdentityVerificationCaseUuid(),
+                    $loggedInSignatory->getUuid()
+                );
+            }
+
+            if (count($selectionsRequest->getSignatoryPowers()) === 1) {
+                $this->stepTransitionService->transition(
+                    MerchantOnboardingStepEntity::STEP_SIGNATORY_CONFIRMATION,
+                    MerchantOnboardingStepTransitionEntity::TRANSITION_COMPLETE,
+                    $selectionsRequest->getMerchantPaymentUuid()
+                );
+            }
         }
     }
 }

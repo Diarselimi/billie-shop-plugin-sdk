@@ -2,9 +2,9 @@
 
 namespace App\DomainModel\DebtorCompany;
 
-use App\DomainModel\SignatoryPowersSelection\SignatoryPowerDTO;
-use App\DomainModel\GetSignatoryPowers\GetSignatoryPowerDTO;
 use App\DomainModel\MerchantDebtor\MerchantDebtorDuplicateDTO;
+use App\DomainModel\SignatoryPower\SignatoryPowerDTO;
+use App\DomainModel\SignatoryPower\SignatoryPowerSelectionDTO;
 
 interface CompaniesServiceInterface
 {
@@ -37,10 +37,16 @@ interface CompaniesServiceInterface
     public function getDebtors(array $debtorIds): array;
 
     /**
-     * @param  string                 $companyIdentifier
-     * @return GetSignatoryPowerDTO[]
+     * @param  string              $companyIdentifier
+     * @return SignatoryPowerDTO[]
      */
     public function getSignatoryPowers(string $companyIdentifier): array;
 
-    public function saveSelectedSignatoryPowers(string $companyIdentifier, SignatoryPowerDTO ...$signatoryPowerDTOs);
+    public function saveSelectedSignatoryPowers(string $companyIdentifier, SignatoryPowerSelectionDTO ...$signatoryPowerDTOs);
+
+    public function getSignatoryPowerDetails(string $token): ?SignatoryPowerDTO;
+
+    public function acceptSignatoryPowerTc(string $signatoryPowerUuid): void;
+
+    public function assignIdentityVerificationCase(string $caseUuid, string $signatoryPowerUuid): void;
 }

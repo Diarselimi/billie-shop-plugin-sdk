@@ -51,6 +51,15 @@ security:
                 authenticators:
                     - App\Http\Authentication\Authenticator\InvitedUserTokenAuthenticator
 
+        signatory_power_token:
+            pattern: ^/(public/)?merchant/signatory-powers/.*(/(start-identity-verification))?
+            methods: [GET, POST, OPTIONS]
+            anonymous: false
+            stateless: true
+            guard:
+                authenticators:
+                    - App\Http\Authentication\Authenticator\SignatoryPowerTokenAuthenticator
+
         default_security:
             anonymous: false
             stateless: true

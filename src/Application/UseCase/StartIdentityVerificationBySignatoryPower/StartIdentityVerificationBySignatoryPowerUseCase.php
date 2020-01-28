@@ -2,23 +2,18 @@
 
 declare(strict_types=1);
 
-namespace App\Application\UseCase\StartIdentityVerification;
+namespace App\Application\UseCase\StartIdentityVerificationBySignatoryPower;
 
-use App\Application\Exception\MerchantOnboardingStepTransitionException;
-use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\StartIdentityVerificationResponse;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\IdentityVerification\IdentityVerificationServiceException;
 use App\DomainModel\IdentityVerification\IdentityVerificationServiceInterface;
 use App\DomainModel\IdentityVerification\IdentityVerificationStartRequestDTO;
-use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepEntity;
-use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepNotFoundException;
-use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepTransitionEntity;
 use App\DomainModel\MerchantOnboarding\MerchantStepTransitionService;
 use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
 
-class StartIdentityVerificationUseCase implements ValidatedUseCaseInterface
+class StartIdentityVerificationBySignatoryPowerUseCase implements ValidatedUseCaseInterface
 {
     use ValidatedUseCaseTrait;
 
@@ -38,18 +33,12 @@ class StartIdentityVerificationUseCase implements ValidatedUseCaseInterface
         $this->stepTransitionService = $stepTransitionService;
     }
 
-    public function execute(StartIdentityVerificationRequest $request): StartIdentityVerificationResponse
+    public function execute(StartIdentityVerificationBySignatoryPowerRequest $request): StartIdentityVerificationResponse
     {
         $this->validateRequest($request);
 
-        try {
-            $this->stepTransitionService->transition(
-                MerchantOnboardingStepEntity::STEP_IDENTITY_VERIFICATION,
-                MerchantOnboardingStepTransitionEntity::TRANSITION_REQUEST_CONFIRMATION,
-                $request->getMerchantPaymentUuid()
-            );
-        } catch (MerchantOnboardingStepNotFoundException | WorkflowException $exception) {
-            throw new MerchantOnboardingStepTransitionException();
+        if ($request->getSignatoryPowerDTO()->isIdentityVerified()) {
+            throw new SignatoryPowerAlreadyIdentifiedException();
         }
 
         $identificationRequest = $this->buildIdentityVerificationStartRequestDTO($request);
@@ -57,27 +46,21 @@ class StartIdentityVerificationUseCase implements ValidatedUseCaseInterface
         try {
             $identificationResponse = $this->identityVerificationService->startVerificationCase($identificationRequest);
         } catch (IdentityVerificationServiceException $exception) {
-            throw new StartIdentityVerificationException();
+            throw new StartIdentityVerificationBySignatoryPowerException();
         }
 
         return new StartIdentityVerificationResponse($identificationResponse->getUrl());
     }
 
-    private function buildIdentityVerificationStartRequestDTO(StartIdentityVerificationRequest $request): IdentityVerificationStartRequestDTO
+    private function buildIdentityVerificationStartRequestDTO(StartIdentityVerificationBySignatoryPowerRequest $request): IdentityVerificationStartRequestDTO
     {
-        $identificationRequest = (new IdentityVerificationStartRequestDTO())
-            ->setMerchantUserId($request->getMerchantUserId())
-            ->setFirstName($request->getFirstName())
-            ->setLastName($request->getLastName())
-            ->setEmail($request->getEmail())
+        return (new IdentityVerificationStartRequestDTO())
+            ->setSignatoryPowerUuid($request->getSignatoryPowerDTO()->getUuid())
+            ->setFirstName($request->getSignatoryPowerDTO()->getFirstName())
+            ->setLastName($request->getSignatoryPowerDTO()->getLastName())
+            ->setEmail($request->getSignatoryPowerDTO()->getEmail())
             ->setRedirectUrlCouponRequested($request->getRedirectUrlCouponRequested())
             ->setRedirectUrlReviewPending($request->getRedirectUrlReviewPending())
             ->setRedirectUrlDeclined($request->getRedirectUrlDeclined());
-
-        if ($request->getSignatoryPowerUuid()) {
-            $identificationRequest->setSignatoryPowerUuid($request->getSignatoryPowerUuid());
-        }
-
-        return $identificationRequest;
     }
 }

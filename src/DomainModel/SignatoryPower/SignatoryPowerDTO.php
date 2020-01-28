@@ -1,16 +1,18 @@
 <?php
 
-namespace App\DomainModel\GetSignatoryPowers;
+namespace App\DomainModel\SignatoryPower;
 
-class GetSignatoryPowerDTO
+class SignatoryPowerDTO
 {
     private $uuid;
+
+    private $companyUuid;
 
     private $firstName;
 
     private $lastName;
 
-    private $additionalSignatoriesRequired;
+    private $email;
 
     private $addressHouse;
 
@@ -22,6 +24,12 @@ class GetSignatoryPowerDTO
 
     private $addressCountry;
 
+    private $additionalSignatoriesRequired;
+
+    private $isIdentityVerified;
+
+    private $identityVerificationUrl;
+
     private $automaticallyIdentifiedAsUser;
 
     public function getUuid(): string
@@ -29,7 +37,7 @@ class GetSignatoryPowerDTO
         return $this->uuid;
     }
 
-    public function setUuid(string $uuid): GetSignatoryPowerDTO
+    public function setUuid(string $uuid): SignatoryPowerDTO
     {
         $this->uuid = $uuid;
 
@@ -41,7 +49,7 @@ class GetSignatoryPowerDTO
         return $this->firstName;
     }
 
-    public function setFirstName(string $firstName): GetSignatoryPowerDTO
+    public function setFirstName(string $firstName): SignatoryPowerDTO
     {
         $this->firstName = $firstName;
 
@@ -53,9 +61,21 @@ class GetSignatoryPowerDTO
         return $this->lastName;
     }
 
-    public function setLastName(string $lastName): GetSignatoryPowerDTO
+    public function setLastName(string $lastName): SignatoryPowerDTO
     {
         $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): SignatoryPowerDTO
+    {
+        $this->email = $email;
 
         return $this;
     }
@@ -65,7 +85,7 @@ class GetSignatoryPowerDTO
         return $this->additionalSignatoriesRequired;
     }
 
-    public function setAdditionalSignatoriesRequired(int $additionalSignatoriesRequired): GetSignatoryPowerDTO
+    public function setAdditionalSignatoriesRequired(int $additionalSignatoriesRequired): SignatoryPowerDTO
     {
         $this->additionalSignatoriesRequired = $additionalSignatoriesRequired;
 
@@ -77,7 +97,7 @@ class GetSignatoryPowerDTO
         return $this->addressHouse;
     }
 
-    public function setAddressHouse(?string $addressHouse): GetSignatoryPowerDTO
+    public function setAddressHouse(?string $addressHouse): SignatoryPowerDTO
     {
         $this->addressHouse = $addressHouse;
 
@@ -89,7 +109,7 @@ class GetSignatoryPowerDTO
         return $this->addressStreet;
     }
 
-    public function setAddressStreet(?string $addressStreet): GetSignatoryPowerDTO
+    public function setAddressStreet(?string $addressStreet): SignatoryPowerDTO
     {
         $this->addressStreet = $addressStreet;
 
@@ -101,7 +121,7 @@ class GetSignatoryPowerDTO
         return $this->addressCity;
     }
 
-    public function setAddressCity(?string $addressCity): GetSignatoryPowerDTO
+    public function setAddressCity(?string $addressCity): SignatoryPowerDTO
     {
         $this->addressCity = $addressCity;
 
@@ -113,7 +133,7 @@ class GetSignatoryPowerDTO
         return $this->addressPostalCode;
     }
 
-    public function setAddressPostalCode(?string $addressPostalCode): GetSignatoryPowerDTO
+    public function setAddressPostalCode(?string $addressPostalCode): SignatoryPowerDTO
     {
         $this->addressPostalCode = $addressPostalCode;
 
@@ -125,7 +145,7 @@ class GetSignatoryPowerDTO
         return $this->addressCountry;
     }
 
-    public function setAddressCountry(?string $addressCountry): GetSignatoryPowerDTO
+    public function setAddressCountry(?string $addressCountry): SignatoryPowerDTO
     {
         $this->addressCountry = $addressCountry;
 
@@ -137,9 +157,45 @@ class GetSignatoryPowerDTO
         return $this->automaticallyIdentifiedAsUser;
     }
 
-    public function setAutomaticallyIdentifiedAsUser(bool $automaticallyIdentifiedAsUser): GetSignatoryPowerDTO
+    public function setAutomaticallyIdentifiedAsUser(bool $automaticallyIdentifiedAsUser): SignatoryPowerDTO
     {
         $this->automaticallyIdentifiedAsUser = $automaticallyIdentifiedAsUser;
+
+        return $this;
+    }
+
+    public function getCompanyUuid(): ?string
+    {
+        return $this->companyUuid;
+    }
+
+    public function setCompanyUuid(?string $companyUuid): SignatoryPowerDTO
+    {
+        $this->companyUuid = $companyUuid;
+
+        return $this;
+    }
+
+    public function isIdentityVerified(): bool
+    {
+        return $this->isIdentityVerified;
+    }
+
+    public function setIsIdentityVerified(bool $isIdentityVerified): SignatoryPowerDTO
+    {
+        $this->isIdentityVerified = $isIdentityVerified;
+
+        return $this;
+    }
+
+    public function getIdentityVerificationUrl(): ?string
+    {
+        return $this->identityVerificationUrl;
+    }
+
+    public function setIdentityVerificationUrl(?string $identityVerificationUrl): SignatoryPowerDTO
+    {
+        $this->identityVerificationUrl = $identityVerificationUrl;
 
         return $this;
     }

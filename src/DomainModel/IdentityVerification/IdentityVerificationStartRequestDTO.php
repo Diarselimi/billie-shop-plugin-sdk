@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\DomainModel\IdentityVerification;
 
-use App\DomainModel\ArrayableInterface;
-
-class IdentityVerificationStartRequestDTO implements ArrayableInterface
+class IdentityVerificationStartRequestDTO
 {
     private $firstName;
 
@@ -19,6 +17,10 @@ class IdentityVerificationStartRequestDTO implements ArrayableInterface
     private $redirectUrlReviewPending;
 
     private $redirectUrlDeclined;
+
+    private $merchantUserId;
+
+    private $signatoryPowerUuid;
 
     public function getFirstName(): string
     {
@@ -92,15 +94,27 @@ class IdentityVerificationStartRequestDTO implements ArrayableInterface
         return $this;
     }
 
-    public function toArray(): array
+    public function getMerchantUserId(): ?int
     {
-        return [
-            'first_name' => $this->getFirstName(),
-            'last_name' => $this->getLastName(),
-            'email' => $this->getEmail(),
-            'redirect_url_coupon_requested' => $this->getRedirectUrlCouponRequested(),
-            'redirect_url_review_pending' => $this->getRedirectUrlReviewPending(),
-            'redirect_url_declined' => $this->getRedirectUrlDeclined(),
-        ];
+        return $this->merchantUserId;
+    }
+
+    public function setMerchantUserId(?int $merchantUserId): IdentityVerificationStartRequestDTO
+    {
+        $this->merchantUserId = $merchantUserId;
+
+        return $this;
+    }
+
+    public function getSignatoryPowerUuid(): ?string
+    {
+        return $this->signatoryPowerUuid;
+    }
+
+    public function setSignatoryPowerUuid(string $signatoryPowerUuid): IdentityVerificationStartRequestDTO
+    {
+        $this->signatoryPowerUuid = $signatoryPowerUuid;
+
+        return $this;
     }
 }

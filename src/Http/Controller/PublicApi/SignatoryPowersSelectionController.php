@@ -6,7 +6,7 @@ use App\Application\Exception\MerchantOnboardingStepTransitionException;
 use App\Application\UseCase\SignatoryPowersSelection\SignatoryPowersSelectionException;
 use App\Application\UseCase\SignatoryPowersSelection\SignatoryPowersSelectionRequest;
 use App\Application\UseCase\SignatoryPowersSelection\SignatoryPowersSelectionUseCase;
-use App\DomainModel\SignatoryPowersSelection\SignatoryPowerDTO;
+use App\DomainModel\SignatoryPower\SignatoryPowerSelectionDTO;
 use App\Http\Authentication\UserProvider;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -53,18 +53,18 @@ class SignatoryPowersSelectionController
     public function execute(Request $request): void
     {
         $requestDTOs = array_map(function (array $data) {
-            return (new SignatoryPowerDTO())
+            return (new SignatoryPowerSelectionDTO())
                 ->setUuid($data['uuid'] ?? null)
                 ->setEmail($data['email'] ?? null)
                 ->setIsIdentifiedAsUser($data['is_identified_as_user'] ?? false);
-        }, $request->request->get('signatory_powers', []));
+        }, (array) $request->request->get('signatory_powers', []));
 
         $merchantPaymentUuid = $this->userProvider->getMerchantUser()->getMerchant()->getPaymentUuid();
         $companyId = $this->userProvider->getMerchantUser()->getMerchant()->getCompanyId();
-        $merchantUserId = $this->userProvider->getMerchantUser()->getUserEntity()->getId();
+        $merchantUser = $this->userProvider->getMerchantUser()->getUserEntity();
 
         try {
-            $this->useCase->execute(new SignatoryPowersSelectionRequest($merchantUserId, $companyId, $merchantPaymentUuid, ...$requestDTOs));
+            $this->useCase->execute(new SignatoryPowersSelectionRequest($merchantUser, $companyId, $merchantPaymentUuid, ...$requestDTOs));
         } catch (SignatoryPowersSelectionException $exception) {
             throw new BadRequestHttpException();
         } catch (MerchantOnboardingStepTransitionException $exception) {

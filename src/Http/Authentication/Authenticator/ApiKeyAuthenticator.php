@@ -23,9 +23,9 @@ class ApiKeyAuthenticator extends AbstractAuthenticator
         return $request->headers->get(HttpConstantsInterface::REQUEST_HEADER_API_KEY);
     }
 
-    public function getUser($credentials, UserProviderInterface $userProvider)
+    public function getUser($apiKey, UserProviderInterface $userProvider)
     {
-        $merchant = $this->getActiveMerchantOrFail(null, $credentials);
+        $merchant = $this->assertValidMerchant($this->merchantRepository->getOneByApiKey($apiKey));
 
         return new MerchantApiUser($merchant);
     }

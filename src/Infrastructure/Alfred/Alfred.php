@@ -9,10 +9,10 @@ use App\DomainModel\DebtorCompany\DebtorCompanyFactory;
 use App\DomainModel\DebtorCompany\DebtorCreationDTO;
 use App\DomainModel\DebtorCompany\IdentifyDebtorRequestDTO;
 use App\DomainModel\DebtorCompany\IsEligibleForPayAfterDeliveryRequestDTO;
-use App\DomainModel\GetSignatoryPowers\GetSignatoryPowerDTO;
-use App\DomainModel\GetSignatoryPowers\SignatoryPowerDTOFactory;
 use App\DomainModel\MerchantDebtor\MerchantDebtorDuplicateDTO;
-use App\DomainModel\SignatoryPowersSelection\SignatoryPowerDTO;
+use App\DomainModel\SignatoryPower\SignatoryPowerDTO;
+use App\DomainModel\SignatoryPower\SignatoryPowerDTOFactory;
+use App\DomainModel\SignatoryPower\SignatoryPowerSelectionDTO;
 use App\Infrastructure\ClientResponseDecodeException;
 use App\Infrastructure\DecodeResponseTrait;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
@@ -223,7 +223,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
     }
 
     /**
-     * @return GetSignatoryPowerDTO[]
+     * @return SignatoryPowerDTO[]
      * @throws CompaniesServiceRequestException
      */
     public function getSignatoryPowers(string $companyIdentifier): array
@@ -237,9 +237,49 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         return $this->signatoryPowersDTOFactory->createFromArrayCollection($this->decodeResponse($response));
     }
 
-    public function saveSelectedSignatoryPowers(string $companyIdentifier, SignatoryPowerDTO ...$signatoryPowerDTOs)
+    public function getSignatoryPowerDetails(string $token): ?SignatoryPowerDTO
     {
-        $requestData['signatory_powers'] = array_map(function (SignatoryPowerDTO $signatoryPowerDTO) {
+        try {
+            $response = $this->client->get("/signatory-powers/{$token}");
+        } catch (ClientException $exception) {
+            if ($exception->getCode() === Response::HTTP_NOT_FOUND) {
+                return null;
+            }
+
+            throw new CompaniesServiceRequestException($exception);
+        } catch (TransferException $exception) {
+            throw new CompaniesServiceRequestException($exception);
+        }
+
+        return $this->signatoryPowersDTOFactory->createFromArray($this->decodeResponse($response));
+    }
+
+    public function acceptSignatoryPowerTc(string $signatoryPowerUuid): void
+    {
+        try {
+            $this->client->post("/signatory-powers/{$signatoryPowerUuid}/accept-tc");
+        } catch (TransferException $exception) {
+            throw new CompaniesServiceRequestException($exception);
+        }
+    }
+
+    public function assignIdentityVerificationCase(string $caseUuid, string $signatoryPowerUuid): void
+    {
+        try {
+            $this->client->post('/signatory-powers/assign-identity-verification', [
+                'json' => [
+                    'signatory_power_uuid' => $signatoryPowerUuid,
+                    'identity_verification_case_uuid' => $caseUuid,
+                ],
+            ]);
+        } catch (TransferException $exception) {
+            throw new CompaniesServiceRequestException($exception);
+        }
+    }
+
+    public function saveSelectedSignatoryPowers(string $companyIdentifier, SignatoryPowerSelectionDTO ...$signatoryPowerDTOs)
+    {
+        $requestData['signatory_powers'] = array_map(function (SignatoryPowerSelectionDTO $signatoryPowerDTO) {
             return $signatoryPowerDTO->toArray();
         }, $signatoryPowerDTOs);
 

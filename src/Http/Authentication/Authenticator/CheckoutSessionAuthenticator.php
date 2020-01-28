@@ -32,15 +32,15 @@ class CheckoutSessionAuthenticator extends AbstractAuthenticator
         return $request->attributes->get(HttpConstantsInterface::REQUEST_ATTRIBUTE_CHECKOUT_SESSION_ID);
     }
 
-    public function getUser($credentials, UserProviderInterface $userProvider)
+    public function getUser($checkoutSessionId, UserProviderInterface $userProvider)
     {
-        $checkoutSession = $this->checkoutSessionRepository->findOneByUuid($credentials);
+        $checkoutSession = $this->checkoutSessionRepository->findOneByUuid($checkoutSessionId);
 
         if (!$checkoutSession || !$checkoutSession->isActive()) {
             throw new AuthenticationException();
         }
 
-        $merchant = $this->getActiveMerchantOrFail($checkoutSession->getMerchantId());
+        $merchant = $this->assertValidMerchant($this->merchantRepository->getOneById($checkoutSession->getMerchantId()));
 
         return new CheckoutUser($merchant, $checkoutSession);
     }

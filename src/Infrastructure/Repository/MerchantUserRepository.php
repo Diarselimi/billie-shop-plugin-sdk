@@ -16,6 +16,7 @@ class MerchantUserRepository extends AbstractPdoRepository implements MerchantUs
         'user_id',
         'merchant_id',
         'signatory_power_uuid',
+        'identity_verification_case_uuid',
         'first_name',
         'last_name',
         'role_id',

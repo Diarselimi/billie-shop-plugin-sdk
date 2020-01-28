@@ -4,53 +4,26 @@ declare(strict_types=1);
 
 namespace App\Application\UseCase\StartIdentityVerification;
 
+use App\Application\UseCase\StartIdentityVerificationRedirectsTrait;
 use App\Application\UseCase\ValidatedRequestInterface;
-use OpenApi\Annotations as OA;
-use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @OA\Schema(
- *      schema="StartIdentityVerificationRequest",
- *      type="object",
- *      properties={
- *          @OA\Property(property="redirect_url_coupon_requested", type="string", format="url"),
- *          @OA\Property(property="redirect_url_review_pending", type="string", format="url"),
- *          @OA\Property(property="redirect_url_declined", type="string", format="url"),
- *      },
- *      required={"redirect_url_coupon_requested", "redirect_url_review_pending", "redirect_url_declined"}
- * )
- */
 class StartIdentityVerificationRequest implements ValidatedRequestInterface
 {
+    use StartIdentityVerificationRedirectsTrait;
+
     private $merchantId;
 
     private $merchantPaymentUuid;
 
     private $merchantUserId;
 
+    private $signatoryPowerUuid;
+
     private $email;
 
     private $firstName;
 
     private $lastName;
-
-    /**
-     * @Assert\NotBlank()
-     * @Assert\Url()
-     */
-    private $redirectUrlCouponRequested;
-
-    /**
-     * @Assert\NotBlank()
-     * @Assert\Url()
-     */
-    private $redirectUrlReviewPending;
-
-    /**
-     * @Assert\NotBlank()
-     * @Assert\Url()
-     */
-    private $redirectUrlDeclined;
 
     public function __construct(int $merchantId, string $merchantPaymentUuid)
     {
@@ -71,6 +44,18 @@ class StartIdentityVerificationRequest implements ValidatedRequestInterface
     public function getMerchantUserId(): int
     {
         return $this->merchantUserId;
+    }
+
+    public function getSignatoryPowerUuid(): ?string
+    {
+        return $this->signatoryPowerUuid;
+    }
+
+    public function setSignatoryPowerUuid(string $signatoryPowerUuid): StartIdentityVerificationRequest
+    {
+        $this->signatoryPowerUuid = $signatoryPowerUuid;
+
+        return $this;
     }
 
     public function setMerchantUserId(int $merchantUserId): StartIdentityVerificationRequest
@@ -112,42 +97,6 @@ class StartIdentityVerificationRequest implements ValidatedRequestInterface
     public function setLastName(string $lastName): StartIdentityVerificationRequest
     {
         $this->lastName = $lastName;
-
-        return $this;
-    }
-
-    public function getRedirectUrlCouponRequested(): string
-    {
-        return $this->redirectUrlCouponRequested;
-    }
-
-    public function setRedirectUrlCouponRequested($redirectUrlCouponRequested): StartIdentityVerificationRequest
-    {
-        $this->redirectUrlCouponRequested = $redirectUrlCouponRequested;
-
-        return $this;
-    }
-
-    public function getRedirectUrlReviewPending(): string
-    {
-        return $this->redirectUrlReviewPending;
-    }
-
-    public function setRedirectUrlReviewPending($redirectUrlReviewPending): StartIdentityVerificationRequest
-    {
-        $this->redirectUrlReviewPending = $redirectUrlReviewPending;
-
-        return $this;
-    }
-
-    public function getRedirectUrlDeclined(): string
-    {
-        return $this->redirectUrlDeclined;
-    }
-
-    public function setRedirectUrlDeclined($redirectUrlDeclined): StartIdentityVerificationRequest
-    {
-        $this->redirectUrlDeclined = $redirectUrlDeclined;
 
         return $this;
     }

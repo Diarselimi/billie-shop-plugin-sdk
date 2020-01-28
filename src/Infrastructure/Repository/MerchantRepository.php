@@ -103,6 +103,17 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
         return $row ? $this->factory->createFromArray($row) : null;
     }
 
+    public function getOneByCompanyUuid(string $companyUuid): ?MerchantEntity
+    {
+        $row = $this->doFetchOne(
+            $this->generateSelectQuery(self::TABLE_NAME, self::SELECT_FIELDS) .
+            ' WHERE company_uuid = :company_uuid ',
+            ['company_uuid' => $companyUuid]
+        );
+
+        return $row ? $this->factory->createFromArray($row) : null;
+    }
+
     public function getOneByApiKey(string $apiKey): ?MerchantEntity
     {
         $row = $this->doFetchOne($this->generateSelectQuery(self::TABLE_NAME, self::SELECT_FIELDS) . '

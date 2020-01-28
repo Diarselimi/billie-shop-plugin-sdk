@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Application\UseCase\StartIdentityVerification;
+namespace App\Application\UseCase;
 
 use App\DomainModel\ArrayableInterface;
 use OpenApi\Annotations as OA;

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\DomainModel\SignatoryPowersSelection;
+namespace App\DomainModel\SignatoryPower;
 
 use App\DomainModel\ArrayableInterface;
-use Symfony\Component\Validator\Constraints as Assert;
 use OpenApi\Annotations as OA;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @OA\Schema(schema="SignatoryPowerDTO", title="Signatory Power Data transfer object", type="object", properties={
@@ -13,7 +13,7 @@ use OpenApi\Annotations as OA;
  *      @OA\Property(property="is_identified_as_user", type="bool"),
  * })
  */
-class SignatoryPowerDTO implements ArrayableInterface
+class SignatoryPowerSelectionDTO implements ArrayableInterface
 {
     /**
      * @Assert\NotBlank()
@@ -36,7 +36,7 @@ class SignatoryPowerDTO implements ArrayableInterface
         return $this->uuid;
     }
 
-    public function setUuid($uuid): SignatoryPowerDTO
+    public function setUuid($uuid): SignatoryPowerSelectionDTO
     {
         $this->uuid = $uuid;
 
@@ -48,7 +48,7 @@ class SignatoryPowerDTO implements ArrayableInterface
         return $this->email;
     }
 
-    public function setEmail($email): SignatoryPowerDTO
+    public function setEmail($email): SignatoryPowerSelectionDTO
     {
         $this->email = $email;
 
@@ -60,7 +60,7 @@ class SignatoryPowerDTO implements ArrayableInterface
         return $this->isIdentifiedAsUser;
     }
 
-    public function setIsIdentifiedAsUser($isIdentifiedAsUser): SignatoryPowerDTO
+    public function setIsIdentifiedAsUser($isIdentifiedAsUser): SignatoryPowerSelectionDTO
     {
         $this->isIdentifiedAsUser = $isIdentifiedAsUser;
 

@@ -1025,6 +1025,15 @@ class PaellaCoreContext extends MinkContext
         }
     }
 
+    /**
+     * @Given the onboarding step :step should be in state :state for merchant :merchantPaymentUuid
+     */
+    public function theOnboardingStepShouldBeInState(string $step, string $state, string $merchantPaymentUuid)
+    {
+        $step = $this->getMerchantOnboardingStepRepository()->getOneByStepNameAndPaymentUuid($step, $merchantPaymentUuid);
+        Assert::eq($step->getState(), $state, 'The onboarding step is in a different state');
+    }
+
     public function createRole($name, $uuid, array $permissions): MerchantUserRoleEntity
     {
         $role = (new MerchantUserRoleEntity())

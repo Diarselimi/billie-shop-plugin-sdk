@@ -16,7 +16,7 @@ use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 
 abstract class AbstractAuthenticator extends AbstractGuardAuthenticator
 {
-    private $merchantRepository;
+    protected $merchantRepository;
 
     public function __construct(MerchantRepositoryInterface $merchantRepository)
     {
@@ -41,10 +41,11 @@ abstract class AbstractAuthenticator extends AbstractGuardAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
-        /** @var AbstractUser $user */
         $user = $token->getUser();
 
-        $request->attributes->set(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID, $user->getMerchant()->getId());
+        if ($user instanceof AbstractUser) {
+            $request->attributes->set(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID, $user->getMerchant()->getId());
+        }
 
         return null;
     }
@@ -64,19 +65,9 @@ abstract class AbstractAuthenticator extends AbstractGuardAuthenticator
         return $request->attributes->has(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID);
     }
 
-    protected function getActiveMerchantOrFail(
-        ?int $merchantId = null,
-        ?string $apiKey = null,
-        ?string $oauthClientId = null
-    ): MerchantEntity {
-        $merchant = $merchantId !== null ? $this->merchantRepository->getOneById($merchantId) :
-            (
-                $apiKey !== null ?
-                $this->merchantRepository->getOneByApiKey($apiKey) :
-                $this->merchantRepository->getOneByOauthClientId($oauthClientId)
-            );
-
-        if (!$merchant || !$merchant->isActive()) {
+    protected function assertValidMerchant($merchant): MerchantEntity
+    {
+        if (!($merchant instanceof MerchantEntity) || !$merchant->isActive()) {
             throw new AuthenticationException();
         }
 

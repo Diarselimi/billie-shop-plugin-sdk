@@ -7,8 +7,8 @@ namespace App\Http\Controller\PublicApi;
 use App\Application\Exception\MerchantOnboardingStepTransitionException;
 use App\Application\UseCase\StartIdentityVerification\StartIdentityVerificationException;
 use App\Application\UseCase\StartIdentityVerification\StartIdentityVerificationRequest;
-use App\Application\UseCase\StartIdentityVerification\StartIdentityVerificationResponse;
 use App\Application\UseCase\StartIdentityVerification\StartIdentityVerificationUseCase;
+use App\Application\UseCase\StartIdentityVerificationResponse;
 use App\Http\Authentication\UserProvider;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -30,7 +30,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  *
  *     @OA\RequestBody(
  *          required=true,
- *          @OA\MediaType(mediaType="application/json", @OA\Schema(ref="#/components/schemas/StartIdentityVerificationRequest"))
+ *          @OA\MediaType(mediaType="application/json", @OA\Schema(ref="#/components/schemas/StartIdentityVerificationRedirects"))
  *     ),
  *
  *     @OA\Response(
@@ -71,6 +71,10 @@ class StartIdentityVerificationController
             ->setRedirectUrlCouponRequested($request->get('redirect_url_coupon_requested'))
             ->setRedirectUrlDeclined($request->get('redirect_url_declined'))
             ->setRedirectUrlReviewPending($request->get('redirect_url_review_pending'));
+
+        if ($user->getSignatoryPowerUuid()) {
+            $useCaseRequest->setSignatoryPowerUuid($user->getSignatoryPowerUuid());
+        }
 
         try {
             return $this->useCase->execute($useCaseRequest);

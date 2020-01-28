@@ -31,7 +31,6 @@ class OAuthTokenAuthenticator extends AbstractAuthenticator
         $this->authenticationService = $authenticationService;
         $this->merchantUserRepository = $merchantUserRepository;
         $this->merchantUserPermissionsService = $merchantUserPermissionsService;
-
         parent::__construct($merchantRepository);
     }
 
@@ -70,7 +69,7 @@ class OAuthTokenAuthenticator extends AbstractAuthenticator
 
     private function authenticateAsMerchantClient(string $oauthClientId): UserInterface
     {
-        $merchant = $this->getActiveMerchantOrFail(null, null, $oauthClientId);
+        $merchant = $this->assertValidMerchant($this->merchantRepository->getOneByOauthClientId($oauthClientId));
 
         return new MerchantApiUser($merchant);
     }
@@ -83,7 +82,7 @@ class OAuthTokenAuthenticator extends AbstractAuthenticator
             throw new AuthenticationException();
         }
 
-        $merchant = $this->getActiveMerchantOrFail($userEntity->getMerchantId());
+        $merchant = $this->assertValidMerchant($this->merchantRepository->getOneById($userEntity->getMerchantId()));
         $permissions = $this->merchantUserPermissionsService->resolveUserRole($userEntity)->getPermissions();
 
         return new MerchantUser($merchant, $email, $userEntity, $permissions);

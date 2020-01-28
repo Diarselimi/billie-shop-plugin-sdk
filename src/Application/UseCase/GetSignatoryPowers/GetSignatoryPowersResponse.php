@@ -1,8 +1,9 @@
 <?php
 
-namespace App\DomainModel\GetSignatoryPowers;
+namespace App\Application\UseCase\GetSignatoryPowers;
 
 use App\DomainModel\ArrayableInterface;
+use App\DomainModel\SignatoryPower\SignatoryPowerDTO;
 use OpenApi\Annotations as OA;
 
 /**
@@ -30,7 +31,7 @@ class GetSignatoryPowersResponse implements ArrayableInterface
 
     public function toArray(): array
     {
-        return array_map(function (GetSignatoryPowerDTO $signatoryPowerDTO) {
+        return array_map(function (SignatoryPowerDTO $signatoryPowerDTO) {
             return [
                     'uuid' => $signatoryPowerDTO->getUuid(),
                     'first_name' => $signatoryPowerDTO->getFirstName(),

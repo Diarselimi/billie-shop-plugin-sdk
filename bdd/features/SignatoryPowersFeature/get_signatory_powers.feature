@@ -1,6 +1,6 @@
 Feature: Get list of signatory-powers from alfred and send response.
 
-  Background: Something to happen
+  Background:
     Given I add "Content-type" header equal to "application/json"
     And I add "X-Test" header equal to 1
     And I add "Authorization" header equal to "Bearer someToken"

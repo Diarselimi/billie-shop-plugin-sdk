@@ -4,10 +4,9 @@ namespace App\Application\UseCase\GetSignatoryPowers;
 
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
-use App\DomainModel\GetSignatoryPowers\GetSignatoryPowersResponse;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
-use App\DomainModel\SignatoryPowersSelection\UserSignatoryPowerMatcher;
+use App\DomainModel\SignatoryPower\UserSignatoryPowerMatcher;
 
 class GetSignatoryPowersUseCase
 {

@@ -10,7 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @IsGranted("ROLE_MANAGE_USERS")
+ * @IsGranted({"ROLE_AUTHENTICATED_AS_MERCHANT", "ROLE_MANAGE_USERS"})
  *
  * @OA\Get(
  *     path="/merchant/roles",

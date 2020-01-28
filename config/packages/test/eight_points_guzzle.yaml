@@ -36,18 +36,18 @@ eight_points_guzzle:
         debug: false
         query:
           app: paella_sandbox
-    webapp:
-      base_url: "%behat_mock_server_url%:8028"
-      options:
-        debug: false
-        query:
-          app: webapp
     fintech_toolbox:
       base_url: "%behat_mock_server_url%:8027"
       options:
         debug: false
         query:
           app: bic_lookup
+    webapp:
+      base_url: "%behat_mock_server_url%:8028"
+      options:
+        debug: false
+        query:
+          app: webapp
     nachos:
       base_url: "%behat_mock_server_url%:8029"
       options:
@@ -60,3 +60,4 @@ eight_points_guzzle:
         debug: false
         query:
           app: document_generator
+

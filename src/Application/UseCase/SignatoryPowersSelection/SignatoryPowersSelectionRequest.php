@@ -4,9 +4,10 @@ namespace App\Application\UseCase\SignatoryPowersSelection;
 
 use App\Application\UseCase\ValidatedRequestInterface;
 use App\Application\Validator\Constraint as PaellaAssert;
-use App\DomainModel\SignatoryPowersSelection\SignatoryPowerDTO;
-use Symfony\Component\Validator\Constraints as Assert;
+use App\DomainModel\MerchantUser\MerchantUserEntity;
+use App\DomainModel\SignatoryPower\SignatoryPowerSelectionDTO;
 use OpenApi\Annotations as OA;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @OA\Schema(
@@ -33,13 +34,13 @@ class SignatoryPowersSelectionRequest implements ValidatedRequestInterface
 
     private $companyId;
 
-    private $merchantUserId;
+    private $merchantUser;
 
     private $merchantPaymentUuid;
 
-    public function __construct(int $merchantUserId, string $companyId, string $merchantPaymentUuid, SignatoryPowerDTO ...$signatoryPowers)
+    public function __construct(MerchantUserEntity $merchantUser, string $companyId, string $merchantPaymentUuid, SignatoryPowerSelectionDTO ...$signatoryPowers)
     {
-        $this->merchantUserId = $merchantUserId;
+        $this->merchantUser = $merchantUser;
         $this->companyId = $companyId;
         $this->merchantPaymentUuid = $merchantPaymentUuid;
         $this->signatoryPowers = $signatoryPowers;
@@ -51,16 +52,16 @@ class SignatoryPowersSelectionRequest implements ValidatedRequestInterface
     }
 
     /**
-     * @return SignatoryPowerDTO[]
+     * @return SignatoryPowerSelectionDTO[]
      */
     public function getSignatoryPowers(): array
     {
         return $this->signatoryPowers;
     }
 
-    public function getMerchantUserId(): int
+    public function getMerchantUser(): MerchantUserEntity
     {
-        return $this->merchantUserId;
+        return $this->merchantUser;
     }
 
     public function getMerchantPaymentUuid(): string
@@ -68,7 +69,7 @@ class SignatoryPowersSelectionRequest implements ValidatedRequestInterface
         return $this->merchantPaymentUuid;
     }
 
-    public function findSelectedAsLoggedInSignatory(): ?SignatoryPowerDTO
+    public function findSelectedAsLoggedInSignatory(): ?SignatoryPowerSelectionDTO
     {
         foreach ($this->getSignatoryPowers() as $signatoryPowerDTO) {
             if ($signatoryPowerDTO->isIdentifiedAsUser()) {

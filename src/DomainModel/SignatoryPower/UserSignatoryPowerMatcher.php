@@ -1,13 +1,12 @@
 <?php
 
-namespace App\DomainModel\SignatoryPowersSelection;
+namespace App\DomainModel\SignatoryPower;
 
-use App\DomainModel\GetSignatoryPowers\GetSignatoryPowerDTO;
 use App\DomainModel\MerchantUser\MerchantUserEntity;
 
 class UserSignatoryPowerMatcher
 {
-    public function identify(MerchantUserEntity $merchantUser, GetSignatoryPowerDTO ...$signatoryPowerDTOs)
+    public function identify(MerchantUserEntity $merchantUser, SignatoryPowerDTO ...$signatoryPowerDTOs)
     {
         if ($merchantUser->getSignatoryPowerUuid()) {
             $this->identifyByUuid($merchantUser->getSignatoryPowerUuid(), ...$signatoryPowerDTOs);
@@ -16,7 +15,7 @@ class UserSignatoryPowerMatcher
         }
     }
 
-    private function identifyByFullName(MerchantUserEntity $merchantUser, GetSignatoryPowerDTO ...$signatoryPowerDTOs): void
+    private function identifyByFullName(MerchantUserEntity $merchantUser, SignatoryPowerDTO ...$signatoryPowerDTOs): void
     {
         foreach ($signatoryPowerDTOs as $signatoryPowersDTO) {
             $isIdentifiedAsUser = mb_strtolower($merchantUser->getFirstName()) === mb_strtolower($signatoryPowersDTO->getFirstName())
@@ -30,7 +29,7 @@ class UserSignatoryPowerMatcher
         }
     }
 
-    private function identifyByUuid(string $signatoryPowerUuid, GetSignatoryPowerDTO ...$signatoryPowerDTOs): void
+    private function identifyByUuid(string $signatoryPowerUuid, SignatoryPowerDTO ...$signatoryPowerDTOs): void
     {
         foreach ($signatoryPowerDTOs as $signatoryPowerDTO) {
             if ($signatoryPowerDTO->getUuid() === $signatoryPowerUuid) {

@@ -3,12 +3,12 @@
 namespace App\Http\Controller\PublicApi;
 
 use App\Application\UseCase\GetSignatoryPowers\GetSignatoryPowersRequest;
+use App\Application\UseCase\GetSignatoryPowers\GetSignatoryPowersResponse;
 use App\Application\UseCase\GetSignatoryPowers\GetSignatoryPowersUseCase;
 use App\Application\UseCase\GetSignatoryPowers\GetSignatoryPowersUseCaseException;
-use App\DomainModel\GetSignatoryPowers\GetSignatoryPowersResponse;
+use App\Http\Authentication\UserProvider;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use App\Http\Authentication\UserProvider;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
