@@ -106,10 +106,10 @@ services:
         - 'debtor_identified_strict'
         - 'delivery_address'
         - 'debtor_is_trusted'
-        - 'limit'
         - 'debtor_not_customer'
         - 'debtor_blacklisted'
         - 'debtor_overdue'
+        - 'limit'
         - 'company_b2b_score'
       $checkLoader: !service
         class: Symfony\Component\DependencyInjection\ServiceLocator
