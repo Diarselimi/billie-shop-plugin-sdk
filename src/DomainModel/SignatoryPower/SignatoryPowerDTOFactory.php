@@ -23,6 +23,6 @@ class SignatoryPowerDTOFactory extends AbstractFactory
             ->setCompanyUuid($data['company_uuid'])
             ->setIdentityVerificationUrl($data['identity_verification_url'])
             ->setIsIdentityVerified($data['is_identity_verified'] ?? false)
-            ;
+        ;
     }
 }

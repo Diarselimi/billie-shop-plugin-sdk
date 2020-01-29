@@ -68,12 +68,12 @@ class SignatoryPowerDTO
         return $this;
     }
 
-    public function getEmail(): string
+    public function getEmail(): ?string
     {
         return $this->email;
     }
 
-    public function setEmail(string $email): SignatoryPowerDTO
+    public function setEmail(?string $email): SignatoryPowerDTO
     {
         $this->email = $email;
 
