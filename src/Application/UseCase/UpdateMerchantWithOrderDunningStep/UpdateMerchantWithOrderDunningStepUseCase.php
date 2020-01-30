@@ -50,7 +50,7 @@ class UpdateMerchantWithOrderDunningStepUseCase implements LoggingInterface
         $this->notificationScheduler->createAndSchedule(
             $order,
             OrderNotificationEntity::NOTIFICATION_TYPE_DCI_COMMUNICATION,
-            $this->orderEventPayloadFactory->create($order, OrderNotificationEntity::NOTIFICATION_TYPE_DCI_COMMUNICATION)
+            $this->orderEventPayloadFactory->create($order, $request->getStep())
         );
     }
 }

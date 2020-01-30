@@ -64,7 +64,7 @@ class UpdateMerchantWithOrderDunningStepUseCaseSpec extends ObjectBehavior
         $orderRepository->getOneByUuid(self::ORDER_UUID)->shouldBeCalled()->willReturn($orderEntity);
 
         $payload = ['event' => 'Dunning', 'order_id' => self::ORDER_EXTERNAL_ID];
-        $orderEventPayloadFactory->create($orderEntity, OrderNotificationEntity::NOTIFICATION_TYPE_DCI_COMMUNICATION)->willReturn($payload);
+        $orderEventPayloadFactory->create($orderEntity, 'Dunning')->willReturn($payload);
 
         $notificationScheduler
             ->createAndSchedule(
