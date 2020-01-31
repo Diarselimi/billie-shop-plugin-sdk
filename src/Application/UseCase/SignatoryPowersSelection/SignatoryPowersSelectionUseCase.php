@@ -64,6 +64,8 @@ class SignatoryPowersSelectionUseCase implements ValidatedUseCaseInterface
                 $loggedInSignatory->getUuid()
             );
 
+            $this->companiesService->acceptSignatoryPowerTc($loggedInSignatory->getUuid());
+
             if ($selectionsRequest->getMerchantUser()->getIdentityVerificationCaseUuid()) {
                 $this->companiesService->assignIdentityVerificationCase(
                     $selectionsRequest->getMerchantUser()->getIdentityVerificationCaseUuid(),
