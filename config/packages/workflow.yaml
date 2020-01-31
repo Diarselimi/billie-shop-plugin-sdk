@@ -42,7 +42,7 @@ framework:
           from: [shipped, paid_out, late]
           to: complete
         cancel:
-          from: [new, created]
+          from: [new, created, waiting]
           to: canceled
         cancel_shipped:
           from: [shipped, paid_out, late]

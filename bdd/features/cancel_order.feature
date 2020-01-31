@@ -21,6 +21,17 @@ Feature:
         And the order "CO123" is in state canceled
         And Order notification should exist for order "CO123" with type "order_canceled"
 
+    Scenario: Successful waiting order cancellation
+      Given I have a waiting order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+      And I get from companies service get debtor response
+      And Debtor release limit call succeeded
+      When I send a POST request to "/order/CO123/cancel"
+      And print last JSON response
+      Then the response status code should be 204
+      And the response should be empty
+      And the order "CO123" is in state canceled
+      And Order notification should exist for order "CO123" with type "order_canceled"
+
     Scenario: Successful created order cancellation
         Given I have a created order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
         And I get from companies service get debtor response
