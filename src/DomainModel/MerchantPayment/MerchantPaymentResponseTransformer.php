@@ -18,7 +18,6 @@ class MerchantPaymentResponseTransformer
         $item = $this->addIsAllocated($item);
         $item = $this->addOverpaidAmount($item);
 
-        // simplify
         $item['merchant_debtor_uuid'] = $item['merchant_debtor']['uuid'] ?? null;
         unset($item['merchant_debtor']);
 
@@ -28,7 +27,7 @@ class MerchantPaymentResponseTransformer
     public function addIsAllocated(array $item): array
     {
         if (array_key_exists('is_allocated', $item)) {
-            $item['is_allocated'] = boolval($item['is_allocated']);
+            $item['is_allocated'] = (bool) $item['is_allocated'];
         }
 
         return $item;
@@ -36,19 +35,17 @@ class MerchantPaymentResponseTransformer
 
     public function addOverpaidAmount(array $item): array
     {
-        if (!array_key_exists('orders', $item) || empty($item['orders'])) {
-            // APIS-1447: if there are no mapped orders (tickets) the whole transaction amount is an overpayment
-            $item['overpaid_amount'] = $item['amount'];
+        $overpayment = 0;
+        $orders = array_filter($item['orders'], static function (array $order) use (&$overpayment) {
+            if ($order['uuid'] !== null) {
+                return $order;
+            }
 
-            return $item;
-        }
+            $overpayment = $order['mapped_amount'];
+        });
 
-        $ordersAmountTotal = 0;
-        foreach ($item['orders'] as $order) {
-            $ordersAmountTotal += ($order['mapped_amount'] ?? 0);
-        }
-        $paidAmount = $item['amount'];
-        $item['overpaid_amount'] = (float) bcsub($paidAmount, $ordersAmountTotal, 2);
+        $item['orders'] = $orders;
+        $item['overpaid_amount'] = $overpayment;
 
         return $item;
     }

@@ -56,7 +56,7 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
     {
         $response = $this->executeQuery($name, $params);
         $total = $response['total'] ?? count($response);
-        $this->logInfo('GraphQL "' . $name . '" query', ['params' => $params, 'total_results' => $total]);
+        $this->logInfo('GraphQL "' . $name . '" query', ['params' => $params, 'total_results' => $total, 'response' => $response]);
 
         return $response;
     }
