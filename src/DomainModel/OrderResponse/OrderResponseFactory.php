@@ -159,6 +159,8 @@ class OrderResponseFactory
             ->setFeeRate($orderPaymentDetails->getFeeRate())
             ->setFeeAmount($orderPaymentDetails->getFeeAmount())
             ->setDueDate($orderPaymentDetails->getDueDate())
+            ->setPendingCancellationAmount($orderPaymentDetails->getOutstandingAmountInvoiceCancellation())
+            ->setPendingMerchantPaymentAmount($orderPaymentDetails->getOutstandingAmountMerchantPayment())
         ;
     }
 

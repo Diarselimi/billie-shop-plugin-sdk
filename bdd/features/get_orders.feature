@@ -60,7 +60,9 @@ Feature: Retrieve and search all orders of a merchant
 				"outstanding_amount":null,
 				"fee_amount":null,
 				"fee_rate":null,
-				"due_date":null
+				"due_date":null,
+				"pending_merchant_payment_amount": null,
+				"pending_cancellation_amount": null
 			 },
 			 "debtor_external_data":{
 				"name":"test",
@@ -133,7 +135,9 @@ Feature: Retrieve and search all orders of a merchant
 				"outstanding_amount":null,
 				"fee_amount":null,
 				"fee_rate":null,
-				"due_date":null
+				"due_date":null,
+				"pending_merchant_payment_amount": null,
+				"pending_cancellation_amount": null
 			 },
 			 "debtor_external_data":{
 				"name":"test",
@@ -206,7 +210,9 @@ Feature: Retrieve and search all orders of a merchant
 				"outstanding_amount":null,
 				"fee_amount":null,
 				"fee_rate":null,
-				"due_date":null
+				"due_date":null,
+				"pending_merchant_payment_amount": null,
+				"pending_cancellation_amount": null
 			 },
 			 "debtor_external_data":{
 				"name":"test",
@@ -279,7 +285,9 @@ Feature: Retrieve and search all orders of a merchant
 				"outstanding_amount":null,
 				"fee_amount":null,
 				"fee_rate":null,
-				"due_date":null
+				"due_date":null,
+				"pending_merchant_payment_amount": null,
+				"pending_cancellation_amount": null
 			 },
 			 "debtor_external_data":{
 				"name":"test",
@@ -366,7 +374,9 @@ Feature: Retrieve and search all orders of a merchant
 				"outstanding_amount":null,
 				"fee_amount":null,
 				"fee_rate":null,
-				"due_date":null
+				"due_date":null,
+				"pending_merchant_payment_amount": null,
+				"pending_cancellation_amount": null
 			 },
 			 "debtor_external_data":{
 				"name":"test",
@@ -477,7 +487,9 @@ Feature: Retrieve and search all orders of a merchant
 				"outstanding_amount":null,
 				"fee_amount":null,
 				"fee_rate":null,
-				"due_date":null
+				"due_date":null,
+				"pending_merchant_payment_amount": null,
+				"pending_cancellation_amount": null
 			 },
 			 "debtor_external_data":{
 				"name":"test",

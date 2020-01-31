@@ -5,5 +5,13 @@
     "outstanding_amount": 1000,
     "fee_amount": 10,
     "fee_rate": 1,
-    "due_date": "20-11-1978"
+    "due_date": "20-11-1978",
+    "outstanding_amount_merchant_payment": 0.00,
+    "outstanding_amount_invoice_cancellation": 0.00,
+    "outstanding_amount_fraud_reclaim": 0.00,
+    "outstanding_amount_invoice_payback": 1000.00,
+    "paid_amount_merchant_payment": 0.00,
+    "paid_amount_invoice_cancellation": 0.00,
+    "paid_amount_fraud_reclaim": 0.00,
+    "paid_amount_invoice_payback": 0.00
 }

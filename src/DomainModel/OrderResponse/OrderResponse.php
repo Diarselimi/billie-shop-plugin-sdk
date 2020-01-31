@@ -37,6 +37,8 @@ use OpenApi\Annotations as OA;
  *          @OA\Property(property="invoice_number", ref="#/components/schemas/TinyText", nullable=true),
  *          @OA\Property(property="payout_amount", type="number", format="float", nullable=true),
  *          @OA\Property(property="outstanding_amount", type="number", format="float", nullable=true),
+ *          @OA\Property(property="pending_merchant_payment_amount", type="number", format="float", nullable=true),
+ *          @OA\Property(property="pending_cancellation_amount", type="number", format="float", nullable=true),
  *          @OA\Property(property="fee_amount", type="number", format="float", nullable=true),
  *          @OA\Property(property="fee_rate", type="number", format="float", nullable=true),
  *          @OA\Property(property="due_date", type="string", format="date", nullable=true, example="2019-03-20"),
@@ -114,6 +116,10 @@ class OrderResponse implements ArrayableInterface
     private $feeRate;
 
     private $dueDate;
+
+    private $pendingMerchantPaymentAmount;
+
+    private $pendingCancellationAmount;
 
     /**
      * @deprecated
@@ -506,6 +512,30 @@ class OrderResponse implements ArrayableInterface
         return $this;
     }
 
+    public function getPendingMerchantPaymentAmount(): ?float
+    {
+        return $this->pendingMerchantPaymentAmount;
+    }
+
+    public function setPendingMerchantPaymentAmount(?float $pendingMerchantPaymentAmount): OrderResponse
+    {
+        $this->pendingMerchantPaymentAmount = $pendingMerchantPaymentAmount;
+
+        return $this;
+    }
+
+    public function getPendingCancellationAmount(): ?float
+    {
+        return $this->pendingCancellationAmount;
+    }
+
+    public function setPendingCancellationAmount(?float $pendingCancellationAmount): OrderResponse
+    {
+        $this->pendingCancellationAmount = $pendingCancellationAmount;
+
+        return $this;
+    }
+
     public function getCreatedAt(): \DateTime
     {
         return $this->createdAt;
@@ -718,6 +748,8 @@ class OrderResponse implements ArrayableInterface
                 'fee_amount' => $this->getFeeAmount(),
                 'fee_rate' => $this->getFeeRate(),
                 'due_date' => $this->getDueDate() ? $this->getDueDate()->format(DateFormat::FORMAT_YMD) : null,
+                'pending_merchant_payment_amount' => $this->getPendingMerchantPaymentAmount(),
+                'pending_cancellation_amount' => $this->getPendingCancellationAmount(),
             ],
             'debtor_external_data' => [
                 'merchant_customer_id' => $this->getDebtorExternalDataCustomerId(),

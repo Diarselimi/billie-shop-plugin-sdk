@@ -50,7 +50,9 @@ Feature:
               "outstanding_amount":null,
               "fee_amount": null,
               "fee_rate": null,
-              "due_date": null
+              "due_date": null,
+              "pending_merchant_payment_amount": null,
+              "pending_cancellation_amount": null
           },
           "debtor_external_data": {
               "name": "test",
@@ -118,7 +120,9 @@ Feature:
             "outstanding_amount":null,
             "fee_amount": null,
             "fee_rate": null,
-            "due_date": null
+            "due_date": null,
+            "pending_merchant_payment_amount": null,
+            "pending_cancellation_amount": null
         },
         "debtor_external_data": {
             "name": "test",
@@ -190,7 +194,9 @@ Feature:
             "outstanding_amount": 1000,
             "fee_amount": 10,
             "fee_rate": 1,
-            "due_date": "1978-11-20"
+            "due_date": "1978-11-20",
+            "pending_merchant_payment_amount": 0,
+            "pending_cancellation_amount": 0
         },
         "debtor_external_data": {
             "merchant_customer_id": "ext_id",
@@ -260,7 +266,9 @@ Feature:
             "outstanding_amount": 1000,
             "fee_amount": 10,
             "fee_rate": 1,
-            "due_date": "1978-11-20"
+            "due_date": "1978-11-20",
+            "pending_merchant_payment_amount": 0,
+            "pending_cancellation_amount": 0
         },
         "debtor_external_data": {
             "merchant_customer_id": "ext_id",

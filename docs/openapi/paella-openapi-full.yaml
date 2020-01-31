@@ -3826,6 +3826,14 @@ components:
               type: number
               format: float
               nullable: true
+            pending_merchant_payment_amount:
+              type: number
+              format: float
+              nullable: true
+            pending_cancellation_amount:
+              type: number
+              format: float
+              nullable: true
             fee_amount:
               type: number
               format: float

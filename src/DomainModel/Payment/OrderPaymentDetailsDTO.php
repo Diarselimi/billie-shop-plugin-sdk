@@ -26,6 +26,10 @@ class OrderPaymentDetailsDTO
 
     private $dueDate;
 
+    private $outstandingAmountMerchantPayment;
+
+    private $outstandingAmountInvoiceCancellation;
+
     public function getId(): string
     {
         return $this->id;
@@ -128,5 +132,29 @@ class OrderPaymentDetailsDTO
     public function isPaidFully(): bool
     {
         return $this->getState() === self::STATE_PAID_FULLY;
+    }
+
+    public function getOutstandingAmountMerchantPayment(): ?float
+    {
+        return $this->outstandingAmountMerchantPayment;
+    }
+
+    public function setOutstandingAmountMerchantPayment(?float $outstandingAmountMerchantPayment): OrderPaymentDetailsDTO
+    {
+        $this->outstandingAmountMerchantPayment = $outstandingAmountMerchantPayment;
+
+        return $this;
+    }
+
+    public function getOutstandingAmountInvoiceCancellation(): ?float
+    {
+        return $this->outstandingAmountInvoiceCancellation;
+    }
+
+    public function setOutstandingAmountInvoiceCancellation(?float $outstandingAmountInvoiceCancellation): OrderPaymentDetailsDTO
+    {
+        $this->outstandingAmountInvoiceCancellation = $outstandingAmountInvoiceCancellation;
+
+        return $this;
     }
 }
