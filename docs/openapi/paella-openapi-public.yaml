@@ -709,11 +709,46 @@ components:
       required:
         - amount
         - duration
+        - debtor_company
       properties:
         amount:
           $ref: '#/components/schemas/CreateOrderAmountRequest'
         duration:
           $ref: '#/components/schemas/OrderDuration'
+        debtor_company:
+          $ref: '#/components/schemas/DebtorCompanyRequest'
+      type: object
+    DebtorCompanyRequest:
+      title: 'Debtor Company Request'
+      required:
+        - name
+        - address_street
+        - address_city
+        - address_postal_code
+        - address_country
+      properties:
+        name:
+          example: 'Billie GmbH'
+          $ref: '#/components/schemas/TinyText'
+        address_addition:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        address_house_number:
+          example: '4'
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        address_street:
+          example: Charlottenstr.
+          $ref: '#/components/schemas/TinyText'
+        address_city:
+          example: Berlin
+          $ref: '#/components/schemas/TinyText'
+        address_postal_code:
+          example: '10969'
+          $ref: '#/components/schemas/PostalCode'
+        address_country:
+          example: DE
+          $ref: '#/components/schemas/CountryCode'
       type: object
     CreateOrderRequest:
       title: 'Order Creation Request'

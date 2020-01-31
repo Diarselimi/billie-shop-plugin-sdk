@@ -10,9 +10,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 use OpenApi\Annotations as OA;
 
 /**
- * @OA\Schema(schema="CheckoutSessionConfirmOrderRequest", required={"amount", "duration"}, properties={
+ * @OA\Schema(schema="CheckoutSessionConfirmOrderRequest", required={"amount", "duration", "debtor_company"}, properties={
  *      @OA\Property(property="amount", ref="#/components/schemas/CreateOrderAmountRequest"),
- *      @OA\Property(property="duration", ref="#/components/schemas/OrderDuration")
+ *      @OA\Property(property="duration", ref="#/components/schemas/OrderDuration"),
+ *      @OA\Property(property="debtor_company", ref="#/components/schemas/DebtorCompanyRequest")
  * })
  */
 class CheckoutSessionConfirmOrderRequest implements ValidatedRequestInterface
@@ -30,6 +31,11 @@ class CheckoutSessionConfirmOrderRequest implements ValidatedRequestInterface
     private $duration;
 
     private $sessionUuid;
+
+    /**
+     * @Assert\Valid()
+     */
+    private $debtorCompanyRequest;
 
     public function getAmount(): ?CreateOrderAmountRequest
     {
@@ -63,6 +69,18 @@ class CheckoutSessionConfirmOrderRequest implements ValidatedRequestInterface
     public function setSessionUuid(string $sessionUuid): CheckoutSessionConfirmOrderRequest
     {
         $this->sessionUuid = $sessionUuid;
+
+        return $this;
+    }
+
+    public function getDebtorCompanyRequest(): DebtorCompanyRequest
+    {
+        return $this->debtorCompanyRequest;
+    }
+
+    public function setDebtorCompanyRequest(DebtorCompanyRequest $debtorCompanyRequest): CheckoutSessionConfirmOrderRequest
+    {
+        $this->debtorCompanyRequest = $debtorCompanyRequest;
 
         return $this;
     }

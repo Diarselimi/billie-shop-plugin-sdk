@@ -4,9 +4,8 @@ namespace App\Http\Controller\PublicApi;
 
 use App\Application\Exception\CheckoutSessionConfirmException;
 use App\Application\Exception\OrderNotFoundException;
-use App\Application\UseCase\CheckoutSessionConfirmOrder\CheckoutSessionConfirmOrderRequest;
+use App\Application\UseCase\CheckoutSessionConfirmOrder\CheckoutSessionConfirmOrderFactory;
 use App\Application\UseCase\CheckoutSessionConfirmOrder\CheckoutSessionConfirmUseCase;
-use App\Application\UseCase\CreateOrder\Request\CreateOrderAmountRequest;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -47,26 +46,26 @@ class ConfirmCheckoutSessionController
 
     private $useCase;
 
+    private $requestFactory;
+
     public function __construct(
         OrderRepositoryInterface $orderRepository,
-        CheckoutSessionConfirmUseCase $checkoutSessionUseCase
+        CheckoutSessionConfirmUseCase $checkoutSessionUseCase,
+        CheckoutSessionConfirmOrderFactory $factory
     ) {
         $this->orderRepository = $orderRepository;
         $this->useCase = $checkoutSessionUseCase;
+        $this->requestFactory = $factory;
     }
 
     public function execute(Request $request, string $sessionUuid): JsonResponse
     {
-        $checkoutRequest = (new CheckoutSessionConfirmOrderRequest())
-            ->setAmount(
-                (new CreateOrderAmountRequest())
-                    ->setNet($request->request->get('amount')['net'] ?? null)
-                    ->setGross($request->request->get('amount')['gross'] ?? null)
-                    ->setTax($request->request->get('amount')['tax'] ?? null)
-            )
-            ->setDuration($request->request->get('duration'))
-            ->setSessionUuid($sessionUuid)
-        ;
+        $checkoutRequest = $this->requestFactory->create(
+            $request->request->get('amount', []),
+            $request->request->get('debtor_company', []),
+            $request->request->get('duration'),
+            $sessionUuid
+        );
 
         try {
             $orderResponse = $this->useCase->execute($checkoutRequest);

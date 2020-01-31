@@ -46,7 +46,16 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
           "gross":100.0,
           "tax":10.0
        },
-       "duration":30
+       "duration":30,
+       "debtor_company":{
+          "name":"Test User Company",
+          "address_addition":"left door",
+          "address_house_number":"10",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_city":"Berlin",
+          "address_postal_code":"10179",
+          "address_country":"DE"
+       }
     }
     """
     Then the response status code should be 202
@@ -98,7 +107,55 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     And I send a PUT request to "/checkout-session/123123/confirm"
     Then the JSON response should be:
     """
-    {"errors":[{"source":"amount.net","title":"This value should not be blank.","code":"request_validation_error"},{"source":"amount.gross","title":"This value should not be blank.","code":"request_validation_error"},{"source":"amount.tax","title":"This value should not be blank.","code":"request_validation_error"},{"source":"duration","title":"This value should not be blank.","code":"request_validation_error"}]}
+    {
+      "errors": [
+        {
+          "title": "This value should not be blank.",
+          "code": "request_validation_error",
+          "source": "amount.net"
+        },
+        {
+          "title": "This value should not be blank.",
+          "code": "request_validation_error",
+          "source": "amount.gross"
+        },
+        {
+          "title": "This value should not be blank.",
+          "code": "request_validation_error",
+          "source": "amount.tax"
+        },
+        {
+          "title": "This value should not be blank.",
+          "code": "request_validation_error",
+          "source": "duration"
+        },
+        {
+          "title": "This value should not be blank.",
+          "code": "request_validation_error",
+          "source": "debtor_company_request.name"
+        },
+        {
+          "title": "This value should not be blank.",
+          "code": "request_validation_error",
+          "source": "debtor_company_request.address_street"
+        },
+        {
+          "title": "This value should not be blank.",
+          "code": "request_validation_error",
+          "source": "debtor_company_request.address_city"
+        },
+        {
+          "title": "This value should not be blank.",
+          "code": "request_validation_error",
+          "source": "debtor_company_request.address_postal_code"
+        },
+        {
+          "title": "This value should not be blank.",
+          "code": "request_validation_error",
+          "source": "debtor_company_request.address_country"
+        }
+      ]
+    }
     """
     And the response status code should be 400
 
@@ -112,7 +169,16 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
           "gross":50.0,
           "tax":0.0
        },
-       "duration":30
+       "duration":30,
+       "debtor_company":{
+          "name":"Test User Company",
+          "address_addition":"left door",
+          "address_house_number":"10",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_city":"Berlin",
+          "address_postal_code":"10179",
+          "address_country":"DE"
+       }
     }
     """
     And the response status code should be 404
