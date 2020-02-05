@@ -19,6 +19,7 @@ $db = [
     'pass' => getenv('DATABASE_PASSWORD'),
     'port' => getenv('DATABASE_PORT'),
     'charset' => 'utf8',
+    'collation' => 'utf8_unicode_ci',
     'adapter' => 'mysql',
 ];
 
