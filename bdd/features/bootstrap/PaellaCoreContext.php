@@ -83,6 +83,8 @@ class PaellaCoreContext extends MinkContext
 
     public const MERCHANT_COMPANY_UUID = 'c7be46c0-e049-4312-b274-258ec5aeeb70';
 
+    private $debtorData;
+
     public function __construct(KernelInterface $kernel, PdoConnection $connection)
     {
         $this->kernel = $kernel;
@@ -262,15 +264,15 @@ class PaellaCoreContext extends MinkContext
             ->setIsWhitelisted(false);
         $this->getMerchantDebtorRepository()->insert($merchantDebtor);
 
-        return [$person, $deliveryAddress, $debtor, $merchantDebtor];
+        return $this->debtorData = [$person, $deliveryAddress, $debtor, $merchantDebtor];
     }
 
     /**
      * @Given I have a(n) :state order :externalCode with amounts :gross/:net/:tax, duration :duration and comment :comment
      */
-    public function iHaveAnOrder($state, $externalCode, $gross, $net, $tax, $duration, $comment)
+    public function iHaveAnOrder($state, $externalCode, $gross, $net, $tax, $duration, $comment, $paymentUuid = null)
     {
-        list($person, $deliveryAddress, $debtor, $merchantDebtor) = $this->iHaveADebtorWithoutOrders();
+        list($person, $deliveryAddress, $debtor, $merchantDebtor) = $this->debtorData ?? $this->iHaveADebtorWithoutOrders();
 
         $order = (new OrderEntity())
             ->setExternalCode($externalCode)
@@ -282,12 +284,12 @@ class PaellaCoreContext extends MinkContext
             ->setExternalComment($comment)
             ->setMerchantDebtorId($merchantDebtor->getId())
             ->setMerchantId('1')
-            ->setPaymentId(self::DUMMY_UUID4)
+            ->setPaymentId($paymentUuid ?? self::DUMMY_UUID4)
             ->setCreatedAt(new \DateTime('2019-05-20 13:00:00'))
             ->setCheckoutSessionId(1)
-            ->setUuid('test-order-uuid');
+            ->setUuid('test-order-uuid'.$externalCode);
 
-        $this->iHaveASessionId("123123", 0);
+        $this->iHaveASessionId("123123".$externalCode, 0);
 
         $this->getOrderRepository()->insert($order);
 
@@ -334,7 +336,7 @@ class PaellaCoreContext extends MinkContext
         $checkoutSession = new CheckoutSessionEntity();
         $checkoutSession->setMerchantId(1)
             ->setMerchantDebtorExternalId($arg1)
-            ->setUuid("123123")
+            ->setUuid("123123-".$arg1)
             ->setIsActive($active)
             ->setCreatedAt(new DateTime())
             ->setUpdatedAt(new DateTime());
@@ -1154,5 +1156,24 @@ class PaellaCoreContext extends MinkContext
         $merchant = $this->getMerchantRepository()->getOneById($this->merchant->getId());
 
         Assert::notNull($merchant->getSepaB2BDocumentUuid(), 'There is no file.');
+    }
+
+    /**
+     * @Given /^I have orders with the following data$/
+     */
+    public function iHaveOrdersWithTheFollowingData(TableNode $table)
+    {
+        foreach ($table as $row) {
+            $this->iHaveAnOrder(
+                $row['state'],
+                $row['external_id'],
+                $row['gross'],
+                $row['net'],
+                $row['tax'],
+                $row['duration'],
+                $row['comment'],
+                $row['payment_uuid']
+            );
+        }
     }
 }

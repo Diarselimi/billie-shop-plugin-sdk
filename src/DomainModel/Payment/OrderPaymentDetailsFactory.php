@@ -18,4 +18,19 @@ class OrderPaymentDetailsFactory
             ->setOutstandingAmountMerchantPayment($response['outstanding_amount_merchant_payment'])
         ;
     }
+
+    /**
+     * @param  array                    $ordersResponse
+     * @return OrderPaymentDetailsDTO[]
+     * @throws \Exception
+     */
+    public function createFromBorschtArrayResponse(array $ordersResponse): array
+    {
+        $ordersResponses = [];
+        foreach ($ordersResponse as $orderResponse) {
+            $ordersResponses[$ordersResponse['id']] = $this->createFromBorschtResponse($orderResponse);
+        }
+
+        return $ordersResponses;
+    }
 }

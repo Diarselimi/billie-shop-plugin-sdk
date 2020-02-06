@@ -49,6 +49,7 @@ class PaymentsServiceContext implements Context
     public function iGetFromPaymentsServiceGetDebtorResponse()
     {
         $this->mockRequest('/debtor/test.json', new ResponseStack(
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/payments_service_get_debtor.json')),
             new MockResponse(file_get_contents(__DIR__ . '/../resources/payments_service_get_debtor.json'))
         ));
     }
@@ -91,6 +92,16 @@ class PaymentsServiceContext implements Context
         $this->mockRequest('/order.json', new ResponseStack(
             new MockResponse(''),
             new MockResponse('')
+        ));
+    }
+
+    /**
+     * @Given /^I get from payments service get orders details response$/
+     */
+    public function iGetFromPaymentsServiceGetOrdersDetailsResponse()
+    {
+        $this->mockRequest('/orders.json', new ResponseStack(
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/payments_service_orders_details.json'))
         ));
     }
 }

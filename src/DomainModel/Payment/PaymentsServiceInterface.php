@@ -15,6 +15,8 @@ interface PaymentsServiceInterface
 
     public function getOrderPaymentDetails(string $orderPaymentId): OrderPaymentDetailsDTO;
 
+    public function getBatchOrderPaymentDetails(array $orderPaymentIds): array;
+
     public function cancelOrder(OrderEntity $order): void;
 
     public function modifyOrder(ModifyRequestDTO $requestDTO): void;

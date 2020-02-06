@@ -3,6 +3,8 @@
 namespace App\DomainModel\OrderResponse;
 
 use App\DomainModel\Address\AddressEntity;
+use App\DomainModel\DebtorCompany\DebtorCompany;
+use App\DomainModel\Payment\OrderPaymentDetailsDTO;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\Order\OrderDeclinedReasonsMapper;
@@ -49,7 +51,7 @@ class OrderResponseFactory
         }
 
         if ($this->orderStateManager->wasShipped($order) || $this->orderStateManager->isComplete($order)) {
-            $this->addInvoiceData($order, $response);
+            $this->addInvoiceData($orderContainer, $response);
         }
 
         if ($this->orderStateManager->isLate($order)) {
@@ -72,6 +74,48 @@ class OrderResponseFactory
         }
 
         $orderResponses = [];
+
+        $debtorCompanies = $this->getDebtorCompanies($orderContainers);
+        $orderPaymentsDetails = $this->getOrderPaymentsDetails($orderContainers);
+        foreach ($orderContainers as $orderContainer) {
+            if ($orderContainer->getOrder()->getMerchantDebtorId() !== null) {
+                $key = $orderContainer->getMerchantDebtor()->getDebtorId();
+                $orderContainer->setDebtorCompany($debtorCompanies[$key]);
+            }
+
+            if (isset($orderPaymentsDetails[$orderContainer->getOrder()->getPaymentId()])) {
+                $orderContainer->setPaymentDetails($orderPaymentsDetails[$orderContainer->getOrder()->getPaymentId()]);
+            }
+
+            $orderResponses[] = $this->create($orderContainer);
+        }
+
+        return $orderResponses;
+    }
+
+    /**
+     * @param OrderContainer[]
+     * @return OrderPaymentDetailsDTO[]
+     */
+    public function getOrderPaymentsDetails(array $orderContainers): array
+    {
+        $paymentIds = array_map(static function (OrderContainer $orderContainer) {
+            if ($orderContainer->getOrder()->getPaymentId() !== null) {
+                return $orderContainer->getOrder()->getPaymentId();
+            }
+
+            return null;
+        }, $orderContainers);
+
+        return  $this->paymentsService->getBatchOrderPaymentDetails($paymentIds);
+    }
+
+    /**
+     * @param OrderContainer[]
+     * @return DebtorCompany[]
+     */
+    private function getDebtorCompanies(array $orderContainers): array
+    {
         $debtorIds = array_map(static function (OrderContainer $orderContainer) {
             if ($orderContainer->getOrder()->getMerchantDebtorId() !== null) {
                 return $orderContainer->getMerchantDebtor()->getDebtorId();
@@ -81,17 +125,7 @@ class OrderResponseFactory
         }, $orderContainers);
         $debtorIds = array_filter($debtorIds);
 
-        $debtorCompanies = $this->companiesService->getDebtors($debtorIds);
-        foreach ($orderContainers as $orderContainer) {
-            if ($orderContainer->getOrder()->getMerchantDebtorId() !== null) {
-                $key = $orderContainer->getMerchantDebtor()->getDebtorId();
-                $orderContainer->setDebtorCompany($debtorCompanies[$key]);
-            }
-
-            $orderResponses[] = $this->create($orderContainer);
-        }
-
-        return $orderResponses;
+        return $this->companiesService->getDebtors($debtorIds);
     }
 
     private function addAmountData(OrderContainer $orderContainer, OrderResponse $response): void
@@ -149,11 +183,11 @@ class OrderResponseFactory
         ;
     }
 
-    private function addInvoiceData(OrderEntity $order, OrderResponse $response)
+    private function addInvoiceData(OrderContainer $orderContainer, OrderResponse $response)
     {
-        $orderPaymentDetails = $this->paymentsService->getOrderPaymentDetails($order->getPaymentId());
+        $orderPaymentDetails = $orderContainer->getPaymentDetails();
         $response
-            ->setInvoiceNumber($order->getInvoiceNumber())
+            ->setInvoiceNumber($orderContainer->getOrder()->getInvoiceNumber())
             ->setPayoutAmount($orderPaymentDetails->getPayoutAmount())
             ->setOutstandingAmount($orderPaymentDetails->getOutstandingAmount())
             ->setFeeRate($orderPaymentDetails->getFeeRate())

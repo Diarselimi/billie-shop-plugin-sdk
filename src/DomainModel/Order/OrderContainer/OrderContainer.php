@@ -12,6 +12,7 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderLineItem\OrderLineItemEntity;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntity;
+use App\DomainModel\Payment\OrderPaymentDetailsDTO;
 use App\DomainModel\Person\PersonEntity;
 
 class OrderContainer
@@ -44,6 +45,8 @@ class OrderContainer
 
     private $lineItems;
 
+    private $paymentDetails;
+
     private $relationLoader;
 
     public function __construct(OrderEntity $order, OrderContainerRelationLoader $relationLoader)
@@ -61,7 +64,7 @@ class OrderContainer
     {
         return $this->orderFinancialDetails
             ?: $this->orderFinancialDetails = $this->relationLoader->loadOrderFinancialDetails($this)
-            ;
+        ;
     }
 
     public function getMerchantDebtor(): MerchantDebtorEntity
@@ -209,6 +212,18 @@ class OrderContainer
     public function setLineItems(array $lineItems): OrderContainer
     {
         $this->lineItems = $lineItems;
+
+        return $this;
+    }
+
+    public function getPaymentDetails(): OrderPaymentDetailsDTO
+    {
+        return $this->paymentDetails ?: $this->paymentDetails = $this->relationLoader->loadPaymentDetails($this);
+    }
+
+    public function setPaymentDetails(OrderPaymentDetailsDTO $paymentDetails): OrderContainer
+    {
+        $this->paymentDetails = $paymentDetails;
 
         return $this;
     }

@@ -72,6 +72,28 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
         }
     }
 
+    /**
+     * @param  string[]                 $orderPaymentIds
+     * @return OrderPaymentDetailsDTO[]
+     * @throws \Exception
+     */
+    public function getBatchOrderPaymentDetails(array $orderPaymentIds): array
+    {
+        $query = ['id' => $orderPaymentIds];
+
+        try {
+            $response = $this->client->get('/orders.json', ['query' => $query]);
+
+            $decodedResponse = $this->decodeResponse($response);
+
+            return $this->paymentDetailsFactory->createFromBorschtArrayResponse($decodedResponse);
+        } catch (TransferException $exception) {
+            throw new PaymentsServiceRequestException($exception);
+        } catch (ClientResponseDecodeException $exception) {
+            throw new PaymentsServiceRequestException(null, self::ERR_BODY_DECODE_MESSAGE);
+        }
+    }
+
     public function cancelOrder(OrderEntity $order): void
     {
         $json = ['ticket_id' => $order->getPaymentId()];

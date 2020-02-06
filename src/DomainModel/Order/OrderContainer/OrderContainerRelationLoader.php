@@ -20,6 +20,8 @@ use App\DomainModel\OrderLineItem\OrderLineItemEntity;
 use App\DomainModel\OrderLineItem\OrderLineItemRepositoryInterface;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntity;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
+use App\DomainModel\Payment\OrderPaymentDetailsDTO;
+use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonRepositoryInterface;
 
@@ -47,6 +49,8 @@ class OrderContainerRelationLoader
 
     private $orderLineItemRepository;
 
+    private $paymentsService;
+
     public function __construct(
         DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
         AddressRepositoryInterface $addressRepository,
@@ -58,7 +62,8 @@ class OrderContainerRelationLoader
         OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
         OrderDunningStatusService $orderDunningStatusService,
         OrderRiskCheckRepositoryInterface $orderRiskCheckRepository,
-        OrderLineItemRepositoryInterface $orderLineItemRepository
+        OrderLineItemRepositoryInterface $orderLineItemRepository,
+        PaymentsServiceInterface $paymentsService
     ) {
         $this->debtorExternalDataRepository = $debtorExternalDataRepository;
         $this->addressRepository = $addressRepository;
@@ -71,6 +76,7 @@ class OrderContainerRelationLoader
         $this->orderDunningStatusService = $orderDunningStatusService;
         $this->orderRiskCheckRepository = $orderRiskCheckRepository;
         $this->orderLineItemRepository = $orderLineItemRepository;
+        $this->paymentsService = $paymentsService;
     }
 
     public function loadMerchantDebtor(OrderContainer $orderContainer): MerchantDebtorEntity
@@ -146,5 +152,10 @@ class OrderContainerRelationLoader
     public function loadOrderLineItems(OrderContainer $orderContainer): array
     {
         return $this->orderLineItemRepository->getByOrderId($orderContainer->getOrder()->getId());
+    }
+
+    public function loadPaymentDetails(OrderContainer $orderContainer): OrderPaymentDetailsDTO
+    {
+        return $this->paymentsService->getOrderPaymentDetails($orderContainer->getOrder()->getPaymentId());
     }
 }
