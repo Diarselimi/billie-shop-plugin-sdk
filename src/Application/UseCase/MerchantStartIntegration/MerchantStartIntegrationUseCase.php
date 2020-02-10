@@ -9,6 +9,7 @@ use App\DomainModel\MerchantOnboarding\MerchantOnboardingContainerFactory;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepEntity;
 use App\DomainModel\Sandbox\SandboxClientInterface;
 use App\DomainModel\Sandbox\SandboxServiceRequestException;
+use App\Helper\Payment\IbanGenerator;
 
 class MerchantStartIntegrationUseCase
 {
@@ -24,16 +25,20 @@ class MerchantStartIntegrationUseCase
 
     private $companiesService;
 
+    private $ibanGenerator;
+
     public function __construct(
         MerchantOnboardingContainerFactory $onboardingContainerFactory,
         MerchantRepositoryInterface $merchantRepository,
         SandboxClientInterface $sandboxClient,
-        CompaniesServiceInterface $companiesService
+        CompaniesServiceInterface $companiesService,
+        IbanGenerator $ibanGenerator
     ) {
         $this->onboardingContainerFactory = $onboardingContainerFactory;
         $this->merchantRepository = $merchantRepository;
         $this->sandboxClient = $sandboxClient;
         $this->companiesService = $companiesService;
+        $this->ibanGenerator = $ibanGenerator;
     }
 
     public function execute(MerchantStartIntegrationRequest $request): MerchantStartIntegrationResponse
@@ -56,6 +61,8 @@ class MerchantStartIntegrationUseCase
             ->setIsOnboardingComplete(true)
             ->setMerchantFinancingLimit(self::SANDBOX_MERCHANT_LIMIT)
             ->setInitialDebtorFinancingLimit(self::SANDBOX_MERCHANT_DEBTOR_LIMIT)
+            ->setIban($this->ibanGenerator->iban('DE', null, 24))
+            ->setBic($this->ibanGenerator->bic())
             ->setName($merchant->getName())
             ->setSchufaId($company->getSchufaId())
             ->setCrefoId($company->getCrefoId())
@@ -65,7 +72,7 @@ class MerchantStartIntegrationUseCase
             ->setAddressCity($company->getAddressCity())
             ->setAddressCountry($company->getAddressCountry())
             ->setLegalForm($company->getLegalForm())
-            ;
+        ;
 
         try {
             /** @var MerchantWithCompanyCreationDTO $creationDTO */

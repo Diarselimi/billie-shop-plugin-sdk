@@ -30,6 +30,8 @@ use OpenApi\Annotations as OA;
  *               description="Authorization header that will be sent with the merchant webhooks.
  *                             Currently only `X-Api-Key: XXX` and `Authorization: Basic XXX` formats are supported."
  *          ),
+ *          @OA\Property(property="iban", ref="#/components/schemas/TinyText", example="DE87500105173872482875"),
+ *          @OA\Property(property="bic", ref="#/components/schemas/TinyText", example="AABSDE31"),
  *          @OA\Property(property="is_onboarding_complete", type="boolean"),
  *      },
  *      required={"name", "legal_form", "address_street", "address_city", "address_postal_code", "address_country", "crefo_id", "schufa_id"}

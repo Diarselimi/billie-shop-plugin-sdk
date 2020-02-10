@@ -6,6 +6,10 @@ use App\Application\Exception\RequestValidationException;
 use App\Application\UseCase\CreateMerchant\CreateMerchantResponse;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
+use App\DomainModel\BankAccount\BankAccountCoreAcceptedAnnouncer;
+use App\DomainModel\BankAccount\BankAccountDTOFactory;
+use App\DomainModel\BankAccount\IbanDTOFactory;
+use App\DomainModel\BankAccount\SepaMandateReferenceGenerator;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
 use App\DomainModel\Merchant\DuplicateMerchantCompanyException;
@@ -20,36 +24,40 @@ class CreateMerchantWithCompanyUseCase implements ValidatedUseCaseInterface
 {
     use ValidatedUseCaseTrait;
 
-    /**
-     * @var CompaniesServiceInterface
-     */
     private $companiesService;
 
-    /**
-     * @var MerchantCreationService
-     */
     private $merchantCreationService;
 
-    /**
-     * @var UuidGeneratorInterface
-     */
     private $uuidGenerator;
 
-    /**
-     * @var MerchantRepositoryInterface
-     */
     private $merchantRepository;
+
+    private $bankAccountDTOFactory;
+
+    private $announcer;
+
+    private $mandateReferenceGenerator;
+
+    private $ibanFactory;
 
     public function __construct(
         UuidGeneratorInterface $uuidGenerator,
         MerchantCreationService $merchantCreationService,
         CompaniesServiceInterface $companiesService,
-        MerchantRepositoryInterface $merchantRepository
+        MerchantRepositoryInterface $merchantRepository,
+        BankAccountDTOFactory $bankAccountDTOFactory,
+        BankAccountCoreAcceptedAnnouncer $announcer,
+        SepaMandateReferenceGenerator $mandateReferenceGenerator,
+        IbanDTOFactory $ibanFactory
     ) {
         $this->uuidGenerator = $uuidGenerator;
         $this->merchantCreationService = $merchantCreationService;
         $this->companiesService = $companiesService;
         $this->merchantRepository = $merchantRepository;
+        $this->bankAccountDTOFactory = $bankAccountDTOFactory;
+        $this->announcer = $announcer;
+        $this->mandateReferenceGenerator = $mandateReferenceGenerator;
+        $this->ibanFactory = $ibanFactory;
     }
 
     public function execute(CreateMerchantWithCompanyRequest $request): CreateMerchantResponse
@@ -78,6 +86,16 @@ class CreateMerchantWithCompanyUseCase implements ValidatedUseCaseInterface
                 ->setWebhookAuthorization($request->getWebhookAuthorization())
                 ->setIsOnboardingComplete($request->isOnboardingComplete())
         );
+
+        $bankAccount = $this->bankAccountDTOFactory->create(
+            $creationDTO->getCompany()->getName(),
+            $this->ibanFactory->createFromString($request->getIban()),
+            $request->getBic(),
+            $creationDTO->getPaymentUuid()
+        );
+
+        $mandateReference = $this->mandateReferenceGenerator->generate();
+        $this->announcer->announce($bankAccount, $mandateReference);
 
         return new CreateMerchantResponse(
             $creationDTO->getMerchant(),

@@ -34,6 +34,18 @@ class MerchantWithCompanyCreationDTO extends DebtorCreationDTO
      */
     private $isOnboardingComplete;
 
+    /**
+     * @Assert\Iban()
+     * @Assert\NotBlank()
+     */
+    private $iban;
+
+    /**
+     * @Assert\Bic()
+     * @Assert\NotBlank()
+     */
+    private $bic;
+
     public function getMerchantFinancingLimit(): float
     {
         return $this->merchantFinancingLimit;
@@ -94,6 +106,30 @@ class MerchantWithCompanyCreationDTO extends DebtorCreationDTO
         return $this;
     }
 
+    public function getIban(): ?string
+    {
+        return $this->iban;
+    }
+
+    public function setIban($iban): MerchantWithCompanyCreationDTO
+    {
+        $this->iban = $iban;
+
+        return $this;
+    }
+
+    public function getBic(): ?string
+    {
+        return $this->bic;
+    }
+
+    public function setBic($bic): MerchantWithCompanyCreationDTO
+    {
+        $this->bic = $bic;
+
+        return $this;
+    }
+
     public function toArray(): array
     {
         return array_merge(parent::toArray(), [
@@ -102,6 +138,8 @@ class MerchantWithCompanyCreationDTO extends DebtorCreationDTO
             'webhook_url' => $this->getWebhookUrl(),
             'webhook_authorization' => $this->getWebhookAuthorization(),
             'is_onboarding_complete' => $this->isOnboardingComplete(),
+            'iban' => $this->getIban(),
+            'bic' => $this->getBic(),
         ]);
     }
 }

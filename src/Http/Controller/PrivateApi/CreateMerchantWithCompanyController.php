@@ -56,6 +56,8 @@ class CreateMerchantWithCompanyController
         $useCaseRequest = (new CreateMerchantWithCompanyRequest())
             ->setMerchantFinancingLimit($request->get('merchant_financing_limit', 0))
             ->setInitialDebtorFinancingLimit($request->get('initial_debtor_financing_limit', 0))
+            ->setIban($request->get('iban'))
+            ->setBic($request->get('bic'))
             ->setWebhookUrl($request->get('webhook_url'))
             ->setWebhookAuthorization($request->get('webhook_authorization'))
             ->setIsOnboardingComplete($request->get('is_onboarding_complete', false))
