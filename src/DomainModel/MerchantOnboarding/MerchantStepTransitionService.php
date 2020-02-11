@@ -30,6 +30,10 @@ class MerchantStepTransitionService
             throw new MerchantOnboardingStepNotFoundException();
         }
 
+        if ($transitionName === MerchantOnboardingStepTransitionEntity::TRANSITION_COMPLETE && $step->isComplete()) {
+            return; // APIS-1905: ignore multiple transition to complete
+        }
+
         $this->transitionStepEntity($step, $transitionName);
     }
 
