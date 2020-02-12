@@ -87,7 +87,11 @@ class SetupMerchantBankAccountUseCase implements ValidatedUseCaseInterface
             throw new SetupMerchantBankAccountMissingBicException();
         }
 
-        $this->stepTransitionService->transitionStepEntity($step, MerchantOnboardingStepTransitionEntity::TRANSITION_REQUEST_CONFIRMATION);
+        $this->stepTransitionService->transition(
+            MerchantOnboardingStepEntity::STEP_SEPA_MANDATE_CONFIRMATION,
+            MerchantOnboardingStepTransitionEntity::TRANSITION_REQUEST_CONFIRMATION,
+            $merchant->getId()
+        );
 
         $bankAccount = $this->bankAccountDTOFactory->create(
             $merchant->getName(),

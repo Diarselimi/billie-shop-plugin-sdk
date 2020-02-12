@@ -43,7 +43,7 @@ class SaveMerchantFinancialAssessmentUseCase implements ValidatedUseCaseInterfac
             $this->stepTransitionService->transition(
                 MerchantOnboardingStepEntity::STEP_FINANCIAL_ASSESSMENT,
                 MerchantOnboardingStepTransitionEntity::TRANSITION_REQUEST_CONFIRMATION,
-                $request->getMerchantPaymentUuid()
+                $request->getMerchantId()
             );
         } catch (MerchantOnboardingStepNotFoundException | WorkflowException $exception) {
             throw new MerchantOnboardingStepTransitionException();

@@ -1018,10 +1018,10 @@ class PaellaCoreContext extends MinkContext
     /**
      * @Given The following onboarding steps are in states for merchant :merchantPaymentUuid:
      */
-    public function theFollowingOnboardingStepsAreInStates(TableNode $table, $merchantPaymentUuid)
+    public function theFollowingOnboardingStepsAreInStates(TableNode $table, $merchantId)
     {
         foreach ($table as $row) {
-            $step = $this->getMerchantOnboardingStepRepository()->getOneByStepNameAndPaymentUuid($row['name'], $merchantPaymentUuid);
+            $step = $this->getMerchantOnboardingStepRepository()->getOneByStepNameAndPaymentUuid($row['name'], $merchantId);
             $step->setState($row['state']);
             $this->getMerchantOnboardingStepRepository()->update($step);
         }
@@ -1030,9 +1030,9 @@ class PaellaCoreContext extends MinkContext
     /**
      * @Given the onboarding step :step should be in state :state for merchant :merchantPaymentUuid
      */
-    public function theOnboardingStepShouldBeInState(string $step, string $state, string $merchantPaymentUuid)
+    public function theOnboardingStepShouldBeInState(string $step, string $state, int $merchantId)
     {
-        $step = $this->getMerchantOnboardingStepRepository()->getOneByStepNameAndPaymentUuid($step, $merchantPaymentUuid);
+        $step = $this->getMerchantOnboardingStepRepository()->getOneByStepNameAndPaymentUuid($step, $merchantId);
         Assert::eq($step->getState(), $state, 'The onboarding step is in a different state');
     }
 

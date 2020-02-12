@@ -11,6 +11,7 @@
         "doctrine/annotations": "^1.6",
         "egulias/email-validator": "^2.1",
         "eightpoints/guzzle-bundle": "^7.3",
+        "farmatholin/segment-io-bundle": "^1.2",
         "globalcitizen/php-iban": "^2.7",
         "illuminate/support": "^5.8",
         "ocramius/proxy-manager": "2.2.0",

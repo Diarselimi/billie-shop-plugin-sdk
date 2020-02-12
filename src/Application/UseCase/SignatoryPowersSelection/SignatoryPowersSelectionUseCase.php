@@ -42,7 +42,7 @@ class SignatoryPowersSelectionUseCase implements ValidatedUseCaseInterface
             $this->stepTransitionService->transition(
                 MerchantOnboardingStepEntity::STEP_SIGNATORY_CONFIRMATION,
                 MerchantOnboardingStepTransitionEntity::TRANSITION_REQUEST_CONFIRMATION,
-                $selectionsRequest->getMerchantPaymentUuid()
+                $selectionsRequest->getMerchantUser()->getMerchantId()
             );
         } catch (MerchantOnboardingStepNotFoundException | WorkflowException $exception) {
             throw new MerchantOnboardingStepTransitionException();
@@ -77,7 +77,7 @@ class SignatoryPowersSelectionUseCase implements ValidatedUseCaseInterface
                 $this->stepTransitionService->transition(
                     MerchantOnboardingStepEntity::STEP_SIGNATORY_CONFIRMATION,
                     MerchantOnboardingStepTransitionEntity::TRANSITION_COMPLETE,
-                    $selectionsRequest->getMerchantPaymentUuid()
+                    $selectionsRequest->getMerchantUser()->getMerchantId()
                 );
             }
         }

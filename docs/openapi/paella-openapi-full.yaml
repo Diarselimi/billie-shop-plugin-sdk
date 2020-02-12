@@ -659,6 +659,14 @@ paths:
         - 'Dashboard Merchants'
       summary: 'Merchant Onboarding Step Transition'
       operationId: merchant_onboarding_step_transition_update
+      parameters:
+        -
+          name: uuid
+          in: path
+          description: 'Merchant Payment UUID'
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
       requestBody:
         required: true
         content:
@@ -686,6 +694,14 @@ paths:
         - 'Dashboard Merchants'
       summary: 'Merchant Onboarding Transition'
       operationId: merchant_onboarding_transition_change
+      parameters:
+        -
+          name: uuid
+          in: path
+          description: 'Merchant Payment UUID'
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
       requestBody:
         required: true
         content:

@@ -150,6 +150,9 @@
     "fabpot/goutte": {
         "version": "v3.2.2"
     },
+    "farmatholin/segment-io-bundle": {
+        "version": "1.2.1"
+    },
     "fesor/json_matcher": {
         "version": "0.2.3"
     },
@@ -377,6 +380,9 @@
     },
     "sebastian/version": {
         "version": "2.0.1"
+    },
+    "segmentio/analytics-php": {
+        "version": "1.5.2"
     },
     "sensio/framework-extra-bundle": {
         "version": "5.2",

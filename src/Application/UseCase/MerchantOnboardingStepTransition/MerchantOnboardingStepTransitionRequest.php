@@ -36,7 +36,7 @@ class MerchantOnboardingStepTransitionRequest implements ValidatedRequestInterfa
      */
     private $transition;
 
-    public function __construct(string $merchantPaymentUuid, $step, $state)
+    public function __construct(string $merchantPaymentUuid, string $step, string $state)
     {
         $this->merchantPaymentUuid = $merchantPaymentUuid;
         $this->step = $step;

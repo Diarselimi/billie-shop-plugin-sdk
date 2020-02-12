@@ -1,0 +1,4 @@
+segment_io:
+  # env: dev
+  options:
+    debug: true

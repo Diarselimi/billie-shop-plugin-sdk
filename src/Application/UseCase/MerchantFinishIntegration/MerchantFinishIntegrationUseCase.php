@@ -26,7 +26,7 @@ class MerchantFinishIntegrationUseCase
             ->transition(
                 $request->getStepName(),
                 $request->getTransitionName(),
-                $request->getMerchantPaymentUuid()
+                $request->getMerchantId()
             );
     }
 }

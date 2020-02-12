@@ -6,6 +6,7 @@ use App\Application\UseCase\MerchantUserLogin\MerchantUserLoginResponse;
 use App\Application\UseCase\RegisterInvitedMerchantUser\Exception\RegisterInvitedMerchantUserException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
+use App\DomainEvent\MerchantOnboarding\MerchantOnboardingAdminUserCreated;
 use App\DomainModel\MerchantUser\MerchantUserAlreadyExistsException;
 use App\DomainModel\MerchantUser\MerchantUserEntity;
 use App\DomainModel\MerchantUser\MerchantUserEntityFactory;
@@ -13,6 +14,7 @@ use App\DomainModel\MerchantUser\MerchantUserLoginService;
 use App\DomainModel\MerchantUser\MerchantUserRegistrationService;
 use App\DomainModel\MerchantUser\MerchantUserService;
 use App\DomainModel\MerchantUserInvitation\MerchantUserInvitationEntity;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class RegisterInvitedMerchantUserUseCase implements ValidatedUseCaseInterface
 {
@@ -26,16 +28,20 @@ class RegisterInvitedMerchantUserUseCase implements ValidatedUseCaseInterface
 
     private $userService;
 
+    private $eventDispatcher;
+
     public function __construct(
         MerchantUserEntityFactory $merchantUserEntityFactory,
         MerchantUserRegistrationService $registrationService,
         MerchantUserLoginService $loginService,
-        MerchantUserService $userService
+        MerchantUserService $userService,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->merchantUserEntityFactory = $merchantUserEntityFactory;
         $this->loginService = $loginService;
         $this->registrationService = $registrationService;
         $this->userService = $userService;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function execute(RegisterInvitedMerchantUserRequest $request): MerchantUserLoginResponse
@@ -46,6 +52,7 @@ class RegisterInvitedMerchantUserUseCase implements ValidatedUseCaseInterface
         $email = $request->getInvitation()->getEmail();
         $login = $this->loginService->login($email, $request->getPassword());
         $merchantUserResponse = $this->userService->getUser($merchantUser->getUuid(), $email);
+        $this->eventDispatcher->dispatch(new MerchantOnboardingAdminUserCreated($merchantUser->getMerchantId()));
 
         return new MerchantUserLoginResponse($merchantUserResponse, $login->getAccessToken());
     }

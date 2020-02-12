@@ -2,6 +2,6 @@
 
 namespace App\Application\UseCase\GetMerchant;
 
-class MerchantNotFoundException extends \Exception
+class MerchantNotFoundException extends \RuntimeException
 {
 }

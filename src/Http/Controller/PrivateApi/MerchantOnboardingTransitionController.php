@@ -21,6 +21,14 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     tags={"Dashboard Merchants"},
  *     x={"groups":{"private"}},
  *
+ *     @OA\Parameter(
+ *          in="path",
+ *          name="uuid",
+ *          @OA\Schema(ref="#/components/schemas/UUID"),
+ *          description="Merchant Payment UUID",
+ *          required=true
+ *     ),
+ *
  *     @OA\RequestBody(
  *          required=true,
  *          @OA\MediaType(mediaType="application/json",

@@ -46,7 +46,7 @@ class StartIdentityVerificationUseCase implements ValidatedUseCaseInterface
             $this->stepTransitionService->transition(
                 MerchantOnboardingStepEntity::STEP_IDENTITY_VERIFICATION,
                 MerchantOnboardingStepTransitionEntity::TRANSITION_REQUEST_CONFIRMATION,
-                $request->getMerchantPaymentUuid()
+                $request->getMerchantId()
             );
         } catch (MerchantOnboardingStepNotFoundException | WorkflowException $exception) {
             throw new MerchantOnboardingStepTransitionException();

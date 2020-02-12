@@ -14,4 +14,5 @@ return [
     Ozean12\AmqpPackBundle\Ozean12AmqpPackBundle::class => ['all' => true],
     Ozean12\GraphQLBundle\GraphQLBundle::class => ['all' => true],
     Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle::class => ['all' => true],
+    Farmatholin\SegmentIoBundle\SegmentIoBundle::class => ['all' => true],
 ];

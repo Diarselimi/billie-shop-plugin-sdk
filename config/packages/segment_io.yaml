@@ -1,0 +1,12 @@
+segment_io:
+  write_key: "%env(SEGMENT_IO_API_KEY)%"
+  guest_id: "guest"
+  env: prod
+  options:
+    consumer: socket
+    debug: false
+    ssl: false
+    max_queue_size: 10000
+    batch_size: 100
+    timeout: 0.5
+    filename: null

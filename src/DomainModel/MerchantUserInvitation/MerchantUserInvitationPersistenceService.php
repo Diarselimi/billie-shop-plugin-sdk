@@ -2,9 +2,11 @@
 
 namespace App\DomainModel\MerchantUserInvitation;
 
+use App\DomainEvent\MerchantOnboarding\MerchantOnboardingAdminInvited;
 use App\DomainModel\MerchantUser\MerchantUserRoleEntity;
 use App\DomainModel\MerchantUser\MerchantUserRoleRepositoryInterface;
 use App\DomainModel\MerchantUser\RoleNotFoundException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MerchantUserInvitationPersistenceService
 {
@@ -14,14 +16,18 @@ class MerchantUserInvitationPersistenceService
 
     private $invitationFactory;
 
+    private $eventDispatcher;
+
     public function __construct(
         MerchantUserRoleRepositoryInterface $merchantUserRoleRepository,
         MerchantUserInvitationRepositoryInterface $invitationRepository,
-        MerchantUserInvitationEntityFactory $invitationFactory
+        MerchantUserInvitationEntityFactory $invitationFactory,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->merchantUserRoleRepository = $merchantUserRoleRepository;
         $this->invitationRepository = $invitationRepository;
         $this->invitationFactory = $invitationFactory;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function createInvitation(?MerchantUserRoleEntity $role, int $merchantId, string $email, ?\DateTime $expiresAt = null): MerchantUserInvitationEntity
@@ -39,6 +45,10 @@ class MerchantUserInvitationPersistenceService
             $invitation->setExpiresAt($expiresAt);
         }
         $this->invitationRepository->create($invitation);
+
+        if ($role->isAdmin()) {
+            $this->eventDispatcher->dispatch(new MerchantOnboardingAdminInvited($merchantId));
+        }
 
         return $invitation;
     }

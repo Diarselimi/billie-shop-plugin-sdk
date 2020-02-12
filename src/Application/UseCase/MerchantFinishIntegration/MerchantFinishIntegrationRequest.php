@@ -8,15 +8,15 @@ use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepTransitionEntity;
 
 class MerchantFinishIntegrationRequest implements ValidatedRequestInterface
 {
-    private $merchantPaymentUuid;
+    private $merchantId;
 
     private $stepName;
 
     private $transitionName;
 
-    public function __construct(string $merchantPaymentUuid)
+    public function __construct(int $merchantId)
     {
-        $this->merchantPaymentUuid = $merchantPaymentUuid;
+        $this->merchantId = $merchantId;
         $this->stepName = MerchantOnboardingStepEntity::STEP_TECHNICAL_INTEGRATION;
         $this->transitionName = MerchantOnboardingStepTransitionEntity::TRANSITION_REQUEST_CONFIRMATION;
     }
@@ -31,8 +31,8 @@ class MerchantFinishIntegrationRequest implements ValidatedRequestInterface
         return $this->transitionName;
     }
 
-    public function getMerchantPaymentUuid(): string
+    public function getMerchantId(): int
     {
-        return $this->merchantPaymentUuid;
+        return $this->merchantId;
     }
 }

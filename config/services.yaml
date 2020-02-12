@@ -40,6 +40,7 @@ services:
       $orderWorkflow: '@state_machine.order'
       $onboardingStepWorkflow: '@state_machine.merchant_onboarding_step'
       $onboardingWorkflow: '@state_machine.merchant_onboarding'
+      $segmentIoProvider: '@segment_io.analytics'
 
   _instanceof:
     App\Application\UseCase\ValidatedUseCaseInterface:

@@ -48,7 +48,7 @@ class MerchantFinishIntegrationController
     public function execute()
     {
         $useCaseRequest = new MerchantFinishIntegrationRequest(
-            $this->userProvider->getUser()->getMerchant()->getPaymentUuid()
+            $this->userProvider->getUser()->getMerchant()->getId()
         );
 
         try {

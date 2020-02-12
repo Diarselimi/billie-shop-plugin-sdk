@@ -3,6 +3,7 @@
 namespace App\Http\Controller\PrivateApi;
 
 use App\Application\Exception\WorkflowException;
+use App\Application\UseCase\GetMerchant\MerchantNotFoundException;
 use App\Application\UseCase\MerchantOnboardingStepTransition\MerchantOnboardingStepTransitionRequest;
 use App\Application\UseCase\MerchantOnboardingStepTransition\MerchantOnboardingStepTransitionUseCase;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepNotFoundException;
@@ -19,6 +20,14 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *
  *     tags={"Dashboard Merchants"},
  *     x={"groups":{"private"}},
+ *
+ *     @OA\Parameter(
+ *          in="path",
+ *          name="uuid",
+ *          @OA\Schema(ref="#/components/schemas/UUID"),
+ *          description="Merchant Payment UUID",
+ *          required=true
+ *     ),
  *
  *     @OA\RequestBody(
  *          required=true,
@@ -54,6 +63,8 @@ class MerchantOnboardingStepTransitionController
             $this->useCase->execute($useCaseRequest);
         } catch (MerchantOnboardingStepNotFoundException $exception) {
             throw new NotFoundHttpException('Onboarding step not found', $exception);
+        } catch (MerchantNotFoundException $exception) {
+            throw new NotFoundHttpException('Merchant not found', $exception);
         } catch (WorkflowException $exception) {
             throw new BadRequestHttpException('Transition not supported', $exception);
         }

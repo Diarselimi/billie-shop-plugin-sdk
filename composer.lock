@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fc9ba0aab4252576cfbdd3a955385c5a",
+    "content-hash": "753b9f812a9825c9b9a307281d84636c",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -1318,6 +1318,58 @@
                 "testing"
             ],
             "time": "2019-05-27T13:12:22+00:00"
+        },
+        {
+            "name": "farmatholin/segment-io-bundle",
+            "version": "1.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/farmatholin/SegmentIoBundle.git",
+                "reference": "02f3f2ac9b26a1ec8d0df3e1954ed2f265f55ef6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/farmatholin/SegmentIoBundle/zipball/02f3f2ac9b26a1ec8d0df3e1954ed2f265f55ef6",
+                "reference": "02f3f2ac9b26a1ec8d0df3e1954ed2f265f55ef6",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/annotations": "1.*",
+                "php": ">=5.4",
+                "psr/log": "^1.0",
+                "segmentio/analytics-php": "^1.5",
+                "symfony/config": ">= 2.7",
+                "symfony/dependency-injection": ">= 2.7",
+                "symfony/http-kernel": ">= 2.7",
+                "symfony/security-core": ">= 2.7"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Farmatholin\\SegmentIoBundle\\": "."
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Vladislav Marin",
+                    "email": "farmatholin@gmail.com"
+                }
+            ],
+            "description": "Segment.io php lib",
+            "homepage": "http://github.com/farmatholin/SegmentIoBundle",
+            "keywords": [
+                "bundle",
+                "doctrine",
+                "farmatholin",
+                "segment",
+                "segmentio",
+                "symfony"
+            ],
+            "time": "2019-10-01T08:43:35+00:00"
         },
         {
             "name": "globalcitizen/php-iban",
@@ -3145,6 +3197,55 @@
                 "phinx"
             ],
             "time": "2019-08-28T12:24:19+00:00"
+        },
+        {
+            "name": "segmentio/analytics-php",
+            "version": "1.5.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/segmentio/analytics-php.git",
+                "reference": "9513e3762ab24c9abd00078b0fb9e185aec10e07"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/segmentio/analytics-php/zipball/9513e3762ab24c9abd00078b0fb9e185aec10e07",
+                "reference": "9513e3762ab24c9abd00078b0fb9e185aec10e07",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0"
+            },
+            "bin": [
+                "bin/analytics"
+            ],
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "lib/Segment.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Segment.io <friends@segment.com>",
+                    "homepage": "https://segment.com/"
+                }
+            ],
+            "description": "Segment Analytics PHP Library",
+            "homepage": "https://segment.com/libraries/php",
+            "keywords": [
+                "analytics",
+                "analytics.js",
+                "segment",
+                "segmentio"
+            ],
+            "time": "2017-08-18T22:13:00+00:00"
         },
         {
             "name": "sensio/framework-extra-bundle",
