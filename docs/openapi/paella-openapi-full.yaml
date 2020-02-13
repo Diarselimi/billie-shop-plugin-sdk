@@ -936,41 +936,6 @@ paths:
           $ref: '#/components/responses/ServerError'
       x-groups:
         - private
-  '/checkout-session/{sessionUuid}/authorize':
-    put:
-      tags:
-        - 'Checkout Client'
-      summary: 'Checkout Session Authorize'
-      description: 'Authorizes an existing checkout session, completing all missing order data.'
-      operationId: checkout_session_authorize
-      parameters:
-        -
-          name: sessionUuid
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/UUID'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateOrderRequest'
-      responses:
-        '200':
-          description: 'Order created with ''authorized'' state, but a merchant confirmation is needed.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CheckoutSessionAuthorizeResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   '/order/{id}/cancel':
     post:
       tags:
@@ -1003,6 +968,41 @@ paths:
       x-groups:
         - public
         - private
+  '/checkout-session/{sessionUuid}/authorize':
+    put:
+      tags:
+        - 'Checkout Client'
+      summary: 'Checkout Session Authorize'
+      description: 'Authorizes an existing checkout session, completing all missing order data.'
+      operationId: checkout_session_authorize
+      parameters:
+        -
+          name: sessionUuid
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '200':
+          description: 'Order created with ''authorized'' state, but a merchant confirmation is needed.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckoutAuthorizeOrderResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      x-groups:
+        - private
   '/checkout-session/{sessionUuid}/confirm':
     put:
       tags:
@@ -1022,7 +1022,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CheckoutSessionConfirmOrderRequest'
+              $ref: '#/components/schemas/CheckoutConfirmOrderRequest'
       responses:
         '202':
           description: 'Order data successfully confirmed'
@@ -1036,6 +1036,46 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+      x-groups:
+        - public
+        - private
+  /checkout-session:
+    post:
+      tags:
+        - 'Checkout Server'
+      summary: 'Checkout Session Create'
+      description: 'Initializes a new Billie Checkout session for the given customer.'
+      operationId: checkout_session_create
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                merchant_customer_id:
+                  description: 'Debtor ID in the merchant system.'
+                  $ref: '#/components/schemas/TinyText'
+              type: object
+      responses:
+        '200':
+          description: 'Checkout session created.'
+          content:
+            application/json:
+              schema:
+                required:
+                  - id
+                properties:
+                  id: { description: 'Checkout Session Token', $ref: '#/components/schemas/UUID' }
+                type: object
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/ServerError'
       security:
@@ -1087,46 +1127,6 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-      x-groups:
-        - public
-        - private
-  /checkout-session:
-    post:
-      tags:
-        - 'Checkout Server'
-      summary: 'Checkout Session Create'
-      description: 'Initializes a new Billie Checkout session for the given customer.'
-      operationId: checkout_session_create
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              properties:
-                merchant_customer_id:
-                  description: 'Debtor ID in the merchant system.'
-                  $ref: '#/components/schemas/TinyText'
-              type: object
-      responses:
-        '200':
-          description: 'Checkout session created.'
-          content:
-            application/json:
-              schema:
-                required:
-                  - id
-                properties:
-                  id: { description: 'Checkout Session Token', $ref: '#/components/schemas/UUID' }
-                type: object
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/ServerError'
       security:
@@ -2429,6 +2429,7 @@ components:
       type: string
       enum:
         - new
+        - pre_waiting
         - authorized
         - waiting
         - created
@@ -2615,7 +2616,7 @@ components:
           type: string
           nullable: false
       type: object
-    CheckoutSessionConfirmOrderRequest:
+    CheckoutConfirmOrderRequest:
       required:
         - amount
         - duration
@@ -3739,7 +3740,7 @@ components:
           example: '2019-03-20'
           nullable: true
       type: object
-    CheckoutSessionAuthorizeResponse:
+    CheckoutAuthorizeOrderResponse:
       title: 'Authorize Checkout Order Response'
       properties:
         state:

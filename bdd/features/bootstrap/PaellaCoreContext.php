@@ -336,7 +336,7 @@ class PaellaCoreContext extends MinkContext
         $checkoutSession = new CheckoutSessionEntity();
         $checkoutSession->setMerchantId(1)
             ->setMerchantDebtorExternalId($arg1)
-            ->setUuid("123123-".$arg1)
+            ->setUuid($arg1)
             ->setIsActive($active)
             ->setCreatedAt(new DateTime())
             ->setUpdatedAt(new DateTime());
@@ -843,6 +843,20 @@ class PaellaCoreContext extends MinkContext
         Assert::notNull($notification);
     }
 
+    /**
+     * @Given Order notification should NOT exist for order :orderCode with type :notificationType
+     */
+    public function orderNotificationShouldNotExistForOrderWithType($orderCode, $notificationType)
+    {
+        $order = $this->getOrderRepository()->getOneByExternalCode($orderCode, $this->merchant->getId());
+
+        $notification = $this
+            ->getOrderNotificationRepository()
+            ->getOneByOrderIdAndNotificationType($order->getId(), $notificationType);
+
+        Assert::null($notification);
+    }
+
     private function getDebtorExternalDataRepository(): DebtorExternalDataRepositoryInterface
     {
         return $this->get(DebtorExternalDataRepositoryInterface::class);
@@ -1156,6 +1170,28 @@ class PaellaCoreContext extends MinkContext
         $merchant = $this->getMerchantRepository()->getOneById($this->merchant->getId());
 
         Assert::notNull($merchant->getSepaB2BDocumentUuid(), 'There is no file.');
+    }
+
+    /**
+     * @Given The :check merchant risk check for merchant :merchantId is configured as enabled = :enabledValue and decline_on_failure = :declineValue
+     */
+    public function theMerchantRiskCheckForMerchantIsConfiguredAsEnabledAndDecline_on_failure(
+        $check,
+        $merchantId,
+        $enabledValue,
+        $declineValue
+    ) {
+        $riskCheckDefinition = $this->getRiskCheckDefinitionRepository()->getByName($check);
+        Assert::isInstanceOf(
+            $riskCheckDefinition,
+            RiskCheckDefinitionEntity::class,
+            "risk check {$check} not found for merchant {$merchantId}"
+        );
+
+        $this->getConnection()->exec(
+            "UPDATE merchant_risk_check_settings SET enabled={$enabledValue}, decline_on_failure={$declineValue} WHERE id="
+            . $riskCheckDefinition->getId()
+        );
     }
 
     /**

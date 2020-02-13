@@ -48,7 +48,7 @@ class DeclineOrderUseCaseSpec extends ObjectBehavior
         $this->shouldThrow(OrderNotFoundException::class)->during('execute', [$request]);
     }
 
-    public function it_throws_exception_if_order_is_not_in_waiting_or_pre_approved_state(
+    public function it_throws_exception_if_transition_not_supported(
         OrderContainerFactory $orderContainerFactory,
         DeclineOrderRequest $request,
         OrderStateManager $orderStateManager,
@@ -62,13 +62,7 @@ class DeclineOrderUseCaseSpec extends ObjectBehavior
         ;
 
         $orderStateManager
-            ->isWaiting($order)
-            ->shouldBeCalled()
-            ->willReturn(false)
-        ;
-
-        $orderStateManager
-            ->isPreApproved($order)
+            ->can($order, OrderStateManager::TRANSITION_DECLINE)
             ->shouldBeCalled()
             ->willReturn(false)
         ;
@@ -76,7 +70,7 @@ class DeclineOrderUseCaseSpec extends ObjectBehavior
         $this->shouldThrow(WorkflowException::class)->during('execute', [$request]);
     }
 
-    public function it_successfully_declines_the_order_if_in_waiting_state(
+    public function it_successfully_declines_if_transition_is_supported(
         OrderContainerFactory $orderContainerFactory,
         DeclineOrderRequest $request,
         OrderStateManager $orderStateManager,
@@ -90,36 +84,7 @@ class DeclineOrderUseCaseSpec extends ObjectBehavior
         ;
 
         $orderStateManager
-            ->isWaiting($order)
-            ->shouldBeCalled()
-            ->willReturn(true)
-        ;
-
-        $orderStateManager->decline($orderContainer)->shouldBeCalledOnce();
-        $this->execute($request);
-    }
-
-    public function it_successfully_declines_the_order_if_in_pre_approved_state(
-        OrderContainerFactory $orderContainerFactory,
-        DeclineOrderRequest $request,
-        OrderStateManager $orderStateManager,
-        OrderEntity $order,
-        OrderContainer $orderContainer
-    ) {
-        $orderContainerFactory
-            ->loadByUuid(self::ORDER_UUID)
-            ->shouldBeCalled()
-            ->willReturn($orderContainer)
-        ;
-
-        $orderStateManager
-            ->isWaiting($order)
-            ->shouldBeCalled()
-            ->willReturn(false)
-        ;
-
-        $orderStateManager
-            ->isPreApproved($order)
+            ->can($order, OrderStateManager::TRANSITION_DECLINE)
             ->shouldBeCalled()
             ->willReturn(true)
         ;

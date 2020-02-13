@@ -12,6 +12,10 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
 
     private const STATE_LATE = 'late';
 
+    public const MAX_DURATION_IN_PRE_WAITING_STATE = '1 days';
+
+    public const MAX_DURATION_IN_AUTHORIZED_STATE = '1 days';
+
     public const MAX_DURATION_IN_WAITING_STATE = '9 days';
 
     public const MAX_DURATION_IN_PRE_APPROVED_STATE = '30 days';

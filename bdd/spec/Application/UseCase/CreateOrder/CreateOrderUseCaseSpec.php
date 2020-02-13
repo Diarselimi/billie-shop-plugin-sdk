@@ -4,22 +4,22 @@ namespace spec\App\Application\UseCase\CreateOrder;
 
 use App\Application\UseCase\CreateOrder\CreateOrderRequest;
 use App\Application\UseCase\CreateOrder\CreateOrderUseCase;
+use App\Application\UseCase\CreateOrder\Request\CreateOrderAmountRequest;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\MerchantDebtor\Finder\MerchantDebtorFinder;
 use App\DomainModel\MerchantDebtor\Finder\MerchantDebtorFinderResult;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
+use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\Order\IdentifyAndTriggerAsyncIdentification;
 use App\DomainModel\Order\NewOrder\OrderCreationDTO;
 use App\DomainModel\Order\NewOrder\OrderPersistenceService;
-use App\Application\UseCase\CreateOrder\Request\CreateOrderAmountRequest;
-use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\Order\OrderChecksRunnerService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
-use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
+use App\DomainModel\OrderResponse\OrderResponse;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -51,6 +51,7 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
         $persistNewOrderService->persistFromRequest($request)->willReturn($newOrderDTO);
         $orderContainerFactory->createFromNewOrderDTO($newOrderDTO)->willReturn($orderContainer);
 
+        $orderContainer->getMerchantDebtor()->willReturn((new MerchantDebtorEntity())->setId(1));
         $orderContainer->getOrder()->willReturn($order);
         $orderContainer->getMerchantSettings()->willReturn($merchantSettings);
         $order->getCheckoutSessionId()->willReturn(1);
@@ -70,33 +71,87 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
         OrderChecksRunnerService $orderChecksRunnerService,
         OrderStateManager $orderStateManager,
         OrderContainer $orderContainer,
-        CreateOrderRequest $request
+        CreateOrderRequest $request,
+        OrderEntity $order,
+        OrderResponseFactory $orderResponseFactory
     ) {
-        $orderChecksRunnerService->runPreIdentificationChecks($orderContainer)->willReturn(false);
+        $orderChecksRunnerService->passesPreIdentificationChecks($orderContainer)->shouldBeCalledOnce()->willReturn(false);
+        $orderStateManager->isDeclined($order)->shouldBeCalledOnce()->willReturn(true);
         $orderStateManager->decline($orderContainer)->shouldBeCalledOnce();
+        $orderResponseFactory->create($orderContainer)->shouldBeCalledOnce()->willReturn(new OrderResponse());
 
-        $this->shouldNotThrow(\Exception::class)->during('execute', [$request]);
+        $this->execute($request);
     }
 
     public function it_should_be_declined_if_post_identifications_checks_fail(
         OrderChecksRunnerService $orderChecksRunnerService,
-        MerchantDebtorFinder $debtorFinder,
         OrderStateManager $orderStateManager,
         OrderContainer $orderContainer,
         CreateOrderRequest $request,
-        MerchantDebtorFinderResult $result
+        OrderEntity $order,
+        OrderResponseFactory $orderResponseFactory,
+        IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification
     ) {
-        $orderChecksRunnerService->runPreIdentificationChecks($orderContainer)->willReturn(false);
+        $merchantDebtor = (new MerchantDebtorEntity())->setId(1);
+        $orderContainer->getMerchantDebtor()->willReturn($merchantDebtor);
 
-        $result->getMerchantDebtor()->willReturn(new MerchantDebtorEntity());
-        $result->getDebtorCompany()->willReturn(new DebtorCompany());
-        $debtorFinder->findDebtor($orderContainer)->willReturn($result);
+        $orderChecksRunnerService->passesPreIdentificationChecks($orderContainer)->shouldBeCalledOnce()->willReturn(true);
+        $identifyAndTriggerAsyncIdentification->identifyDebtor($orderContainer)->shouldBeCalledOnce()->willReturn(true);
+        $orderChecksRunnerService->passesPostIdentificationChecks($orderContainer)->shouldBeCalledOnce()->willReturn(false);
 
-        $orderChecksRunnerService->runPostIdentificationChecks($orderContainer)->willReturn(false);
-
+        $orderStateManager->isDeclined($order)->shouldBeCalledOnce()->willReturn(true);
         $orderStateManager->decline($orderContainer)->shouldBeCalledOnce();
+        $orderResponseFactory->create($orderContainer)->shouldBeCalledOnce()->willReturn(new OrderResponse());
 
-        $this->shouldNotThrow(\Exception::class)->during('execute', [$request]);
+        $this->execute($request);
+    }
+
+    public function it_should_put_the_order_in_waiting_state_if_has_soft_declinable_checks(
+        OrderChecksRunnerService $orderChecksRunnerService,
+        OrderStateManager $orderStateManager,
+        OrderContainer $orderContainer,
+        CreateOrderRequest $request,
+        OrderEntity $order,
+        OrderResponseFactory $orderResponseFactory,
+        IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification
+    ) {
+        $merchantDebtor = (new MerchantDebtorEntity())->setId(1);
+        $orderContainer->getMerchantDebtor()->willReturn($merchantDebtor);
+
+        $orderChecksRunnerService->passesPreIdentificationChecks($orderContainer)->shouldBeCalledOnce()->willReturn(true);
+        $identifyAndTriggerAsyncIdentification->identifyDebtor($orderContainer)->shouldBeCalledOnce()->willReturn(true);
+        $orderChecksRunnerService->passesPostIdentificationChecks($orderContainer)->shouldBeCalledOnce()->willReturn(true);
+        $orderChecksRunnerService->hasFailedSoftDeclinableChecks($orderContainer)->shouldBeCalledOnce()->willReturn(true);
+
+        $orderStateManager->isDeclined($order)->shouldBeCalledOnce()->willReturn(false);
+        $orderStateManager->wait($orderContainer)->shouldBeCalledOnce();
+        $orderResponseFactory->create($orderContainer)->shouldBeCalledOnce()->willReturn(new OrderResponse());
+
+        $this->execute($request);
+    }
+
+    public function it_should_succeed_if_all_is_fine(
+        OrderChecksRunnerService $orderChecksRunnerService,
+        OrderStateManager $orderStateManager,
+        OrderContainer $orderContainer,
+        CreateOrderRequest $request,
+        OrderEntity $order,
+        OrderResponseFactory $orderResponseFactory,
+        IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification
+    ) {
+        $merchantDebtor = (new MerchantDebtorEntity())->setId(1);
+        $orderContainer->getMerchantDebtor()->willReturn($merchantDebtor);
+
+        $orderChecksRunnerService->passesPreIdentificationChecks($orderContainer)->shouldBeCalledOnce()->willReturn(true);
+        $identifyAndTriggerAsyncIdentification->identifyDebtor($orderContainer)->shouldBeCalledOnce()->willReturn(true);
+        $orderChecksRunnerService->passesPostIdentificationChecks($orderContainer)->shouldBeCalledOnce()->willReturn(true);
+        $orderChecksRunnerService->hasFailedSoftDeclinableChecks($orderContainer)->shouldBeCalledOnce()->willReturn(false);
+
+        $orderStateManager->isDeclined($order)->shouldBeCalledOnce()->willReturn(false);
+        $orderStateManager->approve($orderContainer)->shouldBeCalledOnce();
+        $orderResponseFactory->create($orderContainer)->shouldBeCalledOnce()->willReturn(new OrderResponse());
+
+        $this->execute($request);
     }
 
     private function mockRequest(CreateOrderRequest $request)
@@ -104,9 +159,9 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
         $request->getDuration()->willReturn(30);
         $request->getAmount()->willReturn(
             (new CreateOrderAmountRequest())
-            ->setNet(123.3)
-            ->setTax(123.33)
-            ->setGross(22.22)
+                ->setNet(123.3)
+                ->setTax(123.33)
+                ->setGross(22.22)
         );
         $request->getMerchantId()->willReturn(30);
         $request->getCheckoutSessionId()->willReturn(1);

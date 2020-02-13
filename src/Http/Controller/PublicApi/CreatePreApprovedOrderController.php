@@ -2,7 +2,7 @@
 
 namespace App\Http\Controller\PublicApi;
 
-use App\Application\UseCase\CreatePreApproveOrder\CreatePreApprovedOrderUseCase;
+use App\Application\UseCase\CreatePreApprovedOrder\CreatePreApprovedOrderUseCase;
 use App\DomainModel\OrderResponse\OrderResponse;
 use App\Http\RequestHandler\CreateOrderRequestFactory;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;

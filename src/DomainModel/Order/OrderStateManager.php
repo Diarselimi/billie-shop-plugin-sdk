@@ -3,10 +3,12 @@
 namespace App\DomainModel\Order;
 
 use App\Application\Exception\WorkflowException;
+use App\DomainEvent\Order\OrderAuthorizedEvent;
 use App\DomainEvent\Order\OrderCanceledEvent;
 use App\DomainEvent\Order\OrderCompleteEvent;
 use App\DomainEvent\Order\OrderApprovedEvent;
 use App\DomainEvent\Order\OrderDeclinedEvent;
+use App\DomainEvent\Order\OrderInPreWaitingStateEvent;
 use App\DomainEvent\Order\OrderInWaitingStateEvent;
 use App\DomainEvent\Order\OrderIsLateEvent;
 use App\DomainEvent\Order\OrderPaidOutEvent;
@@ -23,6 +25,8 @@ class OrderStateManager implements LoggingInterface
     use LoggingTrait;
 
     public const STATE_NEW = 'new';
+
+    public const STATE_PRE_WAITING = 'pre_waiting';
 
     public const STATE_AUTHORIZED = 'authorized';
 
@@ -46,6 +50,7 @@ class OrderStateManager implements LoggingInterface
 
     public const ALL_STATES = [
         self::STATE_NEW,
+        self::STATE_PRE_WAITING,
         self::STATE_AUTHORIZED,
         self::STATE_WAITING,
         self::STATE_CREATED,
@@ -66,7 +71,11 @@ class OrderStateManager implements LoggingInterface
         self::STATE_LATE => OrderIsLateEvent::class,
         self::STATE_CANCELED => OrderCanceledEvent::class,
         self::STATE_COMPLETE => OrderCompleteEvent::class,
+        self::STATE_PRE_WAITING => OrderInPreWaitingStateEvent::class,
+        self::STATE_AUTHORIZED => OrderAuthorizedEvent::class,
     ];
+
+    public const TRANSITION_PRE_WAITING = 'pre_waiting';
 
     public const TRANSITION_AUTHORIZE = 'authorize';
 
@@ -110,6 +119,11 @@ class OrderStateManager implements LoggingInterface
         $this->eventDispatcher = $eventDispatcher;
     }
 
+    public function can(OrderEntity $order, string $transitionName): bool
+    {
+        return $this->workflow->can($order, $transitionName);
+    }
+
     public function wasShipped(OrderEntity $order): bool
     {
         return in_array($order->getState(), [
@@ -117,6 +131,11 @@ class OrderStateManager implements LoggingInterface
             self::STATE_PAID_OUT,
             self::STATE_LATE,
         ], true);
+    }
+
+    public function isPreWaiting(OrderEntity $order): bool
+    {
+        return $order->getState() === self::STATE_PRE_WAITING;
     }
 
     public function isLate(OrderEntity $order): bool
@@ -189,6 +208,12 @@ class OrderStateManager implements LoggingInterface
     public function wait(OrderContainer $orderContainer)
     {
         $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_WAITING);
+        $this->update($orderContainer);
+    }
+
+    public function preWait(OrderContainer $orderContainer)
+    {
+        $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_PRE_WAITING);
         $this->update($orderContainer);
     }
 

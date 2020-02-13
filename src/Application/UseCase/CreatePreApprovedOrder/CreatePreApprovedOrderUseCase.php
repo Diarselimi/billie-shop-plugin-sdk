@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Application\UseCase\CreateOrder;
+namespace App\Application\UseCase\CreatePreApprovedOrder;
 
+use App\Application\UseCase\CreateOrder\CreateOrderRequest;
 use App\Application\UseCase\OrderCreationUseCaseTrait;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
@@ -16,7 +17,7 @@ use App\DomainModel\OrderResponse\OrderResponseFactory;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
-class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
+class CreatePreApprovedOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 {
     use LoggingTrait, ValidatedUseCaseTrait, OrderCreationUseCaseTrait;
 
@@ -49,12 +50,12 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         }
 
         if ($this->orderChecksRunnerService->hasFailedSoftDeclinableChecks($orderContainer)) {
-            $this->orderStateManager->wait($orderContainer);
+            $this->orderStateManager->decline($orderContainer);
 
             return $this->orderResponseFactory->create($orderContainer);
         }
 
-        $this->orderStateManager->approve($orderContainer);
+        $this->orderStateManager->preApprove($orderContainer);
 
         return $this->orderResponseFactory->create($orderContainer);
     }

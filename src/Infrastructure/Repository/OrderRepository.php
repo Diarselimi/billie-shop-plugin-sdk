@@ -204,6 +204,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
               merchant_debtor_id = :merchant_debtor_id,
               amount_forgiven = :amount_forgiven,
               shipped_at = :shipped_at,
+              updated_at = :updated_at,
               payment_id = :payment_id,
               invoice_number = :invoice_number,
               invoice_url = :invoice_url,
@@ -212,10 +213,11 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
             WHERE id = :id
         ', [
             'external_code' => $order->getExternalCode(),
-            'amount_forgiven' => $order->getAmountForgiven(),
             'state' => $order->getState(),
             'merchant_debtor_id' => $order->getMerchantDebtorId(),
+            'amount_forgiven' => $order->getAmountForgiven(),
             'shipped_at' => $order->getShippedAt() ? $order->getShippedAt()->format(self::DATE_FORMAT) : null,
+            'updated_at' => (new \DateTime())->format(self::DATE_FORMAT),
             'payment_id' => $order->getPaymentId(),
             'invoice_number' => $order->getInvoiceNumber(),
             'invoice_url' => $order->getInvoiceUrl(),
@@ -223,6 +225,21 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
             'marked_as_fraud_at' => $order->getMarkedAsFraudAt() ? $order->getMarkedAsFraudAt()->format(self::DATE_FORMAT)
                 : null,
             'id' => $order->getId(),
+        ]);
+    }
+
+    public function updateMerchantDebtor(int $orderId, int $merchantDebtorId): void
+    {
+        $this->doUpdate('
+            UPDATE ' . self::TABLE_NAME . '
+            SET
+              merchant_debtor_id = :merchant_debtor_id,
+              updated_at = :updated_at
+            WHERE id = :id
+        ', [
+            'merchant_debtor_id' => $merchantDebtorId,
+            'updated_at' => (new \DateTime())->format(self::DATE_FORMAT),
+            'id' => $orderId,
         ]);
     }
 
@@ -363,18 +380,21 @@ SQL;
         }
     }
 
-    public function getAuthorizedByCheckoutSessionUuid(string $checkoutSessionUuid): ?OrderEntity
+    public function getNotYetConfirmedByCheckoutSessionUuid(string $checkoutSessionUuid): ?OrderEntity
     {
-        $sql = 'SELECT orders.'  . implode(', orders.', self::SELECT_FIELDS) . ' FROM orders
+        $states = array_map(function ($state) {
+            return "'{$state}'";
+        }, [OrderStateManager::STATE_PRE_WAITING, OrderStateManager::STATE_AUTHORIZED]);
+
+        $sql = 'SELECT orders.' . implode(', orders.', self::SELECT_FIELDS) . ' FROM orders
             INNER JOIN checkout_sessions ch ON ch.id = orders.checkout_session_id
-            WHERE ch.uuid = :checkout_session_uuid AND orders.state = :authorized_state
+            WHERE ch.uuid = :checkout_session_uuid AND orders.state IN (' . implode(',', $states) . ')
         ';
 
         $row = $this->doFetchOne(
             $sql,
             [
                 'checkout_session_uuid' => $checkoutSessionUuid,
-                'authorized_state' => OrderStateManager::STATE_AUTHORIZED,
             ]
         );
 

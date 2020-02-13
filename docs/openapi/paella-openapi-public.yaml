@@ -187,7 +187,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CheckoutSessionConfirmOrderRequest'
+              $ref: '#/components/schemas/CheckoutConfirmOrderRequest'
       responses:
         '202':
           description: 'Order data successfully confirmed'
@@ -201,6 +201,43 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+  /checkout-session:
+    post:
+      tags:
+        - 'Checkout Server'
+      summary: 'Checkout Session Create'
+      description: 'Initializes a new Billie Checkout session for the given customer.'
+      operationId: checkout_session_create
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                merchant_customer_id:
+                  description: 'Debtor ID in the merchant system.'
+                  $ref: '#/components/schemas/TinyText'
+              type: object
+      responses:
+        '200':
+          description: 'Checkout session created.'
+          content:
+            application/json:
+              schema:
+                required:
+                  - id
+                properties:
+                  id: { description: 'Checkout Session Token', $ref: '#/components/schemas/UUID' }
+                type: object
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/ServerError'
       security:
@@ -249,43 +286,6 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-  /checkout-session:
-    post:
-      tags:
-        - 'Checkout Server'
-      summary: 'Checkout Session Create'
-      description: 'Initializes a new Billie Checkout session for the given customer.'
-      operationId: checkout_session_create
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              properties:
-                merchant_customer_id:
-                  description: 'Debtor ID in the merchant system.'
-                  $ref: '#/components/schemas/TinyText'
-              type: object
-      responses:
-        '200':
-          description: 'Checkout session created.'
-          content:
-            application/json:
-              schema:
-                required:
-                  - id
-                properties:
-                  id: { description: 'Checkout Session Token', $ref: '#/components/schemas/UUID' }
-                type: object
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/ServerError'
       security:
@@ -600,6 +600,7 @@ components:
       type: string
       enum:
         - new
+        - pre_waiting
         - authorized
         - waiting
         - created
@@ -705,7 +706,7 @@ components:
           type: string
           nullable: false
       type: object
-    CheckoutSessionConfirmOrderRequest:
+    CheckoutConfirmOrderRequest:
       required:
         - amount
         - duration

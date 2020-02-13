@@ -46,17 +46,17 @@ class OrderChecksRunnerService implements LoggingInterface
         $this->postIdentificationChecks = $postIdentificationChecks;
     }
 
-    public function runPreIdentificationChecks(OrderContainer $orderContainer): bool
+    public function passesPreIdentificationChecks(OrderContainer $orderContainer): bool
     {
         return $this->runChecks($orderContainer, $this->preIdentificationChecks);
     }
 
-    public function runPostIdentificationChecks(OrderContainer $orderContainer): bool
+    public function passesPostIdentificationChecks(OrderContainer $orderContainer): bool
     {
         return $this->runChecks($orderContainer, $this->postIdentificationChecks);
     }
 
-    public function checkForFailedSoftDeclinableCheckResults(OrderContainer $orderContainer): bool
+    public function hasFailedSoftDeclinableChecks(OrderContainer $orderContainer): bool
     {
         $riskCheckResults = $orderContainer->getRiskChecks();
 

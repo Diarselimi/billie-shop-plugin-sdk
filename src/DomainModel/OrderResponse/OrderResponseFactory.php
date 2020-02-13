@@ -150,7 +150,7 @@ class OrderResponseFactory
     }
 
     /**
-     * @param OrderResponse|CheckoutSessionAuthorizeResponse $response
+     * @param OrderResponse|CheckoutAuthorizeOrderResponse $response
      */
     private function addCompanyData(OrderContainer $orderContainer, $response)
     {
@@ -198,10 +198,10 @@ class OrderResponseFactory
         ;
     }
 
-    public function createAuthorizeResponse(OrderContainer $orderContainer): CheckoutSessionAuthorizeResponse
+    public function createAuthorizeResponse(OrderContainer $orderContainer): CheckoutAuthorizeOrderResponse
     {
         $order = $orderContainer->getOrder();
-        $response = (new CheckoutSessionAuthorizeResponse())
+        $response = (new CheckoutAuthorizeOrderResponse())
             ->setState($order->getState())
         ;
 
@@ -215,8 +215,8 @@ class OrderResponseFactory
     }
 
     /**
-     * @param  OrderResponse|CheckoutSessionAuthorizeResponse $response
-     * @return OrderResponse|CheckoutSessionAuthorizeResponse $response
+     * @param  OrderResponse|CheckoutAuthorizeOrderResponse $response
+     * @return OrderResponse|CheckoutAuthorizeOrderResponse $response
      */
     private function addReasons(OrderEntity $order, $response)
     {

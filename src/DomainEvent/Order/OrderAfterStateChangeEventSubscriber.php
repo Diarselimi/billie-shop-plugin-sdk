@@ -19,6 +19,10 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
 {
     use LoggingTrait, SlackClientAwareTrait;
 
+    private const PRE_WAITING_STATE_QUEUE_ROUTING_KEY = 'order_in_pre_waiting_state_paella';
+
+    private const AUTHORIZED_STATE_QUEUE_ROUTING_KEY = 'order_in_authorized_state_paella';
+
     private const WAITING_STATE_QUEUE_ROUTING_KEY = 'order_in_waiting_state_paella';
 
     private const PRE_APPROVED_STATE_QUEUE_ROUTING_KEY = 'order_in_pre_approved_state_paella';
@@ -54,6 +58,8 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
             OrderPaidOutEvent::class => 'onPaidOut',
             OrderIsLateEvent::class => 'onLate',
             OrderCanceledEvent::class => 'onCancel',
+            OrderInPreWaitingStateEvent::class => 'onPreWaiting',
+            OrderAuthorizedEvent::class => 'onAuthorized',
         ];
     }
 
@@ -136,6 +142,28 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
             self::PRE_APPROVED_STATE_QUEUE_ROUTING_KEY,
             ['order_id' => $order->getUuid(), 'merchant_id' => $order->getMerchantId()],
             OrderEntity::MAX_DURATION_IN_PRE_APPROVED_STATE
+        );
+    }
+
+    public function onPreWaiting(OrderInPreWaitingStateEvent $event): void
+    {
+        $order = $event->getOrderContainer()->getOrder();
+
+        $this->delayedMessageProducer->produce(
+            self::PRE_WAITING_STATE_QUEUE_ROUTING_KEY,
+            ['order_id' => $order->getUuid(), 'merchant_id' => $order->getMerchantId()],
+            OrderEntity::MAX_DURATION_IN_PRE_WAITING_STATE
+        );
+    }
+
+    public function onAuthorized(OrderAuthorizedEvent $event): void
+    {
+        $order = $event->getOrderContainer()->getOrder();
+
+        $this->delayedMessageProducer->produce(
+            self::AUTHORIZED_STATE_QUEUE_ROUTING_KEY,
+            ['order_id' => $order->getUuid(), 'merchant_id' => $order->getMerchantId()],
+            OrderEntity::MAX_DURATION_IN_AUTHORIZED_STATE
         );
     }
 

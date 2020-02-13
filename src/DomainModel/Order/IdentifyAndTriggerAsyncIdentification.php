@@ -45,6 +45,8 @@ class IdentifyAndTriggerAsyncIdentification implements LoggingInterface
             ->setDebtorCompany($debtorFinderResult->getDebtorCompany())
         ;
 
+        $orderContainer->getOrder()->setMerchantDebtorId($debtorFinderResult->getMerchantDebtor()->getId());
+
         return true;
     }
 
