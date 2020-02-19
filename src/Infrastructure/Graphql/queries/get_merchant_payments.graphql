@@ -26,7 +26,7 @@ query q(
         transaction_counterparty_name: bank_transaction_counterparty_name
         transaction_reference: bank_transaction_reference
         merchant_debtor {
-            uuid
+          uuid
         }
     }
 }

@@ -15,25 +15,24 @@ class MerchantPaymentResponseTransformer
 
     public function expandPaymentItem(array $item): array
     {
-        $item = $this->addIsAllocated($item);
-        $item = $this->addOverpaidAmount($item);
-
-        $item['merchant_debtor_uuid'] = $item['merchant_debtor']['uuid'] ?? null;
-        unset($item['merchant_debtor']);
+        $this->addMerchantDebtorUuid($item);
+        $this->addIsAllocated($item);
+        $this->addOverpaidAmount($item);
 
         return $item;
     }
 
-    public function addIsAllocated(array $item): array
+    public function addMerchantDebtorUuid(array &$item): void
     {
-        if (array_key_exists('is_allocated', $item)) {
-            $item['is_allocated'] = (bool) $item['is_allocated'];
-        }
-
-        return $item;
+        $item['merchant_debtor_uuid'] = $item['merchant_debtor']['uuid'];
     }
 
-    public function addOverpaidAmount(array $item): array
+    public function addIsAllocated(array &$item): void
+    {
+        $item['is_allocated'] = (bool) $item['is_allocated'];
+    }
+
+    public function addOverpaidAmount(array &$item): void
     {
         $overpayment = 0;
         $orders = array_filter($item['orders'], static function (array $order) use (&$overpayment) {
@@ -44,9 +43,7 @@ class MerchantPaymentResponseTransformer
             $overpayment = $order['mapped_amount'];
         });
 
-        $item['orders'] = $orders;
+        $item['orders'] = array_values($orders);
         $item['overpaid_amount'] = $overpayment;
-
-        return $item;
     }
 }
