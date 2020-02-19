@@ -51,6 +51,7 @@ class OrderEntityFactory
             ->setCreatedAt(new \DateTime($row['created_at']))
             ->setUpdatedAt(new \DateTime($row['updated_at']))
             ->setCheckoutSessionId($row['checkout_session_id'])
+            ->setCompanyBillingAddressUuid($row['company_billing_address_uuid'])
         ;
     }
 }

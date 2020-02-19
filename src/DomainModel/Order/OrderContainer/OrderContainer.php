@@ -108,6 +108,13 @@ class OrderContainer
             ?? $this->billingAddress = $this->relationLoader->loadBillingAddress($this);
     }
 
+    public function setBillingAddress(?AddressEntity $address): OrderContainer
+    {
+        $this->billingAddress = $address;
+
+        return $this;
+    }
+
     public function getMerchant(): MerchantEntity
     {
         return $this->merchant

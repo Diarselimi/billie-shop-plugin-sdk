@@ -47,6 +47,18 @@ class AddressEntityFactory
         ;
     }
 
+    public function createDebtorCompanyAddressFromDatabaseRow(array $row): AddressEntity
+    {
+        return (new AddressEntity())
+            ->setCountry($row['country'])
+            ->setCity($row['city'])
+            ->setPostalCode($row['postal_code'])
+            ->setStreet($row['street'])
+            ->setHouseNumber($row['house'])
+            ->setAddition('addition')
+            ;
+    }
+
     public function createFromDebtorCompany(DebtorCompany $debtorCompany): AddressEntity
     {
         return (new AddressEntity())

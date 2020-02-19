@@ -51,7 +51,7 @@ Feature: When I send a request to save I should be able to save financial data f
       "default_rate": 50.0
     }
     """
-    And The following onboarding steps are in states for merchant "f2ec4d5e-79f4-40d6-b411-31174b6519ac":
+    And The following onboarding steps are in states for merchant 1:
       | name                  | state     |
       | financial_assessment  |  confirmation_pending |
     When I send a POST request to "/merchant/financial-assessment" with body:

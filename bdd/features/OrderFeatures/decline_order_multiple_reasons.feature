@@ -235,7 +235,7 @@ Feature:
     And The following notification settings exist for merchant 1:
         | notification_type | enabled |
         | order_declined    | 1       |
-    When I send a POST request to "/private/order/test-order-uuid/decline"
+    When I send a POST request to "/private/order/test-order-uuidCO123/decline"
     Then the response status code should be 204
     And the order CO123 is in state declined
     And Order notification should NOT exist for order "CO123" with type "order_declined"

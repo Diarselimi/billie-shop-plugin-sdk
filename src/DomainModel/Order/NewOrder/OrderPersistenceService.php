@@ -111,6 +111,7 @@ class OrderPersistenceService
             $debtorExternalData,
             $debtorAddress,
             $deliveryAddress,
+            $billingAddress,
             $lineItems
         );
     }

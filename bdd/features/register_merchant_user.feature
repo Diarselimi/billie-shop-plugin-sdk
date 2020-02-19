@@ -41,6 +41,7 @@ Feature: Register merchant user to access dashboard
     """
     Then the response status code should be 201
     And merchant user with merchant id 1 and user id "test-auth-id" should be created
+    And I add "X-Test" header equal to 1
     When I get a response from Authentication Service from endpoint "/users" with status code 409
     When I send a POST request to "/private/merchant/1/user" with body:
     """
@@ -52,7 +53,8 @@ Feature: Register merchant user to access dashboard
         "password": "testPassword"
     }
     """
-    Then the response status code should be 403
+    Then print last JSON response
+    And the response status code should be 403
 
   Scenario: validation error
     When I send a POST request to "/private/merchant/1/user" with body:

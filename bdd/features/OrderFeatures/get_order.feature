@@ -163,67 +163,67 @@ Feature:
     And I get from salesforce dunning status endpoint "Created" status
     When I send a GET request to "/order/XF43Y"
     Then the response status code should be 200
+    And print last JSON response
     And the JSON response should be:
     """
     {
-        "order_id": "XF43Y",
-        "uuid": "test123",
-        "state": "late",
-        "reasons": null,
-        "decline_reason": null,
-        "amount": 1000,
-        "amount_net": 900,
-        "amount_tax": 100,
-        "duration": 30,
-        "dunning_status": "active",
-        "debtor_company": {
-            "name": "Test User Company",
-            "address_house_number": "10",
-            "address_street": "Heinrich-Heine-Platz",
-            "address_postal_code": "10179",
-            "address_city": "Berlin",
-            "address_country": "DE"
-        },
-        "bank_account": {
-            "iban": "DE1234",
-            "bic": "BICISHERE"
-        },
-        "invoice": {
-            "invoice_number": null,
-            "payout_amount": 1000,
-            "outstanding_amount": 1000,
-            "fee_amount": 10,
-            "fee_rate": 1,
-            "due_date": "1978-11-20",
-            "pending_merchant_payment_amount": 0,
-            "pending_cancellation_amount": 0
-        },
-        "debtor_external_data": {
-            "merchant_customer_id": "ext_id",
-            "name": "test",
-            "address_country": "TE",
-            "address_city": "testCity",
-            "address_postal_code": "test",
-            "address_street": "test",
-            "address_house": "test",
-            "industry_sector": "test"
-        },
-        "delivery_address": {
-            "house_number": "test",
-            "street": "test",
-            "city": "test",
-            "postal_code": "test",
-            "country": "TE"
-        },
-        "billing_address":{
+       "order_id":"XF43Y",
+       "state":"late",
+       "reasons":null,
+       "decline_reason":null,
+       "amount":1000,
+       "amount_net":900,
+       "amount_tax":100,
+       "duration":30,
+       "dunning_status":"not_started",
+       "debtor_company":{
+          "name":"Test User Company",
+          "address_house_number":"10",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_postal_code":"10179",
+          "address_city":"Berlin",
+          "address_country":"DE"
+       },
+       "bank_account":{
+          "iban":"DE1234",
+          "bic":"BICISHERE"
+       },
+       "invoice":{
+          "invoice_number":null,
+          "payout_amount":1000,
+          "outstanding_amount":1000,
+          "fee_amount":10,
+          "fee_rate":1,
+          "due_date":"1978-11-20",
+          "pending_merchant_payment_amount":0,
+          "pending_cancellation_amount":0
+       },
+       "debtor_external_data":{
+          "merchant_customer_id":"ext_id",
+          "name":"test",
+          "address_country":"TE",
+          "address_city":"testCity",
+          "address_postal_code":"test",
+          "address_street":"test",
+          "address_house":"test",
+          "industry_sector":"test"
+       },
+       "delivery_address":{
           "house_number":"test",
           "street":"test",
           "city":"test",
           "postal_code":"test",
           "country":"TE"
-        },
-        "created_at": "2019-05-20T13:00:00+0200",
-        "shipped_at": null
+       },
+       "billing_address":{
+          "house_number":"test",
+          "street":"test",
+          "city":"test",
+          "postal_code":"test",
+          "country":"TE"
+       },
+       "created_at":"2019-05-20T13:00:00+0200",
+       "shipped_at":null
     }
     """
 

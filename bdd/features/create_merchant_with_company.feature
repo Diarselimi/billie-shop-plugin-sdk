@@ -5,7 +5,7 @@ Feature: Create a new merchant specifying the data of the company that will be c
     And I add "X-Test" header equal to 1
 
   Scenario: Failed to create a merchant - provided data is wrong data
-    When I send a POST request to "/api/merchant/with-company" with body:
+    When I send a POST request to "/private/merchant/with-company" with body:
       """
       {
         "merchant_financing_limit": "x2",
@@ -19,26 +19,36 @@ Feature: Create a new merchant specifying the data of the company that will be c
     And the JSON response should be:
       """
       {
-        "errors": [
+        "errors":[
           {
-            "title": "This value should be of type float.",
-            "code": "request_validation_error",
-            "source": "merchant_financing_limit"
+            "title":"The number should have have maximum 2 numbers after decimal.",
+            "code":"request_validation_error",
+            "source":"merchant_financing_limit"
           },
           {
-            "title": "This value should be of type float.",
-            "code": "request_validation_error",
-            "source": "initial_debtor_financing_limit"
+            "title":"The number should have have maximum 2 numbers after decimal.",
+            "code":"request_validation_error",
+            "source":"initial_debtor_financing_limit"
           },
           {
-            "title": "This value is not a valid URL.",
-            "code": "request_validation_error",
-            "source": "webhook_url"
+            "title":"This value is not a valid URL.",
+            "code":"request_validation_error",
+            "source":"webhook_url"
           },
           {
-            "title": "This value should be of type bool.",
-            "code": "request_validation_error",
-            "source": "is_onboarding_complete"
+            "title":"This value should be of type bool.",
+            "code":"request_validation_error",
+            "source":"is_onboarding_complete"
+          },
+          {
+            "title":"This value should not be blank.",
+            "code":"request_validation_error",
+            "source":"iban"
+          },
+          {
+            "title":"This value should not be blank.",
+            "code":"request_validation_error",
+            "source":"bic"
           }
         ]
       }
@@ -86,7 +96,7 @@ Feature: Create a new merchant specifying the data of the company that will be c
         ]
       }
       """
-    When I send a POST request to "/api/merchant/with-company" with body:
+    When I send a POST request to "/private/merchant/with-company" with body:
       """
       {
         "merchant_financing_limit": 5000.44,
@@ -100,46 +110,16 @@ Feature: Create a new merchant specifying the data of the company that will be c
     And the JSON response should be:
       """
       {
-        "errors": [
+        "errors":[
           {
-            "title": "This value should not be blank.",
-            "code": "request_validation_error",
-            "source": "name"
+             "title":"This value should not be blank.",
+             "code":"request_validation_error",
+             "source":"iban"
           },
           {
-            "title": "This value should not be blank.",
-            "code": "request_validation_error",
-            "source": "legal_form"
-          },
-          {
-            "title": "This value should not be blank.",
-            "code": "request_validation_error",
-            "source": "address_street"
-          },
-          {
-            "title": "This value should not be blank.",
-            "code": "request_validation_error",
-            "source": "address_city"
-          },
-          {
-            "title": "This value should not be blank.",
-            "code": "request_validation_error",
-            "source": "address_postal_code"
-          },
-          {
-            "title": "This value should not be blank.",
-            "code": "request_validation_error",
-            "source": "address_country"
-          },
-          {
-            "title": "One of crefo_id or schufa_id should be provided, but both are empty.",
-            "code": "request_validation_error",
-            "source": "crefo_id"
-          },
-          {
-            "title": "One of crefo_id or schufa_id should be provided, but both are empty.",
-            "code": "request_validation_error",
-            "source": "schufa_id"
+             "title":"This value should not be blank.",
+             "code":"request_validation_error",
+             "source":"bic"
           }
         ]
       }
@@ -150,7 +130,7 @@ Feature: Create a new merchant specifying the data of the company that will be c
       """
       {"error": "Something went wrong"}
       """
-    When I send a POST request to "/api/merchant/with-company" with body:
+    When I send a POST request to "/private/merchant/with-company" with body:
       """
       {
         "name": "Gunny GmbH",
@@ -165,10 +145,13 @@ Feature: Create a new merchant specifying the data of the company that will be c
         "initial_debtor_financing_limit": 500.00,
         "webhook_url": "http://billie.md",
         "webhook_authorization": "X-Api-Key: key",
-        "is_onboarding_complete": false
+        "is_onboarding_complete": false,
+        "iban": "DE87500105173872482875",
+        "bic": "AABSDE31"
       }
       """
-    Then the response status code should be 503
+    Then print last JSON response
+    And the response status code should be 503
     And the JSON response should be:
       """
       {"errors":[{"title":"Merchant company creation failed.","code":"service_unavailable"}]}
@@ -196,7 +179,7 @@ Feature: Create a new merchant specifying the data of the company that will be c
         "is_from_trusted_source": true
       }
       """
-    When I send a POST request to "/api/merchant/with-company" with body:
+    When I send a POST request to "/private/merchant/with-company" with body:
       """
       {
         "name": "Gunny GmbH",
@@ -211,7 +194,9 @@ Feature: Create a new merchant specifying the data of the company that will be c
         "initial_debtor_financing_limit": 500.00,
         "webhook_url": "http://billie.md",
         "webhook_authorization": "X-Api-Key: key",
-        "is_onboarding_complete": false
+        "is_onboarding_complete": false,
+        "iban": "DE87500105173872482875",
+        "bic": "AABSDE31"
       }
       """
     Then the response status code should be 409
@@ -243,7 +228,7 @@ Feature: Create a new merchant specifying the data of the company that will be c
         "is_from_trusted_source": true
       }
       """
-    When I send a POST request to "/api/merchant/with-company" with body:
+    When I send a POST request to "/private/merchant/with-company" with body:
       """
       {
         "name": "Gunny GmbH",
@@ -258,7 +243,9 @@ Feature: Create a new merchant specifying the data of the company that will be c
         "initial_debtor_financing_limit": 500.00,
         "webhook_url": "http://billie.md",
         "webhook_authorization": "X-Api-Key: key",
-        "is_onboarding_complete": false
+        "is_onboarding_complete": false,
+        "iban": "DE87500105173872482875",
+        "bic": "AABSDE31"
       }
       """
     Then the response status code should be 503
@@ -301,7 +288,8 @@ Feature: Create a new merchant specifying the data of the company that will be c
       | debtor_overdue            |
       | company_b2b_score         |
     And I successfully create OAuth client with id testClientId and secret testClientSecret
-    When I send a POST request to "/api/merchant/with-company" with body:
+    And I get from limit service create default debtor-customer limit successful response
+    When I send a POST request to "/private/merchant/with-company" with body:
       """
       {
         "name": "Gunny GmbH",
@@ -316,22 +304,29 @@ Feature: Create a new merchant specifying the data of the company that will be c
         "initial_debtor_financing_limit": 500.00,
         "webhook_url": "http://billie.md",
         "webhook_authorization": "X-Api-Key: hola",
-        "is_onboarding_complete": false
+        "is_onboarding_complete": false,
+        "iban": "DE87500105173872482875",
+        "bic": "AABSDE31"
       }
       """
     Then the response status code should be 201
     And the JSON response should be:
       """
       {
-        "name": "Gunny GmbH",
-        "financing_power": 5000.44,
-        "financing_limit": 5000.44,
-        "company_id": "1",
-        "is_active": true,
-        "webhook_url": "http://billie.md",
-        "webhook_authorization": "X-Api-Key: hola",
-        "oauth_client_id": "testClientId",
-        "oauth_client_secret": "testClientSecret"
+         "id":2,
+         "name":"Gunny GmbH",
+         "financing_power":5000.44,
+         "financing_limit":5000.44,
+         "company_id":"1",
+         "company_uuid":"3a88a67f-770c-4e2b-8d56-fba0ca003d6a",
+         "payment_merchant_id":"f90e2969-4c42-4003-8d2e-0f3cc6082ab6",
+         "is_active":true,
+         "webhook_url":"http:\/\/billie.md",
+         "webhook_authorization":"X-Api-Key: hola",
+         "created_at":"2020-02-17 14:27:32",
+         "updated_at":"2020-02-17 14:27:32",
+         "oauth_client_id":"testClientId",
+         "oauth_client_secret":"testClientSecret"
       }
       """
     And the JSON should have "api_key"

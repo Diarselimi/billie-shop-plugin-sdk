@@ -203,7 +203,7 @@ Feature:
     Given I have a pre_approved order "CO123" with amounts 55.2/43.30/10.10, duration 30 and comment "test order"
     And I get from companies service identify match and good decision response
     And I get from companies service get debtor response
-    And I send a POST request to "/order/test-order-uuid/confirm" with body:
+    And I send a POST request to "/order/test-order-uuidCO123/confirm" with body:
     """
     """
     Then the response status code should be 200
@@ -224,7 +224,7 @@ Feature:
   Scenario: Order success confirmation when the order exists in another state than pre_confirmed
     Given I have a created order "CO123" with amounts 55.2/43.30/10.10, duration 30 and comment "test order"
     And I get from companies service identify match and good decision response
-    And I send a POST request to "/order/test-order-uuid/confirm" with body:
+    And I send a POST request to "/order/test-order-uuidCO123/confirm" with body:
     """
     """
     Then the response status code should be 400

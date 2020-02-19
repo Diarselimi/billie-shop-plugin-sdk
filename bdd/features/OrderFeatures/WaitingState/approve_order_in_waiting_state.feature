@@ -42,7 +42,7 @@ Feature: Endpoint to approve an order in waiting state
 
 	Scenario: Order is not in waiting state
 		Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-		When I send a POST request to "/private/order/test-order-uuid/approve"
+		When I send a POST request to "/private/order/test-order-uuidCO123/approve"
 		Then the response status code should be 403
 		And the JSON response should be:
     """
@@ -51,7 +51,7 @@ Feature: Endpoint to approve an order in waiting state
 
 	Scenario: Fails when order is in pre_waiting state
 		Given I have a pre_waiting order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-		When I send a POST request to "/private/order/test-order-uuid/approve"
+		When I send a POST request to "/private/order/test-order-uuidCO123/approve"
 		Then the response status code should be 403
 		And the JSON response should be:
     """
@@ -75,7 +75,7 @@ Feature: Endpoint to approve an order in waiting state
 			| company_b2b_score         | 1         |
 		And I get from companies service get debtor response
     And Debtor has insufficient limit
-		When I send a POST request to "/private/order/test-order-uuid/approve"
+		When I send a POST request to "/private/order/test-order-uuidCO123/approve"
 		Then the response status code should be 403
 		And the JSON response should be:
     """
@@ -102,7 +102,7 @@ Feature: Endpoint to approve an order in waiting state
 		And I get from companies service get debtor response
 		And Debtor has sufficient limit
 		And Debtor lock limit call succeeded
-		When I send a POST request to "/private/order/test-order-uuid/approve"
+		When I send a POST request to "/private/order/test-order-uuidCO123/approve"
 		Then the response status code should be 204
 		And the order CO123 is in state created
 
@@ -123,7 +123,7 @@ Feature: Endpoint to approve an order in waiting state
 			| company_b2b_score         | 1         |
 		And I get from companies service get debtor response
 		And Debtor has insufficient limit
-		When I send a POST request to "/private/order/test-order-uuid/approve"
+		When I send a POST request to "/private/order/test-order-uuidCO123/approve"
 		Then the response status code should be 403
 		And the order CO123 is in state waiting
 
@@ -145,7 +145,7 @@ Feature: Endpoint to approve an order in waiting state
 		And I get from companies service get debtor response
 		And Debtor has sufficient limit
 		And Debtor lock limit call succeeded
-		When I send a POST request to "/private/order/test-order-uuid/approve"
+		When I send a POST request to "/private/order/test-order-uuidCO123/approve"
 		Then the response status code should be 204
 		And the order CO123 is in state created
 
@@ -166,7 +166,7 @@ Feature: Endpoint to approve an order in waiting state
 			| company_b2b_score         | 1         |
 		And Debtor has insufficient limit
 		And I get from companies service get debtor response
-		When I send a POST request to "/private/order/test-order-uuid/approve"
+		When I send a POST request to "/private/order/test-order-uuidCO123/approve"
 		Then the JSON response should be:
     """
     {"errors":[{"title":"Cannot approve the order. Limit check failed","code":"forbidden"}]}
@@ -194,7 +194,7 @@ Feature: Endpoint to approve an order in waiting state
 		And I get from companies service get debtor response
 		And Debtor has sufficient limit
 		And Debtor lock limit call succeeded
-		When I send a POST request to "/private/order/test-order-uuid/approve"
+		When I send a POST request to "/private/order/test-order-uuidCO123/approve"
 		Then the response status code should be 204
 		And the order CO123 is in state created
 		And Order notification should exist for order "CO123" with type "order_approved"

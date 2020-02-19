@@ -27,7 +27,7 @@ Feature:
         """
 
   Scenario: Merchant onboarding transition complete succeeded
-    Given The following onboarding steps are in states for merchant "f2ec4d5e-79f4-40d6-b411-31174b6519ac":
+    Given The following onboarding steps are in states for merchant 1:
       | name                        | state    |
       | financial_assessment        | complete |
       | signatory_confirmation      | complete |

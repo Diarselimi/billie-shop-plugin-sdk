@@ -79,7 +79,7 @@ Feature: As a merchant that is in the onboarding process, I want start the techn
   Scenario: Start integration fails if step is not in state new
     Given I add "X-Test" header equal to 1
     And a merchant user exists with role "admin" and permission MANAGE_ONBOARDING
-    And The following onboarding steps are in states for merchant "f2ec4d5e-79f4-40d6-b411-31174b6519ac":
+    And The following onboarding steps are in states for merchant 1:
       | name                        | state    |
       | financial_assessment        | new      |
       | signatory_confirmation      | new      |

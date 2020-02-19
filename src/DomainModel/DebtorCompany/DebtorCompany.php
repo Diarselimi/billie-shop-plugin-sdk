@@ -2,6 +2,8 @@
 
 namespace App\DomainModel\DebtorCompany;
 
+use App\DomainModel\Address\AddressEntity;
+
 class DebtorCompany
 {
     private $id;
@@ -33,6 +35,10 @@ class DebtorCompany
     private $isSynchronized;
 
     private $legalForm;
+
+    private $debtorBillingAddresses;
+
+    private $billingAddressMatchUuid;
 
     public function getId(): int
     {
@@ -210,6 +216,37 @@ class DebtorCompany
     public function setLegalForm(?string $legalForm): DebtorCompany
     {
         $this->legalForm = $legalForm;
+
+        return $this;
+    }
+
+    /**
+     * @return AddressEntity[]
+     */
+    public function getDebtorBillingAddresses(): array
+    {
+        return $this->debtorBillingAddresses;
+    }
+
+    /**
+     * @param  AddressEntity[] $debtorBillingAddresses
+     * @return DebtorCompany
+     */
+    public function setDebtorBillingAddresses(array $debtorBillingAddresses): DebtorCompany
+    {
+        $this->debtorBillingAddresses = $debtorBillingAddresses;
+
+        return $this;
+    }
+
+    public function getBillingAddressMatchUuid(): ?string
+    {
+        return $this->billingAddressMatchUuid;
+    }
+
+    public function setBillingAddressMatchUuid(?string $billingAddressMatchUuid): DebtorCompany
+    {
+        $this->billingAddressMatchUuid = $billingAddressMatchUuid;
 
         return $this;
     }

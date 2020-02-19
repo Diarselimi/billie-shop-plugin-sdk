@@ -43,6 +43,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
         'shipped_at',
         'marked_as_fraud_at',
         'checkout_session_id',
+        'company_billing_address_uuid',
     ];
 
     private $orderFactory;
@@ -77,6 +78,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
               checkout_session_id, 
               uuid, 
               rid, 
+              company_billing_address_uuid, 
               created_at, 
               updated_at
             ) VALUES (
@@ -97,6 +99,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
               :checkout_session_id,
               :uuid, 
               :rid,
+              :company_billing_address_uuid,
               :created_at, 
               :updated_at
             )
@@ -120,6 +123,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
             'created_at' => $order->getCreatedAt()->format(self::DATE_FORMAT),
             'updated_at' => $order->getUpdatedAt()->format(self::DATE_FORMAT),
             'merchant_debtor_id' => $order->getMerchantDebtorId(),
+            'company_billing_address_uuid' => $order->getCompanyBillingAddressUuid(),
         ]);
 
         $order->setId($id);
@@ -209,7 +213,8 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
               invoice_number = :invoice_number,
               invoice_url = :invoice_url,
               proof_of_delivery_url = :proof_of_delivery_url,
-              marked_as_fraud_at = :marked_as_fraud_at
+              marked_as_fraud_at = :marked_as_fraud_at,
+              company_billing_address_uuid = :company_billing_address_uuid
             WHERE id = :id
         ', [
             'external_code' => $order->getExternalCode(),
@@ -224,6 +229,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
             'proof_of_delivery_url' => $order->getProofOfDeliveryUrl(),
             'marked_as_fraud_at' => $order->getMarkedAsFraudAt() ? $order->getMarkedAsFraudAt()->format(self::DATE_FORMAT)
                 : null,
+            'company_billing_address_uuid' => $order->getCompanyBillingAddressUuid(),
             'id' => $order->getId(),
         ]);
     }

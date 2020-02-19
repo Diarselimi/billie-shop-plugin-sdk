@@ -84,6 +84,7 @@ class OrderContainerFactory
             ->setDeliveryAddress($newOrder->getDeliveryAddress())
             ->setOrderFinancialDetails($newOrder->getFinancialDetails())
             ->setLineItems($newOrder->getLineItems())
+            ->setBillingAddress($newOrder->getBillingAddress())
         ;
     }
 }

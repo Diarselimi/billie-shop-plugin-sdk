@@ -23,6 +23,8 @@ class OrderCreationDTO
 
     private $deliveryAddress;
 
+    private $billingAddress;
+
     private $lineItems;
 
     public function __construct(
@@ -32,6 +34,7 @@ class OrderCreationDTO
         DebtorExternalDataEntity $debtorExternalData,
         AddressEntity $debtorExternalDataAddress,
         AddressEntity $deliveryAddress,
+        AddressEntity $billingAddress,
         array $lineItems
     ) {
         $this->order = $order;
@@ -40,6 +43,7 @@ class OrderCreationDTO
         $this->debtorExternalData = $debtorExternalData;
         $this->debtorExternalDataAddress = $debtorExternalDataAddress;
         $this->deliveryAddress = $deliveryAddress;
+        $this->billingAddress = $billingAddress;
         $this->lineItems = $lineItems;
     }
 
@@ -79,5 +83,10 @@ class OrderCreationDTO
     public function getLineItems(): array
     {
         return $this->lineItems;
+    }
+
+    public function getBillingAddress(): AddressEntity
+    {
+        return $this->billingAddress;
     }
 }

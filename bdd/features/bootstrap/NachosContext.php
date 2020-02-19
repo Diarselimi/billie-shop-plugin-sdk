@@ -50,7 +50,7 @@ class NachosContext implements Context
     {
         $this->mockRequest('/files/c7be46c0-e049-4312-b274-258ec5aeeb70/raw', new ResponseStack(
             new MockResponse(
-                file_get_contents(__DIR__ . '/../resources/sepa_mandate_sample.pdf'),
+                "dummy_string_as_content_for_pdf_file",
                 [
                     'Content-Type' => 'application/force-download',
                     'Content-Transfer-Encoding' => 'binary',

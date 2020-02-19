@@ -93,60 +93,63 @@ Feature:
     And the JSON response should be:
     """
     {
-      "order_id":"A1",
-      "state":"created",
-      "reasons":null,
-      "decline_reason":null,
-      "amount":1000.00,
-      "amount_net": 900.00,
-      "amount_tax": 100.00,
-      "debtor_company":{
-        "name":"Test User Company",
-        "address_house_number":"10",
-        "address_street":"Heinrich-Heine-Platz",
-        "address_postal_code":"10179",
-        "address_city":"Berlin",
-        "address_country":"DE"
-      },
-      "bank_account":{
-        "iban":"DE1234",
-        "bic":"BICISHERE"
-      },
-      "invoice":{
-        "invoice_number":null,
-        "payout_amount":null,
-        "outstanding_amount":null,
-        "fee_amount":null,
-        "fee_rate":null,
-        "due_date":null
-      },
-      "debtor_external_data":{
-        "name":"Test User Company",
-        "address_country":"DE",
-        "address_city": "Berlin",
-        "address_postal_code":"10179",
-        "address_street":"Heinrich-Heine-Platz",
-        "address_house":"10",
-        "industry_sector":"SOME SECTOR",
-        "merchant_customer_id":"12"
-     },
-     "duration":30,
-     "dunning_status": null,
-     "shipped_at":null,
-     "delivery_address":{
-        "house_number":"10",
-        "street":"Heinrich-Heine-Platz",
-        "city":"Berlin",
-        "postal_code":"10179",
-        "country":"DE"
-     },
-     "billing_address":{
-        "house_number":"10",
-        "street":"Heinrich-Heine-Platz",
-        "city": "Berlin",
-        "postal_code":"10179",
-        "country":"DE"
-     }
+       "order_id":"A1",
+       "state":"created",
+       "reasons":null,
+       "decline_reason":null,
+       "amount":1000,
+       "amount_net":900,
+       "amount_tax":100,
+       "duration":30,
+       "dunning_status":null,
+       "debtor_company":{
+          "name":"Test User Company",
+          "address_house_number":"10",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_postal_code":"10179",
+          "address_city":"Berlin",
+          "address_country":"DE"
+       },
+       "bank_account":{
+          "iban":"DE1234",
+          "bic":"BICISHERE"
+       },
+       "invoice":{
+          "invoice_number":null,
+          "payout_amount":null,
+          "outstanding_amount":null,
+          "fee_amount":null,
+          "fee_rate":null,
+          "due_date":null,
+          "pending_merchant_payment_amount":null,
+          "pending_cancellation_amount":null
+       },
+       "debtor_external_data":{
+          "merchant_customer_id":"12",
+          "name":"Test User Company",
+          "address_country":"DE",
+          "address_city":"Berlin",
+          "address_postal_code":"10179",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_house":"10",
+          "industry_sector":"SOME SECTOR"
+       },
+       "delivery_address":{
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city":"Berlin",
+          "postal_code":"10179",
+          "country":"DE"
+       },
+       "billing_address":{
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city":"Berlin",
+          "postal_code":"10179",
+          "country":"DE"
+       },
+       "created_at":"2020-02-18T12:13:14+0100",
+       "shipped_at":null
     }
     """
 
@@ -213,60 +216,63 @@ Feature:
     And the JSON response should be:
     """
     {
-      "order_id":"A1",
-      "state":"created",
-      "reasons":null,
-      "decline_reason":null,
-      "amount":1000.00,
-      "amount_net": 900.00,
-      "amount_tax": 100.00,
-      "debtor_company":{
-        "name":"Test User Company",
-        "address_house_number":"10",
-        "address_street":"Heinrich-Heine-Platz",
-        "address_postal_code":"10179",
-        "address_city":"Berlin",
-        "address_country":"DE"
-      },
-      "bank_account":{
-        "iban":"DE1234",
-        "bic":"BICISHERE"
-      },
-      "invoice":{
-        "invoice_number":null,
-        "payout_amount":null,
-        "outstanding_amount":null,
-        "fee_amount":null,
-        "fee_rate":null,
-        "due_date":null
-      },
-      "debtor_external_data":{
-        "name":"Test User Company",
-        "address_country":"DE",
-        "address_city": "Berlin",
-        "address_postal_code":"10179",
-        "address_street":"Heinrich-Heine-Platz",
-        "address_house":"10",
-        "industry_sector":"SOME SECTOR",
-        "merchant_customer_id":"12"
-     },
-     "duration":30,
-     "dunning_status": null,
-     "shipped_at":null,
-     "delivery_address":{
-        "house_number":"10",
-        "street":"Heinrich-Heine-Platz",
-        "city":"Berlin",
-        "postal_code":"10179",
-        "country":"DE"
-     },
-     "billing_address":{
-        "house_number":"99",
+       "order_id":"A1",
+       "state":"created",
+       "reasons":null,
+       "decline_reason":null,
+       "amount":1000,
+       "amount_net":900,
+       "amount_tax":100,
+       "duration":30,
+       "dunning_status":null,
+       "debtor_company":{
+          "name":"Test User Company",
+          "address_house_number":"10",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_postal_code":"10179",
+          "address_city":"Berlin",
+          "address_country":"DE"
+       },
+       "bank_account":{
+          "iban":"DE1234",
+          "bic":"BICISHERE"
+       },
+       "invoice":{
+          "invoice_number":null,
+          "payout_amount":null,
+          "outstanding_amount":null,
+          "fee_amount":null,
+          "fee_rate":null,
+          "due_date":null,
+          "pending_merchant_payment_amount":null,
+          "pending_cancellation_amount":null
+       },
+       "debtor_external_data":{
+          "merchant_customer_id":"12",
+          "name":"Test User Company",
+          "address_country":"DE",
+          "address_city":"Berlin",
+          "address_postal_code":"10179",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_house":"10",
+          "industry_sector":"SOME SECTOR"
+       },
+       "delivery_address":{
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city":"Berlin",
+          "postal_code":"10179",
+          "country":"DE"
+       },
+       "billing_address":{
+          "house_number":"99",
           "street":"Deliver here",
           "city":"Paris",
           "postal_code":"98765",
           "country":"FR"
-     }
+       },
+       "created_at":"2020-02-18T12:14:44+0100",
+       "shipped_at":null
     }
     """
     And the order "A1" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz 10 de"
@@ -327,60 +333,63 @@ Feature:
     And the JSON response should be:
     """
     {
-      "order_id":"A1",
-      "state":"created",
-      "reasons":null,
-      "decline_reason":null,
-      "amount":1000,
-      "amount_net": 900,
-      "amount_tax": 100,
-      "debtor_company":{
-        "name":"Test User Company",
-        "address_house_number":"10",
-        "address_street":"Heinrich-Heine-Platz",
-        "address_postal_code":"10179",
-        "address_city":"Berlin",
-        "address_country":"DE"
-      },
-      "bank_account":{
-        "iban":"DE1234",
-        "bic":"BICISHERE"
-      },
-      "invoice":{
-        "invoice_number":null,
-        "payout_amount":null,
-        "outstanding_amount":null,
-        "fee_amount":null,
-        "fee_rate":null,
-        "due_date":null
-      },
-      "debtor_external_data":{
-        "name":"Test User Company",
-        "address_country":"DE",
-        "address_city": "Berlin",
-        "address_postal_code":"10179",
-        "address_street":"Heinrich-Heine-Platz",
-        "address_house":"10",
-        "industry_sector":"SOME SECTOR",
-        "merchant_customer_id":"12"
-     },
-     "duration":30,
-     "dunning_status": null,
-     "shipped_at":null,
-     "delivery_address":{
-        "house_number":"10",
-        "street":"Heinrich-Heine-Platz",
-        "city":"Berlin",
-        "postal_code":"10179",
-        "country":"DE"
-     },
-     "billing_address":{
-        "house_number":"10",
-        "street":"Heinrich-Heine-Platz",
-        "city": "Berlin",
-        "postal_code":"10179",
-        "country":"DE"
-     }
+       "order_id":"A1",
+       "state":"created",
+       "reasons":null,
+       "decline_reason":null,
+       "amount":1000,
+       "amount_net":900,
+       "amount_tax":100,
+       "duration":30,
+       "dunning_status":null,
+       "debtor_company":{
+          "name":"Test User Company",
+          "address_house_number":"10",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_postal_code":"10179",
+          "address_city":"Berlin",
+          "address_country":"DE"
+       },
+       "bank_account":{
+          "iban":"DE1234",
+          "bic":"BICISHERE"
+       },
+       "invoice":{
+          "invoice_number":null,
+          "payout_amount":null,
+          "outstanding_amount":null,
+          "fee_amount":null,
+          "fee_rate":null,
+          "due_date":null,
+          "pending_merchant_payment_amount":null,
+          "pending_cancellation_amount":null
+       },
+       "debtor_external_data":{
+          "merchant_customer_id":"12",
+          "name":"Test User Company",
+          "address_country":"DE",
+          "address_city":"Berlin",
+          "address_postal_code":"10179",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_house":"10",
+          "industry_sector":"SOME SECTOR"
+       },
+       "delivery_address":{
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city":"Berlin",
+          "postal_code":"10179",
+          "country":"DE"
+       },
+       "billing_address":{
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city":"Berlin",
+          "postal_code":"10179",
+          "country":"DE"
+       },
+       "created_at":"2020-02-18T12:16:07+0100",
+       "shipped_at":null
     }
     """
     And the order "A1" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz 10 de"
@@ -434,60 +443,63 @@ Feature:
     And the JSON response should be:
     """
     {
-      "order_id":"A1",
-      "state":"created",
-      "reasons":null,
-      "decline_reason":null,
-      "amount":1000,
-      "amount_net": 900,
-      "amount_tax": 100,
-      "debtor_company":{
-        "name":"Test User Company",
-        "address_house_number":"10",
-        "address_street":"Heinrich-Heine-Platz",
-        "address_postal_code":"10179",
-        "address_city":"Berlin",
-        "address_country":"DE"
-      },
-      "bank_account":{
-        "iban":"DE1234",
-        "bic":"BICISHERE"
-      },
-      "invoice":{
-        "invoice_number":null,
-        "payout_amount":null,
-        "outstanding_amount":null,
-        "fee_amount":null,
-        "fee_rate":null,
-        "due_date":null
-      },
-      "debtor_external_data":{
-        "name":"Test User Company",
-        "address_country":"DE",
-        "address_city": "Berlin",
-        "address_postal_code":"10179",
-        "address_street":"Heinrich-Heine-Platz",
-        "address_house":"10",
-        "industry_sector":"SOME SECTOR",
-        "merchant_customer_id":"12"
-     },
-     "duration":30,
-     "dunning_status": null,
-     "shipped_at":null,
-     "delivery_address":{
-        "house_number":"10",
-        "street":"Heinrich-Heine-Platz",
-        "city": "Berlin",
-        "postal_code":"10179",
-        "country":"DE"
-     },
-     "billing_address":{
-        "house_number":"10",
-        "street":"Heinrich-Heine-Platz",
-        "city": "Berlin",
-        "postal_code":"10179",
-        "country":"DE"
-     }
+       "order_id":"A1",
+       "state":"created",
+       "reasons":null,
+       "decline_reason":null,
+       "amount":1000,
+       "amount_net":900,
+       "amount_tax":100,
+       "duration":30,
+       "dunning_status":null,
+       "debtor_company":{
+          "name":"Test User Company",
+          "address_house_number":"10",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_postal_code":"10179",
+          "address_city":"Berlin",
+          "address_country":"DE"
+       },
+       "bank_account":{
+          "iban":"DE1234",
+          "bic":"BICISHERE"
+       },
+       "invoice":{
+          "invoice_number":null,
+          "payout_amount":null,
+          "outstanding_amount":null,
+          "fee_amount":null,
+          "fee_rate":null,
+          "due_date":null,
+          "pending_merchant_payment_amount":null,
+          "pending_cancellation_amount":null
+       },
+       "debtor_external_data":{
+          "merchant_customer_id":"12",
+          "name":"Test User Company",
+          "address_country":"DE",
+          "address_city":"Berlin",
+          "address_postal_code":"10179",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_house":"10",
+          "industry_sector":"SOME SECTOR"
+       },
+       "delivery_address":{
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city":"Berlin",
+          "postal_code":"10179",
+          "country":"DE"
+       },
+       "billing_address":{
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city":"Berlin",
+          "postal_code":"10179",
+          "country":"DE"
+       },
+       "created_at":"2020-02-18T12:17:44+0100",
+       "shipped_at":null
     }
     """
     And the order "A1" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz 10 de"
@@ -549,60 +561,63 @@ Feature:
     And the JSON response should be:
     """
     {
-      "order_id":"A1",
-      "state":"created",
-      "reasons":null,
-      "decline_reason":null,
-      "amount":1000,
-      "amount_net": 900,
-      "amount_tax": 100,
-      "debtor_company":{
-        "name":"Test User Company",
-        "address_house_number":"10",
-        "address_street":"Heinrich-Heine-Platz",
-        "address_postal_code":"10179",
-        "address_city":"Berlin",
-        "address_country":"DE"
-      },
-      "bank_account":{
-        "iban":"DE1234",
-        "bic":"BICISHERE"
-      },
-      "invoice":{
-        "invoice_number":null,
-        "payout_amount":null,
-        "outstanding_amount":null,
-        "fee_amount":null,
-        "fee_rate":null,
-        "due_date":null
-      },
-      "debtor_external_data":{
-        "name":"Test User Company",
-        "address_country":"DE",
-        "address_city": "Berlin",
-        "address_postal_code":"10179",
-        "address_street":"Heinrich-Heine-Platz",
-        "address_house":"10",
-        "industry_sector":"SOME SECTOR",
-        "merchant_customer_id":"12"
-     },
-     "duration":30,
-     "dunning_status": null,
-     "shipped_at":null,
-     "delivery_address":{
-        "house_number":"10",
-        "street":"Heinrich-Heine-Platz",
-        "city":"Berlin",
-        "postal_code":"10179",
-        "country":"DE"
-     },
-     "billing_address":{
-        "house_number":"10",
-        "street":"Heinrich-Heine-Platz",
-        "city": "Berlin",
-        "postal_code":"10179",
-        "country":"DE"
-     }
+       "order_id":"A1",
+       "state":"created",
+       "reasons":null,
+       "decline_reason":null,
+       "amount":1000,
+       "amount_net":900,
+       "amount_tax":100,
+       "duration":30,
+       "dunning_status":null,
+       "debtor_company":{
+          "name":"Test User Company",
+          "address_house_number":"10",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_postal_code":"10179",
+          "address_city":"Berlin",
+          "address_country":"DE"
+       },
+       "bank_account":{
+          "iban":"DE1234",
+          "bic":"BICISHERE"
+       },
+       "invoice":{
+          "invoice_number":null,
+          "payout_amount":null,
+          "outstanding_amount":null,
+          "fee_amount":null,
+          "fee_rate":null,
+          "due_date":null,
+          "pending_merchant_payment_amount":null,
+          "pending_cancellation_amount":null
+       },
+       "debtor_external_data":{
+          "merchant_customer_id":"12",
+          "name":"Test User Company",
+          "address_country":"DE",
+          "address_city":"Berlin",
+          "address_postal_code":"10179",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_house":"10",
+          "industry_sector":"SOME SECTOR"
+       },
+       "delivery_address":{
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city":"Berlin",
+          "postal_code":"10179",
+          "country":"DE"
+       },
+       "billing_address":{
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city":"Berlin",
+          "postal_code":"10179",
+          "country":"DE"
+       },
+       "created_at":"2020-02-18T12:19:53+0100",
+       "shipped_at":null
     }
     """
     And the order "A1" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz 10 de"
@@ -663,59 +678,62 @@ Feature:
     And the JSON response should be:
     """
     {
-      "order_id":"A1",
-      "state":"created",
-      "reasons":null,
-      "decline_reason":null,
-      "amount":1000.00,
-      "amount_net": 900.00,
-      "amount_tax": 100.00,
-      "debtor_company":{
-        "name":"Test User Company",
-        "address_house_number":"10",
-        "address_street":"Heinrich-Heine-Platz",
-        "address_postal_code":"10179",
-        "address_city":"Berlin",
-        "address_country":"DE"
-      },
-      "bank_account":{
-        "iban":"DE1234",
-        "bic":"BICISHERE"
-      },
-      "invoice":{
-        "invoice_number":null,
-        "payout_amount":null,
-        "outstanding_amount":null,
-        "fee_amount":null,
-        "fee_rate":null,
-        "due_date":null
-      },
-      "debtor_external_data":{
-        "name":"Test User Company",
-        "address_country":"DE",
-        "address_city": "Berlin",
-        "address_postal_code":"10179",
-        "address_street":"Heinrich-Heine-Platz",
-        "address_house":"10",
-        "industry_sector":"SOME SECTOR",
-        "merchant_customer_id":"12"
-     },
-     "duration":30,
-     "dunning_status": null,
-     "shipped_at":null,
-     "delivery_address":{
-        "house_number":"22",
-        "street":"Charlot strasse",
-        "city": "Paris",
-        "postal_code":"98765",
-        "country":"DE"
-     },
-     "billing_address":{
-        "house_number":"22",
-        "street":"Charlot strasse",
-        "city": "Paris",
-        "postal_code":"98765",
-        "country":"DE"
-     }
+       "order_id":"A1",
+       "state":"created",
+       "reasons":null,
+       "decline_reason":null,
+       "amount":1000,
+       "amount_net":900,
+       "amount_tax":100,
+       "duration":30,
+       "dunning_status":null,
+       "debtor_company":{
+          "name":"Test User Company",
+          "address_house_number":"10",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_postal_code":"10179",
+          "address_city":"Berlin",
+          "address_country":"DE"
+       },
+       "bank_account":{
+          "iban":"DE1234",
+          "bic":"BICISHERE"
+       },
+       "invoice":{
+          "invoice_number":null,
+          "payout_amount":null,
+          "outstanding_amount":null,
+          "fee_amount":null,
+          "fee_rate":null,
+          "due_date":null,
+          "pending_merchant_payment_amount":null,
+          "pending_cancellation_amount":null
+       },
+       "debtor_external_data":{
+          "merchant_customer_id":"12",
+          "name":"Test User Company",
+          "address_country":"DE",
+          "address_city":"Berlin",
+          "address_postal_code":"10179",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_house":"10",
+          "industry_sector":"SOME SECTOR"
+       },
+       "delivery_address":{
+          "house_number":"22",
+          "street":"Charlot strasse",
+          "city":"Paris",
+          "postal_code":"98765",
+          "country":"DE"
+       },
+       "billing_address":{
+          "house_number":"22",
+          "street":"Charlot strasse",
+          "city":"Paris",
+          "postal_code":"98765",
+          "country":"DE"
+       },
+       "created_at":"2020-02-18T12:21:17+0100",
+       "shipped_at":null
     }
     """

@@ -140,7 +140,7 @@ Feature: API endpoint for "POST /merchant/user/start-identity-verification" (tic
     Given a merchant user exists with permission MANAGE_ONBOARDING
     And I get from Oauth service a valid user token
     And I get from Oauth service revoke token endpoint a successful response
-    And The following onboarding steps are in states for merchant "f2ec4d5e-79f4-40d6-b411-31174b6519ac":
+    And The following onboarding steps are in states for merchant 1:
       | name                   | state     |
       | identity_verification  |  confirmation_pending |
     And I add "Authorization" header equal to "Bearer SomeTokenHere"

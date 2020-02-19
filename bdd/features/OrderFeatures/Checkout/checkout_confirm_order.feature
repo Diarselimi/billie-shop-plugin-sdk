@@ -38,7 +38,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     And I get from companies service identify match response
     And I get from companies service get debtor response
     And Debtor lock limit call succeeded
-    And I send a PUT request to "/checkout-session/123123/confirm" with body:
+    And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
     """
     {
        "amount":{
@@ -66,7 +66,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     And I get from companies service identify match response
     And I get from companies service get debtor response
     And Debtor lock limit call succeeded
-    And I send a PUT request to "/checkout-session/123123/confirm" with body:
+    And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
     """
     {
        "amount":{

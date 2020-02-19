@@ -2,8 +2,18 @@
 
 namespace App\DomainModel\DebtorCompany;
 
+use App\DomainModel\Address\AddressEntity;
+use App\DomainModel\Address\AddressEntityFactory;
+
 class DebtorCompanyFactory
 {
+    private $addressEntityFactory;
+
+    public function __construct(AddressEntityFactory $addressEntityFactory)
+    {
+        $this->addressEntityFactory = $addressEntityFactory;
+    }
+
     public function createFromAlfredResponse(array $data, bool $isStrictMatch = true): DebtorCompany
     {
         return (new DebtorCompany())
@@ -22,7 +32,8 @@ class DebtorCompanyFactory
             ->setIsStrictMatch($isStrictMatch)
             ->setIsSynchronized(boolval($data['is_synchronized'] ?? null))
             ->setLegalForm($data['legal_form'] ?? null)
-        ;
+            ->setDebtorBillingAddresses($data['billing_addresses'] ? $this->extractBillingAddresses($data['billing_addresses']) : [])
+            ->setBillingAddressMatchUuid($data['billing_address_match_uuid']);
     }
 
     /**
@@ -38,5 +49,16 @@ class DebtorCompanyFactory
         }
 
         return $responseData;
+    }
+
+    /**
+     * @param  array           $data
+     * @return AddressEntity[]
+     */
+    private function extractBillingAddresses(array $billingAddresses): array
+    {
+        return array_map(function ($billingAddress) {
+            return $this->addressEntityFactory->createDebtorCompanyAddressFromDatabaseRow($billingAddress);
+        }, $billingAddresses);
     }
 }

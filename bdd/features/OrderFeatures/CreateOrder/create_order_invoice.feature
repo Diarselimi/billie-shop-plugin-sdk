@@ -6,7 +6,7 @@ Feature: Attach invoice file to an order.
     And I have a created order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
 
   Scenario: Successfully create order invoice file
-    When I send a POST request to "/private/order/test-order-uuid/add-invoice" with body:
+    When I send a POST request to "/private/order/test-order-uuidCO123/add-invoice" with body:
       """
       {
           "file_id": "1299",

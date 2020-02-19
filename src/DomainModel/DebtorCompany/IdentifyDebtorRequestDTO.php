@@ -2,8 +2,8 @@
 
 namespace App\DomainModel\DebtorCompany;
 
+use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\ArrayableInterface;
-use App\DomainModel\Order\OrderContainer;
 
 class IdentifyDebtorRequestDTO implements ArrayableInterface
 {
@@ -36,6 +36,8 @@ class IdentifyDebtorRequestDTO implements ArrayableInterface
     private $lastName;
 
     private $isExperimental;
+
+    private $billingAddress;
 
     public function getCompanyId(): ?int
     {
@@ -235,6 +237,19 @@ class IdentifyDebtorRequestDTO implements ArrayableInterface
             'first_name' => $this->getFirstName(),
             'last_name' => $this->getLastName(),
             'is_experimental' => $this->isExperimental(),
+            'billing_address' => $this->getBillingAddress() ? $this->getBillingAddress()->toArray() : null,
         ];
+    }
+
+    public function getBillingAddress(): ?AddressEntity
+    {
+        return $this->billingAddress;
+    }
+
+    public function setBillingAddress(?AddressEntity $billingAddress): IdentifyDebtorRequestDTO
+    {
+        $this->billingAddress = $billingAddress;
+
+        return $this;
     }
 }

@@ -56,6 +56,8 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
 
     private $checkoutSessionId;
 
+    private $companyBillingAddressUuid;
+
     public function getUuid(): string
     {
         return $this->uuid;
@@ -263,5 +265,17 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
     public function getStateTransitionEntityClass(): string
     {
         return self::STATE_TRANSITION_ENTITY_CLASS;
+    }
+
+    public function setCompanyBillingAddressUuid(?string $uuid): OrderEntity
+    {
+        $this->companyBillingAddressUuid = $uuid;
+
+        return $this;
+    }
+
+    public function getCompanyBillingAddressUuid(): ?string
+    {
+        return $this->companyBillingAddressUuid;
     }
 }
