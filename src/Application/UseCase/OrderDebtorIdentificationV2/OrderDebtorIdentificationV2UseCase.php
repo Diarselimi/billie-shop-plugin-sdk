@@ -58,6 +58,7 @@ class OrderDebtorIdentificationV2UseCase
                 ->setFirstName($debtorPerson->getFirstName())
                 ->setLastName($debtorPerson->getLastName())
                 ->setIsExperimental(true)
+                ->setBillingAddress($orderContainer->getBillingAddress())
             );
 
             $this->orderIdentificationRepository->insert(

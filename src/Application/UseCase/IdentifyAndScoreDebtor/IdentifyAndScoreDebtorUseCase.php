@@ -3,6 +3,7 @@
 namespace App\Application\UseCase\IdentifyAndScoreDebtor;
 
 use App\Application\UseCase\IdentifyAndScoreDebtor\Exception\DebtorNotIdentifiedException;
+use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\IdentifyDebtorRequestDTO;
 use App\DomainModel\DebtorCompany\IsEligibleForPayAfterDeliveryRequestDTOFactory;
@@ -79,6 +80,7 @@ class IdentifyAndScoreDebtorUseCase
             ->setFirstName($request->getFirstName())
             ->setLastName($request->getLastName())
             ->setIsExperimental($request->useExperimentalDebtorIdentification())
+            ->setBillingAddress($this->createBillingAddress($request))
         ;
 
         $identifiedDebtor = $this->companiesService->identifyDebtor($identifyRequest);
@@ -143,5 +145,15 @@ class IdentifyAndScoreDebtorUseCase
         $this->debtorLimitService->check($merchantDebtor->getCompanyUuid(), $merchant->getCompanyUuid(), 0.1);
 
         $this->debtorLimitService->update($merchantDebtor->getCompanyUuid(), $merchant->getCompanyUuid(), $limit);
+    }
+
+    private function createBillingAddress(IdentifyAndScoreDebtorRequest $request): AddressEntity
+    {
+        return (new AddressEntity())
+            ->setPostalCode($request->getAddressPostalCode())
+            ->setStreet($request->getAddressStreet())
+            ->setCity($request->getAddressCity())
+            ->setCountry($request->getAddressCountry())
+            ->setHouseNumber($request->getAddressHouse());
     }
 }
