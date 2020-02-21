@@ -133,6 +133,11 @@ class OrderStateManager implements LoggingInterface
         ], true);
     }
 
+    public function isCreated(OrderEntity $order): bool
+    {
+        return $order->getState() === self::STATE_CREATED;
+    }
+
     public function isPreWaiting(OrderEntity $order): bool
     {
         return $order->getState() === self::STATE_PRE_WAITING;

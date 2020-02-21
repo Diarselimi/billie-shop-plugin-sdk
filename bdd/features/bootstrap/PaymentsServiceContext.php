@@ -55,6 +55,14 @@ class PaymentsServiceContext implements Context
     }
 
     /**
+     * @Given /^I get from payments service get order details not found response$/
+     */
+    public function iGetFromPaymentsServiceGetOrderDetailsNotFoundResponse()
+    {
+        $this->mockRequest('/order/' . PaellaCoreContext::DUMMY_UUID4 . '.json', new MockResponse('', [], 404));
+    }
+
+    /**
      * @Given /^I get from payments service get order details response$/
      */
     public function iGetFromPaymentsServiceGetOrderDetailsResponse()

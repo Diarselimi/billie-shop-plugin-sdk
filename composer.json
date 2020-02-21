@@ -6,7 +6,7 @@
         "ext-bcmath": "*",
         "ext-json": "*",
         "aws/aws-sdk-php-symfony": "^2.0",
-        "billie/monitoring-bundle": "dev-fix-missing-logs",
+        "billie/monitoring-bundle": "^2.7",
         "billie/pdo-bundle": "^1.4",
         "doctrine/annotations": "^1.6",
         "egulias/email-validator": "^2.1",

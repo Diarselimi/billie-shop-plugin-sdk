@@ -358,13 +358,13 @@ class PaellaCoreContext extends MinkContext
      */
     public function orderIsInState($orderId, $state)
     {
-        $order = $this->getOrderRepository()->getOneByExternalCode($orderId, 1);
+        $order = $this->getOrderRepository()->getOneByExternalCode($orderId, $this->merchant->getId());
         if ($order === null) {
             if ($state === 'null') {
                 return;
             }
 
-            throw new RuntimeException('Order not found');
+            throw new RuntimeException('Order not found by Behat in ' . __METHOD__ . ':' . __LINE__);
         }
         if ($order->getState() !== $state) {
             throw new RuntimeException(sprintf(

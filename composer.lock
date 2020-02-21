@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "753b9f812a9825c9b9a307281d84636c",
+    "content-hash": "dc1fe656afebeb1bdefb64e0c02e29f9",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -144,16 +144,16 @@
         },
         {
             "name": "billie/monitoring-bundle",
-            "version": "dev-fix-missing-logs",
+            "version": "2.7.1",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/MonitoringBundle.git",
-                "reference": "1c44d73979925ec0c82a640e09ef660709c2ce99"
+                "reference": "6aafaa1b2b1c4bb7479348e987cfeb065ca8264b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/MonitoringBundle/zipball/1c44d73979925ec0c82a640e09ef660709c2ce99",
-                "reference": "1c44d73979925ec0c82a640e09ef660709c2ce99",
+                "url": "https://api.github.com/repos/ozean12/MonitoringBundle/zipball/6aafaa1b2b1c4bb7479348e987cfeb065ca8264b",
+                "reference": "6aafaa1b2b1c4bb7479348e987cfeb065ca8264b",
                 "shasum": ""
             },
             "require": {
@@ -163,10 +163,10 @@
                 "php": "^7.2",
                 "ramsey/uuid": "^3.8",
                 "sentry/sentry": "^1.10",
-                "symfony/config": "^4.2",
-                "symfony/console": "^4.2",
-                "symfony/dependency-injection": "^4.2",
-                "symfony/http-kernel": "^4.2"
+                "symfony/config": "^4.2|^5.0",
+                "symfony/console": "^4.2|^5.0",
+                "symfony/dependency-injection": "^4.2|^5.0",
+                "symfony/http-kernel": "^4.2|^5.0"
             },
             "type": "symfony-bundle",
             "autoload": {
@@ -181,9 +181,9 @@
                 }
             ],
             "support": {
-                "source": "https://github.com/ozean12/MonitoringBundle/tree/fix-missing-logs"
+                "source": "https://github.com/ozean12/MonitoringBundle/tree/2.7.1"
             },
-            "time": "2020-01-22T10:59:46+00:00"
+            "time": "2020-02-20T15:01:35+00:00"
         },
         {
             "name": "billie/pdo-bundle",
@@ -9664,9 +9664,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "billie/monitoring-bundle": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
