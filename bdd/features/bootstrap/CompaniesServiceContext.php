@@ -92,34 +92,6 @@ class CompaniesServiceContext implements Context
     }
 
     /**
-     * @Given /^I get from companies service identify match and good decision response$/
-     */
-    public function iGetFromCompaniesServiceIdentifyMatchAndGoodDecisionResponse()
-    {
-        $this->mockRequest('/debtor/identify', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match_trusted_source.json'))
-        ));
-
-        $this->mockRequest('/debtor/1/is-eligible-for-pay-after-delivery', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_decision_good.json'))
-        ));
-    }
-
-    /**
-     * @Given /^I get from companies service identify match and bad decision response$/
-     */
-    public function iGetFromCompaniesServiceIdentifyMatchAndBadDecisionResponse()
-    {
-        $this->mockRequest('/debtor/identify', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match_trusted_source.json'))
-        ));
-
-        $this->mockRequest('/debtor/1/is-eligible-for-pay-after-delivery', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_decision_bad.json'))
-        ));
-    }
-
-    /**
      * @Given I get from companies service :url endpoint response with status :statusCode and body
      */
     public function iGetFromCompaniesServiceEndpointResponseWithStatusAndBody($url, $statusCode, PyStringNode $response)
@@ -196,10 +168,6 @@ class CompaniesServiceContext implements Context
     {
         $this->mockRequest('/debtor/identify', new ResponseStack(
             new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_no_match_with_suggestion.json'), [], 404)
-        ));
-
-        $this->mockRequest('/debtor/1/is-eligible-for-pay-after-delivery', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_decision_good.json'))
         ));
     }
 

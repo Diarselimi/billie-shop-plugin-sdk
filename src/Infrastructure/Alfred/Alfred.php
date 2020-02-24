@@ -8,7 +8,6 @@ use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorCompany\DebtorCompanyFactory;
 use App\DomainModel\DebtorCompany\DebtorCreationDTO;
 use App\DomainModel\DebtorCompany\IdentifyDebtorRequestDTO;
-use App\DomainModel\DebtorCompany\IsEligibleForPayAfterDeliveryRequestDTO;
 use App\DomainModel\MerchantDebtor\MerchantDebtorDuplicateDTO;
 use App\DomainModel\SignatoryPower\SignatoryPowerDTO;
 use App\DomainModel\SignatoryPower\SignatoryPowerDTOFactory;
@@ -28,8 +27,6 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
     use LoggingTrait, DecodeResponseTrait;
 
     private const IDENTIFICATION_REQUEST_TIMEOUT = 15;
-
-    private const SCORING_REQUEST_TIMEOUT = 15;
 
     private $client;
 
@@ -171,32 +168,6 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
             }
 
             throw new CompaniesServiceRequestException($exception);
-        } catch (TransferException | ClientResponseDecodeException $exception) {
-            throw new CompaniesServiceRequestException($exception);
-        }
-    }
-
-    public function isEligibleForPayAfterDelivery(IsEligibleForPayAfterDeliveryRequestDTO $requestDTO): bool
-    {
-        try {
-            $response = $this->client->get("/debtor/{$requestDTO->getDebtorId()}/is-eligible-for-pay-after-delivery", [
-                'query' => [
-                    'is_sole_trader' => $requestDTO->isSoleTrader(),
-                    'has_paid_invoice' => $requestDTO->isHasPaidInvoice(),
-                    'crefo_low_score_threshold' => $requestDTO->getCrefoLowScoreThreshold(),
-                    'crefo_high_score_threshold' => $requestDTO->getCrefoHighScoreThreshold(),
-                    'schufa_low_score_threshold' => $requestDTO->getSchufaLowScoreThreshold(),
-                    'schufa_average_score_threshold' => $requestDTO->getSchufaAverageScoreThreshold(),
-                    'schufa_high_score_threshold' => $requestDTO->getSchufaHighScoreThreshold(),
-                    'schufa_sole_trader_score_threshold' => $requestDTO->getSchufaSoleTraderScoreThreshold(),
-                ],
-                'on_stats' => function (TransferStats $stats) {
-                    $this->logServiceRequestStats($stats, 'score_debtor');
-                },
-                'timeout' => self::SCORING_REQUEST_TIMEOUT,
-            ]);
-
-            return $this->decodeResponse($response)['is_eligible'];
         } catch (TransferException | ClientResponseDecodeException $exception) {
             throw new CompaniesServiceRequestException($exception);
         }

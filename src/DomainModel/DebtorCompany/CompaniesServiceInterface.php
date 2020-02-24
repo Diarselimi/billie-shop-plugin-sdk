@@ -24,8 +24,6 @@ interface CompaniesServiceInterface
 
     public function createDebtor(DebtorCreationDTO $debtorCreationDTO): DebtorCompany;
 
-    public function isEligibleForPayAfterDelivery(IsEligibleForPayAfterDeliveryRequestDTO $requestDTO): bool;
-
     public function markDuplicates(MerchantDebtorDuplicateDTO ...$duplicates): void;
 
     public function synchronizeDebtor(int $debtorId): DebtorCompany;

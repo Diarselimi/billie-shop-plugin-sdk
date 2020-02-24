@@ -1,11 +1,11 @@
 <?php
 
-namespace App\DomainModel\DebtorCompany;
+namespace App\DomainModel\DebtorScoring;
 
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntity;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationService;
 
-class IsEligibleForPayAfterDeliveryRequestDTOFactory
+class DebtorScoringRequestDTOFactory
 {
     private $scoreThresholdsConfigurationService;
 
@@ -15,14 +15,14 @@ class IsEligibleForPayAfterDeliveryRequestDTOFactory
     }
 
     public function create(
-        int $debtorId,
+        string $debtorUuid,
         bool $isSoleTrader,
         bool $debtorHasAtLeastOneFullyPaidOrder,
         ScoreThresholdsConfigurationEntity $merchantScoreThresholds,
         ?ScoreThresholdsConfigurationEntity $debtorScoreThresholds
-    ): IsEligibleForPayAfterDeliveryRequestDTO {
-        return (new IsEligibleForPayAfterDeliveryRequestDTO())
-            ->setDebtorId($debtorId)
+    ): DebtorScoringRequestDTO {
+        return (new DebtorScoringRequestDTO())
+            ->setDebtorUuid($debtorUuid)
             ->setIsSoleTrader($isSoleTrader)
             ->setHasPaidInvoice($debtorHasAtLeastOneFullyPaidOrder)
             ->setCrefoLowScoreThreshold($this->scoreThresholdsConfigurationService->getCrefoLowScoreThreshold($merchantScoreThresholds, $debtorScoreThresholds))

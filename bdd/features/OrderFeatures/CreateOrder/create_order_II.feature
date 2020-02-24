@@ -171,7 +171,8 @@ Feature:
     """
 
   Scenario: Use debtor company address as delivery address if no delivery address was provided
-    Given I get from companies service identify match and good decision response
+    Given I get from companies service identify match response
+    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And I get from payments service register debtor positive response
     And Debtor has sufficient limit
     And Debtor lock limit call succeeded
@@ -269,7 +270,8 @@ Feature:
     And the order A1 is in state declined
 
   Scenario: The order should be on a state created if the previous order was declined because of the amount exceeded
-    Given I get from companies service identify match and good decision response
+    Given I get from companies service identify match response
+    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And I get from payments service register debtor positive response
     And Debtor has sufficient limit
     And Debtor lock limit call succeeded
@@ -324,7 +326,8 @@ Feature:
     And the response status code should be 200
 
   Scenario: Successful order creation without providing external code
-    Given I get from companies service identify match and good decision response
+    Given I get from companies service identify match response
+    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And Debtor has sufficient limit
     And Debtor lock limit call succeeded
     And I get from payments service register debtor positive response
@@ -447,7 +450,8 @@ Feature:
     """
 
   Scenario: Successful order creation without providing industry_sector
-    Given I get from companies service identify match and good decision response
+    Given I get from companies service identify match response
+    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And Debtor has sufficient limit
     And Debtor lock limit call succeeded
     And I get from payments service register debtor positive response
@@ -499,7 +503,8 @@ Feature:
     Then the response status code should be 200
 
   Scenario: Successful order creation (delivery and company address mismatch and Order amount < 250)
-    Given I get from companies service identify match and good decision response
+    Given I get from companies service identify match response
+    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And Debtor has sufficient limit
     And Debtor lock limit call succeeded
     And I get from payments service register debtor positive response
@@ -553,7 +558,8 @@ Feature:
     And the response status code should be 200
 
   Scenario: Order declined (delivery and company address mismatch and Order amount > 250)
-    Given I get from companies service identify match and good decision response
+    Given I get from companies service identify match response
+    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
     """
@@ -605,7 +611,8 @@ Feature:
     And the response status code should be 200
 
   Scenario: Successful order creation with line items
-    Given I get from companies service identify match and good decision response
+    Given I get from companies service identify match response
+    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And Debtor has sufficient limit
     And Debtor lock limit call succeeded
     And I get from payments service register debtor positive response
@@ -676,7 +683,8 @@ Feature:
     And the response status code should be 200
 
   Scenario: Successful order creation with line items (missing optional line item fields)
-    Given I get from companies service identify match and good decision response
+    Given I get from companies service identify match response
+    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And Debtor has sufficient limit
     And Debtor lock limit call succeeded
     And I get from payments service register debtor positive response
@@ -757,7 +765,8 @@ Feature:
     And the response status code should be 200
 
   Scenario: Failed order creation with line items (missing required line item fields and invalid data)
-    Given I get from companies service identify match and good decision response
+    Given I get from companies service identify match response
+    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
     """
@@ -857,7 +866,8 @@ Feature:
     """
 
   Scenario: Failed order creation with line items (invalid data)
-    Given I get from companies service identify match and good decision response
+    Given I get from companies service identify match response
+    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
     """
@@ -942,7 +952,8 @@ Feature:
     """
 
   Scenario: Failed order creation with line items (invalid line item amount)
-    Given I get from companies service identify match and good decision response
+    Given I get from companies service identify match response
+    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
     """
@@ -1032,7 +1043,8 @@ Feature:
     """
 
   Scenario: Fail to create a good order if I have a public domain email and the line items contain a public domain
-    Given I get from companies service identify match and good decision response
+    Given I get from companies service identify match response
+    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
     """

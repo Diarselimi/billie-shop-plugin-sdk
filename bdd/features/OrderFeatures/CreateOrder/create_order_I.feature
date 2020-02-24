@@ -156,7 +156,8 @@ Feature:
     """
 
   Scenario: Successful order creation
-    Given I get from companies service identify match and good decision response
+    Given I get from companies service identify match response
+    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And Debtor has sufficient limit
     And Debtor lock limit call succeeded
     And I get from payments service register debtor positive response
@@ -273,7 +274,8 @@ Feature:
     And the order "A1" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz 10 de"
 
   Scenario: Successful order creation without house
-    Given I get from companies service identify match and good decision response
+    Given I get from companies service identify match response
+    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And Debtor has sufficient limit
     And Debtor lock limit call succeeded
     And I get from payments service register debtor positive response
@@ -390,7 +392,8 @@ Feature:
     And the order "A1" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz de"
 
   Scenario: Successful order creation without delivery_address.house_number
-    Given I get from companies service identify match and good decision response
+    Given I get from companies service identify match response
+    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And I get from payments service register debtor positive response
     And Debtor has sufficient limit
     And Debtor lock limit call succeeded
@@ -507,7 +510,8 @@ Feature:
     And the order "A123" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz 10 de"
 
   Scenario: Successful order creation using lowercase country
-    Given I get from companies service identify match and good decision response
+    Given I get from companies service identify match response
+    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And Debtor has sufficient limit
     And Debtor lock limit call succeeded
     And I get from payments service register debtor positive response
@@ -623,7 +627,8 @@ Feature:
     """
 
   Scenario: Debtor is not eligible for Point Of Sale
-    Given I get from companies service identify match and bad decision response
+    Given I get from companies service identify match response
+    And I get from scoring service bad debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
     """
