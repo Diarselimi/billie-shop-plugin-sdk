@@ -50,7 +50,7 @@ class OrderResponseFactory
             $this->addPaymentData($orderContainer, $response);
         }
 
-        if ($this->orderStateManager->wasShipped($order) || $this->orderStateManager->isComplete($order)) {
+        if ($order->getPaymentId()) {
             $this->addInvoiceData($orderContainer, $response);
         }
 

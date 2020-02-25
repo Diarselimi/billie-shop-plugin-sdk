@@ -376,6 +376,23 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
+     * @Given the order :orderId has invoice data
+     */
+    public function orderHasInvoiceData($orderId)
+    {
+        $order = $this->getOrderRepository()->getOneByExternalCode($orderId, 1);
+        if ($order === null) {
+            throw new RuntimeException('Order not found');
+        }
+        if (!$order->getInvoiceNumber()) {
+            throw new RuntimeException(sprintf(
+                'Order %s should have invoice data',
+                $order->getId()
+            ));
+        }
+    }
+
+    /**
      * @Given the checkout_session_id :sessionId should be valid
      */
     public function theCheckoutSessionIdShouldBeValid($sessionId)
