@@ -34,7 +34,6 @@ class OrderPaymentStateChangeUseCase implements LoggingInterface
     {
         $orderPaymentDetails = $request->getOrderPaymentDetails();
         $order = $this->orderRepository->getOneByPaymentId($orderPaymentDetails->getId());
-        $orderContainer = $this->orderContainerFactory->createFromOrderEntity($order);
 
         if (!$order) {
             $this->logSuppressedException(
@@ -46,6 +45,7 @@ class OrderPaymentStateChangeUseCase implements LoggingInterface
             return;
         }
 
+        $orderContainer = $this->orderContainerFactory->createFromOrderEntity($order);
         if ($this->orderStateManager->isCanceled($order)) {
             $this->logInfo('Canceled order has been paid back by merchant');
         }
