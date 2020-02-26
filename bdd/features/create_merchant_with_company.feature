@@ -150,7 +150,8 @@ Feature: Create a new merchant specifying the data of the company that will be c
         "bic": "AABSDE31"
       }
       """
-    Then the response status code should be 503
+    Then print last JSON response
+    And the response status code should be 503
     And the JSON response should be:
       """
       {"errors":[{"title":"Merchant company creation failed.","code":"service_unavailable"}]}

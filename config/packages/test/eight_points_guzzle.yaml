@@ -60,10 +60,4 @@ eight_points_guzzle:
         debug: false
         query:
           app: document_generator
-    jarvis:
-      base_url: "%behat_mock_server_url%:8031"
-      options:
-        debug: false
-        query:
-          app: jarvis
 

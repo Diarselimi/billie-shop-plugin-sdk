@@ -53,7 +53,8 @@ Feature: Register merchant user to access dashboard
         "password": "testPassword"
     }
     """
-    Then the response status code should be 403
+    Then print last JSON response
+    And the response status code should be 403
 
   Scenario: validation error
     When I send a POST request to "/private/merchant/1/user" with body:

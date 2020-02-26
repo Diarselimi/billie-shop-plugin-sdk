@@ -21,7 +21,6 @@ services:
       $snsInvoiceUploadTopicArn: '%receive_invoices_sns_topic_arn%'
       $invoiceDownloadClient: '@eight_points_guzzle.client.invoice_download'
       $alfredClient: '@eight_points_guzzle.client.alfred'
-      $jarvisClient: '@eight_points_guzzle.client.jarvis'
       $borschtClient: '@eight_points_guzzle.client.borscht'
       $smaugClient: '@eight_points_guzzle.client.smaug'
       $nachosClient: '@eight_points_guzzle.client.nachos'

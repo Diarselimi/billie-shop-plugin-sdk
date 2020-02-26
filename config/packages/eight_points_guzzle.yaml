@@ -60,8 +60,3 @@ eight_points_guzzle:
         timeout: 5
         headers:
           Content-Type: "application/json"
-    jarvis:
-      base_url: "%env(string:JARVIS_URL)%"
-      options:
-        headers:
-          Content-Type: "application/json"

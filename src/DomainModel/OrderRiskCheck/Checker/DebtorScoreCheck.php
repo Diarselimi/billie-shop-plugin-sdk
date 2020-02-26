@@ -2,8 +2,8 @@
 
 namespace App\DomainModel\OrderRiskCheck\Checker;
 
-use App\DomainModel\DebtorScoring\DebtorScoringRequestDTOFactory;
-use App\DomainModel\DebtorScoring\ScoringServiceInterface;
+use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
+use App\DomainModel\DebtorCompany\IsEligibleForPayAfterDeliveryRequestDTOFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
@@ -16,25 +16,25 @@ class DebtorScoreCheck implements CheckInterface
 
     private $scoreThresholdsConfigurationRepository;
 
-    private $debtorScoringRequestDTOFactory;
+    private $eligibleForPayAfterDeliveryRequestDTOFactory;
 
-    private $scoringService;
+    private $companiesService;
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         ScoreThresholdsConfigurationRepositoryInterface $scoreThresholdsConfigurationRepository,
-        DebtorScoringRequestDTOFactory $debtorScoringRequestDTOFactory,
-        ScoringServiceInterface $scoringService
+        IsEligibleForPayAfterDeliveryRequestDTOFactory $eligibleForPayAfterDeliveryRequestDTOFactory,
+        CompaniesServiceInterface $companiesService
     ) {
         $this->orderRepository = $orderRepository;
         $this->scoreThresholdsConfigurationRepository = $scoreThresholdsConfigurationRepository;
-        $this->debtorScoringRequestDTOFactory = $debtorScoringRequestDTOFactory;
-        $this->scoringService = $scoringService;
+        $this->eligibleForPayAfterDeliveryRequestDTOFactory = $eligibleForPayAfterDeliveryRequestDTOFactory;
+        $this->companiesService = $companiesService;
     }
 
     public function check(OrderContainer $orderContainer): CheckResult
     {
-        $debtorUuid = $orderContainer->getMerchantDebtor()->getCompanyUuid();
+        $debtorId = $orderContainer->getMerchantDebtor()->getDebtorId();
         $merchantSettings = $orderContainer->getMerchantSettings();
         $merchantDebtor = $orderContainer->getMerchantDebtor();
 
@@ -53,8 +53,8 @@ class DebtorScoreCheck implements CheckInterface
             : null
         ;
 
-        $debtorScoringRequestDTO = $this->debtorScoringRequestDTOFactory->create(
-            $debtorUuid,
+        $IsEligibleForPayAfterDeliveryRequestDTO = $this->eligibleForPayAfterDeliveryRequestDTOFactory->create(
+            $debtorId,
             // TODO: refactor to pass the legalForm to this call, so alfred will decide if is sole trader or not. then remove DebtorExternalData\DebtorExternalDataEntity::LEGAL_FORMS_FOR_SOLE_TRADERS
             $orderContainer->getDebtorExternalData()->isLegalFormSoleTrader(),
             $this->orderRepository->debtorHasAtLeastOneFullyPaidOrder($merchantDebtor->getCompanyUuid()),
@@ -62,7 +62,7 @@ class DebtorScoreCheck implements CheckInterface
             $debtorScoreThresholds
         );
 
-        $passed = $this->scoringService->isEligibleForPayAfterDelivery($debtorScoringRequestDTO);
+        $passed = $this->companiesService->isEligibleForPayAfterDelivery($IsEligibleForPayAfterDeliveryRequestDTO);
 
         return new CheckResult($passed, self::NAME);
     }

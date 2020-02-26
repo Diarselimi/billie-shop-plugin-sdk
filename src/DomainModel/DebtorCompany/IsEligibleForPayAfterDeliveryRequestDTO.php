@@ -1,10 +1,10 @@
 <?php
 
-namespace App\DomainModel\DebtorScoring;
+namespace App\DomainModel\DebtorCompany;
 
-class DebtorScoringRequestDTO
+class IsEligibleForPayAfterDeliveryRequestDTO
 {
-    private $debtorUuid;
+    private $debtorId;
 
     private $isSoleTrader;
 
@@ -22,14 +22,14 @@ class DebtorScoringRequestDTO
 
     private $schufaSoleTraderScoreThreshold;
 
-    public function getDebtorUuid(): string
+    public function getDebtorId(): string
     {
-        return $this->debtorUuid;
+        return $this->debtorId;
     }
 
-    public function setDebtorUuid(string $debtorUuid): DebtorScoringRequestDTO
+    public function setDebtorId(string $debtorId): IsEligibleForPayAfterDeliveryRequestDTO
     {
-        $this->debtorUuid = $debtorUuid;
+        $this->debtorId = $debtorId;
 
         return $this;
     }
@@ -39,7 +39,7 @@ class DebtorScoringRequestDTO
         return $this->isSoleTrader;
     }
 
-    public function setIsSoleTrader(bool $isSoleTrader): DebtorScoringRequestDTO
+    public function setIsSoleTrader(bool $isSoleTrader): IsEligibleForPayAfterDeliveryRequestDTO
     {
         $this->isSoleTrader = $isSoleTrader;
 
@@ -51,7 +51,7 @@ class DebtorScoringRequestDTO
         return $this->hasPaidInvoice;
     }
 
-    public function setHasPaidInvoice(bool $hasPaidInvoice): DebtorScoringRequestDTO
+    public function setHasPaidInvoice(bool $hasPaidInvoice): IsEligibleForPayAfterDeliveryRequestDTO
     {
         $this->hasPaidInvoice = $hasPaidInvoice;
 
@@ -63,7 +63,7 @@ class DebtorScoringRequestDTO
         return $this->crefoLowScoreThreshold;
     }
 
-    public function setCrefoLowScoreThreshold(int $crefoLowScoreThreshold): DebtorScoringRequestDTO
+    public function setCrefoLowScoreThreshold(int $crefoLowScoreThreshold): IsEligibleForPayAfterDeliveryRequestDTO
     {
         $this->crefoLowScoreThreshold = $crefoLowScoreThreshold;
 
@@ -75,7 +75,7 @@ class DebtorScoringRequestDTO
         return $this->crefoHighScoreThreshold;
     }
 
-    public function setCrefoHighScoreThreshold(int $crefoHighScoreThreshold): DebtorScoringRequestDTO
+    public function setCrefoHighScoreThreshold(int $crefoHighScoreThreshold): IsEligibleForPayAfterDeliveryRequestDTO
     {
         $this->crefoHighScoreThreshold = $crefoHighScoreThreshold;
 
@@ -87,7 +87,7 @@ class DebtorScoringRequestDTO
         return $this->schufaLowScoreThreshold;
     }
 
-    public function setSchufaLowScoreThreshold(int $schufaLowScoreThreshold): DebtorScoringRequestDTO
+    public function setSchufaLowScoreThreshold(int $schufaLowScoreThreshold): IsEligibleForPayAfterDeliveryRequestDTO
     {
         $this->schufaLowScoreThreshold = $schufaLowScoreThreshold;
 
@@ -99,8 +99,9 @@ class DebtorScoringRequestDTO
         return $this->schufaAverageScoreThreshold;
     }
 
-    public function setSchufaAverageScoreThreshold(int $schufaAverageScoreThreshold): DebtorScoringRequestDTO
-    {
+    public function setSchufaAverageScoreThreshold(
+        int $schufaAverageScoreThreshold
+    ): IsEligibleForPayAfterDeliveryRequestDTO {
         $this->schufaAverageScoreThreshold = $schufaAverageScoreThreshold;
 
         return $this;
@@ -111,7 +112,7 @@ class DebtorScoringRequestDTO
         return $this->schufaHighScoreThreshold;
     }
 
-    public function setSchufaHighScoreThreshold(int $schufaHighScoreThreshold): DebtorScoringRequestDTO
+    public function setSchufaHighScoreThreshold(int $schufaHighScoreThreshold): IsEligibleForPayAfterDeliveryRequestDTO
     {
         $this->schufaHighScoreThreshold = $schufaHighScoreThreshold;
 
@@ -123,8 +124,9 @@ class DebtorScoringRequestDTO
         return $this->schufaSoleTraderScoreThreshold;
     }
 
-    public function setSchufaSoleTraderScoreThreshold(?int $schufaSoleTraderScoreThreshold): DebtorScoringRequestDTO
-    {
+    public function setSchufaSoleTraderScoreThreshold(
+        ?int $schufaSoleTraderScoreThreshold
+    ): IsEligibleForPayAfterDeliveryRequestDTO {
         $this->schufaSoleTraderScoreThreshold = $schufaSoleTraderScoreThreshold;
 
         return $this;

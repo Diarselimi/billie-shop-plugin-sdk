@@ -6,8 +6,7 @@ Feature:
   Background:
     Given I add "Content-type" header equal to "application/json"
     And I add "X-Test" header equal to 1
-    And I get from companies service identify match response
-    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
+    And I get from companies service identify match and good decision response
 
   Scenario: Try to mark a non-existent order as fraud
     Given I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
