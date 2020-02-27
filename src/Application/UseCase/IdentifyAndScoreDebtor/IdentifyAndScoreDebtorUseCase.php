@@ -6,7 +6,8 @@ use App\Application\UseCase\IdentifyAndScoreDebtor\Exception\DebtorNotIdentified
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\IdentifyDebtorRequestDTO;
-use App\DomainModel\DebtorCompany\IsEligibleForPayAfterDeliveryRequestDTOFactory;
+use App\DomainModel\DebtorScoring\DebtorScoringRequestDTOFactory;
+use App\DomainModel\DebtorScoring\ScoringServiceInterface;
 use App\DomainModel\DebtorLimit\DebtorLimitServiceInterface;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantNotFoundException;
@@ -28,7 +29,7 @@ class IdentifyAndScoreDebtorUseCase
 
     private $scoreThresholdsConfigurationRepository;
 
-    private $eligibleForPayAfterDeliveryRequestDTOFactory;
+    private $debtorScoringRequestDTOFactory;
 
     private $companiesService;
 
@@ -36,24 +37,28 @@ class IdentifyAndScoreDebtorUseCase
 
     private $debtorLimitService;
 
+    private $scoringService;
+
     public function __construct(
         MerchantRepositoryInterface $merchantRepository,
         MerchantSettingsRepositoryInterface $merchantSettingsRepository,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         ScoreThresholdsConfigurationRepositoryInterface $scoreThresholdsConfigurationRepository,
-        IsEligibleForPayAfterDeliveryRequestDTOFactory $eligibleForPayAfterDeliveryRequestDTOFactory,
+        DebtorScoringRequestDTOFactory $debtorScoringRequestDTOFactory,
         CompaniesServiceInterface $companiesService,
         MerchantDebtorRegistrationService $merchantDebtorRegistrationService,
-        DebtorLimitServiceInterface $debtorLimitService
+        DebtorLimitServiceInterface $debtorLimitService,
+        ScoringServiceInterface $scoringService
     ) {
         $this->merchantRepository = $merchantRepository;
         $this->merchantSettingsRepository = $merchantSettingsRepository;
         $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->scoreThresholdsConfigurationRepository = $scoreThresholdsConfigurationRepository;
-        $this->eligibleForPayAfterDeliveryRequestDTOFactory = $eligibleForPayAfterDeliveryRequestDTOFactory;
+        $this->debtorScoringRequestDTOFactory = $debtorScoringRequestDTOFactory;
         $this->companiesService = $companiesService;
         $this->merchantDebtorRegistrationService = $merchantDebtorRegistrationService;
         $this->debtorLimitService = $debtorLimitService;
+        $this->scoringService = $scoringService;
     }
 
     public function execute(IdentifyAndScoreDebtorRequest $request): IdentifyAndScoreDebtorResponse
@@ -129,15 +134,15 @@ class IdentifyAndScoreDebtorUseCase
             $this->scoreThresholdsConfigurationRepository->getById($merchantDebtor->getScoreThresholdsConfigurationId())
             : null;
 
-        $IsEligibleForPayAfterDeliveryRequestDTO = $this->eligibleForPayAfterDeliveryRequestDTOFactory->create(
-            $merchantDebtor->getDebtorId(),
+        $debtorScoringRequestDTO = $this->debtorScoringRequestDTOFactory->create(
+            $merchantDebtor->getCompanyUuid(),
             false,
             false,
             $merchantScoreThresholds,
             $debtorScoreThresholds
         );
 
-        return $this->companiesService->isEligibleForPayAfterDelivery($IsEligibleForPayAfterDeliveryRequestDTO);
+        return $this->scoringService->isEligibleForPayAfterDelivery($debtorScoringRequestDTO);
     }
 
     private function setLimit(MerchantEntity $merchant, MerchantDebtorEntity $merchantDebtor, float $limit)

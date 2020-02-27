@@ -15,5 +15,5 @@ services:
     arguments:
       $mockServerUrl: '%env(MOCKSERVER_URL)%'
       $servicesToMock: [salesforce]
-      $servicesToProxyHeader: [alfred]
+      $servicesToProxyHeader: [alfred, jarvis]
       $cliTestId: '%x_test_id%'

@@ -38,7 +38,8 @@ Feature:
 
 
   Scenario: Successfully create an order in pre-approved state
-    Given I get from companies service identify match and good decision response
+    Given I get from companies service identify match response
+    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And Debtor has sufficient limit
     And Debtor lock limit call succeeded
     And I send a POST request to "/order/pre-approve" with body:
@@ -92,7 +93,8 @@ Feature:
     And the response should contain "pre_approved"
 
   Scenario: Successfully create an order in pre-approved state without house
-    Given I get from companies service identify match and good decision response
+    Given I get from companies service identify match response
+    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And Debtor has sufficient limit
     And Debtor lock limit call succeeded
     And I send a POST request to "/order/pre-approve" with body:
@@ -146,7 +148,8 @@ Feature:
     And the response should contain "pre_approved"
 
   Scenario: Debtor identification failed
-    Given I get from companies service identify match and bad decision response
+    Given I get from companies service identify match response
+    And I get from scoring service bad debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And Debtor has sufficient limit
     And Debtor lock limit call succeeded
     And I send a POST request to "/order/pre-approve" with body:
@@ -201,7 +204,8 @@ Feature:
 
   Scenario: Order success confirmation when the order exists
     Given I have a pre_approved order "CO123" with amounts 55.2/43.30/10.10, duration 30 and comment "test order"
-    And I get from companies service identify match and good decision response
+    And I get from companies service identify match response
+    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And I get from companies service get debtor response
     And I send a POST request to "/order/test-order-uuidCO123/confirm" with body:
     """
@@ -211,7 +215,8 @@ Feature:
 
   Scenario: Order success confirmation when the order does not exists
     Given I have a pre_approved order "CO123" with amounts 55.2/43.30/10.10, duration 30 and comment "test order"
-    And I get from companies service identify match and good decision response
+    And I get from companies service identify match response
+    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And I send a POST request to "/order/not_existent_uuid/confirm" with body:
     """
     """
@@ -223,7 +228,8 @@ Feature:
 
   Scenario: Order success confirmation when the order exists in another state than pre_confirmed
     Given I have a created order "CO123" with amounts 55.2/43.30/10.10, duration 30 and comment "test order"
-    And I get from companies service identify match and good decision response
+    And I get from companies service identify match response
+    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And I send a POST request to "/order/test-order-uuidCO123/confirm" with body:
     """
     """

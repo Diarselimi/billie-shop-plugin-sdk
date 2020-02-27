@@ -1,10 +1,10 @@
 <?php
 
-namespace App\DomainModel\DebtorCompany;
+namespace App\DomainModel\DebtorScoring;
 
-class IsEligibleForPayAfterDeliveryRequestDTO
+class DebtorScoringRequestDTO
 {
-    private $debtorId;
+    private $debtorUuid;
 
     private $isSoleTrader;
 
@@ -22,14 +22,14 @@ class IsEligibleForPayAfterDeliveryRequestDTO
 
     private $schufaSoleTraderScoreThreshold;
 
-    public function getDebtorId(): string
+    public function getDebtorUuid(): string
     {
-        return $this->debtorId;
+        return $this->debtorUuid;
     }
 
-    public function setDebtorId(string $debtorId): IsEligibleForPayAfterDeliveryRequestDTO
+    public function setDebtorUuid(string $debtorUuid): DebtorScoringRequestDTO
     {
-        $this->debtorId = $debtorId;
+        $this->debtorUuid = $debtorUuid;
 
         return $this;
     }
@@ -39,7 +39,7 @@ class IsEligibleForPayAfterDeliveryRequestDTO
         return $this->isSoleTrader;
     }
 
-    public function setIsSoleTrader(bool $isSoleTrader): IsEligibleForPayAfterDeliveryRequestDTO
+    public function setIsSoleTrader(bool $isSoleTrader): DebtorScoringRequestDTO
     {
         $this->isSoleTrader = $isSoleTrader;
 
@@ -51,7 +51,7 @@ class IsEligibleForPayAfterDeliveryRequestDTO
         return $this->hasPaidInvoice;
     }
 
-    public function setHasPaidInvoice(bool $hasPaidInvoice): IsEligibleForPayAfterDeliveryRequestDTO
+    public function setHasPaidInvoice(bool $hasPaidInvoice): DebtorScoringRequestDTO
     {
         $this->hasPaidInvoice = $hasPaidInvoice;
 
@@ -63,7 +63,7 @@ class IsEligibleForPayAfterDeliveryRequestDTO
         return $this->crefoLowScoreThreshold;
     }
 
-    public function setCrefoLowScoreThreshold(int $crefoLowScoreThreshold): IsEligibleForPayAfterDeliveryRequestDTO
+    public function setCrefoLowScoreThreshold(int $crefoLowScoreThreshold): DebtorScoringRequestDTO
     {
         $this->crefoLowScoreThreshold = $crefoLowScoreThreshold;
 
@@ -75,7 +75,7 @@ class IsEligibleForPayAfterDeliveryRequestDTO
         return $this->crefoHighScoreThreshold;
     }
 
-    public function setCrefoHighScoreThreshold(int $crefoHighScoreThreshold): IsEligibleForPayAfterDeliveryRequestDTO
+    public function setCrefoHighScoreThreshold(int $crefoHighScoreThreshold): DebtorScoringRequestDTO
     {
         $this->crefoHighScoreThreshold = $crefoHighScoreThreshold;
 
@@ -87,7 +87,7 @@ class IsEligibleForPayAfterDeliveryRequestDTO
         return $this->schufaLowScoreThreshold;
     }
 
-    public function setSchufaLowScoreThreshold(int $schufaLowScoreThreshold): IsEligibleForPayAfterDeliveryRequestDTO
+    public function setSchufaLowScoreThreshold(int $schufaLowScoreThreshold): DebtorScoringRequestDTO
     {
         $this->schufaLowScoreThreshold = $schufaLowScoreThreshold;
 
@@ -99,9 +99,8 @@ class IsEligibleForPayAfterDeliveryRequestDTO
         return $this->schufaAverageScoreThreshold;
     }
 
-    public function setSchufaAverageScoreThreshold(
-        int $schufaAverageScoreThreshold
-    ): IsEligibleForPayAfterDeliveryRequestDTO {
+    public function setSchufaAverageScoreThreshold(int $schufaAverageScoreThreshold): DebtorScoringRequestDTO
+    {
         $this->schufaAverageScoreThreshold = $schufaAverageScoreThreshold;
 
         return $this;
@@ -112,7 +111,7 @@ class IsEligibleForPayAfterDeliveryRequestDTO
         return $this->schufaHighScoreThreshold;
     }
 
-    public function setSchufaHighScoreThreshold(int $schufaHighScoreThreshold): IsEligibleForPayAfterDeliveryRequestDTO
+    public function setSchufaHighScoreThreshold(int $schufaHighScoreThreshold): DebtorScoringRequestDTO
     {
         $this->schufaHighScoreThreshold = $schufaHighScoreThreshold;
 
@@ -124,9 +123,8 @@ class IsEligibleForPayAfterDeliveryRequestDTO
         return $this->schufaSoleTraderScoreThreshold;
     }
 
-    public function setSchufaSoleTraderScoreThreshold(
-        ?int $schufaSoleTraderScoreThreshold
-    ): IsEligibleForPayAfterDeliveryRequestDTO {
+    public function setSchufaSoleTraderScoreThreshold(?int $schufaSoleTraderScoreThreshold): DebtorScoringRequestDTO
+    {
         $this->schufaSoleTraderScoreThreshold = $schufaSoleTraderScoreThreshold;
 
         return $this;

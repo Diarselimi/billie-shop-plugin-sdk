@@ -39,7 +39,8 @@ Feature:
       | debtor_blacklisted        | 1       | 1                  |
       | debtor_overdue            | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
-    And I get from companies service identify match and bad decision response
+    And I get from companies service identify match response
+    And I get from scoring service bad debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And Debtor has insufficient limit
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
@@ -108,7 +109,8 @@ Feature:
       | debtor_blacklisted        | 1       | 1                  |
       | debtor_overdue            | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
-    And I get from companies service identify match and good decision response
+    And I get from companies service identify match response
+    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And Debtor has insufficient limit
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
@@ -178,6 +180,7 @@ Feature:
       | debtor_overdue            | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
     And I get from companies service identify no match and respond with suggestion
+    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And Debtor has insufficient limit
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:

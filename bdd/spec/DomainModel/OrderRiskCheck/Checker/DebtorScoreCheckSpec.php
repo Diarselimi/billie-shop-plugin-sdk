@@ -2,10 +2,10 @@
 
 namespace spec\App\DomainModel\OrderRiskCheck\Checker;
 
-use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\DebtorCompany;
-use App\DomainModel\DebtorCompany\IsEligibleForPayAfterDeliveryRequestDTO;
-use App\DomainModel\DebtorCompany\IsEligibleForPayAfterDeliveryRequestDTOFactory;
+use App\DomainModel\DebtorScoring\DebtorScoringRequestDTO;
+use App\DomainModel\DebtorScoring\DebtorScoringRequestDTOFactory;
+use App\DomainModel\DebtorScoring\ScoringServiceInterface;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
@@ -28,14 +28,14 @@ class DebtorScoreCheckSpec extends ObjectBehavior
     public function let(
         OrderRepositoryInterface $orderRepository,
         ScoreThresholdsConfigurationRepositoryInterface $scoreThresholdsConfigurationRepository,
-        IsEligibleForPayAfterDeliveryRequestDTOFactory $afterDeliveryRequestDTOFactory,
-        CompaniesServiceInterface $companiesService,
+        DebtorScoringRequestDTOFactory $afterDeliveryRequestDTOFactory,
+        ScoringServiceInterface $scoringService,
         OrderContainer $orderContainer,
         MerchantDebtorEntity $merchantDebtor,
         DebtorExternalDataEntity $debtorExternalData,
         MerchantSettingsEntity $merchantSettings,
         ScoreThresholdsConfigurationEntity $scoreThresholds,
-        IsEligibleForPayAfterDeliveryRequestDTO $request,
+        DebtorScoringRequestDTO $request,
         DebtorCompany $debtorCompany
     ) {
         $orderContainer->getMerchantDebtor()->willReturn($merchantDebtor);
@@ -82,20 +82,20 @@ class DebtorScoreCheckSpec extends ObjectBehavior
     }
 
     public function it_returns_false_check_result_if_companies_service_returns_false(
-        CompaniesServiceInterface $companiesService,
+        ScoringServiceInterface $scoringService,
         OrderContainer $orderContainer
     ) {
-        $companiesService->isEligibleForPayAfterDelivery(Argument::any())->willReturn(false);
+        $scoringService->isEligibleForPayAfterDelivery(Argument::any())->willReturn(false);
 
         $checkResult = $this->check($orderContainer);
         $checkResult->isPassed()->shouldBe(false);
     }
 
     public function it_returns_false_check_result_if_companies_service_returns_true(
-        CompaniesServiceInterface $companiesService,
+        ScoringServiceInterface $scoringService,
         OrderContainer $orderContainer
     ) {
-        $companiesService->isEligibleForPayAfterDelivery(Argument::any())->willReturn(true);
+        $scoringService->isEligibleForPayAfterDelivery(Argument::any())->willReturn(true);
 
         $checkResult = $this->check($orderContainer);
         $checkResult->isPassed()->shouldBe(true);

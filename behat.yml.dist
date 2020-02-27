@@ -22,6 +22,7 @@ default:
         - BicLookupServiceContext
         - DocumentGeneratorContext
         - NachosContext
+        - ScoringServiceContext
 
   extensions:
     Behatch\Extension: ~
