@@ -144,6 +144,8 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface
         if (!$order->getPaymentId()) {
             $order->setPaymentId($this->uuidGenerator->uuid4());
         }
+
+        $this->orderRepository->update($order);
     }
 
     private function uploadInvoice(OrderEntity $order): void
@@ -163,8 +165,6 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface
 
             $orderContainer->setPaymentDetails($paymentDetails);
         } catch (PaymentsServiceRequestException $exception) {
-            $this->orderRepository->update($orderContainer->getOrder());
-
             throw new ShipOrderException('Payments call unsuccessful', null, $exception);
         }
     }
