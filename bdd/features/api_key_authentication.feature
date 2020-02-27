@@ -26,5 +26,6 @@ Feature: As a merchant, i should be able to access all endpoints by providing AP
     And I get from companies service get debtor response
     And I get from payments service get debtor response
     And I add "X-Api-Key" header equal to test
+    And I get from payments service get order details response
     When I send a GET request to "/order/XF43Y2"
     Then the response status code should be 200

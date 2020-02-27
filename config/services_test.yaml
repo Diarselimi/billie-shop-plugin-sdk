@@ -1,14 +1,25 @@
 parameters:
   behat_mock_server_url: "http://localhost"
-#  billie_monitoring_slack_webhook_url: ''
+  #billie_monitoring_slack_webhook_url: null # do not use slack client for tests!
 
 services:
   _defaults:
     autowire: true
     public: true
 
-  App\Http\ApiError\VerboseApiErrorResponseFactory: ~
+  # override sentry calls:
   App\Test\TestMessageBus: ~
+  App\Test\TestSentryClient: ~
+  App\Test\TestSentrySubscriber: ~
+  Psr\Log\NullLogger: ~
+
+
+  Billie\MonitoringBundle\Service\Alerting\Sentry\Raven\RavenClient: '@App\Test\TestSentryClient'
+  Billie\MonitoringBundle\Service\Alerting\Sentry\SentrySubscriber: '@App\Test\TestSentrySubscriber'
+  Raven_Client: '@App\Test\TestSentryClient'
+  Psr\Log\LoggerInterface: '@Psr\Log\NullLogger'
+
+  App\Http\ApiError\VerboseApiErrorResponseFactory: ~
   Symfony\Component\Messenger\MessageBusInterface: '@App\Test\TestMessageBus'
   App\Http\ApiError\ApiErrorResponseFactory: '@App\Http\ApiError\VerboseApiErrorResponseFactory'
 

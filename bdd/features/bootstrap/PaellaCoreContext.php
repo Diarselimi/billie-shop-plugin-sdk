@@ -91,8 +91,8 @@ class PaellaCoreContext extends MinkContext
         $this->connection = $connection;
 
         $this->getConnection()->exec('
-            SET SESSION wait_timeout=45;
-            SET SESSION max_connections = 1000;
+            SET SESSION wait_timeout=65;
+            SET SESSION max_connections = 250;
             SET SESSION max_allowed_packet = "16M";
         ');
         $this->cleanUpScenario();
@@ -201,6 +201,19 @@ class PaellaCoreContext extends MinkContext
             ALTER TABLE orders AUTO_INCREMENT = 1;
             SET FOREIGN_KEY_CHECKS = 1;
         ');
+        $this->killOpenDbProcesses();
+    }
+
+    private function killOpenDbProcesses()
+    {
+        $dbName = 'paella';
+        $threads = $this->connection->query('SHOW FULL PROCESSLIST');
+
+        while ($thread = $threads->fetch()) {
+            if ($thread['db'] == $dbName && $thread['Command'] == 'Sleep') {
+                $this->connection->query(sprintf('KILL %d', $thread['Id']));
+            }
+        }
     }
 
     /**

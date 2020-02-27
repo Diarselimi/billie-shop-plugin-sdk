@@ -19,6 +19,7 @@ Feature:
     Given I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
     And I get from companies service get debtor response
     And I get from payments service get debtor response
+    And I get from payments service get order details response
     When I send a GET request to "/order/XF43Y"
     Then the response status code should be 200
     And the JSON response should be:
@@ -46,13 +47,13 @@ Feature:
         },
         "invoice": {
             "invoice_number": null,
-            "payout_amount": null,
-            "outstanding_amount":null,
-            "fee_amount": null,
-            "fee_rate": null,
-            "due_date": null,
-            "pending_merchant_payment_amount": null,
-            "pending_cancellation_amount": null
+            "payout_amount": 1000,
+            "outstanding_amount":1000,
+            "fee_amount": 10,
+            "fee_rate": 1,
+            "due_date": "1978-11-20",
+            "pending_merchant_payment_amount": 0,
+            "pending_cancellation_amount": 0
         },
         "debtor_external_data": {
             "name": "test",
@@ -174,6 +175,7 @@ Feature:
     Given I have a declined order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
     And I get from companies service get debtor response
     And I get from companies service get debtor response
+    And I get from payments service get order details response
     When I send a GET request to "/order/XF43Y"
     Then the response status code should be 200
     And the JSON response should be:
@@ -202,13 +204,13 @@ Feature:
         },
         "invoice": {
             "invoice_number": null,
-            "payout_amount": null,
-            "outstanding_amount":null,
-            "fee_amount": null,
-            "fee_rate": null,
-            "due_date": null,
-            "pending_merchant_payment_amount": null,
-            "pending_cancellation_amount": null
+            "payout_amount": 1000,
+            "outstanding_amount":1000,
+            "fee_amount": 10,
+            "fee_rate": 1,
+            "due_date": "1978-11-20",
+            "pending_merchant_payment_amount": 0,
+            "pending_cancellation_amount": 0
         },
         "debtor_external_data": {
             "name": "test",
