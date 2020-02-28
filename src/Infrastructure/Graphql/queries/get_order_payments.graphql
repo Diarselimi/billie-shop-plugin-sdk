@@ -1,0 +1,24 @@
+query q(
+    $ticketUuid: String!
+    $offset: String
+    $limit: String
+    $sortBy: String
+    $sortDirection: String
+    $keyword: String
+){
+    getPadOrderPayments(
+        ticket_uuid: $ticketUuid
+        search_keyword: $keyword
+        limit: $limit
+        offset: $offset
+        order_by: $sortBy
+        order_direction: $sortDirection
+    ) {
+        transaction_uuid
+        payment_type
+        mapped_amount
+        pending_amount
+        created_at
+        mapped_at
+    }
+}

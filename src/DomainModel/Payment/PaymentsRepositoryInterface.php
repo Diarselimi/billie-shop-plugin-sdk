@@ -7,7 +7,9 @@ use App\Support\PaginatedCollection;
 
 interface PaymentsRepositoryInterface
 {
-    public function get(string $merchantPaymentUuid, string $transactionUuid): array;
+    public function getPaymentDetails(string $merchantPaymentUuid, string $transactionUuid): array;
 
-    public function search(SearchPaymentsDTO $paymentsDTO): PaginatedCollection;
+    public function searchMerchantPayments(SearchPaymentsDTO $paymentsDTO): PaginatedCollection;
+
+    public function getOrderPayments(string $orderPaymentUuid): PaginatedCollection;
 }

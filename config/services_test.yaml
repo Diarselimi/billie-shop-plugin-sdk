@@ -86,7 +86,7 @@ services:
     alias: 'App\Infrastructure\Repository\OrderNotificationRepository'
     public: true
   App\DomainModel\Payment\PaymentsRepositoryInterface:
-    alias: 'App\DomainModel\Payment\EmptyPaymentsRepository'
+    alias: 'App\DomainModel\Payment\DummyPaymentsRepository'
     public: true
   App\DomainModel\MerchantOnboarding\MerchantOnboardingRepositoryInterface:
     alias: 'App\Infrastructure\Repository\MerchantOnboarding\MerchantOnboardingRepository'

@@ -1823,6 +1823,44 @@ paths:
       x-groups:
         - public
         - private
+  '/order/{uuid}/payments':
+    get:
+      tags:
+        - 'Order Management'
+      summary: 'Get Order Payments'
+      operationId: get_order_payments
+      parameters:
+        -
+          name: uuid
+          in: path
+          description: 'Order UUID'
+          required: true
+          schema:
+            oneOf:
+              -
+                $ref: '#/components/schemas/UUID'
+              -
+                type: string
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetOrderPaymentsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+      x-groups:
+        - private
   /orders:
     get:
       tags:
@@ -3740,6 +3778,17 @@ components:
           example: '2019-03-20'
           nullable: true
       type: object
+    OrderPaymentDTO:
+      properties:
+        amount:
+          type: float
+        created_at:
+          $ref: '#/components/schemas/DateTime'
+        state:
+          $ref: string
+        type:
+          $ref: string
+      type: object
     CheckoutAuthorizeOrderResponse:
       title: 'Authorize Checkout Order Response'
       properties:
@@ -4045,6 +4094,18 @@ components:
               merchant_debtor_uuid:
                 $ref: '#/components/schemas/UUID'
             type: object
+        total:
+          description: 'Total number of results'
+          type: integer
+      type: object
+    GetOrderPaymentsResponse:
+      title: 'Order Payments Response'
+      properties:
+        items:
+          description: 'Order payment item'
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderPaymentDTO'
         total:
           description: 'Total number of results'
           type: integer

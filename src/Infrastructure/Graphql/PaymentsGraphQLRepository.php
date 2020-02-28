@@ -14,7 +14,7 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
 {
     use LoggingTrait;
 
-    public function search(SearchPaymentsDTO $paymentsDTO): PaginatedCollection
+    public function searchMerchantPayments(SearchPaymentsDTO $paymentsDTO): PaginatedCollection
     {
         $params = [
             'merchantUuid' => $paymentsDTO->getMerchantPaymentUuid(),
@@ -40,7 +40,7 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
         return new PaginatedCollection($this->query('get_merchant_payments', $params), $total);
     }
 
-    public function get(string $merchantPaymentUuid, string $transactionUuid): array
+    public function getPaymentDetails(string $merchantPaymentUuid, string $transactionUuid): array
     {
         $params = [
             'merchantUuid' => $merchantPaymentUuid,
@@ -50,6 +50,22 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
         $response = $this->query('get_merchant_payment_details', $params);
 
         return empty($response) ? [] : $response[0];
+    }
+
+    public function getOrderPayments(string $orderPaymentUuid): PaginatedCollection
+    {
+        $params = [
+            'ticketUuid' => $orderPaymentUuid,
+            'offset' => '0',
+            'limit' => '100',
+            'sortBy' => 'transaction_date',
+            'sortDirection' => 'desc',
+            'keyword' => null,
+        ];
+
+        $result = $this->query('get_order_payments', $params);
+
+        return new PaginatedCollection($result, count($result));
     }
 
     private function query(string $name, array $params): array

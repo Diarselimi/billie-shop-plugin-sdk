@@ -36,6 +36,16 @@ class PaginatedCollection implements IteratorAggregate, Countable, ArrayableInte
         return $this;
     }
 
+    public function filter(PaginationFilterInterface $filter): PaginatedCollection
+    {
+        $this->items = array_filter($this->items, function ($item) use ($filter) {
+            return $filter->check($item);
+        });
+        $this->total = count($this->items);
+
+        return $this;
+    }
+
     public function getTotal(): int
     {
         return $this->total;
