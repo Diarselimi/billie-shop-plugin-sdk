@@ -65,7 +65,7 @@
 </head>
 <body>
 <div id="redoc_container">Loading ...</div>
-<script src="https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js"></script>
+<script src="<?php /** @noinspection PhpUndefinedVariableInspection */echo $redoc_js_url; ?>"></script>
 <script>
 
 // noinspection JSAnnotator

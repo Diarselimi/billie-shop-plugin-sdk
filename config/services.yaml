@@ -5,6 +5,7 @@ parameters:
   billie_monitoring_slack_webhook_url: '%env(SLACK_WEBHOOK_URL)%'
   smaug_client_id: '%env(string:SMAUG_CLIENT_ID)%'
   smaug_client_secret: '%env(string:SMAUG_CLIENT_SECRET)%'
+  redoc_js_url: 'https://cdn.jsdelivr.net/npm/redoc@v2.0.0-rc.23/bundles/redoc.standalone.js'
 
 services:
   _defaults:
@@ -42,6 +43,7 @@ services:
       $onboardingStepWorkflow: '@state_machine.merchant_onboarding_step'
       $onboardingWorkflow: '@state_machine.merchant_onboarding'
       $segmentIoProvider: '@segment_io.analytics'
+      $redocJsUrl: '%redoc_js_url%'
 
   _instanceof:
     App\Application\UseCase\ValidatedUseCaseInterface:

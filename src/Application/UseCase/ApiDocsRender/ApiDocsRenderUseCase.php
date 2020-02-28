@@ -110,8 +110,9 @@ class ApiDocsRenderUseCase
         ],
     ];
 
-    public function __construct(RelativeFileReader $resourcesFileReader)
+    public function __construct(string $redocJsUrl, RelativeFileReader $resourcesFileReader)
     {
+        $this->templateVars['redoc_js_url'] = $redocJsUrl;
         $this->resourcesFileReader = $resourcesFileReader;
     }
 
