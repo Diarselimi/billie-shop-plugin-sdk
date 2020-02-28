@@ -57,6 +57,7 @@ class MerchantDebtorFinder implements LoggingInterface
         if ($merchantDebtor) {
             $this->logInfo('Found the existing merchant debtor', ['id' => $merchantDebtor->getId()]);
             $identifyRequest->setCompanyId((int) $merchantDebtor->getDebtorId());
+            $identifyRequest->setCompanyUuid($merchantDebtor->getCompanyUuid());
         } else {
             $hash = $debtorExternalData->getDataHash();
 
@@ -82,6 +83,7 @@ class MerchantDebtorFinder implements LoggingInterface
                 }
 
                 $identifyRequest->setCompanyId($merchantDebtor->getDebtorId());
+                $identifyRequest->setCompanyUuid($merchantDebtor->getCompanyUuid());
                 $this->logInfo('Used the existing company id for identifying.');
             } else {
                 $this->logInfo('Try to identify new debtor');

@@ -5,6 +5,7 @@
     "schufa_id": "123",
     "google_places_id": null,
     "name": "Test User Company",
+    "legal_form": "GmbH",
     "address_house": "10",
     "address_street": "Heinrich-Heine-Platz",
     "address_city": "Berlin",

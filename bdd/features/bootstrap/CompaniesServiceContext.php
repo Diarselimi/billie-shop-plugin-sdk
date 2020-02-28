@@ -55,6 +55,26 @@ class CompaniesServiceContext implements Context
     }
 
     /**
+     * @Given /^I get from companies service a good debtor strict match response$/
+     */
+    public function iGetFromCompaniesServiceGoodStrictMatchResponse()
+    {
+        $this->mockRequest('/debtor/strict-match', new ResponseStack(
+            new MockResponse('', [], 202)
+        ));
+    }
+
+    /**
+     * @Given /^I get from companies service a bad debtor strict match response$/
+     */
+    public function iGetFromCompaniesServiceBadStrictMatchResponse()
+    {
+        $this->mockRequest('/debtor/strict-match', new ResponseStack(
+            new MockResponse('', [], 400)
+        ));
+    }
+
+    /**
      * @Given /^I get from companies service get debtor response$/
      */
     public function iGetFromCompaniesServiceGetDebtorResponse()

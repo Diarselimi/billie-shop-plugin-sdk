@@ -2,10 +2,11 @@
 
 namespace App\Application\UseCase\CheckoutConfirmOrder;
 
-use App\Application\Exception\CheckoutSessionConfirmException;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
+use App\DomainModel\CheckoutSession\CheckoutOrderMatcherInterface;
+use App\DomainModel\CheckoutSession\CheckoutOrderRequestDTO;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
@@ -23,14 +24,18 @@ class CheckoutConfirmOrderUseCase implements ValidatedUseCaseInterface
 
     private $stateManager;
 
+    private $dataMatcher;
+
     public function __construct(
         OrderResponseFactory $orderResponseFactory,
         OrderContainerFactory $orderContainerFactory,
-        OrderStateManager $orderStateManager
+        OrderStateManager $orderStateManager,
+        CheckoutOrderMatcherInterface $dataMatcher
     ) {
         $this->orderResponseFactory = $orderResponseFactory;
         $this->orderContainerFactory = $orderContainerFactory;
         $this->stateManager = $orderStateManager;
+        $this->dataMatcher = $dataMatcher;
     }
 
     public function execute(CheckoutConfirmOrderRequest $request): OrderResponse
@@ -38,13 +43,15 @@ class CheckoutConfirmOrderUseCase implements ValidatedUseCaseInterface
         $this->validateRequest($request);
 
         try {
-            $orderContainer = $this->orderContainerFactory->loadNotYetConfirmedByCheckoutSessionUuid($request->getSessionUuid());
+            $orderContainer = $this->orderContainerFactory->loadNotYetConfirmedByCheckoutSessionUuid(
+                $request->getSessionUuid()
+            );
         } catch (OrderContainerFactoryException $exception) {
             throw new OrderNotFoundException($exception);
         }
 
         if (!$this->hasMatchingData($request, $orderContainer)) {
-            throw new CheckoutSessionConfirmException();
+            throw new CheckoutConfirmDataMismatchException();
         }
 
         if ($this->stateManager->isPreWaiting($orderContainer->getOrder())) {
@@ -56,13 +63,14 @@ class CheckoutConfirmOrderUseCase implements ValidatedUseCaseInterface
         return $this->orderResponseFactory->create($orderContainer);
     }
 
-    private function hasMatchingData(CheckoutConfirmOrderRequest $confirmOrderRequest, OrderContainer $orderContainer): bool
+    private function hasMatchingData(CheckoutConfirmOrderRequest $request, OrderContainer $orderContainer): bool
     {
-        $orderFinancialDetails = $orderContainer->getOrderFinancialDetails();
+        $orderRequestDto = (new CheckoutOrderRequestDTO())
+            ->setSessionUuid($request->getSessionUuid())
+            ->setAmount($request->getAmount())
+            ->setDebtorCompany($request->getDebtorCompanyRequest())
+            ->setDuration($request->getDuration());
 
-        return $confirmOrderRequest->getAmount()->getGross() === $orderFinancialDetails->getAmountGross() &&
-            $confirmOrderRequest->getAmount()->getNet() === $orderFinancialDetails->getAmountNet() &&
-            $confirmOrderRequest->getAmount()->getTax() === $orderFinancialDetails->getAmountTax() &&
-            $confirmOrderRequest->getDuration() === $orderFinancialDetails->getDuration();
+        return $this->dataMatcher->matches($orderRequestDto, $orderContainer);
     }
 }

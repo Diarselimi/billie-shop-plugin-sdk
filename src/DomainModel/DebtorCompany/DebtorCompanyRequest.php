@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\UseCase;
+namespace App\DomainModel\DebtorCompany;
 
 use OpenApi\Annotations as OA;
 use Symfony\Component\Validator\Constraints as Assert;

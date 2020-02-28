@@ -91,8 +91,8 @@ class PaellaCoreContext extends MinkContext
         $this->connection = $connection;
 
         $this->getConnection()->exec('
-            SET SESSION wait_timeout=65;
-            SET SESSION max_connections = 250;
+            SET SESSION wait_timeout=90;
+            SET SESSION max_connections = 500;
             SET SESSION max_allowed_packet = "16M";
         ');
         $this->cleanUpScenario();
@@ -300,9 +300,9 @@ class PaellaCoreContext extends MinkContext
             ->setPaymentId($paymentUuid ?? self::DUMMY_UUID4)
             ->setCreatedAt(new \DateTime('2019-05-20 13:00:00'))
             ->setCheckoutSessionId(1)
-            ->setUuid('test-order-uuid'.$externalCode);
+            ->setUuid('test-order-uuid' . $externalCode);
 
-        $this->iHaveASessionId("123123".$externalCode, 0);
+        $this->iHaveASessionId("123123" . $externalCode, 0);
 
         $this->getOrderRepository()->insert($order);
 
@@ -336,20 +336,20 @@ class PaellaCoreContext extends MinkContext
     /**
      * @Given I have a invalid checkout_session_id :arg1
      */
-    public function iHaveAInvalidSessionId($arg1)
+    public function iHaveAInvalidSessionId($sessionId)
     {
-        $this->iHaveASessionId($arg1, false);
+        $this->iHaveASessionId($sessionId, false);
     }
 
     /**
      * @Given I have a checkout_session_id :arg1
      */
-    public function iHaveASessionId($arg1, $active = true)
+    public function iHaveASessionId($sessionId, $active = true)
     {
         $checkoutSession = new CheckoutSessionEntity();
         $checkoutSession->setMerchantId(1)
-            ->setMerchantDebtorExternalId($arg1)
-            ->setUuid($arg1)
+            ->setMerchantDebtorExternalId($sessionId)
+            ->setUuid($sessionId)
             ->setIsActive($active)
             ->setCreatedAt(new DateTime())
             ->setUpdatedAt(new DateTime());
@@ -1241,5 +1241,24 @@ class PaellaCoreContext extends MinkContext
                 $row['payment_uuid']
             );
         }
+    }
+
+    /**
+     * @Given a merchant :merchantId is complete at :date
+     */
+    public function aMerchantIsCompleteAt(string $merchantId, string $date)
+    {
+        $onboarding = $this->getMerchantOnboardingRepository()->findNewestByPaymentUuid($merchantId);
+        $onboarding->setState('complete');
+        $this->getMerchantOnboardingRepository()->update($onboarding);
+
+        $transition = (new MerchantOnboardingTransitionEntity())
+            ->setReferenceId($onboarding->getId())
+            ->setFrom('new')
+            ->setTo('complete')
+            ->setTransition('complete')
+            ->setTransitedAt(new \DateTime($date))
+        ;
+        $this->getMerchantOnboardingTransitionRepository()->insert($transition);
     }
 }

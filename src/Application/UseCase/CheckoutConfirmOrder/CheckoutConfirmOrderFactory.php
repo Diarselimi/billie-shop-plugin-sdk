@@ -3,14 +3,14 @@
 namespace App\Application\UseCase\CheckoutConfirmOrder;
 
 use App\Application\UseCase\CreateOrder\Request\CreateOrderAmountRequest;
-use App\Application\UseCase\DebtorCompanyRequest;
+use App\DomainModel\DebtorCompany\DebtorCompanyRequest;
 
 class CheckoutConfirmOrderFactory
 {
     public function create(
         array $amountData,
         array $debtorCompanyData,
-        ?int $duration,
+        int $duration,
         string $sessionUuid
     ) {
         return (new CheckoutConfirmOrderRequest())

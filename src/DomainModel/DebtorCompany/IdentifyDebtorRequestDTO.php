@@ -7,7 +7,12 @@ use App\DomainModel\ArrayableInterface;
 
 class IdentifyDebtorRequestDTO implements ArrayableInterface
 {
+    /**
+     * @deprecated Use companyUuid
+     */
     private $companyId;
+
+    private $companyUuid;
 
     private $name;
 
@@ -39,14 +44,34 @@ class IdentifyDebtorRequestDTO implements ArrayableInterface
 
     private $billingAddress;
 
+    /**
+     * @deprecated Use getCompanyUuid()
+     * @see IdentifyDebtorRequestDTO::getCompanyUuid()
+     */
     public function getCompanyId(): ?int
     {
         return $this->companyId;
     }
 
+    /**
+     * @deprecated Use setCompanyUuid()
+     * @see IdentifyDebtorRequestDTO::setCompanyUuid()
+     */
     public function setCompanyId(int $companyId): IdentifyDebtorRequestDTO
     {
         $this->companyId = $companyId;
+
+        return $this;
+    }
+
+    public function getCompanyUuid(): ?string
+    {
+        return $this->companyUuid;
+    }
+
+    public function setCompanyUuid(string $companyUuid): IdentifyDebtorRequestDTO
+    {
+        $this->companyUuid = $companyUuid;
 
         return $this;
     }
@@ -171,12 +196,12 @@ class IdentifyDebtorRequestDTO implements ArrayableInterface
         return $this;
     }
 
-    public function getLegalForm(): string
+    public function getLegalForm(): ?string
     {
         return $this->legalForm;
     }
 
-    public function setLegalForm(string $legalForm): IdentifyDebtorRequestDTO
+    public function setLegalForm(?string $legalForm): IdentifyDebtorRequestDTO
     {
         $this->legalForm = $legalForm;
 
@@ -223,6 +248,7 @@ class IdentifyDebtorRequestDTO implements ArrayableInterface
     {
         return [
             'company_id' => $this->getCompanyId(),
+            'company_uuid' => $this->getCompanyUuid(),
             'name' => $this->getName(),
             'address_house' => $this->getHouseNumber(),
             'address_street' => $this->getStreet(),

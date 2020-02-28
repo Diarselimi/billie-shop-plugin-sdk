@@ -2,10 +2,10 @@
 
 namespace App\Http\Controller\PublicApi;
 
-use App\Application\Exception\CheckoutSessionConfirmException;
 use App\Application\Exception\OrderNotFoundException;
-use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmOrderUseCase;
+use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmDataMismatchException;
 use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmOrderFactory;
+use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmOrderUseCase;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -63,7 +63,7 @@ class CheckoutConfirmOrderController
         $checkoutRequest = $this->requestFactory->create(
             $request->request->get('amount', []),
             $request->request->get('debtor_company', []),
-            $request->request->get('duration'),
+            $request->request->get('duration', 0),
             $sessionUuid
         );
 
@@ -71,7 +71,7 @@ class CheckoutConfirmOrderController
             $orderResponse = $this->useCase->execute($checkoutRequest);
         } catch (OrderNotFoundException $exception) {
             throw new NotFoundHttpException($exception->getMessage());
-        } catch (CheckoutSessionConfirmException $exception) {
+        } catch (CheckoutConfirmDataMismatchException $exception) {
             throw new BadRequestHttpException($exception->getMessage());
         }
 

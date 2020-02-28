@@ -3,12 +3,11 @@
 namespace App\Application\UseCase\CheckoutConfirmOrder;
 
 use App\Application\UseCase\CreateOrder\Request\CreateOrderAmountRequest;
-use App\Application\UseCase\DebtorCompanyRequest;
 use App\Application\UseCase\ValidatedRequestInterface;
 use App\Application\Validator\Constraint as CustomConstrains;
-use Symfony\Component\Validator\Constraints as Assert;
-
+use App\DomainModel\DebtorCompany\DebtorCompanyRequest;
 use OpenApi\Annotations as OA;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @OA\Schema(schema="CheckoutConfirmOrderRequest", required={"amount", "duration", "debtor_company"}, properties={
@@ -20,6 +19,7 @@ use OpenApi\Annotations as OA;
 class CheckoutConfirmOrderRequest implements ValidatedRequestInterface
 {
     /**
+     * @Assert\NotBlank()
      * @Assert\Valid()
      */
     private $amount;
@@ -34,28 +34,29 @@ class CheckoutConfirmOrderRequest implements ValidatedRequestInterface
     private $sessionUuid;
 
     /**
+     * @Assert\NotBlank()
      * @Assert\Valid()
      */
     private $debtorCompanyRequest;
 
-    public function getAmount(): ?CreateOrderAmountRequest
+    public function getAmount(): CreateOrderAmountRequest
     {
         return $this->amount;
     }
 
-    public function setAmount(?CreateOrderAmountRequest $amount): CheckoutConfirmOrderRequest
+    public function setAmount(CreateOrderAmountRequest $amount): CheckoutConfirmOrderRequest
     {
         $this->amount = $amount;
 
         return $this;
     }
 
-    public function getDuration(): ?int
+    public function getDuration(): int
     {
         return $this->duration;
     }
 
-    public function setDuration(?int $duration): CheckoutConfirmOrderRequest
+    public function setDuration(int $duration): CheckoutConfirmOrderRequest
     {
         $this->duration = $duration;
 

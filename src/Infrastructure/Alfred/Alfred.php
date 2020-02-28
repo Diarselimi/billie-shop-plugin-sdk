@@ -173,6 +173,24 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         }
     }
 
+    public function strictMatchDebtor(string $debtorUuid, IdentifyDebtorRequestDTO $requestDTO): bool
+    {
+        try {
+            $this->client->post("/debtor/strict-match", [
+                'json' => array_merge(['expected_company_uuid' => $debtorUuid], $requestDTO->toArray()),
+                'on_stats' => function (TransferStats $stats) {
+                    $this->logServiceRequestStats($stats, 'strict_match_debtor');
+                },
+            ]);
+
+            return true;
+        } catch (ClientException $exception) {
+            return false;
+        } catch (TransferException $exception) {
+            throw new CompaniesServiceRequestException($exception);
+        }
+    }
+
     public function markDuplicates(MerchantDebtorDuplicateDTO ...$duplicates): void
     {
         $payload = ['duplicates' => []];
