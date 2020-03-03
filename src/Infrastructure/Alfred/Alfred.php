@@ -55,8 +55,12 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
      */
     public function getDebtors(array $debtorIds): array
     {
+        if (empty($debtorIds)) {
+            return [];
+        }
+
         try {
-            $response = $this->client->get("/debtors", [
+            $response = $this->client->get('/debtors', [
                 'query' => [
                     'ids' => $debtorIds,
                 ],
