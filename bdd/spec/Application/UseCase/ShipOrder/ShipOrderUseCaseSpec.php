@@ -146,6 +146,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
         OrderContainerFactory $orderContainerFactory,
         ShipOrderRequest $request,
         OrderContainer $orderContainer,
+        OrderStateManager $orderStateManager,
         OrderEntity $order
     ) {
         $orderContainerFactory
@@ -168,6 +169,8 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
         $order->setShippedAt(Argument::type(\DateTime::class))
             ->shouldBeCalled()
             ->willReturn($order);
+
+        $orderStateManager->ship($orderContainer)->shouldNotBeCalled();
 
         $paymentsService
             ->getOrderPaymentDetails(self::PAYMENT_DETAILS_ID)

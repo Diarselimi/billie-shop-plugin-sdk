@@ -90,8 +90,7 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface
         $this->addRequestData($request, $order);
 
         if ($wasShippedInPayments && $this->workflow->can($order, OrderStateManager::TRANSITION_SHIP)) {
-            // fix paella-side shipment
-            $this->orderStateManager->ship($orderContainer);
+            $this->orderStateManager->ship($orderContainer); // fix paella-side shipment
 
             return $this->orderResponseFactory->create($orderContainer);
         }
@@ -100,6 +99,7 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface
             throw new WorkflowException("Order state '{$order->getState()}' does not support shipment");
         }
 
+        $this->orderRepository->update($order);
         $this->uploadInvoice($order);
         $this->createPaymentsTicket($orderContainer);
 
@@ -144,8 +144,6 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface
         if (!$order->getPaymentId()) {
             $order->setPaymentId($this->uuidGenerator->uuid4());
         }
-
-        $this->orderRepository->update($order);
     }
 
     private function uploadInvoice(OrderEntity $order): void
