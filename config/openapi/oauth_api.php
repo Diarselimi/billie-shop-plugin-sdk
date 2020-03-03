@@ -58,7 +58,7 @@ use OpenApi\Annotations as OA;
  *     type="object",
  *     required={"grant_type", "client_id", "client_secret"},
  *     properties={
- *        @OA\Property(property="grant_type", const="client_credentials", type="string"),
+ *        @OA\Property(property="grant_type", example="client_credentials", type="string"),
  *        @OA\Property(property="client_id", ref="#/components/schemas/UUID"),
  *        @OA\Property(property="client_secret", type="string")
  *     }

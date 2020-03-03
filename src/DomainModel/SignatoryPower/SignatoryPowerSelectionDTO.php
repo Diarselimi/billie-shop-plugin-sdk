@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @OA\Schema(schema="SignatoryPowerDTO", title="Signatory Power Data transfer object", type="object", properties={
  *      @OA\Property(property="uuid", type="string"),
  *      @OA\Property(property="email", type="string", nullable=true),
- *      @OA\Property(property="is_identified_as_user", type="bool"),
+ *      @OA\Property(property="is_identified_as_user", type="boolean"),
  * })
  */
 class SignatoryPowerSelectionDTO implements ArrayableInterface

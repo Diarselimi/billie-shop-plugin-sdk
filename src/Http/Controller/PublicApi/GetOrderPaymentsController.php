@@ -28,7 +28,7 @@ use OpenApi\Annotations as OA;
  *     x={"groups":{"private"}},
  *
  *     @OA\Parameter(in="path", name="uuid",
- *          @OA\Schema(oneOf={@OA\Schema(ref="#/components/schemas/UUID"), @OA\Schema(type="string")}),
+ *          @OA\Schema(ref="#/components/schemas/UUID"),
  *          description="Order UUID",
  *          required=true
  *     ),

@@ -26,7 +26,7 @@ use OpenApi\Annotations as OA;
  *     tags={"Back-end Order Creation"},
  *     x={"groups":{"public", "private"}},
  *
- *     @OA\Parameter(in="path", name="id", @OA\Schema(oneOf={@OA\Schema(ref="#/components/schemas/UUID"), @OA\Schema(type="string")}), required=true),
+ *     @OA\Parameter(in="path", name="uuid", @OA\Schema(oneOf={@OA\Schema(ref="#/components/schemas/UUID"), @OA\Schema(type="string")}), required=true),
  *
  *     @OA\Response(response=202, description="Order was confirmed and now it's in state created.", @OA\JsonContent(ref="#/components/schemas/OrderResponse")),
  *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),

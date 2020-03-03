@@ -12,7 +12,12 @@ use OpenApi\Annotations as OA;
  *      x={"groups": {"private"}},
  *      type="object",
  *      properties={
- *          @OA\Property(property="production", type="null", nullable=true),
+ *          @OA\Property(property="production", type="object", nullable=true,
+ *              properties={
+ *                  @OA\Property(property="client_id", type="string"),
+ *                  @OA\Property(property="client_secret", type="string"),
+ *              }
+ *          ),
  *          @OA\Property(property="sandbox", type="object", nullable=false,
  *              properties={
  *                  @OA\Property(property="client_id", type="string"),

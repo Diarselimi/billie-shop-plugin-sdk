@@ -40,4 +40,15 @@ mkdir -p docs/openapi
 generate_api_docs full # special command wildcard to generate the docs for all groups. See GenerateOpenApiSpec::buildProcessors
 generate_api_docs public
 
-echo "DONE."
+command -v openapi-generator >/dev/null 2>&1 || {
+    echo "WARNING: openapi-generator is not installed. Skipping OpenAPI validation..."
+    echo "!!! PLEASE install openapi-generator via: brew install openapi-generator"
+    exit 1
+}
+
+echo "Validating..."
+
+openapi-generator validate -i "${SPEC_DIR}/paella-openapi-full.yaml" || exit 1
+openapi-generator validate -i "${SPEC_DIR}/paella-openapi-public.yaml" || exit 1
+
+echo "OpenAPI specifications have been generated successfully."

@@ -1,0 +1,156 @@
+#!/usr/bin/env bash
+
+command -v git >/dev/null 2>&1 || {
+    echo "ERROR: git is not installed. Aborting..."
+    exit 1
+}
+
+command -v openapi-generator >/dev/null 2>&1 || {
+    echo "ERROR: openapi-generator is not installed. Aborting..."
+    exit 1
+}
+
+GENERATOR_NAME=${1:-"html"}
+
+FULL_SRC_FILE="docs/openapi/paella-openapi-full.yaml"
+FULL_DEST_DIR="docs/${GENERATOR_NAME}/full"
+
+PUBLIC_SRC_FILE="docs/openapi/paella-openapi-public.yaml"
+PUBLIC_DEST_DIR="docs/${GENERATOR_NAME}/public"
+
+
+openapi-generator validate -i ${FULL_SRC_FILE} || exit 1
+openapi-generator validate -i ${PUBLIC_SRC_FILE} || exit 1
+
+openapi-generator generate -i ${FULL_SRC_FILE} -g ${GENERATOR_NAME} -o ${FULL_DEST_DIR} ${@:2}
+openapi-generator generate -i ${PUBLIC_SRC_FILE} -g ${GENERATOR_NAME} -o ${PUBLIC_DEST_DIR} ${@:2}
+
+echo "DONE."
+
+echo "Available generators:
+  ada
+  ada-server
+  android
+  apache2
+  apex
+  aspnetcore
+  avro-schema
+  bash
+  c
+  clojure
+  cwiki
+  cpp-qt5-client
+  cpp-qt5-qhttpengine-server
+  cpp-pistache-server
+  cpp-restbed-server
+  cpp-restsdk
+  cpp-tizen
+  csharp
+  csharp-netcore
+  csharp-dotnet2
+  csharp-nancyfx
+  dart
+  dart-dio
+  dart-jaguar
+  eiffel
+  elixir
+  elm
+  erlang-client
+  erlang-proper
+  erlang-server
+  flash
+  fsharp-giraffe-server
+  go
+  go-experimental
+  go-server
+  go-gin-server
+  graphql-schema
+  graphql-nodejs-express-server
+  groovy
+  kotlin
+  kotlin-server
+  kotlin-spring
+  kotlin-vertx
+  haskell-http-client
+  haskell
+  java
+  jaxrs-cxf-client
+  java-inflector
+  java-msf4j
+  java-pkmst
+  java-play-framework
+  java-undertow-server
+  java-vertx
+  java-vertx-web
+  jaxrs-cxf
+  jaxrs-cxf-extended
+  jaxrs-cxf-cdi
+  jaxrs-jersey
+  jaxrs-resteasy
+  jaxrs-resteasy-eap
+  jaxrs-spec
+  javascript
+  javascript-flowtyped
+  javascript-closure-angular
+  jmeter
+  lua
+  mysql-schema
+  nim
+  nodejs-server-deprecated
+  nodejs-express-server
+  objc
+  ocaml
+  openapi
+  openapi-yaml
+  perl
+  php
+  php-laravel
+  php-lumen
+  php-slim-deprecated
+  php-slim4
+  php-silex
+  php-symfony
+  php-ze-ph
+  powershell
+  protobuf-schema
+  python
+  python-experimental
+  python-flask
+  python-aiohttp
+  python-blueplanet
+  r
+  ruby
+  ruby-on-rails
+  ruby-sinatra
+  rust
+  rust-server
+  scalatra
+  scala-akka
+  scala-finch
+  scala-httpclient-deprecated
+  scala-gatling
+  scala-lagom-server
+  scala-play-server
+  scalaz
+  spring
+  dynamic-html
+  html
+  html2
+  swift2-deprecated
+  swift3-deprecated
+  swift4
+  swift5
+  typescript-angular
+  typescript-angularjs
+  typescript-aurelia
+  typescript-axios
+  typescript-fetch
+  typescript-inversify
+  typescript-jquery
+  typescript-node
+  typescript-redux-query
+  typescript-rxjs
+  asciidoc
+  fsharp-functions
+  markdown
+"

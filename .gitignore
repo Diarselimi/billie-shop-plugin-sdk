@@ -2,6 +2,8 @@ config/secrets
 *.html
 *.zip
 *.tar.gz
+/docs/*
+!/docs/openapi/
 
 ###> symfony/framework-bundle ###
 /.env.local

@@ -11,7 +11,7 @@ use OpenApi\Annotations as OA;
  * @OA\Schema(schema="GetMerchantUsersResponse", title="Merchant Users List", type="object", properties={
  *     @OA\Property(property="total", type="integer", nullable=false),
  *     @OA\Property(property="items", nullable=false, type="array", @OA\Items(type="object", properties={
- *          @OA\Property(property="uuid", allOf={@OA\Schema(ref="#/components/schemas/UUID"), @OA\Schema(nullable=true)}),
+ *          @OA\Property(property="uuid", @OA\Schema(ref="#/components/schemas/UUID", nullable=true)),
  *          @OA\Property(property="first_name", type="string", nullable=true),
  *          @OA\Property(property="last_name", type="string", nullable=true),
  *          @OA\Property(property="email", type="string", format="email", nullable=false),

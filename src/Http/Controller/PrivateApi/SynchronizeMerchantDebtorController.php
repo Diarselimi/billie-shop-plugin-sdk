@@ -28,7 +28,7 @@ class SynchronizeMerchantDebtorController
      *
      *     @OA\Parameter(
      *          in="path",
-     *          name="Uuid",
+     *          name="merchantDebtorUuid",
      *          @OA\Schema(ref="#/components/schemas/UUID"),
      *          description="Mechant Debtor UUID",
      *          required=true

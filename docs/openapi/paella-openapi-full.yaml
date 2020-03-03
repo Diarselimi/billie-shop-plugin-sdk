@@ -792,7 +792,7 @@ paths:
       operationId: synchronize_merchant_debtor
       parameters:
         -
-          name: Uuid
+          name: merchantDebtorUuid
           in: path
           description: 'Mechant Debtor UUID'
           required: true
@@ -1836,11 +1836,7 @@ paths:
           description: 'Order UUID'
           required: true
           schema:
-            oneOf:
-              -
-                $ref: '#/components/schemas/UUID'
-              -
-                type: string
+            $ref: '#/components/schemas/UUID'
       responses:
         '200':
           description: 'Successful response'
@@ -2146,7 +2142,7 @@ paths:
       operationId: order_pre_approve_confirmation
       parameters:
         -
-          name: id
+          name: uuid
           in: path
           required: true
           schema:
@@ -2632,7 +2628,7 @@ components:
       properties:
         grant_type:
           type: string
-          const: client_credentials
+          example: client_credentials
         client_id:
           $ref: '#/components/schemas/UUID'
         client_secret:
@@ -3011,38 +3007,6 @@ components:
         amount:
           $ref: '#/components/schemas/CreateOrderAmountRequest'
       type: object
-    DebtorCompanyRequest:
-      title: 'Debtor Company Request'
-      required:
-        - name
-        - address_street
-        - address_city
-        - address_postal_code
-        - address_country
-      properties:
-        name:
-          example: 'Billie GmbH'
-          $ref: '#/components/schemas/TinyText'
-        address_addition:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        address_house_number:
-          example: '4'
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        address_street:
-          example: Charlottenstr.
-          $ref: '#/components/schemas/TinyText'
-        address_city:
-          example: Berlin
-          $ref: '#/components/schemas/TinyText'
-        address_postal_code:
-          example: '10969'
-          $ref: '#/components/schemas/PostalCode'
-        address_country:
-          example: DE
-          $ref: '#/components/schemas/CountryCode'
-      type: object
     GetDebtorCompanyLimitsMerchant:
       title: 'Debtor''s Merchant IDs Object'
       properties:
@@ -3193,10 +3157,7 @@ components:
           type: array
           items:
             properties:
-              uuid:
-                allOf:
-                  - { $ref: '#/components/schemas/UUID' }
-                  - { nullable: true }
+              uuid: {  }
               first_name:
                 type: string
                 nullable: true
@@ -3247,7 +3208,7 @@ components:
           example: 'Last name'
           $ref: '#/components/schemas/TinyText'
         additional_signatories_required:
-          type: int
+          type: integer
           example: 2
         address_house:
           example: '4'
@@ -3303,7 +3264,12 @@ components:
       title: MerchantStartIntegrationResponse
       properties:
         production:
-          type: 'null'
+          properties:
+            client_id:
+              type: string
+            client_secret:
+              type: string
+          type: object
           nullable: true
         sandbox:
           properties:
@@ -3416,7 +3382,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MerchantUserPermissions'
-          default: null
+          default: []
           nullable: true
       type: object
     SaveMerchantFinancialAssessmentRequest:
@@ -3541,6 +3507,38 @@ components:
           description: 'Order external code'
           example: DE123456-1
           $ref: '#/components/schemas/TinyText'
+      type: object
+    DebtorCompanyRequest:
+      title: 'Debtor Company Request'
+      required:
+        - name
+        - address_street
+        - address_city
+        - address_postal_code
+        - address_country
+      properties:
+        name:
+          example: 'Billie GmbH'
+          $ref: '#/components/schemas/TinyText'
+        address_addition:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        address_house_number:
+          example: '4'
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        address_street:
+          example: Charlottenstr.
+          $ref: '#/components/schemas/TinyText'
+        address_city:
+          example: Berlin
+          $ref: '#/components/schemas/TinyText'
+        address_postal_code:
+          example: '10969'
+          $ref: '#/components/schemas/PostalCode'
+        address_country:
+          example: DE
+          $ref: '#/components/schemas/CountryCode'
       type: object
     MerchantEntity:
       properties:
@@ -3781,13 +3779,14 @@ components:
     OrderPaymentDTO:
       properties:
         amount:
-          type: float
+          type: number
+          format: float
         created_at:
           $ref: '#/components/schemas/DateTime'
         state:
-          $ref: string
+          type: string
         type:
-          $ref: string
+          type: string
       type: object
     CheckoutAuthorizeOrderResponse:
       title: 'Authorize Checkout Order Response'
@@ -4005,7 +4004,7 @@ components:
           type: string
           nullable: true
         is_identified_as_user:
-          type: bool
+          type: boolean
       type: object
     ErrorsObject:
       title: 'API Errors'

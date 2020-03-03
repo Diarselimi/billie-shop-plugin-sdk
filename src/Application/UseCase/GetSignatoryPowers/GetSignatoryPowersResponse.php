@@ -11,7 +11,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="uuid", ref="#/components/schemas/UUID"),
  *     @OA\Property(property="first_name", ref="#/components/schemas/TinyText", example="Person Name"),
  *     @OA\Property(property="last_name", ref="#/components/schemas/TinyText", example="Last name"),
- *     @OA\Property(property="additional_signatories_required", type="int", example=2),
+ *     @OA\Property(property="additional_signatories_required", type="integer", example=2),
  *     @OA\Property(property="address_house", ref="#/components/schemas/TinyText", nullable=true, example="4"),
  *     @OA\Property(property="address_street", ref="#/components/schemas/TinyText", nullable=true, example="Charlottenstr."),
  *     @OA\Property(property="address_city", ref="#/components/schemas/TinyText", nullable=true, example="Berlin"),

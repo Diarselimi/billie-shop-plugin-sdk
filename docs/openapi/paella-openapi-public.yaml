@@ -516,7 +516,7 @@ paths:
       operationId: order_pre_approve_confirmation
       parameters:
         -
-          name: id
+          name: uuid
           in: path
           required: true
           schema:
@@ -684,7 +684,7 @@ components:
       properties:
         grant_type:
           type: string
-          const: client_credentials
+          example: client_credentials
         client_id:
           $ref: '#/components/schemas/UUID'
         client_secret:
@@ -935,38 +935,6 @@ components:
         amount:
           $ref: '#/components/schemas/CreateOrderAmountRequest'
       type: object
-    DebtorCompanyRequest:
-      title: 'Debtor Company Request'
-      required:
-        - name
-        - address_street
-        - address_city
-        - address_postal_code
-        - address_country
-      properties:
-        name:
-          example: 'Billie GmbH'
-          $ref: '#/components/schemas/TinyText'
-        address_addition:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        address_house_number:
-          example: '4'
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        address_street:
-          example: Charlottenstr.
-          $ref: '#/components/schemas/TinyText'
-        address_city:
-          example: Berlin
-          $ref: '#/components/schemas/TinyText'
-        address_postal_code:
-          example: '10969'
-          $ref: '#/components/schemas/PostalCode'
-        address_country:
-          example: DE
-          $ref: '#/components/schemas/CountryCode'
-      type: object
     PauseOrderDunningRequest:
       title: 'Pause Order Dunning'
       properties:
@@ -1004,6 +972,38 @@ components:
           description: 'Order external code'
           example: DE123456-1
           $ref: '#/components/schemas/TinyText'
+      type: object
+    DebtorCompanyRequest:
+      title: 'Debtor Company Request'
+      required:
+        - name
+        - address_street
+        - address_city
+        - address_postal_code
+        - address_country
+      properties:
+        name:
+          example: 'Billie GmbH'
+          $ref: '#/components/schemas/TinyText'
+        address_addition:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        address_house_number:
+          example: '4'
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        address_street:
+          example: Charlottenstr.
+          $ref: '#/components/schemas/TinyText'
+        address_city:
+          example: Berlin
+          $ref: '#/components/schemas/TinyText'
+        address_postal_code:
+          example: '10969'
+          $ref: '#/components/schemas/PostalCode'
+        address_country:
+          example: DE
+          $ref: '#/components/schemas/CountryCode'
       type: object
     OrderResponse:
       title: 'Order Entity'

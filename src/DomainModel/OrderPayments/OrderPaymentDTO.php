@@ -7,10 +7,10 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Schema(schema="OrderPaymentDTO", type="object", properties={
- *      @OA\Property(property="amount", type="float"),
+ *      @OA\Property(property="amount", type="number", format="float"),
  *      @OA\Property(property="created_at", ref="#/components/schemas/DateTime"),
- *      @OA\Property(property="state", ref="string"),
- *      @OA\Property(property="type", ref="string")
+ *      @OA\Property(property="state", type="string"),
+ *      @OA\Property(property="type", type="string")
  * })
  */
 class OrderPaymentDTO
