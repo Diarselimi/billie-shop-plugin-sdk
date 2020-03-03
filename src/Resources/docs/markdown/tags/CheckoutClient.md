@@ -1,16 +1,16 @@
 To integrate the Billie checkout widget, the following steps are required:
 
-1. Include Billie checkout widget bundle into your checkout page
-2. Provide config data _(with `session_id` from server-side integration)_
-3. Provide order details and call mount method
-4. Handle widget responses
+1. Add the Billie checkout widget bundle to your checkout page
+2. Provide config data _(with the `session_id` from the server-side integration)_
+3. Provide order details and call the mount method
+4. Handle the widget responses
 5. Apply customized styling _[optional]_
 
-This document will go over details of how to do each step and explain easiest course of action to get the widget working.
+This section provides a step-by-step guide of the setup process.
 
 ### 1. Include Billie Checkout Widget Bundle into your Checkout Page
 
-On the checkout page, the following code snippet needs to be included:
+On the checkout page, the following code snippet must be included:
 ```html
 <script>
   var bcwSrc = 'https://static-paella-sandbox.billie.io/checkout/billie-checkout.js';
@@ -22,18 +22,19 @@ On the checkout page, the following code snippet needs to be included:
 </script>
 ```
 
-URL specified in `bcwSrc` is going to specify if you are using Sandbox or Production environment:
+The URL contained in `bcwSrc` specifies whether you are using the Sandbox or Production environment:
 
-Sandbox: https://static-paella-sandbox.billie.io/checkout/billie-checkout.js  
-Production: https://static.billie.io/checkout/billie-checkout.js   
+Sandbox: https://static-paella-sandbox.billie.io/checkout/billie-checkout.js
 
-This code snippet will inject our checkout script into the head of the webshop. That will download our widget bundle code and enable function calls to interact with the widget.  
+Production: https://static.billie.io/checkout/billie-checkout.js
 
-It is **highly recommended** to add this code snippet as high as possible in document `head` so that download of the widget bundle is finished as soon as possible in order to ensure smooth user experience.  
+The code snippet above injects our checkout script into the `head` of the webshop. This will download our widget bundle code and enable function calls to interact with the widget.
+
+It is **strongly recommended** to add this code snippet as high as possible in the document head to ensure that the widget download completes as soon as possible, providing a smooth user experience.
 
 ### 2. Provide Config Data
 
-During initialization of the the widget, we expect to get `session_id`. This can be obtained by calling [Checkout Session Create](#operation/checkout_session_create) with Billie from your backend and exposing it to the frontend. The `session_id` will be unique per order.
+During initialization of the widget, the `session_id` is required. This can be obtained by calling [Checkout Session Create](#operation/checkout_session_create) from your backend and exposing it to the frontend. The `session_id` will be unique per order.
 ```html
 <script>
   const billie_config_data = {
@@ -42,14 +43,13 @@ During initialization of the the widget, we expect to get `session_id`. This can
   }
 </script>
 ```
+The `session_id` is needed to approve the order and should be known before mounting the widget.
 
-`session_id` is needed to approve the order and should be known before mounting the widget.
-
-Ideally if you are using server side rendering, this piece of code can be inserted into the document `head` with prefilled values. Otherwise please ensure there is [XHR request](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest) as soon as possible to your backend to retrieve `session_id`.
+Ideally, if you are using server side rendering, this piece of code should be inserted into the document head with prefilled values. Otherwise please ensure there is an [XHR request](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest) as early as possible to your backend to retrieve the `session_id`.
 
 ### 3. Provide Order Details and Call Mount Method
 
-Once the user reviews his checkout basket and is ready to pay, he can click on the **Pay with Billie** button. When that happens we are expecting the `mount` method to be called. Easiest integration would be to inline the call of the function directly on the button, for example:
+Once the user reviews his checkout basket and is ready to pay, he can click on the **Pay with Billie** button. When this happens, Billie expects the `mount` method to be called. The easiest integration option is to inline the function call directly on the button, for example:
 ```html
 <script>
   function payWithBillie() {
@@ -71,23 +71,23 @@ Once the user reviews his checkout basket and is ready to pay, he can click on t
 <button onclick="payWithBillie()"> Pay with Billie </button>
 ```
 
-`BillieCheckoutWidget` is a promise which can accept optional `then` and `catch` methods. They can be added if the webshop needs to do something with the outcome of the order authorization. 
+`BillieCheckoutWidget` is a JavaScript promise which can accept optional `then` and `catch` methods. They can be added if the webshop needs to perform an action based on the outcome of the order authorization. 
 
-`then` block will receive as parameter the object with the authorised order details. 
+The `then` block will receive as parameter the object with the authorised order details.
 
-`catch` block will receive the error object with reasons why the order creation was rejected.
+The `catch` block will receive the error object with reasons why the order creation was rejected.
 
 
 #### 3.a Mount Method Parameters
 
 `BillieCheckoutWidget.mount` expects two parameters:
-- `billie_config_data` is object you have from step two which includes the `session_id` and `merchant_name`
-- `billie_order_data` is collection of order data from user
+- `billie_config_data` is the object received in step two which includes the `session_id` and `merchant_name`
+- `billie_order_data`  is a collection of order data from the user
 
 
 #### 3.b Order Data Object
 
-Order data object needs to contain all information about order in following format, required values are bolded:
+The order data object must contain all information about an order, in the following format (required values are **bolded**):
 
 - `amount` **[object]**
    - `gross` **[float]** `> 0`
@@ -130,8 +130,7 @@ Order data object needs to contain all information about order in following form
     - `tax` **[float]** `>= 0`
     - `net` **[float]** `> 0`
 
-Below you can find an example of orderData object in javascript
-
+Below you can find an example of `orderData` object in javascript
 ```javascript
 const billie_order_data = {
   "amount": { "net": 100, "gross": 100, "tax": 0 },
@@ -181,10 +180,11 @@ const billie_order_data = {
 
 ### 4. Handle Widget Responses
 
-When submitted, the checkout widget will evaluate if an order with the given data can be accepted or not. If an order could not be accepted the widget will return the state `declined` with a specified decline_reason.
+When submitted, the checkout widget will evaluate if an order with the given data can be accepted or not. If an order could not be accepted, the widget will return the state `declined` with a specified `decline_reason`.
 
 #### Response
-After submitting the widget, following data will be returned to either `then` or `catch` block:
+
+After submitting the widget, the following data will be returned to either the `then` or `catch` block:
 - `state` **[string]** `<= 255 characters`   
 &nbsp;&nbsp;&nbsp;&nbsp;Enum: `authorized` `declined`
 - `decline_reason` **[string]** `<= 255 characters`   
@@ -200,6 +200,7 @@ After submitting the widget, following data will be returned to either `then` or
 `decline_reason` will be set only when `state` value is `declined`
 
 #### 5. Apply Customized Styling
+
 It is possible to set some CSS rules to be applied over widget in a simple format. Simply use this snippet:
 
 ```html

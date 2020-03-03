@@ -13,6 +13,17 @@ Billie takes over reminding customers on your behalf (white-label solution). Add
 by absorbing any potential debtor defaults.
 
 ---
+## Event Names
+### Order State Transitions
+
+![img](src/Resources/docs/orders-workflow-public.png)
+
+### Waiting State
+| Event Name    |   Description    |
+|---------------|------------------|
+|order_approved | Order gets approved and moves from waiting state to Order Approved |
+|order_declined | Order gets declined and moves from the waiting state to order_declined|
+
 
 ## Order States
 
@@ -29,9 +40,6 @@ by absorbing any potential debtor defaults.
 | complete      | The outstanding amount was successfully paid back by the customer                             |
 | canceled      | The order was canceled by the merchant       
 
-## Order State Transitions
-
-![img](src/Resources/docs/orders-workflow-public.png)
 
 ## Order Decline Reasons
 

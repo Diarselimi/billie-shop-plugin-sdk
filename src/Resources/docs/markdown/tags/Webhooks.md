@@ -2,6 +2,7 @@ To send updates on relevant events, Billie PaD sends POST requests to the incomi
 See "Event Names" section for the list of events that can be communicated via webhooks
 
 ### Webhook Authentication
+
 The authentication for webhooks sent from Billie to the merchants incoming webhook URL depends on the merchant specifications 
 and needs, but one possibility is sending the Billie API Key via headers:
 Examples:
@@ -26,19 +27,25 @@ the `application/json` Content-Type and the following body format:
 }
 ```
 
-### Event Names
+## Event Names
+### State Transitions
 
-**General**
+| Event Name    | Description |
+|---------------|-------------|
+|order_waiting  | Order is moved to waiting state. |
+|order_shipped  | When the order is moved to shipped. |
+|order_paid_out | When the order is paid_out  |
+|order_late     | When the order goes in state late. |
+|order_canceled | When the order is canceled. |
+
+### Waiting State
 
 | Event Name      | Description                                                                                                                |
 |-----------------|----------------------------------------------------------------------------------------------------------------------------|
-| order\_approved | waiting order approved                                                                                                     |
-| order\_declined | waiting order declined                                                                                                     |
-| payment         | The outstanding amount for an order changed. <br><br> This message is sent for full as well as partial payments for orders |
+| order\_approved | An order that is in waiting state and moves to order_approved.                                                             |
+| order\_declined | An order that is in waiting state and moves to order_declined.                                                             |
 
-<br>
-
-**Webhooks for Dunning & Collections**
+### Webhooks for Dunning & Collections
 
 | Event Name       | Description                              |
 |------------------|------------------------------------------|
@@ -52,4 +59,8 @@ the `application/json` Content-Type and the following body format:
 | reminder_email_4 | 4th Reminder email was sent              |
 | dca_email        | Handover to collections email was sent   |
 
+### Payments 
 
+| Event Name |  Description |
+|------------|--------------|
+|payments    |The outstanding amount for an order changed. This message is sent for full as well as partial payments for orders| 
