@@ -85,11 +85,6 @@ class NotificationDeliveryUseCase implements LoggingInterface
         $url = $merchant->getWebhookUrl();
 
         if (!$url) {
-            $this->logSuppressedException(
-                new NotificationDeliveryException("Notification url not set for merchant {$merchant->getId()}"),
-                'Exception while delivering notification, url not set'
-            );
-
             return;
         }
 
