@@ -98,10 +98,12 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 
         $merchant = $orderContainer->getMerchant();
 
-        try {
-            $this->limitsService->unlock($orderContainer, $amountChange->getAmountChange());
-        } catch (MerchantDebtorLimitsException $exception) {
-            $this->logSuppressedException($exception, 'Amazing merchant payment borscht bug');
+        if ($amountChange->getAmountChange() > 0) {
+            try {
+                $this->limitsService->unlock($orderContainer, $amountChange->getAmountChange());
+            } catch (MerchantDebtorLimitsException $exception) {
+                $this->logSuppressedException($exception, 'Limes call failed', ['exception' => $exception]);
+            }
         }
 
         $merchant->increaseFinancingLimit($amountChange->getAmountChange());

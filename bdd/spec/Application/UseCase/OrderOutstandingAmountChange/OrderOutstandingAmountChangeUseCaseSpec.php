@@ -268,7 +268,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         $this->execute($request);
     }
 
-    public function it_should_not_schedule_event_if_amount_change_type_is_not_payment(
+    public function it_should_not_schedule_event_and_call_limes_if_amount_change_type_is_not_payment(
         OrderContainerFactory $orderContainerFactory,
         MerchantRepositoryInterface $merchantRepository,
         NotificationScheduler $notificationScheduler,
@@ -282,6 +282,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         OrderOutstandingAmountChangeRequest $request
     ) {
         $amountChange->isPayment()->shouldBeCalledOnce()->willReturn(false);
+        $amountChange->getAmountChange()->shouldBeCalled()->willReturn(-100);
 
         $orderContainerFactory
             ->createFromPaymentId(self::TICKET_ID)
@@ -292,7 +293,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
 
         $order->getAmountForgiven()->shouldBeCalledOnce()->willReturn(0);
 
-        $limitsService->unlock($orderContainer, self::AMOUNT_CHANGE)->shouldBeCalledOnce();
+        $limitsService->unlock($orderContainer, Argument::any())->shouldNotBeCalled();
         $merchantRepository->update($merchant)->shouldBeCalledOnce();
 
         $notificationScheduler->createAndSchedule(Argument::any(), Argument::any())->shouldNotBeCalled();
