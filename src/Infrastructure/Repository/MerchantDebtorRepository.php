@@ -26,9 +26,9 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
     {
         $id = $this->doInsert('
             INSERT INTO ' . self::TABLE_NAME . '
-            (merchant_id, debtor_id, company_uuid, payment_debtor_id, uuid, score_thresholds_configuration_id, created_at, updated_at, is_whitelisted)
+            (merchant_id, debtor_id, company_uuid, payment_debtor_id, uuid, score_thresholds_configuration_id, created_at, updated_at)
             VALUES
-            (:merchant_id, :debtor_id, :company_uuid, :payment_debtor_id, :uuid, :score_thresholds_configuration_id, :created_at, :updated_at, :is_whitelisted)
+            (:merchant_id, :debtor_id, :company_uuid, :payment_debtor_id, :uuid, :score_thresholds_configuration_id, :created_at, :updated_at)
         ', [
             'merchant_id' => $merchantDebtor->getMerchantId(),
             'debtor_id' => $merchantDebtor->getDebtorId(),
@@ -38,25 +38,9 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
             'score_thresholds_configuration_id' => $merchantDebtor->getScoreThresholdsConfigurationId(),
             'created_at' => $merchantDebtor->getCreatedAt()->format(self::DATE_FORMAT),
             'updated_at' => $merchantDebtor->getUpdatedAt()->format(self::DATE_FORMAT),
-            'is_whitelisted' => (int) $merchantDebtor->isWhitelisted(),
         ]);
 
         $merchantDebtor->setId($id);
-    }
-
-    public function update(MerchantDebtorEntity $merchantDebtor): void
-    {
-        $merchantDebtor->setUpdatedAt(new \DateTime());
-
-        $this->doUpdate('
-            UPDATE ' . self::TABLE_NAME . '
-            SET is_whitelisted = :whitelisted, updated_at = :updated_at
-            WHERE id = :id
-        ', [
-            'id' => $merchantDebtor->getId(),
-            'whitelisted' => (int) $merchantDebtor->isWhitelisted(),
-            'updated_at' => $merchantDebtor->getUpdatedAt()->format(self::DATE_FORMAT),
-        ]);
     }
 
     public function getOneById(int $id): ?MerchantDebtorEntity
@@ -279,7 +263,7 @@ SQL;
             $sql,
             'merchants_debtors.id',
             $where
-            ) . ') AS md', $queryParameters);
+        ) . ') AS md', $queryParameters);
 
         $sql .= " ORDER BY :sort_field :sort_direction LIMIT {$offset},{$limit}";
         $queryParameters['sort_field'] = $tableName . '.' . $sortBy;

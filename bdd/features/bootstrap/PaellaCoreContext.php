@@ -6,6 +6,7 @@ use App\DomainModel\CheckoutSession\CheckoutSessionEntity;
 use App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
+use App\DomainModel\DebtorSettings\DebtorSettingsRepositoryInterface;
 use App\DomainModel\FraudRules\FraudRuleEntity;
 use App\DomainModel\FraudRules\FraudRuleRepositoryInterface;
 use App\DomainModel\Merchant\MerchantEntity;
@@ -217,6 +218,16 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
+     * @Given the order :orderId belongs to company :companyUuid
+     */
+    public function orderBelongsToCompany($orderId, $companyUuid)
+    {
+        $order = $this->getOrderRepository()->getOneByExternalCode($orderId, $this->merchant->getId());
+        $merchantDebtor = $this->getMerchantDebtorRepository()->getOneById($order->getMerchantDebtorId());
+        Assert::eq($merchantDebtor->getCompanyUuid(), $companyUuid);
+    }
+
+    /**
      * @Given I have a(n) :state order with amounts :gross/:net/:tax, duration :duration and comment :comment
      */
     public function iHaveAnOrderWithoutExternalCode($state, $gross, $net, $tax, $duration, $comment)
@@ -273,8 +284,7 @@ class PaellaCoreContext extends MinkContext
             ->setCompanyUuid(self::DEBTOR_COMPANY_UUID)
             ->setUuid(self::DEBTOR_UUID)
             ->setPaymentDebtorId('test')
-            ->setCreatedAt(new \DateTime('2019-01-01 12:00:00'))
-            ->setIsWhitelisted(false);
+            ->setCreatedAt(new \DateTime('2019-01-01 12:00:00'));
         $this->getMerchantDebtorRepository()->insert($merchantDebtor);
 
         return $this->debtorData = [$person, $deliveryAddress, $debtor, $merchantDebtor];
@@ -464,16 +474,16 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
-     * @Given the merchant debtor :externalId with merchantId :merchantId should be whitelisted
+     * @Given the debtor company with uuid :companyUuid should be whitelisted
      */
-    public function checkMerchantDebtorWhitelistStatus(string $externalId, string $merchantId)
+    public function checkDebtorSettingsWhitelistStatus(string $companyUuid)
     {
-        $merchantDebtor = $this->getMerchantDebtorRepository()->getOneByExternalIdAndMerchantId($externalId, $merchantId, []);
+        $debtorSettings = $this->getDebtorSettingsRepository()->getOneByCompanyUuid($companyUuid);
 
-        if (!$merchantDebtor->isWhitelisted()) {
+        if (!$debtorSettings->isWhitelisted()) {
             throw new RuntimeException(sprintf(
-                'MerchantDebtor with id %s is not whitelisted.',
-                $merchantDebtor->getId()
+                'DebtorSettings for companyUuid %s is not whitelisted.',
+                $debtorSettings->getCompanyUuid()
             ));
         }
     }
@@ -1015,6 +1025,11 @@ class PaellaCoreContext extends MinkContext
     private function getMerchantFinancialAssessmentRepository(): MerchantFinancialAssessmentRepositoryInterface
     {
         return $this->get(MerchantFinancialAssessmentRepositoryInterface::class);
+    }
+
+    private function getDebtorSettingsRepository(): DebtorSettingsRepositoryInterface
+    {
+        return $this->get(DebtorSettingsRepositoryInterface::class);
     }
 
     private function getConnection(): PdoConnection

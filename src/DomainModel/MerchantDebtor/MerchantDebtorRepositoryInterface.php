@@ -6,8 +6,6 @@ interface MerchantDebtorRepositoryInterface
 {
     public function insert(MerchantDebtorEntity $merchantDebtor): void;
 
-    public function update(MerchantDebtorEntity $merchantDebtor): void;
-
     public function getOneById(int $id): ?MerchantDebtorEntity;
 
     public function getOneByUuid(string $uuid): ?MerchantDebtorEntity;

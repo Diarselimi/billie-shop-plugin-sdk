@@ -65,7 +65,6 @@ Feature:
             "company_id":1,
             "company_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
             "payment_id":"test",
-            "is_whitelisted":false,
             "is_blacklisted":false,
             "is_trusted_source":true,
             "crefo_id":"123",

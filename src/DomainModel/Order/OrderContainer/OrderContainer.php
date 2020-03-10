@@ -5,6 +5,7 @@ namespace App\DomainModel\Order\OrderContainer;
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
+use App\DomainModel\DebtorSettings\DebtorSettingsEntity;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
@@ -46,6 +47,8 @@ class OrderContainer
     private $lineItems;
 
     private $paymentDetails;
+
+    private $debtorSettings;
 
     private $relationLoader;
 
@@ -134,6 +137,11 @@ class OrderContainer
         return $this->debtorCompany
             ?: $this->debtorCompany = $this->relationLoader->loadDebtorCompany($this)
         ;
+    }
+
+    public function getDebtorSettings(): ?DebtorSettingsEntity
+    {
+        return $this->debtorSettings ?: $this->debtorSettings = $this->relationLoader->loadDebtorSettings($this);
     }
 
     public function setOrderFinancialDetails(OrderFinancialDetailsEntity $orderFinancialDetails): OrderContainer

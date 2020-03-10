@@ -104,3 +104,6 @@ services:
   App\DomainModel\MerchantFinancialAssessment\MerchantFinancialAssessmentRepositoryInterface:
     alias: 'App\Infrastructure\Repository\MerchantFinancialAssessmentRepository'
     public: true
+  App\DomainModel\DebtorSettings\DebtorSettingsRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\DebtorSettingsRepository'
+    public: true

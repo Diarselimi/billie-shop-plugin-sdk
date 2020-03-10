@@ -7,6 +7,7 @@ use App\DomainModel\DebtorScoring\DebtorScoringRequestDTO;
 use App\DomainModel\DebtorScoring\DebtorScoringRequestDTOFactory;
 use App\DomainModel\DebtorScoring\ScoringServiceInterface;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
+use App\DomainModel\DebtorSettings\DebtorSettingsEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
@@ -36,11 +37,13 @@ class DebtorScoreCheckSpec extends ObjectBehavior
         MerchantSettingsEntity $merchantSettings,
         ScoreThresholdsConfigurationEntity $scoreThresholds,
         DebtorScoringRequestDTO $request,
-        DebtorCompany $debtorCompany
+        DebtorCompany $debtorCompany,
+        DebtorSettingsEntity $debtorSettings
     ) {
         $orderContainer->getMerchantDebtor()->willReturn($merchantDebtor);
         $orderContainer->getDebtorExternalData()->willReturn($debtorExternalData);
         $orderContainer->getMerchantSettings()->willReturn($merchantSettings);
+        $orderContainer->getDebtorSettings()->willReturn($debtorSettings);
 
         $debtorCompany->isTrustedSource()->willReturn(true);
         $orderContainer->getDebtorCompany()->willReturn($debtorCompany);
@@ -61,8 +64,9 @@ class DebtorScoreCheckSpec extends ObjectBehavior
 
         $merchantDebtor->getDebtorId()->willReturn(1);
         $merchantDebtor->getCompanyUuid()->willReturn('ad74bbc4-509e-47d5-9b50-a0320ce3d715');
-        $merchantDebtor->isWhitelisted()->willReturn(false);
         $merchantDebtor->getScoreThresholdsConfigurationId()->willReturn(1);
+
+        $debtorSettings->isWhitelisted()->willReturn(false);
 
         $merchantSettings->getScoreThresholdsConfigurationId()->willReturn(1);
         $debtorExternalData->isLegalFormSoleTrader()->willReturn(false);
@@ -102,10 +106,10 @@ class DebtorScoreCheckSpec extends ObjectBehavior
     }
 
     public function it_will_return_true_if_the_debtor_is_whitelisted(
-        MerchantDebtorEntity $merchantDebtor,
+        DebtorSettingsEntity $debtorSettings,
         OrderContainer $orderContainer
     ) {
-        $merchantDebtor->isWhitelisted()->willReturn(true);
+        $debtorSettings->isWhitelisted()->willReturn(true);
 
         $this->check($orderContainer)->shouldBeLike(new CheckResult(true, DebtorScoreCheck::NAME));
     }

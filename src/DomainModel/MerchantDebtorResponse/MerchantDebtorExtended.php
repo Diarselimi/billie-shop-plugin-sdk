@@ -45,11 +45,6 @@ class MerchantDebtorExtended extends MerchantDebtor
     /**
      * @var boolean
      */
-    private $isWhitelisted;
-
-    /**
-     * @var boolean
-     */
     private $isBlacklisted;
 
     /**
@@ -127,22 +122,6 @@ class MerchantDebtorExtended extends MerchantDebtor
         return $this;
     }
 
-    public function isWhitelisted(): bool
-    {
-        return $this->isWhitelisted;
-    }
-
-    /**
-     * @param  bool                          $isWhitelisted
-     * @return MerchantDebtorExtended|static
-     */
-    public function setIsWhitelisted(bool $isWhitelisted): MerchantDebtorExtended
-    {
-        $this->isWhitelisted = $isWhitelisted;
-
-        return $this;
-    }
-
     public function isBlacklisted(): bool
     {
         return $this->isBlacklisted;
@@ -216,7 +195,6 @@ class MerchantDebtorExtended extends MerchantDebtor
             'company_id' => (int) $this->companyId,
             'company_uuid' => $this->companyUuid,
             'payment_id' => $this->paymentId,
-            'is_whitelisted' => $this->isWhitelisted,
             'is_blacklisted' => $this->isBlacklisted,
             'is_trusted_source' => $this->isTrustedSource,
             'crefo_id' => $this->crefoId,

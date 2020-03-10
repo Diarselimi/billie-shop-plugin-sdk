@@ -14,6 +14,6 @@ class DebtorIsTrusted implements CheckInterface
             return new CheckResult(true, self::NAME);
         }
 
-        return new CheckResult($orderContainer->getMerchantDebtor()->isWhitelisted(), self::NAME);
+        return new CheckResult($orderContainer->getDebtorSettings()->isWhitelisted(), self::NAME);
     }
 }

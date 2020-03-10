@@ -490,6 +490,39 @@ paths:
           $ref: '#/components/responses/ServerError'
       x-groups:
         - private
+  '/debtors/{companyUuid}/whitelist':
+    post:
+      tags:
+        - Support
+      summary: 'Whitelist Debtor'
+      operationId: whitelist_debtor
+      parameters:
+        -
+          name: companyUuid
+          in: path
+          description: 'Company UUID'
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                is_whitelisted:
+                  type: boolean
+                  nullable: false
+              type: object
+      responses:
+        '204':
+          description: 'Debtor is_whitelisted flag is saved.'
+        '404':
+          description: 'Company not found.'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      x-groups:
+        - private
   '/order/{uuid}/decline':
     post:
       tags:
@@ -905,39 +938,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
-  '/merchant-debtor/{debtorUuid}/whitelist':
-    post:
-      tags:
-        - Support
-      summary: 'Whitelist Merchant Debtor'
-      operationId: whitelist_merchant_debtor
-      parameters:
-        -
-          name: debtorUuid
-          in: path
-          description: 'Merchant-Debtor UUID'
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              properties:
-                is_whitelisted:
-                  type: boolean
-                  nullable: false
-              type: object
-      responses:
-        '204':
-          description: 'Merchant debtor is whitelisted'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':

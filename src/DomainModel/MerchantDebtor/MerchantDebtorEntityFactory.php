@@ -24,7 +24,6 @@ class MerchantDebtorEntityFactory
             ->setUuid($row['uuid'])
             ->setPaymentDebtorId($row['payment_debtor_id'])
             ->setScoreThresholdsConfigurationId($row['score_thresholds_configuration_id'])
-            ->setIsWhitelisted(boolval($row['is_whitelisted']))
             ->setCreatedAt(new \DateTime($row['created_at']))
             ->setUpdatedAt(new \DateTime($row['updated_at']));
     }
@@ -32,8 +31,7 @@ class MerchantDebtorEntityFactory
     public function create(
         DebtorCompany $debtorCompany,
         string $merchantId,
-        string $paymentDebtorId,
-        bool $isWhitelisted = false
+        string $paymentDebtorId
     ): MerchantDebtorEntity {
         $now = new \DateTime();
 
@@ -43,7 +41,6 @@ class MerchantDebtorEntityFactory
             ->setCompanyUuid($debtorCompany->getUuid())
             ->setUuid($this->uuidGenerator->uuid4())
             ->setPaymentDebtorId($paymentDebtorId)
-            ->setIsWhitelisted($isWhitelisted)
             ->setCreatedAt($now)
             ->setUpdatedAt($now);
     }

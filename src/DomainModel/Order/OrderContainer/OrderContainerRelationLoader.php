@@ -8,6 +8,8 @@ use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
+use App\DomainModel\DebtorSettings\DebtorSettingsEntity;
+use App\DomainModel\DebtorSettings\DebtorSettingsRepositoryInterface;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
@@ -51,6 +53,8 @@ class OrderContainerRelationLoader
 
     private $paymentsService;
 
+    private $debtorSettingsRepository;
+
     public function __construct(
         DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
         AddressRepositoryInterface $addressRepository,
@@ -63,7 +67,8 @@ class OrderContainerRelationLoader
         OrderDunningStatusService $orderDunningStatusService,
         OrderRiskCheckRepositoryInterface $orderRiskCheckRepository,
         OrderLineItemRepositoryInterface $orderLineItemRepository,
-        PaymentsServiceInterface $paymentsService
+        PaymentsServiceInterface $paymentsService,
+        DebtorSettingsRepositoryInterface $debtorSettingsRepository
     ) {
         $this->debtorExternalDataRepository = $debtorExternalDataRepository;
         $this->addressRepository = $addressRepository;
@@ -77,6 +82,7 @@ class OrderContainerRelationLoader
         $this->orderRiskCheckRepository = $orderRiskCheckRepository;
         $this->orderLineItemRepository = $orderLineItemRepository;
         $this->paymentsService = $paymentsService;
+        $this->debtorSettingsRepository = $debtorSettingsRepository;
     }
 
     public function loadMerchantDebtor(OrderContainer $orderContainer): MerchantDebtorEntity
@@ -157,5 +163,10 @@ class OrderContainerRelationLoader
     public function loadPaymentDetails(OrderContainer $orderContainer): OrderPaymentDetailsDTO
     {
         return $this->paymentsService->getOrderPaymentDetails($orderContainer->getOrder()->getPaymentId());
+    }
+
+    public function loadDebtorSettings(OrderContainer $orderContainer): ?DebtorSettingsEntity
+    {
+        return $this->debtorSettingsRepository->getOneByCompanyUuid($orderContainer->getDebtorCompany()->getUuid());
     }
 }
