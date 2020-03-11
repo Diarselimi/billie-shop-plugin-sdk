@@ -18,6 +18,7 @@ use App\DomainModel\OrderNotification\OrderNotificationEntity;
 use App\DomainModel\OrderPayment\OrderPaymentForgivenessService;
 use App\DomainModel\Payment\OrderAmountChangeDTO;
 use Billie\MonitoringBundle\Service\Alerting\Sentry\Raven\RavenClient;
+use Ozean12\Money\Money;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
@@ -97,7 +98,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
 
         $orderContainer->getMerchant()->shouldBeCalledOnce()->willReturn($merchant);
 
-        $limitsService->unlock($orderContainer, self::AMOUNT_CHANGE)->shouldBeCalledOnce();
+        $limitsService->unlock($orderContainer, new Money(self::AMOUNT_CHANGE))->shouldBeCalledOnce();
         $merchantRepository->update($merchant)->shouldBeCalledOnce();
 
         $notificationScheduler
@@ -155,7 +156,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         $order->getAmountForgiven()->shouldBeCalledOnce()->willReturn(0);
         $orderContainer->getMerchant()->shouldBeCalledOnce()->willReturn($merchant);
 
-        $limitsService->unlock($orderContainer, 25)->shouldBeCalledOnce();
+        $limitsService->unlock($orderContainer, new Money(25))->shouldBeCalledOnce();
         $merchantRepository->update($merchant)->shouldBeCalledOnce();
 
         $orderStateManager->wasShipped($order)->shouldBeCalledOnce()->willReturn(true);
@@ -198,7 +199,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         $orderStateManager->wasShipped($order)->shouldBeCalledOnce()->willReturn(false);
         $orderStateManager->isCanceled($order)->shouldBeCalledOnce()->willReturn(false);
 
-        $limitsService->unlock($orderContainer, self::AMOUNT_CHANGE)->shouldNotBeCalled();
+        $limitsService->unlock($orderContainer, new Money(self::AMOUNT_CHANGE))->shouldNotBeCalled();
         $merchantRepository->update($orderContainer->getMerchant())->shouldNotBeCalled();
 
         $notificationScheduler->createAndSchedule(Argument::any(), Argument::any())->shouldNotBeCalled();
@@ -225,7 +226,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willThrow(OrderContainerFactoryException::class);
 
-        $limitsService->unlock($orderContainer, self::AMOUNT_CHANGE)->shouldNotBeCalled();
+        $limitsService->unlock($orderContainer, new Money(self::AMOUNT_CHANGE))->shouldNotBeCalled();
         $merchantRepository->update($orderContainer->getMerchant())->shouldNotBeCalled();
 
         $notificationScheduler->createAndSchedule(Argument::any(), Argument::any())->shouldNotBeCalled();
@@ -255,7 +256,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
 
         $order->getAmountForgiven()->shouldBeCalledTimes(2)->willReturn(0.01);
 
-        $limitsService->unlock($orderContainer, self::AMOUNT_CHANGE)->shouldNotBeCalled();
+        $limitsService->unlock($orderContainer, new Money(self::AMOUNT_CHANGE))->shouldNotBeCalled();
         $merchantRepository->update($orderContainer->getMerchant())->shouldNotBeCalled();
 
         $notificationScheduler->createAndSchedule(Argument::any(), Argument::any())->shouldNotBeCalled();

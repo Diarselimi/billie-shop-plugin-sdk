@@ -43,9 +43,9 @@ class UpdateOrderAmountValidator
         $financialDetails = $orderContainer->getOrderFinancialDetails();
 
         return
-            ($financialDetails->getAmountGross() !== $newAmount->getGross())
-            || ($financialDetails->getAmountNet() !== $newAmount->getNet())
-            || ($financialDetails->getAmountTax() !== $newAmount->getTax());
+            !$financialDetails->getAmountGross()->equals($newAmount->getGross()) ||
+            !$financialDetails->getAmountNet()->equals($newAmount->getNet()) ||
+            !$financialDetails->getAmountTax()->equals($newAmount->getTax());
     }
 
     private function isAmountEmpty(CreateOrderAmountRequest $amount): bool
@@ -62,8 +62,8 @@ class UpdateOrderAmountValidator
         $financialDetails = $orderContainer->getOrderFinancialDetails();
 
         return
-            ($newAmount->getGross() <= $financialDetails->getAmountGross())
-            && ($newAmount->getNet() <= $financialDetails->getAmountNet())
-            && ($newAmount->getTax() <= $financialDetails->getAmountTax());
+            $financialDetails->getAmountGross()->greaterThanOrEqual($newAmount->getGross()) &&
+            $financialDetails->getAmountNet()->greaterThanOrEqual($newAmount->getNet()) &&
+            $financialDetails->getAmountTax()->greaterThanOrEqual($newAmount->getTax());
     }
 }

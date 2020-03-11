@@ -3,6 +3,7 @@
 namespace App\DomainModel\Merchant;
 
 use App\Support\AbstractFactory;
+use Ozean12\Money\Money;
 
 class MerchantEntityFactory extends AbstractFactory
 {
@@ -13,8 +14,8 @@ class MerchantEntityFactory extends AbstractFactory
             ->setName($data['name'])
             ->setCompanyUuid($data['company_uuid'])
             ->setApiKey($data['api_key'])
-            ->setFinancingPower($data['financing_power'])
-            ->setFinancingLimit($data['available_financing_limit'])
+            ->setFinancingPower(new Money($data['financing_power']))
+            ->setFinancingLimit(new Money($data['available_financing_limit']))
             ->setCompanyId($data['company_id'])
             ->setPaymentUuid($data['payment_merchant_id'])
             ->setSepaB2BDocumentUuid($data['sepa_b2b_document_uuid'])
@@ -33,8 +34,8 @@ class MerchantEntityFactory extends AbstractFactory
         return (new MerchantEntity())
             ->setCompanyId($creationDTO->getCompany()->getId())
             ->setCompanyUuid($creationDTO->getCompany()->getUuid())
-            ->setFinancingPower($creationDTO->getMerchantFinancingLimit())
-            ->setFinancingLimit($creationDTO->getMerchantFinancingLimit())
+            ->setFinancingPower(new Money($creationDTO->getMerchantFinancingLimit()))
+            ->setFinancingLimit(new Money($creationDTO->getMerchantFinancingLimit()))
             ->setName($creationDTO->getCompany()->getName())
             ->setApiKey($creationDTO->getApiKey())
             ->setPaymentUuid($creationDTO->getPaymentUuid())
@@ -50,8 +51,8 @@ class MerchantEntityFactory extends AbstractFactory
         return (new MerchantEntity())
             ->setId($payload['id'])
             ->setName($payload['name'])
-            ->setFinancingPower($payload['financing_power'])
-            ->setFinancingLimit($payload['financing_limit'])
+            ->setFinancingPower(new Money($payload['financing_power']))
+            ->setFinancingLimit(new Money($payload['financing_limit']))
             ->setApiKey($payload['api_key'])
             ->setCompanyId($payload['company_id'])
             ->setCompanyUuid($payload['company_uuid'])

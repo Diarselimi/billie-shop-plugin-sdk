@@ -23,6 +23,7 @@ use App\DomainModel\OrderUpdate\UpdateOrderRequestValidator;
 use App\DomainModel\Payment\PaymentRequestFactory;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Payment\RequestDTO\ModifyRequestDTO;
+use Ozean12\Money\Money;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -67,19 +68,19 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
             (new CreateOrderAmountRequest())->setGross(150)->setNet(150)->setTax(0)
         );
         $orderFinancialDetails = (new OrderFinancialDetailsEntity())
-            ->setAmountGross(200)
-            ->setAmountNet(200)
-            ->setAmountTax(0)
+            ->setAmountGross(new Money(200))
+            ->setAmountNet(new Money(200))
+            ->setAmountTax(new Money(0))
             ->setDuration(30)
             ->setOrderId(1);
         $newOrderFinancialDetails = (new OrderFinancialDetailsEntity())
-            ->setAmountGross(150)
-            ->setAmountNet(150)
-            ->setAmountTax(0)
+            ->setAmountGross(new Money(150))
+            ->setAmountNet(new Money(150))
+            ->setAmountTax(new Money(0))
             ->setDuration(30)
             ->setOrderId(1);
 
-        $grossDiff = 50;
+        $grossDiff = new Money(50);
         $order = new OrderEntity();
 
         $orderContainer->getOrder()->shouldBeCalled()->willReturn($order);
@@ -132,19 +133,19 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
             (new CreateOrderAmountRequest())->setGross(150)->setNet(150)->setTax(0)
         );
         $orderFinancialDetails = (new OrderFinancialDetailsEntity())
-            ->setAmountGross(200)
-            ->setAmountNet(200)
-            ->setAmountTax(0)
+            ->setAmountGross(new Money(200))
+            ->setAmountNet(new Money(200))
+            ->setAmountTax(new Money(0))
             ->setDuration(30)
             ->setOrderId(1);
         $newOrderFinancialDetails = (new OrderFinancialDetailsEntity())
-            ->setAmountGross(150)
-            ->setAmountNet(150)
-            ->setAmountTax(0)
+            ->setAmountGross(new Money(150))
+            ->setAmountNet(new Money(150))
+            ->setAmountTax(new Money(0))
             ->setDuration(30)
             ->setOrderId(1);
 
-        $grossDiff = 50;
+        $grossDiff = new Money(50);
         $order = new OrderEntity();
 
         $orderContainer->getOrder()->shouldBeCalled()->willReturn($order);
@@ -194,15 +195,15 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
     ) {
         $changeSet = (new UpdateOrderRequest('order123', 1))->setDuration(60);
         $orderFinancialDetails = (new OrderFinancialDetailsEntity())
-            ->setAmountGross(200)
-            ->setAmountNet(200)
-            ->setAmountTax(0)
+            ->setAmountGross(new Money(200))
+            ->setAmountNet(new Money(200))
+            ->setAmountTax(new Money(0))
             ->setDuration(30)
             ->setOrderId(1);
         $newOrderFinancialDetails = (new OrderFinancialDetailsEntity())
-            ->setAmountGross(200)
-            ->setAmountNet(200)
-            ->setAmountTax(0)
+            ->setAmountGross(new Money(200))
+            ->setAmountNet(new Money(200))
+            ->setAmountTax(new Money(0))
             ->setDuration(60)
             ->setOrderId(1);
 
@@ -393,19 +394,19 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
             (new CreateOrderAmountRequest())->setGross(150)->setNet(150)->setTax(0)
         );
         $orderFinancialDetails = (new OrderFinancialDetailsEntity())
-            ->setAmountGross(200)
-            ->setAmountNet(200)
-            ->setAmountTax(0)
+            ->setAmountGross(new Money(200))
+            ->setAmountNet(new Money(200))
+            ->setAmountTax(new Money(0))
             ->setDuration(30)
             ->setOrderId(1);
         $newOrderFinancialDetails = (new OrderFinancialDetailsEntity())
-            ->setAmountGross(150)
-            ->setAmountNet(150)
-            ->setAmountTax(0)
+            ->setAmountGross(new Money(150))
+            ->setAmountNet(new Money(150))
+            ->setAmountTax(new Money(0))
             ->setDuration(30)
             ->setOrderId(1);
 
-        $grossDiff = 50;
+        $grossDiff = new Money(50);
         $order = new OrderEntity();
 
         $orderContainer->getOrder()->shouldBeCalled()->willReturn($order);

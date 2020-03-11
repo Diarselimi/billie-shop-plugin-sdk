@@ -102,7 +102,7 @@ class UpdateOrderPersistenceService
 
     private function unlockLimits(OrderContainer $orderContainer, UpdateOrderRequest $changeSet)
     {
-        $amountGrossDiff = $orderContainer->getOrderFinancialDetails()->getAmountGross() - $changeSet->getAmount()->getGross();
+        $amountGrossDiff = $orderContainer->getOrderFinancialDetails()->getAmountGross()->subtract($changeSet->getAmount()->getGross());
 
         // unlock merchant-debtor limit
         $this->merchantDebtorLimitsService->unlock($orderContainer, $amountGrossDiff);
@@ -122,9 +122,9 @@ class UpdateOrderPersistenceService
             $net = $changeSet->getAmount()->getNet();
             $tax = $changeSet->getAmount()->getTax();
         } else {
-            $gross = $financialDetails->getAmountGross();
-            $net = $financialDetails->getAmountNet();
-            $tax = $financialDetails->getAmountTax();
+            $gross = $financialDetails->getAmountGross()->toFloat();
+            $net = $financialDetails->getAmountNet()->toFloat();
+            $tax = $financialDetails->getAmountTax()->toFloat();
         }
 
         $duration = $changeSet->getDuration() !== null ? $changeSet->getDuration() : $financialDetails->getDuration();

@@ -21,7 +21,7 @@ class DeliveryAddressCheck implements CheckInterface
 
     public function check(OrderContainer $orderContainer): CheckResult
     {
-        if ($orderContainer->getOrderFinancialDetails()->getAmountGross() < self::ORDER_AMOUNT_THRESHOLD) {
+        if ($orderContainer->getOrderFinancialDetails()->getAmountGross()->lessThan(self::ORDER_AMOUNT_THRESHOLD)) {
             return new CheckResult(true, self::NAME);
         }
 

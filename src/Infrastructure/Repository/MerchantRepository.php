@@ -38,8 +38,8 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
             'api_key' => $merchant->getApiKey(),
             'oauth_client_id' => $merchant->getOauthClientId(),
             'is_active' => $merchant->isActive(),
-            'financing_power' => $merchant->getFinancingPower(),
-            'available_financing_limit' => $merchant->getFinancingPower(),
+            'financing_power' => $merchant->getFinancingPower()->getMoneyValue(),
+            'available_financing_limit' => $merchant->getFinancingPower()->getMoneyValue(),
             'company_id' => $merchant->getCompanyId(),
             'payment_merchant_id' => $merchant->getPaymentUuid(),
             'sepa_b2b_document_uuid' => $merchant->getSepaB2BDocumentUuid(),
@@ -66,8 +66,8 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
             WHERE id = :id
         ', [
             'id' => $merchant->getId(),
-            'financing_power' => $merchant->getFinancingPower(),
-            'available_financing_limit' => $merchant->getFinancingLimit(),
+            'financing_power' => $merchant->getFinancingPower()->getMoneyValue(),
+            'available_financing_limit' => $merchant->getFinancingLimit()->getMoneyValue(),
             'sandbox_payment_merchant_id' => $merchant->getSandboxPaymentUuid(),
             'document_uuid' => $merchant->getSepaB2BDocumentUuid(),
             'updated_at' => $merchant->getUpdatedAt()->format(self::DATE_FORMAT),

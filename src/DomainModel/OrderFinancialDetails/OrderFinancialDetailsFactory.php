@@ -2,6 +2,8 @@
 
 namespace App\DomainModel\OrderFinancialDetails;
 
+use Ozean12\Money\Money;
+
 class OrderFinancialDetailsFactory
 {
     public function create(
@@ -13,9 +15,9 @@ class OrderFinancialDetailsFactory
     ): OrderFinancialDetailsEntity {
         return (new OrderFinancialDetailsEntity)
             ->setOrderId($orderId)
-            ->setAmountGross($amountGross)
-            ->setAmountNet($amountNet)
-            ->setAmountTax($amountTax)
+            ->setAmountGross(new Money($amountGross))
+            ->setAmountNet(new Money($amountNet))
+            ->setAmountTax(new Money($amountTax))
             ->setDuration($duration)
             ->setCreatedAt(new \DateTime())
             ->setUpdatedAt(new \DateTime())
@@ -27,9 +29,9 @@ class OrderFinancialDetailsFactory
         return (new OrderFinancialDetailsEntity)
             ->setId(intval($row['id']))
             ->setOrderId(intval($row['order_id']))
-            ->setAmountGross(floatval($row['amount_gross']))
-            ->setAmountNet(floatval($row['amount_net']))
-            ->setAmountTax(floatval($row['amount_tax']))
+            ->setAmountGross(new Money(floatval($row['amount_gross'])))
+            ->setAmountNet(new Money(floatval($row['amount_net'])))
+            ->setAmountTax(new Money(floatval($row['amount_tax'])))
             ->setDuration(intval($row['duration']))
             ->setCreatedAt(new \DateTime($row['created_at']))
             ->setUpdatedAt(new \DateTime($row['updated_at']))

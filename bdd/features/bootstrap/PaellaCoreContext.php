@@ -56,6 +56,7 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Billie\PdoBundle\Infrastructure\Pdo\PdoConnection;
+use Ozean12\Money\Money;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
@@ -119,9 +120,9 @@ class PaellaCoreContext extends MinkContext
             ->setCompanyUuid(self::MERCHANT_COMPANY_UUID)
             ->setIsActive(true)
             ->setPaymentUuid('f2ec4d5e-79f4-40d6-b411-31174b6519ac')
-            ->setFinancingLimit(10000)
+            ->setFinancingLimit(new Money(10000))
             ->setSepaB2BDocumentUuid('c7be46c0-e049-4312-b274-258ec5aeeb70')
-            ->setFinancingPower(10000)
+            ->setFinancingPower(new Money(10000))
             ->setApiKey('test')
             ->setCompanyId('10')
             ->setOauthClientId('oauthClientId');
@@ -319,9 +320,9 @@ class PaellaCoreContext extends MinkContext
         $this->getOrderFinancialDetailsRepository()->insert(
             (new OrderFinancialDetailsEntity())
                 ->setOrderId($order->getId())
-                ->setAmountGross($gross)
-                ->setAmountNet($net)
-                ->setAmountTax($tax)
+                ->setAmountGross(new Money($gross))
+                ->setAmountNet(new Money($net))
+                ->setAmountTax(new Money($tax))
                 ->setDuration($duration)
                 ->setCreatedAt(new DateTime())
                 ->setUpdatedAt(new DateTime())
@@ -336,8 +337,8 @@ class PaellaCoreContext extends MinkContext
         $merchant = (new MerchantEntity())
             ->setId(1)
             ->setSandboxPaymentUuid(self::SANDBOX_MERCHANT_PAYMENT_UUID)
-            ->setFinancingPower(1111)
-            ->setFinancingLimit(22222)
+            ->setFinancingPower(new Money(1111))
+            ->setFinancingLimit(new Money(22222))
             ->setUpdatedAt(new \DateTime())
             ;
         $this->getMerchantRepository()->update($merchant);
@@ -815,8 +816,8 @@ class PaellaCoreContext extends MinkContext
             ->setName('test merchant')
             ->setIsActive(true)
             ->setPaymentUuid('any-payment-id')
-            ->setFinancingPower(10000)
-            ->setFinancingLimit(10000)
+            ->setFinancingPower(new Money(10000))
+            ->setFinancingLimit(new Money(10000))
             ->setApiKey('testMerchantApiKey')
             ->setCompanyId((int) $companyId)
             ->setCompanyUuid(self::MERCHANT_COMPANY_UUID)

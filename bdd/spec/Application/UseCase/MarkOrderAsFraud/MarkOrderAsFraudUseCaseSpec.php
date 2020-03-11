@@ -17,6 +17,7 @@ use App\Application\Exception\OrderNotFoundException;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
+use Ozean12\Money\Money;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -41,6 +42,8 @@ class MarkOrderAsFraudUseCaseSpec extends ObjectBehavior
     private const DEBTOR_ADDRESS_STREET = 'testStr';
 
     private const DEBTOR_ADDRESS_HOUSE_NUMBER = '11';
+
+    private const ORDER_FINANCIAL_DETAILS_AMOUNT_GROSS = '1000';
 
     public function let(
         OrderRepositoryInterface $orderRepository,
@@ -204,7 +207,7 @@ class MarkOrderAsFraudUseCaseSpec extends ObjectBehavior
             ->willReturn($orderContainer)
         ;
 
-        $orderFinancialDetails->getAmountGross()->willReturn(MarkOrderAsFraudUseCase::ORDER_AMOUNT_LIMIT - 1000);
+        $orderFinancialDetails->getAmountGross()->willReturn((new Money(MarkOrderAsFraudUseCase::ORDER_AMOUNT_LIMIT))->subtract(1000));
 
         $orderStateManager->isLate($order)->willReturn(true);
         $orderStateManager->isPaidOut($order)->willReturn(true);

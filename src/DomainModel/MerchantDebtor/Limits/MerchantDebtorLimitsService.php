@@ -8,6 +8,7 @@ use App\DomainModel\DebtorLimit\DebtorLimitServiceRequestException;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
+use Ozean12\Money\Money;
 
 class MerchantDebtorLimitsService implements LoggingInterface
 {
@@ -24,7 +25,7 @@ class MerchantDebtorLimitsService implements LoggingInterface
     {
         $debtorCompanyUuid = $container->getDebtorCompany()->getUuid();
         $customerCompanyUuid = $container->getMerchant()->getCompanyUuid();
-        $amount = $container->getOrderFinancialDetails()->getAmountGross();
+        $amount = $container->getOrderFinancialDetails()->getAmountGross()->toFloat();
 
         return $this->debtorLimitService->check($debtorCompanyUuid, $customerCompanyUuid, $amount);
     }
@@ -33,7 +34,7 @@ class MerchantDebtorLimitsService implements LoggingInterface
     {
         $debtorCompanyUuid = $container->getDebtorCompany()->getUuid();
         $customerCompanyUuid = $container->getMerchant()->getCompanyUuid();
-        $amount = $container->getOrderFinancialDetails()->getAmountGross();
+        $amount = $container->getOrderFinancialDetails()->getAmountGross()->toFloat();
 
         try {
             $this->debtorLimitService->lock($debtorCompanyUuid, $customerCompanyUuid, $amount);
@@ -42,14 +43,14 @@ class MerchantDebtorLimitsService implements LoggingInterface
         }
     }
 
-    public function unlock(OrderContainer $container, float $amount = null): void
+    public function unlock(OrderContainer $container, Money $amount = null): void
     {
-        $amount = $amount === null ? $container->getOrderFinancialDetails()->getAmountGross() : $amount;
+        $amount = $amount ?? $container->getOrderFinancialDetails()->getAmountGross();
         $debtorCompanyUuid = $container->getDebtorCompany()->getUuid();
         $customerCompanyUuid = $container->getMerchant()->getCompanyUuid();
 
         try {
-            $this->debtorLimitService->release($debtorCompanyUuid, $customerCompanyUuid, $amount);
+            $this->debtorLimitService->release($debtorCompanyUuid, $customerCompanyUuid, $amount->toFloat());
         } catch (DebtorLimitServiceRequestException $exception) {
             throw new MerchantDebtorLimitsException("Limit service call was unsuccessful", null, $exception);
         }

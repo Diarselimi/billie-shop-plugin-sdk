@@ -3,6 +3,7 @@
 namespace App\DomainModel\OrderFinancialDetails;
 
 use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
+use Ozean12\Money\Money;
 
 class OrderFinancialDetailsEntity extends AbstractTimestampableEntity
 {
@@ -28,36 +29,36 @@ class OrderFinancialDetailsEntity extends AbstractTimestampableEntity
         return $this;
     }
 
-    public function getAmountGross(): float
+    public function getAmountGross(): Money
     {
         return $this->amountGross;
     }
 
-    public function setAmountGross(float $amountGross): OrderFinancialDetailsEntity
+    public function setAmountGross(Money $amountGross): OrderFinancialDetailsEntity
     {
         $this->amountGross = $amountGross;
 
         return $this;
     }
 
-    public function getAmountNet(): float
+    public function getAmountNet(): Money
     {
         return $this->amountNet;
     }
 
-    public function setAmountNet(float $amountNet): OrderFinancialDetailsEntity
+    public function setAmountNet(Money $amountNet): OrderFinancialDetailsEntity
     {
         $this->amountNet = $amountNet;
 
         return $this;
     }
 
-    public function getAmountTax(): float
+    public function getAmountTax(): Money
     {
         return $this->amountTax;
     }
 
-    public function setAmountTax(float $amountTax): OrderFinancialDetailsEntity
+    public function setAmountTax(Money $amountTax): OrderFinancialDetailsEntity
     {
         $this->amountTax = $amountTax;
 

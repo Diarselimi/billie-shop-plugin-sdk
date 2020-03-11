@@ -131,9 +131,9 @@ class OrderResponseFactory
     private function addAmountData(OrderContainer $orderContainer, OrderResponse $response): void
     {
         $response
-            ->setAmountGross($orderContainer->getOrderFinancialDetails()->getAmountGross())
-            ->setAmountNet($orderContainer->getOrderFinancialDetails()->getAmountNet())
-            ->setAmountTax($orderContainer->getOrderFinancialDetails()->getAmountTax())
+            ->setAmountGross($orderContainer->getOrderFinancialDetails()->getAmountGross()->toFloat())
+            ->setAmountNet($orderContainer->getOrderFinancialDetails()->getAmountNet()->toFloat())
+            ->setAmountTax($orderContainer->getOrderFinancialDetails()->getAmountTax()->toFloat())
             ->setDuration($orderContainer->getOrderFinancialDetails()->getDuration())
             ;
     }

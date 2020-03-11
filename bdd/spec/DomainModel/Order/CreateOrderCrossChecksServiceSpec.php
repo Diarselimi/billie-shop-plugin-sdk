@@ -12,6 +12,7 @@ use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use Billie\MonitoringBundle\Service\Alerting\Sentry\Raven\RavenClient;
+use Ozean12\Money\Money;
 use PhpSpec\ObjectBehavior;
 use Psr\Log\NullLogger;
 
@@ -34,7 +35,7 @@ class CreateOrderCrossChecksServiceSpec extends ObjectBehavior
         $orderContainer->getOrder()->willReturn($order);
         $orderContainer->getOrderFinancialDetails()->willReturn($orderFinancialDetails);
         $order->getId()->willReturn(self::ORDER_ID);
-        $orderFinancialDetails->getAmountGross()->willReturn(self::AMOUNT);
+        $orderFinancialDetails->getAmountGross()->willReturn(new Money(self::AMOUNT));
 
         $this->beConstructedWith(...func_get_args());
 
@@ -52,7 +53,7 @@ class CreateOrderCrossChecksServiceSpec extends ObjectBehavior
         MerchantEntity $merchant
     ) {
         $merchantDebtorLimitsService->lock($orderContainer)->shouldBeCalledOnce()->willThrow(MerchantDebtorLimitsException::class);
-        $merchant->reduceFinancingLimit(self::AMOUNT)->shouldNotBeCalled();
+        $merchant->reduceFinancingLimit(new Money(self::AMOUNT))->shouldNotBeCalled();
 
         $this->shouldThrow(WorkflowException::class)->during('run', [$orderContainer]);
     }
@@ -64,7 +65,7 @@ class CreateOrderCrossChecksServiceSpec extends ObjectBehavior
         MerchantEntity $merchant
     ) {
         $merchantDebtorLimitsService->lock($orderContainer)->shouldBeCalledOnce();
-        $merchant->reduceFinancingLimit(self::AMOUNT)->shouldBeCalledOnce()->willThrow(MerchantDebtorLimitsException::class);
+        $merchant->reduceFinancingLimit(new Money(self::AMOUNT))->shouldBeCalledOnce()->willThrow(MerchantDebtorLimitsException::class);
 
         $merchantRepository->update($merchant)->shouldNotBeCalled();
 
@@ -78,7 +79,7 @@ class CreateOrderCrossChecksServiceSpec extends ObjectBehavior
         MerchantEntity $merchant
     ) {
         $merchantDebtorLimitsService->lock($orderContainer)->shouldBeCalledOnce();
-        $merchant->reduceFinancingLimit(self::AMOUNT)->shouldBeCalledOnce();
+        $merchant->reduceFinancingLimit(new Money(self::AMOUNT))->shouldBeCalledOnce();
 
         $merchantRepository->update($merchant)->shouldBeCalledOnce();
 

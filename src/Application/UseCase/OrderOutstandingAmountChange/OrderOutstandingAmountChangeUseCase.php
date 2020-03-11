@@ -18,6 +18,7 @@ use App\DomainModel\OrderNotification\NotificationScheduler;
 use App\DomainModel\OrderPayment\OrderPaymentForgivenessService;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
+use Ozean12\Money\Money;
 
 class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 {
@@ -86,6 +87,10 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
             return;
         }
 
+        /**
+         * This check is deprecated and will be removed, no Money refactoring needed
+         * @deprecated
+         */
         if ($order->getAmountForgiven() > 0 && $amountChange->getOutstandingAmount() > 0) {
             $this->logInfo("Order {id} has been already forgiven by a total of {amount}. Current outstanding amount is {outstanding_amount}.", [
                 'id' => $order->getId(),
@@ -100,13 +105,13 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 
         if ($amountChange->getAmountChange() > 0) {
             try {
-                $this->limitsService->unlock($orderContainer, $amountChange->getAmountChange());
+                $this->limitsService->unlock($orderContainer, new Money($amountChange->getAmountChange()));
             } catch (MerchantDebtorLimitsException $exception) {
                 $this->logSuppressedException($exception, 'Limes call failed', ['exception' => $exception]);
             }
         }
 
-        $merchant->increaseFinancingLimit($amountChange->getAmountChange());
+        $merchant->increaseFinancingLimit(new Money($amountChange->getAmountChange()));
         $this->merchantRepository->update($merchant);
 
         if (!$amountChange->isPayment()) {

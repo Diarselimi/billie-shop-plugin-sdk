@@ -20,9 +20,9 @@ class StrictCheckoutOrderMatcher implements CheckoutOrderMatcherInterface
     {
         $orderFinancialDetails = $orderContainer->getOrderFinancialDetails();
 
-        $matchAmount = $request->getAmount()->getGross() === $orderFinancialDetails->getAmountGross() &&
-            $request->getAmount()->getNet() === $orderFinancialDetails->getAmountNet() &&
-            $request->getAmount()->getTax() === $orderFinancialDetails->getAmountTax();
+        $matchAmount = $orderFinancialDetails->getAmountGross()->equals($request->getAmount()->getGross()) &&
+            $orderFinancialDetails->getAmountNet()->equals($request->getAmount()->getNet()) &&
+            $orderFinancialDetails->getAmountTax()->equals($request->getAmount()->getTax());
 
         if (!$matchAmount) {
             return false;

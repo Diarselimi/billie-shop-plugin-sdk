@@ -52,9 +52,9 @@ class OrderFinancialDetailsRepository extends AbstractPdoRepository implements O
             )
         ', [
             'order_id' => $orderFinancialDetailsEntity->getOrderId(),
-            'amount_gross' => $orderFinancialDetailsEntity->getAmountGross(),
-            'amount_net' => $orderFinancialDetailsEntity->getAmountNet(),
-            'amount_tax' => $orderFinancialDetailsEntity->getAmountTax(),
+            'amount_gross' => $orderFinancialDetailsEntity->getAmountGross()->getMoneyValue(),
+            'amount_net' => $orderFinancialDetailsEntity->getAmountNet()->getMoneyValue(),
+            'amount_tax' => $orderFinancialDetailsEntity->getAmountTax()->getMoneyValue(),
             'duration' => $orderFinancialDetailsEntity->getDuration(),
             'created_at' => $orderFinancialDetailsEntity->getCreatedAt()->format(self::DATE_FORMAT),
             'updated_at' => $orderFinancialDetailsEntity->getUpdatedAt()->format(self::DATE_FORMAT),

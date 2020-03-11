@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dc1fe656afebeb1bdefb64e0c02e29f9",
+    "content-hash": "71903c9425f6e67929bc955f8101a94d",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -2246,6 +2246,58 @@
                 "source": "https://github.com/ozean12/graphql-repository-client/tree/1.0.0"
             },
             "time": "2019-07-10T07:25:24+00:00"
+        },
+        {
+            "name": "ozean12/money",
+            "version": "2.0.0",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:ozean12/money-php.git",
+                "reference": "d89bb479c1d319ff01de65e8a277f6aeb318fca3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ozean12/money-php/zipball/d89bb479c1d319ff01de65e8a277f6aeb318fca3",
+                "reference": "d89bb479c1d319ff01de65e8a277f6aeb318fca3",
+                "shasum": ""
+            },
+            "require": {
+                "ext-intl": "*",
+                "ext-json": "*",
+                "php": ">=7.2"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.16",
+                "phpunit/phpunit": "^8.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Ozean12\\Money\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Tests\\Ozean12\\Money\\": "tests/",
+                    "Benchmarks\\Ozean12\\Money\\": "benchmarks/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "./vendor/bin/phpunit"
+                ],
+                "phpcs-fix": [
+                    "./vendor/bin/php-cs-fixer fix --ansi"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "PHP package for dealing with decimals, percents and money",
+            "support": {
+                "source": "https://github.com/ozean12/money-php/tree/2.0.0"
+            },
+            "time": "2020-03-02T15:44:06+00:00"
         },
         {
             "name": "paragonie/random_compat",

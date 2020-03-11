@@ -3,6 +3,7 @@
 namespace App\DomainModel\OrderRiskCheck\Checker;
 
 use App\DomainModel\Order\OrderContainer\OrderContainer;
+use Ozean12\Money\Money;
 
 class AmountCheck implements CheckInterface
 {
@@ -15,7 +16,7 @@ class AmountCheck implements CheckInterface
         $amount = $orderContainer->getOrderFinancialDetails()->getAmountGross();
         $minAmount = $orderContainer->getMerchantSettings()->getMinOrderAmount();
 
-        $result = ($amount >= $minAmount) && ($amount <= self::MAX_AMOUNT);
+        $result = $amount->greaterThanOrEqual($minAmount) && $amount->lessThanOrEqual(self::MAX_AMOUNT);
 
         return new CheckResult($result, self::NAME);
     }

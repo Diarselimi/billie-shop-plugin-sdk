@@ -74,7 +74,8 @@ class MarkOrderAsFraudUseCase
 
         return ($this->orderStateManager->isLate($order) || $this->orderStateManager->isPaidOut($order)) &&
             $this->isDeliveryAddressDifferentToDebtorAddress($orderContainer->getDeliveryAddress(), $orderContainer->getDebtorExternalDataAddress()) &&
-            ($orderContainer->getDebtorExternalData()->isEstablishedCustomer() === null || $orderContainer->getOrderFinancialDetails()->getAmountGross() > self::ORDER_AMOUNT_LIMIT)
+            ($orderContainer->getDebtorExternalData()->isEstablishedCustomer() === null ||
+                $orderContainer->getOrderFinancialDetails()->getAmountGross()->greaterThan(self::ORDER_AMOUNT_LIMIT))
         ;
     }
 }
