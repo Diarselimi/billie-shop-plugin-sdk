@@ -95,3 +95,32 @@ framework:
         new:
           from: [complete, confirmation_pending]
           to: new
+
+    debtor_information_change_request:
+      type: state_machine
+      marking_store:
+        type: method
+        property: state
+      supports: App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestEntity
+      places:
+        - new
+        - confirmation_pending
+        - complete
+        - declined
+        - canceled
+      transitions:
+        request_confirmation:
+          from: [new]
+          to: confirmation_pending
+        complete_manually:
+          from: [confirmation_pending]
+          to: complete
+        complete_automatically:
+          from: [new]
+          to: complete
+        decline:
+          from: [confirmation_pending]
+          to: declined
+        cancel:
+          from: [confirmation_pending]
+          to: canceled

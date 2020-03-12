@@ -42,6 +42,7 @@ services:
       $orderWorkflow: '@state_machine.order'
       $onboardingStepWorkflow: '@state_machine.merchant_onboarding_step'
       $onboardingWorkflow: '@state_machine.merchant_onboarding'
+      $debtorInformationChangeRequestWorkflow: '@state_machine.debtor_information_change_request'
       $segmentIoProvider: '@segment_io.analytics'
       $redocJsUrl: '%redoc_js_url%'
 
@@ -146,3 +147,7 @@ services:
   App\Infrastructure\Repository\MerchantOnboarding\MerchantOnboardingStepTransitionRepository:
     tags:
       - { name: billie_pdo.state_transition_repository, entity: App\DomainModel\MerchantOnboarding\MerchantOnboardingStepTransitionEntity }
+
+  App\Infrastructure\Repository\DebtorInformationChangeRequestTransitionRepository:
+    tags:
+      - { name: billie_pdo.state_transition_repository, entity: App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestTransitionEntity }
