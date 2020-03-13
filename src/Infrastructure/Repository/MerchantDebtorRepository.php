@@ -13,7 +13,7 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
 {
     public const TABLE_NAME = "merchants_debtors";
 
-    private const SELECT_FIELDS = 'id, merchant_id, debtor_id, company_uuid, payment_debtor_id, uuid, score_thresholds_configuration_id, is_whitelisted, created_at, updated_at';
+    private const SELECT_FIELDS = 'id, merchant_id, debtor_id, company_uuid, payment_debtor_id, uuid, score_thresholds_configuration_id, created_at, updated_at';
 
     private $factory;
 
