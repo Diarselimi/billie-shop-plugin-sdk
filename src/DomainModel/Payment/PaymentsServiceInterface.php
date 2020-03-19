@@ -2,6 +2,7 @@
 
 namespace App\DomainModel\Payment;
 
+use App\DomainModel\MerchantDebtor\RegisterDebtorDTO;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Payment\RequestDTO\ConfirmRequestDTO;
 use App\DomainModel\Payment\RequestDTO\CreateRequestDTO;
@@ -9,7 +10,7 @@ use App\DomainModel\Payment\RequestDTO\ModifyRequestDTO;
 
 interface PaymentsServiceInterface
 {
-    public function registerDebtor(string $paymentMerchantId): DebtorPaymentRegistrationDTO;
+    public function registerDebtor(RegisterDebtorDTO $registerDebtorDTO): DebtorPaymentRegistrationDTO;
 
     public function getDebtorPaymentDetails(string $debtorPaymentId): DebtorPaymentDetailsDTO;
 

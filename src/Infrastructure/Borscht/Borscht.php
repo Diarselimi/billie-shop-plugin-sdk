@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\Borscht;
 
+use App\DomainModel\MerchantDebtor\RegisterDebtorDTO;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Payment\DebtorPaymentDetailsDTO;
 use App\DomainModel\Payment\DebtorPaymentRegistrationDTO;
@@ -165,13 +166,16 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
         }
     }
 
-    public function registerDebtor(string $paymentMerchantId): DebtorPaymentRegistrationDTO
+    public function registerDebtor(RegisterDebtorDTO $registerDebtorDTO): DebtorPaymentRegistrationDTO
     {
+        $json = ['company_uuid' => $registerDebtorDTO->getCompanyUuid()];
+
         try {
             $response = $this->client->post('debtor.json', [
                 'headers' => [
-                    'x-merchant-id' => $paymentMerchantId,
+                    'x-merchant-id' => $registerDebtorDTO->getMerchantPaymentUuid(),
                 ],
+                'json' => $json,
                 'on_stats' => function (TransferStats $stats) {
                     $this->logServiceRequestStats($stats, 'create_borscht_debtor');
                 },
