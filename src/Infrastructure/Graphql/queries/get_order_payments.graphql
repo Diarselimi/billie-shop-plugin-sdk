@@ -15,6 +15,7 @@ query q(
         order_direction: $sortDirection
     ) {
         transaction_uuid
+        debtor_name
         payment_type
         mapped_amount
         pending_amount

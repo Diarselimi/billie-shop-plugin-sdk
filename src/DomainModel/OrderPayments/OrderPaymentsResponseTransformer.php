@@ -28,6 +28,8 @@ class OrderPaymentsResponseTransformer
             ->setCreatedAt($this->getPaymentCreatedAt($item))
             ->setState($this->getPaymentState($item))
             ->setType($item['payment_type'])
+            ->setTransactionUuid($item['transaction_uuid'])
+            ->setDebtorName($item['debtor_name'])
             ->toArray()
         ;
     }

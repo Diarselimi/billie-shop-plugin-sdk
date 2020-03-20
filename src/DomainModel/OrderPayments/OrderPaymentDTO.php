@@ -10,7 +10,9 @@ use OpenApi\Annotations as OA;
  *      @OA\Property(property="amount", type="number", format="float"),
  *      @OA\Property(property="created_at", ref="#/components/schemas/DateTime"),
  *      @OA\Property(property="state", type="string"),
- *      @OA\Property(property="type", type="string")
+ *      @OA\Property(property="type", type="string"),
+ *      @OA\Property(property="transaction_uuid", ref="#/components/schemas/UUID"),
+ *      @OA\Property(property="debtor_name", type="string")
  * })
  */
 class OrderPaymentDTO
@@ -28,6 +30,10 @@ class OrderPaymentDTO
     private $type;
 
     private $state;
+
+    private $transactionUuid;
+
+    private $debtorName;
 
     public function getCreatedAt(): \DateTime
     {
@@ -77,6 +83,30 @@ class OrderPaymentDTO
         return $this;
     }
 
+    public function getTransactionUuid(): ?string
+    {
+        return $this->transactionUuid;
+    }
+
+    public function setTransactionUuid(?string $transactionUuid): OrderPaymentDTO
+    {
+        $this->transactionUuid = $transactionUuid;
+
+        return $this;
+    }
+
+    public function getDebtorName(): ?string
+    {
+        return $this->debtorName;
+    }
+
+    public function setDebtorName(?string $debtorName): OrderPaymentDTO
+    {
+        $this->debtorName = $debtorName;
+
+        return $this;
+    }
+
     public function toArray(): array
     {
         return [
@@ -84,6 +114,8 @@ class OrderPaymentDTO
             'created_at' => $this->getCreatedAt()->format(DateFormat::FORMAT_YMD_HIS),
             'state' => $this->getState(),
             'type' => $this->getType(),
+            'transaction_uuid' => $this->getTransactionUuid(),
+            'debtor_name' => $this->getDebtorName(),
         ];
     }
 }

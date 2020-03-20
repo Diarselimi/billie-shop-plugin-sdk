@@ -3862,6 +3862,10 @@ components:
           type: string
         type:
           type: string
+        transaction_uuid:
+          $ref: '#/components/schemas/UUID'
+        debtor_name:
+          type: string
       type: object
     CheckoutAuthorizeOrderResponse:
       title: 'Authorize Checkout Order Response'

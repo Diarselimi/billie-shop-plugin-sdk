@@ -21,7 +21,9 @@ Feature:
           "created_at": "2018-06-28T17:10:05",
           "amount": 67.12,
           "type": "invoice_payback",
-          "state": "complete"
+          "state": "complete",
+          "transaction_uuid": "fc23cb4e-77c3-11e9-a2c4-02c6850949d6",
+          "debtor_name": "Dummy Debtor GmbH"
         }
       ],
       "total": 1

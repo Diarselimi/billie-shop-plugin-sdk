@@ -32,6 +32,7 @@ class DummyPaymentsRepository implements PaymentsRepositoryInterface
                     "pending_amount" => 67.12,
                     "transaction_uuid" => "fc23cb4e-77c3-11e9-a2c4-02c6850949d6",
                     "payment_type" => "invoice_payback",
+                    "debtor_name" => "Dummy Debtor GmbH",
                 ],
                 [
                     "created_at" => "2018-06-28T17:10:05Z",
@@ -40,6 +41,7 @@ class DummyPaymentsRepository implements PaymentsRepositoryInterface
                     "pending_amount" => 67.12,
                     "transaction_uuid" => null,
                     "payment_type" => "invoice_payback",
+                    "debtor_name" => null,
                 ],
             ],
             1
