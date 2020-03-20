@@ -6,6 +6,8 @@ use App\DomainModel\CheckoutSession\CheckoutSessionEntity;
 use App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
+use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestEntity;
+use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestRepositoryInterface;
 use App\DomainModel\DebtorSettings\DebtorSettingsRepositoryInterface;
 use App\DomainModel\FraudRules\FraudRuleEntity;
 use App\DomainModel\FraudRules\FraudRuleRepositoryInterface;
@@ -197,6 +199,9 @@ class PaellaCoreContext extends MinkContext
             TRUNCATE merchant_onboarding_transitions;
             TRUNCATE merchant_onboarding_steps;
             TRUNCATE merchant_onboarding_step_transitions;
+            TRUNCATE debtor_settings;
+            TRUNCATE debtor_information_change_request_transitions;
+            TRUNCATE debtor_information_change_requests;
             ALTER TABLE merchants AUTO_INCREMENT = 1;
             ALTER TABLE merchants_debtors AUTO_INCREMENT = 1;
             ALTER TABLE merchant_users AUTO_INCREMENT = 1;
@@ -1033,6 +1038,11 @@ class PaellaCoreContext extends MinkContext
         return $this->get(DebtorSettingsRepositoryInterface::class);
     }
 
+    private function getDebtorInformationChangeRequestRepository(): DebtorInformationChangeRequestRepositoryInterface
+    {
+        return $this->get(DebtorInformationChangeRequestRepositoryInterface::class);
+    }
+
     private function getConnection(): PdoConnection
     {
         return $this->connection;
@@ -1276,5 +1286,28 @@ class PaellaCoreContext extends MinkContext
             ->setTransitedAt(new \DateTime($date))
         ;
         $this->getMerchantOnboardingTransitionRepository()->insert($transition);
+    }
+
+    /**
+     * @Given the following debtor information change requests exist:
+     */
+    public function theFollowingDebtorInformationChangeRequestsExist(TableNode $table)
+    {
+        foreach ($table as $row) {
+            $debtorInformationChangeRequest = (new DebtorInformationChangeRequestEntity())
+                ->setUuid(uniqid())
+                ->setMerchantUserId(1)
+                ->setCompanyUuid($row['company_uuid'])
+                ->setIsSeen($row['is_seen'])
+                ->setName('Some name')
+                ->setCity('Berlin')
+                ->setPostalCode('10247')
+                ->setStreet('Some street')
+                ->setMerchantUserId(1)
+                ->setState($row['state']);
+            $this->getDebtorInformationChangeRequestRepository()->insert(
+                $debtorInformationChangeRequest
+            );
+        }
     }
 }

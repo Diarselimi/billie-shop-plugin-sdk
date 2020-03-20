@@ -26,6 +26,8 @@ interface MerchantUserPermissions
 
     public const MANAGE_ONBOARDING = 'MANAGE_ONBOARDING';
 
+    public const CHANGE_DEBTOR_INFORMATION = 'CHANGE_DEBTOR_INFORMATION';
+
     public const ALL_PERMISSIONS = [
         // read:
         self::VIEW_ORDERS,
@@ -41,6 +43,7 @@ interface MerchantUserPermissions
         self::MANAGE_USERS,
         self::CANCEL_ORDERS,
         self::MANAGE_ONBOARDING,
+        self::CHANGE_DEBTOR_INFORMATION,
     ];
 
     /**
@@ -61,5 +64,6 @@ interface MerchantUserPermissions
         self::MANAGE_USERS,
         self::CANCEL_ORDERS,
         self::MANAGE_ONBOARDING,
+        self::CHANGE_DEBTOR_INFORMATION,
     ];
 }

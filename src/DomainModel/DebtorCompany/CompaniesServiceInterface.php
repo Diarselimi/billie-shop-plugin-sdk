@@ -22,7 +22,7 @@ interface CompaniesServiceInterface
 
     public function strictMatchDebtor(string $debtorUuid, IdentifyDebtorRequestDTO $requestDTO): bool;
 
-    public function updateDebtor(string $debtorUuid, array $updateData): DebtorCompany;
+    public function updateCompany(string $companyUuid, array $updateData): DebtorCompany;
 
     public function createDebtor(DebtorCreationDTO $debtorCreationDTO): DebtorCompany;
 

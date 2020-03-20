@@ -142,15 +142,16 @@ class DebtorInformationChangeRequestEntity extends AbstractTimestampableEntity i
 
     public function toArray(array $properties = []): array
     {
+        //TODO: refactor
         $result = [
             'id' => $this->getId(),
             'uuid' => $this->uuid,
             'company_uuid' => $this->companyUuid,
             'name' => $this->name,
-            'city' => $this->city,
-            'postal_code' => $this->postalCode,
             'street' => $this->street,
             'house_number' => $this->houseNumber,
+            'city' => $this->city,
+            'postal_code' => $this->postalCode,
             'merchant_user_id' => $this->merchantUserId,
             'is_seen' => $this->isSeen,
             'state' => $this->state,

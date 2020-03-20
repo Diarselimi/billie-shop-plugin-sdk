@@ -107,10 +107,10 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         }
     }
 
-    public function updateDebtor(string $debtorUuid, array $updateData): DebtorCompany
+    public function updateCompany(string $companyUuid, array $updateData): DebtorCompany
     {
         try {
-            $response = $this->client->put("/debtor/{$debtorUuid}", [
+            $response = $this->client->put("/companies/{$companyUuid}", [
                 'json' => $updateData,
             ]);
 
@@ -123,7 +123,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
     public function createDebtor(DebtorCreationDTO $debtorCreationDTO): DebtorCompany
     {
         try {
-            $response = $this->client->post("/debtors", [
+            $response = $this->client->post('/debtors', [
                 'json' => $debtorCreationDTO->toArray(),
             ]);
 
@@ -149,7 +149,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
     public function identifyDebtor(IdentifyDebtorRequestDTO $requestDTO): ?DebtorCompany
     {
         try {
-            $response = $this->client->post("/debtor/identify", [
+            $response = $this->client->post('/debtor/identify', [
                 'json' => $requestDTO->toArray(),
                 'on_stats' => function (TransferStats $stats) {
                     $this->logServiceRequestStats($stats, 'identify_debtor');
@@ -180,7 +180,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
     public function strictMatchDebtor(string $debtorUuid, IdentifyDebtorRequestDTO $requestDTO): bool
     {
         try {
-            $this->client->post("/debtor/strict-match", [
+            $this->client->post('/debtor/strict-match', [
                 'json' => array_merge(['expected_company_uuid' => $debtorUuid], $requestDTO->toArray()),
                 'on_stats' => function (TransferStats $stats) {
                     $this->logServiceRequestStats($stats, 'strict_match_debtor');
@@ -207,7 +207,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         }
 
         try {
-            $this->client->post("/debtor/mark-duplicates", [
+            $this->client->post('/debtor/mark-duplicates', [
                 'json' => $payload,
             ]);
         } catch (TransferException $exception) {

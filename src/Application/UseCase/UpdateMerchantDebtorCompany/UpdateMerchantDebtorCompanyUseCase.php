@@ -16,6 +16,8 @@ class UpdateMerchantDebtorCompanyUseCase implements LoggingInterface, ValidatedU
 {
     use LoggingTrait, ValidatedUseCaseTrait;
 
+    private const CHANGE_REASON = 'manual_update';
+
     private $merchantDebtorRepository;
 
     private $companiesService;
@@ -41,7 +43,7 @@ class UpdateMerchantDebtorCompanyUseCase implements LoggingInterface, ValidatedU
         $originalDebtor = $this->companiesService->getDebtor($merchantDebtor->getDebtorId());
 
         $updateData = $this->prepareUpdateData($request);
-        $updatedDebtor = $this->companiesService->updateDebtor($merchantDebtor->getCompanyUuid(), $updateData);
+        $updatedDebtor = $this->companiesService->updateCompany($merchantDebtor->getCompanyUuid(), $updateData);
 
         $this->logUpdateDetails($merchantDebtor, $originalDebtor, $updatedDebtor);
     }
@@ -77,6 +79,7 @@ class UpdateMerchantDebtorCompanyUseCase implements LoggingInterface, ValidatedU
             'address_street' => $request->getAddressStreet(),
             'address_city' => $request->getAddressCity(),
             'address_postal_code' => $request->getAddressPostalCode(),
+            'change_reason' => self::CHANGE_REASON,
         ];
 
         return array_filter($updateData);

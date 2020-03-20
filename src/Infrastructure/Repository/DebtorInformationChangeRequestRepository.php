@@ -48,4 +48,24 @@ class DebtorInformationChangeRequestRepository extends AbstractPdoRepository imp
             'updated_at' => $entity->getUpdatedAt()->format(self::DATE_FORMAT),
         ]);
     }
+
+    public function getNotSeenCountByMerchantId(int $merchantId): int
+    {
+        $total = $this->doFetchOne('
+            SELECT COUNT(*) AS total
+            FROM ' . self::TABLE_NAME . ' dicr
+            INNER JOIN merchant_users mu ON (
+                dicr.merchant_user_id = mu.id
+                AND mu.merchant_id = :merchantId
+            )
+            WHERE dicr.is_seen = 0
+            AND dicr.state IN(:stateComplete, :stateDeclined)
+        ', [
+            'merchantId' => $merchantId,
+            'stateComplete' => DebtorInformationChangeRequestEntity::STATE_COMPLETE,
+            'stateDeclined' => DebtorInformationChangeRequestEntity::STATE_DECLINED,
+        ]);
+
+        return (int) $total['total'];
+    }
 }

@@ -104,7 +104,8 @@ The generated image will be stored under the `docs` folder as SVG and PNG files.
 ![orders_workflow](src/Resources/docs/orders-workflow.png).
 
 ### Update API Documentation
-Requirements: `git`.
+Requirements: `git`, `openapi-generator`.
+You should run this command on your host, so not inside the Docker container. Run `brew install openapi-generator` first.
 
 Usage:
 

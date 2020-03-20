@@ -48,6 +48,7 @@ interface MerchantUserDefaultRoles
             MerchantUserPermissions::CONFIRM_ORDER_PAYMENT,
             MerchantUserPermissions::PAUSE_DUNNING,
             MerchantUserPermissions::CANCEL_ORDERS,
+            MerchantUserPermissions::CHANGE_DEBTOR_INFORMATION,
         ],
     ];
 }

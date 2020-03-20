@@ -72,12 +72,13 @@ class UpdateMerchantDebtorCompanyUseCaseSpec extends ObjectBehavior
         $validator->validate($request, Argument::any(), Argument::any())->shouldBeCalledOnce()->willReturn(new ConstraintViolationList());
         $merchantDebtorRepository->getOneByUuid(self::MERCHANT_DEBTOR_UUID)->shouldBeCalledOnce()->willReturn($merchantDebtor);
         $companiesService->getDebtor(self::DEBTOR_ID)->shouldBeCalledOnce()->willReturn($debtorCompany);
-        $companiesService->updateDebtor(self::DEBTOR_UUID, [
+        $companiesService->updateCompany(self::DEBTOR_UUID, [
             'name' => 'Billie1',
             'address_house' => 'House1',
             'address_street' => 'Street1',
             'address_city' => 'City1',
             'address_postal_code' => 'PostalCode1',
+            'change_reason' => 'manual_update',
         ])->shouldBeCalledOnce()->willThrow(CompaniesServiceRequestException::class);
 
         $this->shouldThrow(CompaniesServiceRequestException::class)->during('execute', [$request]);
@@ -98,12 +99,13 @@ class UpdateMerchantDebtorCompanyUseCaseSpec extends ObjectBehavior
         $validator->validate($request, Argument::any(), Argument::any())->shouldBeCalledOnce()->willReturn(new ConstraintViolationList());
         $merchantDebtorRepository->getOneByUuid(self::MERCHANT_DEBTOR_UUID)->shouldBeCalledOnce()->willReturn($merchantDebtor);
         $companiesService->getDebtor(self::DEBTOR_ID)->shouldBeCalledOnce()->willReturn($debtorCompany);
-        $companiesService->updateDebtor(self::DEBTOR_UUID, [
+        $companiesService->updateCompany(self::DEBTOR_UUID, [
             'name' => 'Billie1',
             'address_house' => 'House1',
             'address_street' => 'Street1',
             'address_city' => 'City1',
             'address_postal_code' => 'PostalCode1',
+            'change_reason' => 'manual_update',
         ])->shouldBeCalledOnce()->willReturn($debtorCompany);
 
         $this->execute($request);

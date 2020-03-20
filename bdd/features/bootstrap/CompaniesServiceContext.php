@@ -98,12 +98,12 @@ class CompaniesServiceContext implements Context
      */
     public function iGetFromCompaniesServiceUpdateDebtorPositiveResponse()
     {
-        $this->mockRequest('/debtor/1', new ResponseStack(
+        $this->mockRequest('/companies/1', new ResponseStack(
             new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_match_trusted_source.json'))
         ));
 
         $this->mockRequestWith(
-            '/debtor/c7be46c0-e049-4312-b274-258ec5aeeb70',
+            '/companies/c7be46c0-e049-4312-b274-258ec5aeeb70',
             file_get_contents(__DIR__.'/../resources/companies_service_match_trusted_source.json'),
             [],
             200,
