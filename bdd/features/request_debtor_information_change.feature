@@ -78,6 +78,6 @@ Feature:
 				And the JSON response should be:
     """
     {
-      "debtor_information_change_request":2
+      "debtor_information_change_requests":2
     }
     """
