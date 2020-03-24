@@ -27,6 +27,7 @@ class DebtorInformationChangeRequestEntityFactory extends AbstractFactory
     public function createFromDatabaseRow(array $row): DebtorInformationChangeRequestEntity
     {
         return $this->createFromArray($row)
-            ->setId($row['id']);
+            ->setId($row['id'])
+        ;
     }
 }

@@ -84,8 +84,8 @@ class RequestDebtorInformationChangeUseCase implements ValidatedUseCaseInterface
             'merchant_user_id' => $request->getMerchantUserId(),
             'is_seen' => false,
             'state' => DebtorInformationChangeRequestEntity::INITIAL_STATE,
-            'created_at' => new \DateTime(),
-            'updated_at' => new \DateTime(),
+            'created_at' => 'now',
+            'updated_at' => 'now',
         ]);
 
         $this->debtorInformationChangeRequestRepo->insert($debtorInformationChangeRequestEntity);
