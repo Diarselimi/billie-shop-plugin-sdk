@@ -52,6 +52,7 @@ class DebtorInformationChangeRequestAutomaticApprover implements LoggingInterfac
             );
         }
 
+        $changeRequest->setIsSeen(true);
         $this->workflow->apply($changeRequest, DebtorInformationChangeRequestTransitionEntity::TRANSITION_COMPLETE_AUTOMATICALLY);
         $this->changeRequestRepository->update($changeRequest);
 
