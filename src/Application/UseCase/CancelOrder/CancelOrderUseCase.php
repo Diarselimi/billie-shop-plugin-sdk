@@ -11,10 +11,14 @@ use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderStateManager;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\Workflow\Workflow;
 
-class CancelOrderUseCase
+class CancelOrderUseCase implements LoggingInterface
 {
+    use LoggingTrait;
+
     private $limitsService;
 
     private $paymentsService;
@@ -61,6 +65,8 @@ class CancelOrderUseCase
         }
 
         if ($this->workflow->can($order, OrderStateManager::TRANSITION_CANCEL)) {
+            $this->logInfo('Cancel order {id}', ['id' => $order->getId()]);
+
             $orderContainer->getMerchant()->increaseFinancingLimit(
                 $orderContainer->getOrderFinancialDetails()->getAmountGross()
             );
@@ -74,9 +80,14 @@ class CancelOrderUseCase
 
             $this->orderStateManager->cancel($orderContainer);
         } elseif ($this->workflow->can($order, OrderStateManager::TRANSITION_CANCEL_SHIPPED)) {
-            $this->paymentsService->cancelOrder($order);
+            $this->logInfo('Cancel shipped order {id}', ['id' => $order->getId()]);
 
+            $this->paymentsService->cancelOrder($order);
             $this->orderStateManager->cancelShipped($orderContainer);
+        } elseif ($this->workflow->can($order, OrderStateManager::TRANSITION_CANCEL_WAITING)) {
+            $this->logInfo('Cancel waiting order {id}', ['id' => $order->getId()]);
+
+            $this->orderStateManager->cancelWaiting($orderContainer);
         } else {
             throw new CancelOrderException("Order #{$request->getOrderId()} can not be cancelled");
         }

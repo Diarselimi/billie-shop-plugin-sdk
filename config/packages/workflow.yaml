@@ -45,7 +45,10 @@ framework:
           from: [shipped, paid_out, late]
           to: complete
         cancel:
-          from: [new, created, waiting]
+          from: [new, created]
+          to: canceled
+        cancel_waiting:
+          from: [waiting]
           to: canceled
         cancel_shipped:
           from: [shipped, paid_out, late]

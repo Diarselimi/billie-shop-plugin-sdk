@@ -97,6 +97,8 @@ class OrderStateManager implements LoggingInterface
 
     public const TRANSITION_CANCEL_SHIPPED = 'cancel_shipped';
 
+    public const TRANSITION_CANCEL_WAITING = 'cancel_waiting';
+
     public const TRANSITION_PRE_APPROVED = 'pre_approve';
 
     private $orderRepository;
@@ -268,6 +270,12 @@ class OrderStateManager implements LoggingInterface
     public function cancelShipped(OrderContainer $orderContainer): void
     {
         $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_CANCEL_SHIPPED);
+        $this->update($orderContainer);
+    }
+
+    public function cancelWaiting(OrderContainer $orderContainer): void
+    {
+        $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_CANCEL_WAITING);
         $this->update($orderContainer);
     }
 
