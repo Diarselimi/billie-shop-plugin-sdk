@@ -2,6 +2,7 @@
 
 namespace App\DomainModel\MerchantDebtorResponse;
 
+use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestEntity;
 use App\DomainModel\DebtorLimit\DebtorCustomerLimitDTO;
 use App\DomainModel\DebtorLimit\DebtorLimitDTO;
 use App\DomainModel\Merchant\MerchantEntity;
@@ -29,6 +30,8 @@ class MerchantDebtorContainer
 
     private $totalLateOrdersAmount;
 
+    private $debtorInformationChangeRequest;
+
     public function __construct(
         MerchantDebtorEntity $merchantDebtor,
         MerchantEntity $merchant,
@@ -37,7 +40,8 @@ class MerchantDebtorContainer
         DebtorPaymentDetailsDTO $paymentDetails,
         float $totalCreatedOrdersAmount,
         float $totalLateOrdersAmount,
-        ?string $externalId
+        ?string $externalId,
+        ?DebtorInformationChangeRequestEntity $debtorInformationChangeRequest
     ) {
         $this->merchantDebtor = $merchantDebtor;
         $this->merchant = $merchant;
@@ -47,6 +51,7 @@ class MerchantDebtorContainer
         $this->totalCreatedOrdersAmount = $totalCreatedOrdersAmount;
         $this->totalLateOrdersAmount = $totalLateOrdersAmount;
         $this->externalId = $externalId;
+        $this->debtorInformationChangeRequest = $debtorInformationChangeRequest;
     }
 
     public function getMerchantDebtor(): MerchantDebtorEntity
@@ -97,5 +102,10 @@ class MerchantDebtorContainer
     public function getTotalLateOrdersAmount(): float
     {
         return $this->totalLateOrdersAmount;
+    }
+
+    public function getDebtorInformationChangeRequest(): ?DebtorInformationChangeRequestEntity
+    {
+        return $this->debtorInformationChangeRequest;
     }
 }

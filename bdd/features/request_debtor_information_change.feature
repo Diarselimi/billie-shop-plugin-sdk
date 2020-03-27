@@ -65,7 +65,56 @@ Feature:
     }
     """
 
-			Scenario: Notifications count for not seen change requests which transitioned to complete or declined
+  Scenario: Successfully mark debtor information change request as seen
+    Given a merchant user exists with role "admin" and permission CHANGE_DEBTOR_INFORMATION
+    And I have a created order "XF43Y" with amounts 800/800/0, duration 30 and comment "test order"
+    And I get from companies service get debtor response
+    And I get from companies service update debtor positive response
+    When I send a POST request to "/debtor/ad74bbc4-509e-47d5-9b50-a0320ce3d715/information-change-request" with body:
+    """
+    {
+        "name": "Test User Company",
+        "address_city": "BilCity",
+        "address_postal_code": "10887",
+        "address_street": "Billiestr.",
+        "address_house": "222",
+        "tc_accepted": true
+    }
+    """
+    Then the response status code should be 201
+    And I add "X-Api-Key" header equal to test
+    And I add "X-Test" header equal to 1
+    And I get from companies service get debtor response
+    And I get from limit service get debtor limit successful response for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
+    And I get from payments service get debtor response
+    When I send a GET request to "/public/debtor/ad74bbc4-509e-47d5-9b50-a0320ce3d715"
+    Then the response status code should be 200
+    And the JSON response should be:
+    """
+    {
+      "id":"ad74bbc4-509e-47d5-9b50-a0320ce3d715",
+      "external_code":"ext_id",
+      "name":"Test User Company",
+      "financing_limit":7500,
+      "financing_power":4500,
+      "bank_account_iban":"DE1234",
+      "bank_account_bic":"BICISHERE",
+      "created_at":"2020-03-16T16:00:13+0100",
+      "address_street":"Heinrich-Heine-Platz",
+      "address_house":"10",
+      "address_postal_code":"10179",
+      "address_city":"Berlin",
+      "address_country":"DE",
+      "outstanding_amount":500,
+      "outstanding_amount_created":800,
+      "outstanding_amount_late":0,
+      "debtor_information_change_request_state":"complete",
+      "debtor_information_change_request":null
+    }
+    """
+    And the merchant debtor with companyUuid "c7be46c0-e049-4312-b274-258ec5aeeb70" should have all change requests seen
+
+		Scenario: Notifications count for not seen change requests which transitioned to complete or declined
 			 Given a merchant user exists with role "admin" and permission CHANGE_DEBTOR_INFORMATION
 				And the following debtor information change requests exist:
 						| company_uuid | is_seen | state                 |

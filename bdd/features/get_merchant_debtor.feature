@@ -31,7 +31,9 @@ Feature:
             "outstanding_amount_created":800,
             "outstanding_amount_late":0,
             "bank_account_iban":"DE1234",
-            "bank_account_bic":"BICISHERE"
+            "bank_account_bic":"BICISHERE",
+            "debtor_information_change_request_state":null,
+            "debtor_information_change_request":null
         }
         """
 
@@ -59,6 +61,8 @@ Feature:
             "outstanding_amount":500,
             "outstanding_amount_created":800,
             "outstanding_amount_late":0,
+            "debtor_information_change_request_state":null,
+            "debtor_information_change_request":null,
             "bank_account_iban":"DE1234",
             "bank_account_bic":"BICISHERE",
             "merchant_debtor_id":1,

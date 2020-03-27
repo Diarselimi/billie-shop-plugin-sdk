@@ -229,3 +229,13 @@ use OpenApi\Annotations as OA;
  *     example=\App\DomainModel\MerchantUser\MerchantUserPermissions::ALL_PERMISSIONS
  * )
  */
+
+/**
+ * @OA\Schema(
+ *     schema="DebtorInformationChangeRequestState",
+ *     title="Debtor Information ChangeRequest State",
+ *     type="string",
+ *     example="new",
+ *     enum=\App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestEntity::ALL_STATES
+ * )
+ */

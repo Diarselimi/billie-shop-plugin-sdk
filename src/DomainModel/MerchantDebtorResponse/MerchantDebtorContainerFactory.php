@@ -3,6 +3,7 @@
 namespace App\DomainModel\MerchantDebtorResponse;
 
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
+use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestRepositoryInterface;
 use App\DomainModel\DebtorLimit\DebtorLimitServiceInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
@@ -22,18 +23,22 @@ class MerchantDebtorContainerFactory
 
     private $debtorLimitService;
 
+    private $debtorInformationChangeRequestRepository;
+
     public function __construct(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         MerchantRepositoryInterface $merchantRepository,
         PaymentsServiceInterface $paymentService,
         CompaniesServiceInterface $companiesService,
-        DebtorLimitServiceInterface $debtorLimitService
+        DebtorLimitServiceInterface $debtorLimitService,
+        DebtorInformationChangeRequestRepositoryInterface $debtorInformationChangeRequestRepository
     ) {
         $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->merchantRepository = $merchantRepository;
         $this->paymentService = $paymentService;
         $this->companiesService = $companiesService;
         $this->debtorLimitService = $debtorLimitService;
+        $this->debtorInformationChangeRequestRepository = $debtorInformationChangeRequestRepository;
     }
 
     public function create(MerchantDebtorEntity $merchantDebtor): MerchantDebtorContainer
@@ -54,6 +59,8 @@ class MerchantDebtorContainerFactory
         $totalLateOrdersAmount = $this->merchantDebtorRepository
             ->getMerchantDebtorOrdersAmountByState($merchantDebtor->getId(), OrderStateManager::STATE_LATE);
 
+        $debtorInformationChangeRequest = $this->debtorInformationChangeRequestRepository->getNotSeenRequestByCompanyUuid($company->getUuid());
+
         return new MerchantDebtorContainer(
             $merchantDebtor,
             $merchant,
@@ -62,7 +69,8 @@ class MerchantDebtorContainerFactory
             $paymentsDetails,
             $totalCreatedOrdersAmount,
             $totalLateOrdersAmount,
-            $externalId
+            $externalId,
+            $debtorInformationChangeRequest
         );
     }
 }

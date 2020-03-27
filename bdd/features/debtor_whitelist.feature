@@ -12,7 +12,7 @@ Feature:
     And I get from payments service get debtor response
     When I send a POST request to "/private/debtors/c7be46c0-e049-4312-b274-258ec5aeeb70/whitelist" with body:
     """
-      {"is_whitelisted": "1"}
+      {"is_whitelisted": true}
     """
     Then the response status code should be 204
-    And the debtor settings with companyUuid "c7be46c0-e049-4312-b274-258ec5aeeb70" should be whitelisted
+    And the debtor company with uuid "c7be46c0-e049-4312-b274-258ec5aeeb70" should be whitelisted

@@ -4,6 +4,7 @@ namespace spec\App\Application\UseCase\GetMerchantDebtor;
 
 use App\Application\Exception\MerchantDebtorNotFoundException;
 use App\Application\UseCase\GetMerchantDebtor\GetMerchantDebtorRequest;
+use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestRepositoryInterface;
 use App\DomainModel\MerchantDebtorResponse\MerchantDebtorContainerFactory;
 use App\DomainModel\MerchantDebtorResponse\MerchantDebtorContainer;
 use App\Application\UseCase\GetMerchantDebtor\GetMerchantDebtorUseCase;
@@ -29,9 +30,10 @@ class GetMerchantDebtorUseCaseSpec extends ObjectBehavior
     public function let(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         MerchantDebtorContainerFactory $merchantDebtorContainerFactory,
+        DebtorInformationChangeRequestRepositoryInterface $debtorInformationChangeRequestRepositoryInterface,
         ValidatorInterface $validator
     ) {
-        $this->beConstructedWith($merchantDebtorRepository, $merchantDebtorContainerFactory);
+        $this->beConstructedWith($merchantDebtorRepository, $merchantDebtorContainerFactory, $debtorInformationChangeRequestRepositoryInterface);
 
         $validator->validate(Argument::any(), Argument::any(), Argument::any())->willReturn(new ConstraintViolationList());
         $this->setValidator($validator);

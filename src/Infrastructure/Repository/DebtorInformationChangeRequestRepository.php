@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Repository;
 
 use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestEntity;
+use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestEntityFactory;
 use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestRepositoryInterface;
 use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
@@ -26,6 +27,14 @@ class DebtorInformationChangeRequestRepository extends AbstractPdoRepository imp
         'updated_at',
     ];
 
+    public $factory;
+
+    public function __construct(
+        DebtorInformationChangeRequestEntityFactory $factory
+    ) {
+        $this->factory = $factory;
+    }
+
     public function insert(DebtorInformationChangeRequestEntity $entity): void
     {
         $sql = $this->generateInsertQuery(self::TABLE_NAME, self::SELECT_FIELDS);
@@ -40,11 +49,12 @@ class DebtorInformationChangeRequestRepository extends AbstractPdoRepository imp
 
         $this->doUpdate('
             UPDATE ' . self::TABLE_NAME . '
-            SET state = :state, updated_at = :updated_at
+            SET state = :state, is_seen = :is_seen, updated_at = :updated_at
             WHERE id = :id
         ', [
             'state' => $entity->getState(),
             'id' => $entity->getId(),
+            'is_seen' => $entity->isSeen(),
             'updated_at' => $entity->getUpdatedAt()->format(self::DATE_FORMAT),
         ]);
     }
@@ -67,5 +77,22 @@ class DebtorInformationChangeRequestRepository extends AbstractPdoRepository imp
         ]);
 
         return (int) $total['total'];
+    }
+
+    public function getNotSeenRequestByCompanyUuid(string $companyUuid): ?DebtorInformationChangeRequestEntity
+    {
+        $row = $this->doFetchOne(
+            '
+          SELECT ' . implode(', ', self::SELECT_FIELDS) . '
+          FROM ' . self::TABLE_NAME . '
+          WHERE company_uuid = :companyUuid AND is_seen = 0
+          ORDER BY created_at DESC LIMIT 1
+        ',
+            [
+                'companyUuid' => $companyUuid,
+            ]
+        );
+
+        return $row ? $this->factory->createFromDatabaseRow($row) : null;
     }
 }

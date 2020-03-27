@@ -495,6 +495,16 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
+     * @Given the merchant debtor with companyUuid :companyUuid should have all change requests seen
+     */
+    public function checkDebtorChangeRequestSeenAlready(string $companyUuid)
+    {
+        $debtorChangeRequest = $this->getDebtorInformationChangeRequestRepository()->getNotSeenRequestByCompanyUuid($companyUuid);
+
+        Assert::notNull($debtorChangeRequest);
+    }
+
+    /**
      * @Given the order :orderId :key is :expectedValue
      */
     public function orderDurationIs($orderId, $key, $expectedValue)
@@ -938,6 +948,11 @@ class PaellaCoreContext extends MinkContext
         return $this->get(MerchantDebtorRepositoryInterface::class);
     }
 
+    private function getDebtorInformationChangeRequestRepository(): DebtorInformationChangeRequestRepositoryInterface
+    {
+        return $this->get(DebtorInformationChangeRequestRepositoryInterface::class);
+    }
+
     private function getScoreThresholdsConfigurationRepository(): ScoreThresholdsConfigurationRepositoryInterface
     {
         return $this->get(ScoreThresholdsConfigurationRepositoryInterface::class);
@@ -1036,11 +1051,6 @@ class PaellaCoreContext extends MinkContext
     private function getDebtorSettingsRepository(): DebtorSettingsRepositoryInterface
     {
         return $this->get(DebtorSettingsRepositoryInterface::class);
-    }
-
-    private function getDebtorInformationChangeRequestRepository(): DebtorInformationChangeRequestRepositoryInterface
-    {
-        return $this->get(DebtorInformationChangeRequestRepositoryInterface::class);
     }
 
     private function getConnection(): PdoConnection

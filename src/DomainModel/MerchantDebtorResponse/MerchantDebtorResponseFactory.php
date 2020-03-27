@@ -3,6 +3,7 @@
 namespace App\DomainModel\MerchantDebtorResponse;
 
 use App\DomainModel\DebtorCompany\DebtorCompany;
+use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestEntity;
 use App\DomainModel\DebtorLimit\DebtorCustomerLimitDTO;
 use App\DomainModel\DebtorLimit\DebtorLimitDTO;
 
@@ -27,6 +28,8 @@ class MerchantDebtorResponseFactory
             ->setBankAccountIban($container->getPaymentDetails()->getBankAccountIban())
             ->setBankAccountBic($container->getPaymentDetails()->getBankAccountBic())
             ->setCreatedAt(new \DateTime())
+            ->setDebtorInformationChangeRequestState($container->getDebtorInformationChangeRequest() ? $container->getDebtorInformationChangeRequest()->getState() : null)
+            ->setDebtorInformationChangeRequest($container->getDebtorInformationChangeRequest())
         ;
     }
 

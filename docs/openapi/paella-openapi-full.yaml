@@ -2263,6 +2263,36 @@ paths:
           oauth2: []
       x-groups:
         - private
+  '/debtor/{uuid}/information-change-request':
+    post:
+      tags:
+        - 'Dashboard Debtors'
+      summary: 'Request Debtor Information Change'
+      operationId: debtor_information_change_request
+      parameters:
+        -
+          name: uuid
+          in: path
+          description: 'Merchant debtor UUID'
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '201':
+          description: 'Debtor information change request created'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+      x-groups:
+        - private
   '/merchant/users/invitations/{uuid}/resend':
     post:
       tags:
@@ -2675,6 +2705,16 @@ components:
         - CANCEL_ORDERS
         - MANAGE_ONBOARDING
         - CHANGE_DEBTOR_INFORMATION
+    DebtorInformationChangeRequestState:
+      title: 'Debtor Information ChangeRequest State'
+      type: string
+      enum:
+        - new
+        - confirmation_pending
+        - complete
+        - declined
+        - canceled
+      example: new
     OauthClientCredentialsGrantRequestBodyParams:
       title: 'Request OAuth Token'
       required:
@@ -3693,6 +3733,23 @@ components:
         outstanding_amount_late:
           type: number
           format: float
+        debtor_information_change_request_state:
+          $ref: '#/components/schemas/DebtorInformationChangeRequestState'
+        debtor_information_change_request:
+          type: array
+          items:
+            properties:
+              name:
+                type: string
+              house_number:
+                type: string
+              state:
+                type: string
+              city:
+                type: string
+              postal_code:
+                type: string
+            type: object
       type: object
       allOf:
         -

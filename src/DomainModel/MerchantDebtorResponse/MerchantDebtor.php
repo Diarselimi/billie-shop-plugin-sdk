@@ -2,6 +2,7 @@
 
 namespace App\DomainModel\MerchantDebtorResponse;
 
+use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestEntity;
 use OpenApi\Annotations as OA;
 
 /**
@@ -14,6 +15,17 @@ use OpenApi\Annotations as OA;
  *      @OA\Property(property="outstanding_amount", type="number", format="float"),
  *      @OA\Property(property="outstanding_amount_created", type="number", format="float"),
  *      @OA\Property(property="outstanding_amount_late", type="number", format="float"),
+ *      @OA\Property(property="debtor_information_change_request_state", ref="#/components/schemas/DebtorInformationChangeRequestState"),
+ *      @OA\Property(property="debtor_information_change_request", type="array", @OA\Items(
+ *          type="object",
+ *          properties={
+ *              @OA\Property(property="name", type="string"),
+ *              @OA\Property(property="house_number", type="string"),
+ *              @OA\Property(property="state", type="string"),
+ *              @OA\Property(property="city", type="string"),
+ *              @OA\Property(property="postal_code", type="string"),
+ *          }
+ *      )),
  * })
  */
 class MerchantDebtor extends AbstractMerchantDebtor
@@ -33,6 +45,10 @@ class MerchantDebtor extends AbstractMerchantDebtor
     private $outstandingAmountCreated;
 
     private $outstandingAmountLate;
+
+    private $debtorInformationChangeRequestState;
+
+    private $debtorInformationChangeRequest;
 
     public function getAddressStreet(): string
     {
@@ -162,6 +178,30 @@ class MerchantDebtor extends AbstractMerchantDebtor
         return $this;
     }
 
+    public function setDebtorInformationChangeRequestState(?string $debtorInformationChangeRequestState): MerchantDebtor
+    {
+        $this->debtorInformationChangeRequestState = $debtorInformationChangeRequestState;
+
+        return $this;
+    }
+
+    public function getDebtorInformationChangeRequestState(): ?string
+    {
+        return $this->debtorInformationChangeRequestState;
+    }
+
+    public function setDebtorInformationChangeRequest(?DebtorInformationChangeRequestEntity $debtorInformationChangeRequest): MerchantDebtor
+    {
+        $this->debtorInformationChangeRequest = $debtorInformationChangeRequest;
+
+        return $this;
+    }
+
+    public function getDebtorInformationChangeRequest(): ?DebtorInformationChangeRequestEntity
+    {
+        return $this->debtorInformationChangeRequest;
+    }
+
     public function toArray(): array
     {
         $data = parent::toArray();
@@ -176,6 +216,19 @@ class MerchantDebtor extends AbstractMerchantDebtor
             'outstanding_amount' => $this->outstandingAmount,
             'outstanding_amount_created' => $this->outstandingAmountCreated,
             'outstanding_amount_late' => $this->outstandingAmountLate,
+
+            'debtor_information_change_request_state' => $this->debtorInformationChangeRequestState,
+            'debtor_information_change_request' => $this->getChangeRequestData($this->debtorInformationChangeRequest),
         ]);
+    }
+
+    private function getChangeRequestData(?DebtorInformationChangeRequestEntity $debtorInformationChangeRequest): ?array
+    {
+        $returnProperties = ['name', 'street', 'house_number', 'city', 'postal_code'];
+
+        return
+            $debtorInformationChangeRequest && $debtorInformationChangeRequest->getState() === DebtorInformationChangeRequestEntity::STATE_PENDING ?
+                $debtorInformationChangeRequest->toArray($returnProperties) :
+                null;
     }
 }
