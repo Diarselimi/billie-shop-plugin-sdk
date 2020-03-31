@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "71903c9425f6e67929bc955f8101a94d",
+    "content-hash": "6a6d0fb14f40965131e8b6afc8c98200",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -2249,16 +2249,16 @@
         },
         {
             "name": "ozean12/money",
-            "version": "2.0.0",
+            "version": "2.1.0",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/money-php.git",
-                "reference": "d89bb479c1d319ff01de65e8a277f6aeb318fca3"
+                "reference": "b125500cf10bf90374dc46363b7456ca41e5bc59"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/money-php/zipball/d89bb479c1d319ff01de65e8a277f6aeb318fca3",
-                "reference": "d89bb479c1d319ff01de65e8a277f6aeb318fca3",
+                "url": "https://api.github.com/repos/ozean12/money-php/zipball/b125500cf10bf90374dc46363b7456ca41e5bc59",
+                "reference": "b125500cf10bf90374dc46363b7456ca41e5bc59",
                 "shasum": ""
             },
             "require": {
@@ -2295,9 +2295,9 @@
             ],
             "description": "PHP package for dealing with decimals, percents and money",
             "support": {
-                "source": "https://github.com/ozean12/money-php/tree/2.0.0"
+                "source": "https://github.com/ozean12/money-php/tree/2.1.0"
             },
-            "time": "2020-03-02T15:44:06+00:00"
+            "time": "2020-03-30T11:41:49+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -9724,5 +9724,6 @@
         "ext-bcmath": "*",
         "ext-json": "*"
     },
-    "platform-dev": []
+    "platform-dev": [],
+    "plugin-api-version": "1.1.0"
 }

@@ -8,6 +8,7 @@ use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestEntity;
 use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestRepositoryInterface;
+use App\DomainModel\DebtorSettings\DebtorSettingsEntity;
 use App\DomainModel\DebtorSettings\DebtorSettingsRepositoryInterface;
 use App\DomainModel\FraudRules\FraudRuleEntity;
 use App\DomainModel\FraudRules\FraudRuleRepositoryInterface;
@@ -292,6 +293,11 @@ class PaellaCoreContext extends MinkContext
             ->setPaymentDebtorId('test')
             ->setCreatedAt(new \DateTime('2019-01-01 12:00:00'));
         $this->getMerchantDebtorRepository()->insert($merchantDebtor);
+
+        $debtorSettings = (new DebtorSettingsEntity())
+            ->setCompanyUuid($merchantDebtor->getCompanyUuid())
+            ->setIsWhitelisted(true);
+        $this->getDebtorSettingsRepository()->insert($debtorSettings);
 
         return $this->debtorData = [$person, $deliveryAddress, $debtor, $merchantDebtor];
     }
