@@ -46,8 +46,6 @@ class MerchantDebtor extends AbstractMerchantDebtor
 
     private $outstandingAmountLate;
 
-    private $debtorInformationChangeRequestState;
-
     private $debtorInformationChangeRequest;
 
     public function getAddressStreet(): string
@@ -178,18 +176,6 @@ class MerchantDebtor extends AbstractMerchantDebtor
         return $this;
     }
 
-    public function setDebtorInformationChangeRequestState(?string $debtorInformationChangeRequestState): MerchantDebtor
-    {
-        $this->debtorInformationChangeRequestState = $debtorInformationChangeRequestState;
-
-        return $this;
-    }
-
-    public function getDebtorInformationChangeRequestState(): ?string
-    {
-        return $this->debtorInformationChangeRequestState;
-    }
-
     public function setDebtorInformationChangeRequest(?DebtorInformationChangeRequestEntity $debtorInformationChangeRequest): MerchantDebtor
     {
         $this->debtorInformationChangeRequest = $debtorInformationChangeRequest;
@@ -217,18 +203,20 @@ class MerchantDebtor extends AbstractMerchantDebtor
             'outstanding_amount_created' => $this->outstandingAmountCreated,
             'outstanding_amount_late' => $this->outstandingAmountLate,
 
-            'debtor_information_change_request_state' => $this->debtorInformationChangeRequestState,
-            'debtor_information_change_request' => $this->getChangeRequestData($this->debtorInformationChangeRequest),
+            'debtor_information_change_request' => $this->debtorInformationChangeRequest
+                ? $this->getChangeRequestData($this->debtorInformationChangeRequest)
+                : null,
         ]);
     }
 
-    private function getChangeRequestData(?DebtorInformationChangeRequestEntity $debtorInformationChangeRequest): ?array
-    {
+    private function getChangeRequestData(
+        DebtorInformationChangeRequestEntity $debtorInformationChangeRequest
+    ): ?array {
         $returnProperties = ['name', 'street', 'house_number', 'city', 'postal_code'];
 
         return
-            $debtorInformationChangeRequest && $debtorInformationChangeRequest->getState() === DebtorInformationChangeRequestEntity::STATE_PENDING ?
-                $debtorInformationChangeRequest->toArray($returnProperties) :
-                null;
+            $debtorInformationChangeRequest->getState() === DebtorInformationChangeRequestEntity::STATE_PENDING
+                ? $debtorInformationChangeRequest->toArray($returnProperties)
+                : null;
     }
 }

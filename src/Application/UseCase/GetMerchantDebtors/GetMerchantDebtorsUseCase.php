@@ -2,13 +2,13 @@
 
 namespace App\Application\UseCase\GetMerchantDebtors;
 
-use App\Application\Exception\MerchantDebtorNotFoundException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
+use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
+use App\DomainModel\MerchantDebtor\MerchantDebtorEntityFactory;
 use App\DomainModel\MerchantDebtorResponse\MerchantDebtorContainerFactory;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\MerchantDebtorResponse\MerchantDebtorList;
-use App\DomainModel\MerchantDebtorResponse\MerchantDebtorListItem;
 use App\DomainModel\MerchantDebtorResponse\MerchantDebtorResponseFactory;
 
 class GetMerchantDebtorsUseCase implements ValidatedUseCaseInterface
@@ -21,14 +21,18 @@ class GetMerchantDebtorsUseCase implements ValidatedUseCaseInterface
 
     private $responseFactory;
 
+    private $entityFactory;
+
     public function __construct(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         MerchantDebtorContainerFactory $merchantDebtorContainerFactory,
-        MerchantDebtorResponseFactory $responseFactory
+        MerchantDebtorResponseFactory $responseFactory,
+        MerchantDebtorEntityFactory $entityFactory
     ) {
         $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->merchantDebtorContainerFactory = $merchantDebtorContainerFactory;
         $this->responseFactory = $responseFactory;
+        $this->entityFactory = $entityFactory;
     }
 
     public function execute(GetMerchantDebtorsRequest $request): MerchantDebtorList
@@ -44,23 +48,12 @@ class GetMerchantDebtorsUseCase implements ValidatedUseCaseInterface
             $request->getSearchString()
         );
 
-        $merchantDebtors = array_map(function (array $row) use ($request) {
-            return $this->createListItem($row['id']);
+        $merchantDebtors = array_map(function (MerchantDebtorEntity $merchantDebtorEntity) {
+            $container = $this->merchantDebtorContainerFactory->create($merchantDebtorEntity);
+
+            return $this->responseFactory->createListItemFromContainer($container);
         }, $result['rows']);
 
         return $this->responseFactory->createList($result['total'], $merchantDebtors);
-    }
-
-    private function createListItem(int $id): MerchantDebtorListItem
-    {
-        $merchantDebtor = $this->merchantDebtorRepository->getOneById($id);
-
-        if (!$merchantDebtor) {
-            throw new MerchantDebtorNotFoundException();
-        }
-
-        $container = $this->merchantDebtorContainerFactory->create($merchantDebtor);
-
-        return $this->responseFactory->createListItemFromContainer($container);
     }
 }

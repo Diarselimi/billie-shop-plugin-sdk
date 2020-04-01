@@ -1370,6 +1370,9 @@ paths:
               - external_code
               - 'external_code,desc'
               - 'external_code,asc'
+              - debtor_information_change_request_state
+              - 'debtor_information_change_request_state,desc'
+              - 'debtor_information_change_request_state,asc'
         -
           name: offset
           in: query
@@ -2231,36 +2234,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
-  '/debtor/{uuid}/information-change-request':
-    post:
-      tags:
-        - 'Dashboard Debtors'
-      summary: 'Request Debtor Information Change'
-      operationId: debtor_information_change_request
-      parameters:
-        -
-          name: uuid
-          in: path
-          description: 'Merchant debtor UUID'
-          required: true
-          schema:
-            $ref: '#/components/schemas/UUID'
-      responses:
-        '201':
-          description: 'Debtor information change request created'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
       x-groups:
         - private
   '/debtor/{uuid}/information-change-request':
@@ -3793,6 +3766,10 @@ components:
       type: object
     MerchantDebtorListItem:
       title: 'Debtor Basic Info'
+      properties:
+        debtor_information_change_request_state:
+          $ref: '#/components/schemas/DebtorInformationChangeRequestState'
+      type: object
       allOf:
         -
           $ref: '#/components/schemas/AbstractMerchantDebtorResponse'

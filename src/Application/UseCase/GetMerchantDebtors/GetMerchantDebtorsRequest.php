@@ -23,7 +23,7 @@ class GetMerchantDebtorsRequest implements ValidatedRequestInterface, Pagination
 
     /**
      * @Assert\Type(type="string")
-     * @Assert\Choice({"created_at", "external_code"})
+     * @Assert\Choice({"created_at", "external_code", "debtor_information_change_request_state"})
      */
     private $sortBy;
 

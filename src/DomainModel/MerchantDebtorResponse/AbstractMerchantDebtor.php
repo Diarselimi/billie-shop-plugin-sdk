@@ -35,6 +35,8 @@ abstract class AbstractMerchantDebtor implements ArrayableInterface
 
     private $bankAccountBic;
 
+    protected $debtorInformationChangeRequestState;
+
     public function getUuid(): string
     {
         return $this->uuid;
@@ -155,6 +157,19 @@ abstract class AbstractMerchantDebtor implements ArrayableInterface
         return $this;
     }
 
+    public function setDebtorInformationChangeRequestState(
+        ?string $debtorInformationChangeRequestState
+    ): AbstractMerchantDebtor {
+        $this->debtorInformationChangeRequestState = $debtorInformationChangeRequestState;
+
+        return $this;
+    }
+
+    public function getDebtorInformationChangeRequestState(): ?string
+    {
+        return $this->debtorInformationChangeRequestState;
+    }
+
     public function toArray(): array
     {
         return [
@@ -169,6 +184,8 @@ abstract class AbstractMerchantDebtor implements ArrayableInterface
             'bank_account_bic' => $this->bankAccountBic,
 
             'created_at' => $this->createdAt->format(\DateTime::ISO8601),
+
+            'debtor_information_change_request_state' => $this->debtorInformationChangeRequestState,
         ];
     }
 }

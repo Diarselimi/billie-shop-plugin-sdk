@@ -27,7 +27,7 @@ class DebtorInformationChangeRequestRepository extends AbstractPdoRepository imp
         'updated_at',
     ];
 
-    public $factory;
+    private $factory;
 
     public function __construct(
         DebtorInformationChangeRequestEntityFactory $factory

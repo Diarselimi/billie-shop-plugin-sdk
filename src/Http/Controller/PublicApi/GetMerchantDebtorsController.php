@@ -24,7 +24,10 @@ use Symfony\Component\HttpFoundation\Request;
  *     @OA\Parameter(in="query", name="sort_by", @OA\Schema(type="string",
  *          enum={
  *              "created_at", "created_at,desc", "created_at,asc",
- *              "external_code", "external_code,desc", "external_code,asc"
+ *              "external_code", "external_code,desc", "external_code,asc",
+ *              "debtor_information_change_request_state",
+ *              "debtor_information_change_request_state,desc",
+ *              "debtor_information_change_request_state,asc"
  *          }, default="created_at,desc"), required=false),
  *
  *     @OA\Parameter(in="query", name="offset", @OA\Schema(type="integer", minimum=0), required=false),

@@ -78,6 +78,9 @@ class PaellaCoreContext extends MinkContext
      */
     private $merchant;
 
+    /** @var MerchantUserEntity|null */
+    private $lastCreatedUser;
+
     public const DUMMY_UUID4 = '6d6b4222-be8c-11e9-9cb5-2a2ae2dbcce4';
 
     public const DEBTOR_UUID = 'ad74bbc4-509e-47d5-9b50-a0320ce3d715';
@@ -825,6 +828,8 @@ class PaellaCoreContext extends MinkContext
         $this->getMerchantUserRepository()->create($user);
         $this->createInvitation('test@billie.dev', 1, $roleId, $user->getId(), $invitationStatus);
 
+        $this->lastCreatedUser = $user;
+
         return $user;
     }
 
@@ -1325,5 +1330,25 @@ class PaellaCoreContext extends MinkContext
                 $debtorInformationChangeRequest
             );
         }
+    }
+
+    /**
+     * @Given the debtor has an information change request with state :state
+     */
+    public function theDebtorHasAnInformationChangeRequest(string $state)
+    {
+        $informationChangeRequest = (new DebtorInformationChangeRequestEntity())
+            ->setUuid(uniqid())
+            ->setCompanyUuid(self::DEBTOR_COMPANY_UUID)
+            ->setName('Some name')
+            ->setCity('Berlin')
+            ->setPostalCode('10247')
+            ->setStreet('Charlottenstraße')
+            ->setMerchantUserId($this->lastCreatedUser->getId())
+            ->setIsSeen(false)
+            ->setState($state);
+        $this->getDebtorInformationChangeRequestRepository()->insert(
+            $informationChangeRequest
+        );
     }
 }

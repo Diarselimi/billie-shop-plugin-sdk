@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\Repository;
 
+use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntityFactory;
 use App\DomainModel\MerchantDebtor\MerchantDebtorIdentifierDTO;
@@ -13,7 +14,17 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
 {
     public const TABLE_NAME = "merchants_debtors";
 
-    private const SELECT_FIELDS = 'id, merchant_id, debtor_id, company_uuid, payment_debtor_id, uuid, score_thresholds_configuration_id, created_at, updated_at';
+    private const SELECT_FIELDS = [
+        'id',
+        'merchant_id',
+        'debtor_id',
+        'company_uuid',
+        'payment_debtor_id',
+        'uuid',
+        'score_thresholds_configuration_id',
+        'created_at',
+        'updated_at',
+    ];
 
     private $factory;
 
@@ -46,14 +57,14 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
     public function getOneById(int $id): ?MerchantDebtorEntity
     {
         $row = $this->doFetchOne('
-          SELECT ' . self::SELECT_FIELDS . '
+          SELECT ' . implode(',', self::SELECT_FIELDS) . '
           FROM ' . self::TABLE_NAME . '
           WHERE id = :id
         ', [
             'id' => $id,
         ]);
 
-        return $row ? $this->factory->createFromDatabaseRow($row) : null;
+        return $row ? $this->factory->createFromArray($row) : null;
     }
 
     public function getManyByDebtorCompanyId(int $debtorCompanyId): array
@@ -61,7 +72,7 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
         $results = [];
 
         $stmt = $this->doExecute('
-          SELECT ' . self::SELECT_FIELDS . '
+          SELECT ' . implode(',', self::SELECT_FIELDS) . '
           FROM ' . self::TABLE_NAME . '
           WHERE debtor_id = :debtor_id
         ', [
@@ -69,7 +80,7 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
         ]);
 
         while ($stmt && $row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-            $results[] = $this->factory->createFromDatabaseRow($row);
+            $results[] = $this->factory->createFromArray($row);
         }
 
         return $results;
@@ -78,20 +89,20 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
     public function getOneByUuid(string $uuid): ?MerchantDebtorEntity
     {
         $row = $this->doFetchOne('
-          SELECT ' . self::SELECT_FIELDS . '
+          SELECT ' . implode(',', self::SELECT_FIELDS) . '
           FROM ' . self::TABLE_NAME . '
           WHERE uuid = :uuid
         ', [
             'uuid' => $uuid,
         ]);
 
-        return $row ? $this->factory->createFromDatabaseRow($row) : null;
+        return $row ? $this->factory->createFromArray($row) : null;
     }
 
     public function getOneByUuidAndMerchantId(string $uuid, int $merchantId): ?MerchantDebtorEntity
     {
         $row = $this->doFetchOne('
-          SELECT ' . self::SELECT_FIELDS . '
+          SELECT ' . implode(',', self::SELECT_FIELDS) . '
           FROM ' . self::TABLE_NAME . '
           WHERE uuid = :uuid AND merchant_id = :merchant_id
         ', [
@@ -99,13 +110,13 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
             'merchant_id' => $merchantId,
         ]);
 
-        return $row ? $this->factory->createFromDatabaseRow($row) : null;
+        return $row ? $this->factory->createFromArray($row) : null;
     }
 
     public function getOneByMerchantAndCompanyUuid(string $merchantId, string $companyUuid): ?MerchantDebtorEntity
     {
         $row = $this->doFetchOne('
-          SELECT ' . self::SELECT_FIELDS . '
+          SELECT ' . implode(',', self::SELECT_FIELDS) . '
           FROM ' . self::TABLE_NAME . '
           WHERE merchant_id = :merchant_id
           AND company_uuid = :company_uuid', [
@@ -113,13 +124,13 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
             'company_uuid' => $companyUuid,
         ]);
 
-        return $row ? $this->factory->createFromDatabaseRow($row) : null;
+        return $row ? $this->factory->createFromArray($row) : null;
     }
 
     public function getOneByExternalIdAndMerchantId(string $merchantExternalId, string $merchantId, array $excludedOrderStates = []): ?MerchantDebtorEntity
     {
         $row = $this->doFetchOne('
-            SELECT ' . self::SELECT_FIELDS . '
+            SELECT ' . implode(',', self::SELECT_FIELDS) . '
             FROM ' . self::TABLE_NAME . ' 
             WHERE merchants_debtors.id = (
                 SELECT merchant_debtor_id
@@ -137,13 +148,13 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
             'merchant_id' => $merchantId,
         ]);
 
-        return $row ? $this->factory->createFromDatabaseRow($row) : null;
+        return $row ? $this->factory->createFromArray($row) : null;
     }
 
     public function getOneByUuidOrExternalIdAndMerchantId(string $uuidOrExternalID, int $merchantId): ?MerchantDebtorEntity
     {
         $row = $this->doFetchOne('
-            SELECT ' . self::SELECT_FIELDS . '
+            SELECT ' . implode(',', self::SELECT_FIELDS) . '
             FROM ' . self::TABLE_NAME . ' 
             WHERE (merchants_debtors.id = (
                 SELECT merchant_debtor_id
@@ -161,7 +172,7 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
             'merchant_id' => $merchantId,
         ]);
 
-        return $row ? $this->factory->createFromDatabaseRow($row) : null;
+        return $row ? $this->factory->createFromArray($row) : null;
     }
 
     public function getMerchantDebtorCreatedOrdersAmount(int $merchantDebtorId): float
@@ -240,8 +251,18 @@ SQL;
     ): array {
         $tableName = self::TABLE_NAME;
         $where = $tableName . '.merchant_id = :merchant_id';
-        $queryParameters = ['merchant_id' => $merchantId];
-        $select = "merchants_debtors.id AS id, debtor_id, debtor_external_data.merchant_external_id AS external_id";
+        $queryParameters = [
+            'merchant_id' => $merchantId,
+            'state_confirmation_pending' => DebtorInformationChangeRequestEntity::STATE_PENDING,
+            'state_complete' => DebtorInformationChangeRequestEntity::STATE_COMPLETE,
+            'state_declined' => DebtorInformationChangeRequestEntity::STATE_DECLINED,
+        ];
+        $selectFieldsWithTablePrefix = self::SELECT_FIELDS;
+        array_walk($selectFieldsWithTablePrefix, function (string &$value) {
+            $value = self::TABLE_NAME . '.' . $value;
+        });
+        $selectFieldsWithTablePrefix[] =
+            'debtor_information_change_requests.state AS debtor_information_change_request_state';
 
         $sql = <<<SQL
     SELECT %s
@@ -251,7 +272,15 @@ SQL;
         ) AS last_order ON last_order.merchant_debtor_id = merchants_debtors.id
         INNER JOIN orders ON orders.id = last_order.id
         INNER JOIN debtor_external_data ON debtor_external_data.id = orders.debtor_external_data_id
+        LEFT JOIN debtor_information_change_requests ON (
+            debtor_information_change_requests.company_uuid = {$tableName}.company_uuid
+            AND debtor_information_change_requests.is_seen = 0
+            AND debtor_information_change_requests.state IN (
+                :state_confirmation_pending,:state_complete,:state_declined
+            )
+        )
     WHERE %s
+    GROUP BY {$tableName}.id
 SQL;
 
         if ($searchString) {
@@ -265,15 +294,25 @@ SQL;
             $where
         ) . ') AS md', $queryParameters);
 
-        $sql .= " ORDER BY :sort_field :sort_direction LIMIT {$offset},{$limit}";
-        $queryParameters['sort_field'] = $tableName . '.' . $sortBy;
-        $queryParameters['sort_direction'] = $sortDirection;
+        $orderByColumn = $tableName . '.' . $sortBy;
+        if ($sortBy === 'debtor_information_change_request_state') {
+            $orderByColumn = 'FIELD(debtor_information_change_request_state, :state_complete, :state_declined, :state_confirmation_pending)';
+        }
 
-        $rows = $this->doFetchAll(sprintf($sql, $select, $where), $queryParameters);
+        $sql .= " ORDER BY {$orderByColumn} {$sortDirection} LIMIT {$offset},{$limit}";
+
+        $rows = $this->doFetchAll(
+            sprintf(
+                $sql,
+                implode(',', $selectFieldsWithTablePrefix),
+                $where
+            ),
+            $queryParameters
+        );
 
         return [
             'total' => $totalCount['total_count'] ?? 0,
-            'rows' => $rows,
+            'rows' => $rows ? $this->factory->createFromArrayCollection($rows) : [],
         ];
     }
 }

@@ -59,7 +59,9 @@ class MerchantDebtorContainerFactory
         $totalLateOrdersAmount = $this->merchantDebtorRepository
             ->getMerchantDebtorOrdersAmountByState($merchantDebtor->getId(), OrderStateManager::STATE_LATE);
 
-        $debtorInformationChangeRequest = $this->debtorInformationChangeRequestRepository->getNotSeenRequestByCompanyUuid($company->getUuid());
+        $debtorInformationChangeRequest = $this
+            ->debtorInformationChangeRequestRepository
+            ->getNotSeenRequestByCompanyUuid($company->getUuid());
 
         return new MerchantDebtorContainer(
             $merchantDebtor,

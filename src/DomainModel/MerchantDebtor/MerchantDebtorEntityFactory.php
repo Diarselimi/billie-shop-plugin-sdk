@@ -4,8 +4,9 @@ namespace App\DomainModel\MerchantDebtor;
 
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\Helper\Uuid\UuidGeneratorInterface;
+use App\Support\AbstractFactory;
 
-class MerchantDebtorEntityFactory
+class MerchantDebtorEntityFactory extends AbstractFactory
 {
     private $uuidGenerator;
 
@@ -14,18 +15,18 @@ class MerchantDebtorEntityFactory
         $this->uuidGenerator = $uuidGenerator;
     }
 
-    public function createFromDatabaseRow(array $row): MerchantDebtorEntity
+    public function createFromArray(array $data): MerchantDebtorEntity
     {
         return (new MerchantDebtorEntity())
-            ->setId($row['id'])
-            ->setMerchantId($row['merchant_id'])
-            ->setDebtorId($row['debtor_id'])
-            ->setCompanyUuid($row['company_uuid'])
-            ->setUuid($row['uuid'])
-            ->setPaymentDebtorId($row['payment_debtor_id'])
-            ->setScoreThresholdsConfigurationId($row['score_thresholds_configuration_id'])
-            ->setCreatedAt(new \DateTime($row['created_at']))
-            ->setUpdatedAt(new \DateTime($row['updated_at']));
+            ->setId($data['id'])
+            ->setMerchantId($data['merchant_id'])
+            ->setDebtorId($data['debtor_id'])
+            ->setCompanyUuid($data['company_uuid'])
+            ->setUuid($data['uuid'])
+            ->setPaymentDebtorId($data['payment_debtor_id'])
+            ->setScoreThresholdsConfigurationId($data['score_thresholds_configuration_id'])
+            ->setCreatedAt(new \DateTime($data['created_at']))
+            ->setUpdatedAt(new \DateTime($data['updated_at']));
     }
 
     public function create(
