@@ -23,7 +23,9 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  *     tags={"Dashboard Merchants"},
  *     x={"groups":{"private"}},
  *
- *     @OA\Response(response=200, description="Successful response", content="binary"),
+ *     @OA\Response(response=200, description="The SEPA mandate PDF file contents",
+ *          content={@OA\MediaType(mediaType="application/pdf", @OA\Schema(type="string", format="binary"))}
+ *      ),
  *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),
  *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
  *     @OA\Response(response=403, ref="#/components/responses/Forbidden"),

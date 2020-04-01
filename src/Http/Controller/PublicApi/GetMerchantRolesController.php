@@ -15,11 +15,12 @@ use Symfony\Component\HttpFoundation\Request;
  * @OA\Get(
  *     path="/merchant/roles",
  *     operationId="get_merchant_roles",
- *     summary="List of available roles for this merchant",
+ *     summary="Get merchant roles",
+ *     description="List of all available user roles for the current merchant.",
  *     security={{"oauth2"={}}},
  *
  *     tags={"User Management"},
- *     x={"groups":{"dashboard"}},
+ *     x={"groups":{"private"}},
  *
  *     @OA\Response(
  *          response=200,
