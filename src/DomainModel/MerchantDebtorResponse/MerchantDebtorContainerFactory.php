@@ -5,14 +5,19 @@ namespace App\DomainModel\MerchantDebtorResponse;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestRepositoryInterface;
 use App\DomainModel\DebtorLimit\DebtorLimitServiceInterface;
+use App\DomainModel\DebtorLimit\DebtorLimitServiceRequestException;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\Payment\PaymentsServiceInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
-class MerchantDebtorContainerFactory
+class MerchantDebtorContainerFactory implements LoggingInterface
 {
+    use LoggingTrait;
+
     private $merchantDebtorRepository;
 
     private $merchantRepository;
@@ -49,7 +54,12 @@ class MerchantDebtorContainerFactory
 
         $company = $this->companiesService->getDebtor($merchantDebtor->getDebtorId());
 
-        $debtorLimit = $this->debtorLimitService->retrieve($company->getUuid());
+        try {
+            $debtorLimit = $this->debtorLimitService->retrieve($company->getUuid());
+        } catch (DebtorLimitServiceRequestException $exception) {
+            $this->logError('Request to limit service failed: ' . $exception->getMessage());
+            $debtorLimit = null;
+        }
 
         $paymentsDetails = $this->paymentService->getDebtorPaymentDetails($merchantDebtor->getPaymentDebtorId());
 

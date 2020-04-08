@@ -100,6 +100,20 @@ class LimitServiceContext implements Context
     }
 
     /**
+     * @Given I get from limit service get debtor limit unsuccessful response for debtor :debtorCompanyUuid
+     */
+    public function iGetFromLimitServiceGetDebtorLimitUnsuccessfulResponseForDebtor($debtorCompanyUuid)
+    {
+        $this->mockRequest("/debtor-limit/$debtorCompanyUuid", new ResponseStack(
+            new MockResponse(
+                file_get_contents(__DIR__ . '/../resources/limit_service_get_debtor_limit_unsuccessful.json'),
+                [],
+                404
+            )
+        ));
+    }
+
+    /**
      * @Given /^Debtor update limit call succeeded$/
      */
     public function debtorUpdateLimitCallSucceeded()

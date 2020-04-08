@@ -3,15 +3,20 @@
 namespace App\DomainModel\MerchantDebtorResponse;
 
 use App\DomainModel\DebtorCompany\DebtorCompany;
-use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestEntity;
 use App\DomainModel\DebtorLimit\DebtorCustomerLimitDTO;
 use App\DomainModel\DebtorLimit\DebtorLimitDTO;
-use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 
 class MerchantDebtorResponseFactory
 {
     public function createFromContainer(MerchantDebtorContainer $container): MerchantDebtor
     {
+        $financingLimit = $container->getDebtorCustomerLimit()
+            ? $container->getDebtorCustomerLimit()->getFinancingLimit()
+            : null;
+        $financingPower = $container->getDebtorLimit() && $container->getDebtorCustomerLimit()
+            ? $this->calculateFinancingPower($container->getDebtorLimit(), $container->getDebtorCustomerLimit())
+            : null;
+
         return (new MerchantDebtor())
             ->setUuid($container->getMerchantDebtor()->getUuid())
             ->setExternalCode($container->getExternalId())
@@ -21,8 +26,8 @@ class MerchantDebtorResponseFactory
             ->setAddressPostalCode($container->getDebtorCompany()->getAddressPostalCode())
             ->setAddressCity($container->getDebtorCompany()->getAddressCity())
             ->setAddressCountry($container->getDebtorCompany()->getAddressCountry())
-            ->setFinancingLimit($container->getDebtorCustomerLimit()->getFinancingLimit())
-            ->setFinancingPower($this->calculateFinancingPower($container->getDebtorLimit(), $container->getDebtorCustomerLimit()))
+            ->setFinancingLimit($financingLimit)
+            ->setFinancingPower($financingPower)
             ->setOutstandingAmount($container->getPaymentDetails()->getOutstandingAmount())
             ->setOutstandingAmountCreated($container->getTotalCreatedOrdersAmount())
             ->setOutstandingAmountLate($container->getTotalLateOrdersAmount())
@@ -66,20 +71,26 @@ class MerchantDebtorResponseFactory
 
     public function createListItemFromContainer(MerchantDebtorContainer $container): MerchantDebtorListItem
     {
+        $financingLimit = $container->getDebtorCustomerLimit()
+            ? $container->getDebtorCustomerLimit()->getFinancingLimit()
+            : null;
+        $financingPower = $container->getDebtorLimit() && $container->getDebtorCustomerLimit()
+            ? $this->calculateFinancingPower($container->getDebtorLimit(), $container->getDebtorCustomerLimit())
+            : null;
+        $debtorInformationChangeRequestState = $container->getDebtorInformationChangeRequest()
+            ? $container->getDebtorInformationChangeRequest()->getState()
+            : null;
+
         return (new MerchantDebtorListItem())
             ->setUuid($container->getMerchantDebtor()->getUuid())
             ->setExternalCode($container->getExternalId())
             ->setName($container->getDebtorCompany()->getName())
-            ->setFinancingLimit($container->getDebtorCustomerLimit()->getFinancingLimit())
-            ->setFinancingPower($this->calculateFinancingPower($container->getDebtorLimit(), $container->getDebtorCustomerLimit()))
+            ->setFinancingLimit($financingLimit)
+            ->setFinancingPower($financingPower)
             ->setBankAccountIban($container->getPaymentDetails()->getBankAccountIban())
             ->setBankAccountBic($container->getPaymentDetails()->getBankAccountBic())
             ->setCreatedAt($container->getMerchantDebtor()->getCreatedAt())
-            ->setDebtorInformationChangeRequestState(
-                $container->getDebtorInformationChangeRequest()
-                    ? $container->getDebtorInformationChangeRequest()->getState()
-                    : null
-            )
+            ->setDebtorInformationChangeRequestState($debtorInformationChangeRequestState)
         ;
     }
 

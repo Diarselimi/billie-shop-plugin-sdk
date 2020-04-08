@@ -75,3 +75,29 @@ Feature:
             "items": []
         }
         """
+
+	   Scenario: Empty limits returned when call to limits service unsuccessful
+					Given I have a declined order "XF43Y" with amounts 800/800/0, duration 30 and comment "test order"
+					And I get from payments service get debtor response
+					And I get from companies service get debtor response
+					And I get from limit service get debtor limit unsuccessful response for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
+					When I send a GET request to "/debtors"
+					Then the response status code should be 200
+					And the JSON response should be:
+        """
+        {
+            "total": 1,
+            "items": [
+                {
+                    "id":"ad74bbc4-509e-47d5-9b50-a0320ce3d715",
+                    "external_code":"ext_id",
+                    "name":"Test User Company",
+                    "financing_limit":null,
+                    "financing_power":null,
+                    "bank_account_iban":"DE1234",
+                    "bank_account_bic":"BICISHERE",
+                    "debtor_information_change_request_state":null
+                }
+            ]
+        }
+        """

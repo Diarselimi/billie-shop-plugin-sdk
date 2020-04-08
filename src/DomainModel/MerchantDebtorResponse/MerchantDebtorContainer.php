@@ -36,7 +36,7 @@ class MerchantDebtorContainer
         MerchantDebtorEntity $merchantDebtor,
         MerchantEntity $merchant,
         DebtorCompany $debtorCompany,
-        DebtorLimitDTO $debtorLimit,
+        ?DebtorLimitDTO $debtorLimit,
         DebtorPaymentDetailsDTO $paymentDetails,
         float $totalCreatedOrdersAmount,
         float $totalLateOrdersAmount,
@@ -69,19 +69,28 @@ class MerchantDebtorContainer
         return $this->debtorCompany;
     }
 
-    public function getDebtorLimit(): DebtorLimitDTO
+    public function getDebtorLimit(): ? DebtorLimitDTO
     {
         return $this->debtorLimit;
     }
 
     public function getDebtorCustomerLimit(): ? DebtorCustomerLimitDTO
     {
-        return $this->debtorCustomerLimit = reset(array_filter(
+        if ($this->debtorLimit === null) {
+            return $this->debtorCustomerLimit = null;
+        }
+
+        $debtorCustomerLimit = array_filter(
             $this->debtorLimit->getDebtorCustomerLimits(),
             function (DebtorCustomerLimitDTO $debtorCustomerLimit) {
                 return $debtorCustomerLimit->getCustomerCompanyUuid() === $this->merchant->getCompanyUuid();
             }
-        ));
+        );
+        if (empty($debtorCustomerLimit)) {
+            return $this->debtorCustomerLimit = null;
+        }
+
+        return $this->debtorCustomerLimit = reset($debtorCustomerLimit);
     }
 
     public function getPaymentDetails(): DebtorPaymentDetailsDTO
