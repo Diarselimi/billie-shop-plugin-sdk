@@ -2,30 +2,50 @@
 
 namespace App\DomainModel;
 
+use App\Infrastructure\ClientResponseDecodeException;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Exception\TransferException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 abstract class AbstractServiceRequestException extends \RuntimeException
 {
-    protected $message = 'API call response to the %s service was not successful.';
+    private $defaultMessage = 'API call response to the service %s was not successful.';
 
-    public function __construct(?TransferException $previousException = null, ?string $message = null)
+    public function __construct(?\Throwable $previousException = null, ?string $message = null)
     {
-        parent::__construct($message ?: $this->getDefaultMessage(), 0, $previousException);
+        $this->message = $this->buildMessage($message, $previousException);
+        parent::__construct($this->message, 0, $previousException);
     }
 
-    private function getDefaultMessage(): string
+    private function buildMessage(?string $message = null, ?\Throwable $previous = null): string
     {
+        $message = $message ? "{$message} // {$this->defaultMessage}" : $this->defaultMessage;
         $subst = "'{$this->getServiceName()}'";
-        $request = $this->getRequest();
 
-        if ($request) {
-            $subst .= sprintf("at '%s %s'", strtoupper($request->getMethod()), $request->getUri()->__toString());
+        if ($previous instanceof ClientResponseDecodeException) {
+            return sprintf($message, $subst) . ' ' . $previous->getMessage();
         }
 
-        return sprintf($this->message, $subst);
+        if (!$previous instanceof RequestException) {
+            return sprintf($message, $subst);
+        }
+
+        $request = $previous->getRequest();
+        $response = $previous->getResponse();
+
+        if ($request) {
+            $subst .= sprintf(" to '%s %s'", strtoupper($request->getMethod()), $request->getUri()->__toString());
+        }
+
+        if ($response) {
+            $message .= sprintf(
+                " Response was HTTP %s with body: %s",
+                $response->getStatusCode(),
+                $response->getBody() . ''
+            );
+        }
+
+        return sprintf($message, $subst);
     }
 
     abstract public function getServiceName(): string;

@@ -42,7 +42,7 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
     public function getDebtorPaymentDetails(string $debtorPaymentId): DebtorPaymentDetailsDTO
     {
         try {
-            $response = $this->client->get("/debtor/$debtorPaymentId.json");
+            $response = $this->client->get("/debtor/{$debtorPaymentId}.json");
 
             $decodedResponse = $this->decodeResponse($response);
 
@@ -54,7 +54,7 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
         } catch (TransferException $exception) {
             throw new PaymentsServiceRequestException($exception);
         } catch (ClientResponseDecodeException $exception) {
-            throw new PaymentsServiceRequestException(null, self::ERR_BODY_DECODE_MESSAGE);
+            throw new PaymentsServiceRequestException($exception, self::ERR_BODY_DECODE_MESSAGE);
         }
     }
 
@@ -69,7 +69,7 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
         } catch (TransferException $exception) {
             throw new PaymentsServiceRequestException($exception);
         } catch (ClientResponseDecodeException $exception) {
-            throw new PaymentsServiceRequestException(null, self::ERR_BODY_DECODE_MESSAGE);
+            throw new PaymentsServiceRequestException($exception, self::ERR_BODY_DECODE_MESSAGE);
         }
     }
 
@@ -91,7 +91,7 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
         } catch (TransferException $exception) {
             throw new PaymentsServiceRequestException($exception);
         } catch (ClientResponseDecodeException $exception) {
-            throw new PaymentsServiceRequestException(null, self::ERR_BODY_DECODE_MESSAGE);
+            throw new PaymentsServiceRequestException($exception, self::ERR_BODY_DECODE_MESSAGE);
         }
     }
 
@@ -162,7 +162,7 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
         } catch (TransferException $exception) {
             throw new PaymentsServiceRequestException($exception);
         } catch (ClientResponseDecodeException $exception) {
-            throw new PaymentsServiceRequestException(null, self::ERR_BODY_DECODE_MESSAGE);
+            throw new PaymentsServiceRequestException($exception, self::ERR_BODY_DECODE_MESSAGE);
         }
     }
 
@@ -187,7 +187,7 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
         } catch (TransferException $exception) {
             throw new PaymentsServiceRequestException($exception);
         } catch (ClientResponseDecodeException $exception) {
-            throw new PaymentsServiceRequestException(null, self::ERR_BODY_DECODE_MESSAGE);
+            throw new PaymentsServiceRequestException($exception, self::ERR_BODY_DECODE_MESSAGE);
         }
     }
 
