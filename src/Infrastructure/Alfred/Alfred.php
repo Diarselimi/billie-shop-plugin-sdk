@@ -7,6 +7,7 @@ use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorCompany\DebtorCompanyFactory;
 use App\DomainModel\DebtorCompany\DebtorCreationDTO;
+use App\DomainModel\DebtorCompany\IdentifiedDebtorCompany;
 use App\DomainModel\DebtorCompany\IdentifyDebtorRequestDTO;
 use App\DomainModel\MerchantDebtor\MerchantDebtorDuplicateDTO;
 use App\DomainModel\SignatoryPower\SignatoryPowerDTO;
@@ -146,7 +147,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         }
     }
 
-    public function identifyDebtor(IdentifyDebtorRequestDTO $requestDTO): ?DebtorCompany
+    public function identifyDebtor(IdentifyDebtorRequestDTO $requestDTO): ?IdentifiedDebtorCompany
     {
         try {
             $response = $this->client->post('/debtor/identify', [
@@ -159,13 +160,13 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
 
             $decodedResponse = $this->decodeResponse($response);
 
-            return $this->factory->createFromAlfredResponse($decodedResponse);
+            return $this->factory->createIdentifiedFromAlfredResponse($decodedResponse);
         } catch (ClientException $exception) {
             if ($exception->getCode() === Response::HTTP_NOT_FOUND) {
                 $decodedResponse = $this->decodeResponse($exception->getResponse());
 
                 if (isset($decodedResponse['suggestions']) && !empty($decodedResponse['suggestions'])) {
-                    return $this->factory->createFromAlfredResponse(reset($decodedResponse['suggestions']), false);
+                    return $this->factory->createIdentifiedFromAlfredResponse(reset($decodedResponse['suggestions']), false);
                 }
 
                 return null;

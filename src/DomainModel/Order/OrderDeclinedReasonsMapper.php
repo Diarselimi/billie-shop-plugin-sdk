@@ -2,6 +2,7 @@
 
 namespace App\DomainModel\Order;
 
+use App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedBillingAddressCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedStrictCheck;
 use App\DomainModel\OrderRiskCheck\Checker\LimitCheck;
@@ -28,6 +29,8 @@ class OrderDeclinedReasonsMapper
 
     private const REASON_ADDRESS_MISMATCH = 'debtor_address';
 
+    private const REASON_BILLING_ADDRESS_INVALID = 'debtor_address';
+
     private const REASON_DEBTOR_LIMIT_EXCEEDED = 'debtor_limit_exceeded';
 
     private $riskCheckRepository;
@@ -48,7 +51,18 @@ class OrderDeclinedReasonsMapper
 
         foreach ($checks as $check) {
             if (!$check->isPassed()) {
-                return self::RISK_CHECK_MAPPING[$check->getRiskCheckDefinition()->getName()] ?? self::REASON_RISK_POLICY;
+                switch (true) {
+                    case isset(self::RISK_CHECK_MAPPING[$check->getRiskCheckDefinition()->getName()]):
+                        return self::RISK_CHECK_MAPPING[$check->getRiskCheckDefinition()->getName()];
+
+                        break;
+                    case $check->getRiskCheckDefinition()->getName() === DebtorIdentifiedBillingAddressCheck::NAME:
+                        return self::REASON_ADDRESS_MISMATCH;
+
+                        break;
+                    default:
+                        self::REASON_RISK_POLICY;
+                }
             }
         }
 

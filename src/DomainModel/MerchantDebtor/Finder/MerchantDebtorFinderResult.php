@@ -2,19 +2,19 @@
 
 namespace App\DomainModel\MerchantDebtor\Finder;
 
-use App\DomainModel\DebtorCompany\DebtorCompany;
+use App\DomainModel\DebtorCompany\IdentifiedDebtorCompany;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 
 class MerchantDebtorFinderResult
 {
     private $merchantDebtor;
 
-    private $debtorCompany;
+    private $identifiedDebtorCompany;
 
-    public function __construct(MerchantDebtorEntity $merchantDebtor = null, DebtorCompany $debtorCompany = null)
+    public function __construct(MerchantDebtorEntity $merchantDebtor = null, IdentifiedDebtorCompany $identifiedDebtorCompany = null)
     {
         $this->merchantDebtor = $merchantDebtor;
-        $this->debtorCompany = $debtorCompany;
+        $this->identifiedDebtorCompany = $identifiedDebtorCompany;
     }
 
     public function getMerchantDebtor(): ?MerchantDebtorEntity
@@ -22,8 +22,8 @@ class MerchantDebtorFinderResult
         return $this->merchantDebtor;
     }
 
-    public function getDebtorCompany(): ?DebtorCompany
+    public function getIdentifiedDebtorCompany(): ?IdentifiedDebtorCompany
     {
-        return $this->debtorCompany;
+        return $this->identifiedDebtorCompany;
     }
 }

@@ -4,6 +4,7 @@ namespace App\DomainModel\Order\OrderContainer;
 
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\DebtorCompany\DebtorCompany;
+use App\DomainModel\DebtorCompany\IdentifiedDebtorCompany;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorSettings\DebtorSettingsEntity;
 use App\DomainModel\Merchant\MerchantEntity;
@@ -39,6 +40,8 @@ class OrderContainer
     private $merchantSettings;
 
     private $debtorCompany;
+
+    private $identifiedDebtorCompany;
 
     private $dunningStatus;
 
@@ -192,6 +195,19 @@ class OrderContainer
         $this->debtorCompany = $debtorCompany;
 
         return $this;
+    }
+
+    public function setIdentifiedDebtorCompany(IdentifiedDebtorCompany $identifiedDebtorCompany): OrderContainer
+    {
+        $this->debtorCompany = $identifiedDebtorCompany;
+        $this->identifiedDebtorCompany = $identifiedDebtorCompany;
+
+        return $this;
+    }
+
+    public function getIdentifiedDebtorCompany(): ?IdentifiedDebtorCompany
+    {
+        return $this->identifiedDebtorCompany;
     }
 
     public function getDunningStatus(): ?string

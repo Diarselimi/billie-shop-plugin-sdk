@@ -32,7 +32,7 @@ class IdentifyAndTriggerAsyncIdentification implements LoggingInterface
         if (!$orderContainer->getMerchantSettings()->useExperimentalDebtorIdentification()) {
             $this->triggerV2DebtorIdentificationAsync(
                 $orderContainer->getOrder(),
-                $debtorFinderResult->getDebtorCompany() ? $debtorFinderResult->getDebtorCompany() : null
+                $debtorFinderResult->getIdentifiedDebtorCompany() ? $debtorFinderResult->getIdentifiedDebtorCompany() : null
             );
         }
 
@@ -42,12 +42,12 @@ class IdentifyAndTriggerAsyncIdentification implements LoggingInterface
 
         $orderContainer
             ->setMerchantDebtor($debtorFinderResult->getMerchantDebtor())
-            ->setDebtorCompany($debtorFinderResult->getDebtorCompany())
+            ->setIdentifiedDebtorCompany($debtorFinderResult->getIdentifiedDebtorCompany())
         ;
 
         $orderContainer->getOrder()->setMerchantDebtorId($debtorFinderResult->getMerchantDebtor()->getId());
         $orderContainer->getOrder()->setCompanyBillingAddressUuid(
-            $debtorFinderResult->getDebtorCompany()->getBillingAddressMatchUuid()
+            $debtorFinderResult->getIdentifiedDebtorCompany()->getBillingAddressMatchUuid()
         );
 
         return true;

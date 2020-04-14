@@ -55,6 +55,26 @@ class CompaniesServiceContext implements Context
     }
 
     /**
+     * @Given /^I get from companies service identify with billing address match response$/
+     */
+    public function iGetFromCompaniesServiceIdentifyMatchWithBillingAddressResponse()
+    {
+        $this->mockRequest('/debtor/identify', new ResponseStack(
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match_trusted_source_with_billing_address.json'))
+        ));
+    }
+
+    /**
+     * @Given /^I get from companies service identify with random billing address match response$/
+     */
+    public function iGetFromCompaniesServiceIdentifyMatchWithRandomBillingAddressResponse()
+    {
+        $this->mockRequest('/debtor/identify', new ResponseStack(
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match_trusted_source_with_random_billing_address.json'))
+        ));
+    }
+
+    /**
      * @Given /^I get from companies service a good debtor strict match response$/
      */
     public function iGetFromCompaniesServiceGoodStrictMatchResponse()

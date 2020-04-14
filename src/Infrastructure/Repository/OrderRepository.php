@@ -424,6 +424,26 @@ SQL;
         return intval($result['total']);
     }
 
+    public function getOrdersCountByCompanyBillingAddressAndState(string $companyUuid, string $addressUuid, string $state): int
+    {
+        $result = $this->doFetchOne(
+            'SELECT COUNT(*) as total FROM ' . self::TABLE_NAME .' o
+            JOIN merchants_debtors md ON o.merchant_debtor_id = md.id 
+            WHERE state = :state AND o.company_billing_address_uuid = :address_uuid AND md.company_uuid = :company_uuid',
+            [
+                'state' => $state,
+                'address_uuid' => $addressUuid,
+                'company_uuid' => $companyUuid,
+            ]
+        );
+
+        if (!$result) {
+            return 0;
+        }
+
+        return intval($result['total']);
+    }
+
     public function search(
         int $merchantId,
         int $offset,

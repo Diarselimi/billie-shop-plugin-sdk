@@ -47,8 +47,7 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
         $orderContainerFactory
             ->loadByUuid(self::ORDER_UUID)
             ->shouldBeCalled()
-            ->willThrow(OrderContainerFactoryException::class)
-        ;
+            ->willThrow(OrderContainerFactoryException::class);
 
         $this->shouldThrow(OrderNotFoundException::class)->during('execute', [$request]);
     }
@@ -63,14 +62,12 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
         $orderContainerFactory
             ->loadByUuid(self::ORDER_UUID)
             ->shouldBeCalled()
-            ->willReturn($orderContainer)
-        ;
+            ->willReturn($orderContainer);
 
         $orderStateManager
             ->isWaiting($order)
             ->shouldBeCalled()
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
         $this->shouldThrow(WorkflowException::class)->during('execute', [$request]);
     }
@@ -86,20 +83,17 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
         $orderContainerFactory
             ->loadByUuid(self::ORDER_UUID)
             ->shouldBeCalled()
-            ->willReturn($orderContainer)
-        ;
+            ->willReturn($orderContainer);
 
         $orderStateManager
             ->isWaiting($order)
             ->shouldBeCalled()
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
 
         $orderChecksRunnerService
             ->rerunCheck($orderContainer, LimitCheck::NAME)
             ->shouldBeCalled()
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
         $this->shouldThrow(WorkflowException::class)->during('execute', [$request]);
     }
@@ -115,26 +109,22 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
         $orderContainerFactory
             ->loadByUuid(self::ORDER_UUID)
             ->shouldBeCalled()
-            ->willReturn($orderContainer)
-        ;
+            ->willReturn($orderContainer);
 
         $orderStateManager
             ->isWaiting($order)
             ->shouldBeCalled()
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
 
         $orderChecksRunnerService
             ->rerunCheck($orderContainer, LimitCheck::NAME)
             ->shouldBeCalled()
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
 
         $orderChecksRunnerService
-            ->rerunFailedChecks($orderContainer)
+            ->rerunFailedChecks($orderContainer, ApproveOrderUseCase::RISK_CHECKS_TO_SKIP)
             ->shouldBeCalled()
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
 
         $orderStateManager->approve($orderContainer)->shouldBeCalledOnce();
         $this->execute($request);
@@ -152,26 +142,22 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
         $orderContainerFactory
             ->loadByUuid(self::ORDER_UUID)
             ->shouldBeCalled()
-            ->willReturn($orderContainer)
-        ;
+            ->willReturn($orderContainer);
 
         $orderStateManager
             ->isWaiting($order)
             ->shouldBeCalled()
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
 
         $orderChecksRunnerService
             ->rerunCheck($orderContainer, LimitCheck::NAME)
             ->shouldBeCalled()
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
 
         $orderChecksRunnerService
-            ->rerunFailedChecks($orderContainer)
+            ->rerunFailedChecks($orderContainer, ApproveOrderUseCase::RISK_CHECKS_TO_SKIP)
             ->shouldBeCalled()
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
         $declinedReasonsMapper->mapReasons($order)->shouldBeCalled()->willReturn([]);
 

@@ -10,10 +10,17 @@ use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderStateManager;
+use App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedBillingAddressCheck;
+use App\DomainModel\OrderRiskCheck\Checker\DeliveryAddressCheck;
 use App\DomainModel\OrderRiskCheck\Checker\LimitCheck;
 
 class ApproveOrderUseCase
 {
+    public const RISK_CHECKS_TO_SKIP = [
+        DeliveryAddressCheck::NAME,
+        DebtorIdentifiedBillingAddressCheck::NAME,
+    ];
+
     private $orderContainerFactory;
 
     private $orderStateManager;
@@ -50,7 +57,7 @@ class ApproveOrderUseCase
             throw new WorkflowException("Cannot approve the order. Limit check failed");
         }
 
-        if (!$this->orderChecksRunnerService->rerunFailedChecks($orderContainer)) {
+        if (!$this->orderChecksRunnerService->rerunFailedChecks($orderContainer, self::RISK_CHECKS_TO_SKIP)) {
             throw new WorkflowException(
                 sprintf(
                     "Cannot approve the order. failed risk checks: %s",

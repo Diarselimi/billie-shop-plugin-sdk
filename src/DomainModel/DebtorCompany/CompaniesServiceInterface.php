@@ -18,7 +18,7 @@ interface CompaniesServiceInterface
      */
     public function getDebtorsByCrefoId(string $crefoId): array;
 
-    public function identifyDebtor(IdentifyDebtorRequestDTO $requestDTO): ?DebtorCompany;
+    public function identifyDebtor(IdentifyDebtorRequestDTO $requestDTO): ?IdentifiedDebtorCompany;
 
     public function strictMatchDebtor(string $debtorUuid, IdentifyDebtorRequestDTO $requestDTO): bool;
 

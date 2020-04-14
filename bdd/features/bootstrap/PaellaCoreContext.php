@@ -325,7 +325,8 @@ class PaellaCoreContext extends MinkContext
             ->setPaymentId($paymentUuid ?? self::DUMMY_UUID4)
             ->setCreatedAt(new \DateTime('2019-05-20 13:00:00'))
             ->setCheckoutSessionId(1)
-            ->setUuid('test-order-uuid' . $externalCode);
+            ->setUuid('test-order-uuid' . $externalCode)
+            ->setCompanyBillingAddressUuid('c7be46c0-e049-4312-b274-258ec5aeeb71');
 
         $this->iHaveASessionId("123123" . $externalCode, 0);
 
@@ -510,7 +511,7 @@ class PaellaCoreContext extends MinkContext
     {
         $debtorChangeRequest = $this->getDebtorInformationChangeRequestRepository()->getNotSeenRequestByCompanyUuid($companyUuid);
 
-        Assert::notNull($debtorChangeRequest);
+        Assert::null($debtorChangeRequest);
     }
 
     /**

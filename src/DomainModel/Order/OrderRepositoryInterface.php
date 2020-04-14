@@ -59,4 +59,6 @@ interface OrderRepositoryInterface
     ): array;
 
     public function getOrdersCountByMerchantDebtorAndState(int $merchantDebtorId, string $state): int;
+
+    public function getOrdersCountByCompanyBillingAddressAndState(string $companyUuid, string $addressUuid, string $state): int;
 }

@@ -1,59 +1,60 @@
 Feature:
-	I create an order for whitelisted debtor so we skip scoring check
+  I create an order for whitelisted debtor so we skip scoring check
 
-	Background:
-		Given I add "Content-type" header equal to "application/json"
-		And I add "X-Test" header equal to 1
-		And I add "X-Api-Key" header equal to test
-		And The following risk check definitions exist:
-			| name                      |
-			| available_financing_limit |
-			| amount                    |
-			| debtor_country            |
-			| debtor_industry_sector    |
-			| debtor_identified         |
-			| debtor_identified_strict  |
-			| delivery_address          |
-			| debtor_is_trusted         |
-			| limit                     |
-			| debtor_not_customer       |
-			| debtor_blacklisted        |
-			| debtor_overdue            |
-			| company_b2b_score         |
-			| line_items                |
-		And The following merchant risk check settings exist for merchant 1:
-			| risk_check_name           | enabled | decline_on_failure |
-			| line_items                | 1       | 1                  |
-			| available_financing_limit | 1       | 1                  |
-			| amount                    | 1       | 1                  |
-			| debtor_country            | 1       | 1                  |
-			| debtor_industry_sector    | 1       | 1                  |
-			| debtor_identified         | 1       | 1                  |
-			| delivery_address          | 1       | 1                  |
-			| debtor_identified_strict  | 1       | 1                  |
-			| debtor_is_trusted         | 1       | 1                  |
-			| limit                     | 1       | 1                  |
-			| debtor_not_customer       | 1       | 1                  |
-			| debtor_blacklisted        | 1       | 1                  |
-			| debtor_overdue            | 1       | 1                  |
-			| company_b2b_score         | 1       | 1                  |
+  Background:
+    Given I add "Content-type" header equal to "application/json"
+    And I add "X-Test" header equal to 1
+    And I add "X-Api-Key" header equal to test
+    And The following risk check definitions exist:
+      | name                      |
+      | available_financing_limit |
+      | amount                    |
+      | debtor_country            |
+      | debtor_industry_sector    |
+      | debtor_identified         |
+      | debtor_identified_strict  |
+      | delivery_address          |
+      | debtor_is_trusted         |
+      | limit                     |
+      | debtor_not_customer       |
+      | debtor_blacklisted        |
+      | debtor_overdue            |
+      | company_b2b_score         |
+      | line_items                |
+    And The following merchant risk check settings exist for merchant 1:
+      | risk_check_name           | enabled | decline_on_failure |
+      | line_items                | 1       | 1                  |
+      | available_financing_limit | 1       | 1                  |
+      | amount                    | 1       | 1                  |
+      | debtor_country            | 1       | 1                  |
+      | debtor_industry_sector    | 1       | 1                  |
+      | debtor_identified         | 1       | 1                  |
+      | delivery_address          | 1       | 1                  |
+      | debtor_identified_strict  | 1       | 1                  |
+      | debtor_is_trusted         | 1       | 1                  |
+      | limit                     | 1       | 1                  |
+      | debtor_not_customer       | 1       | 1                  |
+      | debtor_blacklisted        | 1       | 1                  |
+      | debtor_overdue            | 1       | 1                  |
+      | company_b2b_score         | 1       | 1                  |
 
-	Scenario: Successful order creation for whitelisted debtor
-		And I send a POST request to "/private/debtors/c7be46c0-e049-4312-b274-258ec5aeeb70/whitelist" with body:
+  Scenario: Successful order creation for whitelisted debtor
+    Given I get from companies service get debtor response
+    And I send a POST request to "/private/debtors/c7be46c0-e049-4312-b274-258ec5aeeb70/whitelist" with body:
 		"""
 		{
 			"is_whitelisted": true
 		}
 		"""
-		And the response status code should be 204
-		And I add "X-Test" header equal to 1
-		And I add "X-Api-Key" header equal to test
-		And I get from companies service identify match response
-		And Debtor has sufficient limit
-		And Debtor lock limit call succeeded
-		And I get from payments service register debtor positive response
-		And I get from payments service get debtor response
-		When I send a POST request to "/order" with body:
+    And the response status code should be 204
+    And I add "X-Test" header equal to 1
+    And I add "X-Api-Key" header equal to test
+    And I get from companies service identify match response
+    And Debtor has sufficient limit
+    And Debtor lock limit call succeeded
+    And I get from payments service register debtor positive response
+    And I get from payments service get debtor response
+    When I send a POST request to "/order" with body:
     """
     {
        "debtor_person":{
@@ -99,9 +100,9 @@ Feature:
        "order_id":"A1"
     }
     """
-		Then the order A1 is in state created
-		And the response status code should be 200
-		And the JSON response should be:
+    Then the order A1 is in state created
+    And the response status code should be 200
+    And the JSON response should be:
     """
     {
        "order_id":"A1",
@@ -163,4 +164,4 @@ Feature:
        "shipped_at":null
     }
     """
-				And the order A1 belongs to company "c7be46c0-e049-4312-b274-258ec5aeeb70"
+    And the order A1 belongs to company "c7be46c0-e049-4312-b274-258ec5aeeb70"

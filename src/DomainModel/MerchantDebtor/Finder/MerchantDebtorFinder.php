@@ -3,7 +3,6 @@
 namespace App\DomainModel\MerchantDebtor\Finder;
 
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
-use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorCompany\IdentifyDebtorRequestFactory;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRegistrationService;
@@ -95,7 +94,6 @@ class MerchantDebtorFinder implements LoggingInterface
             'order_external_code' => $orderContainer->getOrder()->getExternalCode(),
         ]);
 
-        /** @var DebtorCompany $debtorCompany */
         $debtorCompany = $this->companiesService->identifyDebtor($identifyRequest);
         if (!$debtorCompany) {
             $this->logInfo('Debtor could not be identified');
