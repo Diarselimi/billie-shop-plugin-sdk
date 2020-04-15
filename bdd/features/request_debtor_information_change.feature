@@ -106,21 +106,21 @@ Feature:
     }
     """
 
-#		Scenario Outline: Change request decision issued <decision>
-#			 Given a merchant user exists with role "admin" and permission CHANGE_DEBTOR_INFORMATION
-#				And the following debtor information change requests exist:
-#					| uuid | company_uuid | is_seen | state                 |
-#					| aaa  | aaa-bbb-ccc  | 0       | confirmation_pending  |
-#				When I consume an existing queue message of type company_information_change_request.company_information_change_request_decision_issued containing this payload:
-#					"""
-#					{
-#							"request_uuid":"aaa",
-#							"decision":"<decision>"
-#					}
-#					"""
-#			 Then debtor information change request aaa should have state <state>
-#
-#				Examples:
-#						| decision | state    |
-#			   | approved | complete |
-#			   | declined | declined |
+		Scenario Outline: Change request decision issued <decision>
+			 Given a merchant user exists with role "admin" and permission CHANGE_DEBTOR_INFORMATION
+				And the following debtor information change requests exist:
+					| uuid | company_uuid | is_seen | state                 |
+					| aaa  | aaa-bbb-ccc  | 0       | confirmation_pending  |
+				When I consume an existing queue message of type company_information_change_request.company_information_change_request_decision_issued containing this payload:
+					"""
+					{
+							"request_uuid":"aaa",
+							"decision":"<decision>"
+					}
+					"""
+			 Then debtor information change request aaa should have state <state>
+
+				Examples:
+						| decision | state    |
+			   | approved | complete |
+			   | declined | declined |
