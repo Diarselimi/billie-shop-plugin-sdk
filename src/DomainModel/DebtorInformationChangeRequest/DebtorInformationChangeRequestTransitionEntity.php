@@ -14,11 +14,14 @@ class DebtorInformationChangeRequestTransitionEntity extends AbstractStateTransi
 
     public const TRANSITION_CANCEL = 'cancel';
 
+    public const TRANSITION_DECLINE_MANUALLY = 'decline_manually';
+
     public const ALL_TRANSITIONS = [
         self::TRANSITION_REQUEST_CONFIRMATION,
         self::TRANSITION_COMPLETE_MANUALLY,
         self::TRANSITION_COMPLETE_AUTOMATICALLY,
         self::TRANSITION_CANCEL,
+        self::TRANSITION_DECLINE_MANUALLY,
     ];
 
     private $debtorInformationChangeRequestId;

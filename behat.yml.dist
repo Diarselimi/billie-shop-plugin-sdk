@@ -23,6 +23,10 @@ default:
         - DocumentGeneratorContext
         - NachosContext
         - ScoringServiceContext
+        - MessengerContext:
+            kernel: '@kernel'
+            amqpMapper: '@Ozean12\AmqpPackBundle\Mapping\AmqpMapperInterface'
+            changeRequestDecisionIssuesHandler: '@App\Amqp\Handler\CompanyInformationChangeRequestDecisionIssuedHandler'
 
   extensions:
     Behatch\Extension: ~

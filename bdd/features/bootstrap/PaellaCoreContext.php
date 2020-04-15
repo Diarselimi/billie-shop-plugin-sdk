@@ -1317,7 +1317,7 @@ class PaellaCoreContext extends MinkContext
     {
         foreach ($table as $row) {
             $debtorInformationChangeRequest = (new DebtorInformationChangeRequestEntity())
-                ->setUuid(uniqid())
+                ->setUuid($row['uuid'])
                 ->setMerchantUserId(1)
                 ->setCompanyUuid($row['company_uuid'])
                 ->setIsSeen($row['is_seen'])
@@ -1331,6 +1331,20 @@ class PaellaCoreContext extends MinkContext
                 $debtorInformationChangeRequest
             );
         }
+    }
+
+    /**
+     * @Then debtor information change request :uuid should have state :state
+     */
+    public function changeRequestShouldHaveState(string $uuid, string $state)
+    {
+        Assert::eq(
+            $state,
+            $this
+                ->getDebtorInformationChangeRequestRepository()
+                ->getOneByUuid($uuid)
+                ->getState()
+        );
     }
 
     /**

@@ -15,3 +15,6 @@ ozean12_amqp_pack:
   publish:
     customer.customer_created: Ozean12\Transfer\Message\Customer\CustomerCreated
     bank_account.bank_account_core_accepted: Ozean12\Transfer\Message\BankAccount\BankAccountCoreAccepted
+    company_information_change_request.company_information_change_request_created: Ozean12\Transfer\Message\CompanyInformationChangeRequest\CompanyInformationChangeRequestCreated
+  subscribe:
+    company_information_change_request.company_information_change_request_decision_issued: Ozean12\Transfer\Message\CompanyInformationChangeRequest\CompanyInformationChangeRequestDecisionIssued

@@ -95,4 +95,20 @@ class DebtorInformationChangeRequestRepository extends AbstractPdoRepository imp
 
         return $row ? $this->factory->createFromDatabaseRow($row) : null;
     }
+
+    public function getOneByUuid(string $uuid): ?DebtorInformationChangeRequestEntity
+    {
+        $row = $this->doFetchOne(
+            '
+          SELECT ' . implode(', ', self::SELECT_FIELDS) . '
+          FROM ' . self::TABLE_NAME . '
+          WHERE uuid = :uuid
+        ',
+            [
+                'uuid' => $uuid,
+            ]
+        );
+
+        return $row ? $this->factory->createFromDatabaseRow($row) : null;
+    }
 }

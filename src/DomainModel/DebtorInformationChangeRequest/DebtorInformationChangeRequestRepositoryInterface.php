@@ -11,4 +11,6 @@ interface DebtorInformationChangeRequestRepositoryInterface
     public function getNotSeenCountByMerchantId(int $merchantId): int;
 
     public function getNotSeenRequestByCompanyUuid(string $companyUuid): ?DebtorInformationChangeRequestEntity;
+
+    public function getOneByUuid(string $uuid): ?DebtorInformationChangeRequestEntity;
 }

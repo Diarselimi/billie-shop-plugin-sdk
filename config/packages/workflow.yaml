@@ -121,7 +121,7 @@ framework:
         complete_automatically:
           from: [new]
           to: complete
-        decline:
+        decline_manually:
           from: [confirmation_pending]
           to: declined
         cancel:

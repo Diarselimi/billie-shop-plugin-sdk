@@ -77,6 +77,11 @@ class MerchantUserRepository extends AbstractPdoRepository implements MerchantUs
         return $this->getOneBy('user_id', $uuid);
     }
 
+    public function getOneById(int $id): ?MerchantUserEntity
+    {
+        return $this->getOneBy('id', $id);
+    }
+
     public function assignSignatoryPowerToUser(int $id, string $signatoryPowerUuid): void
     {
         $this->update($id, ['signatory_power_uuid' => $signatoryPowerUuid]);
