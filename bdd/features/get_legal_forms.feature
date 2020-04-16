@@ -102,6 +102,12 @@ Feature: An endpoint to return list of supported legal forms
 		  "required": 1
 		},
 		{
+				"code": 99998,
+				"name": "Öffentliche Einrichtung",
+				"required_input": "HR-NR",
+				"required": 0
+		},
+		{
 		  "code": 99999,
 		  "name": "Sonstige",
 		  "required_input": "HR-NR",
