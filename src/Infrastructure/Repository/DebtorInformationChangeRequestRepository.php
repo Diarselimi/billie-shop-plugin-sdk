@@ -83,13 +83,31 @@ class DebtorInformationChangeRequestRepository extends AbstractPdoRepository imp
     {
         $row = $this->doFetchOne(
             '
-          SELECT ' . implode(', ', self::SELECT_FIELDS) . '
-          FROM ' . self::TABLE_NAME . '
-          WHERE company_uuid = :companyUuid AND is_seen = 0
-          ORDER BY created_at DESC LIMIT 1
+            SELECT ' . implode(', ', self::SELECT_FIELDS) . '
+            FROM ' . self::TABLE_NAME . '
+            WHERE company_uuid = :companyUuid AND is_seen = 0
+            ORDER BY created_at DESC LIMIT 1
         ',
             [
                 'companyUuid' => $companyUuid,
+            ]
+        );
+
+        return $row ? $this->factory->createFromDatabaseRow($row) : null;
+    }
+
+    public function getPendingByCompanyUuid(string $companyUuid): ?DebtorInformationChangeRequestEntity
+    {
+        $row = $this->doFetchOne(
+            '
+            SELECT ' . implode(', ', self::SELECT_FIELDS) . '
+            FROM ' . self::TABLE_NAME . '
+            WHERE company_uuid = :companyUuid
+            AND state = :state
+        ',
+            [
+                'companyUuid' => $companyUuid,
+                'state' => DebtorInformationChangeRequestEntity::STATE_PENDING,
             ]
         );
 
@@ -100,9 +118,9 @@ class DebtorInformationChangeRequestRepository extends AbstractPdoRepository imp
     {
         $row = $this->doFetchOne(
             '
-          SELECT ' . implode(', ', self::SELECT_FIELDS) . '
-          FROM ' . self::TABLE_NAME . '
-          WHERE uuid = :uuid
+            SELECT ' . implode(', ', self::SELECT_FIELDS) . '
+            FROM ' . self::TABLE_NAME . '
+            WHERE uuid = :uuid
         ',
             [
                 'uuid' => $uuid,

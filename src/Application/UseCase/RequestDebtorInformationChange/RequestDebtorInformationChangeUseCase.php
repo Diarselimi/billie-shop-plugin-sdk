@@ -4,18 +4,20 @@ namespace App\Application\UseCase\RequestDebtorInformationChange;
 
 use App\Application\Exception\CompanyNotFoundException;
 use App\Application\Exception\MerchantDebtorNotFoundException;
-use App\Application\Exception\RequestValidationException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
 use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestApprover\DebtorInformationChangeRequestAutomaticApprover;
 use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestApprover\DebtorInformationChangeRequestManualApprover;
+use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestCanceler;
 use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestEntity;
 use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestEntityFactory;
 use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestRepositoryInterface;
+use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestTransitionEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\Helper\Uuid\UuidGeneratorInterface;
+use Symfony\Component\Workflow\Workflow;
 
 class RequestDebtorInformationChangeUseCase implements ValidatedUseCaseInterface
 {
@@ -35,6 +37,8 @@ class RequestDebtorInformationChangeUseCase implements ValidatedUseCaseInterface
 
     private $automaticApprover;
 
+    private $canceler;
+
     public function __construct(
         MerchantDebtorRepositoryInterface $merchantDebtorRepo,
         DebtorInformationChangeRequestRepositoryInterface $debtorInformationChangeRequestRepo,
@@ -42,7 +46,8 @@ class RequestDebtorInformationChangeUseCase implements ValidatedUseCaseInterface
         UuidGeneratorInterface $uuidGenerator,
         CompaniesServiceInterface $companiesService,
         DebtorInformationChangeRequestManualApprover $manualApprover,
-        DebtorInformationChangeRequestAutomaticApprover $automaticApprover
+        DebtorInformationChangeRequestAutomaticApprover $automaticApprover,
+        DebtorInformationChangeRequestCanceler $canceler
     ) {
         $this->merchantDebtorRepo = $merchantDebtorRepo;
         $this->debtorInformationChangeRequestRepo = $debtorInformationChangeRequestRepo;
@@ -51,6 +56,7 @@ class RequestDebtorInformationChangeUseCase implements ValidatedUseCaseInterface
         $this->companiesService = $companiesService;
         $this->manualApprover = $manualApprover;
         $this->automaticApprover = $automaticApprover;
+        $this->canceler = $canceler;
     }
 
     public function execute(RequestDebtorInformationChangeRequest $request): void
@@ -72,6 +78,8 @@ class RequestDebtorInformationChangeUseCase implements ValidatedUseCaseInterface
         } catch (CompaniesServiceRequestException $exception) {
             throw new CompanyNotFoundException($exception->getMessage(), null, $exception);
         }
+
+        $this->canceler->cancel($merchantDebtor);
 
         $debtorInformationChangeRequestEntity = $this->changeRequestEntityFactory->createFromArray([
             'uuid' => $this->uuidGenerator->uuid4(),

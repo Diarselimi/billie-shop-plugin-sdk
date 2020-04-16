@@ -106,6 +106,30 @@ Feature:
     }
     """
 
+		Scenario: Existing request is canceled when new one is created for debtor
+			 Given a merchant user exists with role "admin" and permission CHANGE_DEBTOR_INFORMATION
+			 And I have a created order "XF43Y" with amounts 800/800/0, duration 30 and comment "test order"
+			 And I get from companies service get debtor response
+			 And I get from companies service update debtor positive response
+				And the following debtor information change requests exist:
+					| uuid | company_uuid                         | is_seen | state                |
+					| aaa  | c7be46c0-e049-4312-b274-258ec5aeeb70 | 0       | confirmation_pending |
+			 When I send a POST request to "/debtor/ad74bbc4-509e-47d5-9b50-a0320ce3d715/information-change-request" with body:
+				"""
+    {
+      "name": "Test User Company",
+      "address_city": "BilCity",
+      "address_postal_code": "10887",
+      "address_street": "Billiestr.",
+      "address_house": "222",
+      "tc_accepted": true
+    }
+    """
+			 Then change request number 1 from debtor "ad74bbc4-509e-47d5-9b50-a0320ce3d715" should have state canceled
+			 Then change request number 1 from debtor "ad74bbc4-509e-47d5-9b50-a0320ce3d715" should have is_seen 1
+			 # The second change request will get state complete because it's auto approved
+			 And change request number 2 from debtor "ad74bbc4-509e-47d5-9b50-a0320ce3d715" should have state complete
+
 		Scenario Outline: Change request decision issued <decision>
 			 Given a merchant user exists with role "admin" and permission CHANGE_DEBTOR_INFORMATION
 				And the following debtor information change requests exist:

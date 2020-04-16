@@ -12,5 +12,7 @@ interface DebtorInformationChangeRequestRepositoryInterface
 
     public function getNotSeenRequestByCompanyUuid(string $companyUuid): ?DebtorInformationChangeRequestEntity;
 
+    public function getPendingByCompanyUuid(string $companyUuid): ?DebtorInformationChangeRequestEntity;
+
     public function getOneByUuid(string $uuid): ?DebtorInformationChangeRequestEntity;
 }

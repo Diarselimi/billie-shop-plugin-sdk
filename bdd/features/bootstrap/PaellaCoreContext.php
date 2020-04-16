@@ -54,6 +54,8 @@ use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonRepositoryInterface;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntity;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
+use App\Infrastructure\Repository\DebtorInformationChangeRequestRepository;
+use App\Infrastructure\Repository\MerchantDebtorRepository;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\MinkExtension\Context\MinkContext;
@@ -1331,6 +1333,40 @@ class PaellaCoreContext extends MinkContext
                 $debtorInformationChangeRequest
             );
         }
+    }
+
+    /**
+     * @Then change request number :number from debtor :debtorUuid should have :field :value
+     */
+    public function changeRequestNumberShouldHaveStatus(int $number, string $debtorUuid, string $field, string $value)
+    {
+        $queryBuilder = $this->getConnection()->createQueryBuilder();
+        $query = $queryBuilder
+            ->select('dicr.' . $field)
+            ->from(DebtorInformationChangeRequestRepository::TABLE_NAME, 'dicr')
+            ->innerJoin(
+                'dicr',
+                MerchantDebtorRepository::TABLE_NAME,
+                'md',
+                $queryBuilder->expr()->andX(
+                    $queryBuilder->expr()->eq(
+                        'md.company_uuid',
+                        'dicr.company_uuid'
+                    ),
+                    $queryBuilder->expr()->eq(
+                        'md.uuid',
+                        ':debtorUuid'
+                    )
+                )
+            )
+            ->orderBy('dicr.created_at', 'ASC');
+
+        $pdoQuery = $this->getConnection()
+            ->prepare($query->getSQL());
+        $pdoQuery->execute(['debtorUuid' => $debtorUuid]);
+        $rows = $pdoQuery->fetchAll();
+        $index = $number - 1;
+        Assert::eq($value, $rows[$index][$field]);
     }
 
     /**

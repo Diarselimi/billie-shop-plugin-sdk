@@ -23,9 +23,6 @@
     "behat/mink-browserkit-driver": {
         "version": "v1.3.2"
     },
-    "behat/mink-extension": {
-        "version": "2.3.1"
-    },
     "behat/mink-goutte-driver": {
         "version": "v1.2.1"
     },
@@ -85,6 +82,15 @@
             "version": "1.0",
             "ref": "cb4152ebcadbe620ea2261da1a1c5a9b8cea7672"
         }
+    },
+    "doctrine/cache": {
+        "version": "1.10.0"
+    },
+    "doctrine/dbal": {
+        "version": "v2.10.1"
+    },
+    "doctrine/event-manager": {
+        "version": "1.1.0"
     },
     "doctrine/inflector": {
         "version": "v1.3.0"
@@ -155,6 +161,9 @@
     },
     "fesor/json_matcher": {
         "version": "0.2.3"
+    },
+    "friends-of-behat/mink-extension": {
+        "version": "2.3.1"
     },
     "globalcitizen/php-iban": {
         "version": "v2.7.2"
@@ -275,6 +284,9 @@
     },
     "phpdocumentor/type-resolver": {
         "version": "0.4.0"
+    },
+    "phpseclib/phpseclib": {
+        "version": "2.0.26"
     },
     "phpspec/php-diff": {
         "version": "v1.1.0"
@@ -422,9 +434,6 @@
     },
     "symfony/cache-contracts": {
         "version": "v1.1.5"
-    },
-    "symfony/class-loader": {
-        "version": "v3.4.7"
     },
     "symfony/config": {
         "version": "v4.0.6"
