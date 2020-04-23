@@ -38,9 +38,9 @@ class PaginatedCollection implements IteratorAggregate, Countable, ArrayableInte
 
     public function filter(PaginationFilterInterface $filter): PaginatedCollection
     {
-        $this->items = array_filter($this->items, function ($item) use ($filter) {
+        $this->items = array_values(array_filter($this->items, function ($item) use ($filter) {
             return $filter->check($item);
-        });
+        }));
         $this->total = count($this->items);
 
         return $this;
