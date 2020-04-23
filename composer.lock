@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "845e8857ac3897dd2d66a0b59fdfd68a",
+    "content-hash": "0c46c13e5805e164dbc1f59d00d8d50d",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -2372,16 +2372,16 @@
         },
         {
             "name": "ozean12/amqp-transfers",
-            "version": "0.3.17",
+            "version": "v0.3.21",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/amqp-transfers.git",
-                "reference": "cfd403644090ab2c3946cc7a8545304785d16fb0"
+                "reference": "ca0a05b3f6f2bd2dd4eba4f899802c37cf300fc8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/amqp-transfers/zipball/cfd403644090ab2c3946cc7a8545304785d16fb0",
-                "reference": "cfd403644090ab2c3946cc7a8545304785d16fb0",
+                "url": "https://api.github.com/repos/ozean12/amqp-transfers/zipball/ca0a05b3f6f2bd2dd4eba4f899802c37cf300fc8",
+                "reference": "ca0a05b3f6f2bd2dd4eba4f899802c37cf300fc8",
                 "shasum": ""
             },
             "require": {
@@ -2417,10 +2417,10 @@
             ],
             "description": "Transfer objects across Billie universe",
             "support": {
-                "source": "https://github.com/ozean12/amqp-transfers/tree/0.3.17",
+                "source": "https://github.com/ozean12/amqp-transfers/tree/v0.3.21",
                 "issues": "https://github.com/ozean12/amqp-transfers/issues"
             },
-            "time": "2020-03-19T12:34:46+00:00"
+            "time": "2020-04-22T08:28:50+00:00"
         },
         {
             "name": "ozean12/amqp-transfers-serializer",

@@ -21,11 +21,13 @@ class DebtorInformationChangeRequestCreatedAnnouncer implements LoggingInterface
 
     public function announceChangeRequestCreated(
         DebtorInformationChangeRequestEntity $changeRequestEntity,
+        string $merchantCompanyUuid,
         string $merchantUserUuid
     ): void {
         $message = (new CompanyInformationChangeRequestCreated())
             ->setRequestUuid($changeRequestEntity->getUuid())
-            ->setCompanyUuid($changeRequestEntity->getCompanyUuid())
+            ->setDebtorCompanyUuid($changeRequestEntity->getCompanyUuid())
+            ->setMerchantCompanyUuid($merchantCompanyUuid)
             ->setMerchantUserUuid($merchantUserUuid)
             ->setName($changeRequestEntity->getName())
             ->setHouse($changeRequestEntity->getHouseNumber())

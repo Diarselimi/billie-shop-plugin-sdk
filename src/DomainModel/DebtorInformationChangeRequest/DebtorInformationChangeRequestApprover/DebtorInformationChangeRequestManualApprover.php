@@ -6,6 +6,7 @@ use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeReques
 use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestEntity;
 use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestRepositoryInterface;
 use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestTransitionEntity;
+use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -23,16 +24,20 @@ class DebtorInformationChangeRequestManualApprover implements LoggingInterface
 
     private $merchantUserRepository;
 
+    private $merchantRepository;
+
     public function __construct(
         Workflow $debtorInformationChangeRequestWorkflow,
         DebtorInformationChangeRequestRepositoryInterface $changeRequestRepository,
         DebtorInformationChangeRequestCreatedAnnouncer $debtorInformationChangeRequestAnnouncer,
-        MerchantUserRepositoryInterface $merchantUserRepository
+        MerchantUserRepositoryInterface $merchantUserRepository,
+        MerchantRepositoryInterface $merchantRepository
     ) {
         $this->workflow = $debtorInformationChangeRequestWorkflow;
         $this->changeRequestRepository = $changeRequestRepository;
         $this->debtorInformationChangeRequestAnnouncer = $debtorInformationChangeRequestAnnouncer;
         $this->merchantUserRepository = $merchantUserRepository;
+        $this->merchantRepository = $merchantRepository;
     }
 
     public function approve(DebtorInformationChangeRequestEntity $changeRequestEntity): void
@@ -46,8 +51,10 @@ class DebtorInformationChangeRequestManualApprover implements LoggingInterface
         $merchantUser = $this->merchantUserRepository->getOneById(
             $changeRequestEntity->getMerchantUserId()
         );
+        $merchant = $this->merchantRepository->getOneById($merchantUser->getMerchantId());
         $this->debtorInformationChangeRequestAnnouncer->announceChangeRequestCreated(
             $changeRequestEntity,
+            $merchant->getCompanyUuid(),
             $merchantUser->getUuid()
         );
 
