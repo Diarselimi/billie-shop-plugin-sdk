@@ -92,11 +92,11 @@ Feature:
   Scenario: Notifications count for not seen change requests which transitioned to complete or declined
     Given a merchant user exists with role "admin" and permission CHANGE_DEBTOR_INFORMATION
     And the following debtor information change requests exist:
-					| uuid | company_uuid | is_seen | state                 |
-					| aaa  | aaa-bbb-ccc  | 0       | complete              |
-					| bbb  | bbb-ccc-ddd  | 0       | declined              |
-					| ccc  | ccc-ddd-eee  | 0       | confirmation_pending  |
-					| ddd  | ddd-eee-fff  | 1       | complete              |
+      | uuid | company_uuid | is_seen | state                |
+      | aaa  | aaa-bbb-ccc  | 0       | complete             |
+      | bbb  | bbb-ccc-ddd  | 0       | declined             |
+      | ccc  | ccc-ddd-eee  | 0       | confirmation_pending |
+      | ddd  | ddd-eee-fff  | 1       | complete             |
     When I send a GET request to "/notifications"
     Then the response status code should be 200
     And the JSON response should be:
@@ -106,16 +106,16 @@ Feature:
     }
     """
 
-		Scenario: Existing request is canceled when new one is created for debtor
-			 Given a merchant user exists with role "admin" and permission CHANGE_DEBTOR_INFORMATION
-			 And I have a created order "XF43Y" with amounts 800/800/0, duration 30 and comment "test order"
-			 And I get from companies service get debtor response
-			 And I get from companies service update debtor positive response
-				And the following debtor information change requests exist:
-					| uuid | company_uuid                         | is_seen | state                |
-					| aaa  | c7be46c0-e049-4312-b274-258ec5aeeb70 | 0       | confirmation_pending |
-			 When I send a POST request to "/debtor/ad74bbc4-509e-47d5-9b50-a0320ce3d715/information-change-request" with body:
-				"""
+  Scenario: Existing request is canceled when new one is created for debtor
+    Given a merchant user exists with role "admin" and permission CHANGE_DEBTOR_INFORMATION
+    And I have a created order "XF43Y" with amounts 800/800/0, duration 30 and comment "test order"
+    And I get from companies service get debtor response
+    And I get from companies service update debtor positive response
+    And the following debtor information change requests exist:
+      | uuid | company_uuid                         | is_seen | state                |
+      | aaa  | c7be46c0-e049-4312-b274-258ec5aeeb70 | 0       | confirmation_pending |
+    When I send a POST request to "/debtor/ad74bbc4-509e-47d5-9b50-a0320ce3d715/information-change-request" with body:
+    """
     {
       "name": "Test User Company",
       "address_city": "BilCity",
@@ -125,26 +125,54 @@ Feature:
       "tc_accepted": true
     }
     """
-			 Then change request number 1 from debtor "ad74bbc4-509e-47d5-9b50-a0320ce3d715" should have state canceled
-			 Then change request number 1 from debtor "ad74bbc4-509e-47d5-9b50-a0320ce3d715" should have is_seen 1
-			 # The second change request will get state complete because it's auto approved
-			 And change request number 2 from debtor "ad74bbc4-509e-47d5-9b50-a0320ce3d715" should have state complete
+    Then change request number 1 from debtor "ad74bbc4-509e-47d5-9b50-a0320ce3d715" should have state canceled
+    Then change request number 1 from debtor "ad74bbc4-509e-47d5-9b50-a0320ce3d715" should have is_seen 1
+    # The second change request will get state complete because it's auto approved
+    And change request number 2 from debtor "ad74bbc4-509e-47d5-9b50-a0320ce3d715" should have state complete
 
-		Scenario Outline: Change request decision issued <decision>
-			 Given a merchant user exists with role "admin" and permission CHANGE_DEBTOR_INFORMATION
-				And the following debtor information change requests exist:
-					| uuid | company_uuid | is_seen | state                 |
-					| aaa  | aaa-bbb-ccc  | 0       | confirmation_pending  |
-				When I consume an existing queue message of type company_information_change_request.company_information_change_request_decision_issued containing this payload:
-					"""
-					{
-							"request_uuid":"aaa",
-							"decision":"<decision>"
-					}
-					"""
-			 Then debtor information change request aaa should have state <state>
+  Scenario : Change request approved decision issued
+    Given a merchant user exists with role "admin" and permission CHANGE_DEBTOR_INFORMATION
+    And the following debtor information change requests exist:
+      | uuid | company_uuid                         | is_seen | state                |
+      | aaa  | c7be46c0-e049-4312-b274-258ec5aeeb70 | 0       | confirmation_pending |
+    And I get from companies service update debtor positive response
+    When I consume an existing queue message of type company_information_change_request.company_information_change_request_decision_issued containing this payload:
+    """
+    {
+      "request_uuid":"aaa",
+      "decision":"approved"
+    }
+    """
+    Then debtor information change request aaa should have state complete
 
-				Examples:
-						| decision | state    |
-			   | approved | complete |
-			   | declined | declined |
+  Scenario: Change request declined decision issued
+    Given a merchant user exists with role "admin" and permission CHANGE_DEBTOR_INFORMATION
+    And the following debtor information change requests exist:
+      | uuid | company_uuid | is_seen | state                |
+      | aaa  | aaa-bbb-ccc  | 0       | confirmation_pending |
+    When I consume an existing queue message of type company_information_change_request.company_information_change_request_decision_issued containing this payload:
+    """
+      {
+        "request_uuid":"aaa",
+        "decision":"declined"
+      }
+    """
+    Then debtor information change request aaa should have state declined
+
+  Scenario: Invalidate debtor external data when change request decision issued approved
+    Given a merchant user exists with role "admin" and permission CHANGE_DEBTOR_INFORMATION
+    And the following debtor information change requests exist:
+      | uuid | company_uuid                         | is_seen | state                |
+      | aaa  | c7be46c0-e049-4312-b274-258ec5aeeb70 | 0       | confirmation_pending |
+    And the following debtor external data exist:
+      | id | name        | legal_form | address_id | billing_address_id | merchant_external_id | debtor_data_hash |
+      | 1  | Random Name | GmbH       | 1          | 1                  | external-id-123      | random-hash-123  |
+    When I consume an existing queue message of type company_information_change_request.company_information_change_request_decision_issued containing this payload:
+    """
+    {
+      "request_uuid":"aaa",
+      "decision":"approved"
+    }
+    """
+    Then debtor information change request aaa should have state complete
+    And debtor external data "1" should have been invalidated "external-id-123"

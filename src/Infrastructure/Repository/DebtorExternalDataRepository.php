@@ -11,6 +11,10 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
 {
     public const TABLE_NAME = "debtor_external_data";
 
+    public const INVALID_MERCHANT_EXTERNAL_ID_SUFFIX = 'invalidated';
+
+    public const INVALID_DEBTOR_DATA_HASH = 'INVALID_HASH';
+
     private const SELECT_FIELDS =
         self::TABLE_NAME.'.id as id, 
         name, 
@@ -102,5 +106,25 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
         );
 
         return $debtorExternalData ? $this->debtorExternalDataEntityFactory->createFromDatabaseRow($debtorExternalData) : null;
+    }
+
+    public function invalidateMerchantExternalIdAndDebtorHashForCompanyUuid(string $companyUuid): void
+    {
+        $sql = "
+            UPDATE ". self::TABLE_NAME ." ded
+            JOIN orders o ON o.debtor_external_data_id = ded.id
+            JOIN merchants_debtors md ON md.id = o.merchant_debtor_id
+            SET merchant_external_id = CONCAT_WS('-', merchant_external_id, :merchantExternalIdSuffix), debtor_data_hash = :invalidDebtorDataHash
+            WHERE md.company_uuid = :companyUuid;
+        ";
+
+        $this->doUpdate(
+            $sql,
+            [
+                'companyUuid' => $companyUuid,
+                'merchantExternalIdSuffix' => self::INVALID_MERCHANT_EXTERNAL_ID_SUFFIX,
+                'invalidDebtorDataHash' => self::INVALID_DEBTOR_DATA_HASH,
+            ]
+        );
     }
 }

@@ -54,6 +54,7 @@ use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonRepositoryInterface;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntity;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
+use App\Infrastructure\Repository\DebtorExternalDataRepository;
 use App\Infrastructure\Repository\DebtorInformationChangeRequestRepository;
 use App\Infrastructure\Repository\MerchantDebtorRepository;
 use Behat\Gherkin\Node\PyStringNode;
@@ -1401,5 +1402,38 @@ class PaellaCoreContext extends MinkContext
         $this->getDebtorInformationChangeRequestRepository()->insert(
             $informationChangeRequest
         );
+    }
+
+    /**
+     * @Given the following debtor external data exist:
+     */
+    public function theFollowingDebtorExternalDataExist(TableNode $table)
+    {
+        // first we need to add some mandatory data
+        $this->iHaveAnOrder('new', 'CO123', 1000, 900, 100, 30, 'test order');
+
+        foreach ($table as $row) {
+            $debtorExternalData = (new DebtorExternalDataEntity())
+                ->setId($row['id'])
+                ->setName($row['name'])
+                ->setLegalForm($row['legal_form'])
+                ->setAddressId($row['address_id'])
+                ->setBillingAddressId($row['billing_address_id'])
+                ->setMerchantExternalId($row['merchant_external_id'])
+                ->setDataHash($row['debtor_data_hash'])
+                ;
+            $this->getDebtorExternalDataRepository()->insert($debtorExternalData);
+        }
+    }
+
+    /**
+     * @Then debtor external data :id should have been invalidated :merchantExternalId
+     */
+    public function debtorExternalDataShouldHaveBeenInvalidated(int $id, string $merchantExternalId)
+    {
+        $debtorExternalData = $this->getDebtorExternalDataRepository()->getOneById($id);
+
+        Assert::eq($debtorExternalData->getDataHash(), DebtorExternalDataRepository::INVALID_DEBTOR_DATA_HASH);
+        Assert::eq($debtorExternalData->getMerchantExternalId(), $merchantExternalId ."-".DebtorExternalDataRepository::INVALID_MERCHANT_EXTERNAL_ID_SUFFIX);
     }
 }

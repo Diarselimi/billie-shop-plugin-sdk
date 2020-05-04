@@ -2,27 +2,42 @@
 
 namespace App\DomainModel\DebtorInformationChangeRequest;
 
+use App\DomainEvent\DebtorInformationChangeRequest\DebtorInformationChangeRequestCompletedEvent;
+use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
+use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
+use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestApprover\DebtorInformationChangeRequestApproverException;
 use App\DomainModel\DebtorInformationChangeRequest\Exception\ChangeRequestNotFoundException;
 use App\DomainModel\DebtorInformationChangeRequest\Exception\InvalidDecisionValueException;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Ozean12\Transfer\Message\CompanyInformationChangeRequest\CompanyInformationChangeRequestDecisionIssued;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Workflow\Workflow;
 
 class DebtorInformationChangeRequestDecisionIssuer implements LoggingInterface
 {
     use LoggingTrait;
 
+    private const CHANGE_REASON = 'merchant_request';
+
     private $workflow;
 
     private $repository;
 
+    private $eventDispatcher;
+
+    private $companiesService;
+
     public function __construct(
         Workflow $debtorInformationChangeRequestWorkflow,
-        DebtorInformationChangeRequestRepositoryInterface $repository
+        DebtorInformationChangeRequestRepositoryInterface $repository,
+        EventDispatcherInterface $eventDispatcher,
+        CompaniesServiceInterface $companiesService
     ) {
         $this->workflow = $debtorInformationChangeRequestWorkflow;
         $this->repository = $repository;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->companiesService = $companiesService;
     }
 
     public function issueDecision(CompanyInformationChangeRequestDecisionIssued $message): void
@@ -37,6 +52,26 @@ class DebtorInformationChangeRequestDecisionIssuer implements LoggingInterface
         switch ($message->getDecision()) {
             case 'approved':
                 $transitionName = DebtorInformationChangeRequestTransitionEntity::TRANSITION_COMPLETE_MANUALLY;
+
+                try {
+                    $this->companiesService->updateCompany($changeRequest->getCompanyUuid(), [
+                        'change_reason_uuid' => $changeRequest->getUuid(),
+                        'name' => $changeRequest->getName(),
+                        'address_street' => $changeRequest->getStreet(),
+                        'address_house' => $changeRequest->getHouseNumber(),
+                        'address_city' => $changeRequest->getCity(),
+                        'address_postal_code' => $changeRequest->getPostalCode(),
+                        'change_reason' => self::CHANGE_REASON,
+                    ]);
+
+                    $this->dispatchChangeRequestEvent($changeRequest, $transitionName);
+                } catch (CompaniesServiceRequestException $exception) {
+                    throw new DebtorInformationChangeRequestApproverException(
+                        'Manual change request approval failed',
+                        null,
+                        $exception
+                    );
+                }
 
                 break;
             case 'declined':
@@ -58,5 +93,12 @@ class DebtorInformationChangeRequestDecisionIssuer implements LoggingInterface
             'Debtor information change request {id} decision issued',
             ['id' => $changeRequest->getId()]
         );
+    }
+
+    private function dispatchChangeRequestEvent(DebtorInformationChangeRequestEntity $changeRequest, string $transitionName): void
+    {
+        if ($transitionName === DebtorInformationChangeRequestTransitionEntity::TRANSITION_COMPLETE_MANUALLY) {
+            $this->eventDispatcher->dispatch(new DebtorInformationChangeRequestCompletedEvent($changeRequest));
+        }
     }
 }
