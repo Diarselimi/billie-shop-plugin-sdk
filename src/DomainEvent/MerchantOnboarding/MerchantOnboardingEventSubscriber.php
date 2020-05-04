@@ -28,29 +28,30 @@ class MerchantOnboardingEventSubscriber implements EventSubscriberInterface, Log
     public static function getSubscribedEvents()
     {
         return [
-            MerchantOnboardingCompleted::class => 'onMerchantOnboardingEvent',
-            MerchantOnboardingAdminInvited::class => 'onMerchantOnboardingEvent',
-            MerchantOnboardingAdminInvitationOpened::class => 'onMerchantOnboardingEvent',
-            MerchantOnboardingAdminUserCreated::class => 'onMerchantOnboardingEvent',
-            MerchantOnboardingFinancialAssessmentConfirmed::class => 'onMerchantOnboardingStepCompleteEvent',
-            MerchantOnboardingIdentityVerificationConfirmed::class => 'onMerchantOnboardingStepCompleteEvent',
-            MerchantOnboardingSalesConfirmed::class => 'onMerchantOnboardingStepCompleteEvent',
-            MerchantOnboardingSepaMandateConfirmed::class => 'onMerchantOnboardingStepCompleteEvent',
-            MerchantOnboardingSignatoryPowerConfirmed::class => 'onMerchantOnboardingStepCompleteEvent',
-            MerchantOnboardingTechnicalIntegrationConfirmed::class => 'onMerchantOnboardingStepCompleteEvent',
-            MerchantOnboardingUboPepSanctionsConfirmed::class => 'onMerchantOnboardingStepCompleteEvent',
+            MerchantOnboardingCompleted::class => 'trackMerchantOnboardingEvent',
+            MerchantOnboardingAdminInvited::class => 'trackMerchantOnboardingEvent',
+            MerchantOnboardingAdminInvitationOpened::class => 'trackMerchantOnboardingEvent',
+            MerchantOnboardingAdminUserCreated::class => 'trackMerchantOnboardingEvent',
+            MerchantOnboardingFinancialAssessmentConfirmed::class => 'trackMerchantOnboardingStepCompleteEvent',
+            MerchantOnboardingIdentityVerificationConfirmed::class => 'trackMerchantOnboardingStepCompleteEvent',
+            MerchantOnboardingSalesConfirmed::class => 'trackMerchantOnboardingStepCompleteEvent',
+            MerchantOnboardingSepaMandateConfirmed::class => 'trackMerchantOnboardingStepCompleteEvent',
+            MerchantOnboardingSignatoryPowerConfirmed::class => 'trackMerchantOnboardingStepCompleteEvent',
+            MerchantOnboardingTechnicalIntegrationConfirmed::class => 'trackMerchantOnboardingStepCompleteEvent',
+            MerchantOnboardingUboPepSanctionsConfirmed::class => 'trackMerchantOnboardingStepCompleteEvent',
+            MerchantIntegrationStarted::class => 'trackMerchantOnboardingEvent',
         ];
     }
 
-    public function onMerchantOnboardingEvent(AbstractMerchantOnboardingEvent $event)
+    public function trackMerchantOnboardingEvent(AbstractMerchantOnboardingEvent $event)
     {
         $this->segmentIOClient->track($event->getTrackingEventName(), $event->getMerchantId(), ['id' => $this->userUuid]);
     }
 
-    public function onMerchantOnboardingStepCompleteEvent(AbstractMerchantOnboardingEvent $event)
+    public function trackMerchantOnboardingStepCompleteEvent(AbstractMerchantOnboardingEvent $event)
     {
         if ($event->getTransitionName() === MerchantOnboardingStepTransitionEntity::TRANSITION_COMPLETE) {
-            $this->onMerchantOnboardingEvent($event);
+            $this->trackMerchantOnboardingEvent($event);
         }
     }
 }
