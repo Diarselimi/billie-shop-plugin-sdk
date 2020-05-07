@@ -24,6 +24,7 @@ class IdentifyDebtorRequestFactory
             ->setLastName($orderContainer->getDebtorPerson()->getLastName())
             ->setIsExperimental($orderContainer->getMerchantSettings()->useExperimentalDebtorIdentification())
             ->setBillingAddress($orderContainer->getBillingAddress())
+            ->setEmail($orderContainer->getDebtorPerson()->getEmail())
         ;
     }
 }

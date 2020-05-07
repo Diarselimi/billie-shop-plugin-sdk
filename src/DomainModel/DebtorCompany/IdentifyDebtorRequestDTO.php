@@ -44,6 +44,8 @@ class IdentifyDebtorRequestDTO implements ArrayableInterface
 
     private $billingAddress;
 
+    private $email;
+
     /**
      * @deprecated Use getCompanyUuid()
      * @see IdentifyDebtorRequestDTO::getCompanyUuid()
@@ -264,6 +266,7 @@ class IdentifyDebtorRequestDTO implements ArrayableInterface
             'last_name' => $this->getLastName(),
             'is_experimental' => $this->isExperimental(),
             'billing_address' => $this->getBillingAddress() ? $this->getBillingAddress()->toArray() : null,
+            'email' => $this->getEmail(),
         ];
     }
 
@@ -275,6 +278,18 @@ class IdentifyDebtorRequestDTO implements ArrayableInterface
     public function setBillingAddress(?AddressEntity $billingAddress): IdentifyDebtorRequestDTO
     {
         $this->billingAddress = $billingAddress;
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): IdentifyDebtorRequestDTO
+    {
+        $this->email = $email;
 
         return $this;
     }

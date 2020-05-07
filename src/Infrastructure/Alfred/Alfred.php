@@ -13,6 +13,7 @@ use App\DomainModel\MerchantDebtor\MerchantDebtorDuplicateDTO;
 use App\DomainModel\SignatoryPower\SignatoryPowerDTO;
 use App\DomainModel\SignatoryPower\SignatoryPowerDTOFactory;
 use App\DomainModel\SignatoryPower\SignatoryPowerSelectionDTO;
+use App\DomainModel\TrackingAnalytics\DebtorEmailHashFactory;
 use App\Infrastructure\ClientResponseDecodeException;
 use App\Infrastructure\DecodeResponseTrait;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
@@ -28,6 +29,8 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
     use LoggingTrait, DecodeResponseTrait;
 
     private const IDENTIFICATION_REQUEST_TIMEOUT = 15;
+
+    private const HEADER_X_TRACKER_USER_ID = 'X-Tracker-User-Id';
 
     private $client;
 
@@ -152,6 +155,9 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         try {
             $response = $this->client->post('/debtor/identify', [
                 'json' => $requestDTO->toArray(),
+                'headers' => [
+                    self::HEADER_X_TRACKER_USER_ID => DebtorEmailHashFactory::create($requestDTO->getEmail()),
+                ],
                 'on_stats' => function (TransferStats $stats) {
                     $this->logServiceRequestStats($stats, 'identify_debtor');
                 },
