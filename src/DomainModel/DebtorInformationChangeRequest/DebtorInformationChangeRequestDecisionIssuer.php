@@ -2,6 +2,7 @@
 
 namespace App\DomainModel\DebtorInformationChangeRequest;
 
+use App\Application\Exception\WorkflowException;
 use App\DomainEvent\DebtorInformationChangeRequest\DebtorInformationChangeRequestCompletedEvent;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
@@ -19,6 +20,10 @@ class DebtorInformationChangeRequestDecisionIssuer implements LoggingInterface
     use LoggingTrait;
 
     private const CHANGE_REASON = 'merchant_request';
+
+    private const DECISION_APPROVED = 'approved';
+
+    private const DECISION_DECLINED = 'declined';
 
     private $workflow;
 
@@ -50,31 +55,11 @@ class DebtorInformationChangeRequestDecisionIssuer implements LoggingInterface
         }
 
         switch ($message->getDecision()) {
-            case 'approved':
+            case self::DECISION_APPROVED:
                 $transitionName = DebtorInformationChangeRequestTransitionEntity::TRANSITION_COMPLETE_MANUALLY;
 
-                try {
-                    $this->companiesService->updateCompany($changeRequest->getCompanyUuid(), [
-                        'change_reason_uuid' => $changeRequest->getUuid(),
-                        'name' => $changeRequest->getName(),
-                        'address_street' => $changeRequest->getStreet(),
-                        'address_house' => $changeRequest->getHouseNumber(),
-                        'address_city' => $changeRequest->getCity(),
-                        'address_postal_code' => $changeRequest->getPostalCode(),
-                        'change_reason' => self::CHANGE_REASON,
-                    ]);
-
-                    $this->dispatchChangeRequestEvent($changeRequest, $transitionName);
-                } catch (CompaniesServiceRequestException $exception) {
-                    throw new DebtorInformationChangeRequestApproverException(
-                        'Manual change request approval failed',
-                        null,
-                        $exception
-                    );
-                }
-
                 break;
-            case 'declined':
+            case self::DECISION_DECLINED:
                 $transitionName = DebtorInformationChangeRequestTransitionEntity::TRANSITION_DECLINE_MANUALLY;
 
                 break;
@@ -84,6 +69,36 @@ class DebtorInformationChangeRequestDecisionIssuer implements LoggingInterface
                     $message->getDecision(),
                     $message->getRequestUuid()
                 ));
+        }
+
+        if (!$this->workflow->can($changeRequest, $transitionName)) {
+            throw new WorkflowException(sprintf(
+                'Cannot issue decision (transition: %s). Change request is in %s state.',
+                $transitionName,
+                $changeRequest->getState()
+            ));
+        }
+
+        if ($message->getDecision() === self::DECISION_APPROVED) {
+            try {
+                $this->companiesService->updateCompany($changeRequest->getCompanyUuid(), [
+                    'change_reason_uuid' => $changeRequest->getUuid(),
+                    'name' => $changeRequest->getName(),
+                    'address_street' => $changeRequest->getStreet(),
+                    'address_house' => $changeRequest->getHouseNumber(),
+                    'address_city' => $changeRequest->getCity(),
+                    'address_postal_code' => $changeRequest->getPostalCode(),
+                    'change_reason' => self::CHANGE_REASON,
+                ]);
+
+                $this->dispatchChangeRequestEvent($changeRequest, $transitionName);
+            } catch (CompaniesServiceRequestException $exception) {
+                throw new DebtorInformationChangeRequestApproverException(
+                    'Manual change request approval failed',
+                    null,
+                    $exception
+                );
+            }
         }
 
         $this->workflow->apply($changeRequest, $transitionName);

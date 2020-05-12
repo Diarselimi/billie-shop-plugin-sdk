@@ -130,7 +130,7 @@ Feature:
     # The second change request will get state complete because it's auto approved
     And change request number 2 from debtor "ad74bbc4-509e-47d5-9b50-a0320ce3d715" should have state complete
 
-  Scenario : Change request approved decision issued
+  Scenario: Change request approved decision issued
     Given a merchant user exists with role "admin" and permission CHANGE_DEBTOR_INFORMATION
     And the following debtor information change requests exist:
       | uuid | company_uuid                         | is_seen | state                |
