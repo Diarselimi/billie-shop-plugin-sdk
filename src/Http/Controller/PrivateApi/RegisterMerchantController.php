@@ -6,6 +6,7 @@ namespace App\Http\Controller\PrivateApi;
 
 use App\Application\UseCase\RegisterMerchant\RegisterMerchantRequest;
 use App\Application\UseCase\RegisterMerchant\RegisterMerchantUseCase;
+use App\DomainModel\DebtorCompany\IdentifyFirmenwissenFailedException;
 use App\DomainModel\Merchant\CreateMerchantException;
 use App\DomainModel\Merchant\DuplicateMerchantCompanyException;
 use App\DomainModel\Merchant\MerchantCompanyNotFoundException;
@@ -59,6 +60,8 @@ class RegisterMerchantController
             $useCaseResponse = $this->useCase->execute($useCaseRequest);
         } catch (MerchantCompanyNotFoundException $e) {
             throw new NotFoundHttpException($e->getMessage());
+        } catch (IdentifyFirmenwissenFailedException $e) {
+            throw new NotFoundHttpException('Firmenwissen identification failed');
         } catch (DuplicateMerchantCompanyException $e) {
             throw new ConflictHttpException($e->getMessage());
         } catch (CreateMerchantException $e) {

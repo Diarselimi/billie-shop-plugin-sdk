@@ -184,6 +184,25 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         }
     }
 
+    public function identifyFirmenwissen(string $crefoId): DebtorCompany
+    {
+        try {
+            $response = $this->client->post('/debtor/identify/firmenwissen', [
+                'json' => ['crefo_id' => $crefoId],
+                'on_stats' => function (TransferStats $stats) {
+                    $this->logServiceRequestStats($stats, 'identify_firmenwissen');
+                },
+                'timeout' => self::IDENTIFICATION_REQUEST_TIMEOUT,
+            ]);
+
+            $decodedResponse = $this->decodeResponse($response);
+
+            return $this->factory->createFromAlfredResponse($decodedResponse);
+        } catch (ClientException | TransferException | ClientResponseDecodeException $exception) {
+            throw new CompaniesServiceRequestException($exception);
+        }
+    }
+
     public function strictMatchDebtor(string $debtorUuid, IdentifyDebtorRequestDTO $requestDTO): bool
     {
         try {

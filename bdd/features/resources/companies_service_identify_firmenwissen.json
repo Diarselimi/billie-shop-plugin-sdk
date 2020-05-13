@@ -1,0 +1,21 @@
+{
+  "id": 6,
+  "uuid": "07be46c0-e049-4312-b274-258ec5aeeb70",
+  "crefo_id": "123",
+  "schufa_id": "123",
+  "google_places_id": null,
+  "name": "Test User Company",
+  "address_house": "10",
+  "address_street": "Heinrich-Heine-Platz",
+  "address_city": "Berlin",
+  "address_postal_code": "10179",
+  "address_country": "DE",
+  "address_addition": null,
+  "legal_form": "Gesellschaft mit beschränkter Haftung",
+  "is_blacklisted": 0,
+  "is_from_trusted_source": 1,
+  "registration_number": null,
+  "tax_id": null,
+  "billing_address_match_uuid": null,
+  "billing_addresses": []
+}

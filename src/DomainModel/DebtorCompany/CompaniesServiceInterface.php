@@ -20,6 +20,8 @@ interface CompaniesServiceInterface
 
     public function identifyDebtor(IdentifyDebtorRequestDTO $requestDTO): ?IdentifiedDebtorCompany;
 
+    public function identifyFirmenwissen(string $crefoId): DebtorCompany;
+
     public function strictMatchDebtor(string $debtorUuid, IdentifyDebtorRequestDTO $requestDTO): bool;
 
     public function updateCompany(string $companyUuid, array $updateData): DebtorCompany;

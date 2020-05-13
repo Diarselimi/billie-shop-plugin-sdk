@@ -7,8 +7,9 @@ namespace App\Application\UseCase\RegisterMerchant;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
+use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
 use App\DomainModel\Merchant\DuplicateMerchantCompanyException;
-use App\DomainModel\Merchant\MerchantCompanyNotFoundException;
+use App\DomainModel\DebtorCompany\IdentifyFirmenwissenFailedException;
 use App\DomainModel\Merchant\MerchantCreationDTO;
 use App\DomainModel\Merchant\MerchantCreationService;
 use App\DomainModel\MerchantUser\MerchantUserDefaultRoles;
@@ -57,7 +58,11 @@ class RegisterMerchantUseCase implements ValidatedUseCaseInterface
         $companies = $this->companiesService->getDebtorsByCrefoId($request->getCrefoId());
 
         if (empty($companies)) {
-            throw new MerchantCompanyNotFoundException('Cannot find a company with the given crefo ID');
+            try {
+                $companies = [$this->companiesService->identifyFirmenwissen($request->getCrefoId())];
+            } catch (CompaniesServiceRequestException $exception) {
+                throw new IdentifyFirmenwissenFailedException($exception->getMessage(), 0, $exception);
+            }
         }
 
         if (count($companies) > 1) {

@@ -208,3 +208,21 @@ Feature: Register a new merchant with an invitation for the initial admin user.
     And the default notification settings should be created for merchant with company ID 1
     And all the default roles should be created for merchant with company ID 1
     And a user invitation with role "admin" and email "test@billie.dev" should have been created for merchant with company ID 1
+
+		Scenario: Identify company via Firmenwissen when not found
+				Given I get from companies service identify firmenwissen response
+			 And I successfully create OAuth client with id testClientId and secret testClientSecret
+				When I send a POST request to "/private/merchant/registration" with body:
+						"""
+      {
+        "crefo_id": "123",
+        "email": "test@billie.dev"
+      }
+						"""
+				Then the JSON response should be:
+						"""
+						{
+								"name": "Test User Company"
+						}
+						"""
+    And the response status code should be 201

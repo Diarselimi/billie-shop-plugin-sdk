@@ -234,4 +234,16 @@ class CompaniesServiceContext implements Context
     {
         $this->mockRequest($endpoint, new MockResponse('{}', [], (int) $status));
     }
+
+    /**
+     * @Given /^I get from companies service identify firmenwissen response$/
+     */
+    public function iGetFromCompaniesServiceIdentifyFirmenwissenResponse()
+    {
+        $this->mockRequest('/debtor/identify/firmenwissen', new ResponseStack(
+            new MockResponse(file_get_contents(
+                __DIR__ . '/../resources/companies_service_identify_firmenwissen.json'
+            ), [], 200)
+        ));
+    }
 }
