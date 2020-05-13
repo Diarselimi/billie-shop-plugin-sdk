@@ -4,7 +4,7 @@ namespace App\Http\Controller\PublicApi;
 
 use App\Application\UseCase\CreatePreApprovedOrder\CreatePreApprovedOrderUseCase;
 use App\DomainModel\OrderResponse\OrderResponse;
-use App\Http\RequestHandler\CreateOrderRequestFactory;
+use App\Http\RequestTransformer\CreateOrder\CreateOrderRequestFactory;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use OpenApi\Annotations as OA;

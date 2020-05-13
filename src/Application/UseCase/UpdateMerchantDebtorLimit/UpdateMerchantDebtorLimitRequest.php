@@ -17,7 +17,7 @@ class UpdateMerchantDebtorLimitRequest implements ValidatedRequestInterface
     /**
      * @Assert\NotBlank()
      * @Assert\GreaterThan(value=0)
-     * @PaellaAssert\Number()
+     * @Assert\Type("numeric")
      */
     private $limit;
 

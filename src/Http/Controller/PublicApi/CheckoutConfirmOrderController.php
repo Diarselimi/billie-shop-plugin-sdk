@@ -4,7 +4,7 @@ namespace App\Http\Controller\PublicApi;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmDataMismatchException;
-use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmOrderFactory;
+use App\Http\RequestTransformer\CheckoutConfirmOrderRequestFactory;
 use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmOrderUseCase;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use OpenApi\Annotations as OA;
@@ -51,7 +51,7 @@ class CheckoutConfirmOrderController
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         CheckoutConfirmOrderUseCase $checkoutSessionUseCase,
-        CheckoutConfirmOrderFactory $factory
+        CheckoutConfirmOrderRequestFactory $factory
     ) {
         $this->orderRepository = $orderRepository;
         $this->useCase = $checkoutSessionUseCase;
@@ -60,12 +60,7 @@ class CheckoutConfirmOrderController
 
     public function execute(Request $request, string $sessionUuid): JsonResponse
     {
-        $checkoutRequest = $this->requestFactory->create(
-            $request->request->get('amount', []),
-            $request->request->get('debtor_company', []),
-            $request->request->get('duration', 0),
-            $sessionUuid
-        );
+        $checkoutRequest = $this->requestFactory->create($request, $sessionUuid);
 
         try {
             $orderResponse = $this->useCase->execute($checkoutRequest);

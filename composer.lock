@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0c46c13e5805e164dbc1f59d00d8d50d",
+    "content-hash": "bb1702163b3f4e19dac4c2c7c94b20e1",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -2514,26 +2514,32 @@
         },
         {
             "name": "ozean12/money",
-            "version": "2.1.0",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/money-php.git",
-                "reference": "b125500cf10bf90374dc46363b7456ca41e5bc59"
+                "reference": "8730c018f96ef0e2e90ea3f1bbb398f8b11cf6a7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/money-php/zipball/b125500cf10bf90374dc46363b7456ca41e5bc59",
-                "reference": "b125500cf10bf90374dc46363b7456ca41e5bc59",
+                "url": "https://api.github.com/repos/ozean12/money-php/zipball/8730c018f96ef0e2e90ea3f1bbb398f8b11cf6a7",
+                "reference": "8730c018f96ef0e2e90ea3f1bbb398f8b11cf6a7",
                 "shasum": ""
             },
             "require": {
-                "ext-intl": "*",
                 "ext-json": "*",
                 "php": ">=7.2"
             },
             "require-dev": {
+                "doctrine/annotations": "^1.10",
+                "doctrine/cache": "^1.10",
                 "friendsofphp/php-cs-fixer": "^2.16",
-                "phpunit/phpunit": "^8.5"
+                "phpunit/phpunit": "^8.5",
+                "symfony/phpunit-bridge": ">=3.4,<5",
+                "symfony/validator": ">=3.4,<5"
+            },
+            "suggest": {
+                "symfony/validator": "Adds support for Money validation annotations."
             },
             "type": "library",
             "autoload": {
@@ -2560,9 +2566,9 @@
             ],
             "description": "PHP package for dealing with decimals, percents and money",
             "support": {
-                "source": "https://github.com/ozean12/money-php/tree/2.1.0"
+                "source": "https://github.com/ozean12/money-php/tree/3.0.0"
             },
-            "time": "2020-03-30T11:41:49+00:00"
+            "time": "2020-05-12T07:33:55+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -10041,5 +10047,6 @@
         "ext-bcmath": "*",
         "ext-json": "*"
     },
-    "platform-dev": []
+    "platform-dev": [],
+    "plugin-api-version": "1.1.0"
 }

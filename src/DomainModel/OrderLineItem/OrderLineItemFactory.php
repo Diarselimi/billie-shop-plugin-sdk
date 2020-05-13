@@ -18,9 +18,9 @@ class OrderLineItemFactory
             ->setBrand($request->getBrand())
             ->setGtin($request->getGtin())
             ->setMpn($request->getMpn())
-            ->setAmountGross($request->getAmount()->getGross())
-            ->setAmountTax($request->getAmount()->getTax())
-            ->setAmountNet($request->getAmount()->getNet())
+            ->setAmountGross($request->getAmount()->getGross()->getMoneyValue())
+            ->setAmountTax($request->getAmount()->getTax()->getMoneyValue())
+            ->setAmountNet($request->getAmount()->getNet()->getMoneyValue())
         ;
     }
 

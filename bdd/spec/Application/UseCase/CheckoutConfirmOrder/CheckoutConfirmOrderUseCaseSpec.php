@@ -5,7 +5,6 @@ namespace spec\App\Application\UseCase\CheckoutConfirmOrder;
 use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmDataMismatchException;
 use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmOrderRequest;
 use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmOrderUseCase;
-use App\Application\UseCase\CreateOrder\Request\CreateOrderAmountRequest;
 use App\DomainModel\CheckoutSession\CheckoutOrderMatcherInterface;
 use App\DomainModel\CheckoutSession\CheckoutOrderRequestDTO;
 use App\DomainModel\DebtorCompany\DebtorCompanyRequest;
@@ -15,6 +14,7 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderResponse\OrderResponse;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
+use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -128,7 +128,7 @@ class CheckoutConfirmOrderUseCaseSpec extends ObjectBehavior
         float $amountNet = 0.0,
         float $amountTax = 0.0
     ): CheckoutConfirmOrderRequest {
-        $amount = (new CreateOrderAmountRequest())->setGross($amountGross)->setNet($amountNet)->setTax($amountTax);
+        $amount = TaxedMoneyFactory::create($amountGross, $amountNet, $amountTax);
         $debtorCompany = new DebtorCompanyRequest();
 
         return (new CheckoutConfirmOrderRequest())

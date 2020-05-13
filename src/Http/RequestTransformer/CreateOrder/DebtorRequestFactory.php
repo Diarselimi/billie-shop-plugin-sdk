@@ -1,21 +1,24 @@
 <?php
 
-namespace App\Application\UseCase\CreateOrder\Request;
+namespace App\Http\RequestTransformer\CreateOrder;
 
+use App\Application\UseCase\CreateOrder\Request\CreateOrderDebtorCompanyRequest;
 use App\DomainModel\Order\OrderRegistrationNumberConverter;
+use Symfony\Component\HttpFoundation\Request;
 
 class DebtorRequestFactory
 {
     private $registrationNumberConverter;
 
-    public function __construct(
-        OrderRegistrationNumberConverter $registrationNumberConverter
-    ) {
+    public function __construct(OrderRegistrationNumberConverter $registrationNumberConverter)
+    {
         $this->registrationNumberConverter = $registrationNumberConverter;
     }
 
-    public function createFromRequest(?array $requestData): CreateOrderDebtorCompanyRequest
+    public function create(Request $request): CreateOrderDebtorCompanyRequest
     {
+        $requestData = $request->request->get('debtor_company', []);
+
         $debtorCompany = (new CreateOrderDebtorCompanyRequest())
             ->setMerchantCustomerId($requestData['merchant_customer_id'] ?? null)
             ->setName($requestData['name'] ?? null)

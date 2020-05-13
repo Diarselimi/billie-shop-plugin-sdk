@@ -1,25 +1,29 @@
 <?php
 
-namespace App\Application\UseCase\CheckoutConfirmOrder;
+declare(strict_types=1);
 
-use App\Application\UseCase\CreateOrder\Request\CreateOrderAmountRequest;
+namespace App\Http\RequestTransformer;
+
+use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmOrderRequest;
 use App\DomainModel\DebtorCompany\DebtorCompanyRequest;
+use Symfony\Component\HttpFoundation\Request;
 
-class CheckoutConfirmOrderFactory
+class CheckoutConfirmOrderRequestFactory
 {
-    public function create(
-        array $amountData,
-        array $debtorCompanyData,
-        int $duration,
-        string $sessionUuid
-    ) {
+    private $amountRequestFactory;
+
+    public function __construct(AmountRequestFactory $amountRequestFactory)
+    {
+        $this->amountRequestFactory = $amountRequestFactory;
+    }
+
+    public function create(Request $request, string $sessionUuid): CheckoutConfirmOrderRequest
+    {
+        $debtorCompanyData = $request->request->get('debtor_company', []);
+        $duration = $request->request->getInt('duration', 0);
+
         return (new CheckoutConfirmOrderRequest())
-            ->setAmount(
-                (new CreateOrderAmountRequest())
-                ->setNet($amountData['net'])
-                ->setGross($amountData['gross'])
-                ->setTax($amountData['tax'])
-            )
+            ->setAmount($this->amountRequestFactory->create($request))
             ->setDebtorCompanyRequest($this->buildDebtorCompanyRequest($debtorCompanyData))
             ->setDuration($duration)
             ->setSessionUuid($sessionUuid);

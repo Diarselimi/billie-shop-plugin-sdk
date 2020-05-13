@@ -4,7 +4,7 @@ namespace App\Http\Controller\PublicApi;
 
 use App\Application\UseCase\CreateOrder\CreateOrderUseCase;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
-use App\Http\RequestHandler\CreateOrderRequestFactory;
+use App\Http\RequestTransformer\CreateOrder\CreateOrderRequestFactory;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;

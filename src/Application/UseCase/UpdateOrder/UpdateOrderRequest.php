@@ -3,16 +3,16 @@
 namespace App\Application\UseCase\UpdateOrder;
 
 use App\Application\UseCase\AbstractOrderRequest;
-use App\Application\UseCase\CreateOrder\Request\CreateOrderAmountRequest;
 use App\Application\UseCase\ValidatedRequestInterface;
 use App\Application\Validator\Constraint as PaellaAssert;
+use Ozean12\Money\TaxedMoney\TaxedMoney;
 use OpenApi\Annotations as OA;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @OA\Schema(schema="UpdateOrderRequest", title="Order Update Object", type="object", properties={
  *      @OA\Property(property="duration", ref="#/components/schemas/OrderDuration"),
- *      @OA\Property(property="amount", ref="#/components/schemas/CreateOrderAmountRequest"),
+ *      @OA\Property(property="amount", ref="#/components/schemas/AmountDTO"),
  *      @OA\Property(property="invoice_number", ref="#/components/schemas/TinyText"),
  *      @OA\Property(property="invoice_url", ref="#/components/schemas/TinyText"),
  *      @OA\Property(property="order_id", ref="#/components/schemas/TinyText", description="Order external code", example="DE123456-1")
@@ -38,13 +38,12 @@ class UpdateOrderRequest extends AbstractOrderRequest implements ValidatedReques
 
     /**
      * @Assert\Valid()
-     * @PaellaAssert\OrderAmounts()
-     * @var CreateOrderAmountRequest
+     * @var TaxedMoney
      */
     private $amount;
 
     /**
-     * @Assert\Type(type="int")
+     * @Assert\Type(type="integer")
      * @PaellaAssert\OrderDuration
      */
     private $duration;
@@ -85,14 +84,14 @@ class UpdateOrderRequest extends AbstractOrderRequest implements ValidatedReques
         return $this;
     }
 
-    public function setAmount(?CreateOrderAmountRequest $amountRequest): UpdateOrderRequest
+    public function setAmount(?TaxedMoney $amountRequest): UpdateOrderRequest
     {
         $this->amount = $amountRequest;
 
         return $this;
     }
 
-    public function getAmount(): ?CreateOrderAmountRequest
+    public function getAmount(): ?TaxedMoney
     {
         return $this->amount;
     }

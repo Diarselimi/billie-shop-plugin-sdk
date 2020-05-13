@@ -8,6 +8,7 @@ Feature:
 
     Scenario: Update merchant debtor company
         And I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
+        And I get from companies service get debtor response
         And I get from companies service update debtor positive response
         When I send a POST request to "/private/merchant-debtor/ad74bbc4-509e-47d5-9b50-a0320ce3d715/update-company" with body:
         """

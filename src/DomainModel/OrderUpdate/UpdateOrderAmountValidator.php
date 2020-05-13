@@ -2,7 +2,7 @@
 
 namespace App\DomainModel\OrderUpdate;
 
-use App\Application\UseCase\CreateOrder\Request\CreateOrderAmountRequest;
+use Ozean12\Money\TaxedMoney\TaxedMoney;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderStateManager;
 
@@ -20,9 +20,9 @@ class UpdateOrderAmountValidator
         OrderStateManager::STATE_CREATED,
     ];
 
-    public function getValidatedValue(OrderContainer $orderContainer, ?CreateOrderAmountRequest $newAmount): ?CreateOrderAmountRequest
+    public function getValidatedValue(OrderContainer $orderContainer, ?TaxedMoney $newAmount): ?TaxedMoney
     {
-        if (!$newAmount || $this->isAmountEmpty($newAmount) || !$this->isAmountChanged($orderContainer, $newAmount)) {
+        if (!$newAmount || !$this->isAmountChanged($orderContainer, $newAmount)) {
             return null;
         }
 
@@ -38,7 +38,7 @@ class UpdateOrderAmountValidator
         return $newAmount;
     }
 
-    private function isAmountChanged(OrderContainer $orderContainer, CreateOrderAmountRequest $newAmount): bool
+    private function isAmountChanged(OrderContainer $orderContainer, TaxedMoney $newAmount): bool
     {
         $financialDetails = $orderContainer->getOrderFinancialDetails();
 
@@ -48,16 +48,7 @@ class UpdateOrderAmountValidator
             !$financialDetails->getAmountTax()->equals($newAmount->getTax());
     }
 
-    private function isAmountEmpty(CreateOrderAmountRequest $amount): bool
-    {
-        return
-            $amount->getGross() === null
-            && $amount->getNet() === null
-            && $amount->getTax() === null
-        ;
-    }
-
-    private function isAmountAllowed(OrderContainer $orderContainer, CreateOrderAmountRequest $newAmount): bool
+    private function isAmountAllowed(OrderContainer $orderContainer, TaxedMoney $newAmount): bool
     {
         $financialDetails = $orderContainer->getOrderFinancialDetails();
 

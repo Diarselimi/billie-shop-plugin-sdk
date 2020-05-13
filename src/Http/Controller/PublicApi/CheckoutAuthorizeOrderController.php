@@ -5,7 +5,7 @@ namespace App\Http\Controller\PublicApi;
 use App\Application\UseCase\CheckoutAuthorizeOrder\CheckoutAuthorizeOrderUseCase;
 use App\DomainModel\OrderResponse\CheckoutAuthorizeOrderResponse;
 use App\Http\Authentication\UserProvider;
-use App\Http\RequestHandler\CreateOrderRequestFactory;
+use App\Http\RequestTransformer\CreateOrder\CreateOrderRequestFactory;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;

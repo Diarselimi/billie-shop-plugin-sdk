@@ -3,6 +3,7 @@
 namespace App\DomainModel\OrderResponse;
 
 use App\DomainModel\Address\AddressEntity;
+use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\Payment\OrderPaymentDetailsDTO;
 use App\DomainModel\Payment\PaymentsServiceInterface;
@@ -39,7 +40,7 @@ class OrderResponseFactory
         $order = $orderContainer->getOrder();
         $response = new OrderResponse();
 
-        $this->addAmountData($orderContainer, $response);
+        $this->addFinancialDetails($orderContainer, $response);
         $this->addOrderData($order, $response);
         $this->addExternalData($orderContainer, $response);
         $this->addDeliveryData($orderContainer, $response);
@@ -128,14 +129,15 @@ class OrderResponseFactory
         return $this->companiesService->getDebtors($debtorIds);
     }
 
-    private function addAmountData(OrderContainer $orderContainer, OrderResponse $response): void
+    private function addFinancialDetails(OrderContainer $orderContainer, OrderResponse $response): void
     {
         $response
-            ->setAmountGross($orderContainer->getOrderFinancialDetails()->getAmountGross()->getMoneyValue())
-            ->setAmountNet($orderContainer->getOrderFinancialDetails()->getAmountNet()->getMoneyValue())
-            ->setAmountTax($orderContainer->getOrderFinancialDetails()->getAmountTax()->getMoneyValue())
-            ->setDuration($orderContainer->getOrderFinancialDetails()->getDuration())
-            ;
+            ->setAmount(TaxedMoneyFactory::create(
+                $orderContainer->getOrderFinancialDetails()->getAmountGross(),
+                $orderContainer->getOrderFinancialDetails()->getAmountNet(),
+                $orderContainer->getOrderFinancialDetails()->getAmountTax()
+            ))
+            ->setDuration($orderContainer->getOrderFinancialDetails()->getDuration());
     }
 
     private function addOrderData(OrderEntity $order, OrderResponse $response): void

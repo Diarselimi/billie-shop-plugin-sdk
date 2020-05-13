@@ -106,12 +106,12 @@ Feature: As a merchant, I should be able to create an order by providing a valid
         {
           "title": "This value should not be blank.",
           "code": "request_validation_error",
-          "source": "amount.net"
+          "source": "amount.gross"
         },
         {
           "title": "This value should not be blank.",
           "code": "request_validation_error",
-          "source": "amount.gross"
+          "source": "amount.net"
         },
         {
           "title": "This value should not be blank.",
@@ -315,3 +315,36 @@ Feature: As a merchant, I should be able to create an order by providing a valid
     """
     Then the order CO123 is in state authorized
     And the response status code should be 400
+
+  Scenario: Successfully order confirmation returns exactly the same decimal numbers for amounts
+    Given I have a authorized order "CO123" with amounts 100.3/99.1/1.2, duration 30 and comment "test order"
+    And I get from companies service a good debtor strict match response
+    And I get from companies service get debtor response
+    And I get from payments service get order details response
+    And Debtor lock limit call succeeded
+    And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
+    """
+    {
+       "amount":{
+          "gross":100.3,
+          "net":99.1,
+          "tax":1.2
+       },
+       "duration":30,
+       "debtor_company":{
+          "name":"Test User Company",
+          "legal_form": "GmbH",
+          "address_addition":"lorem ipsum",
+          "address_house_number":"10",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_city":"Berlin",
+          "address_postal_code":"10179",
+          "address_country":"DE"
+       }
+    }
+    """
+    Then the order CO123 is in state created
+    And the response status code should be 202
+    And the JSON at "amount" should be 100.3
+    And the JSON at "amount_net" should be 99.1
+    And the JSON at "amount_tax" should be 1.2

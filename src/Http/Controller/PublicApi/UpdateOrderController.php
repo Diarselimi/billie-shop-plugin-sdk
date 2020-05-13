@@ -4,9 +4,10 @@ namespace App\Http\Controller\PublicApi;
 
 use App\Application\Exception\FraudOrderException;
 use App\Application\Exception\OrderNotFoundException;
-use App\Application\UseCase\CreateOrder\Request\CreateOrderAmountRequest;
 use App\Application\UseCase\UpdateOrder\UpdateOrderRequest;
 use App\Application\UseCase\UpdateOrder\UpdateOrderUseCase;
+use Ozean12\Money\TaxedMoney\TaxedMoney;
+use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
 use App\DomainModel\OrderUpdate\UpdateOrderException;
 use App\Http\HttpConstantsInterface;
 use OpenApi\Annotations as OA;
@@ -73,7 +74,7 @@ class UpdateOrderController
         }
     }
 
-    private function createAmount(Request $request)
+    private function createAmount(Request $request): ?TaxedMoney
     {
         $amount = $request->request->get('amount');
 
@@ -89,9 +90,6 @@ class UpdateOrderController
             return null;
         }
 
-        return (new CreateOrderAmountRequest())
-            ->setGross($gross)
-            ->setNet($net)
-            ->setTax($tax);
+        return TaxedMoneyFactory::create($gross, $net, $tax);
     }
 }

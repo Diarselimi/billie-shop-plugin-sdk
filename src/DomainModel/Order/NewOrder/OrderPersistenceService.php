@@ -54,7 +54,7 @@ class OrderPersistenceService
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
-        OrderFinancialDetailsRepositoryInterface  $orderFinancialDetailsRepository,
+        OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
         PersonRepositoryInterface $personRepository,
         AddressRepositoryInterface $addressRepository,
         DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
@@ -159,9 +159,9 @@ class OrderPersistenceService
     {
         $orderFinancialDetails = $this->orderFinancialDetailsFactory->create(
             $orderId,
-            $request->getAmount()->getGross(),
-            $request->getAmount()->getNet(),
-            $request->getAmount()->getTax(),
+            $request->getAmount()->getGross()->getMoneyValue(),
+            $request->getAmount()->getNet()->getMoneyValue(),
+            $request->getAmount()->getTax()->getMoneyValue(),
             $request->getDuration()
         );
 

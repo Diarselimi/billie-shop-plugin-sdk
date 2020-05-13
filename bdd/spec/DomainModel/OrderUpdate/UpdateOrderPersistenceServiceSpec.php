@@ -2,8 +2,8 @@
 
 namespace spec\App\DomainModel\OrderUpdate;
 
-use App\Application\UseCase\CreateOrder\Request\CreateOrderAmountRequest;
 use App\Application\UseCase\UpdateOrder\UpdateOrderRequest;
+use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
@@ -65,7 +65,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         PaymentsServiceInterface $paymentsService
     ) {
         $changeSet = (new UpdateOrderRequest('order123', 1))->setAmount(
-            (new CreateOrderAmountRequest())->setGross(150)->setNet(150)->setTax(0)
+            TaxedMoneyFactory::create(150, 150, 0)
         );
         $orderFinancialDetails = (new OrderFinancialDetailsEntity())
             ->setAmountGross(new Money(200))
@@ -130,7 +130,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         PaymentsServiceInterface $paymentsService
     ) {
         $changeSet = (new UpdateOrderRequest('order123', 1))->setAmount(
-            (new CreateOrderAmountRequest())->setGross(150)->setNet(150)->setTax(0)
+            TaxedMoneyFactory::create(150, 150, 0)
         );
         $orderFinancialDetails = (new OrderFinancialDetailsEntity())
             ->setAmountGross(new Money(200))
@@ -391,7 +391,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         PaymentsServiceInterface $paymentsService
     ) {
         $changeSet = (new UpdateOrderRequest('order123', 1))->setAmount(
-            (new CreateOrderAmountRequest())->setGross(150)->setNet(150)->setTax(0)
+            TaxedMoneyFactory::create(150, 150, 0)
         );
         $orderFinancialDetails = (new OrderFinancialDetailsEntity())
             ->setAmountGross(new Money(200))

@@ -1,6 +1,10 @@
 <?php
 
-namespace App\Application\UseCase\CreateOrder\Request;
+namespace App\Http\RequestTransformer\CreateOrder;
+
+use App\Application\UseCase\CreateOrder\Request\CreateOrderLineItemRequest;
+use App\Http\RequestTransformer\AmountRequestFactory;
+use Symfony\Component\HttpFoundation\Request;
 
 class OrderLineItemsRequestFactory
 {
@@ -12,12 +16,13 @@ class OrderLineItemsRequestFactory
     }
 
     /**
-     * @param array $lineItems
-     *
+     * @param  Request                      $request
      * @return CreateOrderLineItemRequest[]
      */
-    public function createMultipleFromArray(array $lineItems): array
+    public function create(Request $request): array
     {
+        $lineItems = $request->request->get('line_items', []);
+
         return array_map([$this, 'createFromArray'], $lineItems);
     }
 
@@ -32,7 +37,6 @@ class OrderLineItemsRequestFactory
             ->setBrand($data['brand'] ?? null)
             ->setGtin($data['gtin'] ?? null)
             ->setMpn($data['mpn'] ?? null)
-            ->setAmount($this->amountRequestFactory->createFromArray($data['amount'] ?? []))
-        ;
+            ->setAmount($this->amountRequestFactory->createFromArray($data['amount'] ?? []));
     }
 }

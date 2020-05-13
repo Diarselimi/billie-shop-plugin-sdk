@@ -2,6 +2,7 @@
 
 namespace App\DomainModel\OrderResponse;
 
+use Ozean12\Money\TaxedMoney\TaxedMoney;
 use App\DomainModel\ArrayableInterface;
 use App\Support\DateFormat;
 use OpenApi\Annotations as OA;
@@ -13,9 +14,9 @@ use OpenApi\Annotations as OA;
  *      @OA\Property(property="state", ref="#/components/schemas/OrderState", example="created"),
  *      @OA\Property(property="reasons", enum=\App\DomainModel\Order\OrderDeclinedReasonsMapper::REASONS, type="string", nullable=true, deprecated=true),
  *      @OA\Property(property="decline_reason", ref="#/components/schemas/OrderDeclineReason", nullable=true),
- *      @OA\Property(property="amount", type="number", format="float", nullable=false, example=123.45),
- *      @OA\Property(property="amount_tax", type="number", format="float", nullable=false, example=123.45),
- *      @OA\Property(property="amount_net", type="number", format="float", nullable=false, example=123.45),
+ *      @OA\Property(property="amount", type="number", format="float", nullable=false, example=123.57, description="Gross amount"),
+ *      @OA\Property(property="amount_net", type="number", format="float", nullable=false, example=100.12),
+ *      @OA\Property(property="amount_tax", type="number", format="float", nullable=false, example=23.45),
  *      @OA\Property(property="duration", ref="#/components/schemas/OrderDuration", example=30),
  *      @OA\Property(property="dunning_status", ref="#/components/schemas/OrderDunningStatus"),
  *
@@ -105,11 +106,7 @@ class OrderResponse implements ArrayableInterface
 
     private $outstandingAmount;
 
-    private $amountGross;
-
-    private $amountTax;
-
-    private $amountNet;
+    private $amount;
 
     private $feeAmount;
 
@@ -122,7 +119,7 @@ class OrderResponse implements ArrayableInterface
     private $pendingCancellationAmount;
 
     /**
-     * @deprecated
+     * @deprecated use declineReason
      */
     private $reasons;
 
@@ -440,38 +437,14 @@ class OrderResponse implements ArrayableInterface
         return $this;
     }
 
-    public function getAmountGross(): float
+    public function getAmount(): TaxedMoney
     {
-        return $this->amountGross;
+        return $this->amount;
     }
 
-    public function setAmountGross(float $amountGross): OrderResponse
+    public function setAmount(TaxedMoney $amount): OrderResponse
     {
-        $this->amountGross = $amountGross;
-
-        return $this;
-    }
-
-    public function getAmountTax(): float
-    {
-        return $this->amountTax;
-    }
-
-    public function setAmountTax(float $amountTax): OrderResponse
-    {
-        $this->amountTax = $amountTax;
-
-        return $this;
-    }
-
-    public function getAmountNet(): float
-    {
-        return $this->amountNet;
-    }
-
-    public function setAmountNet(float $amountNet): OrderResponse
-    {
-        $this->amountNet = $amountNet;
+        $this->amount = $amount;
 
         return $this;
     }
@@ -722,11 +695,11 @@ class OrderResponse implements ArrayableInterface
             'order_id' => $this->getExternalCode(), // This is very confusing because the api used to return the external_code as an order_id.
             'uuid' => $this->getUuid(),
             'state' => $this->getState(),
-            'reasons' => $this->getReasons() ? join(', ', $this->getReasons()) : null,
+            'reasons' => $this->getReasons() ? implode(', ', $this->getReasons()) : null,
             'decline_reason' => $this->getDeclineReason(),
-            'amount' => $this->getAmountGross(),
-            'amount_net' => $this->getAmountNet(),
-            'amount_tax' => $this->getAmountTax(),
+            'amount' => $this->getAmount()->getGross()->getMoneyValue(),
+            'amount_net' => $this->getAmount()->getNet()->getMoneyValue(),
+            'amount_tax' => $this->getAmount()->getTax()->getMoneyValue(),
             'duration' => $this->getDuration(),
             'dunning_status' => $this->getDunningStatus(),
             'debtor_company' => [

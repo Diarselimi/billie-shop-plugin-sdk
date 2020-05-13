@@ -138,7 +138,7 @@ Feature: APIS-1077
       | gross | net | tax |
       | 500   | 150 | 100 |
     Then the response status code should be 400
-    And the response should contain "Invalid amounts"
+    And the response should contain "gross is not equal to net + tax"
 
   Scenario Template: Provided amount is wrong: amount is zero or negative
     Given I have a new order "abc123" with amounts 1000/900/100, duration 30 and comment "test order"

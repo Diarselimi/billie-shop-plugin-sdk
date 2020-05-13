@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Application\UseCase\CheckoutConfirmOrder;
 
 use App\Application\Exception\OrderNotFoundException;

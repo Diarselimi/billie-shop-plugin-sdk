@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\DomainModel\CheckoutSession;
 
-// TODO: APIS-1946 // refactor all amount-related code into App\DomainModel\Amount and stop using App\Application layer here
-use App\Application\UseCase\CreateOrder\Request\CreateOrderAmountRequest;
+use Ozean12\Money\TaxedMoney\TaxedMoney;
 use App\DomainModel\DebtorCompany\DebtorCompanyRequest;
 
 class CheckoutOrderRequestDTO
@@ -18,12 +17,12 @@ class CheckoutOrderRequestDTO
 
     private $debtorCompany;
 
-    public function getAmount(): CreateOrderAmountRequest
+    public function getAmount(): TaxedMoney
     {
         return $this->amount;
     }
 
-    public function setAmount(CreateOrderAmountRequest $amount): CheckoutOrderRequestDTO
+    public function setAmount(TaxedMoney $amount): CheckoutOrderRequestDTO
     {
         $this->amount = $amount;
 

@@ -775,9 +775,6 @@ Feature:
               "postal_code":"98765",
               "country":"DE"
            },
-           "amount":{
-              "tax":10.10
-           },
            "comment":"Some comment"
         }
       """
@@ -787,14 +784,19 @@ Feature:
       {
          "errors":[
             {
-               "source":"amount.net",
-               "title":"This value should not be blank.",
-               "code":"request_validation_error"
+              "title": "This value should not be blank.",
+              "code": "request_validation_error",
+              "source": "amount.gross"
             },
             {
-               "source":"amount.gross",
-               "title":"This value should not be blank.",
-               "code":"request_validation_error"
+              "title": "This value should not be blank.",
+              "code": "request_validation_error",
+              "source": "amount.net"
+            },
+            {
+              "title": "This value should not be blank.",
+              "code": "request_validation_error",
+              "source": "amount.tax"
             },
             {
                "source":"duration",

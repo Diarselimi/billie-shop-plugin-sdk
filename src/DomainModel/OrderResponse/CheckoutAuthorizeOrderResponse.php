@@ -170,7 +170,7 @@ class CheckoutAuthorizeOrderResponse implements ArrayableInterface
                 'address_city' => $this->getCompanyAddressCity(),
                 'address_country' => $this->getCompanyAddressCountry(),
             ],
-            'reasons' => $this->getReasons() ? join(', ', $this->getReasons()) : null,
+            'reasons' => $this->getReasons() ? implode(', ', $this->getReasons()) : null,
             'decline_reason' => $this->getDeclineReason(),
         ];
     }

@@ -431,18 +431,8 @@ Feature:
     {
        "errors":[
           {
-             "source":"amount.net",
-             "title":"Invalid amounts",
-             "code":"request_validation_error"
-          },
-          {
-             "source":"amount.gross",
-             "title":"Invalid amounts",
-             "code":"request_validation_error"
-          },
-          {
-             "source":"amount.tax",
-             "title":"Invalid amounts",
+             "source":"amount",
+             "title":"Invalid values: gross is not equal to net + tax.",
              "code":"request_validation_error"
           }
        ]
@@ -849,12 +839,12 @@ Feature:
             {
                "title":"This value should not be blank.",
                "code":"request_validation_error",
-               "source":"line_items[0].amount.net"
+               "source":"line_items[0].amount.gross"
             },
             {
                "title":"This value should not be blank.",
                "code":"request_validation_error",
-               "source":"line_items[0].amount.gross"
+               "source":"line_items[0].amount.net"
             },
             {
                "title":"This value should not be blank.",
@@ -1024,19 +1014,9 @@ Feature:
     {
       "errors": [
         {
-          "title": "Invalid amounts",
+          "title": "Invalid values: gross is not equal to net + tax.",
           "code": "request_validation_error",
-          "source": "line_items[0].amount.net"
-        },
-        {
-          "title": "Invalid amounts",
-          "code": "request_validation_error",
-          "source": "line_items[0].amount.gross"
-        },
-        {
-          "title": "Invalid amounts",
-          "code": "request_validation_error",
-          "source": "line_items[0].amount.tax"
+          "source": "line_items[0].amount"
         }
       ]
     }

@@ -91,7 +91,7 @@ Feature:
     """
     Then the order A1 is in state declined
     And the response status code should be 200
-    And the response should contain "risk_policy"
+    And the JSON at "decline_reason" should be "debtor_limit_exceeded"
 
   Scenario: When multiple reasons fail then we should return the reason that was declined for.
     Given The following merchant risk check settings exist for merchant 1:
@@ -160,7 +160,7 @@ Feature:
     }
     """
     Then the order A1 is in state declined
-    And the response should contain "debtor_limit_exceeded"
+    And the JSON at "decline_reason" should be "debtor_limit_exceeded"
     And the response status code should be 200
 
   Scenario: The right reason should be returned after multiple reasons fail.
@@ -229,7 +229,7 @@ Feature:
     }
     """
     Then the order A1 is in state waiting
-    And the response should contain "debtor_address"
+    And the JSON at "decline_reason" should be "debtor_address"
     And the response status code should be 200
 
   Scenario: Successfully decline order in pre_approved state

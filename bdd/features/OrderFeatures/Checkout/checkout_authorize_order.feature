@@ -1029,19 +1029,19 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     {
       "errors": [
         {
-          "source": "amount.net",
           "title": "This value should not be blank.",
-          "code": "request_validation_error"
+          "code": "request_validation_error",
+          "source": "amount.gross"
         },
         {
-          "source": "amount.gross",
           "title": "This value should not be blank.",
-          "code": "request_validation_error"
+          "code": "request_validation_error",
+          "source": "amount.net"
         },
         {
-          "source": "amount.tax",
           "title": "This value should not be blank.",
-          "code": "request_validation_error"
+          "code": "request_validation_error",
+          "source": "amount.tax"
         }
       ]
     }

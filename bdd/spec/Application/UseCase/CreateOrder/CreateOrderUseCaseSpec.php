@@ -4,10 +4,7 @@ namespace spec\App\Application\UseCase\CreateOrder;
 
 use App\Application\UseCase\CreateOrder\CreateOrderRequest;
 use App\Application\UseCase\CreateOrder\CreateOrderUseCase;
-use App\Application\UseCase\CreateOrder\Request\CreateOrderAmountRequest;
-use App\DomainModel\DebtorCompany\DebtorCompany;
-use App\DomainModel\MerchantDebtor\Finder\MerchantDebtorFinder;
-use App\DomainModel\MerchantDebtor\Finder\MerchantDebtorFinderResult;
+use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\Order\IdentifyAndTriggerAsyncIdentification;
@@ -157,12 +154,7 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
     private function mockRequest(CreateOrderRequest $request)
     {
         $request->getDuration()->willReturn(30);
-        $request->getAmount()->willReturn(
-            (new CreateOrderAmountRequest())
-                ->setNet(123.3)
-                ->setTax(123.33)
-                ->setGross(22.22)
-        );
+        $request->getAmount()->willReturn(TaxedMoneyFactory::create(123, 123, 0));
         $request->getMerchantId()->willReturn(30);
         $request->getCheckoutSessionId()->willReturn(1);
         $request->getExternalCode()->willReturn('aaa123');

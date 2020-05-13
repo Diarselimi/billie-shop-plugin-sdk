@@ -2,12 +2,12 @@
 
 namespace App\Application\UseCase\CreateOrder;
 
-use App\Application\UseCase\CreateOrder\Request\CreateOrderAmountRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderDebtorCompanyRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderDebtorPersonRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
 use App\Application\UseCase\ValidatedRequestInterface;
 use App\Application\Validator\Constraint as CustomConstrains;
+use Ozean12\Money\TaxedMoney\TaxedMoney;
 use App\DomainModel\ArrayableInterface;
 use App\DomainModel\OrderLineItem\OrderLineItemEntity;
 use OpenApi\Annotations as OA;
@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @OA\Schema(schema="CreateOrderRequest", title="Order Creation Request", required={"amount", "duration", "debtor_company", "debtor_person"},
  *     properties={
- *          @OA\Property(property="amount", ref="#/components/schemas/CreateOrderAmountRequest"),
+ *          @OA\Property(property="amount", ref="#/components/schemas/AmountDTO"),
  *          @OA\Property(property="comment", ref="#/components/schemas/TinyText", nullable=true),
  *          @OA\Property(property="duration", ref="#/components/schemas/OrderDuration"),
  *          @OA\Property(property="order_id", ref="#/components/schemas/TinyText", description="Order external code", example="DE123456-1"),
@@ -36,7 +36,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterface
 {
     /**
+     * @Assert\NotBlank()
      * @Assert\Valid()
+     * @var TaxedMoney
      */
     private $amount;
 
@@ -92,12 +94,12 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
      */
     private $lineItems;
 
-    public function getAmount(): CreateOrderAmountRequest
+    public function getAmount(): TaxedMoney
     {
         return $this->amount;
     }
 
-    public function setAmount(CreateOrderAmountRequest $amount): CreateOrderRequest
+    public function setAmount(TaxedMoney $amount): CreateOrderRequest
     {
         $this->amount = $amount;
 

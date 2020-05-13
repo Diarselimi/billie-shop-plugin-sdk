@@ -1,22 +1,16 @@
 <?php
 
-namespace App\Http\RequestHandler;
+namespace App\Http\RequestTransformer\CreateOrder;
 
 use App\Application\UseCase\CreateOrder\CreateOrderRequest;
-use App\Application\UseCase\CreateOrder\Request\AddressRequestFactory;
-use App\Application\UseCase\CreateOrder\Request\AmountRequestFactory;
-use App\Application\UseCase\CreateOrder\Request\DebtorPersonRequestFactory;
-use App\Application\UseCase\CreateOrder\Request\DebtorRequestFactory;
-use App\Application\UseCase\CreateOrder\Request\OrderLineItemsRequestFactory;
 use App\DomainModel\CheckoutSession\CheckoutSessionEntity;
 use App\Http\HttpConstantsInterface;
+use App\Http\RequestTransformer\AmountRequestFactory;
 use Symfony\Component\HttpFoundation\Request;
 
 class CreateOrderRequestFactory
 {
     private $addressRequestFactory;
-
-    private $amountRequestFactory;
 
     private $debtorRequestFactory;
 
@@ -24,43 +18,45 @@ class CreateOrderRequestFactory
 
     private $lineItemsRequestFactory;
 
+    private $amountRequestFactory;
+
     public function __construct(
-        AmountRequestFactory $amountRequestFactory,
         DebtorRequestFactory $debtorRequestFactory,
         DebtorPersonRequestFactory $debtorPersonRequestFactory,
         AddressRequestFactory $addressRequestFactory,
-        OrderLineItemsRequestFactory $lineItemsRequestFactory
+        OrderLineItemsRequestFactory $lineItemsRequestFactory,
+        AmountRequestFactory $amountRequestFactory
     ) {
         $this->addressRequestFactory = $addressRequestFactory;
-        $this->amountRequestFactory = $amountRequestFactory;
         $this->debtorRequestFactory = $debtorRequestFactory;
         $this->debtorPersonRequestFactory = $debtorPersonRequestFactory;
         $this->lineItemsRequestFactory = $lineItemsRequestFactory;
+        $this->amountRequestFactory = $amountRequestFactory;
     }
 
     public function createForCreateOrder(Request $request): CreateOrderRequest
     {
         $useCaseRequest = (new CreateOrderRequest())
-            ->setAmount($this->amountRequestFactory->createFromArray($request->request->get('amount', [])))
+            ->setAmount($this->amountRequestFactory->create($request))
             ->setCheckoutSessionId($request->attributes->get('checkout_session_id', null))
             ->setMerchantId($request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID))
             ->setDuration($request->request->getInt('duration'))
             ->setComment($request->request->get('comment'))
             ->setExternalCode($request->request->get('order_id'))
-            ->setDebtorCompany($this->debtorRequestFactory->createFromRequest($request->request->get('debtor_company', [])))
-            ->setDebtorPerson($this->debtorPersonRequestFactory->createFromArray($request->request->get('debtor_person', [])))
+            ->setDebtorCompany($this->debtorRequestFactory->create($request))
+            ->setDebtorPerson($this->debtorPersonRequestFactory->create($request))
         ;
 
         $useCaseRequest->setDeliveryAddress(
-            $this->addressRequestFactory->createFromArray($request->request->get('delivery_address', []))
+            $this->addressRequestFactory->create($request, 'delivery_address')
         );
 
         $useCaseRequest->setBillingAddress(
-            $this->addressRequestFactory->createFromArray($request->request->get('billing_address', []))
+            $this->addressRequestFactory->create($request, 'billing_address')
         );
 
         $useCaseRequest->setLineItems(
-            $this->lineItemsRequestFactory->createMultipleFromArray($request->request->get('line_items', []))
+            $this->lineItemsRequestFactory->create($request)
         );
 
         return $useCaseRequest;
