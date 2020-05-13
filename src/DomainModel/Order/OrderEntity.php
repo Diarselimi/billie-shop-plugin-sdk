@@ -18,8 +18,6 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
 
     public const MAX_DURATION_IN_WAITING_STATE = '9 days';
 
-    public const MAX_DURATION_IN_PRE_APPROVED_STATE = '30 days';
-
     private const STATE_TRANSITION_ENTITY_CLASS = OrderStateTransitionEntity::class;
 
     private $uuid;

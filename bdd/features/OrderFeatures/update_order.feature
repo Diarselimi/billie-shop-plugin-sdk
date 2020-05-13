@@ -60,7 +60,6 @@ Feature: APIS-1077
       | shipped      |
       | paid_out     |
       | late         |
-      | pre_approved |
       | waiting      |
 
 

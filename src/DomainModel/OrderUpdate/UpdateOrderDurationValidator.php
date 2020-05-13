@@ -14,7 +14,6 @@ class UpdateOrderDurationValidator
         OrderStateManager::STATE_SHIPPED,
         OrderStateManager::STATE_PAID_OUT,
         OrderStateManager::STATE_LATE,
-        OrderStateManager::STATE_PRE_APPROVED,
         OrderStateManager::STATE_WAITING,
         OrderStateManager::STATE_CREATED,
     ];

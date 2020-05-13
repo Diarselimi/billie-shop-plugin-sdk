@@ -27,7 +27,6 @@ info:
     |---------------|-----------------------------------------------------------------------------------------------|
     | waiting       | The order creation failed and needs a manual operation in order to be approved or declined    |
     | authorized    | State of an order after creating it via the checkout widget. For approval, it needs merchant-side confirmation.    |
-    | pre_approved  | State of an order after creating it via the pre-approve API. For approval, it needs a merchant-side confirmation.  |
     | created       | The order is successfully approved and Billie can offer financing for this transaction        |
     | declined      | The order was declined and no financing is offered for this transaction                       |
     | shipped       | The order was successfully shipped by the merchant                                            |
@@ -327,34 +326,6 @@ paths:
       security:
         -
           oauth2: []
-  /order/pre-approve:
-    post:
-      tags:
-        - 'Back-end Order Creation'
-      summary: 'Pre-approve Order Create'
-      operationId: pre_approve_create_order
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateOrderRequest'
-      responses:
-        '201':
-          description: 'Order was created, but a confirmation is needed.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
   /legal-forms:
     get:
       tags:
@@ -508,41 +479,6 @@ paths:
       security:
         -
           oauth2: []
-  '/order/{uuid}/confirm':
-    post:
-      tags:
-        - 'Back-end Order Creation'
-      summary: 'Pre-approve Order Confirm'
-      operationId: order_pre_approve_confirmation
-      parameters:
-        -
-          name: uuid
-          in: path
-          required: true
-          schema:
-            oneOf:
-              -
-                $ref: '#/components/schemas/UUID'
-              -
-                type: string
-      responses:
-        '202':
-          description: 'Order was confirmed and now it''s in state created.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
   '/order/{id}/ship':
     post:
       tags:
@@ -610,7 +546,6 @@ components:
         - late
         - complete
         - canceled
-        - pre_approved
       example: created
     OrderDeclineReason:
       title: 'Order Decline Reason'

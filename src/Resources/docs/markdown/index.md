@@ -23,7 +23,6 @@ by absorbing any potential debtor defaults.
 |---------------|-----------------------------------------------------------------------------------------------|
 | waiting       | The order creation failed and needs a manual operation in order to be approved or declined    |
 | authorized    | State of an order after creating it via the checkout widget. For approval, it needs merchant-side confirmation.    |
-| pre_approved  | State of an order after creating it via the pre-approve API. For approval, it needs a merchant-side confirmation.  |
 | created       | The order is successfully approved and Billie can offer financing for this transaction        |
 | declined      | The order was declined and no financing is offered for this transaction                       |
 | shipped       | The order was successfully shipped by the merchant                                            |

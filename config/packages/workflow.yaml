@@ -18,7 +18,6 @@ framework:
         - canceled
         - pre_waiting
         - authorized
-        - pre_approved
       transitions:
         pre_waiting:
           from: new
@@ -27,10 +26,10 @@ framework:
           from: [new, pre_waiting]
           to: waiting
         create:
-          from: [new, waiting, authorized, pre_approved]
+          from: [new, waiting, authorized]
           to: created
         decline:
-          from: [new, waiting, authorized, pre_waiting, pre_approved]
+          from: [new, waiting, authorized, pre_waiting]
           to: declined
         ship:
           from: created
@@ -56,9 +55,6 @@ framework:
         authorize:
           from: [new]
           to: authorized
-        pre_approve:
-          from: new
-          to: pre_approved
 
     merchant_onboarding:
       type: state_machine

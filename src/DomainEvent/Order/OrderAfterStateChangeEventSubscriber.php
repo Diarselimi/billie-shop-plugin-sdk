@@ -25,8 +25,6 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
 
     private const WAITING_STATE_QUEUE_ROUTING_KEY = 'order_in_waiting_state_paella';
 
-    private const PRE_APPROVED_STATE_QUEUE_ROUTING_KEY = 'order_in_pre_approved_state_paella';
-
     private $orderRepository;
 
     private $notificationScheduler;
@@ -53,7 +51,6 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
             OrderApprovedEvent::class => 'onApproved',
             OrderDeclinedEvent::class => 'onDeclined',
             OrderInWaitingStateEvent::class => 'onWaiting',
-            OrderPreApprovedEvent::class => 'onPreApproved',
             OrderShippedEvent::class => 'onShipped',
             OrderPaidOutEvent::class => 'onPaidOut',
             OrderIsLateEvent::class => 'onLate',
@@ -132,17 +129,6 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
         );
 
         $this->getSlackClient()->sendMessage($message);
-    }
-
-    public function onPreApproved(OrderPreApprovedEvent $event): void
-    {
-        $order = $event->getOrderContainer()->getOrder();
-
-        $this->delayedMessageProducer->produce(
-            self::PRE_APPROVED_STATE_QUEUE_ROUTING_KEY,
-            ['order_id' => $order->getUuid(), 'merchant_id' => $order->getMerchantId()],
-            OrderEntity::MAX_DURATION_IN_PRE_APPROVED_STATE
-        );
     }
 
     public function onPreWaiting(OrderInPreWaitingStateEvent $event): void

@@ -14,7 +14,6 @@ use App\DomainEvent\Order\OrderIsLateEvent;
 use App\DomainEvent\Order\OrderPaidOutEvent;
 use App\DomainEvent\Order\OrderShippedEvent;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
-use App\DomainEvent\Order\OrderPreApprovedEvent;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -46,8 +45,6 @@ class OrderStateManager implements LoggingInterface
 
     public const STATE_CANCELED = 'canceled';
 
-    public const STATE_PRE_APPROVED = 'pre_approved';
-
     public const ALL_STATES = [
         self::STATE_NEW,
         self::STATE_PRE_WAITING,
@@ -60,11 +57,9 @@ class OrderStateManager implements LoggingInterface
         self::STATE_LATE,
         self::STATE_COMPLETE,
         self::STATE_CANCELED,
-        self::STATE_PRE_APPROVED,
     ];
 
     private const STATE_TRANSITION_EVENTS = [
-        self::STATE_PRE_APPROVED => OrderPreApprovedEvent::class,
         self::STATE_WAITING => OrderInWaitingStateEvent::class,
         self::STATE_SHIPPED => OrderShippedEvent::class,
         self::STATE_PAID_OUT => OrderPaidOutEvent::class,
@@ -98,8 +93,6 @@ class OrderStateManager implements LoggingInterface
     public const TRANSITION_CANCEL_SHIPPED = 'cancel_shipped';
 
     public const TRANSITION_CANCEL_WAITING = 'cancel_waiting';
-
-    public const TRANSITION_PRE_APPROVED = 'pre_approve';
 
     private $orderRepository;
 
@@ -175,11 +168,6 @@ class OrderStateManager implements LoggingInterface
         return $order->getState() === self::STATE_WAITING;
     }
 
-    public function isPreApproved(OrderEntity $order): bool
-    {
-        return $order->getState() === self::STATE_PRE_APPROVED;
-    }
-
     public function approve(OrderContainer $orderContainer): void
     {
         $order = $orderContainer->getOrder();
@@ -227,12 +215,6 @@ class OrderStateManager implements LoggingInterface
     public function authorize(OrderContainer $orderContainer)
     {
         $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_AUTHORIZE);
-        $this->update($orderContainer);
-    }
-
-    public function preApprove(OrderContainer $orderContainer)
-    {
-        $this->workflow->apply($orderContainer->getOrder(), OrderStateManager::TRANSITION_PRE_APPROVED);
         $this->update($orderContainer);
     }
 
