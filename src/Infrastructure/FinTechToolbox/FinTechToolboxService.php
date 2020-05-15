@@ -29,7 +29,7 @@ class FinTechToolboxService implements BicLookupServiceInterface, LoggingInterfa
     public function lookup(IbanDTO $iban): FinTechToolboxResponseDTO
     {
         try {
-            $response = $this->client->get('/bankcodes/' . $iban->getBankCode() . '.json', [
+            $response = $this->client->get('bankcodes/' . $iban->getBankCode() . '.json', [
                 'on_stats' => function (TransferStats $stats) {
                     $this->logServiceRequestStats($stats, 'bic_lookup');
                 },

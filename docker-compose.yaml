@@ -1,0 +1,82 @@
+version: "3.7"
+services:
+  mysql:
+    image: mysql:5.7
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+    restart: always
+    command:
+      - '--max_allowed_packet=16M'
+      - '--default-authentication-plugin=mysql_native_password'
+      - '--character-set-server=utf8'
+      - '--collation-server=utf8_unicode_ci'
+      - '--sql-mode=NO_ENGINE_SUBSTITUTION'
+    environment:
+      - MYSQL_DATABASE=paella
+      - MYSQL_USER=paella
+      - MYSQL_PASSWORD=test
+      - MYSQL_ROOT_PASSWORD=test
+    healthcheck:
+      test:
+        - CMD
+        - mysqladmin
+        - '-ptest'
+        - ping
+        - '-h'
+        - localhost
+      interval: 5s
+      timeout: 20s
+      retries: 20
+
+  app: # do not change this name, it is required by provisioner.
+    build:
+      context: .
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+    restart: always
+    depends_on:
+      - mysql
+    environment:
+      - APP_ENV=test
+      - APP_NAME=paella-core
+      - INSTANCE_SUFFIX=_test
+      - SENTRY_DSN=
+      - NEWRELIC_APP_KEY=
+      - APP_SECRET=abcdef0123456789abcdef0123456789
+      - DATABASE_DRIVER=mysql
+      - DATABASE_HOST=mysql
+      - DATABASE_PORT=3306
+      - DATABASE_NAME=paella
+      - DATABASE_USERNAME=paella
+      - DATABASE_PASSWORD=test
+      - ENQUEUE_DSN=null://
+      - ALFRED_URL=
+      - AWS_ACCESS_KEY_ID=TEST
+      - AWS_REGION=eu-central-1
+      - AWS_SECRET_ACCESS_KEY=test
+      - BORSCHT_URL=
+      - GRAPHQL_API_KEY=test
+      - GRAPHQL_ENDPOINT=
+      - LIMES_URL=
+      - MOCKSERVER_URL=
+      - NACHOS_URL=
+      - RABBITMQ_HOST=
+      - RABBITMQ_USERNAME=
+      - RABBITMQ_PASSWORD=
+      - RECEIVE_INVOICES_SNS_TOPIC_ARN=
+      - RISKY_URL=
+      - SALESFORCE_API_KEY=
+      - SALESFORCE_API_URL=
+      - SLACK_WEBHOOK_URL=
+      - SMAUG_CLIENT_ID=
+      - SMAUG_CLIENT_SECRET=
+      - SMAUG_URL=
+      - FINTECH_TOOLBOX_API_URL=
+      - FINTECH_TOOLBOX_API_KEY=
+      - DOCUMENT_GENERATOR_URL=
+    volumes:
+      - './:/app:delegated'

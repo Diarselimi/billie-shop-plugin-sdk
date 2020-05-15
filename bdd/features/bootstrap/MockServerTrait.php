@@ -1,32 +1,17 @@
 <?php
 
 use Behat\Gherkin\Node\PyStringNode;
-use donatj\MockWebServer\MockWebServer;
 use donatj\MockWebServer\Response;
 use donatj\MockWebServer\ResponseByMethod;
 use donatj\MockWebServer\ResponseInterface;
 
 trait MockServerTrait
 {
-    /**
-     * @var MockWebServer
-     */
-    private static $server;
-
-    public static function startServer(int $port)
-    {
-        self::$server = new MockWebServer($port);
-        self::$server->start();
-    }
-
-    public static function stopServer()
-    {
-        self::$server->stop();
-    }
+    private $serviceBasePath = '/';
 
     public function mockRequest($uri, ResponseInterface $response)
     {
-        self::$server->setResponseOfPath($uri, $response);
+        MockServerContext::getServer()->setResponseOfPath($this->serviceBasePath . ltrim($uri, '/'), $response);
     }
 
     /**

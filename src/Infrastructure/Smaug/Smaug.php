@@ -39,7 +39,7 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
     {
         try {
             $response = $this->client->get(
-                '/oauth/authorization',
+                'oauth/authorization',
                 [
                     'headers' => ['Authorization' => $token],
                     'on_stats' => function (TransferStats $stats) {
@@ -64,7 +64,7 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
     {
         try {
             $response = $this->client->post(
-                '/clients',
+                'clients',
                 [
                     'json' => ['name' => $clientName],
                     'on_stats' => function (TransferStats $stats) {
@@ -93,7 +93,7 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
     {
         try {
             $response = $this->client->post(
-                '/users',
+                'users',
                 [
                     'json' => ['email' => $email, 'password' => $password],
                     'on_stats' => function (TransferStats $stats) {
@@ -122,7 +122,7 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
     {
         try {
             $response = $this->client->post(
-                '/oauth/token',
+                'oauth/token',
                 [
                     'json' => [
                         'grant_type' => 'password',
@@ -157,7 +157,7 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
     {
         try {
             $this->client->post(
-                '/oauth/token/revoke',
+                'oauth/token/revoke',
                 [
                     'headers' => [
                         'Authorization' => $token,
@@ -184,7 +184,7 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
     public function getCredentials(string $clientId): ?GetMerchantCredentialsDTO
     {
         try {
-            $response = $this->client->get("/client/{$clientId}/credentials", [
+            $response = $this->client->get("client/{$clientId}/credentials", [
                 'on_stats' => function (TransferStats $stats) {
                     $this->logServiceRequestStats($stats, 'get_client_credentials');
                 },
@@ -210,7 +210,7 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
         try {
             $response = $this->client->request(
                 'get',
-                '/users',
+                'users',
                 [
                     'query' => ['uuids' => $uuids],
                     'on_stats' => function (TransferStats $stats) {

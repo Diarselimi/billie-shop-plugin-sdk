@@ -1,5 +1,5 @@
 parameters:
-  behat_mock_server_url: "http://localhost"
+  behat_mock_server_url: "http://localhost:7070"
   #billie_monitoring_slack_webhook_url: null # do not use slack client for tests!
 
 services:

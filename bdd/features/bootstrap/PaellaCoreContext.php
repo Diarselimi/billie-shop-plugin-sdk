@@ -63,10 +63,13 @@ use Behat\MinkExtension\Context\MinkContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Billie\PdoBundle\Infrastructure\Pdo\PdoConnection;
 use Ozean12\Money\Money;
+use Symfony\Component\HttpKernel\HttpKernelBrowser;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
+use Behat\Mink\Driver\BrowserKitDriver;
+use Behat\Mink\Session;
 
 class PaellaCoreContext extends MinkContext
 {
@@ -108,6 +111,19 @@ class PaellaCoreContext extends MinkContext
         ');
         $this->cleanUpScenario();
         $this->initScenario();
+    }
+
+    /**
+     * @BeforeScenario
+     * @see https://github.com/Behat/Symfony2Extension/pull/124
+     */
+    public function setup()
+    {
+        $this->getMink()->registerSession(
+            'test',
+            new Session(new BrowserKitDriver(new HttpKernelBrowser($this->kernel)))
+        );
+        $this->getMink()->setDefaultSessionName('test');
     }
 
     public function initScenario()
@@ -313,7 +329,7 @@ class PaellaCoreContext extends MinkContext
      */
     public function iHaveAnOrder($state, $externalCode, $gross, $net, $tax, $duration, $comment, $paymentUuid = null)
     {
-        list($person, $deliveryAddress, $debtor, $merchantDebtor) = $this->debtorData ?? $this->iHaveADebtorWithoutOrders();
+        [$person, $deliveryAddress, $debtor, $merchantDebtor] = $this->debtorData ?? $this->iHaveADebtorWithoutOrders();
 
         $order = (new OrderEntity())
             ->setExternalCode($externalCode)

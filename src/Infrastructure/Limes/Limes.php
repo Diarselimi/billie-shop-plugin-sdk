@@ -34,7 +34,7 @@ class Limes implements DebtorLimitServiceInterface, LoggingInterface
     public function check(string $debtorCompanyUuid, string $customerCompanyUuid, float $amount): bool
     {
         try {
-            $response = $this->client->post("/debtor-limit/check", [
+            $response = $this->client->post("debtor-limit/check", [
                 'json' => [
                     'debtor_company_uuid' => $debtorCompanyUuid,
                     'customer_company_uuid' => $customerCompanyUuid,
@@ -56,7 +56,7 @@ class Limes implements DebtorLimitServiceInterface, LoggingInterface
     public function lock(string $debtorCompanyUuid, string $customerCompanyUuid, float $amount): void
     {
         try {
-            $this->client->post("/debtor-limit/lock", [
+            $this->client->post("debtor-limit/lock", [
                 'json' => [
                     'debtor_company_uuid' => $debtorCompanyUuid,
                     'customer_company_uuid' => $customerCompanyUuid,
@@ -74,7 +74,7 @@ class Limes implements DebtorLimitServiceInterface, LoggingInterface
     public function release(string $debtorCompanyUuid, string $customerCompanyUuid, float $amount): void
     {
         try {
-            $this->client->post("/debtor-limit/release", [
+            $this->client->post("debtor-limit/release", [
                 'json' => [
                     'debtor_company_uuid' => $debtorCompanyUuid,
                     'customer_company_uuid' => $customerCompanyUuid,
@@ -92,7 +92,7 @@ class Limes implements DebtorLimitServiceInterface, LoggingInterface
     public function retrieve(string $debtorCompanyUuid): DebtorLimitDTO
     {
         try {
-            $response = $this->client->get("/debtor-limit/$debtorCompanyUuid");
+            $response = $this->client->get("debtor-limit/$debtorCompanyUuid");
 
             return $this->factory->createFromLimesResponse($this->decodeResponse($response));
         } catch (TransferException $exception) {
@@ -103,7 +103,7 @@ class Limes implements DebtorLimitServiceInterface, LoggingInterface
     public function update(string $debtorCompanyUuid, string $customerCompanyUuid, float $newLimit): DebtorLimitDTO
     {
         try {
-            $response = $this->client->post("/debtor-limit/update", [
+            $response = $this->client->post("debtor-limit/update", [
                 'json' => [
                     'debtor_company_uuid' => $debtorCompanyUuid,
                     'customer_company_uuid' => $customerCompanyUuid,
@@ -124,7 +124,7 @@ class Limes implements DebtorLimitServiceInterface, LoggingInterface
     public function createDefaultDebtorCustomerLimit(string $customerCompanyUuid, float $defaultLimit): void
     {
         try {
-            $this->client->put("/debtor-limit/default-customer-limit", [
+            $this->client->put("debtor-limit/default-customer-limit", [
                 'json' => [
                     'customer_company_uuid' => $customerCompanyUuid,
                     'default_financing_limit' => $defaultLimit,

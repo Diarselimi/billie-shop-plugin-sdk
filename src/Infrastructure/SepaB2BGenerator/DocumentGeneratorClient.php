@@ -21,7 +21,7 @@ class DocumentGeneratorClient implements DocumentGeneratorClientInterface
 
     public function generate(SepaB2BDocumentGenerationRequestDTO $b2BGeneratorDTO): string
     {
-        $response = $this->client->post('/generate/b2b_mandate', [
+        $response = $this->client->post('generate/b2b_mandate', [
             'json' => $b2BGeneratorDTO->toArray(),
         ]);
 

@@ -26,7 +26,7 @@ class Salesforce implements SalesforceInterface
     public function pauseOrderDunning(string $orderUuid, int $numberOfDays): void
     {
         try {
-            $this->client->post("/api/services/apexrest/v1/dunning", [
+            $this->client->post("api/services/apexrest/v1/dunning", [
                 'json' => [
                     'referenceUuid' => $orderUuid,
                     'numberOfDays' => $numberOfDays,
@@ -40,7 +40,7 @@ class Salesforce implements SalesforceInterface
     public function getOrderDunningStatus(string $orderUuid): ? string
     {
         try {
-            $response = $this->client->get("/api/services/apexrest/v1/dunning/$orderUuid");
+            $response = $this->client->get("api/services/apexrest/v1/dunning/$orderUuid");
 
             $decodedResponse = $this->decodeResponse($response);
 

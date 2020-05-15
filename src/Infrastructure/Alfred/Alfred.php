@@ -64,7 +64,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         }
 
         try {
-            $response = $this->client->get('/debtors', [
+            $response = $this->client->get('debtors', [
                 'query' => [
                     'ids' => $debtorIds,
                 ],
@@ -84,7 +84,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
     public function getDebtorsByCrefoId(string $crefoId): array
     {
         try {
-            $response = $this->client->get("/debtor/crefo/{$crefoId}");
+            $response = $this->client->get("debtor/crefo/{$crefoId}");
 
             return $this->factory->createFromMultipleDebtorCompaniesResponse($this->decodeResponse($response));
         } catch (TransferException | ClientResponseDecodeException $exception) {
@@ -99,7 +99,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
     private function doGetDebtor($identifier): ?DebtorCompany
     {
         try {
-            $response = $this->client->get("/debtor/{$identifier}");
+            $response = $this->client->get("debtor/{$identifier}");
 
             return $this->factory->createFromAlfredResponse($this->decodeResponse($response));
         } catch (TransferException | ClientResponseDecodeException $exception) {
@@ -114,7 +114,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
     public function updateCompany(string $companyUuid, array $updateData): DebtorCompany
     {
         try {
-            $response = $this->client->put("/companies/{$companyUuid}", [
+            $response = $this->client->put("companies/{$companyUuid}", [
                 'json' => $updateData,
             ]);
 
@@ -127,7 +127,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
     public function createDebtor(DebtorCreationDTO $debtorCreationDTO): DebtorCompany
     {
         try {
-            $response = $this->client->post('/debtors', [
+            $response = $this->client->post('debtors', [
                 'json' => $debtorCreationDTO->toArray(),
             ]);
 
@@ -141,7 +141,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
     {
         try {
             $response = $this->client->post(
-                "/debtor/$debtorId/synchronize"
+                "debtor/$debtorId/synchronize"
             );
 
             return $this->factory->createFromAlfredResponse($this->decodeResponse($response));
@@ -153,7 +153,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
     public function identifyDebtor(IdentifyDebtorRequestDTO $requestDTO): ?IdentifiedDebtorCompany
     {
         try {
-            $response = $this->client->post('/debtor/identify', [
+            $response = $this->client->post('debtor/identify', [
                 'json' => $requestDTO->toArray(),
                 'headers' => [
                     self::HEADER_X_TRACKER_USER_ID => DebtorEmailHashFactory::create($requestDTO->getEmail()),
@@ -206,7 +206,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
     public function strictMatchDebtor(string $debtorUuid, IdentifyDebtorRequestDTO $requestDTO): bool
     {
         try {
-            $this->client->post('/debtor/strict-match', [
+            $this->client->post('debtor/strict-match', [
                 'json' => array_merge(['expected_company_uuid' => $debtorUuid], $requestDTO->toArray()),
                 'on_stats' => function (TransferStats $stats) {
                     $this->logServiceRequestStats($stats, 'strict_match_debtor');
@@ -233,7 +233,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         }
 
         try {
-            $this->client->post('/debtor/mark-duplicates', [
+            $this->client->post('debtor/mark-duplicates', [
                 'json' => $payload,
             ]);
         } catch (TransferException $exception) {
@@ -248,7 +248,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
     public function getSignatoryPowers(string $companyIdentifier): array
     {
         try {
-            $response = $this->client->get("/debtor/{$companyIdentifier}/signatory-powers");
+            $response = $this->client->get("debtor/{$companyIdentifier}/signatory-powers");
         } catch (TransferException $exception) {
             throw new CompaniesServiceRequestException($exception);
         }
@@ -259,7 +259,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
     public function getSignatoryPowerDetails(string $token): ?SignatoryPowerDTO
     {
         try {
-            $response = $this->client->get("/signatory-powers/{$token}");
+            $response = $this->client->get("signatory-powers/{$token}");
         } catch (ClientException $exception) {
             if ($exception->getCode() === Response::HTTP_NOT_FOUND) {
                 return null;
@@ -276,7 +276,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
     public function acceptSignatoryPowerTc(string $signatoryPowerUuid): void
     {
         try {
-            $this->client->post("/signatory-powers/{$signatoryPowerUuid}/accept-tc");
+            $this->client->post("signatory-powers/{$signatoryPowerUuid}/accept-tc");
         } catch (TransferException $exception) {
             throw new CompaniesServiceRequestException($exception);
         }
@@ -285,7 +285,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
     public function assignIdentityVerificationCase(string $caseUuid, string $signatoryPowerUuid): void
     {
         try {
-            $this->client->post('/signatory-powers/assign-identity-verification', [
+            $this->client->post('signatory-powers/assign-identity-verification', [
                 'json' => [
                     'signatory_power_uuid' => $signatoryPowerUuid,
                     'identity_verification_case_uuid' => $caseUuid,
@@ -303,7 +303,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         }, $signatoryPowerDTOs);
 
         try {
-            $this->client->post("/debtor/{$companyIdentifier}/signatory-powers-selection", [
+            $this->client->post("debtor/{$companyIdentifier}/signatory-powers-selection", [
                 'json' => $requestData,
             ]);
         } catch (TransferException $exception) {

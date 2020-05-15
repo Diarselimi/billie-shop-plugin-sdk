@@ -1,67 +1,67 @@
 eight_points_guzzle:
   clients:
     alfred:
-      base_url: "%behat_mock_server_url%:8021"
+      base_url: "%behat_mock_server_url%/alfred/"
       options:
         debug: false
         query:
           app: alfred
     borscht:
-      base_url: "%behat_mock_server_url%:8022"
+      base_url: "%behat_mock_server_url%/borscht/"
       options:
         debug: false
         query:
           app: borscht
     smaug:
-      base_url: "%behat_mock_server_url%:8023"
+      base_url: "%behat_mock_server_url%/smaug/"
       options:
         debug: false
         query:
           app: smaug
     salesforce:
-      base_url: "%behat_mock_server_url%:8024"
+      base_url: "%behat_mock_server_url%/salesforce/"
       options:
         debug: false
         query:
           app: salesforce
     limes:
-      base_url: "%behat_mock_server_url%:8025"
+      base_url: "%behat_mock_server_url%/limes/"
       options:
         debug: false
         query:
           app: limes
     paella_sandbox:
-      base_url: "%behat_mock_server_url%:8026"
+      base_url: "%behat_mock_server_url%/paella_sandbox/"
       options:
         debug: false
         query:
           app: paella_sandbox
     fintech_toolbox:
-      base_url: "%behat_mock_server_url%:8027"
+      base_url: "%behat_mock_server_url%/fintech_toolbox/"
       options:
         debug: false
         query:
           app: bic_lookup
     webapp:
-      base_url: "%behat_mock_server_url%:8028"
+      base_url: "%behat_mock_server_url%/webapp/"
       options:
         debug: false
         query:
           app: webapp
     nachos:
-      base_url: "%behat_mock_server_url%:8029"
+      base_url: "%behat_mock_server_url%/nachos/"
       options:
         debug: false
         query:
           app: file_manager
     document_generator:
-      base_url: "%behat_mock_server_url%:8030"
+      base_url: "%behat_mock_server_url%/document_generator/"
       options:
         debug: false
         query:
           app: document_generator
     jarvis:
-      base_url: "%behat_mock_server_url%:8031"
+      base_url: "%behat_mock_server_url%/jarvis/"
       options:
         debug: false
         query:

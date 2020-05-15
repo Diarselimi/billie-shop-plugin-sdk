@@ -43,3 +43,5 @@ phpspec.yml
 .graphqlconfig
 schema.graphql
 ###< graphql PHPStorm plugin ###
+
+docker-compose.override.yaml

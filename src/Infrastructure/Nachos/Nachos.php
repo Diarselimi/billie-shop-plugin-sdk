@@ -28,7 +28,7 @@ class Nachos implements FileServiceInterface
     public function upload(string $contents, string $filename, string $type): FileServiceResponseDTO
     {
         try {
-            $response = $this->client->post('/files', [
+            $response = $this->client->post('files', [
                 'multipart' => [
                     [
                         'name' => 'file',
@@ -50,7 +50,7 @@ class Nachos implements FileServiceInterface
     public function download(string $fileUuid): StreamInterface
     {
         try {
-            $response = $this->client->get("/files/{$fileUuid}/raw", ['stream' => true]);
+            $response = $this->client->get("files/{$fileUuid}/raw", ['stream' => true]);
         } catch (TransferException $exception) {
             throw new FileServiceRequestException($exception);
         }

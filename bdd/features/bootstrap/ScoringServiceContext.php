@@ -8,33 +8,11 @@ use donatj\MockWebServer\Response as MockResponse;
 
 class ScoringServiceContext implements Context
 {
-    private const MOCK_SERVER_PORT = 8031;
-
     use MockServerTrait;
 
     public function __construct()
     {
-        register_shutdown_function(
-            function () {
-                self::stopServer();
-            }
-        );
-    }
-
-    /**
-     * @BeforeSuite
-     */
-    public static function beforeSuite()
-    {
-        self::startServer(self::MOCK_SERVER_PORT);
-    }
-
-    /**
-     * @AfterSuite
-     */
-    public static function afterSuite()
-    {
-        self::stopServer();
+        $this->serviceBasePath = '/jarvis/';
     }
 
     /**

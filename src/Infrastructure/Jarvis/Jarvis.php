@@ -29,7 +29,7 @@ class Jarvis implements ScoringServiceInterface, LoggingInterface
     public function isEligibleForPayAfterDelivery(DebtorScoringRequestDTO $requestDTO): bool
     {
         try {
-            $response = $this->client->get("/debtor-scoring/{$requestDTO->getDebtorUuid()}", [
+            $response = $this->client->get("debtor-scoring/{$requestDTO->getDebtorUuid()}", [
                 'query' => [
                     'is_sole_trader' => $requestDTO->isSoleTrader(),
                     'has_paid_invoice' => $requestDTO->isHasPaidInvoice(),

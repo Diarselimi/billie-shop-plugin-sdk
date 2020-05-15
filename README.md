@@ -36,27 +36,23 @@ bin/generate-api-docs [API_VERSION]
 
 Generates all API specification variants at the same time (standard, dashboard, support, etc.).
 
-The API_VERSION argument is optional, by default it uses the latest repository tag if possible,
-or you can pass it manually. Examples:
-
-```bash
-# Automatic version (latest local tag + current commit hash)
-bin/generate-api-docs
-```
-
-```bash
-# Latest local tag + current commit hash (same as default)
-bin/generate-api-docs $(git describe --tags 2> /dev/null)
-```
-
-```bash
-# Latest local tag, without any commit hash
-bin/generate-api-docs $(git describe --tags --abbrev=0 2> /dev/null)
-```
-
-```bash
-# Manual
-bin/generate-api-docs "2019.1.72"
-```
+The API_VERSION argument is optional, by default it uses the latest repository tag (found locally) if possible,
+or you can pass it manually.
 
 The generated YAML files live under the `docs/openapi` folder.
+
+
+### Running tests
+
+In order to run tests locally, first you need to configure your laptop 
+[as described in this guide](https://ozean12.atlassian.net/wiki/spaces/INFRA/pages/868385662/Local+Development).
+
+Then you only need to run `make test`.
+
+You can also run anything inside the php-fpm container using the helper script: `./bin/docker-app-exec`, and
+you will be running under the same PHP version as in production. Examples: 
+
+- `./bin/docker-app-exec bin/console list`
+- `./bin/docker-app-exec vendor/bin/behat bdd/specs/foobar.feature`
+
+... but first you need the container to be running: `docker-compose up -d app`.

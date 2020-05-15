@@ -41,7 +41,7 @@ class WebappIdentityVerificationService implements IdentityVerificationServiceIn
     public function startVerificationCase(IdentityVerificationStartRequestDTO $requestDTO): IdentityVerificationStartResponseDTO
     {
         try {
-            $response = $this->client->post('/sdk/identity-verification.json', [
+            $response = $this->client->post('sdk/identity-verification.json', [
                 'json' => [
                     'first_name' => $requestDTO->getFirstName(),
                     'last_name' => $requestDTO->getLastName(),

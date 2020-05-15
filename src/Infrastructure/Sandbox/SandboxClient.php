@@ -35,7 +35,7 @@ class SandboxClient implements SandboxClientInterface
     public function createMerchant(MerchantWithCompanyCreationDTO $creationDTO): SandboxMerchantDTO
     {
         try {
-            $response = $this->paellaSandboxClient->post("/api/merchant/with-company", [
+            $response = $this->paellaSandboxClient->post("api/merchant/with-company", [
                 'json' => $creationDTO->toArray(),
             ]);
 
@@ -53,7 +53,7 @@ class SandboxClient implements SandboxClientInterface
     public function getMerchantCredentials(string $paymentMerchantUuid): GetMerchantCredentialsDTO
     {
         try {
-            $response = $this->paellaSandboxClient->get("/api/merchant/{$paymentMerchantUuid}");
+            $response = $this->paellaSandboxClient->get("api/merchant/{$paymentMerchantUuid}");
             $response = $this->decodeResponse($response);
 
             $credentials = $response['credentials'];
