@@ -248,7 +248,7 @@ Feature:
     And I get from payments service get debtor response
     And I get from payments service get order details response
     And I get from companies service get debtor response
-    And I get from salesforce dunning status endpoint "Created" status
+    And I get from salesforce dunning status endpoint "Created" status for order "test-order-uuidXF43Y"
     When I send a GET request to "/order/XF43Y"
     Then the response status code should be 200
     And the JSON response should be:
@@ -262,7 +262,7 @@ Feature:
        "amount_net":900,
        "amount_tax":100,
        "duration":30,
-       "dunning_status":"not_started",
+       "dunning_status":"active",
        "debtor_company":{
           "name":"Test User Company",
           "address_house_number":"10",

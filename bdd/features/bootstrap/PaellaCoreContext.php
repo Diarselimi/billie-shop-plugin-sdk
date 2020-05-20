@@ -59,6 +59,8 @@ use App\Infrastructure\Repository\DebtorInformationChangeRequestRepository;
 use App\Infrastructure\Repository\MerchantDebtorRepository;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
+use Behat\Mink\Driver\BrowserKitDriver;
+use Behat\Mink\Session;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Billie\PdoBundle\Infrastructure\Pdo\PdoConnection;
@@ -68,24 +70,12 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
-use Behat\Mink\Driver\BrowserKitDriver;
-use Behat\Mink\Session;
 
 class PaellaCoreContext extends MinkContext
 {
     use KernelDictionary;
 
     public const TEST_MERCHANT_OAUTH_CLIENT_ID = 'testMerchantOauthClientId';
-
-    private $connection;
-
-    /**
-     * @var MerchantEntity
-     */
-    private $merchant;
-
-    /** @var MerchantUserEntity|null */
-    private $lastCreatedUser;
 
     public const DUMMY_UUID4 = '6d6b4222-be8c-11e9-9cb5-2a2ae2dbcce4';
 
@@ -97,27 +87,56 @@ class PaellaCoreContext extends MinkContext
 
     public const MERCHANT_COMPANY_UUID = 'c7be46c0-e049-4312-b274-258ec5aeeb70';
 
+    private $connection;
+
+    /**
+     * @var MerchantEntity
+     */
+    private $merchant;
+
+    /** @var MerchantUserEntity|null */
+    private $lastCreatedUser;
+
     private $debtorData;
+
+    private $resetDbSql;
 
     public function __construct(KernelInterface $kernel, PdoConnection $connection)
     {
         $this->kernel = $kernel;
         $this->connection = $connection;
 
-        $this->getConnection()->exec('
-            SET SESSION wait_timeout=90;
-            SET SESSION max_connections = 500;
-            SET SESSION max_allowed_packet = "16M";
-        ');
-        $this->cleanUpScenario();
-        $this->initScenario();
+        $this->prepareResetDbQueries();
     }
 
     /**
      * @BeforeScenario
-     * @see https://github.com/Behat/Symfony2Extension/pull/124
      */
     public function setup()
+    {
+        $this->initMinkExtension();
+        $this->cleanUpDatabase();
+        $this->createInitialDataset();
+    }
+
+    /**
+     * @AfterScenario
+     */
+    private function releaseResources()
+    {
+        $this->connection->disconnect();
+    }
+
+    private function cleanUpDatabase()
+    {
+        $this->connection->exec($this->resetDbSql);
+        $this->merchant = null;
+    }
+
+    /**
+     * @see https://github.com/Behat/Symfony2Extension/pull/124
+     */
+    private function initMinkExtension()
     {
         $this->getMink()->registerSession(
             'test',
@@ -126,7 +145,7 @@ class PaellaCoreContext extends MinkContext
         $this->getMink()->setDefaultSessionName('test');
     }
 
-    public function initScenario()
+    private function createInitialDataset()
     {
         $fraudRule = (new FraudRuleEntity())
             ->setIncludedWords(['Download', 'ESD'])
@@ -184,66 +203,26 @@ class PaellaCoreContext extends MinkContext
         return $merchant;
     }
 
-    /**
-     * @AfterScenario
-     */
-    public function cleanUpScenario()
+    private function prepareResetDbQueries()
     {
-        $this->getConnection()->exec('
-            SET FOREIGN_KEY_CHECKS = 0;
-            TRUNCATE order_transitions;
-            TRUNCATE order_invoices;
-            TRUNCATE order_identifications;
-            TRUNCATE order_risk_checks;
-            TRUNCATE order_financial_details;
-            TRUNCATE order_line_items;
-            TRUNCATE orders;
-            TRUNCATE order_notifications;
-            TRUNCATE persons;
-            TRUNCATE debtor_external_data;
-            TRUNCATE checkout_sessions;
-            TRUNCATE addresses;
-            TRUNCATE merchants_debtors;
-            TRUNCATE merchant_financial_assessments;
-            TRUNCATE merchant_settings;
-            TRUNCATE merchant_risk_check_settings;
-            TRUNCATE merchant_notification_settings;
-            TRUNCATE merchant_users;
-            TRUNCATE merchant_user_roles;
-            TRUNCATE merchant_user_invitations;
-            TRUNCATE merchants;
-            TRUNCATE merchant_debtor_financial_details;
-            TRUNCATE merchants_debtors;
-            TRUNCATE score_thresholds_configuration;
-            TRUNCATE risk_check_definitions;
-            TRUNCATE checkout_sessions;
-            TRUNCATE risk_check_rules;
-            TRUNCATE merchant_onboardings;
-            TRUNCATE merchant_onboarding_transitions;
-            TRUNCATE merchant_onboarding_steps;
-            TRUNCATE merchant_onboarding_step_transitions;
-            TRUNCATE debtor_settings;
-            TRUNCATE debtor_information_change_request_transitions;
-            TRUNCATE debtor_information_change_requests;
-            ALTER TABLE merchants AUTO_INCREMENT = 1;
-            ALTER TABLE merchants_debtors AUTO_INCREMENT = 1;
-            ALTER TABLE merchant_users AUTO_INCREMENT = 1;
-            ALTER TABLE orders AUTO_INCREMENT = 1;
-            SET FOREIGN_KEY_CHECKS = 1;
-        ');
-        $this->killOpenDbProcesses();
-    }
+        $sqls = [
+            'SET FOREIGN_KEY_CHECKS = 0;',
+        ];
 
-    private function killOpenDbProcesses()
-    {
-        $dbName = 'paella';
-        $threads = $this->connection->query('SHOW FULL PROCESSLIST');
+        $tables = $this->connection->query(
+            'SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES 
+                WHERE TABLE_TYPE="BASE TABLE" 
+                AND TABLE_NAME NOT IN ("phinxlog", "public_domains");'
+        )->fetchAll(\PDO::FETCH_ASSOC);
 
-        while ($thread = $threads->fetch()) {
-            if ($thread['db'] == $dbName && $thread['Command'] == 'Sleep') {
-                $this->connection->query(sprintf('KILL %d', $thread['Id']));
-            }
+        foreach ($tables as $table) {
+            $sqls[] = "TRUNCATE TABLE {$table['TABLE_NAME']};";
+            $sqls[] = "ALTER TABLE {$table['TABLE_NAME']} AUTO_INCREMENT = 1;";
         }
+
+        $sqls[] = 'SET FOREIGN_KEY_CHECKS = 1;';
+
+        $this->resetDbSql = implode(PHP_EOL, $sqls);
     }
 
     /**

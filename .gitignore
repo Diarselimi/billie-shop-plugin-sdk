@@ -45,3 +45,4 @@ schema.graphql
 ###< graphql PHPStorm plugin ###
 
 docker-compose.override.yaml
+docker-compose.override.yml

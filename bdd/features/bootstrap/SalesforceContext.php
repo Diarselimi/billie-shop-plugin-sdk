@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Behat\Behat\Context\Context;
 use donatj\MockWebServer\Response as MockResponse;
 use donatj\MockWebServer\ResponseStack;
@@ -18,9 +20,12 @@ class SalesforceContext implements Context
      */
     public function salesforceAPIRespondedForPauseDunningRequestWithSuccess()
     {
-        $this->mockRequest('/api/services/apexrest/v1/dunning', new ResponseStack(
-            new MockResponse(json_encode(['success' => true, 'message' => null]))
-        ));
+        $this->mockRequest(
+            '/api/services/apexrest/v1/dunning',
+            new ResponseStack(
+                new MockResponse(json_encode(['success' => true, 'message' => null]))
+            )
+        );
     }
 
     /**
@@ -28,30 +33,36 @@ class SalesforceContext implements Context
      */
     public function salesforceAPIRespondedForPauseDunningRequestStatusCodeAndErrorMessage($statusCode, $errorMessage)
     {
-        $this->mockRequest('/api/services/apexrest/v1/dunning', new ResponseStack(
-            new MockResponse(json_encode(['success' => false, 'message' => $errorMessage]), [], (int) $statusCode)
-        ));
+        $this->mockRequest(
+            '/api/services/apexrest/v1/dunning',
+            new ResponseStack(
+                new MockResponse(json_encode(['success' => false, 'message' => $errorMessage]), [], (int) $statusCode)
+            )
+        );
     }
 
     /**
-     * @Given I get from salesforce dunning status endpoint :status status
+     * @Given I get from salesforce dunning status endpoint :status status for order :uuid
      */
-    public function iGetFromSalesforceDunningStatusEndpointStatus($status)
+    public function iGetFromSalesforceDunningStatusEndpointStatus($status, $orderUuid)
     {
-        $this->mockRequest('/api/services/apexrest/v1/dunning/test-order-uuid', new ResponseStack(
-            new MockResponse(
-                json_encode(
-                    [
-                        'success' => false,
-                        'message' => null,
-                        'result' => [
-                            ['referenceUuid' => 'test-order-uuid', 'collectionClaimStatus' => $status],
-                        ],
-                    ]
-                ),
-                [],
-                200
+        $this->mockRequest(
+            '/api/services/apexrest/v1/dunning/' . $orderUuid,
+            new ResponseStack(
+                new MockResponse(
+                    json_encode(
+                        [
+                            'success' => false,
+                            'message' => null,
+                            'result' => [
+                                ['referenceUuid' => 'test-order-uuidXF43Y', 'collectionClaimStatus' => $status],
+                            ],
+                        ]
+                    ),
+                    [],
+                    200
+                )
             )
-        ));
+        );
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Salesforce;
 
 use App\DomainModel\Order\SalesforceInterface;
+use App\Infrastructure\ClientResponseDecodeException;
 use App\Infrastructure\DecodeResponseTrait;
 use App\Infrastructure\Salesforce\Exception\SalesforceAuthenticationException;
 use App\Infrastructure\Salesforce\Exception\SalesforceException;
@@ -43,6 +44,10 @@ class Salesforce implements SalesforceInterface
             $response = $this->client->get("api/services/apexrest/v1/dunning/$orderUuid");
 
             $decodedResponse = $this->decodeResponse($response);
+
+            if (!isset($decodedResponse['result']) || !is_array($decodedResponse['result'])) {
+                throw new ClientResponseDecodeException('Unexpected decoded response from Salesforce client.');
+            }
 
             foreach ($decodedResponse['result'] as $result) {
                 if ($orderUuid === $result['referenceUuid']) {

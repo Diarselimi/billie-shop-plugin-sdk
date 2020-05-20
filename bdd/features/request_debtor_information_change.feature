@@ -158,7 +158,7 @@ Feature:
       }
     """
     Then debtor information change request aaa should have state declined
-# TODO: fix this scenario:
+
   Scenario: Invalidate debtor external data when change request decision issued approved
     Given a merchant user exists with role "admin" and permission CHANGE_DEBTOR_INFORMATION
     And the following debtor information change requests exist:
@@ -175,4 +175,4 @@ Feature:
     }
     """
     Then debtor information change request aaa should have state complete
-    And debtor external data "1" should have been invalidated "ext_id-invalidated"
+    And debtor external data "1" should have been invalidated "ext_id"

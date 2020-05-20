@@ -47,12 +47,47 @@ The generated YAML files live under the `docs/openapi` folder.
 In order to run tests locally, first you need to configure your laptop 
 [as described in this guide](https://ozean12.atlassian.net/wiki/spaces/INFRA/pages/868385662/Local+Development).
 
-Then you only need to run `make test`.
+For running tests you need to be able pull images from our AWS Docker registry, to be able
+to use the same PHP image as in production.
 
-You can also run anything inside the php-fpm container using the helper script: `./bin/docker-app-exec`, and
-you will be running under the same PHP version as in production. Examples: 
+#### All tests
+
+This command will start the docker containers, run migrations and run all test suites:
+```bash
+make test
+```
+
+#### Behat
+
+To run only behat tests, you need to first start the containers and run the migrations (if you didn't):
+```bash
+make test-cleanup
+make test-up
+make test-migrate
+```
+
+Then run:
+```bash
+make test-behat
+```
+
+#### PHPSpec
+
+To run only phpspec tests, you need to first start the containers (if you didn't):
+```bash
+make test-cleanup
+make test-up
+```
+
+Then run:
+```bash
+make test-phpspec
+```
+
+#### Running other commands
+
+You can also run anything inside the running php-fpm container using the helper script: `./bin/docker-app-exec`.
+Examples: 
 
 - `./bin/docker-app-exec bin/console list`
 - `./bin/docker-app-exec vendor/bin/behat bdd/specs/foobar.feature`
-
-... but first you need the container to be running: `docker-compose up -d app`.

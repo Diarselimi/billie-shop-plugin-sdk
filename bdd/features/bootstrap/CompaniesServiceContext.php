@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
 use donatj\MockWebServer\Response as MockResponse;
@@ -216,14 +218,32 @@ class CompaniesServiceContext implements Context
     }
 
     /**
-     * @Given /^I get from companies service identify firmenwissen response$/
+     * @Given /^I get from companies service identify firmenwissen a successful response$/
      */
     public function iGetFromCompaniesServiceIdentifyFirmenwissenResponse()
     {
-        $this->mockRequest('/debtor/identify/firmenwissen', new ResponseStack(
-            new MockResponse(file_get_contents(
-                __DIR__ . '/../resources/companies_service_identify_firmenwissen.json'
-            ), [], 200)
-        ));
+        $this->mockRequest(
+            '/debtor/identify/firmenwissen',
+            new ResponseStack(
+                new MockResponse(
+                    file_get_contents(
+                        __DIR__ . '/../resources/companies_service_identify_firmenwissen.json'
+                    ),
+                    [],
+                    200
+                )
+            )
+        );
+    }
+
+    /**
+     * @Given /^I get from companies service identify firmenwissen a Not Found response$/
+     */
+    public function iGetFromCompaniesServiceIdentifyFirmenwissen404Response()
+    {
+        $this->mockRequest(
+            '/debtor/identify/firmenwissen',
+            new MockResponse('{}', [], 404)
+        );
     }
 }

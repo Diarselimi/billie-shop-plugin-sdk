@@ -9,6 +9,7 @@ Feature: Register a new merchant with an invitation for the initial admin user.
       """
       {}
       """
+    And I get from companies service identify firmenwissen a Not Found response
     When I send a POST request to "/private/merchant/registration" with body:
       """
       {
@@ -18,7 +19,7 @@ Feature: Register a new merchant with an invitation for the initial admin user.
       """
     Then the JSON response should be:
       """
-      {"errors":[{"title":"Cannot find a company with the given crefo ID","code":"resource_not_found"}]}
+      {"errors":[{"title":"Firmenwissen identification failed","code":"resource_not_found"}]}
       """
     And the response status code should be 404
 
@@ -209,20 +210,25 @@ Feature: Register a new merchant with an invitation for the initial admin user.
     And all the default roles should be created for merchant with company ID 1
     And a user invitation with role "admin" and email "test@billie.dev" should have been created for merchant with company ID 1
 
-		Scenario: Identify company via Firmenwissen when not found
-				Given I get from companies service identify firmenwissen response
-			 And I successfully create OAuth client with id testClientId and secret testClientSecret
-				When I send a POST request to "/private/merchant/registration" with body:
-						"""
+  Scenario: Identify company via Firmenwissen when not found
+    Given I get from companies service "/debtor/crefo/123" endpoint response with status 404 and body
+      """
+      {}
+      """
+    And I get from companies service identify firmenwissen a successful response
+    And I successfully create OAuth client with id testClientId and secret testClientSecret
+    And I get from limit service create default debtor-customer limit successful response
+    When I send a POST request to "/private/merchant/registration" with body:
+			"""
       {
         "crefo_id": "123",
         "email": "test@billie.dev"
       }
-						"""
-				Then the JSON response should be:
-						"""
-						{
-								"name": "Test User Company"
-						}
-						"""
+      """
+    Then the JSON response should be:
+      """
+      {
+          "name": "Test User Company"
+      }
+      """
     And the response status code should be 201

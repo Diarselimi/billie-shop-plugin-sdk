@@ -9,6 +9,13 @@ services:
     restart: always
     command:
       - '--max_allowed_packet=16M'
+      - '--query_cache_size=8M'
+      - '--query_cache_limit=512K'
+      - '--thread_stack=128K'
+      - '--max_connections=40'
+      - '--thread_cache_size=4'
+      - '--interactive_timeout=20'
+      - '--wait_timeout=10'
       - '--default-authentication-plugin=mysql_native_password'
       - '--character-set-server=utf8'
       - '--collation-server=utf8_unicode_ci'
@@ -38,6 +45,8 @@ services:
       options:
         max-size: 10m
     restart: always
+    volumes:
+      - './:/app'
     depends_on:
       - mysql
     environment:
@@ -78,5 +87,3 @@ services:
       - FINTECH_TOOLBOX_API_URL=
       - FINTECH_TOOLBOX_API_KEY=
       - DOCUMENT_GENERATOR_URL=
-    volumes:
-      - './:/app:delegated'
