@@ -31,6 +31,24 @@ class Limes implements DebtorLimitServiceInterface, LoggingInterface
         $this->factory = $factory;
     }
 
+    public function create(string $debtorCompanyUuid, ?string $customerCompanyUuid, float $amount): void
+    {
+        try {
+            $this->client->post("debtor-limit", [
+                'json' => [
+                    'debtor_company_uuid' => $debtorCompanyUuid,
+                    'customer_company_uuid' => $customerCompanyUuid,
+                    'financing_limit' => $amount,
+                ],
+                'on_stats' => function (TransferStats $stats) {
+                    $this->logServiceRequestStats($stats, 'debtor_create_limit');
+                },
+            ]);
+        } catch (TransferException $exception) {
+            throw new DebtorLimitServiceRequestException($exception);
+        }
+    }
+
     public function check(string $debtorCompanyUuid, string $customerCompanyUuid, float $amount): bool
     {
         try {

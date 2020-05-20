@@ -310,4 +310,13 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
             throw new CompaniesServiceRequestException($exception);
         }
     }
+
+    public function blacklistCompany(string $companyUuid): void
+    {
+        try {
+            $this->client->post("company/{$companyUuid}/blacklist");
+        } catch (TransferException $exception) {
+            throw new CompaniesServiceRequestException($exception);
+        }
+    }
 }

@@ -51,4 +51,6 @@ interface CompaniesServiceInterface
     public function acceptSignatoryPowerTc(string $signatoryPowerUuid): void;
 
     public function assignIdentityVerificationCase(string $caseUuid, string $signatoryPowerUuid): void;
+
+    public function blacklistCompany(string $companyUuid): void;
 }

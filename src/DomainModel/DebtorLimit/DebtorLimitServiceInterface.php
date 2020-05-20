@@ -6,6 +6,8 @@ namespace App\DomainModel\DebtorLimit;
 
 interface DebtorLimitServiceInterface
 {
+    public function create(string $debtorCompanyUuid, ?string $customerCompanyUuid, float $amount): void;
+
     public function check(string $debtorCompanyUuid, string $customerCompanyUuid, float $amount): bool;
 
     public function lock(string $debtorCompanyUuid, string $customerCompanyUuid, float $amount): void;
