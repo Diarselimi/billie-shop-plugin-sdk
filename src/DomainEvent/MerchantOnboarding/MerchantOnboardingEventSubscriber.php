@@ -39,7 +39,6 @@ class MerchantOnboardingEventSubscriber implements EventSubscriberInterface, Log
             MerchantOnboardingSignatoryPowerConfirmed::class => 'trackMerchantOnboardingStepCompleteEvent',
             MerchantOnboardingTechnicalIntegrationConfirmed::class => 'trackMerchantOnboardingStepCompleteEvent',
             MerchantOnboardingUboPepSanctionsConfirmed::class => 'trackMerchantOnboardingStepCompleteEvent',
-            MerchantIntegrationStarted::class => 'trackMerchantOnboardingEvent',
         ];
     }
 

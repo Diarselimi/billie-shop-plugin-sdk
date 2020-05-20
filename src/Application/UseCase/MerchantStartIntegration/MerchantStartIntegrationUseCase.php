@@ -2,7 +2,6 @@
 
 namespace App\Application\UseCase\MerchantStartIntegration;
 
-use App\DomainEvent\MerchantOnboarding\MerchantIntegrationStarted;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\Merchant\MerchantWithCompanyCreationDTO;
@@ -11,7 +10,6 @@ use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepEntity;
 use App\DomainModel\Sandbox\SandboxClientInterface;
 use App\DomainModel\Sandbox\SandboxServiceRequestException;
 use App\Helper\Payment\IbanGenerator;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MerchantStartIntegrationUseCase
 {
@@ -29,22 +27,18 @@ class MerchantStartIntegrationUseCase
 
     private $ibanGenerator;
 
-    private $eventDispatcher;
-
     public function __construct(
         MerchantOnboardingContainerFactory $onboardingContainerFactory,
         MerchantRepositoryInterface $merchantRepository,
         SandboxClientInterface $sandboxClient,
         CompaniesServiceInterface $companiesService,
-        IbanGenerator $ibanGenerator,
-        EventDispatcherInterface $eventDispatcher
+        IbanGenerator $ibanGenerator
     ) {
         $this->onboardingContainerFactory = $onboardingContainerFactory;
         $this->merchantRepository = $merchantRepository;
         $this->sandboxClient = $sandboxClient;
         $this->companiesService = $companiesService;
         $this->ibanGenerator = $ibanGenerator;
-        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function execute(MerchantStartIntegrationRequest $request): MerchantStartIntegrationResponse
@@ -89,8 +83,6 @@ class MerchantStartIntegrationUseCase
 
         $merchant->setSandboxPaymentUuid($sandboxClientDTO->getMerchant()->getPaymentUuid());
         $this->merchantRepository->update($merchant);
-
-        $this->eventDispatcher->dispatch(new MerchantIntegrationStarted($merchant->getId()));
 
         return new MerchantStartIntegrationResponse(
             $sandboxClientDTO->getMerchant()->getOauthClientId(),
