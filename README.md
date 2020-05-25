@@ -61,8 +61,7 @@ make test
 
 To run only behat tests, you need to first start the containers and run the migrations (if you didn't):
 ```bash
-make test-cleanup
-make test-up
+make test-reload
 make test-migrate
 ```
 
@@ -75,8 +74,7 @@ make test-behat
 
 To run only phpspec tests, you need to first start the containers (if you didn't):
 ```bash
-make test-cleanup
-make test-up
+make test-reload
 ```
 
 Then run:
