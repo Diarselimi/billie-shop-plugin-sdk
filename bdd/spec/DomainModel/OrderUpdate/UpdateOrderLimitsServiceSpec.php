@@ -2,7 +2,6 @@
 
 namespace spec\App\DomainModel\OrderUpdate;
 
-use App\Application\UseCase\CreateOrder\Request\CreateOrderAmountRequest;
 use App\Application\UseCase\UpdateOrderWithInvoice\UpdateOrderWithInvoiceRequest;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;

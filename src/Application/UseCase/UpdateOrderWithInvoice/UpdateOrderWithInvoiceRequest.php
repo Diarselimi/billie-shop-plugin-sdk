@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @OA\Schema(schema="UpdateOrderWithInvoiceRequest", title="Order Update with invoice Object", type="object", properties={
- *      @OA\Property(property="amount", ref="#/components/schemas/CreateOrderAmountRequest")
+ *      @OA\Property(property="amount", ref="#/components/schemas/AmountDTO")
  * })
  */
 class UpdateOrderWithInvoiceRequest extends AbstractOrderRequest implements
