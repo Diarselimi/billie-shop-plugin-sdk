@@ -246,4 +246,24 @@ class CompaniesServiceContext implements Context
             new MockResponse('{}', [], 404)
         );
     }
+
+    /**
+     * @Given /^I get from companies service a successful response on get debtors by crefoId$/
+     */
+    public function iGetFromCompaniesServiceASuccessfulResponseOnGetDebtorsByCrefoId()
+    {
+        $this->mockRequest('/debtor/crefo/crefo123', new ResponseStack(
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_get_existing_company_by_crefo_id.json'))
+        ));
+    }
+
+    /**
+     * @Given /^I get from companies service an empty response on get debtors by crefoId$/
+     */
+    public function iGetFromCompaniesServiceAnEmptyResponseOnGetDebtorsByCrefoId()
+    {
+        $this->mockRequest('/debtor/crefo/crefo123', new ResponseStack(
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_get_existing_company_by_crefo_id_empty.json'))
+        ));
+    }
 }

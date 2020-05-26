@@ -12,6 +12,7 @@ use App\DomainModel\BankAccount\IbanDTOFactory;
 use App\DomainModel\BankAccount\SepaMandateReferenceGenerator;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
+use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\Merchant\DuplicateMerchantCompanyException;
 use App\DomainModel\Merchant\MerchantCreationDTO;
 use App\DomainModel\Merchant\MerchantCreationService;
@@ -64,8 +65,12 @@ class CreateMerchantWithCompanyUseCase implements ValidatedUseCaseInterface
     {
         $this->validateRequest($request);
 
+        $company = $this->retrieveCompanyByCrefoIdIfExists($request->getCrefoId());
+
         try {
-            $company = $this->companiesService->createDebtor($request);
+            if ($company === null) {
+                $company = $this->companiesService->createDebtor($request);
+            }
         } catch (CompaniesServiceRequestException $exception) {
             throw $this->wrapCompaniesException($exception);
         }
@@ -118,5 +123,24 @@ class CreateMerchantWithCompanyUseCase implements ValidatedUseCaseInterface
         }
 
         return new RequestValidationException($violationList);
+    }
+
+    private function retrieveCompanyByCrefoIdIfExists(?string $crefoId): ?DebtorCompany
+    {
+        if ($crefoId === null) {
+            return null;
+        }
+
+        $companies = $this->companiesService->getDebtorsByCrefoId($crefoId);
+
+        if (empty($companies)) {
+            return null;
+        }
+
+        if (count($companies) > 1) {
+            throw new DuplicateMerchantCompanyException('There are multiple companies with the same crefo ID');
+        }
+
+        return array_shift($companies);
     }
 }

@@ -126,7 +126,8 @@ Feature: Create a new merchant specifying the data of the company that will be c
       """
 
   Scenario: Failed to create a merchant - call to Companies Service failed
-    Given I get from companies service "/debtors" endpoint response with status 500 and body
+    Given I get from companies service an empty response on get debtors by crefoId
+    And I get from companies service "/debtors" endpoint response with status 500 and body
       """
       {"error": "Something went wrong"}
       """
@@ -254,7 +255,8 @@ Feature: Create a new merchant specifying the data of the company that will be c
       """
 
   Scenario: Successfully create a merchant
-    Given I get from companies service a successful response on create debtor call with body:
+    Given I get from companies service an empty response on get debtors by crefoId
+    And I get from companies service a successful response on create debtor call with body:
       """
       {
         "id": 1,
@@ -273,6 +275,69 @@ Feature: Create a new merchant specifying the data of the company that will be c
         "is_from_trusted_source": true
       }
       """
+    And The following risk check definitions exist:
+      | name                      |
+      | available_financing_limit |
+      | amount                    |
+      | debtor_country            |
+      | debtor_industry_sector    |
+      | debtor_identified         |
+      | debtor_identified_strict  |
+      | limit                     |
+      | debtor_not_customer       |
+      | debtor_blacklisted        |
+      | debtor_overdue            |
+      | company_b2b_score         |
+    And I successfully create OAuth client with id testClientId and secret testClientSecret
+    And I get from limit service create default debtor-customer limit successful response
+    When I send a POST request to "/private/merchant/with-company" with body:
+      """
+      {
+        "name": "Gunny GmbH",
+        "legal_form": "GmbH",
+        "address_street": "Charlottenstr.",
+        "address_house": "7",
+        "address_city": "Berlin",
+        "address_postal_code": "10969",
+        "address_country": "DE",
+        "crefo_id": "crefo123",
+        "merchant_financing_limit": 5000.44,
+        "initial_debtor_financing_limit": 500.00,
+        "webhook_url": "http://billie.md",
+        "webhook_authorization": "X-Api-Key: hola",
+        "is_onboarding_complete": false,
+        "iban": "DE87500105173872482875",
+        "bic": "AABSDE31"
+      }
+      """
+    Then the response status code should be 201
+    And the JSON response should be:
+      """
+      {
+         "id":2,
+         "name":"Gunny GmbH",
+         "financing_power":5000.44,
+         "financing_limit":5000.44,
+         "company_id":"1",
+         "company_uuid":"3a88a67f-770c-4e2b-8d56-fba0ca003d6a",
+         "payment_merchant_id":"f90e2969-4c42-4003-8d2e-0f3cc6082ab6",
+         "is_active":true,
+         "webhook_url":"http:\/\/billie.md",
+         "webhook_authorization":"X-Api-Key: hola",
+         "created_at":"2020-02-17 14:27:32",
+         "updated_at":"2020-02-17 14:27:32",
+         "oauth_client_id":"testClientId",
+         "oauth_client_secret":"testClientSecret"
+      }
+      """
+    And the JSON should have "api_key"
+    And the JSON should have "payment_merchant_id"
+    And the default risk check setting should be created for merchant with company ID 1
+    And the default notification settings should be created for merchant with company ID 1
+    And all the default roles should be created for merchant with company ID 1
+
+  Scenario: Successfully create a merchant with existing company
+    Given I get from companies service a successful response on get debtors by crefoId
     And The following risk check definitions exist:
       | name                      |
       | available_financing_limit |

@@ -1,0 +1,21 @@
+{
+    "total": 1,
+    "items": [
+        {
+            "id": 1,
+            "uuid": "3a88a67f-770c-4e2b-8d56-fba0ca003d6a",
+            "crefo_id": "crefo123",
+            "schufa_id": null,
+            "google_places_id": null,
+            "name": "Gunny GmbH",
+            "address_house": "7",
+            "address_street": "Charlottenstr.",
+            "address_city": "Berlin",
+            "address_postal_code": "10969",
+            "address_country": "DE",
+            "address_addition": null,
+            "is_blacklisted": false,
+            "is_from_trusted_source": true
+        }
+    ]
+}
