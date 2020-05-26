@@ -65,6 +65,16 @@ class OrderContainerFactory
         return new OrderContainer($order, $this->relationLoader);
     }
 
+    public function loadByMerchantIdAndUuid(int $merchantId, string $uuid): OrderContainer
+    {
+        $order = $this->orderRepository->getOneByMerchantIdAndUUID($uuid, $merchantId);
+        if (!$order) {
+            throw new OrderContainerFactoryException("Order not found");
+        }
+
+        return new OrderContainer($order, $this->relationLoader);
+    }
+
     public function loadNotYetConfirmedByCheckoutSessionUuid(string $checkoutSessionUuid): OrderContainer
     {
         $order = $this->orderRepository->getNotYetConfirmedByCheckoutSessionUuid($checkoutSessionUuid);

@@ -159,9 +159,7 @@ class OrderPersistenceService
     {
         $orderFinancialDetails = $this->orderFinancialDetailsFactory->create(
             $orderId,
-            $request->getAmount()->getGross()->getMoneyValue(),
-            $request->getAmount()->getNet()->getMoneyValue(),
-            $request->getAmount()->getTax()->getMoneyValue(),
+            $request->getAmount(),
             $request->getDuration()
         );
 

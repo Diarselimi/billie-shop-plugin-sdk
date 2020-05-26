@@ -13,11 +13,13 @@ use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsFactory;
+use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsPersistenceService;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface;
 use App\DomainModel\OrderInvoice\InvoiceUploadHandlerInterface;
 use App\DomainModel\OrderInvoice\OrderInvoiceManager;
 use App\DomainModel\OrderInvoice\OrderInvoiceUploadException;
 use App\DomainModel\OrderUpdate\UpdateOrderException;
+use App\DomainModel\OrderUpdate\UpdateOrderLimitsService;
 use App\DomainModel\OrderUpdate\UpdateOrderPersistenceService;
 use App\DomainModel\OrderUpdate\UpdateOrderRequestValidator;
 use App\DomainModel\Payment\PaymentRequestFactory;
@@ -38,12 +40,10 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         PaymentsServiceInterface $paymentsService,
         OrderRepositoryInterface $orderRepository,
         OrderStateManager $orderStateManager,
-        OrderFinancialDetailsFactory $orderFinancialDetailsFactory,
-        OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
+        OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderInvoiceManager $invoiceManager,
         PaymentRequestFactory $paymentRequestFactory,
-        MerchantRepositoryInterface $merchantRepository,
-        MerchantDebtorLimitsService $merchantDebtorLimitsService,
+        UpdateOrderLimitsService $updateOrderLimitsService,
         UpdateOrderRequestValidator $updateOrderRequestValidator
     ) {
         $this->beConstructedWith(...func_get_args());
@@ -53,11 +53,10 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         OrderContainer $orderContainer,
         UpdateOrderRequest $request,
         UpdateOrderRequestValidator $updateOrderRequestValidator,
-        MerchantDebtorLimitsService $merchantDebtorLimitsService,
+        UpdateOrderLimitsService $updateOrderLimitsService,
         MerchantEntity $merchant,
         MerchantRepositoryInterface $merchantRepository,
-        OrderFinancialDetailsFactory $orderFinancialDetailsFactory,
-        OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
+        OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
         OrderInvoiceManager $invoiceManager,
         OrderStateManager $orderStateManager,
@@ -89,16 +88,18 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         $orderContainer->getMerchant()->shouldNotBeCalled();
 
         // should NOT unlock merchant debtor limit
-        $merchantDebtorLimitsService->unlock($orderContainer, $grossDiff)->shouldNotBeCalled();
+        $updateOrderLimitsService->unlockLimits($orderContainer, $grossDiff)->shouldNotBeCalled();
 
         // should NOT unlock merchant limit
         $merchant->increaseFinancingLimit($grossDiff)->shouldNotBeCalled();
         $merchantRepository->update($merchant)->shouldNotBeCalled();
 
         // update financial details
-        $orderFinancialDetailsFactory->create(1, 150, 150, 0, 30)->shouldBeCalled()->willReturn($newOrderFinancialDetails);
-        $orderFinancialDetailsRepository->insert($newOrderFinancialDetails)->shouldBeCalled();
-        $orderContainer->setOrderFinancialDetails($newOrderFinancialDetails)->shouldBeCalled()->willReturn($orderContainer);
+        $financialDetailsPersistenceService->updateFinancialDetails(
+            $orderContainer,
+            $changeSet,
+            $newOrderFinancialDetails->getDuration()
+        )->shouldBeCalled();
 
         // should NOT update order nor invoice
         $orderRepository->update(Argument::any())->shouldNotBeCalled();
@@ -118,11 +119,8 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         OrderContainer $orderContainer,
         UpdateOrderRequest $request,
         UpdateOrderRequestValidator $updateOrderRequestValidator,
-        MerchantDebtorLimitsService $merchantDebtorLimitsService,
-        MerchantEntity $merchant,
-        MerchantRepositoryInterface $merchantRepository,
-        OrderFinancialDetailsFactory $orderFinancialDetailsFactory,
-        OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
+        UpdateOrderLimitsService $updateOrderLimitsService,
+        OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
         OrderInvoiceManager $invoiceManager,
         OrderStateManager $orderStateManager,
@@ -145,25 +143,21 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
             ->setDuration(30)
             ->setOrderId(1);
 
-        $grossDiff = new Money(50);
         $order = new OrderEntity();
 
         $orderContainer->getOrder()->shouldBeCalled()->willReturn($order);
         $updateOrderRequestValidator->getValidatedRequest($orderContainer, $request)->shouldBeCalled()->willReturn($changeSet);
         $orderContainer->getOrderFinancialDetails()->shouldBeCalled()->willReturn($orderFinancialDetails);
-        $orderContainer->getMerchant()->shouldBeCalled()->willReturn($merchant);
 
         // unlocks merchant debtor limit
-        $merchantDebtorLimitsService->unlock($orderContainer, $grossDiff)->shouldBeCalled();
-
-        // unlocks merchant limit
-        $merchant->increaseFinancingLimit($grossDiff)->shouldBeCalled();
-        $merchantRepository->update($merchant)->shouldBeCalled();
+        $updateOrderLimitsService->unlockLimits($orderContainer, $changeSet)->shouldBeCalled();
 
         // update financial details
-        $orderFinancialDetailsFactory->create(1, 150, 150, 0, 30)->shouldBeCalled()->willReturn($newOrderFinancialDetails);
-        $orderFinancialDetailsRepository->insert($newOrderFinancialDetails)->shouldBeCalled();
-        $orderContainer->setOrderFinancialDetails($newOrderFinancialDetails)->shouldBeCalled()->willReturn($orderContainer);
+        $financialDetailsPersistenceService->updateFinancialDetails(
+            $orderContainer,
+            $changeSet,
+            $newOrderFinancialDetails->getDuration()
+        )->shouldBeCalled();
 
         // should NOT update order nor invoice
         $orderRepository->update(Argument::any())->shouldNotBeCalled();
@@ -182,11 +176,8 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         OrderContainer $orderContainer,
         UpdateOrderRequest $request,
         UpdateOrderRequestValidator $updateOrderRequestValidator,
-        MerchantDebtorLimitsService $merchantDebtorLimitsService,
-        MerchantEntity $merchant,
-        MerchantRepositoryInterface $merchantRepository,
-        OrderFinancialDetailsFactory $orderFinancialDetailsFactory,
-        OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
+        UpdateOrderLimitsService $updateOrderLimitsService,
+        OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
         OrderInvoiceManager $invoiceManager,
         OrderStateManager $orderStateManager,
@@ -194,12 +185,6 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         PaymentsServiceInterface $paymentsService
     ) {
         $changeSet = (new UpdateOrderRequest('order123', 1))->setDuration(60);
-        $orderFinancialDetails = (new OrderFinancialDetailsEntity())
-            ->setAmountGross(new Money(200))
-            ->setAmountNet(new Money(200))
-            ->setAmountTax(new Money(0))
-            ->setDuration(30)
-            ->setOrderId(1);
         $newOrderFinancialDetails = (new OrderFinancialDetailsEntity())
             ->setAmountGross(new Money(200))
             ->setAmountNet(new Money(200))
@@ -211,17 +196,16 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
 
         $orderContainer->getOrder()->shouldBeCalled()->willReturn($order);
         $updateOrderRequestValidator->getValidatedRequest($orderContainer, $request)->shouldBeCalled()->willReturn($changeSet);
-        $orderContainer->getOrderFinancialDetails()->shouldBeCalled()->willReturn($orderFinancialDetails);
 
         // it does NOT unlock limits
-        $merchantDebtorLimitsService->unlock($orderContainer, Argument::any())->shouldNotBeCalled();
-        $merchant->increaseFinancingLimit(Argument::any())->shouldNotBeCalled();
-        $merchantRepository->update($merchant)->shouldNotBeCalled();
+        $updateOrderLimitsService->unlockLimits($orderContainer, Argument::any())->shouldNotBeCalled();
 
         // update financial details
-        $orderFinancialDetailsFactory->create(1, 200, 200, 0, 60)->shouldBeCalled()->willReturn($newOrderFinancialDetails);
-        $orderFinancialDetailsRepository->insert($newOrderFinancialDetails)->shouldBeCalled();
-        $orderContainer->setOrderFinancialDetails($newOrderFinancialDetails)->shouldBeCalled()->willReturn($orderContainer);
+        $financialDetailsPersistenceService->updateFinancialDetails(
+            $orderContainer,
+            $changeSet,
+            $newOrderFinancialDetails->getDuration()
+        )->shouldBeCalled();
 
         // should NOT update order nor invoice
         $orderRepository->update(Argument::any())->shouldNotBeCalled();
@@ -241,11 +225,8 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         OrderContainer $orderContainer,
         UpdateOrderRequest $request,
         UpdateOrderRequestValidator $updateOrderRequestValidator,
-        MerchantDebtorLimitsService $merchantDebtorLimitsService,
-        MerchantEntity $merchant,
-        MerchantRepositoryInterface $merchantRepository,
-        OrderFinancialDetailsFactory $orderFinancialDetailsFactory,
-        OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
+        UpdateOrderLimitsService $updateOrderLimitsService,
+        OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
         OrderInvoiceManager $invoiceManager,
         OrderStateManager $orderStateManager,
@@ -259,15 +240,12 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         $updateOrderRequestValidator->getValidatedRequest($orderContainer, $request)->shouldBeCalled()->willReturn($changeSet);
 
         // it does NOT unlock limits
-        $merchantDebtorLimitsService->unlock($orderContainer, Argument::any())->shouldNotBeCalled();
-        $merchant->increaseFinancingLimit(Argument::any())->shouldNotBeCalled();
-        $merchantRepository->update($merchant)->shouldNotBeCalled();
+        $updateOrderLimitsService->unlockLimits($orderContainer, Argument::any())->shouldNotBeCalled();
 
         // it does NOT update financial details
-        $orderFinancialDetailsFactory->create(Argument::any(), Argument::any(), Argument::any(), Argument::any(), Argument::any())
-            ->shouldNotBeCalled();
-        $orderFinancialDetailsRepository->insert(Argument::any())->shouldNotBeCalled();
-        $orderContainer->setOrderFinancialDetails(Argument::any())->shouldNotBeCalled();
+        $financialDetailsPersistenceService->updateFinancialDetails(
+            Argument::cetera()
+        )->shouldNotBeCalled();
 
         // update order and invoice
         $orderRepository->update($order)->shouldBeCalled();
@@ -287,11 +265,8 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         OrderContainer $orderContainer,
         UpdateOrderRequest $request,
         UpdateOrderRequestValidator $updateOrderRequestValidator,
-        MerchantDebtorLimitsService $merchantDebtorLimitsService,
-        MerchantEntity $merchant,
-        MerchantRepositoryInterface $merchantRepository,
-        OrderFinancialDetailsFactory $orderFinancialDetailsFactory,
-        OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
+        UpdateOrderLimitsService $updateOrderLimitsService,
+        OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
         OrderInvoiceManager $invoiceManager,
         OrderStateManager $orderStateManager,
@@ -305,15 +280,12 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         $updateOrderRequestValidator->getValidatedRequest($orderContainer, $request)->shouldBeCalled()->willReturn($changeSet);
 
         // it does NOT unlock limits
-        $merchantDebtorLimitsService->unlock($orderContainer, Argument::any())->shouldNotBeCalled();
-        $merchant->increaseFinancingLimit(Argument::any())->shouldNotBeCalled();
-        $merchantRepository->update($merchant)->shouldNotBeCalled();
+        $updateOrderLimitsService->unlockLimits($orderContainer, Argument::any())->shouldNotBeCalled();
 
         // it does NOT update financial details
-        $orderFinancialDetailsFactory->create(Argument::any(), Argument::any(), Argument::any(), Argument::any(), Argument::any())
-            ->shouldNotBeCalled();
-        $orderFinancialDetailsRepository->insert(Argument::any())->shouldNotBeCalled();
-        $orderContainer->setOrderFinancialDetails(Argument::any())->shouldNotBeCalled();
+        $financialDetailsPersistenceService->updateFinancialDetails(
+            Argument::cetera()
+        )->shouldNotBeCalled();
 
         // update order
         $orderRepository->update($order)->shouldBeCalled();
@@ -334,11 +306,8 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         OrderContainer $orderContainer,
         UpdateOrderRequest $request,
         UpdateOrderRequestValidator $updateOrderRequestValidator,
-        MerchantDebtorLimitsService $merchantDebtorLimitsService,
-        MerchantEntity $merchant,
-        MerchantRepositoryInterface $merchantRepository,
-        OrderFinancialDetailsFactory $orderFinancialDetailsFactory,
-        OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
+        UpdateOrderLimitsService $updateOrderLimitsService,
+        OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
         OrderInvoiceManager $invoiceManager,
         OrderStateManager $orderStateManager,
@@ -350,15 +319,12 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         $updateOrderRequestValidator->getValidatedRequest($orderContainer, $request)->shouldBeCalled()->willReturn($changeSet);
 
         // it does NOT unlock limits
-        $merchantDebtorLimitsService->unlock($orderContainer, Argument::any())->shouldNotBeCalled();
-        $merchant->increaseFinancingLimit(Argument::any())->shouldNotBeCalled();
-        $merchantRepository->update($merchant)->shouldNotBeCalled();
+        $updateOrderLimitsService->unlockLimits($orderContainer, Argument::any())->shouldNotBeCalled();
 
         // it does NOT update financial details
-        $orderFinancialDetailsFactory->create(Argument::any(), Argument::any(), Argument::any(), Argument::any(), Argument::any())
-            ->shouldNotBeCalled();
-        $orderFinancialDetailsRepository->insert(Argument::any())->shouldNotBeCalled();
-        $orderContainer->setOrderFinancialDetails(Argument::any())->shouldNotBeCalled();
+        $financialDetailsPersistenceService->updateFinancialDetails(
+            Argument::cetera()
+        )->shouldNotBeCalled();
 
         // it does NOT update order
         $orderRepository->update(Argument::any())->shouldNotBeCalled();
@@ -379,11 +345,8 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         OrderContainer $orderContainer,
         UpdateOrderRequest $request,
         UpdateOrderRequestValidator $updateOrderRequestValidator,
-        MerchantDebtorLimitsService $merchantDebtorLimitsService,
-        MerchantEntity $merchant,
-        MerchantRepositoryInterface $merchantRepository,
-        OrderFinancialDetailsFactory $orderFinancialDetailsFactory,
-        OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
+        UpdateOrderLimitsService $updateOrderLimitsService,
+        OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
         OrderInvoiceManager $invoiceManager,
         OrderStateManager $orderStateManager,
@@ -412,19 +375,16 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         $orderContainer->getOrder()->shouldBeCalled()->willReturn($order);
         $updateOrderRequestValidator->getValidatedRequest($orderContainer, $request)->shouldBeCalled()->willReturn($changeSet);
         $orderContainer->getOrderFinancialDetails()->shouldBeCalled()->willReturn($orderFinancialDetails);
-        $orderContainer->getMerchant()->shouldBeCalled()->willReturn($merchant);
 
         // unlocks merchant debtor limit
-        $merchantDebtorLimitsService->unlock($orderContainer, $grossDiff)->shouldBeCalled();
-
-        // unlocks merchant limit
-        $merchant->increaseFinancingLimit($grossDiff)->shouldBeCalled();
-        $merchantRepository->update($merchant)->shouldBeCalled();
+        $updateOrderLimitsService->unlockLimits($orderContainer, $changeSet)->shouldBeCalled();
 
         // update financial details
-        $orderFinancialDetailsFactory->create(1, 150, 150, 0, 30)->shouldBeCalled()->willReturn($newOrderFinancialDetails);
-        $orderFinancialDetailsRepository->insert($newOrderFinancialDetails)->shouldBeCalled();
-        $orderContainer->setOrderFinancialDetails($newOrderFinancialDetails)->shouldBeCalled()->willReturn($orderContainer);
+        $financialDetailsPersistenceService->updateFinancialDetails(
+            $orderContainer,
+            $changeSet,
+            $newOrderFinancialDetails->getDuration()
+        )->shouldBeCalled();
 
         // should NOT update order nor invoice
         $orderRepository->update(Argument::any())->shouldNotBeCalled();
@@ -443,11 +403,8 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         OrderContainer $orderContainer,
         UpdateOrderRequest $request,
         UpdateOrderRequestValidator $updateOrderRequestValidator,
-        MerchantDebtorLimitsService $merchantDebtorLimitsService,
-        MerchantEntity $merchant,
-        MerchantRepositoryInterface $merchantRepository,
-        OrderFinancialDetailsFactory $orderFinancialDetailsFactory,
-        OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
+        UpdateOrderLimitsService $updateOrderLimitsService,
+        OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
         OrderInvoiceManager $invoiceManager,
         OrderStateManager $orderStateManager,
@@ -461,15 +418,12 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         $updateOrderRequestValidator->getValidatedRequest($orderContainer, $request)->shouldBeCalled()->willReturn($changeSet);
 
         // it does NOT unlock limits
-        $merchantDebtorLimitsService->unlock($orderContainer, Argument::any())->shouldNotBeCalled();
-        $merchant->increaseFinancingLimit(Argument::any())->shouldNotBeCalled();
-        $merchantRepository->update($merchant)->shouldNotBeCalled();
+        $updateOrderLimitsService->unlockLimits($orderContainer, Argument::any())->shouldNotBeCalled();
 
         // it does NOT update financial details
-        $orderFinancialDetailsFactory->create(Argument::any(), Argument::any(), Argument::any(), Argument::any(), Argument::any())
-            ->shouldNotBeCalled();
-        $orderFinancialDetailsRepository->insert(Argument::any())->shouldNotBeCalled();
-        $orderContainer->setOrderFinancialDetails(Argument::any())->shouldNotBeCalled();
+        $financialDetailsPersistenceService->updateFinancialDetails(
+            Argument::cetera()
+        )->shouldNotBeCalled();
 
         // update order and invoice
         $orderRepository->update($order)->shouldBeCalled();

@@ -19,6 +19,8 @@ interface OrderRepositoryInterface
 
     public function getOneByMerchantIdAndExternalCodeOrUUID(string $id, int $merchantId): ? OrderEntity;
 
+    public function getOneByMerchantIdAndUUID(string $uuid, int $merchantId): ? OrderEntity;
+
     public function getOneByPaymentId(string $paymentId): ?OrderEntity;
 
     public function getOneById(int $id): ?OrderEntity;

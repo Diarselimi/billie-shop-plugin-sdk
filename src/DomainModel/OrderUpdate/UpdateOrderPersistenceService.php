@@ -10,6 +10,7 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsFactory;
+use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsPersistenceService;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface;
 use App\DomainModel\OrderInvoice\InvoiceUploadHandlerInterface;
 use App\DomainModel\OrderInvoice\OrderInvoiceManager;
@@ -27,13 +28,9 @@ class UpdateOrderPersistenceService
 
     private $invoiceManager;
 
-    private $orderFinancialDetailsFactory;
+    private $financialDetailsPersistenceService;
 
-    private $orderFinancialDetailsRepository;
-
-    private $merchantRepository;
-
-    private $merchantDebtorLimitsService;
+    private $updateOrderLimitsService;
 
     private $paymentRequestFactory;
 
@@ -43,23 +40,19 @@ class UpdateOrderPersistenceService
         PaymentsServiceInterface $paymentsService,
         OrderRepositoryInterface $orderRepository,
         OrderStateManager $orderStateManager,
-        OrderFinancialDetailsFactory $orderFinancialDetailsFactory,
-        OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
+        OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderInvoiceManager $invoiceManager,
         PaymentRequestFactory $paymentRequestFactory,
-        MerchantRepositoryInterface $merchantRepository,
-        MerchantDebtorLimitsService $merchantDebtorLimitsService,
+        UpdateOrderLimitsService $updateOrderLimitsService,
         UpdateOrderRequestValidator $updateOrderRequestValidator
     ) {
         $this->paymentsService = $paymentsService;
         $this->orderRepository = $orderRepository;
         $this->orderStateManager = $orderStateManager;
-        $this->orderFinancialDetailsFactory = $orderFinancialDetailsFactory;
-        $this->orderFinancialDetailsRepository = $orderFinancialDetailsRepository;
+        $this->financialDetailsPersistenceService = $financialDetailsPersistenceService;
         $this->invoiceManager = $invoiceManager;
         $this->paymentRequestFactory = $paymentRequestFactory;
-        $this->merchantRepository = $merchantRepository;
-        $this->merchantDebtorLimitsService = $merchantDebtorLimitsService;
+        $this->updateOrderLimitsService = $updateOrderLimitsService;
         $this->updateOrderRequestValidator = $updateOrderRequestValidator;
     }
 
@@ -76,11 +69,18 @@ class UpdateOrderPersistenceService
         // Persist only what was changed:
 
         if ($amountChanged && !$this->orderStateManager->wasShipped($order)) {
-            $this->unlockLimits($orderContainer, $changeSet);
+            $this->updateOrderLimitsService->unlockLimits($orderContainer, $changeSet);
         }
 
         if ($amountChanged || $durationChanged) {
-            $this->updateFinancialDetails($orderContainer, $changeSet);
+            $duration = $changeSet->getDuration() !== null
+                ? $changeSet->getDuration()
+                : $orderContainer->getOrderFinancialDetails()->getDuration();
+            $this->financialDetailsPersistenceService->updateFinancialDetails(
+                $orderContainer,
+                $changeSet,
+                $duration
+            );
         }
 
         if ($invoiceChanged || $externalCodeChanged) {
@@ -98,43 +98,6 @@ class UpdateOrderPersistenceService
         }
 
         return $changeSet;
-    }
-
-    private function unlockLimits(OrderContainer $orderContainer, UpdateOrderRequest $changeSet)
-    {
-        $amountGrossDiff = $orderContainer->getOrderFinancialDetails()->getAmountGross()
-            ->subtract($changeSet->getAmount()->getGross());
-
-        // unlock merchant-debtor limit
-        $this->merchantDebtorLimitsService->unlock($orderContainer, $amountGrossDiff);
-
-        // unlock merchant limit
-        $merchant = $orderContainer->getMerchant();
-        $merchant->increaseFinancingLimit($amountGrossDiff);
-        $this->merchantRepository->update($merchant);
-    }
-
-    private function updateFinancialDetails(OrderContainer $orderContainer, UpdateOrderRequest $changeSet)
-    {
-        $financialDetails = $orderContainer->getOrderFinancialDetails();
-
-        if ($changeSet->getAmount() !== null) {
-            $gross = $changeSet->getAmount()->getGross()->getMoneyValue();
-            $net = $changeSet->getAmount()->getNet()->getMoneyValue();
-            $tax = $changeSet->getAmount()->getTax()->getMoneyValue();
-        } else {
-            $gross = $financialDetails->getAmountGross()->getMoneyValue();
-            $net = $financialDetails->getAmountNet()->getMoneyValue();
-            $tax = $financialDetails->getAmountTax()->getMoneyValue();
-        }
-
-        $duration = $changeSet->getDuration() !== null ? $changeSet->getDuration() : $financialDetails->getDuration();
-
-        $newFinancialDetails = $this->orderFinancialDetailsFactory
-            ->create($financialDetails->getOrderId(), $gross, $net, $tax, $duration);
-
-        $this->orderFinancialDetailsRepository->insert($newFinancialDetails);
-        $orderContainer->setOrderFinancialDetails($newFinancialDetails);
     }
 
     private function updateOrder(OrderContainer $orderContainer, UpdateOrderRequest $changeSet)

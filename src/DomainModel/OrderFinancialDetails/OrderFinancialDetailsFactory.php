@@ -3,21 +3,20 @@
 namespace App\DomainModel\OrderFinancialDetails;
 
 use Ozean12\Money\Money;
+use Ozean12\Money\TaxedMoney\TaxedMoney;
 
 class OrderFinancialDetailsFactory
 {
     public function create(
         int $orderId,
-        float $amountGross,
-        float $amountNet,
-        float $amountTax,
+        TaxedMoney $amount,
         int $duration
     ): OrderFinancialDetailsEntity {
         return (new OrderFinancialDetailsEntity)
             ->setOrderId($orderId)
-            ->setAmountGross(new Money($amountGross))
-            ->setAmountNet(new Money($amountNet))
-            ->setAmountTax(new Money($amountTax))
+            ->setAmountGross($amount->getGross())
+            ->setAmountNet($amount->getNet())
+            ->setAmountTax($amount->getTax())
             ->setDuration($duration)
             ->setCreatedAt(new \DateTime())
             ->setUpdatedAt(new \DateTime())

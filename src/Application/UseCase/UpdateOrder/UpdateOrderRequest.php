@@ -18,7 +18,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      @OA\Property(property="order_id", ref="#/components/schemas/TinyText", description="Order external code", example="DE123456-1")
  * })
  */
-class UpdateOrderRequest extends AbstractOrderRequest implements ValidatedRequestInterface
+class UpdateOrderRequest extends AbstractOrderRequest implements
+    ValidatedRequestInterface,
+    UpdateOrderAmountInterface
 {
     /**
      * @PaellaAssert\OrderExternalCode()

@@ -4,8 +4,8 @@ namespace App\Http\Controller\PublicApi;
 
 use App\Application\Exception\FraudOrderException;
 use App\Application\Exception\OrderNotFoundException;
-use App\Application\UseCase\UpdateOrder\UpdateOrderRequest;
-use App\Application\UseCase\UpdateOrder\UpdateOrderUseCase;
+use App\Application\UseCase\UpdateOrderWithInvoice\UpdateOrderWithInvoiceRequest;
+use App\Application\UseCase\UpdateOrderWithInvoice\UpdateOrderWithInvoiceUseCase;
 use App\DomainModel\OrderUpdate\UpdateOrderException;
 use App\Http\HttpConstantsInterface;
 use App\Http\RequestTransformer\UpdateOrder\UpdateOrderAmountRequestFactory;
@@ -13,30 +13,31 @@ use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * @IsGranted("ROLE_AUTHENTICATED_AS_MERCHANT")
+ * @IsGranted("ROLE_UPDATE_ORDERS")
  *
- * @OA\Patch(
- *     path="/order/{id}",
- *     operationId="order_update",
- *     summary="Update Order",
+ * @OA\Post(
+ *     path="/order-with-invoice/{uuid}",
+ *     operationId="order_update_with_invoice",
+ *     summary="Update Order With Invoice",
  *     security={{"oauth2"={}}},
  *
  *     tags={"Order Management"},
- *     x={"groups":{"public", "private"}},
+ *     x={"groups":{"private"}},
  *
- *     @OA\Parameter(in="path", name="id",
- *          @OA\Schema(oneOf={@OA\Schema(ref="#/components/schemas/UUID"), @OA\Schema(type="string")}),
- *          description="Order external code or UUID",
+ *     @OA\Parameter(in="path", name="uuid",
+ *          @OA\Schema(ref="#/components/schemas/UUID"),
+ *          description="Order UUID",
  *          required=true
  *     ),
  *
  *     @OA\RequestBody(
  *          required=true,
  *          @OA\MediaType(mediaType="application/json",
- *          @OA\Schema(ref="#/components/schemas/UpdateOrderRequest"))
+ *          @OA\Schema(ref="#/components/schemas/UpdateOrderWithInvoiceRequest"))
  *     ),
  *
  *     @OA\Response(response=204, description="Order successfully updated"),
@@ -45,34 +46,35 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     @OA\Response(response=500, ref="#/components/responses/ServerError")
  * )
  */
-class UpdateOrderController
+class UpdateOrderWithInvoiceController
 {
     private $useCase;
 
     private $updateOrderAmountRequestFactory;
 
     public function __construct(
-        UpdateOrderUseCase $useCase,
+        UpdateOrderWithInvoiceUseCase $useCase,
         UpdateOrderAmountRequestFactory $updateOrderAmountRequestFactory
     ) {
         $this->useCase = $useCase;
         $this->updateOrderAmountRequestFactory = $updateOrderAmountRequestFactory;
     }
 
-    public function execute(string $id, Request $request): void
+    public function execute(string $uuid, Request $request): void
     {
         try {
-            $merchantId = $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID);
-            $orderRequest = (new UpdateOrderRequest($id, $merchantId))
-                ->setAmount($this->updateOrderAmountRequestFactory->create($request))
-                ->setDuration($request->request->get('duration'))
-                ->setInvoiceNumber($request->request->get('invoice_number'))
-                ->setInvoiceUrl($request->request->get('invoice_url'))
-                ->setExternalCode($request->request->get('order_id'));
+            $amount = $this->updateOrderAmountRequestFactory->create($request);
+            if ($amount === null) {
+                throw new BadRequestHttpException('Invalid amount value supplied');
+            }
 
+            $merchantId = $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID);
+
+            $orderRequest = (new UpdateOrderWithInvoiceRequest($uuid, $merchantId))
+                ->setAmount($amount);
             $this->useCase->execute($orderRequest);
-        } catch (UpdateOrderException | FraudOrderException $e) {
-            throw new AccessDeniedHttpException($e->getMessage());
+        } catch (UpdateOrderException | FraudOrderException $exception) {
+            throw new AccessDeniedHttpException($exception->getMessage());
         } catch (OrderNotFoundException $exception) {
             throw new NotFoundHttpException();
         }

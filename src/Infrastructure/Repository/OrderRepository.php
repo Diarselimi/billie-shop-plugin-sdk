@@ -159,6 +159,20 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
         return $order ? $this->orderFactory->createFromDatabaseRow($order) : null;
     }
 
+    public function getOneByMerchantIdAndUUID(string $uuid, int $merchantId): ?OrderEntity
+    {
+        $order = $this->doFetchOne('
+          SELECT ' . implode(', ', self::SELECT_FIELDS) . '
+          FROM ' . self::TABLE_NAME . '
+          WHERE merchant_id = :merchant_id AND uuid = :uuid
+        ', [
+            'merchant_id' => $merchantId,
+            'uuid' => $uuid,
+        ]);
+
+        return $order ? $this->orderFactory->createFromDatabaseRow($order) : null;
+    }
+
     public function getOneByPaymentId(string $paymentId): ?OrderEntity
     {
         $order = $this->doFetchOne('

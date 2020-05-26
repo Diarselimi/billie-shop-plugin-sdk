@@ -1400,6 +1400,18 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
+     * @Then the order with uuid :uuid should have amounts :gross/:net/:tax
+     */
+    public function theOrderShouldHaveAmount(string $uuid, float $gross, float $net, float $tax)
+    {
+        $order = $this->getOrderRepository()->getOneByUuid($uuid);
+        $financialDetails = $this->getOrderFinancialDetailsRepository()->getCurrentByOrderId($order->getId());
+        Assert::eq($financialDetails->getAmountGross()->getMoneyValue(), $gross);
+        Assert::eq($financialDetails->getAmountNet()->getMoneyValue(), $net);
+        Assert::eq($financialDetails->getAmountTax()->getMoneyValue(), $tax);
+    }
+
+    /**
      * @Given the following debtor external data exist:
      */
     public function theFollowingDebtorExternalDataExist(TableNode $table)
