@@ -1,33 +1,27 @@
-default:
-	docker-compose build
+API_DOCS_VERSION := $(shell date +"%Y.%m")
+
+default:docker-reload
 
 # START Jenkins provisioner required targets:
-# docker-ftest:test # behat tests temporarly DISABLED on Jenkins:
-docker-ftest:
-	make test-reload
-	make test-migrate
-	make test-phpspec
-	make test-down
-
-docker-ftest-clean:test-down
+docker-ftest:test
+docker-ftest-clean:
+	docker-compose down
 # END Jenkins provisioner required targets
 
-test-reload:
+docker-reload:
 	docker-compose down
-	docker-compose up -d app
+	docker-compose up -d
 
-test-down:
-	docker-compose down
-
-test: # all test suites
-	make test-reload
+test:
+	make docker-reload
+	make docs
 	make test-migrate
 	make test-phpspec
 	make test-behat
 
 test-migrate:
 	echo " > Running DB migrations... "
-	sleep 20 # give time to the mysql server to be ready
+	sleep 15 # give time to the mysql server to be ready
 	./bin/docker-app-exec vendor/bin/phinx migrate
 
 test-phpspec:
@@ -36,7 +30,14 @@ test-phpspec:
 
 test-behat:
 	echo " > Running Behat... "
-	./bin/docker-app-exec vendor/bin/behat --stop-on-failure --strict --format progress -v
+	./bin/docker-app-exec vendor/bin/behat --stop-on-failure --strict --format progress -vvv
 
+docs:
+	echo " > Running OpenAPI Spec generator... "
+	./bin/docker-app-exec bin/generate-api-docs "v${API_DOCS_VERSION}"
+	echo " > Running OpenAPI Spec validator... "
+	./.ci/scripts/docker-run --rm swagger-cli validate /openapi/paella-openapi-full.yaml
+	./.ci/scripts/docker-run --rm swagger-cli validate /openapi/paella-openapi-public.yaml
 
 $(V).SILENT:
+.PHONY: docs

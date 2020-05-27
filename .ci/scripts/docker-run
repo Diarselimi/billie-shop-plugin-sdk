@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+if [[ -t 1 ]]; then
+  # stdout is a terminal
+  docker-compose run -e TERM=${TERM:-xterm-256color} "${@}"
+else
+  # stdout is not a terminal
+  docker-compose run -T "${@}"
+fi

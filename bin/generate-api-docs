@@ -1,54 +1,40 @@
 #!/usr/bin/env bash
 
-command -v git >/dev/null 2>&1 || {
-    echo "ERROR: git is not installed. Aborting..."
+function api_current_version() {
+  ver = $(cat docs/openapi/paella-openapi-public.yaml | grep "  version: ")
+  echo ${ver/"  version: "/}
+}
+
+function generate_api_docs() {
+  SPEC_GROUP=${1:-"full"}
+  SPEC_FILE="${SPEC_DIR}/paella-openapi-${SPEC_GROUP}.yaml"
+
+  echo "    - Building ${SPEC_FILE} ..."
+
+  mkdir -p ${SPEC_DIR}
+  rm -f ${SPEC_FILE}
+
+  bin/console paella:openapi:generate ${SPEC_VERSION} \
+    --output-file="${SPEC_FILE}" \
+    --title="${SPEC_TITLE}" \
+    --groups=${SPEC_GROUP}
+
+  if [[ ! -f ${SPEC_FILE} ]]; then
+    echo " ERROR: Open API generation failed. Spec. file does not exist."
     exit 1
+  fi
 }
 
 SPEC_DIR="docs/openapi"
 SPEC_TITLE="Billie - PaD API Documentation"
-SPEC_VERSION=${1:-$(git describe --tags 2> /dev/null || echo "dev")}
-SPEC_VERSION_ABBREV=${1:-$(git describe --tags --abbrev=0 2> /dev/null || echo "dev")}
+SPEC_VERSION=${1:-$(api_current_version)}
 
-function generate_api_docs {
-    SPEC_GROUP=${1:-"full"}
-    SPEC_FILE="${SPEC_DIR}/paella-openapi-${SPEC_GROUP}.yaml"
-
-    echo "    - Building ${SPEC_FILE} ..."
-
-    mkdir -p ${SPEC_DIR}
-    rm -f ${SPEC_FILE}
-
-    bin/console paella:openapi:generate ${SPEC_VERSION_ABBREV} \
-            --output-file="${SPEC_FILE}" \
-            --title="${SPEC_TITLE}" \
-            --groups=${SPEC_GROUP}
-
-    if [[ ! -f ${SPEC_FILE} ]]; then
-        echo "ERROR: Open API generation failed. Spec. file does not exist."
-        exit 1;
-    fi
-}
-
-echo "Generating OpenAPI 3.0 YAML specifications (Paella API v${SPEC_VERSION}):"
-
-bin/console cache:clear -vvvv
+echo " Generating OpenAPI 3.0 YAML specifications (Paella API ${SPEC_VERSION}):"
 
 rm -rf docs/openapi
 mkdir -p docs/openapi
 
-generate_api_docs full # special command wildcard to generate the docs for all groups. See GenerateOpenApiSpec::buildProcessors
+generate_api_docs full # special group name, meaning ALL groups. See GenerateOpenApiSpec::buildProcessors
 generate_api_docs public
 
-command -v openapi-generator >/dev/null 2>&1 || {
-    echo "WARNING: openapi-generator is not installed. Skipping OpenAPI validation..."
-    echo "!!! PLEASE install openapi-generator via: brew install openapi-generator"
-    exit 1
-}
-
-echo "Validating..."
-
-openapi-generator validate -i "${SPEC_DIR}/paella-openapi-full.yaml" || exit 1
-openapi-generator validate -i "${SPEC_DIR}/paella-openapi-public.yaml" || exit 1
-
-echo "OpenAPI specifications have been generated successfully."
+echo " OpenAPI specifications have been generated successfully."

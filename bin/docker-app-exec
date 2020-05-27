@@ -2,8 +2,8 @@
 
 if [[ -t 1 ]]; then
   # stdout is a terminal
-  docker-compose exec --workdir /app -e TERM=${TERM:-xterm-256color} app "${@}"
+  docker-compose exec --workdir /var/www/paella-core -e TERM=${TERM:-xterm-256color} app "${@}"
 else
   # stdout is not a terminal
-  docker-compose exec --workdir /app -T app "${@}"
+  docker-compose exec --workdir /var/www/paella-core -T app "${@}"
 fi

@@ -13,6 +13,16 @@ More info here:
 https://ozean12.atlassian.net/wiki/spaces/PAELLA/pages/954173858/Paella+API#Documentation
 
 ## Maintenance Scripts
+
+Prerequisites: In order to run the commands involving `make` locally, first you need to configure your laptop 
+[as described in this guide](https://ozean12.atlassian.net/wiki/spaces/INFRA/pages/868385662/Local+Development).
+
+You need to be able pull images from our AWS Docker registry, 
+so you always use the same PHP image as in production.
+
+To run `make` scripts, first make sure that your containers are running with `make docker-reload`.
+Some of the targets like `make test-behat` also requires the DB migrations to be ready (`make test-migrate`).
+
 ### Update Workflow Diagrams
 Requirements: `graphviz`.
 
@@ -22,70 +32,56 @@ bin/generate-workflow-diagram
 
 The generated images will be stored under the `docs` folder as PNG files.
 
-### Update API Documentation
-Requirements: `git`, `openapi-generator`.
+Every time there is a change in the state machines (e.g. Symfony Workflow for orders),
+this command needs to be run to update the diagrams.
 
-You should run this command on your host, not inside the Docker container.
-To get `openapi-generator`, run `brew install openapi-generator` first.
+### Update API Documentation
+
+Generates and validates all OpenAPI specification groups at once (for public and internal docs).
+The generated YAML files live under the `docs/openapi` folder.
 
 Usage:
 
 ```bash
-bin/generate-api-docs [API_VERSION]
+make docs
 ```
-
-Generates all API specification variants at the same time (standard, dashboard, support, etc.).
-
-The API_VERSION argument is optional, by default it uses the latest repository tag (found locally) if possible,
-or you can pass it manually.
-
-The generated YAML files live under the `docs/openapi` folder.
-
 
 ### Running tests
 
-In order to run tests locally, first you need to configure your laptop 
-[as described in this guide](https://ozean12.atlassian.net/wiki/spaces/INFRA/pages/868385662/Local+Development).
-
-For running tests you need to be able pull images from our AWS Docker registry, to be able
-to use the same PHP image as in production.
-
 #### All tests
 
-This command will start the docker containers, run migrations and run all test suites:
+This command will start the docker containers, run migrations and run all test suites,
+including OpenAPI spec validation:
+
 ```bash
 make test
 ```
 
 #### Behat
 
-To run only behat tests, you need to first start the containers and run the migrations (if you didn't):
-```bash
-make test-reload
-make test-migrate
-```
-
-Then run:
+Usage:
 ```bash
 make test-behat
 ```
 
-#### PHPSpec
-
-To run only phpspec tests, you need to first start the containers (if you didn't):
+Running behat directly with custom arguments:
 ```bash
-make test-reload
+./bin/docker-app-exec vendor/bin/behat bdd/specs/foobar.feature
 ```
 
-Then run:
+#### PHPSpec
+
+Usage:
 ```bash
 make test-phpspec
+```
+
+Running phpspec directly with custom arguments:
+```bash
+./bin/docker-app-exec vendor/bin/phpspec run -vvv
 ```
 
 #### Running other commands
 
 You can also run anything inside the running php-fpm container using the helper script: `./bin/docker-app-exec`.
-Examples: 
-
-- `./bin/docker-app-exec bin/console list`
-- `./bin/docker-app-exec vendor/bin/behat bdd/specs/foobar.feature`
+Example: `./bin/docker-app-exec bin/console list`.

@@ -1,55 +1,14 @@
-version: "3.7"
+version: "2.4"
 services:
-  mysql:
-    image: mysql:5.7
-    logging:
-      driver: json-file
-      options:
-        max-size: 10m
-    restart: always
-    command:
-      - '--max_allowed_packet=16M'
-      - '--query_cache_size=8M'
-      - '--query_cache_limit=512K'
-      - '--thread_stack=128K'
-      - '--max_connections=40'
-      - '--thread_cache_size=4'
-      - '--interactive_timeout=20'
-      - '--wait_timeout=10'
-      - '--default-authentication-plugin=mysql_native_password'
-      - '--character-set-server=utf8'
-      - '--collation-server=utf8_unicode_ci'
-      - '--sql-mode=NO_ENGINE_SUBSTITUTION'
-    environment:
-      - MYSQL_DATABASE=paella
-      - MYSQL_USER=paella
-      - MYSQL_PASSWORD=test
-      - MYSQL_ROOT_PASSWORD=test
-    healthcheck:
-      test:
-        - CMD
-        - mysqladmin
-        - '-ptest'
-        - ping
-        - '-h'
-        - localhost
-      interval: 5s
-      timeout: 20s
-      retries: 20
-
-  app: # do not change this name, it is required by provisioner.
+  app: # Do not rename this service: it is required by provisioner/jenkins.
     build:
       context: .
-    logging:
-      driver: json-file
-      options:
-        max-size: 10m
-    restart: always
     volumes:
-      - './:/app'
+      - './:/var/www/paella-core'
     depends_on:
       - mysql
     environment:
+      - PHP_MEMORY_LIMIT=256M
       - APP_ENV=test
       - APP_NAME=paella-core
       - INSTANCE_SUFFIX=_test
@@ -87,3 +46,23 @@ services:
       - FINTECH_TOOLBOX_API_URL=
       - FINTECH_TOOLBOX_API_KEY=
       - DOCUMENT_GENERATOR_URL=
+
+  mysql:
+    image: mysql:5.7
+    command: --max_allowed_packet=16M --query_cache_size=8M --query_cache_limit=512K --thread_stack=128K --max_connections=50 --thread_cache_size=4 --interactive_timeout=20 --wait_timeout=10 --default-authentication-plugin=mysql_native_password --character-set-server=utf8 --collation-server=utf8_unicode_ci --sql-mode=NO_ENGINE_SUBSTITUTION
+    environment:
+      - MYSQL_DATABASE=paella
+      - MYSQL_USER=paella
+      - MYSQL_PASSWORD=test
+      - MYSQL_ROOT_PASSWORD=test
+    healthcheck:
+      test: CMD mysqladmin -ptest ping -h localhost
+      interval: 5s
+      timeout: 20s
+      retries: 20
+
+  swagger-cli:
+    build:
+      context: .ci/docker/swagger-cli
+    volumes:
+      - './docs/openapi/:/openapi'
