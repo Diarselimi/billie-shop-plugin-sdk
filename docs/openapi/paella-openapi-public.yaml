@@ -1387,13 +1387,18 @@ tags:
       
       ### 4. Handle Widget Responses
       
-      When submitted, the checkout widget will evaluate if an order with the given data can be accepted or not. If an order could not be accepted, the widget will return the state `declined` with a specified `decline_reason`.
+      When submitted, the checkout widget will evaluate if an order with the given data can be accepted. 
+      - If an order can not be accepted, the widget will return the state `declined` with a specified `decline_reason`
+      - If an order can be accepted immediately the widget will return the state `authorized`. 
+      - It is also possible that some additional checks need to be conducted by Billie in order to accept the order. In this case the widget will return the state `pre_waiting`. 
+      
+      In both `authorized` and `pre_waiting` states the `checkout-session-confirm` call must be used to confirm the order creation. 
+      
       
       #### Response
-      
-      After submitting the widget, the following data will be returned to either the `then` or `catch` block:
+      After submitting the widget, following data will be returned to either `then` or `catch` block:
       - `state` **[string]** `<= 255 characters`   
-      &nbsp;&nbsp;&nbsp;&nbsp;Enum: `authorized` `declined`
+      &nbsp;&nbsp;&nbsp;&nbsp;Enum: `authorized` `declined` `pre_waiting`
       - `decline_reason` **[string]** `<= 255 characters`   
       &nbsp;&nbsp;&nbsp;&nbsp;Enum: `risk_policy` `debtor_not_identified` `debtor_address` `debtor_limit_exceeded`
       - `debtor_company` **[object]**  
