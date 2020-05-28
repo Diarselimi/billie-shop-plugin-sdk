@@ -8,11 +8,11 @@ interface DebtorLimitServiceInterface
 {
     public function create(string $debtorCompanyUuid, ?string $customerCompanyUuid, float $amount): void;
 
-    public function check(string $debtorCompanyUuid, string $customerCompanyUuid, float $amount): bool;
+    public function check(string $debtorCompanyUuid, string $customerCompanyUuid, float $amount, ?string $investorUuid = null): bool;
 
-    public function lock(string $debtorCompanyUuid, string $customerCompanyUuid, float $amount): void;
+    public function lock(string $debtorCompanyUuid, string $customerCompanyUuid, string $investorUuid, float $amount): void;
 
-    public function release(string $debtorCompanyUuid, string $customerCompanyUuid, float $amount): void;
+    public function release(string $debtorCompanyUuid, string $customerCompanyUuid, string $investorUuid, float $amount): void;
 
     public function retrieve(string $debtorCompanyUuid): DebtorLimitDTO;
 

@@ -37,6 +37,7 @@ Feature: As a merchant, i should be able to access all endpoints
 	Given I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
 	And I get from companies service get debtor response
 	And I get from payments service get debtor response
+ And I get from payments service get order details response
 	And I get from Oauth service a valid user token
 	And a merchant user exists with permission AUTHENTICATED_AS_MERCHANT
 	When I add "Authorization" header equal to "Bearer someToken"
@@ -47,6 +48,7 @@ Feature: As a merchant, i should be able to access all endpoints
 	Given I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
 	And I get from companies service get debtor response
 	And I get from payments service get debtor response
+ And I get from payments service get order details response
 	And I get from Oauth service a valid client token response
 	And a merchant user exists with permission AUTHENTICATED_AS_MERCHANT
 	When I add "Authorization" header equal to "Bearer someToken"
@@ -57,6 +59,7 @@ Feature: As a merchant, i should be able to access all endpoints
 	Given I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
 	And I get from companies service get debtor response
 	And I get from payments service get debtor response
+ And I get from payments service get order details response
 	And I get from Oauth service a valid client token response
 	And a merchant user exists with permission AUTHENTICATED_AS_MERCHANT
 	When I add "Authorization" header equal to "Bearer someToken"

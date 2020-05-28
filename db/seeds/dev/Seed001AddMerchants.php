@@ -28,6 +28,7 @@ class Seed001AddMerchants extends AbstractSeed
             'company_uuid' => 'b825f0a8-7248-477f-b827-88eb927fb7c1',
             'oauth_client_id' => '02706840-e7ef-48ef-8576-bcfec20b4458',
             'payment_merchant_id' => 'b95adad7-f747-45b9-b3cb-7851c4b90fac',
+            'investor_uuid' => 'f15d97cd-8e86-48a3-8718-3046ea58bed8',
             'created_at' => $now,
             'updated_at' => $now,
         ])->saveData();

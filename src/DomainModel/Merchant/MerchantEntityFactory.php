@@ -7,6 +7,13 @@ use Ozean12\Money\Money;
 
 class MerchantEntityFactory extends AbstractFactory
 {
+    private $defaultInvestorUuid;
+
+    public function __construct(string $investorUuid)
+    {
+        $this->defaultInvestorUuid = $investorUuid;
+    }
+
     public function createFromArray(array $data): MerchantEntity
     {
         return (new MerchantEntity())
@@ -24,6 +31,7 @@ class MerchantEntityFactory extends AbstractFactory
             ->setWebhookAuthorization($data['webhook_authorization'])
             ->setOauthClientId($data['oauth_client_id'])
             ->setSandboxPaymentUuid($data['sandbox_payment_merchant_id'])
+            ->setInvestorUuid($data['investor_uuid'])
             ->setCreatedAt(new \DateTime($data['created_at']))
             ->setUpdatedAt(new \DateTime($data['updated_at']))
         ;
@@ -43,6 +51,7 @@ class MerchantEntityFactory extends AbstractFactory
             ->setWebhookAuthorization($creationDTO->getWebhookAuthorization())
             ->setOauthClientId($creationDTO->getOauthClient()->getClientId())
             ->setIsActive(true)
+            ->setInvestorUuid($this->defaultInvestorUuid)
         ;
     }
 
@@ -61,6 +70,7 @@ class MerchantEntityFactory extends AbstractFactory
             ->setWebhookUrl($payload['webhook_url'])
             ->setWebhookAuthorization($payload['webhook_authorization'])
             ->setOauthClientId($payload['oauth_client_id'])
+            ->setInvestorUuid($this->defaultInvestorUuid)
             ->setCreatedAt(new \DateTime($payload['created_at']))
             ->setUpdatedAt(new \DateTime($payload['updated_at']))
         ;

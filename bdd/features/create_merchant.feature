@@ -94,21 +94,24 @@ Feature: Create a new merchant.
     Then the response status code should be 201
     And the JSON response should be:
     """
-    {
-      "name": "Test User Company",
-      "financing_power": 5000.44,
-      "financing_limit": 5000.44,
-      "company_id": "1",
-      "company_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
-      "is_active": true,
-      "webhook_url": "http://billie.md",
-      "webhook_authorization": "X-Api-Key: Hola",
-      "oauth_client_id": "testClientId",
-      "oauth_client_secret": "testClientSecret"
-    }
+				{
+				    "name": "Test User Company",
+				    "financing_power": 5000.44,
+				    "financing_limit": 5000.44,
+				    "company_id": "1",
+				    "company_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
+				    "is_active": true,
+				    "webhook_url": "http://billie.md",
+				    "webhook_authorization": "X-Api-Key: Hola",
+				    "investor_uuid": "a5cf2662-35a4-11e9-a2c4-02c6850949d6",
+				    "oauth_client_id": "testClientId",
+				    "oauth_client_secret": "testClientSecret"
+				}
     """
     And the JSON should have "api_key"
     And the JSON should have "payment_merchant_id"
+	   And the JSON should have "investor_uuid"
+	   And the JSON should have "company_uuid"
     And the default risk check setting should be created for merchant with company ID 1
     And the default notification settings should be created for merchant with company ID 1
     And all the default roles should be created for merchant with company ID 1

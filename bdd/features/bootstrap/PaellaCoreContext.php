@@ -87,6 +87,8 @@ class PaellaCoreContext extends MinkContext
 
     public const MERCHANT_COMPANY_UUID = 'c7be46c0-e049-4312-b274-258ec5aeeb70';
 
+    public const INVESTOR_UUID = 'a5cf2662-35a4-11e9-a2c4-02c6850949d6';
+
     private $connection;
 
     /**
@@ -169,7 +171,8 @@ class PaellaCoreContext extends MinkContext
             ->setFinancingPower(new Money(10000))
             ->setApiKey('test')
             ->setCompanyId('10')
-            ->setOauthClientId('oauthClientId');
+            ->setOauthClientId('oauthClientId')
+            ->setInvestorUuid(self::INVESTOR_UUID);
 
         $this->getMerchantRepository()->insert($merchant);
 
@@ -846,7 +849,8 @@ class PaellaCoreContext extends MinkContext
             ->setApiKey('testMerchantApiKey')
             ->setCompanyId((int) $companyId)
             ->setCompanyUuid(self::MERCHANT_COMPANY_UUID)
-            ->setOauthClientId(self::TEST_MERCHANT_OAUTH_CLIENT_ID);
+            ->setOauthClientId(self::TEST_MERCHANT_OAUTH_CLIENT_ID)
+            ->setInvestorUuid(self::INVESTOR_UUID);
         $this->getMerchantRepository()->insert($merchant);
 
         return $merchant;

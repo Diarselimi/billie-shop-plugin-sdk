@@ -30,6 +30,7 @@ Feature: An endpoint to retrieve merchant data
        "is_active":true,
        "webhook_url":null,
        "webhook_authorization":null,
+       "investor_uuid":"a5cf2662-35a4-11e9-a2c4-02c6850949d6",
        "credentials": {
           "client_id":"1234-1244-4122-asd123",
           "secret":"21ergfhgferetr3425tregdf"
@@ -55,6 +56,7 @@ Feature: An endpoint to retrieve merchant data
        "is_active":true,
        "webhook_url":null,
        "webhook_authorization":null,
-       "credentials": null
+       "credentials": null,
+       "investor_uuid":"a5cf2662-35a4-11e9-a2c4-02c6850949d6"
     }
     """

@@ -25,19 +25,21 @@ class MerchantDebtorLimitsService implements LoggingInterface
     {
         $debtorCompanyUuid = $container->getDebtorCompany()->getUuid();
         $customerCompanyUuid = $container->getMerchant()->getCompanyUuid();
+        $investorUuid = $container->getMerchant()->getInvestorUuid();
         $amount = $container->getOrderFinancialDetails()->getAmountGross()->toFloat();
 
-        return $this->debtorLimitService->check($debtorCompanyUuid, $customerCompanyUuid, $amount);
+        return $this->debtorLimitService->check($debtorCompanyUuid, $customerCompanyUuid, $amount, $investorUuid);
     }
 
     public function lock(OrderContainer $container): void
     {
         $debtorCompanyUuid = $container->getDebtorCompany()->getUuid();
         $customerCompanyUuid = $container->getMerchant()->getCompanyUuid();
+        $investorUuid = $container->getMerchant()->getInvestorUuid();
         $amount = $container->getOrderFinancialDetails()->getAmountGross()->toFloat();
 
         try {
-            $this->debtorLimitService->lock($debtorCompanyUuid, $customerCompanyUuid, $amount);
+            $this->debtorLimitService->lock($debtorCompanyUuid, $customerCompanyUuid, $investorUuid, $amount);
         } catch (DebtorLimitServiceRequestException $exception) {
             throw new MerchantDebtorLimitsException("Limit service call was unsuccessful", null, $exception);
         }
@@ -48,9 +50,10 @@ class MerchantDebtorLimitsService implements LoggingInterface
         $amount = $amount ?? $container->getOrderFinancialDetails()->getAmountGross();
         $debtorCompanyUuid = $container->getDebtorCompany()->getUuid();
         $customerCompanyUuid = $container->getMerchant()->getCompanyUuid();
+        $investorUuid = $container->getMerchant()->getInvestorUuid();
 
         try {
-            $this->debtorLimitService->release($debtorCompanyUuid, $customerCompanyUuid, $amount->toFloat());
+            $this->debtorLimitService->release($debtorCompanyUuid, $customerCompanyUuid, $investorUuid, $amount->toFloat());
         } catch (DebtorLimitServiceRequestException $exception) {
             throw new MerchantDebtorLimitsException("Limit service call was unsuccessful", null, $exception);
         }

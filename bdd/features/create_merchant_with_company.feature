@@ -304,34 +304,32 @@ Feature: Create a new merchant specifying the data of the company that will be c
         "merchant_financing_limit": 5000.44,
         "initial_debtor_financing_limit": 500.00,
         "webhook_url": "http://billie.md",
-        "webhook_authorization": "X-Api-Key: hola",
+        "webhook_authorization": "X-Api-Key: Hola",
         "is_onboarding_complete": false,
         "iban": "DE87500105173872482875",
         "bic": "AABSDE31"
       }
       """
-    Then the response status code should be 201
     And the JSON response should be:
       """
-      {
-         "id":2,
-         "name":"Gunny GmbH",
-         "financing_power":5000.44,
-         "financing_limit":5000.44,
-         "company_id":"1",
-         "company_uuid":"3a88a67f-770c-4e2b-8d56-fba0ca003d6a",
-         "payment_merchant_id":"f90e2969-4c42-4003-8d2e-0f3cc6082ab6",
-         "is_active":true,
-         "webhook_url":"http:\/\/billie.md",
-         "webhook_authorization":"X-Api-Key: hola",
-         "created_at":"2020-02-17 14:27:32",
-         "updated_at":"2020-02-17 14:27:32",
-         "oauth_client_id":"testClientId",
-         "oauth_client_secret":"testClientSecret"
-      }
+						{
+					    "company_id": "1",
+					    "company_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
+					    "financing_limit": 5000.44,
+					    "financing_power": 5000.44,
+					    "investor_uuid": "a5cf2662-35a4-11e9-a2c4-02c6850949d6",
+					    "is_active": true,
+					    "name": "Gunny GmbH",
+					    "oauth_client_id": "testClientId",
+					    "oauth_client_secret": "testClientSecret",
+					    "webhook_authorization": "X-Api-Key: Hola",
+					    "webhook_url": "http://billie.md"
+						}
       """
     And the JSON should have "api_key"
     And the JSON should have "payment_merchant_id"
+	   And the JSON should have "investor_uuid"
+	   And the JSON should have "company_uuid"
     And the default risk check setting should be created for merchant with company ID 1
     And the default notification settings should be created for merchant with company ID 1
     And all the default roles should be created for merchant with company ID 1
@@ -384,6 +382,7 @@ Feature: Create a new merchant specifying the data of the company that will be c
          "company_id":"1",
          "company_uuid":"3a88a67f-770c-4e2b-8d56-fba0ca003d6a",
          "payment_merchant_id":"f90e2969-4c42-4003-8d2e-0f3cc6082ab6",
+         "investor_uuid":"f15d97cd-8e86-48a3-8718-3046ea58bed8",
          "is_active":true,
          "webhook_url":"http:\/\/billie.md",
          "webhook_authorization":"X-Api-Key: hola",

@@ -58,6 +58,8 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
 
     private $oauthClientId;
 
+    private $investorUuid;
+
     public function getName(): string
     {
         return $this->name;
@@ -233,6 +235,18 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
         return $this;
     }
 
+    public function getInvestorUuid(): string
+    {
+        return $this->investorUuid;
+    }
+
+    public function setInvestorUuid(string $investorUuid): MerchantEntity
+    {
+        $this->investorUuid = $investorUuid;
+
+        return $this;
+    }
+
     public function toArray(): array
     {
         return [
@@ -247,6 +261,7 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
             'is_active' => $this->isActive(),
             'webhook_url' => $this->getWebhookUrl(),
             'webhook_authorization' => $this->getWebhookAuthorization(),
+            'investor_uuid' => $this->getInvestorUuid(),
             'created_at' => $this->getCreatedAt()->format(DateFormat::FORMAT_YMD_HIS),
             'updated_at' => $this->getUpdatedAt()->format(DateFormat::FORMAT_YMD_HIS),
         ];

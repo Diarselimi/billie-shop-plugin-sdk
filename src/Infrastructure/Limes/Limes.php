@@ -49,15 +49,16 @@ class Limes implements DebtorLimitServiceInterface, LoggingInterface
         }
     }
 
-    public function check(string $debtorCompanyUuid, string $customerCompanyUuid, float $amount): bool
+    public function check(string $debtorCompanyUuid, string $customerCompanyUuid, float $amount, ?string $investorUuid = null): bool
     {
         try {
             $response = $this->client->post("debtor-limit/check", [
-                'json' => [
+                'json' => array_filter([
                     'debtor_company_uuid' => $debtorCompanyUuid,
                     'customer_company_uuid' => $customerCompanyUuid,
+                    'investor_uuid' => $investorUuid,
                     'amount' => $amount,
-                ],
+                ]),
                 'on_stats' => function (TransferStats $stats) {
                     $this->logServiceRequestStats($stats, 'debtor_check_limit');
                 },
@@ -71,13 +72,14 @@ class Limes implements DebtorLimitServiceInterface, LoggingInterface
         }
     }
 
-    public function lock(string $debtorCompanyUuid, string $customerCompanyUuid, float $amount): void
+    public function lock(string $debtorCompanyUuid, string $customerCompanyUuid, string $investorUuid, float $amount): void
     {
         try {
             $this->client->post("debtor-limit/lock", [
                 'json' => [
                     'debtor_company_uuid' => $debtorCompanyUuid,
                     'customer_company_uuid' => $customerCompanyUuid,
+                    'investor_uuid' => $investorUuid,
                     'amount' => $amount,
                 ],
                 'on_stats' => function (TransferStats $stats) {
@@ -89,13 +91,14 @@ class Limes implements DebtorLimitServiceInterface, LoggingInterface
         }
     }
 
-    public function release(string $debtorCompanyUuid, string $customerCompanyUuid, float $amount): void
+    public function release(string $debtorCompanyUuid, string $customerCompanyUuid, string $investorUuid, float $amount): void
     {
         try {
             $this->client->post("debtor-limit/release", [
                 'json' => [
                     'debtor_company_uuid' => $debtorCompanyUuid,
                     'customer_company_uuid' => $customerCompanyUuid,
+                    'investor_uuid' => $investorUuid,
                     'amount' => $amount,
                 ],
                 'on_stats' => function (TransferStats $stats) {

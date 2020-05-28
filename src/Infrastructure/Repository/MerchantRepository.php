@@ -14,6 +14,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
     private const SELECT_FIELDS = [
         'id', 'name', 'api_key', 'oauth_client_id', 'company_id', 'company_uuid', 'payment_merchant_id', 'sandbox_payment_merchant_id', 'sepa_b2b_document_uuid',
         'is_active', 'sepa_b2b_document_uuid', 'financing_power', 'available_financing_limit', 'webhook_url', 'webhook_authorization', 'created_at', 'updated_at',
+        'investor_uuid',
     ];
 
     private $factory;
@@ -28,10 +29,10 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
         $id = $this->doInsert('
             INSERT INTO ' . self::TABLE_NAME . '
             (name, api_key, oauth_client_id, is_active, financing_power, available_financing_limit, 
-                company_id, company_uuid, sepa_b2b_document_uuid, payment_merchant_id, webhook_url, webhook_authorization, created_at, updated_at)
+                company_id, company_uuid, sepa_b2b_document_uuid, payment_merchant_id, webhook_url, webhook_authorization, investor_uuid, created_at, updated_at)
             VALUES
             (:name, :api_key, :oauth_client_id, :is_active, :financing_power, :available_financing_limit, 
-                :company_id, :company_uuid, :sepa_b2b_document_uuid, :payment_merchant_id, :webhook_url, :webhook_authorization, :created_at, :updated_at)
+                :company_id, :company_uuid, :sepa_b2b_document_uuid, :payment_merchant_id, :webhook_url, :webhook_authorization, :investor_uuid, :created_at, :updated_at)
         ', [
             'name' => $merchant->getName(),
             'company_uuid' => $merchant->getCompanyUuid(),
@@ -45,6 +46,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
             'sepa_b2b_document_uuid' => $merchant->getSepaB2BDocumentUuid(),
             'webhook_url' => $merchant->getWebhookUrl(),
             'webhook_authorization' => $merchant->getWebhookAuthorization(),
+            'investor_uuid' => $merchant->getInvestorUuid(),
             'created_at' => $merchant->getCreatedAt()->format(self::DATE_FORMAT),
             'updated_at' => $merchant->getUpdatedAt()->format(self::DATE_FORMAT),
         ]);
