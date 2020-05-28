@@ -19,7 +19,7 @@ abstract class AbstractServiceRequestException extends \RuntimeException
 
     private function buildMessage(?string $message = null, ?\Throwable $previous = null): string
     {
-        $message = $message ? "{$message} // {$this->defaultMessage}" : $this->defaultMessage;
+        $message = $message ? (str_ireplace('%', '', $message)." // {$this->defaultMessage}") : $this->defaultMessage;
         $subst = "'{$this->getServiceName()}'";
 
         if ($previous instanceof ClientResponseDecodeException) {
@@ -41,7 +41,7 @@ abstract class AbstractServiceRequestException extends \RuntimeException
             $message .= sprintf(
                 " Response was HTTP %s with body: %s",
                 $response->getStatusCode(),
-                $response->getBody() . ''
+                str_ireplace('%', '', $response->getBody()) . ''
             );
         }
 
