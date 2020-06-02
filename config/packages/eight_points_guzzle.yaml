@@ -65,3 +65,9 @@ eight_points_guzzle:
       options:
         headers:
           Content-Type: "application/json"
+    watson:
+      base_url: "%env(string:WATSON_URL)%"
+      options:
+        timeout: 5
+        headers:
+          Content-Type: "application/json"

@@ -23,6 +23,7 @@ default:
         - DocumentGeneratorContext
         - NachosContext
         - ScoringServiceContext
+        - FraudServiceContext
         - MessengerContext:
             kernel: '@kernel'
             amqpMapper: '@Ozean12\AmqpPackBundle\Mapping\AmqpMapperInterface'

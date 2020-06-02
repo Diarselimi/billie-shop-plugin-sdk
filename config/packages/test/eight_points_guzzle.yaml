@@ -66,4 +66,10 @@ eight_points_guzzle:
         debug: false
         query:
           app: jarvis
+    watson:
+      base_url: "%behat_mock_server_url%/watson/"
+      options:
+        debug: false
+        query:
+          app: watson
 
