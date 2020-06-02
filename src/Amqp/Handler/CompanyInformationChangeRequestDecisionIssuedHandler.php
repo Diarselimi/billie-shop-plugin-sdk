@@ -37,7 +37,7 @@ class CompanyInformationChangeRequestDecisionIssuedHandler implements MessageHan
             | ChangeRequestNotFoundException
             | InvalidDecisionValueException $exception
         ) {
-            $this->logWarning($exception->getMessage());
+            $this->logSuppressedException($exception, $exception->getMessage());
         }
     }
 }

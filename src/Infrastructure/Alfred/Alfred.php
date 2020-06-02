@@ -30,6 +30,8 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
 
     private const IDENTIFICATION_REQUEST_TIMEOUT = 15;
 
+    private const UPDATE_COMPANY_TIMEOUT = 2;
+
     private const HEADER_X_TRACKER_USER_ID = 'X-Tracker-User-Id';
 
     private $client;
@@ -116,6 +118,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         try {
             $response = $this->client->put("companies/{$companyUuid}", [
                 'json' => $updateData,
+                'timeout' => self::UPDATE_COMPANY_TIMEOUT,
             ]);
 
             return $this->factory->createFromAlfredResponse($this->decodeResponse($response));
