@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\UseCase\ShipOrder;
+namespace App\DomainModel\ShipOrder;
 
 class ShipOrderException extends \RuntimeException
 {

@@ -30,6 +30,8 @@ interface MerchantUserPermissions
 
     public const UPDATE_ORDERS = 'UPDATE_ORDERS';
 
+    public const SHIP_ORDERS = 'SHIP_ORDERS';
+
     public const ALL_PERMISSIONS = [
         // read:
         self::VIEW_ORDERS,
@@ -47,6 +49,7 @@ interface MerchantUserPermissions
         self::MANAGE_ONBOARDING,
         self::CHANGE_DEBTOR_INFORMATION,
         self::UPDATE_ORDERS,
+        self::SHIP_ORDERS,
     ];
 
     /**
@@ -69,5 +72,6 @@ interface MerchantUserPermissions
         self::MANAGE_ONBOARDING,
         self::CHANGE_DEBTOR_INFORMATION,
         self::UPDATE_ORDERS,
+        self::SHIP_ORDERS,
     ];
 }

@@ -50,6 +50,7 @@ interface MerchantUserDefaultRoles
             MerchantUserPermissions::CANCEL_ORDERS,
             MerchantUserPermissions::CHANGE_DEBTOR_INFORMATION,
             MerchantUserPermissions::UPDATE_ORDERS,
+            MerchantUserPermissions::SHIP_ORDERS,
         ],
     ];
 }

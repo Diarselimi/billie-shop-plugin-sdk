@@ -35,6 +35,7 @@ default:
     Behat\MinkExtension:
       base_url: 'http://paella-behat' # Fake URL (see HttpKernelBrowser usage in PaellaCoreContext)
       goutte: ~
+      files_path: "%paths.base%/bdd/features/resources/dummies/"
     Behat\Symfony2Extension:
       kernel:
         bootstrap: bdd/features/bootstrap/bootstrap.php

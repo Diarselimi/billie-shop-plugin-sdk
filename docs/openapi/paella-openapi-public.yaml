@@ -884,17 +884,14 @@ components:
     ShipOrderRequest:
       title: 'Order Shipping Object'
       properties:
-        external_order_id:
-          description: 'External Order ID. It should only be provided if it was not provided in the create order call.'
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        invoice_number:
-          $ref: '#/components/schemas/TinyText'
         invoice_url:
           $ref: '#/components/schemas/URL'
         shipping_document_url:
           $ref: '#/components/schemas/URL'
       type: object
+      allOf:
+        -
+          $ref: '#/components/schemas/AbstractShipOrderRequest'
     UpdateOrderRequest:
       title: 'Order Update Object'
       properties:
@@ -1102,6 +1099,16 @@ components:
           $ref: '#/components/schemas/DateTime'
         shipped_at:
           $ref: '#/components/schemas/DateTime'
+      type: object
+    AbstractShipOrderRequest:
+      title: 'Order Shipping plain Object'
+      properties:
+        external_order_id:
+          description: 'External Order ID. It should only be provided if it was not provided in the create order call.'
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        invoice_number:
+          $ref: '#/components/schemas/TinyText'
       type: object
     ErrorsObject:
       title: 'API Errors'

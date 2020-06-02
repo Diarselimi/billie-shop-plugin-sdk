@@ -10,6 +10,7 @@ use App\Infrastructure\DecodeResponseTrait;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
 use Psr\Http\Message\StreamInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class Nachos implements FileServiceInterface
 {
@@ -56,5 +57,27 @@ class Nachos implements FileServiceInterface
         }
 
         return $response->getBody();
+    }
+
+    public function uploadFromFile(UploadedFile $uploadedFile, string $filename, string $type): FileServiceResponseDTO
+    {
+        try {
+            $response = $this->client->post('files', [
+                'multipart' => [
+                    [
+                        'name' => 'file',
+                        'contents' => fopen($uploadedFile->getPathname(), 'r'),
+                        'filename' => $filename,
+                    ],
+                ],
+                'query' => [
+                    'type' => $type,
+                ],
+            ]);
+        } catch (TransferException $exception) {
+            throw new FileServiceRequestException($exception);
+        }
+
+        return $this->factory->createFromArray($this->decodeResponse($response));
     }
 }
