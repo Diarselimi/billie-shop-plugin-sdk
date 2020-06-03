@@ -2499,7 +2499,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               $ref: '#/components/schemas/UpdateOrderWithInvoiceRequest'
       responses:
@@ -3612,6 +3612,13 @@ components:
       properties:
         amount:
           $ref: '#/components/schemas/AmountDTO'
+        invoice_number:
+          description: 'The invoice number. Required when order state is shipped, paid_out or late'
+          $ref: '#/components/schemas/TinyText'
+        invoice_file:
+          description: 'The invoice file. Required when invoice number has changed.'
+          type: string
+          format: binary
       type: object
     DebtorCompanyRequest:
       title: 'Debtor Company Request'

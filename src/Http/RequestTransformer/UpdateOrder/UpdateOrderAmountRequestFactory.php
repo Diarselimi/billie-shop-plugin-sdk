@@ -20,6 +20,9 @@ class UpdateOrderAmountRequestFactory
     public function create(Request $request): ?TaxedMoney
     {
         $amount = $request->request->get('amount');
+        if (is_string($amount)) {
+            $amount = json_decode($amount, true);
+        }
 
         if (!is_array($amount)) {
             return null;
@@ -33,6 +36,6 @@ class UpdateOrderAmountRequestFactory
             return null;
         }
 
-        return $this->amountRequestFactory->create($request);
+        return $this->amountRequestFactory->createFromArray($amount);
     }
 }

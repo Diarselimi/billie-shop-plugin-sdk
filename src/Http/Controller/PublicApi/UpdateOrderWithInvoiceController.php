@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controller\PublicApi;
 
 use App\Application\Exception\FraudOrderException;
@@ -36,7 +38,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *
  *     @OA\RequestBody(
  *          required=true,
- *          @OA\MediaType(mediaType="application/json",
+ *          @OA\MediaType(mediaType="multipart/form-data",
  *          @OA\Schema(ref="#/components/schemas/UpdateOrderWithInvoiceRequest"))
  *     ),
  *
@@ -71,7 +73,9 @@ class UpdateOrderWithInvoiceController
             $merchantId = $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID);
 
             $orderRequest = (new UpdateOrderWithInvoiceRequest($uuid, $merchantId))
-                ->setAmount($amount);
+                ->setAmount($amount)
+                ->setInvoiceNumber($request->request->get('invoice_number'))
+                ->setInvoiceFile($request->files->get('invoice_file'));
             $this->useCase->execute($orderRequest);
         } catch (UpdateOrderException | FraudOrderException $exception) {
             throw new AccessDeniedHttpException($exception->getMessage());

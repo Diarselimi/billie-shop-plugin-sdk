@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DomainModel\OrderUpdateWithInvoice;
 
 use App\Application\UseCase\UpdateOrderWithInvoice\UpdateOrderWithInvoiceRequest;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
+use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsPersistenceService;
 use App\DomainModel\OrderUpdate\UpdateOrderLimitsService;
@@ -24,13 +27,16 @@ class UpdateOrderWithInvoicePersistenceService
 
     private $updateOrderLimitsService;
 
+    private $orderRepository;
+
     public function __construct(
         PaymentsServiceInterface $paymentsService,
         OrderStateManager $orderStateManager,
         PaymentRequestFactory $paymentRequestFactory,
         UpdateOrderWithInvoiceRequestValidator $updateOrderWithInvoiceRequestValidator,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
-        UpdateOrderLimitsService $updateOrderLimitsService
+        UpdateOrderLimitsService $updateOrderLimitsService,
+        OrderRepositoryInterface $orderRepository
     ) {
         $this->paymentsService = $paymentsService;
         $this->orderStateManager = $orderStateManager;
@@ -38,6 +44,7 @@ class UpdateOrderWithInvoicePersistenceService
         $this->updateOrderWithInvoiceRequestValidator = $updateOrderWithInvoiceRequestValidator;
         $this->financialDetailsPersistenceService = $financialDetailsPersistenceService;
         $this->updateOrderLimitsService = $updateOrderLimitsService;
+        $this->orderRepository = $orderRepository;
     }
 
     public function update(
@@ -51,6 +58,7 @@ class UpdateOrderWithInvoicePersistenceService
         );
 
         $amountChanged = $changeSet->getAmount() !== null;
+        $invoiceNumberChanged = $changeSet->getInvoiceNumber() !== null;
 
         if ($amountChanged && !$this->orderStateManager->wasShipped($order)) {
             $this->updateOrderLimitsService->unlockLimits($orderContainer, $changeSet);
@@ -64,7 +72,12 @@ class UpdateOrderWithInvoicePersistenceService
             );
         }
 
-        if ($amountChanged && $this->orderStateManager->wasShipped($order)) {
+        if ($invoiceNumberChanged) {
+            $order->setInvoiceNumber($changeSet->getInvoiceNumber());
+            $this->orderRepository->update($order);
+        }
+
+        if (($amountChanged || $invoiceNumberChanged) && $this->orderStateManager->wasShipped($order)) {
             $this->paymentsService->modifyOrder(
                 $this->paymentRequestFactory->createModifyRequestDTO($orderContainer)
             );

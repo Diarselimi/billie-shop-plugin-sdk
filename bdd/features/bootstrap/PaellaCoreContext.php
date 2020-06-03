@@ -420,7 +420,7 @@ class PaellaCoreContext extends MinkContext
      */
     public function orderHasInvoiceData($orderId)
     {
-        $order = $this->getOrderRepository()->getOneByExternalCode($orderId, 1);
+        $order = $this->getOrderRepository()->getOneByMerchantIdAndExternalCodeOrUUID($orderId, 1);
         if ($order === null) {
             throw new RuntimeException('Order not found');
         }
@@ -1446,5 +1446,14 @@ class PaellaCoreContext extends MinkContext
 
         Assert::eq($debtorExternalData->getDataHash(), DebtorExternalDataRepository::INVALID_DEBTOR_DATA_HASH);
         Assert::eq($debtorExternalData->getMerchantExternalId(), $merchantExternalId ."-".DebtorExternalDataRepository::INVALID_MERCHANT_EXTERNAL_ID_SUFFIX);
+    }
+
+    /**
+     * @Then the order with uuid :uuid should have invoice number :invoiceNumber
+     */
+    public function theOrderShouldHaveInvoiceNumber(string $uuid, string $invoiceNumber)
+    {
+        $order = $this->getOrderRepository()->getOneByUuid($uuid);
+        Assert::eq($order->getInvoiceNumber(), $invoiceNumber);
     }
 }
