@@ -823,6 +823,7 @@ components:
           enum:
             - m
             - f
+          nullable: true
         first_name:
           example: James
           $ref: '#/components/schemas/TinyText'

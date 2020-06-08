@@ -2675,6 +2675,7 @@ components:
         - CHANGE_DEBTOR_INFORMATION
         - UPDATE_ORDERS
         - SHIP_ORDERS
+        - CREATE_ORDERS
       example:
         - VIEW_ORDERS
         - VIEW_DEBTORS
@@ -2690,6 +2691,7 @@ components:
         - CHANGE_DEBTOR_INFORMATION
         - UPDATE_ORDERS
         - SHIP_ORDERS
+        - CREATE_ORDERS
     DebtorInformationChangeRequestState:
       title: 'Debtor Information ChangeRequest State'
       type: string
@@ -3041,6 +3043,7 @@ components:
           enum:
             - m
             - f
+          nullable: true
         first_name:
           example: James
           $ref: '#/components/schemas/TinyText'
@@ -3759,6 +3762,9 @@ components:
               postal_code:
                 type: string
             type: object
+        legal_form:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
       type: object
       allOf:
         -

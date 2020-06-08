@@ -36,7 +36,7 @@ class MerchantDebtorResponseFactory
             ->setCreatedAt(new \DateTime())
             ->setDebtorInformationChangeRequestState($container->getDebtorInformationChangeRequest() ? $container->getDebtorInformationChangeRequest()->getState() : null)
             ->setDebtorInformationChangeRequest($container->getDebtorInformationChangeRequest())
-        ;
+            ->setLegalForm($container->getDebtorCompany()->getLegalForm());
     }
 
     public function createExtendedFromContainer(MerchantDebtorContainer $container): MerchantDebtorExtended
@@ -66,6 +66,7 @@ class MerchantDebtorResponseFactory
             ->setBankAccountIban($container->getPaymentDetails()->getBankAccountIban())
             ->setBankAccountBic($container->getPaymentDetails()->getBankAccountBic())
             ->setCreatedAt($container->getMerchantDebtor()->getCreatedAt())
+            ->setLegalForm($container->getDebtorCompany()->getLegalForm())
         ;
     }
 

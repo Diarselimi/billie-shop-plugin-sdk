@@ -26,6 +26,7 @@ use OpenApi\Annotations as OA;
  *              @OA\Property(property="postal_code", type="string"),
  *          }
  *      )),
+ *      @OA\Property(property="legal_form", ref="#/components/schemas/TinyText", nullable=true),
  * })
  */
 class MerchantDebtor extends AbstractMerchantDebtor
@@ -47,6 +48,8 @@ class MerchantDebtor extends AbstractMerchantDebtor
     private $outstandingAmountLate;
 
     private $debtorInformationChangeRequest;
+
+    private $legalForm;
 
     public function getAddressStreet(): string
     {
@@ -188,6 +191,18 @@ class MerchantDebtor extends AbstractMerchantDebtor
         return $this->debtorInformationChangeRequest;
     }
 
+    public function setLegalForm(?string $legalForm): MerchantDebtor
+    {
+        $this->legalForm = $legalForm;
+
+        return $this;
+    }
+
+    public function getLegalForm(): ?string
+    {
+        return $this->legalForm;
+    }
+
     public function toArray(): array
     {
         $data = parent::toArray();
@@ -206,6 +221,7 @@ class MerchantDebtor extends AbstractMerchantDebtor
             'debtor_information_change_request' => $this->debtorInformationChangeRequest
                 ? $this->getChangeRequestData($this->debtorInformationChangeRequest)
                 : null,
+            'legal_form' => $this->legalForm,
         ]);
     }
 

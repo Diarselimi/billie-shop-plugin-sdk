@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @IsGranted("ROLE_AUTHENTICATED_AS_MERCHANT")
+ * @IsGranted({"ROLE_AUTHENTICATED_AS_MERCHANT", "ROLE_CREATE_ORDERS"})
  * @OA\Post(
  *     path="/order",
  *     operationId="order_create",
