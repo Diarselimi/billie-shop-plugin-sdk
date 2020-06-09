@@ -61,6 +61,8 @@ class SaveMerchantFinancialAssessmentController
             ->setInvoiceDuration($request->get('invoice_duration'))
             ->setReturningOrderRate($request->get('returning_order_rate'))
             ->setDefaultRate($request->get('default_rate'))
+            ->setHighInvoiceAmount($request->get('high_invoice_amount'))
+            ->setDigitalGoodsRate($request->get('digital_goods_rate'))
         ;
 
         try {

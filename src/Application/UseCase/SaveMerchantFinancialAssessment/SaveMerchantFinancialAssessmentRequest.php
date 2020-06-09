@@ -8,14 +8,24 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @OA\Schema(schema="SaveMerchantFinancialAssessmentRequest", title="Request for submitting finnancial assessment",
- *     required={"yearly_transaction_volume", "mean_invoice_number", "cancellation_rate", "invoice_duration"},
+ *     required={
+ *      "yearly_transaction_volume",
+ *      "mean_invoice_amount",
+ *      "cancellation_rate",
+ *      "invoice_duration",
+ *      "default_rate",
+ *      "high_invoice_amount",
+ *      "digital_goods_rate"
+ *     },
  *     properties={
- *      @OA\Property(property="yearly_transaction_volume",type="number", format="float", example=22.33),
- *      @OA\Property(property="mean_invoice_number",type="number", format="float", example=233.44),
- *      @OA\Property(property="cancellation_rate",type="number", format="float", example=23.3),
- *      @OA\Property(property="invoice_duration",type="integer", example=100),
- *      @OA\Property(property="returning_order_rate",type="number", format="float", example=90.0),
- *      @OA\Property(property="default_rate",type="number", format="float", example=50.0)
+ *      @OA\Property(property="yearly_transaction_volume", type="number", format="float", example=22.33),
+ *      @OA\Property(property="mean_invoice_amount", type="number", format="float", example=233.44),
+ *      @OA\Property(property="cancellation_rate", type="number", format="float", example=23.3),
+ *      @OA\Property(property="invoice_duration", type="integer", example=100),
+ *      @OA\Property(property="returning_order_rate", type="number", format="float", example=90.0, nullable=true),
+ *      @OA\Property(property="default_rate", type="number", format="float", example=50.0),
+ *      @OA\Property(property="high_invoice_amount", type="number", format="float", example=50.55),
+ *      @OA\Property(property="digital_goods_rate", type="number", format="float", example=50.0),
  *     })
  */
 class SaveMerchantFinancialAssessmentRequest implements ValidatedRequestInterface
@@ -54,9 +64,22 @@ class SaveMerchantFinancialAssessmentRequest implements ValidatedRequestInterfac
     private $returningOrderRate;
 
     /**
+     * @Assert\NotBlank()
      * @Assert\Regex("/^\d+(\.\d{1})?$/", message="The number should have have maximum 1 numbers after decimal.")
      */
     private $defaultRate;
+
+    /**
+     * @Assert\NotBlank()
+     * @Assert\Regex("/^\d+(\.\d{1,2})?$/", message="The number should have have maximum 2 numbers after decimal.")
+     */
+    private $highInvoiceAmount;
+
+    /**
+     * @Assert\NotBlank()
+     * @Assert\Regex("/^\d+(\.\d{1})?$/", message="The number should have have maximum 1 numbers after decimal.")
+     */
+    private $digitalGoodsRate;
 
     public function __construct(int $merchantId, string $merchantPaymentUuid)
     {
@@ -146,6 +169,30 @@ class SaveMerchantFinancialAssessmentRequest implements ValidatedRequestInterfac
         return $this->merchantPaymentUuid;
     }
 
+    public function getHighInvoiceAmount(): float
+    {
+        return $this->highInvoiceAmount;
+    }
+
+    public function setHighInvoiceAmount($highInvoiceAmount): SaveMerchantFinancialAssessmentRequest
+    {
+        $this->highInvoiceAmount = $highInvoiceAmount;
+
+        return $this;
+    }
+
+    public function getDigitalGoodsRate(): float
+    {
+        return $this->digitalGoodsRate;
+    }
+
+    public function setDigitalGoodsRate($digitalGoodsRate): SaveMerchantFinancialAssessmentRequest
+    {
+        $this->digitalGoodsRate = $digitalGoodsRate;
+
+        return $this;
+    }
+
     public function toArray(): array
     {
         return [
@@ -155,6 +202,8 @@ class SaveMerchantFinancialAssessmentRequest implements ValidatedRequestInterfac
             'invoice_duration' => $this->getInvoiceDuration(),
             'returning_order_rate' => $this->getReturningOrderRate(),
             'default_rate' => $this->getDefaultRate(),
+            'high_invoice_amount' => $this->getHighInvoiceAmount(),
+            'digital_goods_rate' => $this->getDigitalGoodsRate(),
         ];
     }
 }

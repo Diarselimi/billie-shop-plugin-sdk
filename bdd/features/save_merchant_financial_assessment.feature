@@ -11,12 +11,14 @@ Feature: When I send a request to save I should be able to save financial data f
     When I send a POST request to "/merchant/financial-assessment" with body:
     """
     {
-      "yearly_transaction_volume": "200",
+      "yearly_transaction_volume": 200,
       "mean_invoice_amount": 123.23,
       "cancellation_rate": 12444.2,
       "invoice_duration": 444,
       "returning_order_rate": 22.0,
-      "default_rate": 50.0
+      "default_rate": 50.0,
+      "high_invoice_amount": 20000.43,
+      "digital_goods_rate": 50.0
     }
     """
     Then the response status code should be 204
@@ -30,7 +32,9 @@ Feature: When I send a request to save I should be able to save financial data f
       "cancellation_rate": 12444.22,
       "invoice_duration": 444,
       "returning_order_rate": 22.00,
-      "default_rate": 50.00
+      "default_rate": 50.00,
+      "high_invoice_amount": 20000.43,
+      "digital_goods_rate": 50.0
     }
     """
     Then the response status code should be 400
@@ -48,12 +52,14 @@ Feature: When I send a request to save I should be able to save financial data f
       "cancellation_rate": 12444.2,
       "invoice_duration": 444,
       "returning_order_rate": 22.0,
-      "default_rate": 50.0
+      "default_rate": 50.0,
+      "high_invoice_amount": 20000.43,
+      "digital_goods_rate": 50.0
     }
     """
     And The following onboarding steps are in states for merchant 1:
-      | name                  | state     |
-      | financial_assessment  |  confirmation_pending |
+      | name                 | state                |
+      | financial_assessment | confirmation_pending |
     When I send a POST request to "/merchant/financial-assessment" with body:
     """
     {
@@ -62,7 +68,9 @@ Feature: When I send a request to save I should be able to save financial data f
       "cancellation_rate": 12444.2,
       "invoice_duration": 444,
       "returning_order_rate": 22.0,
-      "default_rate": 50.0
+      "default_rate": 50.0,
+      "high_invoice_amount": 20000.43,
+      "digital_goods_rate": 50.0
     }
     """
     Then the JSON response should be:
@@ -76,11 +84,11 @@ Feature: When I send a request to save I should be able to save financial data f
     When I send a POST request to "/merchant/financial-assessment" with body:
     """
     {
-        "some_bad_datat": "test"
+        "some_bad_data": "test"
     }
     """
     Then the response status code should be 400
-      
+
   Scenario: The request validation fails because request body is empty.
     When I send a POST request to "/merchant/financial-assessment" with body:
     """
@@ -92,6 +100,9 @@ Feature: When I send a request to save I should be able to save financial data f
       {"title":"This value should not be blank.","code":"request_validation_error","source":"yearly_transaction_volume"},
       {"title":"This value should not be blank.","code":"request_validation_error","source":"mean_invoice_amount"},
       {"title":"This value should not be blank.","code":"request_validation_error","source":"cancellation_rate"},
-      {"title":"This value should not be blank.","code":"request_validation_error","source":"invoice_duration"}
+      {"title":"This value should not be blank.","code":"request_validation_error","source":"invoice_duration"},
+      {"title":"This value should not be blank.","code":"request_validation_error","source":"default_rate"},
+      {"title":"This value should not be blank.","code":"request_validation_error","source":"high_invoice_amount"},
+      {"title":"This value should not be blank.","code":"request_validation_error","source":"digital_goods_rate"}
     ]}
     """
