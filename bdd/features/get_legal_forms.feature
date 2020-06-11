@@ -45,7 +45,7 @@ Feature: An endpoint to return list of supported legal forms
 		  "code": 4001,
 		  "name": "GbR (Gesellschaft bürgerlichen Rechts)",
 		  "required_input": "Ust-ID",
-		  "required": 1
+		  "required": 0
 		},
 		{
 		  "code": 10201,
@@ -87,7 +87,7 @@ Feature: An endpoint to return list of supported legal forms
 		  "code": 13001,
 		  "name": "e.V. (eingetragener Verein)",
 		  "required_input": "HR-NR",
-		  "required": 1
+		  "required": 0
 		},
 		{
 		  "code": 12001,
