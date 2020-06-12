@@ -13,6 +13,7 @@ interface MerchantUserDefaultRoles
         self::ROLE_BILLIE_ADMIN,
         self::ROLE_VIEW_ONLY,
         self::ROLE_SUPPORT,
+        self::ROLE_SALES,
     ];
 
     public const ROLE_NONE = [
@@ -51,6 +52,20 @@ interface MerchantUserDefaultRoles
             MerchantUserPermissions::CHANGE_DEBTOR_INFORMATION,
             MerchantUserPermissions::UPDATE_ORDERS,
             MerchantUserPermissions::SHIP_ORDERS,
+        ],
+    ];
+
+    public const ROLE_SALES = [
+        'name' => 'sales',
+        'permissions' => [
+            // read:
+            MerchantUserPermissions::VIEW_ORDERS,
+            MerchantUserPermissions::VIEW_DEBTORS,
+            MerchantUserPermissions::VIEW_PAYMENTS,
+            MerchantUserPermissions::VIEW_USERS,
+            MerchantUserPermissions::VIEW_ONBOARDING,
+            // write:
+            MerchantUserPermissions::CREATE_ORDERS,
         ],
     ];
 }
