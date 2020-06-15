@@ -4,6 +4,7 @@ use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
 use donatj\MockWebServer\Response as MockResponse;
 use donatj\MockWebServer\ResponseStack;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Response;
 
 class OAuthServiceContext implements Context
@@ -56,13 +57,23 @@ class OAuthServiceContext implements Context
     }
 
     /**
+     * @Given I get a successful OAuth client creation response
      * @Given I successfully create OAuth client with id :id and secret :secret
+     * @Given I have an OAuth client with id :id and secret :secret
      */
-    public function iSuccessfullyCreateOAuthClientWithIdAndSecretTestSecret($id, $secret)
-    {
-        $this->mockRequest('/clients', new ResponseStack(
-            new MockResponse(json_encode(['client_id' => $id, 'client_secret' => $secret]))
-        ));
+    public function iSuccessfullyCreateOAuthClientWithIdAndSecretTestSecret(
+        $id = null,
+        $secret = null
+    ) {
+        $id = $id ?: Uuid::uuid4();
+        $secret = $secret ?: Uuid::uuid4();
+
+        $this->mockRequest(
+            '/clients',
+            new ResponseStack(
+                new MockResponse(json_encode(['client_id' => $id, 'client_secret' => $secret]))
+            )
+        );
     }
 
     /**

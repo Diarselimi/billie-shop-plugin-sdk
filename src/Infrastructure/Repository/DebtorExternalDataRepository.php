@@ -81,31 +81,40 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
         return $debtorRowData ? $this->debtorExternalDataEntityFactory->createFromDatabaseRow($debtorRowData) : null;
     }
 
-    public function getOneByHashAndStateNotOlderThanDays(string $hash, string $merchantDebtorExternalId, int $merchantId, int $ignoreId, string $state, int $days = 30): ?DebtorExternalDataEntity
-    {
+    public function getOneByHashAndStateNotOlderThanMaxMinutes(
+        string $hash,
+        string $merchantDebtorExternalId,
+        int $merchantId,
+        int $ignoreId,
+        string $state,
+        int $maxMinutes
+    ): ?DebtorExternalDataEntity {
         $debtorExternalData = $this->doFetchOne(
             '
-            SELECT '. self::SELECT_FIELDS .' FROM '. self::TABLE_NAME . '
-            INNER JOIN orders ON orders.debtor_external_data_id = '. self::TABLE_NAME . '.id
+            SELECT ' . self::SELECT_FIELDS . ' FROM ' . self::TABLE_NAME . '
+            INNER JOIN orders ON orders.debtor_external_data_id = ' . self::TABLE_NAME . '.id
             WHERE 
                 orders.state = :state
                 AND debtor_data_hash = :hash 
-                AND orders.merchant_id = :merchantId
+                AND orders.merchant_id = :merchant_id
                 AND merchant_external_id = :merchant_debtor_external_id
-                AND '. self::TABLE_NAME . '.id != :id
-                AND DATE_ADD( '. self::TABLE_NAME . '.created_at, INTERVAL :days DAY) > NOW()
-                ORDER BY  '. self::TABLE_NAME . '.created_at DESC LIMIT 1',
+                AND ' . self::TABLE_NAME . '.id != :id
+                AND DATE_ADD( ' . self::TABLE_NAME . '.created_at, INTERVAL :minutes MINUTE) > :now
+                ORDER BY  ' . self::TABLE_NAME . '.created_at DESC LIMIT 1',
             [
                 'hash' => $hash,
-                'days' => $days,
+                'minutes' => $maxMinutes,
                 'id' => $ignoreId,
                 'state' => $state,
-                'merchantId' => $merchantId,
+                'merchant_id' => $merchantId,
                 'merchant_debtor_external_id' => $merchantDebtorExternalId,
+                'now' => date(self::DATE_FORMAT),
             ]
         );
 
-        return $debtorExternalData ? $this->debtorExternalDataEntityFactory->createFromDatabaseRow($debtorExternalData) : null;
+        return $debtorExternalData ? $this->debtorExternalDataEntityFactory->createFromDatabaseRow(
+            $debtorExternalData
+        ) : null;
     }
 
     public function invalidateMerchantExternalIdAndDebtorHashForCompanyUuid(string $companyUuid): void

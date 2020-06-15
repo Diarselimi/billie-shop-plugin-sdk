@@ -12,6 +12,8 @@ default:
         - PaellaCoreContext:
             kernel: '@kernel'
             connection: '@billie_pdo.default_connection'
+        - RepositoryIntegrationContext:
+            kernel: '@kernel'
         - PaymentsServiceContext
         - CompaniesServiceContext
         - OAuthServiceContext
@@ -28,6 +30,8 @@ default:
             kernel: '@kernel'
             amqpMapper: '@Ozean12\AmqpPackBundle\Mapping\AmqpMapperInterface'
             changeRequestDecisionIssuesHandler: '@App\Amqp\Handler\CompanyInformationChangeRequestDecisionIssuedHandler'
+        - RepositoryIntegrationContext:
+            kernel: '@kernel'
 
   extensions:
     Behatch\Extension: ~

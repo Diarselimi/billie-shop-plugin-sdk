@@ -9,12 +9,15 @@ use App\DomainModel\MerchantDebtor\MerchantDebtorRegistrationService;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderStateManager;
+use App\Support\DateFormat;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
 class MerchantDebtorFinder implements LoggingInterface
 {
     use LoggingTrait;
+
+    private const DEBTOR_HASH_MAX_MINUTES = 60;
 
     private $merchantDebtorRepository;
 
@@ -54,22 +57,34 @@ class MerchantDebtorFinder implements LoggingInterface
         );
 
         if ($merchantDebtor) {
-            $this->logInfo('Found the existing merchant debtor', ['id' => $merchantDebtor->getId()]);
+            $this->logInfo(
+                'Found an existing merchant debtor by merchant external id',
+                ['id' => $merchantDebtor->getId()]
+            );
             $identifyRequest->setCompanyId((int) $merchantDebtor->getDebtorId());
             $identifyRequest->setCompanyUuid($merchantDebtor->getCompanyUuid());
         } else {
             $hash = $debtorExternalData->getDataHash();
 
-            $existingDebtorExternalData = $this->debtorExternalDataRepository->getOneByHashAndStateNotOlderThanDays(
-                $hash,
-                $debtorExternalData->getMerchantExternalId(),
-                $merchantId,
-                $debtorExternalData->getId(),
-                OrderStateManager::STATE_DECLINED
-            );
+            $existingDebtorExternalData = $this->debtorExternalDataRepository
+                ->getOneByHashAndStateNotOlderThanMaxMinutes(
+                    $hash,
+                    $debtorExternalData->getMerchantExternalId(),
+                    $merchantId,
+                    $debtorExternalData->getId(),
+                    OrderStateManager::STATE_DECLINED,
+                    self::DEBTOR_HASH_MAX_MINUTES
+                );
 
             if ($existingDebtorExternalData) {
-                $this->logInfo('The debtor is with the same data and not older than 30 days found!');
+                $this->logInfo(
+                    'A recent debtor external data hash has been found. '
+                    . 'Trying to find the merchant debtor using the merchant external ID...',
+                    [
+                        'external_data_id' => $existingDebtorExternalData->getId(),
+                        'external_data_timestamp' => $existingDebtorExternalData->getCreatedAt()->format(DateFormat::FORMAT_YMD_HIS),
+                    ]
+                );
 
                 $merchantDebtor = $this->merchantDebtorRepository->getOneByExternalIdAndMerchantId(
                     $existingDebtorExternalData->getMerchantExternalId(),
@@ -78,12 +93,19 @@ class MerchantDebtorFinder implements LoggingInterface
                 );
 
                 if (!$merchantDebtor) {
+                    $this->logInfo(
+                        'Merchant Debtor was NOT found using the merchant external ID.'
+                    );
+
                     return new MerchantDebtorFinderResult();
                 }
 
                 $identifyRequest->setCompanyId($merchantDebtor->getDebtorId());
                 $identifyRequest->setCompanyUuid($merchantDebtor->getCompanyUuid());
-                $this->logInfo('Used the existing company id for identifying.');
+                $this->logInfo(
+                    'Merchant Debtor found using external ID. The associated company will be used for identification.',
+                    ['company_uuid' => $merchantDebtor->getCompanyUuid()]
+                );
             } else {
                 $this->logInfo('Try to identify new debtor');
             }

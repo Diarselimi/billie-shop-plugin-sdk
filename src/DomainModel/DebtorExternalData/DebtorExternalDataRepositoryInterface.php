@@ -6,9 +6,16 @@ interface DebtorExternalDataRepositoryInterface
 {
     public function insert(DebtorExternalDataEntity $debtor): void;
 
-    public function getOneById(int $id): ? DebtorExternalDataEntity;
+    public function getOneById(int $id): ?DebtorExternalDataEntity;
 
-    public function getOneByHashAndStateNotOlderThanDays(string $hash, string $merchantDebtorExternalId, int $merchantId, int $ignoreId, string $state, int $days = 30): ?DebtorExternalDataEntity;
+    public function getOneByHashAndStateNotOlderThanMaxMinutes(
+        string $hash,
+        string $merchantDebtorExternalId,
+        int $merchantId,
+        int $ignoreId,
+        string $state,
+        int $maxMinutes
+    ): ?DebtorExternalDataEntity;
 
     public function invalidateMerchantExternalIdAndDebtorHashForCompanyUuid(string $companyUuid): void;
 }

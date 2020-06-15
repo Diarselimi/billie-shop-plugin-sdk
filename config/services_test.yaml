@@ -5,6 +5,7 @@ parameters:
 services:
   _defaults:
     autowire: true
+    autoconfigure: true
     public: true
 
   # override sentry calls:
@@ -22,6 +23,8 @@ services:
   App\Http\ApiError\VerboseApiErrorResponseFactory: ~
   Symfony\Component\Messenger\MessageBusInterface: '@App\Test\TestMessageBus'
   App\Http\ApiError\ApiErrorResponseFactory: '@App\Http\ApiError\VerboseApiErrorResponseFactory'
+
+  App\DomainModel\Merchant\MerchantCreationService: ~
 
   App\DomainModel\Order\OrderRepositoryInterface:
     alias: 'App\Infrastructure\Repository\OrderRepository'
