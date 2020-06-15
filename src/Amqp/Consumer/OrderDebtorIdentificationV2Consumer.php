@@ -21,7 +21,7 @@ class OrderDebtorIdentificationV2Consumer implements ConsumerInterface
         $data = $msg->getBody();
         $data = json_decode($data, true);
 
-        $request = new OrderDebtorIdentificationV2Request($data['order_id'], $data['v1_company_id']);
+        $request = new OrderDebtorIdentificationV2Request($data['order_id'], null, $data['v1_company_id']);
         $this->useCase->execute($request);
     }
 }

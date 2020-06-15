@@ -3,6 +3,7 @@
 namespace App\Application\UseCase\OrderDebtorIdentificationV2;
 
 use App\Application\Exception\OrderNotFoundException;
+use App\Application\UseCase\IdentifyAndScoreDebtor\Exception\DebtorNotIdentifiedException;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
 use App\DomainModel\DebtorCompany\IdentifyDebtorRequestDTO;
@@ -29,10 +30,14 @@ class OrderDebtorIdentificationV2UseCase
         $this->companiesService = $companiesService;
     }
 
-    public function execute(OrderDebtorIdentificationV2Request $request): void
+    public function execute(OrderDebtorIdentificationV2Request $request): OrderDebtorIdentificationV2Response
     {
         try {
-            $orderContainer = $this->orderContainerFactory->loadById($request->getOrderId());
+            if ($request->getOrderId()) {
+                $orderContainer = $this->orderContainerFactory->loadById($request->getOrderId());
+            } else {
+                $orderContainer = $this->orderContainerFactory->loadByUuid($request->getOrderUuid());
+            }
         } catch (OrderContainerFactoryException $exception) {
             throw new OrderNotFoundException($exception);
         }
@@ -63,11 +68,15 @@ class OrderDebtorIdentificationV2UseCase
 
             $this->orderIdentificationRepository->insert(
                 (new OrderIdentificationEntity())
-                    ->setOrderId($request->getOrderId())
+                    ->setOrderId($orderContainer->getOrder()->getId())
                     ->setV1CompanyId($request->getV1CompanyId())
                     ->setV2CompanyId($identifiedDebtor ? $identifiedDebtor->getId() : null)
                     ->setV2StrictMatch($identifiedDebtor ? $identifiedDebtor->isStrictMatch() : null)
             );
+
+            if ($identifiedDebtor) {
+                return new OrderDebtorIdentificationV2Response($identifiedDebtor);
+            }
         } catch (CompaniesServiceRequestException $e) {
             $this->orderIdentificationRepository->insert(
                 (new OrderIdentificationEntity())
@@ -76,5 +85,7 @@ class OrderDebtorIdentificationV2UseCase
                     ->setV2CompanyId(null)
             );
         }
+
+        throw new DebtorNotIdentifiedException('Debtor not identified');
     }
 }
