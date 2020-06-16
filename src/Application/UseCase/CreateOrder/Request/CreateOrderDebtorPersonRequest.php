@@ -9,7 +9,7 @@ use OpenApi\Annotations as OA;
  * @OA\Schema(
  *     schema="CreateOrderDebtorPersonRequest",
  *     title="Debtor Person",
- *     required={"email", "salutation"},
+ *     required={"email"},
  *     properties={
  *          @OA\Property(property="salutation", maxLength=1, enum={"m", "f"}, type="string", nullable=true),
  *          @OA\Property(property="first_name", ref="#/components/schemas/TinyText", example="James"),

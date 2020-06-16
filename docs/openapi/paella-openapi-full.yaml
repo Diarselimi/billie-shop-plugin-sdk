@@ -3064,7 +3064,6 @@ components:
       title: 'Debtor Person'
       required:
         - email
-        - salutation
       properties:
         salutation:
           type: string
