@@ -29,8 +29,6 @@ class OrderDeclinedReasonsMapper
 
     private const REASON_ADDRESS_MISMATCH = 'debtor_address';
 
-    private const REASON_BILLING_ADDRESS_INVALID = 'debtor_address';
-
     private const REASON_DEBTOR_LIMIT_EXCEEDED = 'debtor_limit_exceeded';
 
     private $riskCheckRepository;

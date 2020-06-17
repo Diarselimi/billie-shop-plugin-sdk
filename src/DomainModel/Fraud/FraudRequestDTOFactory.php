@@ -11,15 +11,14 @@ final class FraudRequestDTOFactory
 {
     public function createFromOrderContainer(
         OrderContainer $orderContainer,
-        bool $isExistingCustomer,
         ?string $ipAddress
     ): FraudRequestDTO {
         return new FraudRequestDTO(
             $orderContainer->getOrder()->getUuid(),
             $orderContainer->getDebtorPerson(),
-            $isExistingCustomer,
+            $orderContainer->getDebtorExternalData()->isEstablishedCustomer() ?? false,
             $orderContainer->getDebtorCompany()->getUuid(),
-            new Money($orderContainer->getPaymentDetails()->getPayoutAmount()),
+            new Money($orderContainer->getOrderFinancialDetails()->getAmountGross()),
             $ipAddress,
             $orderContainer->getBillingAddress(),
             $orderContainer->getDeliveryAddress()

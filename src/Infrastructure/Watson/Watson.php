@@ -34,7 +34,7 @@ class Watson implements FraudServiceInterface, LoggingInterface
     public function check(FraudRequestDTO $request): FraudResponseDTO
     {
         try {
-            $response = $this->client->post('check-fraud', [
+            $response = $this->client->post('check-invoice-fraud', [
                 'json' => $request->toArray(),
                 'on_stats' => function (TransferStats $stats) {
                     $this->logServiceRequestStats($stats, 'check_fraud');

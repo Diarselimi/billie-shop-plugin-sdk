@@ -23,6 +23,7 @@ Feature:
       | debtor_overdue            |
       | company_b2b_score         |
       | line_items                |
+      | fraud_score               |
     And The following merchant risk check settings exist for merchant 1:
       | risk_check_name           | enabled | decline_on_failure |
       | line_items                | 1       | 1                  |
@@ -39,8 +40,10 @@ Feature:
       | debtor_blacklisted        | 1       | 1                  |
       | debtor_overdue            | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
+      | fraud_score               | 1       | 0                  |
     And I get from companies service get debtor response
     And I get from payments service get debtor response
+				And I get from Fraud service a non fraud response
 
   Scenario: Debtor identification failed
     Given I get from companies service identify no match response

@@ -12,6 +12,7 @@ use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedBillingAddressCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DeliveryAddressCheck;
+use App\DomainModel\OrderRiskCheck\Checker\FraudScoreCheck;
 use App\DomainModel\OrderRiskCheck\Checker\LimitCheck;
 
 class ApproveOrderUseCase
@@ -19,6 +20,7 @@ class ApproveOrderUseCase
     public const RISK_CHECKS_TO_SKIP = [
         DeliveryAddressCheck::NAME,
         DebtorIdentifiedBillingAddressCheck::NAME,
+        FraudScoreCheck::NAME,
     ];
 
     private $orderContainerFactory;

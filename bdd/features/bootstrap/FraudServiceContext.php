@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use Behat\Behat\Context\Context;
-use donatj\MockWebServer\ResponseStack;
 use donatj\MockWebServer\Response as MockResponse;
+use donatj\MockWebServer\ResponseStack;
 
 class FraudServiceContext implements Context
 {
@@ -16,14 +16,27 @@ class FraudServiceContext implements Context
     }
 
     /**
-     * @Given /^Fraud API responded on the request with success$/
+     * @Given /^I get from Fraud service a non fraud response$/
      */
     public function fraudApiResponsdedWithSuccess()
     {
         $this->mockRequest(
-            '/find',
+            '/check-invoice-fraud',
             new ResponseStack(
                 new MockResponse(json_encode(['is_fraud' => false]))
+            )
+        );
+    }
+
+    /**
+     * @Given /^I get from Fraud service a fraud response$/
+     */
+    public function fraudApiResponsdedWithFailure()
+    {
+        $this->mockRequest(
+            '/check-invoice-fraud',
+            new ResponseStack(
+                new MockResponse(json_encode(['is_fraud' => true]))
             )
         );
     }
