@@ -44,7 +44,7 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
     {
         $params = [
             'merchantUuid' => $merchantPaymentUuid,
-            'transactionUuid' => "'{$transactionUuid}'",
+            'transactionUuid' => $transactionUuid,
         ];
 
         $response = $this->query('get_merchant_payment_details', $params);

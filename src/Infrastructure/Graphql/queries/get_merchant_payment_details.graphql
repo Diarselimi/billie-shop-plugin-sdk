@@ -1,10 +1,10 @@
 query q(
     $merchantUuid: String!
-    $transactionUuid: String
+    $transactionUuid: String!
 ){
-    getPadPayments(
+    getPadPaymentDetails(
         merchant_uuid: $merchantUuid
-        transaction_uuids: $transactionUuid
+        transaction_uuid: $transactionUuid
     ) {
         uuid: transaction_uuid
         amount
@@ -13,9 +13,7 @@ query q(
         transaction_counterparty_iban: bank_transaction_counterparty_iban
         transaction_counterparty_name: bank_transaction_counterparty_name
         transaction_reference: bank_transaction_reference
-        merchant_debtor {
-            uuid
-        }
+        merchant_debtor_uuid
         orders: sub_items {
             uuid: order_uuid
             amount

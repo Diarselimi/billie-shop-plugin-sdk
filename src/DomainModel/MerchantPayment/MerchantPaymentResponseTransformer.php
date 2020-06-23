@@ -15,16 +15,10 @@ class MerchantPaymentResponseTransformer
 
     public function expandPaymentItem(array $item): array
     {
-        $this->addMerchantDebtorUuid($item);
         $this->addIsAllocated($item);
         $this->addOverpaidAmount($item);
 
         return $item;
-    }
-
-    public function addMerchantDebtorUuid(array &$item): void
-    {
-        $item['merchant_debtor_uuid'] = $item['merchant_debtor']['uuid'];
     }
 
     public function addIsAllocated(array &$item): void
