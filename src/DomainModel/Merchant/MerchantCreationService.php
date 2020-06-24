@@ -109,6 +109,8 @@ class MerchantCreationService
             $creationDTO->getPaymentUuid()
         );
 
+        $this->merchantAnnouncer->announceRequestSchufaB2BReport($creationDTO->getCompany());
+
         return $creationDTO;
     }
 

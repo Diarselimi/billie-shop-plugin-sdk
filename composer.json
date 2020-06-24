@@ -16,7 +16,7 @@
         "illuminate/support": "^5.8",
         "ocramius/proxy-manager": "2.2.0",
         "ozean12/amqp-pack": "^1.0",
-        "ozean12/amqp-transfers": "~0.3.21",
+        "ozean12/amqp-transfers": "~0.3.27",
         "ozean12/graphql-repository-client": "^1.0",
         "ozean12/money": "^3.0",
         "php-amqplib/rabbitmq-bundle": "^1.14",

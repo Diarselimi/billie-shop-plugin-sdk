@@ -17,3 +17,4 @@ ozean12_amqp_pack:
     bank_account.bank_account_core_accepted: Ozean12\Transfer\Message\BankAccount\BankAccountCoreAccepted
     company_information_change_request.company_information_change_request_canceled: Ozean12\Transfer\Message\CompanyInformationChangeRequest\CompanyInformationChangeRequestCanceled
     company_information_change_request.company_information_change_request_created: Ozean12\Transfer\Message\CompanyInformationChangeRequest\CompanyInformationChangeRequestCreated
+    company.request_schufa_b2b_report: Ozean12\Transfer\Message\Company\RequestSchufaB2BReport
