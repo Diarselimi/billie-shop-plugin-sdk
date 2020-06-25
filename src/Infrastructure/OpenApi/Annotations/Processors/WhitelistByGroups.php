@@ -4,6 +4,7 @@ namespace App\Infrastructure\OpenApi\Annotations\Processors;
 
 use OpenApi\Analysis;
 use OpenApi\Annotations as OA;
+
 use const OpenApi\UNDEFINED;
 
 /**
@@ -14,6 +15,8 @@ use const OpenApi\UNDEFINED;
  */
 class WhitelistByGroups implements ProcessorInterface
 {
+    use GroupAwareTrait;
+
     private $groups;
 
     public function __construct(array $groups)
@@ -49,7 +52,7 @@ class WhitelistByGroups implements ProcessorInterface
         foreach ($ext['tagGroups'] as $i => $tagGroup) {
             if (isset($tagGroup['groups'])
                 && is_array($tagGroup['groups'])
-                && $this->isFilteredOut($tagGroup['groups'])
+                && $this->isInFilteredGroups($tagGroup['groups'], $this->groups)
             ) {
                 unset($ext['tagGroups'][$i]);
 
@@ -72,7 +75,7 @@ class WhitelistByGroups implements ProcessorInterface
         foreach ($node as $i => $item) {
             $isNumericIndexed = $isNumericIndexed && is_numeric($i);
 
-            if ($this->isFilteredOut($item)) {
+            if ($this->isInFilteredGroups($item, $this->groups)) {
                 unset($node[$i]);
 
                 continue;
@@ -96,9 +99,11 @@ class WhitelistByGroups implements ProcessorInterface
         $this->filterFromList($item->parameters);
         $this->filterFromList($item->servers);
         $shouldRemovePathItem = true;
-        foreach (['head', 'options', 'trace', 'get', 'post', 'put', 'patch', 'delete'] as $method) {
+        foreach (self::HTTP_METHODS as $method) {
+            /** @var OA\AbstractAnnotation $operation */
             $operation = $item->{$method};
-            if ($this->isFilteredOut($operation)) {
+
+            if ($this->isInFilteredGroups($operation, $this->groups)) {
                 $item->{$method} = UNDEFINED;
             } elseif ($operation instanceof OA\Operation) {
                 $shouldRemovePathItem = false;
@@ -107,47 +112,5 @@ class WhitelistByGroups implements ProcessorInterface
         if ($shouldRemovePathItem) {
             unset($node[$path]);
         }
-    }
-
-    /**
-     * @param  OA\AbstractAnnotation|string[] $source
-     * @return bool
-     */
-    private function isFilteredOut($source): bool
-    {
-        if ($source instanceof OA\AbstractAnnotation) {
-            $groups = $this->extractGroups($source);
-        } elseif (is_array($source)) {
-            $groups = $source;
-        } else {
-            return false;
-        }
-
-        if (empty($groups)) {
-            // skip if x-groups property is not defined or empty
-            return false;
-        }
-
-        foreach ($groups as $group) {
-            if (in_array($group, $this->groups)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private function extractGroups(OA\AbstractAnnotation $annotation): array
-    {
-        $x = $annotation->x;
-
-        if (!is_array($x) || !isset($x['groups']) || !is_array($x['groups']) || empty($x['groups'])) {
-            // skip if x-groups property is not defined or empty
-            return [];
-        }
-
-        unset($annotation->x['groups']);
-
-        return $x['groups'];
     }
 }

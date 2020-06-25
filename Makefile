@@ -1,5 +1,3 @@
-API_DOCS_VERSION := $(shell date +"%Y.%m")
-
 default:install
 
 # START Jenkins provisioner required targets:
@@ -32,11 +30,16 @@ test:
 	make test-behat
 
 docs:
-	echo " > Running OpenAPI Spec generator... "
-	bin/docker/app bin/generate-api-docs "v${API_DOCS_VERSION}"
-	echo " > Running OpenAPI Spec validator... "
-	bin/docker/run-tmp swagger-cli validate /openapi/paella-openapi-full.yaml
-	bin/docker/run-tmp swagger-cli validate /openapi/paella-openapi-public.yaml
+	echo " > Running OpenAPI Specification generator + validator... "
+	# full (internal)
+	bin/docker/app bin/generate-api-docs full
+	bin/docker/run-rm swagger-cli validate /openapi/paella-openapi-full.yaml
+	# public (the one in developers.billie.io)
+	bin/docker/app bin/generate-api-docs public
+	bin/docker/run-rm swagger-cli validate /openapi/paella-openapi-public.yaml
+	# checkout-client (internal)
+	bin/docker/app bin/generate-api-docs checkout-client --with-extra-config
+	bin/docker/run-rm swagger-cli validate /openapi/paella-openapi-checkout-client.yaml
 
 migrate:
 	echo " > Running DB migrations... "
@@ -47,9 +50,12 @@ test-phpspec:
 	echo " > Running PHPSpec... "
 	bin/docker/app vendor/bin/phpspec run --stop-on-failure -vvv
 
-test-phpunit:
+test-seed:
 	echo " > Running DB seeds... "
 	bin/docker/app vendor/bin/phinx seed:run
+
+test-phpunit:
+	make test-seed
 	echo " > Setting up PHPUnit... "
 	bin/docker/app ./.ci/scripts/install-composer.sh
 	bin/docker/app bin/phpunit install -q -n

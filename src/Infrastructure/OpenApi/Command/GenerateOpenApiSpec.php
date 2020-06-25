@@ -35,7 +35,9 @@ class GenerateOpenApiSpec extends Command
     protected function configure()
     {
         $this->setName(self::NAME)
-            ->setDescription('Generates an OpenApi specification out of the given source code directory, parsing all annotations.')
+            ->setDescription(
+                'Generates an OpenApi specification out of the given source code directory, parsing all annotations.'
+            )
             ->addArgument('version', InputArgument::REQUIRED, 'API version')
             ->addOption('output-file', null, InputOption::VALUE_REQUIRED, 'Output file name')
             ->addOption('title', null, InputOption::VALUE_REQUIRED, 'API title', 'Paella API Docs')
@@ -45,6 +47,12 @@ class GenerateOpenApiSpec extends Command
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
                 'White list of groups to include in the generated spec.',
                 ['public', 'private']
+            )
+            ->addOption(
+                'with-extra-config',
+                null,
+                InputOption::VALUE_NONE,
+                'If enabled, extra config (like AWS API Gateway) will be added as x- parameters.'
             );
     }
 
@@ -102,7 +110,7 @@ class GenerateOpenApiSpec extends Command
             $groups = [];
         }
 
-        return [
+        $processors = [
             new Processors\MergeIntoOpenApi(),
             new Processors\MergeIntoComponents(),
             new Processors\ImportTraits(),
@@ -122,5 +130,13 @@ class GenerateOpenApiSpec extends Command
             new CustomProcessors\WhitelistByGroups($groups),
             new CustomProcessors\RemoveOrphanComponents(),
         ];
+
+        if ($input->getOption('with-extra-config')) {
+            $processors[] = new CustomProcessors\AddAmazonApiGatewayConfig();
+        }
+
+        $processors[] = new CustomProcessors\RemoveGroups();
+
+        return $processors;
     }
 }

@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
  *     description="Fills the required order information for the given checkout session. The order will then need to be confirmed by the merchant aftewards.",
  *
  *     tags={"Checkout Client"},
- *     x={"groups":{"private"}},
+ *     x={"groups":{"private", "checkout-client", "amazon-apigateway-integration"}},
  *
  *     @OA\Parameter(in="path", name="sessionUuid", @OA\Schema(ref="#/components/schemas/UUID"), required=true),
  *

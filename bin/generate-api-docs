@@ -1,40 +1,18 @@
 #!/usr/bin/env bash
 
-function api_current_version() {
-  ver = $(cat docs/openapi/paella-openapi-public.yaml | grep "  version: ")
-  echo ${ver/"  version: "/}
-}
-
-function generate_api_docs() {
-  SPEC_GROUP=${1:-"full"}
-  SPEC_FILE="${SPEC_DIR}/paella-openapi-${SPEC_GROUP}.yaml"
-
-  echo "    - Building ${SPEC_FILE} ..."
-
-  mkdir -p ${SPEC_DIR}
-  rm -f ${SPEC_FILE}
-
-  bin/console paella:openapi:generate ${SPEC_VERSION} \
-    --output-file="${SPEC_FILE}" \
-    --title="${SPEC_TITLE}" \
-    --groups=${SPEC_GROUP}
-
-  if [[ ! -f ${SPEC_FILE} ]]; then
-    echo " ERROR: Open API generation failed. Spec. file does not exist."
-    exit 1
-  fi
-}
-
+CURR_DATE=$(date +"%Y.%m")
+SPEC_VERSION="v${CURR_DATE}"
 SPEC_DIR="docs/openapi"
 SPEC_TITLE="Billie - PaD API Documentation"
-SPEC_VERSION=${1:-$(api_current_version)}
+SPEC_GROUP=${1:-"full"}
+SPEC_FILE="${SPEC_DIR}/paella-openapi-${SPEC_GROUP}.yaml"
 
-echo " Generating OpenAPI 3.0 YAML specifications (Paella API ${SPEC_VERSION}):"
+echo "   Generating OpenAPI 3.0 YAML specification for group '${SPEC_GROUP}'."
 
-rm -rf docs/openapi
-mkdir -p docs/openapi
+mkdir -p ${SPEC_DIR}
+rm -f ${SPEC_FILE}
 
-generate_api_docs full # special group name, meaning ALL groups. See GenerateOpenApiSpec::buildProcessors
-generate_api_docs public
+bin/console paella:openapi:generate "${SPEC_VERSION}" --groups="${SPEC_GROUP}" \
+  --output-file="${SPEC_FILE}" --title="${SPEC_TITLE}" "${@:2}"
 
-echo " OpenAPI specifications have been generated successfully."
+echo "   Specification file successfully generated under ${SPEC_FILE}."

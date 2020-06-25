@@ -1,0 +1,527 @@
+openapi: 3.0.0
+info:
+  title: 'Billie - PaD API Documentation'
+  description: |
+    # Introduction
+    
+    With PayAfterDelivery (PAD) / "Rechnungskauf" Billie offers a convenient, secure and simple way to allow your B2B-customers
+    to pay on invoice. Our solution enables merchants to accept invoice payments from other business customers without waiting for their money,
+    reminding customers about the payment, or assuming credit risk.
+    
+    The following documentation describes our RESTFul API, which allows easy integration into your web-shop,
+    eCommerce platform or invoicing back-end.
+    
+    Based upon your Billie contract, your customers will have between 7 and 120 days (payment term) to pay your invoices, while Billie will 
+    transfer the money to you immediately after shipment of goods or fulfilment of service obligation. For outstanding payments, 
+    Billie takes over reminding customers on your behalf (white-label solution). Additionally, Billie protects you from credit risks 
+    by absorbing any potential debtor defaults.
+    
+    ---
+    ## Order State Transitions
+    
+    ![img](src/Resources/docs/orders-workflow-public.png)
+    
+    ## Order States
+    
+    | State         | Description                                                                                   |
+    |---------------|-----------------------------------------------------------------------------------------------|
+    | waiting       | The order creation failed and needs a manual operation in order to be approved or declined    |
+    | authorized    | State of an order after creating it via the checkout widget. For approval, it needs merchant-side confirmation.    |
+    | created       | The order is successfully approved and Billie can offer financing for this transaction        |
+    | declined      | The order was declined and no financing is offered for this transaction                       |
+    | shipped       | The order was successfully shipped by the merchant                                            |
+    | paid_out      | The outstanding amount for the respective order was successfully paid out to the merchant     |
+    | late          | The payment of the outstanding amount is overdue                                              |
+    | complete      | The outstanding amount was successfully paid back by the customer                             |
+    | canceled      | The order was canceled by the merchant       
+    
+    
+    ## Order Decline Reasons
+    
+    An order could be declined by any of these reasons:
+    
+    | Reason                | Description                                               |
+    |-----------------------|-----------------------------------------------------------|
+    | debtor_address        | Debtor address or name mismatch                           |
+    | debtor_not_identified | Debtor could not be identified with the information given |
+    | risk_policy           | Risk decline                                              |
+    | debtor_limit_exceeded | Financing limit of debtor currently exceeded              |
+    
+    
+    ## Usage of Virtual IBANs
+    
+    Since payouts by Billie to the merchant are made immediately after shipment of goods or delivery of the agreed service, customers need to 
+    pay back their invoices directly to Billie upon due date. Therefore, Billie is using so-called virtual IBANs (VIBANs).
+    VIBANs are delivered back to the merchant as response to an (accepted) order creation request. VIBANs are unique for each of your 
+    debtor / customer. The VIBAN needs to be put on the invoice which the customer receives for the purchase.
+    
+  termsOfService: 'https://www.billie.io/agb/'
+  license:
+    name: '© Billie GmbH, 2019'
+    url: 'https://www.billie.io/agb/'
+  version: v2020.06
+  x-logo:
+    url: 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDIyLjAuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkViZW5lXzJfS29waWUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIKCSB5PSIwcHgiIHZpZXdCb3g9IjAgMCA0OC41IDY3LjYiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDQ4LjUgNjcuNjsiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPgoJLnN0MHtkaXNwbGF5Om5vbmU7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDo3O3N0cm9rZS1taXRlcmxpbWl0OjEwO30KCS5zdDF7ZmlsbDojMUYyNTMwO30KCS5zdDJ7ZmlsbDpub25lO30KCS5zdDN7ZGlzcGxheTpub25lO2VuYWJsZS1iYWNrZ3JvdW5kOm5ldyAgICA7fQoJLnN0NHtmb250LWZhbWlseTonQXZlbmlyTmV4dC1EZW1pQm9sZCc7fQoJLnN0NXtmb250LXNpemU6My4wMzAzcHg7fQoJLnN0NntsZXR0ZXItc3BhY2luZzoyO30KPC9zdHlsZT4KPHBhdGggY2xhc3M9InN0MCIgZD0iTTkuOCw0Ni4xYy0wLjUsMCwyNS4xLTEyLjYsMjUuMS0zMi43YzAtNi45LTUuNi0xMi42LTEyLjYtMTIuNlM5LjcsNi41LDkuNywxMy40TDkuOCw0Ni4xaDE4LjUKCWM2LjksMCwxMi42LTUuNiwxMi42LTEyLjZTMzUuMiwyMSwyOC4yLDIxSDkuNyIvPgo8Zz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0yOC4yLDQ3SDguOHYtMC44YzAtMC4xLDAtMC4yLDAtMC4zVjEzLjVDOC44LDYsMTQuOSwwLDIyLjMsMHMxMy41LDYsMTMuNSwxMy41YzAsMi44LTAuNSw1LjUtMS40LDguMgoJCWM0LjMsMi4yLDcuMyw2LjcsNy4zLDExLjlDNDEuNyw0MSwzNS42LDQ3LDI4LjIsNDd6IE0xMi45LDQ1LjJoMTUuM2M2LjQsMCwxMS43LTUuMywxMS43LTExLjdjMC00LjQtMi41LTguMy02LjEtMTAuMwoJCWMtMS44LDQuNC00LjgsOC43LTksMTIuOEMyMC40LDQwLjQsMTUuOCw0My41LDEyLjksNDUuMnogTTEwLjYsMjEuOXYyMi43YzEzLTcuNywxOC45LTE1LjYsMjEuNS0yMmMtMS4yLTAuNC0yLjUtMC43LTMuOS0wLjdIMTAuNgoJCXogTTEwLjYsMjAuMWgxNy42YzEuNiwwLDMuMSwwLjMsNC41LDAuOGMxLTIuOSwxLjMtNS41LDEuMy03LjRDMzQsNywyOC44LDEuOCwyMi4zLDEuOFMxMC42LDcsMTAuNiwxMy41VjIwLjF6Ii8+CjwvZz4KPHJlY3QgeD0iLTExLjEiIHk9Ii01OC43IiBjbGFzcz0ic3QyIiB3aWR0aD0iODUuNCIgaGVpZ2h0PSI0OS41Ii8+Cjx0ZXh0IHRyYW5zZm9ybT0ibWF0cml4KDEgMCAwIDEgLTEuMDQyNCA2Ny41NzcyKSIgY2xhc3M9InN0MyBzdDQgc3Q1IHN0NiI+QklMTElFPC90ZXh0Pgo8Zz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0wLDU4LjFoMy43YzAuNCwwLDAuNywwLjEsMS4xLDAuMWMwLjQsMC4xLDAuNywwLjIsMC45LDAuNGMwLjMsMC4yLDAuNSwwLjQsMC43LDAuN2MwLjIsMC4zLDAuMywwLjcsMC4zLDEuMQoJCWMwLDAuNS0wLjIsMS0wLjUsMS4zYy0wLjMsMC40LTAuNywwLjYtMS4yLDAuOHYwYzAuNiwwLjEsMS4xLDAuMywxLjUsMC43QzYuOCw2My42LDcsNjQuMiw3LDY0LjhjMCwwLjUtMC4xLDEtMC4zLDEuMwoJCWMtMC4yLDAuNC0wLjUsMC42LTAuOCwwLjljLTAuMywwLjItMC43LDAuNC0xLjIsMC41Yy0wLjQsMC4xLTAuOSwwLjItMS4zLDAuMkgwQzAsNjcuNiwwLDU4LjEsMCw1OC4xeiBNMS43LDYyaDEuNQoJCWMwLjYsMCwxLTAuMSwxLjMtMC4zYzAuMy0wLjIsMC40LTAuNSwwLjQtMWMwLTAuNC0wLjItMC43LTAuNS0wLjljLTAuMy0wLjItMC44LTAuMy0xLjQtMC4zSDEuN0wxLjcsNjJMMS43LDYyeiBNMS43LDY2LjFoMS41CgkJYzAuMiwwLDAuNSwwLDAuNy0wLjFzMC41LTAuMSwwLjctMC4yYzAuMi0wLjEsMC40LTAuMywwLjUtMC40YzAuMS0wLjIsMC4yLTAuNCwwLjItMC44YzAtMC41LTAuMi0wLjktMC41LTEKCQljLTAuMy0wLjItMC45LTAuMy0xLjUtMC4zSDEuN1Y2Ni4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTExLjEsNTguMWgxLjd2OS41aC0xLjdWNTguMXoiLz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0xNy4zLDU4LjFoMS43djhoNHYxLjVoLTUuN1Y1OC4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTI2LjUsNTguMWgxLjd2OGg0djEuNWgtNS43TDI2LjUsNTguMUwyNi41LDU4LjF6Ii8+Cgk8cGF0aCBjbGFzcz0ic3QxIiBkPSJNMzUuNyw1OC4xaDEuN3Y5LjVoLTEuN1Y1OC4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTQxLjksNTguMWg2LjN2MS41aC00LjZWNjJINDh2MS40aC00LjNWNjZoNC44djEuNWgtNi41VjU4LjF6Ii8+CjwvZz4KPC9zdmc+Cg=='
+    href: '#'
+servers:
+  -
+    url: 'https://paella-sandbox.billie.io/api/v1'
+    description: 'Test Sandbox API'
+  -
+    url: 'https://paella.billie.io/api/v1'
+    description: 'Production API'
+paths:
+  '/checkout-session/{sessionUuid}/authorize':
+    put:
+      tags:
+        - 'Checkout Client'
+      summary: 'Checkout Session Authorize'
+      description: 'Authorizes an existing checkout session, completing all missing order data.'
+      operationId: checkout_session_authorize
+      parameters:
+        -
+          name: sessionUuid
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '200':
+          description: 'Order created with ''authorized'' state, but a merchant confirmation is needed.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckoutAuthorizeOrderResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      x-amazon-apigateway-integration:
+        uri: 'http://$${stageVariables.lbDnsName}:${paella_port}/public/checkout-session/{sessionUuid}/authorize'
+        httpMethod: PUT
+        type: http_proxy
+        connectionId: '$${stageVariables.vpcLinkId}'
+        connectionType: VPC_LINK
+        passthroughBehavior: when_no_templates
+        requestParameters:
+          integration.request.path.sessionUuid: method.request.path.sessionUuid
+  /legal-forms:
+    get:
+      tags:
+        - 'Back-end Order Creation'
+      summary: 'Get Legal Forms'
+      operationId: get_legal_forms
+      responses:
+        '200':
+          description: 'List of supported legal forms'
+          content:
+            application/json:
+              schema:
+                properties:
+                  items: { type: array, items: { properties: { code: { description: 'Legal form code', type: integer, example: '90101' }, name: { description: 'Legal form name', type: string, example: 'AG & Co. KG', nullable: true }, required_input: { description: 'Required input (HR-NR => Registration Number, Ust-ID => Registration ID)', type: string, example: HR-NR }, required: { description: Required, type: boolean } }, type: object } }
+                type: object
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security: []
+      x-amazon-apigateway-integration:
+        uri: 'http://$${stageVariables.lbDnsName}:${paella_port}/public/legal-forms'
+        httpMethod: GET
+        type: http_proxy
+        connectionId: '$${stageVariables.vpcLinkId}'
+        connectionType: VPC_LINK
+        passthroughBehavior: when_no_templates
+components:
+  schemas:
+    UUID:
+      type: string
+      format: uuid
+      maxLength: 36
+      minLength: 36
+      example: 12345667-890a-bcde-f123-34567890abcd
+    OrderState:
+      title: 'Order State'
+      type: string
+      enum:
+        - new
+        - pre_waiting
+        - authorized
+        - waiting
+        - created
+        - declined
+        - shipped
+        - paid_out
+        - late
+        - complete
+        - canceled
+      example: created
+    OrderDeclineReason:
+      title: 'Order Decline Reason'
+      type: string
+      enum:
+        - risk_policy
+        - debtor_not_identified
+        - debtor_address
+        - debtor_limit_exceeded
+      example: debtor_not_identified
+    OrderDuration:
+      title: 'Order Duration'
+      type: integer
+      maximum: 120
+      minimum: 1
+      example: 30
+    PostalCode:
+      title: 'Postal Code'
+      type: string
+      maxLength: 5
+      example: '10969'
+    CountryCode:
+      title: 'Country Code'
+      type: string
+      maxLength: 2
+      pattern: '^[A-Za-z]{2}$'
+      example: DE
+    PhoneNumber:
+      title: 'Phone Number'
+      type: string
+      maxLength: 21
+      minLength: 5
+      pattern: '^(\+|\d|\()[ \-\/0-9()]{5,20}$'
+      example: '030 31199251'
+    TinyText:
+      title: string
+      type: string
+      maxLength: 255
+    AmountDTO:
+      title: 'Amount with split values for net, gross and tax.'
+      required:
+        - net
+        - gross
+        - tax
+      properties:
+        gross:
+          description: 'Value greater than 0, with max. 2 decimals. It should equal to net + tax.'
+          type: number
+          format: float
+          minimum: 1
+          example: 260.27
+        net:
+          description: 'Value greater than 0, with max. 2 decimals.'
+          type: number
+          format: float
+          minimum: 1
+          example: 200.12
+        tax:
+          description: 'Value greater than or equal to 0, with max. 2 decimals.'
+          type: number
+          format: float
+          minimum: 0
+          example: 60.15
+      type: object
+    CreateOrderRequest:
+      title: 'Order Creation Request'
+      required:
+        - amount
+        - duration
+        - debtor_company
+        - debtor_person
+      properties:
+        amount:
+          $ref: '#/components/schemas/AmountDTO'
+        comment:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        duration:
+          $ref: '#/components/schemas/OrderDuration'
+        order_id:
+          description: 'Order external code'
+          example: DE123456-1
+          $ref: '#/components/schemas/TinyText'
+        delivery_address:
+          nullable: true
+          $ref: '#/components/schemas/CreateOrderAddressRequest'
+        billing_address:
+          nullable: true
+          $ref: '#/components/schemas/CreateOrderAddressRequest'
+        debtor_company:
+          $ref: '#/components/schemas/CreateOrderDebtorCompanyRequest'
+        debtor_person:
+          $ref: '#/components/schemas/CreateOrderDebtorPersonRequest'
+        line_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateOrderLineItemRequest'
+          nullable: true
+      type: object
+    CreateOrderAddressRequest:
+      title: Address
+      required:
+        - street
+        - city
+        - postal_code
+        - country
+      properties:
+        addition:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        house_number:
+          example: '4'
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        street:
+          example: 'Charlotten Str.'
+          $ref: '#/components/schemas/TinyText'
+        city:
+          example: Berlin
+          $ref: '#/components/schemas/TinyText'
+        postal_code:
+          $ref: '#/components/schemas/PostalCode'
+        country:
+          $ref: '#/components/schemas/CountryCode'
+      type: object
+    CreateOrderDebtorCompanyRequest:
+      title: 'Debtor Company'
+      required:
+        - merchant_customer_id
+        - name
+        - legal_form
+        - address_street
+        - address_city
+        - address_postal_code
+        - address_country
+      properties:
+        merchant_customer_id:
+          description: 'Unique identifier of the customer provided by the merchant side.'
+          example: '128483'
+          $ref: '#/components/schemas/TinyText'
+        name:
+          example: 'Billie GmbH'
+          $ref: '#/components/schemas/TinyText'
+        tax_id:
+          example: DE1234556
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        tax_number:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        registration_court:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        registration_number:
+          example: 'HRB 1234556'
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        industry_sector:
+          example: C
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        subindustry_sector:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        employees_number:
+          example: 1-5
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        legal_form:
+          description: 'One of the legal form codes available in the `GET /legal-forms` API endpoint.'
+          example: '10001'
+          $ref: '#/components/schemas/TinyText'
+        established_customer:
+          type: boolean
+          nullable: true
+        address_addition:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        address_house_number:
+          example: '4'
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        address_street:
+          example: Charlottenstr.
+          $ref: '#/components/schemas/TinyText'
+        address_city:
+          example: Berlin
+          $ref: '#/components/schemas/TinyText'
+        address_postal_code:
+          example: '10969'
+          $ref: '#/components/schemas/PostalCode'
+        address_country:
+          example: DE
+          $ref: '#/components/schemas/CountryCode'
+      type: object
+    CreateOrderDebtorPersonRequest:
+      title: 'Debtor Person'
+      required:
+        - email
+      properties:
+        salutation:
+          type: string
+          maxLength: 1
+          enum:
+            - m
+            - f
+          nullable: true
+        first_name:
+          example: James
+          $ref: '#/components/schemas/TinyText'
+        last_name:
+          example: Smith
+          $ref: '#/components/schemas/TinyText'
+        phone_number:
+          $ref: '#/components/schemas/PhoneNumber'
+        email:
+          type: string
+          format: email
+          example: james.smith@example.com
+      type: object
+    CreateOrderLineItemRequest:
+      title: 'Order Line Item'
+      required:
+        - external_id
+        - title
+        - quantity
+        - amount_gross
+        - amount_tax
+        - amount_net
+      properties:
+        external_id:
+          $ref: '#/components/schemas/TinyText'
+        title:
+          $ref: '#/components/schemas/TinyText'
+        description:
+          type: string
+          nullable: true
+        quantity:
+          type: number
+          minimum: 1
+        category:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        brand:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        gtin:
+          description: 'Global Trade Item Number'
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        mpn:
+          description: 'Manufacturer Part Numbers'
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        amount:
+          $ref: '#/components/schemas/AmountDTO'
+      type: object
+    CheckoutAuthorizeOrderResponse:
+      title: 'Authorize Checkout Order Response'
+      properties:
+        state:
+          example: created
+          $ref: '#/components/schemas/OrderState'
+        reasons:
+          type: string
+          enum:
+            - risk_policy
+            - debtor_not_identified
+            - debtor_address
+            - debtor_limit_exceeded
+          nullable: true
+          deprecated: true
+        decline_reason:
+          nullable: true
+          $ref: '#/components/schemas/OrderDeclineReason'
+        debtor_company:
+          description: 'Identified company'
+          properties:
+            name:
+              example: 'Billie GmbH'
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_house_number:
+              example: '4'
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_street:
+              example: Charlottenstr.
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_postal_code:
+              type: string
+              maxLength: 5
+              example: '10969'
+              nullable: true
+            address_city:
+              example: Berlin
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_country:
+              type: string
+              maxLength: 2
+              nullable: true
+          type: object
+      type: object
+    ErrorsObject:
+      title: 'API Errors'
+      properties:
+        errors:
+          type: array
+          items:
+            required:
+              - title
+              - code
+            properties:
+              title:
+                description: 'Error message'
+                type: string
+              code:
+                description: 'Error code'
+                type: string
+                nullable: true
+              source:
+                description: 'Property path where the error occurred, if applicable'
+                type: string
+                nullable: true
+            type: object
+      type: object
+  responses:
+    ServerError:
+      description: 'Unexpected Server Error'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorsObject'
+    Unauthorized:
+      description: 'Unauthorized request or invalid credentials'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorsObject'
+    BadRequest:
+      description: 'Invalid Request Data'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorsObject'
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      description: |
+        This authentication mechanism is based on the OAuth 2.0 prototocol and requires a Client ID, a Client Secret Key and
+        in some cases also a user and password.
+        
+        With these credentials, the client should request a token using the `POST /api/v1/oauth/token` endpoint,
+        which should be used in the `Authorization` header together with the `Bearer` challenge to authenticate all the requests.
+        
+        > Example: `Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c`.
+      flows:
+        password:
+          tokenUrl: /oauth/token
+          scopes:
+            default: default
+tags: []

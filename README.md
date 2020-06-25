@@ -125,7 +125,7 @@ make test-phpunit
 
 Running phpunit directly with custom arguments:
 ```bash
-./bin/docker-app-exec bin/phpunit tests/MyTestCase.php
+./bin/docker/app bin/phpunit tests/MyTestCase.php
 ```
 
 #### PHPSpec

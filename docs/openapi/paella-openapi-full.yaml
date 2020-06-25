@@ -155,8 +155,6 @@ paths:
               schema:
                 type: string
                 default: 'paella_core is alive'
-      x-groups:
-        - private
   /oauth/token:
     post:
       tags:
@@ -196,9 +194,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OauthTokenResponseBody'
-      x-groups:
-        - public
-        - private
   /oauth/authorization:
     get:
       tags:
@@ -227,9 +222,6 @@ paths:
           $ref: '#/components/responses/Forbidden'
         default:
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - public
-        - private
   /internal-docs:
     get:
       tags:
@@ -260,8 +252,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   /internal-docs/billie-pad-openapi.yaml:
     get:
       tags:
@@ -284,8 +274,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   /docs:
     get:
       tags:
@@ -316,8 +304,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   /docs/billie-pad-openapi.yaml:
     get:
       tags:
@@ -340,8 +326,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   '/order/{uuid}/approve':
     post:
       tags:
@@ -368,8 +352,6 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   /merchant:
     post:
       tags:
@@ -401,8 +383,6 @@ paths:
                 $ref: '#/components/schemas/ErrorsObject'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   /merchant/with-company:
     post:
       tags:
@@ -435,8 +415,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   '/order/{uuid}/add-invoice':
     post:
       tags:
@@ -479,8 +457,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   '/debtors/{companyUuid}/whitelist':
     post:
       tags:
@@ -512,8 +488,6 @@ paths:
           description: 'Company not found.'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   '/order/{uuid}/decline':
     post:
       tags:
@@ -539,8 +513,6 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   '/debtor-company/{uuid}/limits':
     get:
       tags:
@@ -572,8 +544,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   '/merchant/{identifier}':
     get:
       tags:
@@ -601,8 +571,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   '/merchant-debtor/{debtorUuid}':
     get:
       tags:
@@ -630,8 +598,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   '/order/{uuid}/identify-debtor':
     get:
       tags:
@@ -659,8 +625,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   /merchant-debtor/mark-duplicates:
     post:
       tags:
@@ -685,8 +649,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   '/order/{uuid}/mark-as-fraud':
     post:
       tags:
@@ -712,8 +674,6 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   '/merchant/{uuid}/onboarding-step/transition':
     post:
       tags:
@@ -747,8 +707,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   '/merchant/{uuid}/onboarding/transition':
     post:
       tags:
@@ -782,8 +740,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   /merchant/registration:
     post:
       tags:
@@ -814,8 +770,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   '/merchant/{merchantId}/user':
     post:
       tags:
@@ -843,8 +797,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   '/merchant-debtor/{merchantDebtorUuid}/synchronize':
     post:
       tags:
@@ -870,8 +822,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   '/order/{uuid}/trigger-failed-notifications':
     post:
       tags:
@@ -893,8 +843,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   '/merchant-debtor/{debtorUuid}/update-company':
     post:
       tags:
@@ -922,8 +870,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   '/merchant-debtor/{debtorUuid}/update-limit':
     post:
       tags:
@@ -962,8 +908,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   '/order/{id}/cancel':
     post:
       tags:
@@ -993,9 +937,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - public
-        - private
   '/checkout-session/{sessionUuid}/authorize':
     put:
       tags:
@@ -1029,8 +970,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   '/checkout-session/{sessionUuid}/confirm':
     put:
       tags:
@@ -1069,9 +1008,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - public
-        - private
   /checkout-session:
     post:
       tags:
@@ -1109,9 +1045,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - public
-        - private
   '/checkout-session/{sessionUuid}/update':
     post:
       tags:
@@ -1145,8 +1078,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   '/order/{id}/confirm-payment':
     post:
       tags:
@@ -1195,9 +1126,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - public
-        - private
   /merchant/users/invitations:
     post:
       tags:
@@ -1232,8 +1160,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   /order:
     post:
       tags:
@@ -1270,9 +1196,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - public
-        - private
   /external-debtors:
     get:
       tags:
@@ -1303,8 +1226,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   '/merchant/users/invitations/{token}/details':
     get:
       tags:
@@ -1334,8 +1255,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   /legal-forms:
     get:
       tags:
@@ -1354,9 +1273,6 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
       security: []
-      x-groups:
-        - public
-        - private
   /merchant/credentials:
     get:
       tags:
@@ -1378,8 +1294,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   '/debtor/{uuid}':
     get:
       tags:
@@ -1411,8 +1325,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   /debtors:
     get:
       tags:
@@ -1475,8 +1387,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   /merchant/financial-assessment:
     get:
       tags:
@@ -1499,8 +1409,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
     post:
       tags:
         - 'Dashboard Merchants'
@@ -1526,8 +1434,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   /notifications:
     get:
       tags:
@@ -1550,8 +1456,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   /merchant/onboarding:
     get:
       tags:
@@ -1576,8 +1480,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   '/payments/{uuid}':
     get:
       tags:
@@ -1611,8 +1513,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   /payments:
     get:
       tags:
@@ -1690,8 +1590,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   /merchant/roles:
     get:
       tags:
@@ -1713,8 +1611,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   /merchant/bank-account/sepa-mandate-document:
     get:
       tags:
@@ -1742,8 +1638,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   /merchant/user:
     get:
       tags:
@@ -1766,8 +1660,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   /merchant/users:
     get:
       tags:
@@ -1820,8 +1712,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   '/order/{id}':
     get:
       tags:
@@ -1863,9 +1753,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - public
-        - private
     patch:
       tags:
         - 'Order Management'
@@ -1916,9 +1803,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - public
-        - private
   '/order/{uuid}/payments':
     get:
       tags:
@@ -1951,8 +1835,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   /orders:
     get:
       tags:
@@ -2037,8 +1919,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   '/merchant/signatory-powers/{token}':
     get:
       tags:
@@ -2067,8 +1947,6 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   /merchant/signatory-powers:
     get:
       tags:
@@ -2089,8 +1967,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   /merchant/finish-integration:
     post:
       tags:
@@ -2109,8 +1985,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   /merchant/start-integration:
     post:
       tags:
@@ -2137,8 +2011,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   /merchant/user/login:
     post:
       tags:
@@ -2163,8 +2035,6 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
       security: []
-      x-groups:
-        - private
   /merchant/user/logout:
     post:
       tags:
@@ -2181,8 +2051,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   '/order/{id}/pause-dunning':
     post:
       tags:
@@ -2227,9 +2095,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - public
-        - private
   '/merchant/users/invitations/{token}/signup':
     post:
       tags:
@@ -2265,8 +2130,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   '/debtor/{uuid}/information-change-request':
     post:
       tags:
@@ -2295,8 +2158,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   '/merchant/users/invitations/{uuid}/resend':
     post:
       tags:
@@ -2332,8 +2193,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   '/merchant/users/invitations/{uuid}':
     delete:
       tags:
@@ -2363,8 +2222,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   /merchant/bank-account:
     post:
       tags:
@@ -2393,8 +2250,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   '/order/{id}/ship':
     post:
       tags:
@@ -2439,9 +2294,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - public
-        - private
   '/order/{uuid}/ship-with-invoice':
     post:
       tags:
@@ -2480,8 +2332,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   /merchant/signatory-powers-selection:
     post:
       tags:
@@ -2506,8 +2356,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   '/merchant/signatory-powers/{token}/start-identity-verification':
     post:
       tags:
@@ -2542,8 +2390,6 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/ServerError'
-      x-groups:
-        - private
   /merchant/user/start-identity-verification:
     post:
       tags:
@@ -2576,8 +2422,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
   '/order-with-invoice/{uuid}':
     post:
       tags:
@@ -2610,8 +2454,6 @@ paths:
       security:
         -
           oauth2: []
-      x-groups:
-        - private
 components:
   schemas:
     UUID:
@@ -2923,8 +2765,6 @@ components:
         role_uuid:
           $ref: '#/components/schemas/UUID'
       type: object
-      x-groups:
-        - private
     CreateMerchantUserInvitationResponse:
       required:
         - invitation_uuid
@@ -2932,8 +2772,6 @@ components:
         invitation_uuid:
           $ref: '#/components/schemas/UUID'
       type: object
-      x-groups:
-        - private
     CreateMerchantWithCompanyRequest:
       required:
         - name
@@ -3001,8 +2839,6 @@ components:
         is_onboarding_complete:
           type: boolean
       type: object
-      x-groups:
-        - private
     CreateOrderRequest:
       title: 'Order Creation Request'
       required:
@@ -3358,8 +3194,6 @@ components:
                 $ref: '#/components/schemas/OnboardingStepState'
             type: object
       type: object
-      x-groups:
-        - private
     GetMerchantRolesResponse:
       title: GetMerchantRolesResponse
       type: array
@@ -3370,8 +3204,6 @@ components:
           name:
             $ref: '#/components/schemas/TinyText'
         type: object
-      x-groups:
-        - dashboard
     GetMerchantUsersResponse:
       title: 'Merchant Users List'
       properties:
@@ -3505,8 +3337,6 @@ components:
           type: object
           nullable: false
       type: object
-      x-groups:
-        - private
     MerchantUserLoginRequest:
       title: 'Merchant User Login'
       required:
@@ -3591,8 +3421,6 @@ components:
         tc_acepted:
           type: boolean
       type: object
-      x-groups:
-        - private
     RegisterMerchantRequest:
       properties:
         crefo_id:
@@ -3697,8 +3525,6 @@ components:
         tc_accepted:
           type: boolean
       type: object
-      x-groups:
-        - private
     ShipOrderRequest:
       title: 'Order Shipping Object'
       properties:
@@ -4513,8 +4339,6 @@ components:
         > Example: `X-Api-Key: bf428b05-f80e-4ed0-aa79-e0e7bef274a3`.
       name: X-Api-Key
       in: header
-      x-groups:
-        - internal
 tags:
   -
     name: Authentication
@@ -4544,9 +4368,6 @@ tags:
       ensures reduced system load on both ends, and is easy to implement as you don't need to keep track of token expiration times.
       
       There is another endpoint available for checking if a token is still valid or not: `GET oauth/token`.
-    x-groups:
-      - public
-      - private
   -
     name: 'Checkout Client'
     description: |
@@ -4772,24 +4593,12 @@ tags:
       - `c-primary` -  color of submit button
       - `s-font` - font size inside the widget 
       - `s-font-small` - font size of small text inside the widget
-    x-groups:
-      - public
-      - private
   -
     name: 'Checkout Server'
-    x-groups:
-      - public
-      - private
   -
     name: 'Back-end Order Creation'
-    x-groups:
-      - public
-      - private
   -
     name: 'Order Management'
-    x-groups:
-      - public
-      - private
   -
     name: Webhooks
     description: |
@@ -4859,34 +4668,17 @@ tags:
       | Event Name |  Description |
       |------------|--------------|
       |payments    |The outstanding amount for an order changed. This message is sent for full as well as partial payments for orders|
-    x-groups:
-      - public
-      - private
   -
     name: 'Dashboard Orders'
-    x-groups:
-      - private
   -
     name: 'Dashboard Debtors'
-    x-groups:
-      - private
   -
     name: 'Dashboard Payments'
-    x-groups:
-      - private
   -
     name: 'Dashboard Users'
-    x-groups:
-      - private
   -
     name: 'Dashboard Merchants'
-    x-groups:
-      - private
   -
     name: Support
-    x-groups:
-      - private
   -
     name: 'API Docs'
-    x-groups:
-      - private

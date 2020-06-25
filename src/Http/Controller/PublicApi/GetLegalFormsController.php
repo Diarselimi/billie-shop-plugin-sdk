@@ -13,7 +13,7 @@ use OpenApi\Annotations as OA;
  *     security={},
  *
  *     tags={"Back-end Order Creation"},
- *     x={"groups":{"public", "private"}},
+ *     x={"groups":{"public", "private", "checkout-client", "amazon-apigateway-integration"}},
  *
  *     @OA\Response(response=200, @OA\JsonContent(type="object", properties={
  *          @OA\Property(property="items", type="array", @OA\Items(
