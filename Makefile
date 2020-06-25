@@ -17,6 +17,7 @@ test:
 	make docs
 	make test-migrate
 	make test-phpspec
+	make test-phpunit
 	make test-behat
 
 test-migrate:
@@ -27,6 +28,15 @@ test-migrate:
 test-phpspec:
 	echo " > Running PHPSpec... "
 	./bin/docker-app-exec vendor/bin/phpspec run --stop-on-failure
+
+test-phpunit:
+	echo " > Running DB seeds... "
+	./bin/docker-app-exec vendor/bin/phinx seed:run
+	echo " > Setting up PHPUnit... "
+	./bin/docker-app-exec ./.ci/scripts/install-composer.sh
+	./bin/docker-app-exec bin/phpunit install -q -n
+	echo " > Running PHPUnit... "
+	./bin/docker-app-exec bin/phpunit --stop-on-failure
 
 test-behat:
 	echo " > Running Behat... "

@@ -5,12 +5,15 @@ declare(strict_types=1);
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
+use App\Tests\Integration\Helpers\RandomDataTrait;
 use Behat\Behat\Context\Context;
+use Behat\Symfony2Extension\Context\KernelDictionary;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Webmozart\Assert\Assert;
 
 class RepositoryIntegrationContext implements Context
 {
+    use KernelDictionary;
     use RandomDataTrait;
 
     public function __construct(KernelInterface $kernel)

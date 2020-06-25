@@ -27,6 +27,7 @@ $env = getenv('APP_ENV') ?: 'dev';
 
 return [
     'environments' => [
+        'default_migration_table' => 'phinxlog',
         'default' => $db,
         $env => $db,
     ],

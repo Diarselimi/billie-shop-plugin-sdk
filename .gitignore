@@ -25,24 +25,24 @@ behat.yml
 /config/*_local.yml
 
 /.php_cs.cache
-
-###> symfony/phpunit-bridge ###
-.phpunit
-/phpunit.xml
-###< symfony/phpunit-bridge ###
-
 ###> phpspec/phpspec ###
 phpspec.yml
 ###< phpspec/phpspec ###
-
-###> phpunit/phpunit ###
-.phpunit.result.cache
-###< phpunit/phpunit ###
-
 ###> graphql PHPStorm plugin ###
 .graphqlconfig
 schema.graphql
 ###< graphql PHPStorm plugin ###
 
+###> symfony/phpunit-bridge ###
+.phpunit
+.phpunit.result.cache
+/phpunit.xml
+###< symfony/phpunit-bridge ###
+
 docker-compose.override.yaml
 docker-compose.override.yml
+
+###> phpunit/phpunit ###
+/phpunit.xml
+.phpunit.result.cache
+###< phpunit/phpunit ###

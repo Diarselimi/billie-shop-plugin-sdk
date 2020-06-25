@@ -46,8 +46,7 @@
         "duxet/json_spec": "^1.2",
         "memio/spec-gen": "^0.9.0",
         "phpspec/phpspec": "^5.0",
-        "phpunit/phpunit": "^7.3",
-        "symfony/test-pack": "*"
+        "symfony/phpunit-bridge": "^5.1"
     },
     "config": {
         "preferred-install": {

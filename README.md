@@ -46,6 +46,39 @@ Usage:
 make docs
 ```
 
+## Tests
+
+### Test types
+
+We have 3 test types:
+* Functional
+* Integration
+* Unit
+
+We implement the testing pyramid principle which means we should have many unit tests, some integration tests and little functional tests.
+When you want to test something you should test it as low level as possible. This drastically increases speed, setup time and debug time.
+Some examples:
+* You want to test that the sorting of a DB table works. This can be tested with a functional test but we shouldn't do that, because we can also test it with an integration test.
+* You want to test that postal code validation works. This can be tested with a functional or an integration test but we shouldn't do that, because we can also test it with a unit test.
+
+#### Functional tests
+
+* How to write them: Behat
+* Where to write them: bdd/features/
+* What do they test: the whole system from start to finish, e.g. an API call, RabbitMQ consumer or executing a console command
+
+#### Integration tests
+
+* How to write them: PHPUnit
+* Where to write them: tests/Integration/
+* What do they test: how different components work together, but not the whole system from start to finish: e.g. use case using other components or a repository method which interacts with the database
+
+#### Unit tests
+
+* How to write them: PHPSpec
+* Where to write them: bdd/spec/
+* What do they test: a single class method in isolation
+
 ### Running tests
 
 #### All tests
@@ -67,6 +100,17 @@ make test-behat
 Running behat directly with custom arguments:
 ```bash
 ./bin/docker-app-exec vendor/bin/behat bdd/specs/foobar.feature
+```
+
+#### PHPUnit
+Usage:
+```bash
+make test-phpunit
+```
+
+Running phpunit directly with custom arguments:
+```bash
+./bin/docker-app-exec bin/phpunit tests/MyTestCase.php
 ```
 
 #### PHPSpec

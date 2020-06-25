@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace App\Tests\Integration\Helpers;
+
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\Address\AddressRepositoryInterface;
 use App\DomainModel\DebtorCompany\DebtorCompany;
@@ -9,18 +11,17 @@ use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\Merchant\MerchantCreationDTO;
 use App\DomainModel\Merchant\MerchantCreationService;
+use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
+use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonRepositoryInterface;
-use Behat\Symfony2Extension\Context\KernelDictionary;
 use Ramsey\Uuid\Uuid;
 use Webmozart\Assert\Assert;
 
 trait RandomDataTrait
 {
-    use KernelDictionary;
-
     private $data = [
         'last_merchant_creation_dto' => null,
         'last_order' => null,
@@ -178,5 +179,12 @@ trait RandomDataTrait
         $this->data['last_merchant_creation_dto'] = $merchantCreationDTO;
 
         return $merchantCreationDTO;
+    }
+
+    private function createMerchantDebtor(MerchantDebtorEntity $entity): MerchantDebtorEntity
+    {
+        $this->getContainer()->get(MerchantDebtorRepositoryInterface::class)->insert($entity);
+
+        return $entity;
     }
 }
