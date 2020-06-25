@@ -9,6 +9,7 @@ use App\DomainModel\DebtorCompany\DebtorCompanyFactory;
 use App\DomainModel\DebtorCompany\DebtorCreationDTO;
 use App\DomainModel\DebtorCompany\IdentifiedDebtorCompany;
 use App\DomainModel\DebtorCompany\IdentifyDebtorRequestDTO;
+use App\DomainModel\ExternalDebtorResponse\ExternalDebtorFactory;
 use App\DomainModel\MerchantDebtor\MerchantDebtorDuplicateDTO;
 use App\DomainModel\SignatoryPower\SignatoryPowerDTO;
 use App\DomainModel\SignatoryPower\SignatoryPowerDTOFactory;
@@ -40,14 +41,18 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
 
     private $signatoryPowersDTOFactory;
 
+    private $externalDebtorFactory;
+
     public function __construct(
         Client $alfredClient,
         DebtorCompanyFactory $debtorFactory,
-        SignatoryPowerDTOFactory $signatoryPowersDTOFactory
+        SignatoryPowerDTOFactory $signatoryPowersDTOFactory,
+        ExternalDebtorFactory $externalDebtorFactory
     ) {
         $this->client = $alfredClient;
         $this->factory = $debtorFactory;
         $this->signatoryPowersDTOFactory = $signatoryPowersDTOFactory;
+        $this->externalDebtorFactory = $externalDebtorFactory;
     }
 
     public function getDebtor(int $debtorCompanyId): ?DebtorCompany
@@ -321,5 +326,27 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         } catch (TransferException $exception) {
             throw new CompaniesServiceRequestException($exception);
         }
+    }
+
+    public function searchExternalDebtors(string $searchQuery, int $limit = 10): array
+    {
+        if (empty($searchQuery)) {
+            return [];
+        }
+
+        try {
+            $response = $this->client->post('company/search-customers-as-you-type', [
+                'json' => [
+                    'query' => $searchQuery,
+                    'limit' => $limit,
+                ],
+            ]);
+        } catch (TransferException $exception) {
+            throw new CompaniesServiceRequestException();
+        }
+
+        $decodedResponse = $this->decodeResponse($response);
+
+        return $this->externalDebtorFactory->createFromArrayCollection(isset($decodedResponse['items']) ? $decodedResponse['items'] : []);
     }
 }

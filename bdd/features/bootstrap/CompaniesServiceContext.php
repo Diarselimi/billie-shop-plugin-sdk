@@ -266,4 +266,14 @@ class CompaniesServiceContext implements Context
             new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_get_existing_company_by_crefo_id_empty.json'))
         ));
     }
+
+    /**
+     * @Given /^I get from companies service external debtors response$/
+     */
+    public function iGetFromCompaniesServiceExternalDebtorsResponse()
+    {
+        $this->mockRequest('/company/search-customers-as-you-type', new ResponseStack(
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_external_debtors.json'))
+        ));
+    }
 }

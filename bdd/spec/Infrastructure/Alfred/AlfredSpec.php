@@ -5,6 +5,7 @@ namespace spec\App\Infrastructure\Alfred;
 use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorCompany\DebtorCompanyFactory;
+use App\DomainModel\ExternalDebtorResponse\ExternalDebtorFactory;
 use App\DomainModel\SignatoryPower\SignatoryPowerDTOFactory;
 use App\Infrastructure\ClientResponseDecodeException;
 use GuzzleHttp\Client;
@@ -19,9 +20,10 @@ class AlfredSpec extends ObjectBehavior
     public function let(
         Client $alfredClient,
         DebtorCompanyFactory $debtorFactory,
-        SignatoryPowerDTOFactory $signatoryPowersDTOFactory
+        SignatoryPowerDTOFactory $signatoryPowersDTOFactory,
+        ExternalDebtorFactory $externalDebtorFactory
     ) {
-        $this->beConstructedWith($alfredClient, $debtorFactory, $signatoryPowersDTOFactory);
+        $this->beConstructedWith($alfredClient, $debtorFactory, $signatoryPowersDTOFactory, $externalDebtorFactory);
     }
 
     public function it_should_return_a_debtor_company_after_successful_identify_firmenwissen(

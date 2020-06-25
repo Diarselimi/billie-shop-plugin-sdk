@@ -1,0 +1,15 @@
+{
+  "items": [
+    {
+      "crefo_id":"Crefo123",
+      "name":"Test User Company",
+      "legal_form":"Test legal form",
+      "street":"Heinrich-Heine-Platz 10",
+      "street_name":"Heinrich-Heine-Platz",
+      "house_number":"10",
+      "city":"Berlin",
+      "postal_code":"10179",
+      "country":"de"
+    }
+  ]
+}

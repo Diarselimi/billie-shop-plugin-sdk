@@ -53,4 +53,6 @@ interface CompaniesServiceInterface
     public function assignIdentityVerificationCase(string $caseUuid, string $signatoryPowerUuid): void;
 
     public function blacklistCompany(string $companyUuid): void;
+
+    public function searchExternalDebtors(string $searchQuery, int $limit = 10): array;
 }

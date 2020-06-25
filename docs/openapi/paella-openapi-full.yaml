@@ -1238,6 +1238,38 @@ paths:
       x-groups:
         - public
         - private
+  /external-debtors:
+    get:
+      tags:
+        - 'Dashboard Debtors'
+      summary: 'Get External Debtors'
+      operationId: external_debtors_get
+      parameters:
+        -
+          name: search
+          in: query
+          description: 'Search text.'
+          required: true
+          schema:
+            $ref: '#/components/schemas/TinyText'
+      responses:
+        '200':
+          description: 'External Debtors List'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetExternalDebtorsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+      x-groups:
+        - private
   '/merchant/users/invitations/{token}/details':
     get:
       tags:
@@ -3170,6 +3202,23 @@ components:
                 description: 'The merchant the merchant-debtor belongs to.'
                 $ref: '#/components/schemas/GetDebtorCompanyLimitsMerchant'
             type: object
+      type: object
+    GetExternalDebtorsResponse:
+      properties:
+        name:
+          $ref: '#/components/schemas/TinyText'
+        legal_form:
+          $ref: '#/components/schemas/TinyText'
+        address_street:
+          $ref: '#/components/schemas/TinyText'
+        address_city:
+          $ref: '#/components/schemas/TinyText'
+        address_postal_code:
+          $ref: '#/components/schemas/TinyText'
+        address_country:
+          $ref: '#/components/schemas/TinyText'
+        address_house_number:
+          $ref: '#/components/schemas/TinyText'
       type: object
     GetInvitedMerchantUserResponse:
       properties:
