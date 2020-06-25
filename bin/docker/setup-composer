@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# sets up composer inside the "app" container, if not found
+
+if [[ ! -f composer.phar ]]; then
+  # Composer version is 1.6.5, same as in provisioner. See @ ozean12/provisioner:group_vars/all.yml:452
+  bin/docker/app curl -sS https://getcomposer.org/installer | php -- --version="1.6.5" --filename=composer.phar;
+  bin/docker/app ./composer.phar --version;
+  bin/docker/app apt-get update;
+  bin/docker/app apt-get install git unzip -y;
+  bin/docker/app ./composer.phar global require -n hirak/prestissimo;
+fi

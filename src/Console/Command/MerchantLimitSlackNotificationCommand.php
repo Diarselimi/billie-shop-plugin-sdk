@@ -60,7 +60,7 @@ class MerchantLimitSlackNotificationCommand extends Command implements LoggingIn
         if (!$merchants) {
             $output->writeln('No merchants with low power_amount found.');
 
-            return;
+            return 0;
         }
 
         foreach ($merchants as $merchant) {
@@ -71,5 +71,7 @@ class MerchantLimitSlackNotificationCommand extends Command implements LoggingIn
         $this->getSlackClient()->sendMessage($message);
 
         $output->writeln('DONE.');
+
+        return 0;
     }
 }

@@ -57,5 +57,7 @@ class MigrateHttpInvoicesCommand extends Command implements BatchCommandInterfac
                 $output->writeln("<error>{$exception->getMessage()}</error>");
             }
         }
+
+        return 0;
     }
 }

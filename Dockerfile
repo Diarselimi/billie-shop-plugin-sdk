@@ -9,4 +9,10 @@ WORKDIR $APP_ROOT
 # bcmath
 RUN docker-php-ext-install bcmath
 
+# intl
+RUN apt-get update && \
+    apt-get install -y libicu-dev && \
+    apt-get clean -y && rm -rf /var/lib/apt/lists/* && \
+    docker-php-ext-install intl
+
 #ansible-remove-me#COPY . $APP_ROOT

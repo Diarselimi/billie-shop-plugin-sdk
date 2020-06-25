@@ -9,12 +9,12 @@ Feature:
     And I add "X-Api-Key" header equal to test
     And The following risk check definitions exist:
       | name                      |
-      | available_financing_limit  |
+      | available_financing_limit |
       | amount                    |
       | debtor_country            |
       | debtor_industry_sector    |
-      | debtor_identified          |
-      | debtor_identified_strict   |
+      | debtor_identified         |
+      | debtor_identified_strict  |
       | delivery_address          |
       | debtor_is_trusted         |
       | limit                     |
@@ -26,13 +26,13 @@ Feature:
     And The following merchant risk check settings exist for merchant 1:
       | risk_check_name           | enabled | decline_on_failure |
       | line_items                | 1       | 1                  |
-      | available_financing_limit  | 1       | 1                  |
+      | available_financing_limit | 1       | 1                  |
       | amount                    | 1       | 1                  |
       | debtor_country            | 1       | 1                  |
       | debtor_industry_sector    | 1       | 1                  |
-      | debtor_identified          | 1       | 1                  |
+      | debtor_identified         | 1       | 1                  |
       | delivery_address          | 1       | 1                  |
-      | debtor_identified_strict   | 1       | 1                  |
+      | debtor_identified_strict  | 1       | 1                  |
       | debtor_is_trusted         | 1       | 1                  |
       | limit                     | 1       | 1                  |
       | debtor_not_customer       | 1       | 1                  |
@@ -158,7 +158,7 @@ Feature:
        "errors":[
           {
             "source":"duration",
-            "title":"This value should be 120 or less.",
+            "title":"This value should be between 1 and 120.",
             "code":"request_validation_error"
           },
           {
@@ -1106,7 +1106,7 @@ Feature:
     Given a merchant user exists with permission CONFIRM_ORDER_PAYMENT
     And I get from Oauth service a valid user token
     And I add "X-Api-Key" header equal to invalid_key
-	And I add "Authorization" header equal to "Bearer someToken"
+    And I add "Authorization" header equal to "Bearer someToken"
     When I send a POST request to "/order" with body:
     """
     {
@@ -1153,8 +1153,8 @@ Feature:
        "order_id":"A1"
     }
     """
-    Then the response status code should be 403
+    Then the response status code should be 401
     And the JSON response should be:
     """
-      {"errors":[{"title":"Access Denied.","code":"forbidden"}]}
+      {"errors":[{"title":"Unauthorized","code":"unauthorized"}]}
     """

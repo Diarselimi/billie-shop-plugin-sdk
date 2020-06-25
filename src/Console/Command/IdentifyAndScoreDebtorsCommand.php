@@ -133,6 +133,8 @@ class IdentifyAndScoreDebtorsCommand extends Command
 
         fclose($handle);
         $output->writeln($this->createCSVReport($results));
+
+        return 0;
     }
 
     private function addResult(array &$results, array $debtorExternalData, ?IdentifyAndScoreDebtorResponse $response)

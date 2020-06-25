@@ -31,5 +31,7 @@ class HashDebtorEmailCommand extends Command
         );
 
         $output->writeln($hash);
+
+        return 0;
     }
 }

@@ -119,7 +119,7 @@ Feature: As a merchant, I should be able to create an order by providing a valid
           "source": "amount.tax"
         },
         {
-          "title": "This value should be 1 or more.",
+          "title": "This value should be between 1 and 120.",
           "code": "request_validation_error",
           "source": "duration"
         },

@@ -58,6 +58,8 @@ class GenerateOpenApiSpec extends Command
             ($this->projectDocsDir . '/paella-' . $input->getArgument('version') . '-openapi.yaml');
 
         file_put_contents($outputFile, $this->buildYaml($input));
+
+        return 0;
     }
 
     protected function buildYaml(InputInterface $input): string

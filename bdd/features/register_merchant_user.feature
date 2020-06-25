@@ -81,6 +81,11 @@ Feature: Register merchant user to access dashboard
              "code":"request_validation_error"
           },
           {
+             "source":"user_password",
+             "title":"This value is too short. It should have 6 characters or more.",
+             "code":"request_validation_error"
+          },
+          {
              "source":"role_uuid",
              "title":"This value should not be blank.",
              "code":"request_validation_error"

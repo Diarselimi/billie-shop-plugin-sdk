@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# executes commands on a running container
+
 if [[ -t 1 ]]; then
   # stdout is a terminal
   docker-compose exec -e TERM=${TERM:-xterm-256color} "${@}"

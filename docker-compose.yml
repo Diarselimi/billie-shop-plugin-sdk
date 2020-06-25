@@ -1,3 +1,4 @@
+---
 version: "2.4"
 services:
   app: # Do not rename this service: it is required by provisioner/jenkins.
@@ -11,10 +12,10 @@ services:
       - PHP_MEMORY_LIMIT=256M
       - APP_ENV=test
       - APP_NAME=paella-core
+      - APP_SECRET=abcdef0123456789abcdef0123456789
       - INSTANCE_SUFFIX=_test
       - SENTRY_DSN=
       - NEWRELIC_APP_KEY=
-      - APP_SECRET=abcdef0123456789abcdef0123456789
       - COMPOSER_NO_INTERACTION=1
       - COMPOSER_MEMORY_LIMIT=0
       - DATABASE_DRIVER=mysql

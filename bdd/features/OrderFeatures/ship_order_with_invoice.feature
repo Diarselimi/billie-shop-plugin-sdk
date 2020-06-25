@@ -1,13 +1,12 @@
- Feature:
+Feature:
   In order to ship an order with uploaded invoice file
   I want to have an end point to ship my orders and upload invoice file
 
-  Background:
-			 Given I add "X-Test" header equal to 1
-			 And I add "X-Api-Key" header equal to test
-				And The following notification settings exist for merchant 1:
-					| notification_type | enabled |
-					| order_shipped     | 1       |
+   Background:
+     Given I add "X-Test" header equal to 1
+     And The following notification settings exist for merchant 1:
+       | notification_type | enabled |
+       | order_shipped     | 1       |
 
   Scenario: Successful invoice upload and order shipment
     Given I have a created order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
@@ -16,10 +15,10 @@
     And I get from companies service identify match response
     And I get from payments service get debtor response
     And I get from companies service get debtor response
-			 And I get from files service a good response
+    And I get from files service a good response
     And a merchant user exists with permission SHIP_ORDERS
-				And I get from Oauth service a valid user token
-				And I add "Authorization" header equal to "Bearer someToken"
+    And I get from Oauth service a valid user token
+    And I add "Authorization" header equal to "Bearer someToken"
     When I send a POST request to "/order/test-order-uuidCO123/ship-with-invoice" with parameters:
       | key               | value              |
       | invoice_number    | 123456A            |
@@ -89,4 +88,4 @@
     And the response status code should be 200
     And the order "CO123" is in state shipped
     And Order notification should exist for order "CO123" with type "order_shipped"
-		  And the order "CO123" has invoice data
+    And the order "CO123" has invoice data

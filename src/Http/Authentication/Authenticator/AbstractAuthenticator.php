@@ -26,8 +26,8 @@ abstract class AbstractAuthenticator extends AbstractGuardAuthenticator
     public function start(Request $request, AuthenticationException $authException = null)
     {
         return new ApiErrorResponse(
-            [new ApiError('Access Denied.', ApiError::CODE_FORBIDDEN)],
-            ApiErrorResponse::HTTP_FORBIDDEN
+            [new ApiError('Unauthorized', ApiError::CODE_UNAUTHORIZED)],
+            ApiErrorResponse::HTTP_UNAUTHORIZED
         );
     }
 
@@ -44,7 +44,10 @@ abstract class AbstractAuthenticator extends AbstractGuardAuthenticator
         $user = $token->getUser();
 
         if ($user instanceof AbstractUser) {
-            $request->attributes->set(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID, $user->getMerchant()->getId());
+            $request->attributes->set(
+                HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID,
+                $user->getMerchant()->getId()
+            );
         }
 
         return null;

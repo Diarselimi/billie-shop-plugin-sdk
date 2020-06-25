@@ -4,6 +4,7 @@ config/secrets
 *.tar.gz
 /docs/*
 !/docs/openapi/
+composer.phar
 
 ###> symfony/framework-bundle ###
 /.env.local

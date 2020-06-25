@@ -3,6 +3,7 @@
 namespace spec\App\Helper\Payment;
 
 use App\Helper\Payment\IbanGenerator;
+use PHP_IBAN\IBAN;
 use PhpSpec\ObjectBehavior;
 use Webmozart\Assert\Assert;
 
@@ -26,7 +27,7 @@ class IbanGeneratorSpec extends ObjectBehavior
             $iban->shouldBeString();
             $iban->shouldContain($testCase[0]);
 
-            $ibanObject = new \IBAN($iban->getWrappedObject());
+            $ibanObject = new IBAN($iban->getWrappedObject());
             Assert::true($ibanObject->Verify());
         }
     }

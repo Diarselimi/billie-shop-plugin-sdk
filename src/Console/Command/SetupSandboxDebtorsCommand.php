@@ -34,6 +34,8 @@ class SetupSandboxDebtorsCommand extends Command
         $this->createRiskPolicyDeclineReasonDebtor();
         $this->createDebtorAddressDeclineReasonDebtor();
         $this->createDebtorLimitExceededDeclineReasonDebtor();
+
+        return 0;
     }
 
     protected function createRiskPolicyDeclineReasonDebtor(): void

@@ -1,0 +1,28 @@
+#
+# Copy this file and rename it to docker-compose.override.dist.yml ,
+# so anything you add here will be merged automatically by docker-compose with the main YAML file.
+#
+# This way you can have your own custom docker-compose config, add new services, change config, etc.
+#
+# Run "docker-compose config" to see the merged version and validate it.
+#
+---
+version: "2.4"
+services:
+  app:
+    environment:
+      - APP_DEBUG=1
+      - COMPOSER_ALLOW_SUPERUSER=1
+      - COMPOSER_PROCESS_TIMEOUT=0
+      - COMPOSER_MEMORY_LIMIT=3G # Installing SF from scratch can be memory-hungry
+      #
+      # IMPORTANT: Replace (not here, but in your own docker-compose.override.yml file)
+      # "YOUR_GITHUB_TOKEN_HERE" with your own Github token.
+      #
+      # Go to https://github.com/settings/tokens to generate a new token.
+      #
+      - "COMPOSER_AUTH='{\"github-oauth\": {\"github.com\": \"YOUR_GITHUB_TOKEN_HERE\"}}'"
+
+  mysql:
+    ports:
+      - "3306:3306" # This allows you to connect to this MySQL container, if needed

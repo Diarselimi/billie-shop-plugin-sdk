@@ -17,7 +17,7 @@ Feature: APIS-1077
     Given a merchant user exists with permission CONFIRM_ORDER_PAYMENT
     And I get from Oauth service a valid user token
     And I add "X-Api-Key" header equal to invalid_key
-	And I add "Authorization" header equal to "Bearer someToken"
+    And I add "Authorization" header equal to "Bearer someToken"
     And I have a "created" order with amounts 1000/900/100, duration 30 and comment "test order"
     When I send a PATCH request to "/order/test-order-uuid" with body:
     """
@@ -31,12 +31,12 @@ Feature: APIS-1077
       }
     }
     """
-    Then the response status code should be 403
+    Then the response status code should be 401
     And the JSON response should be:
     """
-      {"errors":[{"title":"Access Denied.","code":"forbidden"}]}
+      {"errors":[{"title":"Unauthorized","code":"unauthorized"}]}
     """
-			 And the order with uuid "test-order-uuid" should have amounts 1000/900/100
+    And the order with uuid "test-order-uuid" should have amounts 1000/900/100
 
   Scenario Template: Success 1: Partial provided data is OK and update is successful on any non-final state
     Given I have a "<state>" order with amounts 1000/900/100, duration 30 and comment "test order"
@@ -56,13 +56,13 @@ Feature: APIS-1077
     Then the response status code should be 204
     And the response should be empty
     Examples:
-      | state        |
-      | created      |
-      | shipped      |
-      | paid_out     |
-      | late         |
-      | waiting      |
-			 And the order with uuid "test-order-uuid" should have amounts 500/400/100
+      | state    |
+      | created  |
+      | shipped  |
+      | paid_out |
+      | late     |
+      | waiting  |
+    And the order with uuid "test-order-uuid" should have amounts 500/400/100
 
 
   Scenario Template: Success 2: Full provided data is OK and update is successful only when state is or was shipped
@@ -88,7 +88,7 @@ Feature: APIS-1077
       | shipped  |
       | paid_out |
       | late     |
-			 And the order with uuid "test-order-uuid" should have amounts 500/400/100
+    And the order with uuid "test-order-uuid" should have amounts 500/400/100
 
   Scenario: Order does not exist
     When I send a PATCH request to "/order/abc123" with body:
@@ -140,7 +140,7 @@ Feature: APIS-1077
       | gross | net | tax |
       | 500   | 150 | 100 |
     Then the response status code should be 400
-			 And the order with uuid "test-order-uuidabc123" should have amounts 1000/900/100
+    And the order with uuid "test-order-uuidabc123" should have amounts 1000/900/100
     And the response should contain "gross is not equal to net + tax"
 
   Scenario Template: Provided amount is wrong: amount is zero or negative
@@ -161,7 +161,7 @@ Feature: APIS-1077
       | -1    | -1  | 0   |
     Then the response status code should be 400
     And the response should contain "This value should be greater than 0"
-			 And the order with uuid "test-order-uuidabc123" should have amounts 1000/900/100
+    And the order with uuid "test-order-uuidabc123" should have amounts 1000/900/100
 
   Scenario Template: Changing amount is not allowed because of order state
     Given I have a "<state>" order "abc123" with amounts 1000/900/100, duration 30 and comment "test order"
@@ -187,7 +187,7 @@ Feature: APIS-1077
       | declined   |
       | complete   |
       | canceled   |
-			 And the order with uuid "test-order-uuidabc123" should have amounts 1000/900/100
+    And the order with uuid "test-order-uuidabc123" should have amounts 1000/900/100
 
   Scenario: Changing amount is not allowed because it is higher than previous
     Given I have a created order "abc123" with amounts 1000/900/100, duration 30 and comment "test order"
@@ -206,7 +206,7 @@ Feature: APIS-1077
     """
     {"errors":[{"title":"Order amount cannot be updated","code":"forbidden"}]}
     """
-			 And the order with uuid "test-order-uuidabc123" should have amounts 1000/900/100
+    And the order with uuid "test-order-uuidabc123" should have amounts 1000/900/100
 
   Scenario Template: Changing duration is not allowed because of order state
     Given I have a "<state>" order "abc123" with amounts 1000/900/100, duration 30 and comment "test order"
@@ -254,7 +254,7 @@ Feature: APIS-1077
     Then the response status code should be 400
     And the JSON response should be:
     """
-    {"errors":[{"title":"This value should be 120 or less.","code":"request_validation_error","source":"duration"}]}
+    {"errors":[{"title":"This value should be between 1 and 120.","code":"request_validation_error","source":"duration"}]}
     """
 
 

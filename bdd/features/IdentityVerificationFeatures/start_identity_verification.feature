@@ -8,9 +8,9 @@ Feature: API endpoint for "POST /merchant/user/start-identity-verification" (tic
     When I send a POST request to "/merchant/user/start-identity-verification"
     Then the JSON response should be:
     """
-      {"errors":[{"title":"Access Denied.","code":"forbidden"}]}
+      {"errors":[{"title":"Unauthorized","code":"unauthorized"}]}
     """
-    And the response status code should be 403
+    And the response status code should be 401
 
   Scenario: Authenticated user without MANAGE_ONBOARDING permission fails to call POST /merchant/user/start-identity-verification
     Given a merchant user exists with permission FOOBAR

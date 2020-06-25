@@ -6,10 +6,10 @@ Feature: Get current logged in merchant user details
 
   Scenario: Missing authorization header
     When I send a GET request to "/merchant/user"
-    Then the response status code should be 403
+    Then the response status code should be 401
     And the JSON response should be:
     """
-      {"errors":[{"title":"Access Denied.","code":"forbidden"}]}
+      {"errors":[{"title":"Unauthorized","code":"unauthorized"}]}
     """
 
   Scenario: Successfully retrieve merchant user details

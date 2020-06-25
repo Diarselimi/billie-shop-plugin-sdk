@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# executes commands on a running "app" container
+bin/docker/exec --workdir /var/www/paella-core app "${@}"

@@ -3,7 +3,6 @@ Feature: Update order with invoice to reduce the order amount
 	Background:
 		Given I add "Content-type" header equal to "application/json"
 		And I add "X-Test" header equal to 1
-		And I add "X-Api-Key" header equal to test
 		And I get from companies service get debtor response
 
 	Scenario: Order amount can be updated before shipment

@@ -2,6 +2,24 @@
 
 The heart of Billie Pay-After-Delivery (PaD).
 
+## Install
+
+How to install paella-core locally:
+
+1. Clone this repository and `cd` to the folder. Make sure you have Docker installed.
+
+2. Configure your laptop [as described in this guide](https://ozean12.atlassian.net/wiki/spaces/INFRA/pages/868385662/Local+Development)
+if you haven't done it yet.
+   
+3. Have a [Github token](https://github.com/settings/tokens) set in your local copy of 
+[`docker-compose.override.dist.yml`](docker-compose.override.dist.yml), named `docker-compose.override.yml`,
+to be able to install private repositories.
+
+4. Run `make` or `make install`. It will build and freshly start all containers, running composer install 
+and all migrations. If you only wish a fresh container (re)start and nothing else, use `make start` instead.
+
+You have many helpers to use dockerized versions of some tools, under this directory: `bin/docker/*`.
+
 ## Order State Workflow
 
 ![orders_workflow](src/Resources/docs/orders-workflow.png)
@@ -14,14 +32,8 @@ https://ozean12.atlassian.net/wiki/spaces/PAELLA/pages/954173858/Paella+API#Docu
 
 ## Maintenance Scripts
 
-Prerequisites: In order to run the commands involving `make` locally, first you need to configure your laptop 
-[as described in this guide](https://ozean12.atlassian.net/wiki/spaces/INFRA/pages/868385662/Local+Development).
-
-You need to be able pull images from our AWS Docker registry, 
-so you always use the same PHP image as in production.
-
-To run `make` scripts, first make sure that your containers are running with `make docker-reload`.
-Some of the targets like `make test-behat` also requires the DB migrations to be ready (`make test-migrate`).
+To run any command involving `make`, first make sure that your containers are running,
+like mentioned in the "install" section.
 
 ### Update Workflow Diagrams
 Requirements: `graphviz`.
@@ -84,8 +96,11 @@ Some examples:
 #### All tests
 
 This command will start the docker containers, run migrations and run all test suites,
-including OpenAPI spec validation:
+including OpenAPI spec validation.
+This is useful when you want to freshly test everything in one run.
+Used by Jenkins.
 
+Usage:
 ```bash
 make test
 ```
@@ -99,7 +114,7 @@ make test-behat
 
 Running behat directly with custom arguments:
 ```bash
-./bin/docker-app-exec vendor/bin/behat bdd/specs/foobar.feature
+./bin/docker/app vendor/bin/behat -vvv --stop-on-failure bdd/specs/foobar.feature
 ```
 
 #### PHPUnit
@@ -122,10 +137,13 @@ make test-phpspec
 
 Running phpspec directly with custom arguments:
 ```bash
-./bin/docker-app-exec vendor/bin/phpspec run -vvv
+./bin/docker/app vendor/bin/phpspec run -vvv --stop-on-failure
 ```
 
 #### Running other commands
 
-You can also run anything inside the running php-fpm container using the helper script: `./bin/docker-app-exec`.
-Example: `./bin/docker-app-exec bin/console list`.
+You can also run anything else inside the containers using the helper scripts, for example:
+
+-  `./bin/docker/app php -v`
+-  `./bin/docker/console cache:clear` same as: `./bin/docker/app bin/console cache:clear`
+-  `./bin/docker/composer dumpautoload`

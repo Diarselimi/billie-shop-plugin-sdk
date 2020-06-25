@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\DomainModel\BankAccount;
 
+use PHP_IBAN\IBAN;
+
 class IbanDTOFactory
 {
     public function createFromString(string $iban): IbanDTO
     {
-        $ibanObject = new \IBAN($iban);
+        $ibanObject = new IBAN($iban);
 
         if (!$ibanObject->Verify()) {
             throw new InvalidIbanException();

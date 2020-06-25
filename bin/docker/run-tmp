@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# executes commands on a new temporary container, deleting it afterwards.
+# any added file will be lost if it's not in the mounted volume.
+
+if [[ -t 1 ]]; then
+  # stdout is a terminal
+  docker-compose run -e TERM=${TERM:-xterm-256color} --rm "${@}"
+else
+  # stdout is not a terminal
+  docker-compose run -T --rm "${@}"
+fi

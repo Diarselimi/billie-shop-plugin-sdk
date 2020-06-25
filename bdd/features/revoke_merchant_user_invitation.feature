@@ -6,10 +6,10 @@ Feature: APIS-1443 - Revoke user invitation
 
   Scenario: Missing authorization header
     When I send a DELETE request to "/merchant/users/invitations/test_uuid"
-    Then the response status code should be 403
+    Then the response status code should be 401
     And the JSON response should be:
     """
-      {"errors":[{"title":"Access Denied.","code":"forbidden"}]}
+      {"errors":[{"title":"Unauthorized","code":"unauthorized"}]}
     """
 
   Scenario: Authenticated user without MANAGE_USERS permission cannot revoke invitation
