@@ -34,10 +34,10 @@ Feature: As a merchant, I should be able to create an order by providing a valid
     And I get from payments service get debtor response
 
   Scenario: I successfully confirm the order by sending the same expected data. Order is moved to created state.
-    Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and comment "test order"
+    Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
     And I get from companies service a good debtor strict match response
     And I get from companies service get debtor response
-			 And I get from payments service get order details response
+		And I get from payments service get order details response
     And Debtor lock limit call succeeded
     And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
     # for debtor_company, use data from \PaellaCoreContext::iHaveADebtorWithoutOrders
@@ -65,10 +65,10 @@ Feature: As a merchant, I should be able to create an order by providing a valid
     And the order CO123 is in state created
 
   Scenario: I successfully confirm the order that is in pre_waiting state. Order is moved to waiting state.
-    Given I have a pre_waiting order "CO123" with amounts 100.0/90.0/10.0, duration 30 and comment "test order"
+    Given I have a pre_waiting order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
     And I get from companies service a good debtor strict match response
     And I get from companies service get debtor response
-			 And I get from payments service get order details response
+    And I get from payments service get order details response
     And Debtor lock limit call succeeded
     And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
     """
@@ -95,7 +95,7 @@ Feature: As a merchant, I should be able to create an order by providing a valid
     And the order CO123 is in state waiting
 
   Scenario: I fail to confirm the order if I do not send a request body
-    Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and comment "test order"
+    Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
     And I get from companies service a good debtor strict match response
     And I get from companies service get debtor response
     And I send a PUT request to "/checkout-session/123123CO123/confirm"
@@ -178,7 +178,7 @@ Feature: As a merchant, I should be able to create an order by providing a valid
     And the response status code should be 404
 
   Scenario: I fail to confirm the order if I send the wrong gross amount
-    Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and comment "test order"
+    Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
     And I get from companies service a good debtor strict match response
     And I get from companies service get debtor response
     And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
@@ -206,7 +206,7 @@ Feature: As a merchant, I should be able to create an order by providing a valid
     And the response status code should be 400
 
   Scenario: I fail to confirm the order if I send the wrong net amount
-    Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and comment "test order"
+    Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
     And I get from companies service a good debtor strict match response
     And I get from companies service get debtor response
     And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
@@ -234,7 +234,7 @@ Feature: As a merchant, I should be able to create an order by providing a valid
     And the response status code should be 400
 
   Scenario: I fail to confirm the order if I send the wrong tax amount
-    Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and comment "test order"
+    Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
     And I get from companies service a good debtor strict match response
     And I get from companies service get debtor response
     And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
@@ -262,7 +262,7 @@ Feature: As a merchant, I should be able to create an order by providing a valid
     And the response status code should be 400
 
   Scenario: I fail to confirm the order if I send the wrong duration
-    Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and comment "test order"
+    Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
     And I get from companies service a good debtor strict match response
     And I get from companies service get debtor response
     And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
@@ -290,7 +290,7 @@ Feature: As a merchant, I should be able to create an order by providing a valid
     And the response status code should be 400
 
   Scenario: I fail to confirm the order if I send mismatched debtor company
-    Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and comment "test order"
+    Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
     And I get from companies service a bad debtor strict match response
     And I get from companies service get debtor response
     And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
@@ -317,7 +317,7 @@ Feature: As a merchant, I should be able to create an order by providing a valid
     And the response status code should be 400
 
   Scenario: Successfully order confirmation returns exactly the same decimal numbers for amounts
-    Given I have a authorized order "CO123" with amounts 100.3/99.1/1.2, duration 30 and comment "test order"
+    Given I have a authorized order "CO123" with amounts 100.3/99.1/1.2, duration 30 and checkout session "123123CO123"
     And I get from companies service a good debtor strict match response
     And I get from companies service get debtor response
     And I get from payments service get order details response

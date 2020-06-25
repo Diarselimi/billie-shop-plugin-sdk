@@ -263,6 +263,21 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
         ]);
     }
 
+    public function updateIdentificationBillingAddress(int $orderId, string $billingAddressUuid): void
+    {
+        $this->doUpdate('
+            UPDATE ' . self::TABLE_NAME . '
+            SET
+              company_billing_address_uuid = :company_billing_address_uuid,
+              updated_at = :updated_at
+            WHERE id = :id
+        ', [
+            'company_billing_address_uuid' => $billingAddressUuid,
+            'updated_at' => (new \DateTime())->format(self::DATE_FORMAT),
+            'id' => $orderId,
+        ]);
+    }
+
     public function getDebtorMaximumOverdue(string $companyUuid): int
     {
         $result = $this->doFetchOne(

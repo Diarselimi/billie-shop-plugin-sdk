@@ -12,6 +12,8 @@ class DebtorCompany
 
     private $name;
 
+    private $debtorAddress;
+
     private $addressHouse;
 
     private $addressStreet;
@@ -76,16 +78,28 @@ class DebtorCompany
         return $this;
     }
 
+    public function getDebtorAddress(): ?AddressEntity
+    {
+        return $this->debtorAddress;
+    }
+
+    public function setDebtorAddress(AddressEntity $debtorAddress): DebtorCompany
+    {
+        //TODO: support the old format; refactor later everything.
+        $this->addressHouse = $debtorAddress->getHouseNumber();
+        $this->addressCity = $debtorAddress->getCity();
+        $this->addressPostalCode = $debtorAddress->getPostalCode();
+        $this->addressStreet = $debtorAddress->getStreet();
+        $this->addressCountry = $debtorAddress->getCountry();
+
+        $this->debtorAddress = $debtorAddress;
+
+        return $this;
+    }
+
     public function getAddressHouse(): ?string
     {
         return $this->addressHouse;
-    }
-
-    public function setAddressHouse(?string $addressHouse): DebtorCompany
-    {
-        $this->addressHouse = $addressHouse;
-
-        return $this;
     }
 
     public function getAddressStreet(): string
@@ -93,23 +107,9 @@ class DebtorCompany
         return $this->addressStreet;
     }
 
-    public function setAddressStreet(string $addressStreet): DebtorCompany
-    {
-        $this->addressStreet = $addressStreet;
-
-        return $this;
-    }
-
     public function getAddressPostalCode(): string
     {
         return $this->addressPostalCode;
-    }
-
-    public function setAddressPostalCode(string $addressPostalCode): DebtorCompany
-    {
-        $this->addressPostalCode = $addressPostalCode;
-
-        return $this;
     }
 
     public function getAddressCity(): string
@@ -117,23 +117,9 @@ class DebtorCompany
         return $this->addressCity;
     }
 
-    public function setAddressCity(string $addressCity): DebtorCompany
-    {
-        $this->addressCity = $addressCity;
-
-        return $this;
-    }
-
     public function getAddressCountry(): string
     {
         return $this->addressCountry;
-    }
-
-    public function setAddressCountry(string $addressCountry): DebtorCompany
-    {
-        $this->addressCountry = $addressCountry;
-
-        return $this;
     }
 
     public function getCrefoId(): ?string
@@ -249,5 +235,16 @@ class DebtorCompany
         $this->billingAddressMatchUuid = $billingAddressMatchUuid;
 
         return $this;
+    }
+
+    public function getDebtorBillingAddressByUuid(string $uuid): ?AddressEntity
+    {
+        foreach ($this->getDebtorBillingAddresses() as $debtorBillingAddress) {
+            if ($debtorBillingAddress->getUuid() === $uuid) {
+                return $debtorBillingAddress;
+            }
+        }
+
+        return null;
     }
 }

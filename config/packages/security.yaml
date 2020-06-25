@@ -40,7 +40,15 @@ security:
             stateless: true
             guard:
                 authenticators:
-                    - App\Http\Authentication\Authenticator\CheckoutSessionAuthenticator
+                    - App\Http\Authentication\Authenticator\ActiveCheckoutSessionAuthenticator
+
+        checkout_update:
+          pattern: ^/(public/)?checkout-session/.*/update
+          anonymous: false
+          stateless: true
+          guard:
+            authenticators:
+              - App\Http\Authentication\Authenticator\ExistingCheckoutSessionAuthenticator
 
         invited_user:
             pattern: ^/(public/)?merchant/users/invitations/([a-z0-9])+/(signup|details)$

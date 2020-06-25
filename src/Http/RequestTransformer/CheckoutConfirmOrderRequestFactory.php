@@ -6,15 +6,21 @@ namespace App\Http\RequestTransformer;
 
 use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmOrderRequest;
 use App\DomainModel\DebtorCompany\DebtorCompanyRequest;
+use App\Http\RequestTransformer\CreateOrder\AddressRequestFactory;
 use Symfony\Component\HttpFoundation\Request;
 
 class CheckoutConfirmOrderRequestFactory
 {
     private $amountRequestFactory;
 
-    public function __construct(AmountRequestFactory $amountRequestFactory)
-    {
+    private $addressRequestFactory;
+
+    public function __construct(
+        AmountRequestFactory $amountRequestFactory,
+        AddressRequestFactory $addressRequestFactory
+    ) {
         $this->amountRequestFactory = $amountRequestFactory;
+        $this->addressRequestFactory = $addressRequestFactory;
     }
 
     public function create(Request $request, string $sessionUuid): CheckoutConfirmOrderRequest
@@ -31,13 +37,10 @@ class CheckoutConfirmOrderRequestFactory
 
     private function buildDebtorCompanyRequest(array $requestData): DebtorCompanyRequest
     {
+        $addressRequest = $this->addressRequestFactory->createFromOldFormat($requestData);
+
         return (new DebtorCompanyRequest())
             ->setName($requestData['name'] ?? null)
-            ->setAddressAddition($requestData['address_addition'] ?? null)
-            ->setAddressHouseNumber($requestData['address_house_number'] ?? null)
-            ->setAddressStreet($requestData['address_street'] ?? null)
-            ->setAddressCity($requestData['address_city'] ?? null)
-            ->setAddressPostalCode($requestData['address_postal_code'] ?? null)
-            ->setAddressCountry($requestData['address_country'] ?? null);
+            ->setAddressRequest($addressRequest);
     }
 }

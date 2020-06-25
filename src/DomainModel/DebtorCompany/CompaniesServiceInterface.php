@@ -2,9 +2,12 @@
 
 namespace App\DomainModel\DebtorCompany;
 
+use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorDuplicateDTO;
 use App\DomainModel\SignatoryPower\SignatoryPowerDTO;
 use App\DomainModel\SignatoryPower\SignatoryPowerSelectionDTO;
+use App\Infrastructure\Alfred\Dto\StrictMatchRequestDTO;
+use Ramsey\Uuid\UuidInterface;
 
 interface CompaniesServiceInterface
 {
@@ -22,9 +25,11 @@ interface CompaniesServiceInterface
 
     public function identifyFirmenwissen(string $crefoId): DebtorCompany;
 
-    public function strictMatchDebtor(string $debtorUuid, IdentifyDebtorRequestDTO $requestDTO): bool;
+    public function strictMatchDebtor(StrictMatchRequestDTO $requestDTO): bool;
 
     public function updateCompany(string $companyUuid, array $updateData): DebtorCompany;
+
+    public function updateCompanyBillingAddress(string $companyUuid, AddressEntity $addressEntity): UuidInterface;
 
     public function createDebtor(DebtorCreationDTO $debtorCreationDTO): DebtorCompany;
 

@@ -25,7 +25,7 @@
             "addition": null
         }
     ],
-    "billing_address_match_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb71",
+    "billing_address_match_uuid": null,
     "identification_type": "company_address",
     "identified_address_uuid": "some-address-uuid-123"
 }

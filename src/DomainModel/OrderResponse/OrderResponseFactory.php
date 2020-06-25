@@ -3,15 +3,16 @@
 namespace App\DomainModel\OrderResponse;
 
 use App\DomainModel\Address\AddressEntity;
-use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
-use App\DomainModel\DebtorCompany\DebtorCompany;
-use App\DomainModel\Payment\OrderPaymentDetailsDTO;
-use App\DomainModel\Payment\PaymentsServiceInterface;
+use App\DomainModel\Address\AddressEntityFactory;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
+use App\DomainModel\DebtorCompany\DebtorCompany;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderStateManager;
+use App\DomainModel\Payment\OrderPaymentDetailsDTO;
+use App\DomainModel\Payment\PaymentsServiceInterface;
+use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
 
 class OrderResponseFactory
 {
@@ -23,16 +24,20 @@ class OrderResponseFactory
 
     private $declinedReasonsMapper;
 
+    private $addressEntityFactory;
+
     public function __construct(
         CompaniesServiceInterface $companiesService,
         PaymentsServiceInterface $paymentsService,
         OrderStateManager $orderStateManager,
-        OrderDeclinedReasonsMapper $declinedReasonsMapper
+        OrderDeclinedReasonsMapper $declinedReasonsMapper,
+        AddressEntityFactory $addressEntityFactory
     ) {
         $this->companiesService = $companiesService;
         $this->paymentsService = $paymentsService;
         $this->orderStateManager = $orderStateManager;
         $this->declinedReasonsMapper = $declinedReasonsMapper;
+        $this->addressEntityFactory = $addressEntityFactory;
     }
 
     public function create(OrderContainer $orderContainer): OrderResponse
@@ -47,7 +52,11 @@ class OrderResponseFactory
         $this->addBillingAddressData($orderContainer->getBillingAddress(), $response);
 
         if ($order->getMerchantDebtorId()) {
-            $this->addCompanyData($orderContainer, $response);
+            $this->addCompanyData(
+                $orderContainer->getDebtorCompany()->getDebtorAddress(),
+                $orderContainer->getDebtorCompany()->getName(),
+                $response
+            );
             $this->addPaymentData($orderContainer, $response);
         }
 
@@ -154,17 +163,15 @@ class OrderResponseFactory
     /**
      * @param OrderResponse|CheckoutAuthorizeOrderResponse $response
      */
-    private function addCompanyData(OrderContainer $orderContainer, $response)
+    private function addCompanyData(AddressEntity $address, string $companyName, $response)
     {
-        $debtor = $orderContainer->getDebtorCompany();
-
         $response
-            ->setCompanyName($debtor->getName())
-            ->setCompanyAddressHouseNumber($debtor->getAddressHouse())
-            ->setCompanyAddressStreet($debtor->getAddressStreet())
-            ->setCompanyAddressPostalCode($debtor->getAddressPostalCode())
-            ->setCompanyAddressCity($debtor->getAddressCity())
-            ->setCompanyAddressCountry($debtor->getAddressCountry())
+            ->setCompanyName($companyName)
+            ->setCompanyAddressHouseNumber($address->getHouseNumber())
+            ->setCompanyAddressStreet($address->getStreet())
+            ->setCompanyAddressPostalCode($address->getPostalCode())
+            ->setCompanyAddressCity($address->getCity())
+            ->setCompanyAddressCountry($address->getCountry())
         ;
     }
 
@@ -204,13 +211,27 @@ class OrderResponseFactory
     {
         $order = $orderContainer->getOrder();
         $response = (new CheckoutAuthorizeOrderResponse())
-            ->setState($order->getState())
-        ;
+            ->setState($order->getState());
 
         $response = $this->addReasons($order, $response);
 
+        $statesAccepted = [OrderStateManager::STATE_AUTHORIZED, OrderStateManager::STATE_PRE_WAITING];
+        if (in_array($order->getState(), $statesAccepted, true)) {
+            $this->addCompanyData(
+                $orderContainer->getDebtorExternalDataAddress(),
+                $orderContainer->getDebtorExternalData()->getName(),
+                $response
+            );
+
+            return $response;
+        }
+
         if ($order->getMerchantDebtorId()) {
-            $this->addCompanyData($orderContainer, $response);
+            $this->addCompanyData(
+                $orderContainer->getDebtorCompany()->getDebtorAddress(),
+                $orderContainer->getDebtorCompany()->getName(),
+                $response
+            );
         }
 
         return $response;

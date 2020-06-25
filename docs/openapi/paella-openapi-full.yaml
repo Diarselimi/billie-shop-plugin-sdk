@@ -1112,6 +1112,41 @@ paths:
       x-groups:
         - public
         - private
+  '/checkout-session/{sessionUuid}/update':
+    post:
+      tags:
+        - 'Checkout Client'
+      summary: 'Checkout Session Update'
+      operationId: checkout_session_update
+      parameters:
+        -
+          name: sessionUuid
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckoutUpdateOrderRequest'
+      responses:
+        '204':
+          description: 'Order data successfully updated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+      x-groups:
+        - private
   '/order/{id}/confirm-payment':
     post:
       tags:
@@ -2832,6 +2867,13 @@ components:
           $ref: '#/components/schemas/OrderDuration'
         debtor_company:
           $ref: '#/components/schemas/DebtorCompanyRequest'
+      type: object
+    CheckoutUpdateOrderRequest:
+      required:
+        - billing_address
+      properties:
+        billing_address:
+          $ref: '#/components/schemas/CreateOrderAddressRequest'
       type: object
     CreateMerchantRequest:
       title: 'Merchant Data'

@@ -2,6 +2,7 @@
 
 namespace App\Http\Authentication\Authenticator;
 
+use App\DomainModel\CheckoutSession\CheckoutSessionEntity;
 use App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\Http\Authentication\CheckoutUser;
@@ -10,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
-class CheckoutSessionAuthenticator extends AbstractAuthenticator
+class ExistingCheckoutSessionAuthenticator extends AbstractAuthenticator
 {
     private $checkoutSessionRepository;
 
@@ -32,15 +33,21 @@ class CheckoutSessionAuthenticator extends AbstractAuthenticator
         return $request->attributes->get(HttpConstantsInterface::REQUEST_ATTRIBUTE_CHECKOUT_SESSION_ID);
     }
 
+    protected function validateSession(?CheckoutSessionEntity $checkoutSession): void
+    {
+        if ($checkoutSession === null) {
+            throw new AuthenticationException();
+        }
+    }
+
     public function getUser($checkoutSessionId, UserProviderInterface $userProvider)
     {
         $checkoutSession = $this->checkoutSessionRepository->findOneByUuid($checkoutSessionId);
+        $this->validateSession($checkoutSession);
 
-        if (!$checkoutSession || !$checkoutSession->isActive()) {
-            throw new AuthenticationException();
-        }
-
-        $merchant = $this->assertValidMerchant($this->merchantRepository->getOneById($checkoutSession->getMerchantId()));
+        $merchant = $this->assertValidMerchant(
+            $this->merchantRepository->getOneById($checkoutSession->getMerchantId())
+        );
 
         return new CheckoutUser($merchant, $checkoutSession);
     }

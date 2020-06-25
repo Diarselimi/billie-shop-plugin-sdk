@@ -378,7 +378,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
       "state": "authorized",
       "debtor_company":{
         "name":"Test User Company",
-        "address_house_number":"10",
+        "address_house_number":"",
         "address_street":"Heinrich-Heine-Platz",
         "address_postal_code":"10179",
         "address_city":"Berlin",
@@ -830,7 +830,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     """
 
   Scenario: I fail authorization if I try to create an order with a invalid session_id
-    Given I have a invalid checkout_session_id "123123"
+    Given I have an already used checkout_session_id "123123"
     And I send a PUT request to "/checkout-session/123123/authorize" with body:
     """
     {

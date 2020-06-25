@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\Alfred;
 
+use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
 use App\DomainModel\DebtorCompany\DebtorCompany;
@@ -15,6 +16,7 @@ use App\DomainModel\SignatoryPower\SignatoryPowerDTO;
 use App\DomainModel\SignatoryPower\SignatoryPowerDTOFactory;
 use App\DomainModel\SignatoryPower\SignatoryPowerSelectionDTO;
 use App\DomainModel\TrackingAnalytics\DebtorEmailHashFactory;
+use App\Infrastructure\Alfred\Dto\StrictMatchRequestDTO;
 use App\Infrastructure\ClientResponseDecodeException;
 use App\Infrastructure\DecodeResponseTrait;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
@@ -23,6 +25,8 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\TransferStats;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 class Alfred implements CompaniesServiceInterface, LoggingInterface
@@ -132,6 +136,25 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         }
     }
 
+    public function updateCompanyBillingAddress(string $companyUuid, AddressEntity $addressEntity): UuidInterface
+    {
+        try {
+            $response = $this->client->post(
+                "companies/{$companyUuid}/billing-address",
+                [
+                    'json' => $addressEntity->toArray(),
+                    'timeout' => self::UPDATE_COMPANY_TIMEOUT,
+                ]
+            );
+
+            $data = $this->decodeResponse($response);
+
+            return Uuid::fromString($data['billing_address']['uuid']);
+        } catch (TransferException | ClientResponseDecodeException $exception) {
+            throw new CompaniesServiceRequestException($exception);
+        }
+    }
+
     public function createDebtor(DebtorCreationDTO $debtorCreationDTO): DebtorCompany
     {
         try {
@@ -211,11 +234,11 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         }
     }
 
-    public function strictMatchDebtor(string $debtorUuid, IdentifyDebtorRequestDTO $requestDTO): bool
+    public function strictMatchDebtor(StrictMatchRequestDTO $requestDTO): bool
     {
         try {
             $this->client->post('debtor/strict-match', [
-                'json' => array_merge(['expected_company_uuid' => $debtorUuid], $requestDTO->toArray()),
+                'json' => $requestDTO->toArray(),
                 'on_stats' => function (TransferStats $stats) {
                     $this->logServiceRequestStats($stats, 'strict_match_debtor');
                 },

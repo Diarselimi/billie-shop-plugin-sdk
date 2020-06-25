@@ -6,7 +6,6 @@ use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmDataMismatchException;
 use App\Http\RequestTransformer\CheckoutConfirmOrderRequestFactory;
 use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmOrderUseCase;
-use App\DomainModel\Order\OrderRepositoryInterface;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -42,18 +41,14 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class CheckoutConfirmOrderController
 {
-    private $orderRepository;
-
     private $useCase;
 
     private $requestFactory;
 
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
         CheckoutConfirmOrderUseCase $checkoutSessionUseCase,
         CheckoutConfirmOrderRequestFactory $factory
     ) {
-        $this->orderRepository = $orderRepository;
         $this->useCase = $checkoutSessionUseCase;
         $this->requestFactory = $factory;
     }

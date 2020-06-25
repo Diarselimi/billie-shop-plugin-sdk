@@ -13,6 +13,8 @@ interface OrderRepositoryInterface
 
     public function updateMerchantDebtor(int $orderId, int $merchantDebtorId): void;
 
+    public function updateIdentificationBillingAddress(int $orderId, string $billingAddressUuid): void;
+
     public function getOneByExternalCode(string $externalCode, int $merchantId): ?OrderEntity;
 
     public function getNotYetConfirmedByCheckoutSessionUuid(string $checkoutSessionUuid): ?OrderEntity;

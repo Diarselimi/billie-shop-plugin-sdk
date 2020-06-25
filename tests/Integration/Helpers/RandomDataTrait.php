@@ -110,15 +110,18 @@ trait RandomDataTrait
 
     private function getRandomDebtorCompany(): DebtorCompany
     {
+        $address = new AddressEntity();
+        $address->setStreet('Fake street')
+            ->setHouseNumber(mt_rand(1, 200) . '')
+            ->setPostalCode(mt_rand(10000, 19999) . '')
+            ->setCity('Berlin')
+            ->setCountry('DE');
+
         $company = (new DebtorCompany())
             ->setId(mt_rand(100, 10000))
             ->setUuid(Uuid::uuid4()->toString())
             ->setName("Fake Merchant GmbH")
-            ->setAddressStreet('Fake street')
-            ->setAddressHouse(mt_rand(1, 200) . '')
-            ->setAddressPostalCode(mt_rand(10000, 19999) . '')
-            ->setAddressCity('Berlin')
-            ->setAddressCountry('DE');
+            ->setDebtorAddress($address);
 
         return $company;
     }

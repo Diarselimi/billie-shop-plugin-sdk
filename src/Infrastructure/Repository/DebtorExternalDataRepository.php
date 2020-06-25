@@ -136,4 +136,19 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
             ]
         );
     }
+
+    public function update(DebtorExternalDataEntity $externalData): void
+    {
+        $externalData->setUpdatedAt(new \DateTime());
+
+        $this->doUpdate('
+            UPDATE ' . self::TABLE_NAME . '
+            SET billing_address_id = :billing_address_id, updated_at = :updated_at
+            WHERE id = :id
+        ', [
+            'id' => $externalData->getId(),
+            'billing_address_id' => $externalData->getBillingAddressId(),
+            'updated_at' => $externalData->getUpdatedAt()->format(self::DATE_FORMAT),
+        ]);
+    }
 }

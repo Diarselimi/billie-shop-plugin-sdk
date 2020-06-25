@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DomainModel\Address;
 
 use App\DomainModel\ArrayableInterface;
@@ -7,6 +9,8 @@ use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 
 class AddressEntity extends AbstractTimestampableEntity implements ArrayableInterface
 {
+    private $uuid;
+
     private $country;
 
     private $city;
@@ -19,12 +23,24 @@ class AddressEntity extends AbstractTimestampableEntity implements ArrayableInte
 
     private $addition;
 
+    public function getUuid(): ? string
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid(? string $uuid): self
+    {
+        $this->uuid = $uuid;
+
+        return $this;
+    }
+
     public function getCountry(): string
     {
         return $this->country;
     }
 
-    public function setCountry(string $country): AddressEntity
+    public function setCountry(string $country): self
     {
         $this->country = $country;
 
@@ -36,7 +52,7 @@ class AddressEntity extends AbstractTimestampableEntity implements ArrayableInte
         return $this->city;
     }
 
-    public function setCity(string $city): AddressEntity
+    public function setCity(string $city): self
     {
         $this->city = $city;
 
@@ -48,7 +64,7 @@ class AddressEntity extends AbstractTimestampableEntity implements ArrayableInte
         return $this->postalCode;
     }
 
-    public function setPostalCode(string $postalCode): AddressEntity
+    public function setPostalCode(string $postalCode): self
     {
         $this->postalCode = $postalCode;
 
@@ -60,7 +76,7 @@ class AddressEntity extends AbstractTimestampableEntity implements ArrayableInte
         return $this->street;
     }
 
-    public function setStreet(string $street): AddressEntity
+    public function setStreet(string $street): self
     {
         $this->street = $street;
 
@@ -72,19 +88,19 @@ class AddressEntity extends AbstractTimestampableEntity implements ArrayableInte
         return $this->houseNumber;
     }
 
-    public function setHouseNumber(?string $houseNumber): AddressEntity
+    public function setHouseNumber(?string $houseNumber): self
     {
         $this->houseNumber = $houseNumber;
 
         return $this;
     }
 
-    public function getAddition(): ? string
+    public function getAddition(): ?string
     {
         return $this->addition;
     }
 
-    public function setAddition(?string $addition): AddressEntity
+    public function setAddition(?string $addition): self
     {
         $this->addition = $addition;
 

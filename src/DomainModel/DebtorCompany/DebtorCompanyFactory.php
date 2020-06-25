@@ -16,37 +16,34 @@ class DebtorCompanyFactory
 
     public function createFromAlfredResponse(array $data, bool $isStrictMatch = true): DebtorCompany
     {
+        $debtorAddress = $this->addressEntityFactory->createFromOldAddressFormatResponse($data);
+
         return (new DebtorCompany())
             ->setId($data['id'])
             ->setUuid($data['uuid'])
             ->setName($data['name'])
-            ->setAddressHouse($data['address_house'])
-            ->setAddressStreet($data['address_street'])
-            ->setAddressPostalCode($data['address_postal_code'])
-            ->setAddressCity($data['address_city'])
-            ->setAddressCountry($data['address_country'])
+            ->setDebtorAddress($debtorAddress)
             ->setCrefoId($data['crefo_id'])
             ->setSchufaId($data['schufa_id'])
             ->setIsBlacklisted($data['is_blacklisted'])
-            ->setIsTrustedSource(boolval($data['is_from_trusted_source']))
+            ->setIsTrustedSource((bool) $data['is_from_trusted_source'])
             ->setIsStrictMatch($isStrictMatch)
-            ->setIsSynchronized(boolval($data['is_synchronized'] ?? null))
+            ->setIsSynchronized((bool) ($data['is_synchronized'] ?? null))
             ->setLegalForm($data['legal_form'] ?? null)
             ->setDebtorBillingAddresses($data['billing_addresses'] ? $this->extractBillingAddresses($data['billing_addresses']) : [])
-            ->setBillingAddressMatchUuid($data['billing_address_match_uuid']);
+            ->setBillingAddressMatchUuid($data['billing_address_match_uuid'])
+        ;
     }
 
     public function createIdentifiedFromAlfredResponse(array $data, bool $isStrictMatch = true): IdentifiedDebtorCompany
     {
+        $debtorAddress = $this->addressEntityFactory->createFromOldAddressFormatResponse($data);
+
         return (new IdentifiedDebtorCompany())
             ->setId($data['id'])
             ->setUuid($data['uuid'])
             ->setName($data['name'])
-            ->setAddressHouse($data['address_house'])
-            ->setAddressStreet($data['address_street'])
-            ->setAddressPostalCode($data['address_postal_code'])
-            ->setAddressCity($data['address_city'])
-            ->setAddressCountry($data['address_country'])
+            ->setDebtorAddress($debtorAddress)
             ->setCrefoId($data['crefo_id'])
             ->setSchufaId($data['schufa_id'])
             ->setIsBlacklisted($data['is_blacklisted'])

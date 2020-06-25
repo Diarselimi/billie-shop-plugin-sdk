@@ -2,6 +2,7 @@
 
 namespace App\DomainModel\DebtorCompany;
 
+use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
 use OpenApi\Annotations as OA;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -28,6 +29,11 @@ class DebtorCompanyRequest
      * @Assert\Length(max=255)
      */
     private $name;
+
+    /**
+     * No need for validation for now
+     */
+    private $addressRequest;
 
     /**
      * @Assert\Length(max=255)
@@ -75,74 +81,22 @@ class DebtorCompanyRequest
         return $this;
     }
 
-    public function getAddressAddition(): ?string
+    public function getAddressRequest(): CreateOrderAddressRequest
     {
-        return $this->addressAddition;
+        return $this->addressRequest;
     }
 
-    public function setAddressAddition($addressAddition): DebtorCompanyRequest
+    public function setAddressRequest(CreateOrderAddressRequest $addressRequest): DebtorCompanyRequest
     {
-        $this->addressAddition = $addressAddition;
+        //support old format
+        $this->addressAddition = $addressRequest->getAddition();
+        $this->addressStreet = $addressRequest->getStreet();
+        $this->addressHouseNumber = $addressRequest->getHouseNumber();
+        $this->addressPostalCode = $addressRequest->getPostalCode();
+        $this->addressCity = $addressRequest->getCity();
+        $this->addressCountry = $addressRequest->getCountry();
 
-        return $this;
-    }
-
-    public function getAddressHouseNumber(): ?string
-    {
-        return $this->addressHouseNumber;
-    }
-
-    public function setAddressHouseNumber($addressHouseNumber): DebtorCompanyRequest
-    {
-        $this->addressHouseNumber = $addressHouseNumber;
-
-        return $this;
-    }
-
-    public function getAddressStreet(): string
-    {
-        return $this->addressStreet;
-    }
-
-    public function setAddressStreet($addressStreet): DebtorCompanyRequest
-    {
-        $this->addressStreet = $addressStreet;
-
-        return $this;
-    }
-
-    public function getAddressCity(): string
-    {
-        return $this->addressCity;
-    }
-
-    public function setAddressCity($addressCity): DebtorCompanyRequest
-    {
-        $this->addressCity = $addressCity;
-
-        return $this;
-    }
-
-    public function getAddressPostalCode(): string
-    {
-        return $this->addressPostalCode;
-    }
-
-    public function setAddressPostalCode($addressPostalCode): DebtorCompanyRequest
-    {
-        $this->addressPostalCode = $addressPostalCode;
-
-        return $this;
-    }
-
-    public function getAddressCountry(): string
-    {
-        return $this->addressCountry;
-    }
-
-    public function setAddressCountry($addressCountry): DebtorCompanyRequest
-    {
-        $this->addressCountry = $addressCountry;
+        $this->addressRequest = $addressRequest;
 
         return $this;
     }

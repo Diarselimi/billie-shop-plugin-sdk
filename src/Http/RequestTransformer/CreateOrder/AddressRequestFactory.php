@@ -22,4 +22,18 @@ class AddressRequestFactory
             ->setCity($data['city'] ?? null)
             ->setCountry($data['country'] ?? null);
     }
+
+    /**
+     * @deprecated don't use this for new endpoints, only existing ones
+     */
+    public function createFromOldFormat(array $requestData): CreateOrderAddressRequest
+    {
+        return (new CreateOrderAddressRequest())
+        ->setAddition($requestData['address_addition'] ?? null)
+        ->setHouseNumber($requestData['address_house_number'] ?? null)
+        ->setStreet($requestData['address_street'] ?? null)
+        ->setCity($requestData['address_city'] ?? null)
+        ->setPostalCode($requestData['address_postal_code'] ?? null)
+        ->setCountry($requestData['address_country'] ?? null);
+    }
 }

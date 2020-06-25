@@ -2,14 +2,13 @@
 
 namespace spec\App\DomainModel\OrderResponse;
 
+use App\DomainModel\Address\AddressEntityFactory;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
-use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class OrderResponseFactorySpec extends ObjectBehavior
 {
@@ -22,7 +21,8 @@ class OrderResponseFactorySpec extends ObjectBehavior
         CompaniesServiceInterface $companiesService,
         PaymentsServiceInterface $paymentsService,
         OrderStateManager $orderStateManager,
-        OrderDeclinedReasonsMapper $declinedReasonsMapper
+        OrderDeclinedReasonsMapper $declinedReasonsMapper,
+        AddressEntityFactory $addressEntityFactory
     ) {
         $this->beConstructedWith(...func_get_args());
     }

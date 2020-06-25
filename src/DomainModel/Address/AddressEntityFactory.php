@@ -50,13 +50,14 @@ class AddressEntityFactory
     public function createDebtorCompanyAddressFromDatabaseRow(array $row): AddressEntity
     {
         return (new AddressEntity())
+            ->setUuid($row['uuid'] ?? null)
             ->setCountry($row['country'])
             ->setCity($row['city'])
             ->setPostalCode($row['postal_code'])
             ->setStreet($row['street'])
-            ->setHouseNumber($row['house'])
+            ->setHouseNumber($row['house'] ?? $row['house_number'])
             ->setAddition('addition')
-            ;
+        ;
     }
 
     public function createFromDebtorCompany(DebtorCompany $debtorCompany): AddressEntity
@@ -68,5 +69,24 @@ class AddressEntityFactory
             ->setPostalCode($debtorCompany->getAddressPostalCode())
             ->setCountry($debtorCompany->getAddressCountry())
             ;
+    }
+
+    /**
+     * @deprecated this will be removed soon, please use AddressEntityFactory class
+     */
+    public function createFromOldAddressFormatResponse(array $data): AddressEntity
+    {
+        return (new AddressEntity())
+            ->setHouseNumber($data['address_house'] ?? null)
+            ->setStreet($data['address_street'] ?? null)
+            ->setCity($data['address_city'] ?? null)
+            ->setPostalCode($data['address_postal_code'] ?? null)
+            ->setCountry($data['address_country'] ?? null)
+        ;
+    }
+
+    public function createAddressCollection(array $addresses): AddressEntityCollection
+    {
+        return new AddressEntityCollection(...$addresses);
     }
 }

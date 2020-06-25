@@ -243,7 +243,7 @@ class PaellaCoreContext extends MinkContext
      */
     public function iHaveAnOrderWithoutExternalCode($state, $gross, $net, $tax, $duration, $comment)
     {
-        $this->iHaveAnOrder($state, null, $gross, $net, $tax, $duration, $comment);
+        $this->createOrder($state, null, $gross, $net, $tax, $duration, $comment);
     }
 
     /**
@@ -309,8 +309,44 @@ class PaellaCoreContext extends MinkContext
     /**
      * @Given I have a(n) :state order :externalCode with amounts :gross/:net/:tax, duration :duration and comment :comment
      */
-    public function iHaveAnOrder($state, $externalCode, $gross, $net, $tax, $duration, $comment, $paymentUuid = null)
-    {
+    public function iHaveAnOrder(
+        $state,
+        $externalCode,
+        $gross,
+        $net,
+        $tax,
+        $duration,
+        $comment
+    ) {
+        $this->createOrder($state, $externalCode, $gross, $net, $tax, $duration, $comment);
+    }
+
+    /**
+     * @Given I have a(n) :state order :externalCode with amounts :gross/:net/:tax, duration :duration and checkout session :checkoutSession
+     */
+    public function iHaveAnOrderWithCheckoutSession(
+        $state,
+        $externalCode,
+        $gross,
+        $net,
+        $tax,
+        $duration,
+        $checkoutSession
+    ) {
+        $this->createOrder($state, $externalCode, $gross, $net, $tax, $duration, 'test', null, $checkoutSession);
+    }
+
+    public function createOrder(
+        $state,
+        $externalCode,
+        $gross,
+        $net,
+        $tax,
+        $duration,
+        $comment,
+        $paymentUuid = null,
+        $checkoutSession = null
+    ) {
         [$person, $deliveryAddress, $debtor, $merchantDebtor] = $this->debtorData ?? $this->iHaveADebtorWithoutOrders();
 
         $order = (new OrderEntity())
@@ -322,14 +358,19 @@ class PaellaCoreContext extends MinkContext
             ->setDebtorExternalDataId($debtor->getId())
             ->setExternalComment($comment)
             ->setMerchantDebtorId($merchantDebtor->getId())
-            ->setMerchantId('1')
+            ->setMerchantId($this->merchant->getId())
             ->setPaymentId($paymentUuid ?? self::DUMMY_UUID4)
             ->setCreatedAt(new \DateTime('2019-05-20 13:00:00'))
-            ->setCheckoutSessionId(1)
             ->setUuid('test-order-uuid' . $externalCode)
             ->setCompanyBillingAddressUuid('c7be46c0-e049-4312-b274-258ec5aeeb71');
 
-        $this->iHaveASessionId("123123" . $externalCode, 0);
+        if ($checkoutSession) {
+            $checkoutSession = $this->iHaveASessionId(
+                $checkoutSession,
+                stripos('inactive', $checkoutSession) !== false
+            );
+            $order->setCheckoutSessionId($checkoutSession->getId());
+        }
 
         $this->getOrderRepository()->insert($order);
 
@@ -361,17 +402,17 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
-     * @Given I have a invalid checkout_session_id :arg1
+     * @Given I have an already used checkout_session_id :arg1
      */
-    public function iHaveAInvalidSessionId($sessionId)
+    public function iHaveAInvalidSessionId($sessionId): CheckoutSessionEntity
     {
-        $this->iHaveASessionId($sessionId, false);
+        return $this->iHaveASessionId($sessionId, false);
     }
 
     /**
      * @Given I have a checkout_session_id :arg1
      */
-    public function iHaveASessionId($sessionId, $active = true)
+    public function iHaveASessionId($sessionId, $active = true): CheckoutSessionEntity
     {
         $checkoutSession = new CheckoutSessionEntity();
         $checkoutSession->setMerchantId(1)
@@ -380,7 +421,8 @@ class PaellaCoreContext extends MinkContext
             ->setIsActive($active)
             ->setCreatedAt(new DateTime())
             ->setUpdatedAt(new DateTime());
-        $this->getCheckoutSessionRepository()->create($checkoutSession);
+
+        return $this->getCheckoutSessionRepository()->create($checkoutSession);
     }
 
     /**
@@ -1280,7 +1322,7 @@ class PaellaCoreContext extends MinkContext
     public function iHaveOrdersWithTheFollowingData(TableNode $table)
     {
         foreach ($table as $row) {
-            $this->iHaveAnOrder(
+            $this->createOrder(
                 $row['state'],
                 $row['external_id'],
                 $row['gross'],
@@ -1421,7 +1463,7 @@ class PaellaCoreContext extends MinkContext
     public function theFollowingDebtorExternalDataExist(TableNode $table)
     {
         // first we need to add some mandatory data
-        $this->iHaveAnOrder('new', 'CO123', 1000, 900, 100, 30, 'test order');
+        $this->createOrder('new', 'CO123', 1000, 900, 100, 30, 'test order');
 
         foreach ($table as $row) {
             $debtorExternalData = (new DebtorExternalDataEntity())
@@ -1455,5 +1497,27 @@ class PaellaCoreContext extends MinkContext
     {
         $order = $this->getOrderRepository()->getOneByUuid($uuid);
         Assert::eq($order->getInvoiceNumber(), $invoiceNumber);
+    }
+
+    /**
+     * @Given the order with code :code should have company_billing_address set to :addressUuid
+     */
+    public function theOrderBillingAddressUUIDShouldBe($code, $addressUuid)
+    {
+        $order = $this->getOrderRepository()->getOneByExternalCode($code, $this->merchant->getId());
+        Assert::eq($order->getCompanyBillingAddressUuid(), $addressUuid);
+    }
+
+    /**
+     * @Given the debtor external data for order with code :code should have a billing address
+     */
+    public function theDebtorExternalDataForOrderWithCodeShouldHaveABillingAddress($code)
+    {
+        $order = $this->getOrderRepository()->getOneByExternalCode($code, $this->merchant->getId());
+        $extData = $this->getDebtorExternalDataRepository()->getOneById(
+            $order->getDebtorExternalDataId()
+        );
+        Assert::notNull($extData->getBillingAddressId());
+        Assert::true($extData->getBillingAddressId() > 0, 'Billing address ID is not set');
     }
 }
