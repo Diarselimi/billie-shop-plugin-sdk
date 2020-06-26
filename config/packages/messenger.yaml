@@ -1,4 +1,10 @@
 framework:
     messenger:
+      default_bus: default
+        # For some reason the compiler pass won't trigger prepend. So the hack it is for now.
+      buses:
+        default:
+          middleware:
+            - 'Ozean12\AmqpPackBundle\Middleware\TransportConfigurationMiddleware'
       transports: ~
       routing: ~
