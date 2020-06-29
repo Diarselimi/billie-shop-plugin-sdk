@@ -34,7 +34,7 @@ class MerchantPaymentResponseTransformer
                 return $order;
             }
 
-            $overpayment = $order['mapped_amount'];
+            $overpayment += $order['mapped_amount'];
         });
 
         $item['orders'] = array_values($orders);
