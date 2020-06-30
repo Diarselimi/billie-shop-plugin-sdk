@@ -35,29 +35,6 @@ class MerchantOnboardingStepRepository extends AbstractPdoRepository implements
         $this->factory = $factory;
     }
 
-    public function getOneByStepNameAndPaymentUuid(string $name, int $merchantId): ?MerchantOnboardingStepEntity
-    {
-        $fields = array_map(
-            static function (string $field) {
-                return self::TABLE_NAME . '.' . $field;
-            },
-            self::SELECT_FIELDS
-        );
-
-        $query = $this->generateSelectQuery(self::TABLE_NAME, $fields)
-            . ' INNER JOIN merchant_onboardings ON merchant_onboardings.id = merchant_onboarding_id
-                WHERE merchant_onboardings.merchant_id = :merchant_id AND ' . self::TABLE_NAME . '.name = :name 
-                ORDER BY ' . self::TABLE_NAME . '.id DESC LIMIT 1'
-        ;
-
-        $row = $this->doFetchOne($query, [
-            'name' => $name,
-            'merchant_id' => $merchantId,
-        ]);
-
-        return $row ? $this->factory->createFromArray($row) : null;
-    }
-
     public function getOneByStepNameAndMerchant(string $name, int $merchantId): ?MerchantOnboardingStepEntity
     {
         $fields = array_map(

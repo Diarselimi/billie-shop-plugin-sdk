@@ -48,7 +48,7 @@ class MerchantStepTransitionService
      */
     public function transition(string $stepName, string $transitionName, int $merchantId): void
     {
-        $step = $this->repository->getOneByStepNameAndPaymentUuid($stepName, $merchantId);
+        $step = $this->repository->getOneByStepNameAndMerchant($stepName, $merchantId);
 
         if (!$step) {
             throw new MerchantOnboardingStepNotFoundException();

@@ -771,6 +771,16 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
+     * @Given a merchant user exists with permission :permission and identity verification case uuid :invitationCaseUuid
+     */
+    public function aMerchantUserExistsWithPermissionAndIdentifcationCase(string $permission, string $identityVerificationCaseUuid)
+    {
+        $role = $this->createRole('test', 'test_uuid', [$permission]);
+        $user = $this->createUser($role->getId());
+        $this->getMerchantUserRepository()->assignIdentityVerificationCaseToUser($user->getId(), $identityVerificationCaseUuid);
+    }
+
+    /**
      * @Given a merchant user exists with a role with permission :permission and overridden permission :overridden
      */
     public function aMerchantUserExistsWithRoleAndCustomPermission($rolePermission, $overriddenPermission)
@@ -1157,7 +1167,7 @@ class PaellaCoreContext extends MinkContext
     public function theFollowingOnboardingStepsAreInStates(TableNode $table, $merchantId)
     {
         foreach ($table as $row) {
-            $step = $this->getMerchantOnboardingStepRepository()->getOneByStepNameAndPaymentUuid($row['name'], $merchantId);
+            $step = $this->getMerchantOnboardingStepRepository()->getOneByStepNameAndMerchant($row['name'], $merchantId);
             $step->setState($row['state']);
             $this->getMerchantOnboardingStepRepository()->update($step);
         }
@@ -1168,7 +1178,7 @@ class PaellaCoreContext extends MinkContext
      */
     public function theOnboardingStepShouldBeInState(string $step, string $state, int $merchantId)
     {
-        $step = $this->getMerchantOnboardingStepRepository()->getOneByStepNameAndPaymentUuid($step, $merchantId);
+        $step = $this->getMerchantOnboardingStepRepository()->getOneByStepNameAndMerchant($step, $merchantId);
         Assert::eq($step->getState(), $state, 'The onboarding step is in a different state');
     }
 

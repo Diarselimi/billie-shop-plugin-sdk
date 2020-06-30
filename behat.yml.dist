@@ -30,6 +30,7 @@ default:
             kernel: '@kernel'
             amqpMapper: '@Ozean12\AmqpPackBundle\Mapping\AmqpMapperInterface'
             changeRequestDecisionIssuesHandler: '@App\Amqp\Handler\CompanyInformationChangeRequestDecisionIssuedHandler'
+            identityVerificationSucceededHandler: '@App\Amqp\Handler\IdentityVerificationSucceededHandler'
         - RepositoryIntegrationContext:
             kernel: '@kernel'
 

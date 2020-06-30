@@ -6,7 +6,9 @@ interface MerchantUserRepositoryInterface
 {
     public function create(MerchantUserEntity $merchantUserEntity): void;
 
-    public function getOneByUuid(string $uuid): ? MerchantUserEntity;
+    public function getOneByUuid(string $uuid): ?MerchantUserEntity;
+
+    public function getOneByIdentityVerificationCaseUuid(string $caseUuid): ?MerchantUserEntity;
 
     public function assignSignatoryPowerToUser(int $id, string $signatoryPowerUuid): void;
 
