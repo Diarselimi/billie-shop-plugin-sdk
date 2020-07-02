@@ -56,17 +56,6 @@ old_sound_rabbit_mq:
       exchange_options: { name: 'paella_events%env(INSTANCE_SUFFIX)%', type: direct }
       queue_options:    { name: 'http_invoice_upload%env(INSTANCE_SUFFIX)%', routing_keys: ['http_invoice_upload'] }
       callback:         App\Amqp\Consumer\HttpInvoiceUploadConsumer
-    order_dunning_step_changed:
-      connection:       default
-      exchange_options: { name: 'order', type: topic }
-      queue_options:    { name: 'order.order_dunning_step_changed', routing_keys: ['order.order_dunning_step_changed'] }
-      callback:         App\Amqp\Consumer\OrderDunningStepChangedConsumer
-      qos_options:      {prefetch_size: 0, prefetch_count: 1, global: false}
-    company_information_change_request_decision_issued:
-      connection:       default
-      exchange_options: { name: 'company_information_change_request', type: topic }
-      queue_options:    { name: 'paella-core.company_information_change_request.company_information_change_request_decision_issued', routing_keys: ['company_information_change_request.company_information_change_request_decision_issued'] }
-      callback:         App\Amqp\Consumer\CompanyInformationChangeRequestDecisionIssuedConsumer
   producers:
     paella_events:
       connection:       default
