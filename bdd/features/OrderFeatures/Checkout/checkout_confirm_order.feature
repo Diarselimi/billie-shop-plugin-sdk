@@ -58,6 +58,14 @@ Feature: As a merchant, I should be able to create an order by providing a valid
           "address_city":"Berlin",
           "address_postal_code":"10179",
           "address_country":"DE"
+       },
+        "billing_address":{
+          "addition":"lorem ipsum",
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city":"Berlin",
+          "postal_code":"10179",
+          "country":"DE"
        }
     }
     """
@@ -96,8 +104,6 @@ Feature: As a merchant, I should be able to create an order by providing a valid
 
   Scenario: I fail to confirm the order if I do not send a request body
     Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
-    And I get from companies service a good debtor strict match response
-    And I get from companies service get debtor response
     And I send a PUT request to "/checkout-session/123123CO123/confirm"
     Then the JSON response should be:
     """

@@ -31,6 +31,7 @@ class CheckoutConfirmOrderRequestFactory
         return (new CheckoutConfirmOrderRequest())
             ->setAmount($this->amountRequestFactory->create($request))
             ->setDebtorCompanyRequest($this->buildDebtorCompanyRequest($debtorCompanyData))
+            ->setDeliveryAddress($this->addressRequestFactory->create($request, 'delivery_address'))
             ->setDuration($duration)
             ->setSessionUuid($sessionUuid);
     }

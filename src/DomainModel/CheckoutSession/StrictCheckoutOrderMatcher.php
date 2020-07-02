@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\DomainModel\CheckoutSession;
 
+use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
+use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\CompanyRequestFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
@@ -46,30 +48,56 @@ class StrictCheckoutOrderMatcher implements CheckoutOrderMatcherInterface, Loggi
             return false;
         }
 
-        $requestCompanyDTO = $this->requestFactory->createCompanyStrictMatchRequestDTO(
-            $request->getDebtorCompany(),
-            $orderContainer->getDebtorExternalDataAddress(),
-            $orderContainer->getDebtorExternalData()->getName()
-        );
+        $companyNameFromDB = $orderContainer->getDebtorExternalData()->getName();
 
-        $matchDebtor = $this->companiesService->strictMatchDebtor($requestCompanyDTO);
-        if (!$matchDebtor && $orderContainer->getOrder()->getCompanyBillingAddressUuid()) {
+        $isMatch = $this->strictMatchCompanyAddress($request, $orderContainer->getDebtorExternalDataAddress(), $companyNameFromDB);
+        if (!$isMatch && $orderContainer->getOrder()->getCompanyBillingAddressUuid()) {
             $this->logInfo('Debtor company address mismatch, falling back to billing address');
 
-            $requestBillingDTO = $this->requestFactory->createCompanyStrictMatchRequestDTO(
-                $request->getDebtorCompany(),
-                $orderContainer->getBillingAddress(),
-                $orderContainer->getDebtorExternalData()->getName()
-            );
-
-            $matchDebtor = $this->companiesService->strictMatchDebtor($requestBillingDTO);
-            if (!$matchDebtor) {
+            $isMatch = $this->strictMatchCompanyAddress($request, $orderContainer->getBillingAddress(), $companyNameFromDB);
+            if (!$isMatch) {
                 $this->logInfo('[StrictCheckoutOrderMatcher] Debtor mismatch');
 
                 return false;
             }
         }
 
-        return true;
+        $isMatch = $this->strictMatchDeliveryAddress(
+            $request->getDeliveryAddress(),
+            $orderContainer->getDeliveryAddress(),
+            $companyNameFromDB
+        );
+
+        if (!$isMatch) {
+            $this->logInfo('[StrictCheckoutOrderMatcher] Delivery address mismatch');
+        }
+
+        return $isMatch;
+    }
+
+    private function strictMatchCompanyAddress(CheckoutOrderRequestDTO $request, AddressEntity $addressEntity, string $companyNameFromDB): bool
+    {
+        $requestCompanyDTO = $this->requestFactory->createCompanyStrictMatchRequestDTO(
+            $request->getDebtorCompany(),
+            $addressEntity,
+            $companyNameFromDB
+        );
+
+        return $this->companiesService->strictMatchDebtor($requestCompanyDTO);
+    }
+
+    private function strictMatchDeliveryAddress(?CreateOrderAddressRequest $requestDeliveryAddress, AddressEntity $existingDeliveryAddress, string $companyNameFromDB): bool
+    {
+        if ($requestDeliveryAddress === null) {
+            return true;
+        }
+
+        $strictMatchDeliveryDTO = $this->requestFactory->createCompanyStrictMatchRequestDTOFromAddress(
+            $requestDeliveryAddress,
+            $existingDeliveryAddress,
+            $companyNameFromDB
+        );
+
+        return $this->companiesService->strictMatchDebtor($strictMatchDeliveryDTO);
     }
 }

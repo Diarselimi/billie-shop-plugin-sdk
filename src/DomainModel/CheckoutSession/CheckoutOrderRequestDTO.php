@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\DomainModel\CheckoutSession;
 
+use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
 use App\DomainModel\DebtorCompany\DebtorCompanyRequest;
 
@@ -16,6 +17,8 @@ class CheckoutOrderRequestDTO
     private $duration;
 
     private $debtorCompany;
+
+    private $deliveryAddress;
 
     public function getAmount(): TaxedMoney
     {
@@ -61,6 +64,18 @@ class CheckoutOrderRequestDTO
     public function setDebtorCompany(DebtorCompanyRequest $debtorCompany): CheckoutOrderRequestDTO
     {
         $this->debtorCompany = $debtorCompany;
+
+        return $this;
+    }
+
+    public function getDeliveryAddress(): ?CreateOrderAddressRequest
+    {
+        return $this->deliveryAddress;
+    }
+
+    public function setDeliveryAddress(?CreateOrderAddressRequest $deliveryAddress): CheckoutOrderRequestDTO
+    {
+        $this->deliveryAddress = $deliveryAddress;
 
         return $this;
     }

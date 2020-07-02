@@ -71,6 +71,7 @@ class CheckoutConfirmOrderUseCase implements ValidatedUseCaseInterface
             ->setSessionUuid($request->getSessionUuid())
             ->setAmount($request->getAmount())
             ->setDebtorCompany($request->getDebtorCompanyRequest())
+            ->setDeliveryAddress($request->getDeliveryAddress())
             ->setDuration($request->getDuration());
 
         return $this->dataMatcher->matches($orderRequestDto, $orderContainer);

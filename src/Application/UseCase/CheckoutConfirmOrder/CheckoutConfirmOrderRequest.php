@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\UseCase\CheckoutConfirmOrder;
 
+use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
 use App\Application\UseCase\ValidatedRequestInterface;
 use App\Application\Validator\Constraint as CustomConstrains;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
@@ -15,7 +16,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @OA\Schema(schema="CheckoutConfirmOrderRequest", required={"amount", "duration", "debtor_company"}, properties={
  *      @OA\Property(property="amount", ref="#/components/schemas/AmountDTO"),
  *      @OA\Property(property="duration", ref="#/components/schemas/OrderDuration"),
- *      @OA\Property(property="debtor_company", ref="#/components/schemas/DebtorCompanyRequest")
+ *      @OA\Property(property="debtor_company", ref="#/components/schemas/DebtorCompanyRequest"),
+ *      @OA\Property(property="delivery_address", ref="#/components/schemas/CreateOrderAddressRequest", nullable=true)
  * })
  */
 class CheckoutConfirmOrderRequest implements ValidatedRequestInterface
@@ -40,6 +42,11 @@ class CheckoutConfirmOrderRequest implements ValidatedRequestInterface
      * @Assert\Valid()
      */
     private $debtorCompanyRequest;
+
+    /**
+     * @Assert\Valid()
+     */
+    private $deliveryAddress;
 
     public function getAmount(): TaxedMoney
     {
@@ -85,6 +92,18 @@ class CheckoutConfirmOrderRequest implements ValidatedRequestInterface
     public function setDebtorCompanyRequest(DebtorCompanyRequest $debtorCompanyRequest): CheckoutConfirmOrderRequest
     {
         $this->debtorCompanyRequest = $debtorCompanyRequest;
+
+        return $this;
+    }
+
+    public function getDeliveryAddress(): ?CreateOrderAddressRequest
+    {
+        return $this->deliveryAddress;
+    }
+
+    public function setDeliveryAddress(?CreateOrderAddressRequest $deliveryAddress): CheckoutConfirmOrderRequest
+    {
+        $this->deliveryAddress = $deliveryAddress;
 
         return $this;
     }

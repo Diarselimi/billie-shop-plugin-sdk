@@ -2709,6 +2709,9 @@ components:
           $ref: '#/components/schemas/OrderDuration'
         debtor_company:
           $ref: '#/components/schemas/DebtorCompanyRequest'
+        delivery_address:
+          nullable: true
+          $ref: '#/components/schemas/CreateOrderAddressRequest'
       type: object
     CheckoutUpdateOrderRequest:
       required:

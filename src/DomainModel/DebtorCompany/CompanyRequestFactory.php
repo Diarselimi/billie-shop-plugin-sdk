@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\DomainModel\DebtorCompany;
 
+use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\Address\AddressEntityFactory;
 use App\Infrastructure\Alfred\Dto\StrictMatchRequestDTO;
@@ -41,5 +42,16 @@ class CompanyRequestFactory
             'address_city' => $address->getCity(),
             'address_country' => $address->getCountry(),
         ];
+    }
+
+    public function createCompanyStrictMatchRequestDTOFromAddress(
+        CreateOrderAddressRequest $addressRequest,
+        AddressEntity $addressEntity,
+        ?string $companyName = 'default'
+    ) {
+        return new StrictMatchRequestDTO(
+            $this->createDebtorCompanyData($this->entityFactory->createFromAddressRequest($addressRequest), $companyName),
+            $this->createDebtorCompanyData($addressEntity, $companyName)
+        );
     }
 }
