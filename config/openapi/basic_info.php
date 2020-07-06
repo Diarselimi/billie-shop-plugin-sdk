@@ -3,7 +3,7 @@
 use OpenApi\Annotations as OA;
 
 /**
- * @OA\Info(@OA\License(name="© Billie GmbH, 2019", url="https://www.billie.io/agb/"), termsOfService="https://www.billie.io/agb/")
+ * @OA\Info(@OA\License(name="© Billie GmbH, 2020", url="https://www.billie.io/agb/"), termsOfService="https://www.billie.io/agb/")
  */
 
 // Extra endpoints:

@@ -14,8 +14,12 @@ install:
 	docker-compose up -d
 	bin/docker/composer install --ignore-platform-reqs --no-interaction
 	bin/docker/composer dumpautoload
-	bin/docker/app bin/console cache:clear
+	make clear-cache
 	make migrate
+
+clear-cache:
+	rm -rf var/cache
+	bin/docker/app bin/console cache:warmup
 
 start:
 	docker-compose down
@@ -31,6 +35,7 @@ test:
 
 docs:
 	echo " > Running OpenAPI Specification generator + validator... "
+	make clear-cache
 	# full (internal)
 	bin/docker/app bin/generate-api-docs full
 	bin/docker/run-rm swagger-cli validate /openapi/paella-openapi-full.yaml
