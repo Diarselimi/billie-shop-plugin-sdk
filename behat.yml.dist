@@ -12,8 +12,6 @@ default:
         - PaellaCoreContext:
             kernel: '@kernel'
             connection: '@billie_pdo.default_connection'
-        - RepositoryIntegrationContext:
-            kernel: '@kernel'
         - PaymentsServiceContext
         - CompaniesServiceContext
         - OAuthServiceContext

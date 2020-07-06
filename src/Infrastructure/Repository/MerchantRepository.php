@@ -5,6 +5,7 @@ namespace App\Infrastructure\Repository;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantEntityFactory;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\Infrastructure\Repository\MerchantOnboarding\MerchantOnboardingRepository;
 use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class MerchantRepository extends AbstractPdoRepository implements MerchantRepositoryInterface
@@ -130,6 +131,24 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
         $row = $this->doFetchOne($this->generateSelectQuery(self::TABLE_NAME, self::SELECT_FIELDS) . '
           WHERE oauth_client_id = :oauth_client_id
         ', ['oauth_client_id' => $oauthClientId]);
+
+        return $row ? $this->factory->createFromArray($row) : null;
+    }
+
+    public function getOneByMerchantOnboardingId(int $merchantOnboardingId): ?MerchantEntity
+    {
+        $selectFields = array_map(function ($selectField) {
+            return 'merchants.' . $selectField;
+        }, self::SELECT_FIELDS);
+
+        $row = $this->doFetchOne("
+            SELECT " . implode(',', $selectFields) . "
+            FROM " . self::TABLE_NAME  ."
+            INNER JOIN merchant_onboardings ON (
+                merchants.id = merchant_onboardings.merchant_id
+                AND merchant_onboardings.id = :merchantOnboardingId
+            )
+        ", ['merchantOnboardingId' => $merchantOnboardingId]);
 
         return $row ? $this->factory->createFromArray($row) : null;
     }
