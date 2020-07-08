@@ -6,6 +6,7 @@ use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\Address\AddressEntityFactory;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\DebtorCompany;
+use App\DomainModel\DebtorCompany\IdentifiedDebtorCompany;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\Order\OrderEntity;
@@ -217,9 +218,17 @@ class OrderResponseFactory
 
         $statesAccepted = [OrderStateManager::STATE_AUTHORIZED, OrderStateManager::STATE_PRE_WAITING];
         if (in_array($order->getState(), $statesAccepted, true)) {
+            if ($orderContainer->getIdentifiedDebtorCompany()->getIdentificationType() === IdentifiedDebtorCompany::IDENTIFIED_BY_COMPANY_ADDRESS) {
+                $identifiedAddress = $orderContainer->getIdentifiedDebtorCompany()->getDebtorAddress();
+            } else {
+                $identifiedAddress = $orderContainer->getIdentifiedDebtorCompany()->getDebtorBillingAddressByUuid(
+                    $orderContainer->getIdentifiedDebtorCompany()->getIdentifiedAddressUuid()
+                );
+            }
+
             $this->addCompanyData(
-                $orderContainer->getDebtorExternalDataAddress(),
-                $orderContainer->getDebtorExternalData()->getName(),
+                $identifiedAddress,
+                $orderContainer->getDebtorCompany()->getName(),
                 $response
             );
 

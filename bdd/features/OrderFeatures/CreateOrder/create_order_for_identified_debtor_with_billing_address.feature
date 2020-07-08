@@ -101,6 +101,9 @@ Feature:
        "order_id":"A1"
     }
     """
+    Then the response status code should be 200
+    And the order A1 is in state created
+    And print last JSON response
     And the JSON response should be:
     """
     {
@@ -117,8 +120,8 @@ Feature:
         "name":"Test User Company",
         "address_house_number":"10",
         "address_street":"Heinrich-Heine-Platz",
-        "address_postal_code":"10179",
         "address_city":"Berlin",
+        "address_postal_code":"10179",
         "address_country":"DE"
       },
       "bank_account":{
@@ -162,8 +165,6 @@ Feature:
       "shipped_at":null
     }
     """
-    Then the response status code should be 200
-    And the order A1 is in state created
 
   Scenario: Decline order because of billing address mismatch, after company is identified by the billing address with at least one complete older order
     Given I have a complete order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"

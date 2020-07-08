@@ -141,6 +141,95 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     And the response status code should be 200
     And the checkout_session_id "123123" should be valid
 
+  Scenario: I success if I try to create an order with a valid session_id, company identified via billing address.
+    Given I get from companies service identify with billing address match response
+    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
+    And I get from payments service register debtor positive response
+    And Debtor has sufficient limit
+    And I have a checkout_session_id "123123"
+    And I send a PUT request to "/public/checkout-session/123123/authorize" with body:
+    """
+    {
+       "debtor_person":{
+          "salutation":"m",
+          "first_name":"",
+          "last_name":"else",
+          "phone_number":"+491234567",
+          "email":"someone@billie.io"
+       },
+       "debtor_company":{
+          "name":"Test User Company",
+          "address_addition":"left door",
+          "address_house_number":"4",
+          "address_street":"Billing Street",
+          "address_city":"Berlin",
+          "address_postal_code":"10639",
+          "address_country":"DE",
+          "tax_id":"VA222",
+          "tax_number":"3333",
+          "registration_court":"",
+          "registration_number":" some number",
+          "industry_sector":"some sector",
+          "subindustry_sector":"some sub",
+          "employees_number":"33",
+          "legal_form":"some legal",
+          "established_customer":1
+       },
+       "delivery_address":{
+          "house_number":"22",
+          "street":"Charlot strasse",
+          "city":"Paris",
+          "postal_code":"98765",
+          "country":"DE"
+       },
+       "amount":{
+          "net":33.2,
+          "gross":43.30,
+          "tax":10.10
+       },
+       "comment":"Some comment",
+       "duration":30,
+       "dunning_status": null,
+       "order_id":"A1",
+       "line_items": [
+          {
+            "external_id": "SKU111",
+            "title": "Iphone XS Max",
+            "description": "Test test",
+            "quantity": 1,
+            "category": "mobile_phones",
+            "brand": "Apple",
+            "gtin": "test GTIN",
+            "mpn": "test MPN",
+            "amount":{
+              "net":900.00,
+              "gross":1000.00,
+              "tax":100.00
+            }
+          }
+       ]
+    }
+    """
+    Then the response status code should be 200
+    And the order A1 is in state authorized
+    And the checkout_session_id "123123" should be invalid
+    And the JSON response should be:
+    """
+    {
+      "state": "authorized",
+      "debtor_company":{
+        "name":"Test User Company",
+        "address_house_number":"4",
+        "address_street":"Billing Street name",
+        "address_postal_code":"10639",
+        "address_city":"Berlin",
+        "address_country":"DE"
+      },
+      "reasons":null,
+      "decline_reason":null
+    }
+    """
+
   Scenario: I success if I try to create an order with a valid session_id
     Given I get from companies service identify match response
     And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
@@ -161,7 +250,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
           "name":"Test User Company",
           "address_addition":"left door",
           "address_house_number":"10",
-          "address_street":"Heinrich-Heine-Platz",
+          "address_street":"Heinrich-Heine",
           "address_city":"Berlin",
           "address_postal_code":"10179",
           "address_country":"DE",
@@ -378,7 +467,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
       "state": "authorized",
       "debtor_company":{
         "name":"Test User Company",
-        "address_house_number":"",
+        "address_house_number":"10",
         "address_street":"Heinrich-Heine-Platz",
         "address_postal_code":"10179",
         "address_city":"Berlin",
