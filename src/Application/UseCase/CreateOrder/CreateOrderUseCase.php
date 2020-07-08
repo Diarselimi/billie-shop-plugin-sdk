@@ -42,6 +42,10 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
     {
         $this->validateRequest($request);
 
+        if ($request->getExternalCode() === '') {
+            $this->logInfo('[test] Create order empty external code');
+        }
+
         $orderContainer = $this->createIdentifiedOrder($request);
 
         if ($this->orderStateManager->isDeclined($orderContainer->getOrder())) {
