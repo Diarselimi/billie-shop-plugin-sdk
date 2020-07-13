@@ -2,17 +2,16 @@
 
 namespace App\DomainModel\Order;
 
-use App\DomainEvent\OrderRiskCheck\RiskCheckResultEvent;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\OrderRiskCheck\Checker\CheckInterface;
-use App\DomainModel\OrderRiskCheck\CheckResult;
+use App\DomainModel\OrderRiskCheck\Checker\CheckResult;
+use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntity;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntityFactory;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\DependencyInjection\ServiceLocator;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class OrderChecksRunnerService implements LoggingInterface
 {
@@ -30,14 +29,11 @@ class OrderChecksRunnerService implements LoggingInterface
 
     private $postIdentificationChecks;
 
-    private $dispatcher;
-
     public function __construct(
         OrderRiskCheckRepositoryInterface $orderRiskCheckRepository,
         OrderRiskCheckEntityFactory $riskCheckFactory,
         ServiceLocator $checkLoader,
         MerchantRiskCheckSettingsRepositoryInterface $merchantRiskCheckSettingsRepository,
-        EventDispatcherInterface $dispatcher,
         array $preIdentificationChecks,
         array $postIdentificationChecks
     ) {
@@ -47,7 +43,6 @@ class OrderChecksRunnerService implements LoggingInterface
         $this->merchantRiskCheckSettingsRepository = $merchantRiskCheckSettingsRepository;
         $this->preIdentificationChecks = $preIdentificationChecks;
         $this->postIdentificationChecks = $postIdentificationChecks;
-        $this->dispatcher = $dispatcher;
     }
 
     public function passesPreIdentificationChecks(OrderContainer $orderContainer): bool
@@ -62,36 +57,68 @@ class OrderChecksRunnerService implements LoggingInterface
 
     public function hasFailedSoftDeclinableChecks(OrderContainer $orderContainer): bool
     {
-        return $orderContainer->getRiskCheckResultCollection()->getFirstSoftDeclined() !== null;
+        $riskCheckResults = $orderContainer->getRiskChecks();
+
+        foreach ($riskCheckResults as $riskCheckResult) {
+            $merchantRiskCheckSetting = $this->merchantRiskCheckSettingsRepository->getOneByMerchantIdAndRiskCheckName(
+                $orderContainer->getMerchant()->getId(),
+                $riskCheckResult->getRiskCheckDefinition()->getName()
+            );
+
+            if (!$riskCheckResult->isPassed() && !$merchantRiskCheckSetting->isDeclineOnFailure()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function rerunFailedChecks(OrderContainer $orderContainer, array $riskChecksToSkip): bool
     {
-        $failedRiskChecksNames = [];
+        /** @var OrderRiskCheckEntity[] $failedRiskChecks */
+        $failedRiskChecks = array_filter(
+            $orderContainer->getRiskChecks(),
+            function (OrderRiskCheckEntity $orderRiskCheck) {
+                return !$orderRiskCheck->isPassed();
+            }
+        );
 
-        $checkResultCollection = $orderContainer->getRiskCheckResultCollection();
-        foreach ($checkResultCollection->getAllDeclined() as $checkResult) {
-            if (in_array($checkResult->getName(), $riskChecksToSkip)) {
+        foreach ($failedRiskChecks as $orderCheckResult) {
+            if (in_array($orderCheckResult->getRiskCheckDefinition()->getName(), $riskChecksToSkip)) {
                 continue;
             }
 
-            $failedRiskChecksNames[] = $checkResult->getName();
-        }
+            $check = $this->getCheck($orderCheckResult->getRiskCheckDefinition()->getName());
+            $result = $check->check($orderContainer);
 
-        return $this->rerunChecks($orderContainer, $failedRiskChecksNames);
-    }
-
-    public function rerunChecks(OrderContainer $orderContainer, array $checkNames): bool
-    {
-        foreach ($checkNames as $checkName) {
-            $checkResult = $this->check($orderContainer, $checkName);
-
-            if (!$checkResult->isPassed()) {
+            if (!$result->isPassed()) {
                 return false;
             }
+
+            $orderCheckResult->setIsPassed(true);
+            $this->orderRiskCheckRepository->update($orderCheckResult);
         }
 
         return true;
+    }
+
+    public function rerunCheck(OrderContainer $orderContainer, string $checkName): bool
+    {
+        foreach ($orderContainer->getRiskChecks() as $orderCheckResult) {
+            if ($checkName !== $orderCheckResult->getRiskCheckDefinition()->getName()) {
+                continue;
+            }
+
+            $check = $this->getCheck($checkName);
+            $result = $check->check($orderContainer)->isPassed();
+
+            $orderCheckResult->setIsPassed($result);
+            $this->orderRiskCheckRepository->update($orderCheckResult);
+
+            return $result;
+        }
+
+        return false;
     }
 
     private function runChecks(OrderContainer $orderContainer, array $checkNames): bool
@@ -99,7 +126,7 @@ class OrderChecksRunnerService implements LoggingInterface
         foreach ($checkNames as $checkName) {
             $checkResult = $this->check($orderContainer, $checkName);
 
-            if (!$checkResult->isPassed() && $checkResult->isDeclineOnFailure()) {
+            if (!$checkResult) {
                 return false;
             }
         }
@@ -107,10 +134,8 @@ class OrderChecksRunnerService implements LoggingInterface
         return true;
     }
 
-    private function check(
-        OrderContainer $orderContainer,
-        string $riskCheckName
-    ): CheckResult {
+    private function check(OrderContainer $orderContainer, string $riskCheckName): bool
+    {
         $this->logWaypoint(str_replace('_', ' ', $riskCheckName) . ' check');
 
         $merchantRiskCheckSetting = $this->merchantRiskCheckSettingsRepository->getOneByMerchantIdAndRiskCheckName(
@@ -119,14 +144,11 @@ class OrderChecksRunnerService implements LoggingInterface
         );
 
         if (!$merchantRiskCheckSetting || !$merchantRiskCheckSetting->isEnabled()) {
-            return (new CheckResult(true, $riskCheckName))->setDeclineOnFailure(false);
+            return true;
         }
 
         $check = $this->getCheck($riskCheckName);
-        $result = $check->check($orderContainer)
-            ->setDeclineOnFailure($merchantRiskCheckSetting->isDeclineOnFailure());
-
-        $this->dispatcher->dispatch(new RiskCheckResultEvent($orderContainer, $result));
+        $result = $check->check($orderContainer);
 
         $this->logInfo('Check result: {check} -> {result}', [
             'check' => $riskCheckName,
@@ -135,15 +157,16 @@ class OrderChecksRunnerService implements LoggingInterface
 
         $this->persistCheckResult($result, $orderContainer);
 
-        return $result;
+        if (!$merchantRiskCheckSetting->isDeclineOnFailure() && !$result->isPassed()) {
+            return true;
+        }
+
+        return $result->isPassed();
     }
 
     private function persistCheckResult(CheckResult $checkResult, OrderContainer $orderContainer): void
     {
-        $riskCheckEntity = $this->riskCheckFactory->createFromCheckResult(
-            $checkResult,
-            $orderContainer->getOrder()->getId()
-        );
+        $riskCheckEntity = $this->riskCheckFactory->createFromCheckResult($checkResult, $orderContainer->getOrder()->getId());
         $this->orderRiskCheckRepository->insert($riskCheckEntity);
     }
 

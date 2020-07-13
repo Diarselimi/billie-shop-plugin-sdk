@@ -6,7 +6,6 @@ use App\DomainModel\DebtorScoring\DebtorScoringRequestDTOFactory;
 use App\DomainModel\DebtorScoring\ScoringServiceInterface;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\OrderRiskCheck\CheckResult;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
 
 class DebtorScoreCheck implements CheckInterface

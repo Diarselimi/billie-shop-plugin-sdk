@@ -1,14 +1,12 @@
 <?php
 
-namespace App\DomainModel\OrderRiskCheck;
+namespace App\DomainModel\OrderRiskCheck\Checker;
 
 class CheckResult
 {
     private $isPassed;
 
     private $name;
-
-    private $declineOnFailure;
 
     public function __construct(bool $isPassed, string $name)
     {
@@ -24,17 +22,5 @@ class CheckResult
     public function getName(): string
     {
         return $this->name;
-    }
-
-    public function isDeclineOnFailure(): ?bool
-    {
-        return $this->declineOnFailure;
-    }
-
-    public function setDeclineOnFailure(bool $declineOnFailure): self
-    {
-        $this->declineOnFailure = $declineOnFailure;
-
-        return $this;
     }
 }

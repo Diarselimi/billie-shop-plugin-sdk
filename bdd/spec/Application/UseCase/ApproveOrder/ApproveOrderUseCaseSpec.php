@@ -14,10 +14,7 @@ use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderRiskCheck\Checker\LimitCheck;
-use App\DomainModel\OrderRiskCheck\CheckResult;
-use App\DomainModel\OrderRiskCheck\CheckResultCollection;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class ApproveOrderUseCaseSpec extends ObjectBehavior
 {
@@ -94,7 +91,7 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
             ->willReturn(true);
 
         $orderChecksRunnerService
-            ->rerunChecks($orderContainer, [LimitCheck::NAME])
+            ->rerunCheck($orderContainer, LimitCheck::NAME)
             ->shouldBeCalled()
             ->willReturn(false);
 
@@ -120,7 +117,7 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
             ->willReturn(true);
 
         $orderChecksRunnerService
-            ->rerunChecks($orderContainer, [LimitCheck::NAME])
+            ->rerunCheck($orderContainer, LimitCheck::NAME)
             ->shouldBeCalled()
             ->willReturn(true);
 
@@ -137,15 +134,11 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
         OrderContainerFactory $orderContainerFactory,
         OrderStateManager $orderStateManager,
         OrderChecksRunnerService $orderChecksRunnerService,
+        OrderDeclinedReasonsMapper $declinedReasonsMapper,
         OrderEntity $order,
         OrderContainer $orderContainer,
-        ApproveOrderRequest $request,
-        OrderDeclinedReasonsMapper $declinedReasonsMapper,
-        CheckResultCollection $checkResultCollection,
-        CheckResult $result
+        ApproveOrderRequest $request
     ) {
-        $checkResultCollection->getFirstDeclined()->willReturn($result);
-        $declinedReasonsMapper->mapReason(Argument::any())->willReturn('risk_check');
         $orderContainerFactory
             ->loadByUuid(self::ORDER_UUID)
             ->shouldBeCalled()
@@ -157,7 +150,7 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
             ->willReturn(true);
 
         $orderChecksRunnerService
-            ->rerunChecks($orderContainer, [LimitCheck::NAME])
+            ->rerunCheck($orderContainer, LimitCheck::NAME)
             ->shouldBeCalled()
             ->willReturn(true);
 
@@ -166,7 +159,7 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn(false);
 
-        $orderContainer->getRiskCheckResultCollection()->willReturn($checkResultCollection);
+        $declinedReasonsMapper->mapReasons($order)->shouldBeCalled()->willReturn([]);
 
         $this->shouldThrow(WorkflowException::class)->during('execute', [$request]);
     }

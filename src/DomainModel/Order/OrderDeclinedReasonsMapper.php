@@ -6,7 +6,7 @@ use App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedBillingAddressCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedStrictCheck;
 use App\DomainModel\OrderRiskCheck\Checker\LimitCheck;
-use App\DomainModel\OrderRiskCheck\CheckResult;
+use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
 
 class OrderDeclinedReasonsMapper
 {
@@ -21,7 +21,6 @@ class OrderDeclinedReasonsMapper
         DebtorIdentifiedCheck::NAME => self::REASON_DEBTOR_NOT_IDENTIFIED,
         DebtorIdentifiedStrictCheck::NAME => self::REASON_ADDRESS_MISMATCH,
         LimitCheck::NAME => self::REASON_DEBTOR_LIMIT_EXCEEDED,
-        DebtorIdentifiedBillingAddressCheck::NAME => self::REASON_ADDRESS_MISMATCH,
     ];
 
     private const REASON_RISK_POLICY = 'risk_policy';
@@ -32,18 +31,39 @@ class OrderDeclinedReasonsMapper
 
     private const REASON_DEBTOR_LIMIT_EXCEEDED = 'debtor_limit_exceeded';
 
-    public function mapReasons(array $checkResults): array
+    private $riskCheckRepository;
+
+    public function __construct(OrderRiskCheckRepositoryInterface $riskCheckRepository)
     {
-        return array_map(
-            function (CheckResult $result) {
-                return $this->mapReason($result);
-            },
-            $checkResults
-        );
+        $this->riskCheckRepository = $riskCheckRepository;
     }
 
-    public function mapReason(CheckResult $result): string
+    public function mapReasons(OrderEntity $order): array
     {
-        return self::RISK_CHECK_MAPPING[$result->getName()] ?? self::REASON_RISK_POLICY;
+        return [$this->mapReason($order)];
+    }
+
+    public function mapReason(OrderEntity $orderEntity): string
+    {
+        $checks = $this->riskCheckRepository->findByOrder($orderEntity);
+
+        foreach ($checks as $check) {
+            if (!$check->isPassed()) {
+                switch (true) {
+                    case isset(self::RISK_CHECK_MAPPING[$check->getRiskCheckDefinition()->getName()]):
+                        return self::RISK_CHECK_MAPPING[$check->getRiskCheckDefinition()->getName()];
+
+                        break;
+                    case $check->getRiskCheckDefinition()->getName() === DebtorIdentifiedBillingAddressCheck::NAME:
+                        return self::REASON_ADDRESS_MISMATCH;
+
+                        break;
+                    default:
+                        self::REASON_RISK_POLICY;
+                }
+            }
+        }
+
+        return self::REASON_RISK_POLICY;
     }
 }

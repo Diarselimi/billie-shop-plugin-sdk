@@ -13,7 +13,7 @@ use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderLineItem\OrderLineItemEntity;
-use App\DomainModel\OrderRiskCheck\CheckResultCollection;
+use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntity;
 use App\DomainModel\Payment\OrderPaymentDetailsDTO;
 use App\DomainModel\Person\PersonEntity;
 
@@ -45,6 +45,8 @@ class OrderContainer
 
     private $dunningStatus;
 
+    private $riskChecks;
+
     private $lineItems;
 
     private $paymentDetails;
@@ -52,8 +54,6 @@ class OrderContainer
     private $debtorSettings;
 
     private $relationLoader;
-
-    private $riskCheckResultCollection;
 
     public function __construct(OrderEntity $order, OrderContainerRelationLoader $relationLoader)
     {
@@ -225,6 +225,14 @@ class OrderContainer
     }
 
     /**
+     * @return OrderRiskCheckEntity[]
+     */
+    public function getRiskChecks(): array
+    {
+        return $this->riskChecks ?: $this->riskChecks = $this->relationLoader->loadOrderRiskChecks($this);
+    }
+
+    /**
      * @return OrderLineItemEntity[]
      */
     public function getLineItems(): array
@@ -247,18 +255,6 @@ class OrderContainer
     public function setPaymentDetails(OrderPaymentDetailsDTO $paymentDetails): OrderContainer
     {
         $this->paymentDetails = $paymentDetails;
-
-        return $this;
-    }
-
-    public function getRiskCheckResultCollection(): CheckResultCollection
-    {
-        return $this->riskCheckResultCollection ?: $this->riskCheckResultCollection = $this->relationLoader->loadFailedRiskChecks($this);
-    }
-
-    public function setRiskCheckResultCollection(CheckResultCollection $checkResultCollection)
-    {
-        $this->riskCheckResultCollection = $checkResultCollection;
 
         return $this;
     }

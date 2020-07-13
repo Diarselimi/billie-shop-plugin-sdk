@@ -4,7 +4,6 @@ namespace App\DomainModel\OrderRiskCheck\Checker;
 
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\OrderRiskCheck\CheckResult;
 
 class DebtorOverdueCheck implements CheckInterface
 {

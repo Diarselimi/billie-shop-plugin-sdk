@@ -7,9 +7,7 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderNotification\NotificationScheduler;
 use App\DomainModel\OrderNotification\OrderNotificationEntity;
-use App\DomainModel\OrderRiskCheck\CheckResult;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntity;
-use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
 use Billie\MonitoringBundle\Service\Alerting\Slack\SlackClientAwareInterface;
 use Billie\MonitoringBundle\Service\Alerting\Slack\SlackClientAwareTrait;
 use Billie\MonitoringBundle\Service\Alerting\Slack\SlackMessageAttachmentField;
@@ -35,20 +33,16 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
 
     private $orderEventPayloadFactory;
 
-    private $orderRiskCheckRepository;
-
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         NotificationScheduler $notificationScheduler,
         DelayedMessageProducer $delayedMessageProducer,
-        OrderEventPayloadFactory $orderEventPayloadFactory,
-        OrderRiskCheckRepositoryInterface $orderRiskCheckRepository
+        OrderEventPayloadFactory $orderEventPayloadFactory
     ) {
         $this->orderRepository = $orderRepository;
         $this->notificationScheduler = $notificationScheduler;
         $this->delayedMessageProducer = $delayedMessageProducer;
         $this->orderEventPayloadFactory = $orderEventPayloadFactory;
-        $this->orderRiskCheckRepository = $orderRiskCheckRepository;
     }
 
     public static function getSubscribedEvents()
@@ -113,10 +107,15 @@ class OrderAfterStateChangeEventSubscriber implements EventSubscriberInterface, 
         );
 
         $failedRiskCheckNames = array_map(
-            function (CheckResult $result) {
-                return $result->getName();
+            function (OrderRiskCheckEntity $orderRiskCheckEntity) {
+                return $orderRiskCheckEntity->getRiskCheckDefinition()->getName();
             },
-            $event->getOrderContainer()->getRiskCheckResultCollection()->getAllDeclined()
+            array_filter(
+                $event->getOrderContainer()->getRiskChecks(),
+                function (OrderRiskCheckEntity $orderRiskCheck) {
+                    return !$orderRiskCheck->isPassed();
+                }
+            )
         );
 
         $message = $this->getSlackMessageFactory()->createSimple(

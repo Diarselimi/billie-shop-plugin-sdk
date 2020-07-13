@@ -8,7 +8,6 @@ use App\DomainModel\Fraud\FraudRequestDTOFactory;
 use App\DomainModel\Fraud\FraudServiceException;
 use App\DomainModel\Fraud\FraudServiceInterface;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
-use App\DomainModel\OrderRiskCheck\CheckResult;
 use App\Http\IpAddressProvider;
 
 class FraudScoreCheck implements CheckInterface

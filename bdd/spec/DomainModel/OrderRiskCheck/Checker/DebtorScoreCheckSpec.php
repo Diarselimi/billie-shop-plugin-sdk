@@ -12,7 +12,7 @@ use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\OrderRiskCheck\CheckResult;
+use App\DomainModel\OrderRiskCheck\Checker\CheckResult;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorScoreCheck;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntity;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;

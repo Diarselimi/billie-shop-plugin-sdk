@@ -6,7 +6,6 @@ use App\DomainModel\DebtorCompany\IdentifiedDebtorCompany;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
-use App\DomainModel\OrderRiskCheck\CheckResult;
 
 class DebtorIdentifiedBillingAddressCheck implements CheckInterface
 {

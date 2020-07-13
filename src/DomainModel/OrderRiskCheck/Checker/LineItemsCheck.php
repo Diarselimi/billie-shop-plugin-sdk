@@ -3,7 +3,6 @@
 namespace App\DomainModel\OrderRiskCheck\Checker;
 
 use App\DomainModel\Order\OrderContainer\OrderContainer;
-use App\DomainModel\OrderRiskCheck\CheckResult;
 use App\DomainModel\PublicDomain\PublicDomainEmailRepositoryInterface;
 use App\Helper\String\StringSearch;
 use App\Infrastructure\Repository\FraudRuleRepository;

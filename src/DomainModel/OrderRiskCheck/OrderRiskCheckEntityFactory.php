@@ -2,6 +2,8 @@
 
 namespace App\DomainModel\OrderRiskCheck;
 
+use App\DomainModel\OrderRiskCheck\Checker\CheckResult;
+
 class OrderRiskCheckEntityFactory
 {
     private $riskCheckDefinitionRepository;
@@ -27,19 +29,6 @@ class OrderRiskCheckEntityFactory
         ;
     }
 
-    public function createCheckResultFromRows(array $rows): CheckResultCollection
-    {
-        return new CheckResultCollection(
-            ...array_map([$this, 'createCheckResultFromRow'], $rows)
-        );
-    }
-
-    public function createCheckResultFromRow(array $row)
-    {
-        return (new CheckResult($row['is_passed'], $row['check_name']))
-            ->setDeclineOnFailure($row['decline_on_failure']);
-    }
-
     /**
      * @return OrderRiskCheckEntity[]|array
      */
@@ -51,14 +40,19 @@ class OrderRiskCheckEntityFactory
     public function createFromDatabaseRow(array $row): OrderRiskCheckEntity
     {
         return (new OrderRiskCheckEntity())
-            ->setId((int) $row['id'])
+            ->setId((int) $row['risk_check_id'])
             ->setOrderId((int) $row['order_id'])
             ->setRiskCheckDefinition(
-                $this->riskCheckDefinitionRepository->getById($row['risk_check_definition_id'])
+                $this->riskCheckDefinitionEntityFactory->create(
+                    (int) $row['risk_check_definition_id'],
+                    $row['risk_check_definition_name'],
+                    new \DateTime($row['risk_check_definitions_created_at']),
+                    new \DateTime($row['risk_check_definitions_updated_at'])
+                )
             )
             ->setIsPassed($row['is_passed'])
-            ->setCreatedAt(new \DateTime($row['created_at']))
-            ->setUpdatedAt(new \DateTime($row['updated_at']))
+            ->setCreatedAt(new \DateTime($row['risk_check_created_at']))
+            ->setUpdatedAt(new \DateTime($row['risk_check_updated_at']))
         ;
     }
 }

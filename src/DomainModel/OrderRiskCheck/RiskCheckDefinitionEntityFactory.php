@@ -14,11 +14,6 @@ class RiskCheckDefinitionEntityFactory
         ;
     }
 
-    public function createFromDatabaseRows(array $collection): array
-    {
-        return array_map([$this, 'createFromDatabaseRow'], $collection);
-    }
-
     public function createFromDatabaseRow(array $row): RiskCheckDefinitionEntity
     {
         return (new RiskCheckDefinitionEntity())

@@ -3,9 +3,8 @@
 namespace App\DomainModel\OrderRiskCheck\Checker;
 
 use App\DomainModel\Order\OrderContainer\OrderContainer;
-use App\DomainModel\OrderRiskCheck\CheckResult;
 
-class DebtorIsTrustedCheck implements CheckInterface
+class DebtorIsTrusted implements CheckInterface
 {
     public const NAME = "debtor_is_trusted";
 

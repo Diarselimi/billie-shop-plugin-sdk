@@ -11,7 +11,6 @@ use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderStateManager;
-use App\DomainModel\OrderRiskCheck\CheckResultCollection;
 use App\DomainModel\Payment\OrderPaymentDetailsDTO;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
@@ -70,7 +69,7 @@ class OrderResponseFactory
             $response->setDunningStatus($orderContainer->getDunningStatus());
         }
 
-        $response = $this->addReasons($orderContainer->getRiskCheckResultCollection(), $response);
+        $response = $this->addReasons($order, $response);
 
         return $response;
     }
@@ -119,7 +118,7 @@ class OrderResponseFactory
             return null;
         }, $orderContainers);
 
-        return $this->paymentsService->getBatchOrderPaymentDetails($paymentIds);
+        return  $this->paymentsService->getBatchOrderPaymentDetails($paymentIds);
     }
 
     /**
@@ -158,7 +157,8 @@ class OrderResponseFactory
             ->setUuid($order->getUuid())
             ->setState($order->getState())
             ->setCreatedAt($order->getCreatedAt())
-            ->setShippedAt($order->getShippedAt());
+            ->setShippedAt($order->getShippedAt())
+            ;
     }
 
     /**
@@ -172,7 +172,8 @@ class OrderResponseFactory
             ->setCompanyAddressStreet($address->getStreet())
             ->setCompanyAddressPostalCode($address->getPostalCode())
             ->setCompanyAddressCity($address->getCity())
-            ->setCompanyAddressCountry($address->getCountry());
+            ->setCompanyAddressCountry($address->getCountry())
+        ;
     }
 
     private function addPaymentData(OrderContainer $orderContainer, OrderResponse $response)
@@ -213,7 +214,7 @@ class OrderResponseFactory
         $response = (new CheckoutAuthorizeOrderResponse())
             ->setState($order->getState());
 
-        $response = $this->addReasons($orderContainer->getRiskCheckResultCollection(), $response);
+        $response = $this->addReasons($order, $response);
 
         $statesAccepted = [OrderStateManager::STATE_AUTHORIZED, OrderStateManager::STATE_PRE_WAITING];
         if (in_array($order->getState(), $statesAccepted, true)) {
@@ -249,16 +250,12 @@ class OrderResponseFactory
      * @param  OrderResponse|CheckoutAuthorizeOrderResponse $response
      * @return OrderResponse|CheckoutAuthorizeOrderResponse $response
      */
-    private function addReasons(CheckResultCollection $checkResultCollection, $response)
+    private function addReasons(OrderEntity $order, $response)
     {
-        $failedRiskCheckResult = $checkResultCollection->getFirstHardDeclined() ?? $checkResultCollection->getFirstSoftDeclined();
-        if ($failedRiskCheckResult === null) {
-            return $response;
+        if ($this->orderStateManager->isDeclined($order) || $this->orderStateManager->isWaiting($order)) {
+            $response->setReasons($this->declinedReasonsMapper->mapReasons($order));
+            $response->setDeclineReason($this->declinedReasonsMapper->mapReason($order));
         }
-
-        $reason = $this->declinedReasonsMapper->mapReason($failedRiskCheckResult);
-        $response->setReasons([$reason]);
-        $response->setDeclineReason($reason);
 
         return $response;
     }

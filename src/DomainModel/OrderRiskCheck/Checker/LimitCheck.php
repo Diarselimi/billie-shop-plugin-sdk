@@ -4,7 +4,6 @@ namespace App\DomainModel\OrderRiskCheck\Checker;
 
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
-use App\DomainModel\OrderRiskCheck\CheckResult;
 
 class LimitCheck implements CheckInterface
 {
