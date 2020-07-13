@@ -4,6 +4,7 @@ namespace App\Tests\Integration;
 
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\OrderRiskCheck\RiskCheckDefinitionRepositoryInterface;
 use Billie\PdoBundle\Infrastructure\Pdo\PdoConnection;
 
 abstract class DatabaseTestCase extends IntegrationTestCase
@@ -30,5 +31,10 @@ abstract class DatabaseTestCase extends IntegrationTestCase
     protected function getMerchantFromSeed(): MerchantEntity
     {
         return $this->getContainer()->get(MerchantRepositoryInterface::class)->getOneById(1);
+    }
+
+    protected function getRiskChecksDefinitionsFromSeed(): array
+    {
+        return $this->getContainer()->get(RiskCheckDefinitionRepositoryInterface::class)->getAll();
     }
 }

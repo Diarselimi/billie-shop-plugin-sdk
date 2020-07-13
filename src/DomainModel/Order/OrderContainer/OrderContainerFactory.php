@@ -5,6 +5,7 @@ namespace App\DomainModel\Order\OrderContainer;
 use App\DomainModel\Order\NewOrder\OrderCreationDTO;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\OrderRiskCheck\CheckResultCollection;
 
 class OrderContainerFactory
 {
@@ -95,6 +96,7 @@ class OrderContainerFactory
             ->setOrderFinancialDetails($newOrder->getFinancialDetails())
             ->setLineItems($newOrder->getLineItems())
             ->setBillingAddress($newOrder->getBillingAddress())
+            ->setRiskCheckResultCollection(new CheckResultCollection())
         ;
     }
 }

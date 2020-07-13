@@ -1,5 +1,5 @@
 Feature:
-  If the order creation fails with multiple reasons then the one that was declined with should be returned as a reason.
+  If the order creation fails with multiple reasons then the one that was declined with first should be returned as a reason.
 
   Background:
     Given I add "Content-type" header equal to "application/json"
@@ -23,7 +23,7 @@ Feature:
     And I get from companies service get debtor response
     And I get from payments service get debtor response
 
-  Scenario: When multiple reasons fail then we should return the reason that was declined for.
+  Scenario: When multiple reasons fail then we should return the first reason that was declined for
     Given The following merchant risk check settings exist for merchant 1:
       | risk_check_name           | enabled | decline_on_failure |
       | available_financing_limit | 1       | 0                  |
@@ -91,7 +91,7 @@ Feature:
     """
     Then the order A1 is in state declined
     And the response status code should be 200
-    And the JSON at "decline_reason" should be "debtor_limit_exceeded"
+    And the JSON at "decline_reason" should be "risk_policy"
 
   Scenario: When multiple reasons fail then we should return the reason that was declined for.
     Given The following merchant risk check settings exist for merchant 1:

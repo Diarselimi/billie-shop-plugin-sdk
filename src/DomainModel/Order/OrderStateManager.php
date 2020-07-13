@@ -274,4 +274,9 @@ class OrderStateManager implements LoggingInterface
 
         $this->logInfo(sprintf('Order was moved to %s state', $state));
     }
+
+    public function isWaitingOrDeclined(OrderEntity $order)
+    {
+        return $this->isWaiting($order) || $this->isDeclined($order);
+    }
 }
