@@ -1,0 +1,14 @@
+query q(
+    $merchantId: String!
+    $changeRequestStates: String
+    $searchString: String
+){
+    getPadMerchantDebtors(
+        merchant_id: $merchantId
+        change_request_states: $changeRequestStates
+        search_keyword: $searchString
+        as_count: "yes"
+    ) {
+        total: count
+    }
+}

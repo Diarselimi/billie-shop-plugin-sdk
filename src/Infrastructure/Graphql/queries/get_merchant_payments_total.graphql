@@ -2,13 +2,13 @@ query q(
     $merchantUuid: String!
     $paymentDebtorUuid: String
     $transactionUuid: String
-    $keyword: String
+    $searchString: String
 ){
     getPadPayments(
         merchant_uuid: $merchantUuid
         debtor_uuids: $paymentDebtorUuid
         transaction_uuids: $transactionUuid
-        search_keyword: $keyword
+        search_keyword: $searchString
         as_count: "yes"
     ) {
         total: count

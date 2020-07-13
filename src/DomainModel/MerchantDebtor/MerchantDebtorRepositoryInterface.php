@@ -33,24 +33,6 @@ interface MerchantDebtorRepositoryInterface
     public function findExternalId(int $merchantDebtorId): ?string;
 
     /**
-     * @param  int         $merchantId
-     * @param  int         $offset
-     * @param  int         $limit
-     * @param  string      $sortBy
-     * @param  string      $sortDirection
-     * @param  string|null $searchString
-     * @return array       Array with 'total' and 'rows' containing 'id' and 'external_id'
-     */
-    public function getByMerchantId(
-        int $merchantId,
-        int $offset,
-        int $limit,
-        string $sortBy,
-        string $sortDirection,
-        ?string $searchString
-    ): array;
-
-    /**
      * @param  int                    $debtorCompanyId
      * @return MerchantDebtorEntity[]
      */

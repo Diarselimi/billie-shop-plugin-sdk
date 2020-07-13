@@ -113,3 +113,6 @@ services:
   App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestRepositoryInterface:
     alias: 'App\Infrastructure\Repository\DebtorInformationChangeRequestRepository'
     public: true
+  App\DomainModel\MerchantDebtor\SearchMerchantDebtorsRepositoryInterface:
+    alias: 'App\DomainModel\MerchantDebtor\DummySearchMerchantDebtorsRepository'
+    public: true

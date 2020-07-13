@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Infrastructure\Repository;
 
-use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntityFactory;
 use App\DomainModel\MerchantDebtor\MerchantDebtorIdentifierDTO;
@@ -191,7 +192,7 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
             'state' => $state,
         ]);
 
-        return $row['amount'] ?? 0;
+        return (float) $row['amount'] ?? 0;
     }
 
     public function getMerchantDebtorIdentifierDtos(string $where = ''): ?\Generator
@@ -217,8 +218,8 @@ SQL;
         while ($stmt && $row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
             yield (new MerchantDebtorIdentifierDTO())
                 ->setMerchantDebtorUuid($row['merchant_debtor_uuid'])
-                ->setMerchantDebtorId($row['merchant_debtor_id'])
-                ->setMerchantId($row['merchant_id'])
+                ->setMerchantDebtorId((int) $row['merchant_debtor_id'])
+                ->setMerchantId((int) $row['merchant_id'])
                 ->setDebtorId((int) $row['debtor_id'])
                 ->setMerchantExternalId($row['merchant_external_id']);
             $count++;
@@ -239,80 +240,5 @@ SQL;
         $identifierDto = $this->getOneMerchantDebtorIdentifierDto($merchantDebtorId);
 
         return $identifierDto ? $identifierDto->getMerchantExternalId() : null;
-    }
-
-    public function getByMerchantId(
-        int $merchantId,
-        int $offset,
-        int $limit,
-        string $sortBy,
-        string $sortDirection,
-        ?string $searchString
-    ): array {
-        $tableName = self::TABLE_NAME;
-        $where = $tableName . '.merchant_id = :merchant_id';
-        $queryParameters = [
-            'merchant_id' => $merchantId,
-            'state_confirmation_pending' => DebtorInformationChangeRequestEntity::STATE_PENDING,
-            'state_complete' => DebtorInformationChangeRequestEntity::STATE_COMPLETE,
-            'state_declined' => DebtorInformationChangeRequestEntity::STATE_DECLINED,
-        ];
-        $selectFieldsWithTablePrefix = self::SELECT_FIELDS;
-        array_walk($selectFieldsWithTablePrefix, function (string &$value) {
-            $value = self::TABLE_NAME . '.' . $value;
-        });
-        $selectFieldsWithTablePrefix[] =
-            'debtor_information_change_requests.state AS debtor_information_change_request_state';
-
-        $sql = <<<SQL
-    SELECT %s
-    FROM {$tableName}
-        INNER JOIN (
-	        SELECT MAX(id) AS id, merchant_debtor_id FROM orders GROUP BY merchant_debtor_id
-        ) AS last_order ON last_order.merchant_debtor_id = merchants_debtors.id
-        INNER JOIN orders ON orders.id = last_order.id
-        INNER JOIN debtor_external_data ON debtor_external_data.id = orders.debtor_external_data_id
-        LEFT JOIN debtor_information_change_requests ON (
-            debtor_information_change_requests.company_uuid = {$tableName}.company_uuid
-            AND debtor_information_change_requests.is_seen = 0
-            AND debtor_information_change_requests.state IN (
-                :state_confirmation_pending,:state_complete,:state_declined
-            )
-        )
-    WHERE %s
-    GROUP BY {$tableName}.id
-SQL;
-
-        if ($searchString) {
-            $where .= ' AND (debtor_external_data.merchant_external_id LIKE :search)';
-            $queryParameters['search'] = '%' . $searchString . '%';
-        }
-
-        $totalCount = $this->doFetchOne('SELECT count(*) as total_count FROM (' . sprintf(
-            $sql,
-            'merchants_debtors.id',
-            $where
-        ) . ') AS md', $queryParameters);
-
-        $orderByColumn = $tableName . '.' . $sortBy;
-        if ($sortBy === 'debtor_information_change_request_state') {
-            $orderByColumn = 'FIELD(debtor_information_change_request_state, :state_complete, :state_declined, :state_confirmation_pending)';
-        }
-
-        $sql .= " ORDER BY {$orderByColumn} {$sortDirection} LIMIT {$offset},{$limit}";
-
-        $rows = $this->doFetchAll(
-            sprintf(
-                $sql,
-                implode(',', $selectFieldsWithTablePrefix),
-                $where
-            ),
-            $queryParameters
-        );
-
-        return [
-            'total' => $totalCount['total_count'] ?? 0,
-            'rows' => $rows ? $this->factory->createFromArrayCollection($rows) : [],
-        ];
     }
 }

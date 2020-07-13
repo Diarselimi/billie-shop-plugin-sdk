@@ -7,12 +7,16 @@ namespace App\Infrastructure\Graphql;
 use App\DomainModel\Payment\PaymentsRepositoryInterface;
 use App\DomainModel\Payment\RequestDTO\SearchPaymentsDTO;
 use App\Support\PaginatedCollection;
-use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
-use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
-class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements PaymentsRepositoryInterface, LoggingInterface
+class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements PaymentsRepositoryInterface
 {
-    use LoggingTrait;
+    private const GET_MERCHANT_PAYMENTS_QUERY = 'get_merchant_payments';
+
+    private const GET_MERCHANT_PAYMENTS_TOTAL_QUERY = 'get_merchant_payments_total';
+
+    private const GET_PAYMENT_DETAILS_QUERY = 'get_merchant_payment_details';
+
+    private const GET_ORDER_PAYMENTS_QUERY = 'get_order_payments';
 
     public function searchMerchantPayments(SearchPaymentsDTO $paymentsDTO): PaginatedCollection
     {
@@ -24,20 +28,20 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
             'limit' => (string) $paymentsDTO->getLimit(),
             'sortBy' => $paymentsDTO->getSortBy(),
             'sortDirection' => $paymentsDTO->getSortDirection(),
-            'keyword' => $paymentsDTO->getKeyword(),
+            'searchString' => $paymentsDTO->getSearchString(),
         ];
 
         $countParams = [
             'merchantUuid' => $paymentsDTO->getMerchantPaymentUuid(),
             'paymentDebtorUuid' => $paymentsDTO->getPaymentDebtorUuid(),
             'transactionUuid' => $paymentsDTO->getTransactionUuid(),
-            'keyword' => $paymentsDTO->getKeyword(),
+            'searchString' => $paymentsDTO->getSearchString(),
         ];
 
-        $countResult = $this->query('get_merchant_payments_total', $countParams);
+        $countResult = $this->query(self::GET_MERCHANT_PAYMENTS_TOTAL_QUERY, $countParams);
         $total = $countResult[0]['total'] ?? 0;
 
-        return new PaginatedCollection($this->query('get_merchant_payments', $params), $total);
+        return new PaginatedCollection($this->query(self::GET_MERCHANT_PAYMENTS_QUERY, $params), $total);
     }
 
     public function getPaymentDetails(string $merchantPaymentUuid, string $transactionUuid): array
@@ -47,7 +51,7 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
             'transactionUuid' => $transactionUuid,
         ];
 
-        $response = $this->query('get_merchant_payment_details', $params);
+        $response = $this->query(self::GET_PAYMENT_DETAILS_QUERY, $params);
 
         return empty($response) ? [] : $response[0];
     }
@@ -60,20 +64,11 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
             'limit' => '100',
             'sortBy' => 'transaction_date',
             'sortDirection' => 'desc',
-            'keyword' => null,
+            'searchString' => null,
         ];
 
-        $result = $this->query('get_order_payments', $params);
+        $result = $this->query(self::GET_ORDER_PAYMENTS_QUERY, $params);
 
         return new PaginatedCollection($result, count($result));
-    }
-
-    private function query(string $name, array $params): array
-    {
-        $response = $this->executeQuery($name, $params);
-        $total = $response['total'] ?? count($response);
-        $this->logInfo('GraphQL "' . $name . '" query', ['params' => $params, 'total_results' => $total, 'response' => $response]);
-
-        return $response;
     }
 }

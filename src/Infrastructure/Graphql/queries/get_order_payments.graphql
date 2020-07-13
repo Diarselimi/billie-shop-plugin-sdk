@@ -4,11 +4,11 @@ query q(
     $limit: String
     $sortBy: String
     $sortDirection: String
-    $keyword: String
+    $searchString: String
 ){
     getPadOrderPayments(
         ticket_uuid: $ticketUuid
-        search_keyword: $keyword
+        search_keyword: $searchString
         limit: $limit
         offset: $offset
         order_by: $sortBy

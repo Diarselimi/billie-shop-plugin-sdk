@@ -44,7 +44,7 @@ class GetMerchantDebtorsRequest implements ValidatedRequestInterface, Pagination
         int $limit,
         string $sortBy,
         string $sortDirection,
-        ?string $searchString
+        string $searchString
     ) {
         $this->merchantId = $merchantId;
         $this->offset = $offset;
@@ -69,7 +69,7 @@ class GetMerchantDebtorsRequest implements ValidatedRequestInterface, Pagination
         return $this->sortDirection;
     }
 
-    public function getSearchString(): ? string
+    public function getSearchString(): string
     {
         return $this->searchString;
     }

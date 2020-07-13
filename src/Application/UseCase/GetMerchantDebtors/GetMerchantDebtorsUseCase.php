@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Application\UseCase\GetMerchantDebtors;
 
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
-use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntityFactory;
+use App\DomainModel\MerchantDebtor\SearchMerchantDebtorsDTOFactory;
+use App\DomainModel\MerchantDebtor\SearchMerchantDebtorsRepositoryInterface;
 use App\DomainModel\MerchantDebtorResponse\MerchantDebtorContainerFactory;
-use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\MerchantDebtorResponse\MerchantDebtorList;
 use App\DomainModel\MerchantDebtorResponse\MerchantDebtorResponseFactory;
 
@@ -15,23 +17,27 @@ class GetMerchantDebtorsUseCase implements ValidatedUseCaseInterface
 {
     use ValidatedUseCaseTrait;
 
-    private $merchantDebtorRepository;
+    private $searchMerchantDebtorRepository;
 
     private $merchantDebtorContainerFactory;
 
     private $responseFactory;
 
+    private $searchMerchantDebtorFactory;
+
     private $entityFactory;
 
     public function __construct(
-        MerchantDebtorRepositoryInterface $merchantDebtorRepository,
+        SearchMerchantDebtorsRepositoryInterface $searchMerchantDebtorRepository,
         MerchantDebtorContainerFactory $merchantDebtorContainerFactory,
         MerchantDebtorResponseFactory $responseFactory,
+        SearchMerchantDebtorsDTOFactory $searchMerchantDebtorFactory,
         MerchantDebtorEntityFactory $entityFactory
     ) {
-        $this->merchantDebtorRepository = $merchantDebtorRepository;
+        $this->searchMerchantDebtorRepository = $searchMerchantDebtorRepository;
         $this->merchantDebtorContainerFactory = $merchantDebtorContainerFactory;
         $this->responseFactory = $responseFactory;
+        $this->searchMerchantDebtorFactory = $searchMerchantDebtorFactory;
         $this->entityFactory = $entityFactory;
     }
 
@@ -39,21 +45,16 @@ class GetMerchantDebtorsUseCase implements ValidatedUseCaseInterface
     {
         $this->validateRequest($request);
 
-        $result = $this->merchantDebtorRepository->getByMerchantId(
-            $request->getMerchantId(),
-            $request->getOffset(),
-            $request->getLimit(),
-            $request->getSortBy(),
-            $request->getSortDirection(),
-            $request->getSearchString()
-        );
+        $result = $this->searchMerchantDebtorRepository->searchMerchantDebtors($this->searchMerchantDebtorFactory->create($request));
 
-        $merchantDebtors = array_map(function (MerchantDebtorEntity $merchantDebtorEntity) {
-            $container = $this->merchantDebtorContainerFactory->create($merchantDebtorEntity);
+        $merchantDebtors = array_map(function (array $merchantDebtorEntity) {
+            $container = $this->merchantDebtorContainerFactory->create(
+                $this->entityFactory->createFromArray($merchantDebtorEntity)
+            );
 
             return $this->responseFactory->createListItemFromContainer($container);
-        }, $result['rows']);
+        }, $result->getItems());
 
-        return $this->responseFactory->createList($result['total'], $merchantDebtors);
+        return $this->responseFactory->createList($result->getTotal(), $merchantDebtors);
     }
 }

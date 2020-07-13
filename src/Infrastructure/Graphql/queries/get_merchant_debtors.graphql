@@ -1,0 +1,30 @@
+query q(
+    $merchantId: String!
+    $changeRequestStates: String
+    $offset: String
+    $limit: String
+    $sortBy: String
+    $sortDirection: String
+    $searchString: String
+){
+    getPadMerchantDebtors(
+        merchant_id: $merchantId
+        change_request_states: $changeRequestStates
+        search_keyword: $searchString
+        limit: $limit
+        offset: $offset
+        order_by: $sortBy
+        order_direction: $sortDirection
+    ) {
+        id
+        merchant_id
+        uuid
+        debtor_id
+        company_uuid
+        payment_debtor_id
+        score_thresholds_configuration_id
+        created_at
+        updated_at
+        debtor_information_change_request_state
+    }
+}

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controller\PublicApi;
 
 use App\Application\UseCase\GetMerchantDebtors\GetMerchantDebtorsRequest;
@@ -62,7 +64,7 @@ class GetMerchantDebtorsController
             $request->query->getInt('limit', GetMerchantDebtorsRequest::DEFAULT_LIMIT),
             $sortField,
             strtoupper($sortDirection ?: GetMerchantDebtorsRequest::DEFAULT_SORT_DIRECTION),
-            trim($request->query->get('search'))
+            trim($request->query->get('search', ''))
         );
 
         return $this->useCase->execute($useCaseRequest);

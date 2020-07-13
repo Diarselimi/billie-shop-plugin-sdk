@@ -10,6 +10,7 @@ use App\DomainModel\OrderRiskCheck\CheckResult;
 use App\DomainModel\OrderRiskCheck\Checker\LineItemsCheck;
 use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\PublicDomain\PublicDomainEmailRepositoryInterface;
+use App\Helper\String\GermanCharactersProcessor;
 use App\Helper\String\StringSearch;
 use App\Infrastructure\Repository\FraudRuleRepository;
 use PhpSpec\ObjectBehavior;
@@ -21,7 +22,7 @@ class LineItemsCheckSpec extends ObjectBehavior
         FraudRuleRepository $repository,
         PublicDomainEmailRepositoryInterface $domainEmailRepository
     ) {
-        $this->beConstructedWith($repository, $domainEmailRepository, new StringSearch());
+        $this->beConstructedWith($repository, $domainEmailRepository, new StringSearch(new GermanCharactersProcessor));
     }
 
     public function it_is_initializable()
