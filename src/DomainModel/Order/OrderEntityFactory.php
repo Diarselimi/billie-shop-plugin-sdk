@@ -24,6 +24,7 @@ class OrderEntityFactory
             ->setState(OrderStateManager::STATE_NEW)
             ->setUuid($this->uuidGenerator->uuid4())
             ->setCheckoutSessionId($request->getCheckoutSessionId())
+            ->setCreationSource($request->getCreationSource())
         ;
     }
 
@@ -51,6 +52,7 @@ class OrderEntityFactory
             ->setCreatedAt(new \DateTime($row['created_at']))
             ->setUpdatedAt(new \DateTime($row['updated_at']))
             ->setCheckoutSessionId($row['checkout_session_id'])
+            ->setCreationSource($row['creation_source'])
             ->setCompanyBillingAddressUuid($row['company_billing_address_uuid'])
         ;
     }

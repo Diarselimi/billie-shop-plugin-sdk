@@ -1126,6 +1126,34 @@ paths:
       security:
         -
           oauth2: []
+  /order-dashboard:
+    post:
+      tags:
+        - 'Dashboard Order Creation'
+      summary: 'Create Order For Dashboard'
+      operationId: order_create_dashboard
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '200':
+          description: 'Order successfully created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
   /merchant/users/invitations:
     post:
       tags:

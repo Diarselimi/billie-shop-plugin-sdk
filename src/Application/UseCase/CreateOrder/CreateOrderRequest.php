@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Application\UseCase\CreateOrder;
 
 use App\Application\UseCase\CreateOrder\Request\CreateOrderDebtorCompanyRequest;
@@ -82,6 +84,8 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
     private $merchantId;
 
     private $checkoutSessionId;
+
+    private $creationSource;
 
     /**
      * @Assert\Valid()
@@ -198,6 +202,18 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
     public function setCheckoutSessionId(?int $checkoutSessionId)
     {
         $this->checkoutSessionId = $checkoutSessionId;
+
+        return $this;
+    }
+
+    public function getCreationSource(): string
+    {
+        return $this->creationSource;
+    }
+
+    public function setCreationSource(string $creationSource)
+    {
+        $this->creationSource = $creationSource;
 
         return $this;
     }

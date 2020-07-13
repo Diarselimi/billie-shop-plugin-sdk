@@ -3,8 +3,10 @@
 namespace App\Http\Controller\PublicApi;
 
 use App\Application\UseCase\CheckoutAuthorizeOrder\CheckoutAuthorizeOrderUseCase;
+use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderResponse\CheckoutAuthorizeOrderResponse;
 use App\Http\Authentication\UserProvider;
+use App\Http\HttpConstantsInterface;
 use App\Http\RequestTransformer\CreateOrder\CreateOrderRequestFactory;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -55,6 +57,10 @@ class CheckoutAuthorizeOrderController
 
     public function execute(Request $request): CheckoutAuthorizeOrderResponse
     {
+        $request->attributes->set(
+            HttpConstantsInterface::REQUEST_ATTRIBUTE_CREATION_SOURCE,
+            OrderEntity::CREATION_SOURCE_CHECKOUT
+        );
         $checkoutSession = $this->userProvider->getCheckoutUser()->getCheckoutSession();
         $useCaseRequest = $this->orderRequestFactory->createForAuthorizeCheckoutSession($request, $checkoutSession);
 

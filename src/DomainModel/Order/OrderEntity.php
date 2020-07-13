@@ -18,6 +18,12 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
 
     public const MAX_DURATION_IN_WAITING_STATE = '9 days';
 
+    public const CREATION_SOURCE_API = 'api';
+
+    public const CREATION_SOURCE_CHECKOUT = 'checkout';
+
+    public const CREATION_SOURCE_DASHBOARD = 'dashboard';
+
     private const STATE_TRANSITION_ENTITY_CLASS = OrderStateTransitionEntity::class;
 
     private $uuid;
@@ -53,6 +59,8 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
     private $markedAsFraudAt;
 
     private $checkoutSessionId;
+
+    private $creationSource;
 
     private $companyBillingAddressUuid;
 
@@ -256,6 +264,18 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
     public function setCheckoutSessionId(?int $checkoutSessionId): OrderEntity
     {
         $this->checkoutSessionId = $checkoutSessionId;
+
+        return $this;
+    }
+
+    public function getCreationSource(): string
+    {
+        return $this->creationSource;
+    }
+
+    public function setCreationSource(string $creationSource): OrderEntity
+    {
+        $this->creationSource = $creationSource;
 
         return $this;
     }

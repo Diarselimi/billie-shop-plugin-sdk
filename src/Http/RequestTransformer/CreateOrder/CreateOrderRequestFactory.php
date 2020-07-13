@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\RequestTransformer\CreateOrder;
 
 use App\Application\UseCase\CreateOrder\CreateOrderRequest;
 use App\DomainModel\CheckoutSession\CheckoutSessionEntity;
+use App\DomainModel\Order\OrderEntity;
 use App\Http\HttpConstantsInterface;
 use App\Http\RequestTransformer\AmountRequestFactory;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,6 +42,10 @@ class CreateOrderRequestFactory
         $useCaseRequest = (new CreateOrderRequest())
             ->setAmount($this->amountRequestFactory->create($request))
             ->setCheckoutSessionId($request->attributes->get('checkout_session_id', null))
+            ->setCreationSource($request->attributes->get(
+                HttpConstantsInterface::REQUEST_ATTRIBUTE_CREATION_SOURCE,
+                OrderEntity::CREATION_SOURCE_API
+            ))
             ->setMerchantId($request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID))
             ->setDuration($request->request->getInt('duration'))
             ->setComment($request->request->get('comment'))

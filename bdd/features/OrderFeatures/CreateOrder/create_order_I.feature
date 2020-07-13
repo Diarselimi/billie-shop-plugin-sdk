@@ -211,6 +211,7 @@ Feature:
     }
     """
     Then the order A1 is in state created
+    And the order A1 has creation source "api"
     And the response status code should be 200
     And the JSON response should be:
     """

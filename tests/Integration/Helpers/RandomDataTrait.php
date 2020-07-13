@@ -70,7 +70,8 @@ trait RandomDataTrait
             ->setMerchantDebtorId(null)
             ->setMerchantId($merchantId)
             ->setPaymentId(Uuid::uuid4()->toString())
-            ->setUuid(Uuid::uuid4()->toString());
+            ->setUuid(Uuid::uuid4()->toString())
+            ->setCreationSource(OrderEntity::CREATION_SOURCE_API);
     }
 
     private function getRandomAddress(): AddressEntity

@@ -345,7 +345,8 @@ class PaellaCoreContext extends MinkContext
         $duration,
         $comment,
         $paymentUuid = null,
-        $checkoutSession = null
+        $checkoutSession = null,
+        string $creationSource = OrderEntity::CREATION_SOURCE_API
     ) {
         [$person, $deliveryAddress, $debtor, $merchantDebtor] = $this->debtorData ?? $this->iHaveADebtorWithoutOrders();
 
@@ -362,7 +363,8 @@ class PaellaCoreContext extends MinkContext
             ->setPaymentId($paymentUuid ?? self::DUMMY_UUID4)
             ->setCreatedAt(new \DateTime('2019-05-20 13:00:00'))
             ->setUuid('test-order-uuid' . $externalCode)
-            ->setCompanyBillingAddressUuid('c7be46c0-e049-4312-b274-258ec5aeeb71');
+            ->setCompanyBillingAddressUuid('c7be46c0-e049-4312-b274-258ec5aeeb71')
+            ->setCreationSource($creationSource);
 
         if ($checkoutSession) {
             $checkoutSession = $this->iHaveASessionId(
@@ -455,6 +457,15 @@ class PaellaCoreContext extends MinkContext
                 $state
             ));
         }
+    }
+
+    /**
+     * @Then the order :orderId has creation source :creationSource
+     */
+    public function orderHasCreationSource(string $orderId, string $creationSource)
+    {
+        $order = $this->getOrderRepository()->getOneByExternalCode($orderId, $this->merchant->getId());
+        Assert::eq($order->getCreationSource(), $creationSource);
     }
 
     /**

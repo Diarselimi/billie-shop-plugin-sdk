@@ -140,6 +140,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     And the order A1 is in state declined
     And the response status code should be 200
     And the checkout_session_id "123123" should be valid
+    And the order A1 has creation source "checkout"
 
   Scenario: I success if I try to create an order with a valid session_id, company identified via billing address.
     Given I get from companies service identify with billing address match response

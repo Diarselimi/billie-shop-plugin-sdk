@@ -1,9 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controller\PublicApi;
 
 use App\Application\UseCase\CreateOrder\CreateOrderUseCase;
+use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\OrderResponse\OrderResponse;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
+use App\Http\HttpConstantsInterface;
 use App\Http\RequestTransformer\CreateOrder\CreateOrderRequestFactory;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -11,15 +16,15 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @IsGranted({"ROLE_AUTHENTICATED_AS_MERCHANT"})
+ * @IsGranted({"ROLE_AUTHENTICATED_AS_MERCHANT", "ROLE_CREATE_ORDERS"})
  * @OA\Post(
- *     path="/order",
- *     operationId="order_create",
- *     summary="Create Order",
+ *     path="/order-dashboard",
+ *     operationId="order_create_dashboard",
+ *     summary="Create Order For Dashboard",
  *     security={{"oauth2"={}}},
  *
- *     tags={"Back-end Order Creation"},
- *     x={"groups":{"public"}},
+ *     tags={"Dashboard Order Creation"},
+ *     x={"groups":{"private"}},
  *
  *     @OA\RequestBody(
  *          required=true,
@@ -33,7 +38,7 @@ use Symfony\Component\HttpFoundation\Request;
  *     @OA\Response(response=500, ref="#/components/responses/ServerError")
  * )
  */
-class CreateOrderController
+class CreateDashboardOrderController
 {
     private $createOrderUseCase;
 
@@ -51,13 +56,14 @@ class CreateOrderController
         $this->orderResponseFactory = $orderResponseFactory;
     }
 
-    public function execute(Request $request): JsonResponse
+    public function execute(Request $request): OrderResponse
     {
+        $request->attributes->set(
+            HttpConstantsInterface::REQUEST_ATTRIBUTE_CREATION_SOURCE,
+            OrderEntity::CREATION_SOURCE_DASHBOARD
+        );
         $useCaseRequest = $this->orderRequestFactory->createForCreateOrder($request);
 
-        return new JsonResponse(
-            $this->createOrderUseCase->execute($useCaseRequest)->toArray(),
-            JsonResponse::HTTP_OK
-        );
+        return $this->createOrderUseCase->execute($useCaseRequest);
     }
 }

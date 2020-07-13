@@ -15,7 +15,7 @@ install:
 	bin/docker/composer install --ignore-platform-reqs --no-interaction
 	bin/docker/composer dumpautoload
 	make clear-cache
-	make migrate
+	make test-migrate
 
 clear-cache:
 	rm -rf var/cache
@@ -28,7 +28,7 @@ start:
 test:
 	make start
 	make docs
-	make migrate
+	make test-migrate
 	make test-phpspec
 	make test-phpunit
 	make test-behat
@@ -46,7 +46,7 @@ docs:
 	bin/docker/app bin/generate-api-docs checkout-client --with-extra-config
 	bin/docker/run-rm swagger-cli validate /openapi/paella-openapi-checkout-client.yaml
 
-migrate:
+test-migrate:
 	echo " > Running DB migrations... "
 	sleep 15 # give time to the mysql server to be ready
 	bin/docker/app vendor/bin/phinx migrate
