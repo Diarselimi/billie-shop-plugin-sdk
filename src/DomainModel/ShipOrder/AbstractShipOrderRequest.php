@@ -18,6 +18,7 @@ abstract class AbstractShipOrderRequest extends AbstractOrderRequest implements 
 {
     /**
      * @Assert\NotBlank(groups={"RequiredExternalCode"})
+     * @Assert\Type(type="string")
      * @Assert\Length(max="255")
      * @CustomAssert\OrderExternalCode()
      */
@@ -35,7 +36,7 @@ abstract class AbstractShipOrderRequest extends AbstractOrderRequest implements 
         return $this->externalOrderId;
     }
 
-    public function setExternalCode(?string $externalCode): self
+    public function setExternalCode($externalCode): self
     {
         $this->externalOrderId = $externalCode;
 

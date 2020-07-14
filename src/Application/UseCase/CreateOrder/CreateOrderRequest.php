@@ -58,6 +58,8 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
 
     /**
      * @CustomConstrains\OrderExternalCode()
+     * @Assert\Type(type="string")
+     * @Assert\NotBlank(allowNull = true)
      * @Assert\Length(max=255)
      */
     private $externalCode;
@@ -139,7 +141,7 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
         return $this->externalCode;
     }
 
-    public function setExternalCode(?string $externalCode): CreateOrderRequest
+    public function setExternalCode($externalCode): CreateOrderRequest
     {
         $this->externalCode = $externalCode;
 

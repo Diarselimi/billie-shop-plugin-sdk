@@ -24,6 +24,8 @@ class UpdateOrderRequest extends AbstractOrderRequest implements
 {
     /**
      * @PaellaAssert\OrderExternalCode()
+     * @Assert\Type(type="string")
+     * @Assert\NotBlank(allowNull = true)
      * @Assert\Length(max=255)
      */
     private $externalCode;
@@ -103,7 +105,7 @@ class UpdateOrderRequest extends AbstractOrderRequest implements
         return $this->externalCode;
     }
 
-    public function setExternalCode(?string $externalCode): UpdateOrderRequest
+    public function setExternalCode($externalCode): UpdateOrderRequest
     {
         $this->externalCode = $externalCode;
 
