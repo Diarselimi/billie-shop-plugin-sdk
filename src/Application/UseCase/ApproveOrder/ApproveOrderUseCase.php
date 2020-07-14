@@ -14,6 +14,7 @@ use App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedBillingAddressCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DeliveryAddressCheck;
 use App\DomainModel\OrderRiskCheck\Checker\FraudScoreCheck;
 use App\DomainModel\OrderRiskCheck\Checker\LimitCheck;
+use App\DomainModel\OrderRiskCheck\CheckResult;
 
 class ApproveOrderUseCase
 {
@@ -21,6 +22,7 @@ class ApproveOrderUseCase
         DeliveryAddressCheck::NAME,
         DebtorIdentifiedBillingAddressCheck::NAME,
         FraudScoreCheck::NAME,
+        LimitCheck::NAME,
     ];
 
     private $orderContainerFactory;
@@ -60,10 +62,12 @@ class ApproveOrderUseCase
         }
 
         if (!$this->orderChecksRunnerService->rerunFailedChecks($orderContainer, self::RISK_CHECKS_TO_SKIP)) {
+            $firstFailed = $orderContainer->getRiskCheckResultCollection()->getFirstDeclined();
+
             throw new WorkflowException(
                 sprintf(
                     "Cannot approve the order. failed risk checks: %s",
-                    implode(', ', $this->declinedReasonsMapper->mapReasons($orderContainer->getOrder()))
+                    $this->declinedReasonsMapper->mapReason($firstFailed)
                 )
             );
         }
@@ -73,6 +77,6 @@ class ApproveOrderUseCase
 
     private function rerunLimitCheck(OrderContainer $orderContainer): bool
     {
-        return $this->orderChecksRunnerService->rerunCheck($orderContainer, LimitCheck::NAME);
+        return $this->orderChecksRunnerService->rerunChecks($orderContainer, [LimitCheck::NAME]);
     }
 }

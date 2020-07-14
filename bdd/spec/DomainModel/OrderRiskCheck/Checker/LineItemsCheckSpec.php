@@ -6,7 +6,7 @@ use App\DomainModel\FraudRules\FraudRuleEntity;
 use App\DomainModel\FraudRules\FraudRuleRepositoryInterface;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\OrderLineItem\OrderLineItemEntity;
-use App\DomainModel\OrderRiskCheck\Checker\CheckResult;
+use App\DomainModel\OrderRiskCheck\CheckResult;
 use App\DomainModel\OrderRiskCheck\Checker\LineItemsCheck;
 use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\PublicDomain\PublicDomainEmailRepositoryInterface;

@@ -3,7 +3,7 @@
 namespace App\DomainModel\OrderRiskCheck\Checker;
 
 use App\DomainModel\Order\OrderContainer\OrderContainer;
-use Ozean12\Money\Money;
+use App\DomainModel\OrderRiskCheck\CheckResult;
 
 class AmountCheck implements CheckInterface
 {

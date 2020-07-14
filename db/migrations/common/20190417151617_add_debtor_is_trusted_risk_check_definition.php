@@ -1,6 +1,6 @@
 <?php
 
-use App\DomainModel\OrderRiskCheck\Checker\DebtorIsTrusted;
+use App\DomainModel\OrderRiskCheck\Checker\DebtorIsTrustedCheck;
 use App\Infrastructure\Repository\MerchantRepository;
 use App\Infrastructure\Repository\MerchantRiskCheckSettingsRepository;
 use App\Infrastructure\Repository\RiskCheckDefinitionRepository;
@@ -12,12 +12,12 @@ class AddDebtorIsTrustedRiskCheckDefinition extends AbstractMigration
     {
         $currentDatetime = (new DateTime())->format('Y-m-d H:i:s');
         $this->table(RiskCheckDefinitionRepository::TABLE_NAME)->insert([
-            'name' => DebtorIsTrusted::NAME,
+            'name' => DebtorIsTrustedCheck::NAME,
             'created_at' => $currentDatetime,
             'updated_at' => $currentDatetime,
         ])->save();
 
-        $definitionRow = $this->fetchRow("SELECT * FROM ".RiskCheckDefinitionRepository::TABLE_NAME." WHERE name = '".DebtorIsTrusted::NAME."'");
+        $definitionRow = $this->fetchRow("SELECT * FROM ".RiskCheckDefinitionRepository::TABLE_NAME." WHERE name = '".DebtorIsTrustedCheck::NAME."'");
 
         $merchantIds = $this->fetchAll("SELECT id AS merchant_id FROM ". MerchantRepository::TABLE_NAME);
 

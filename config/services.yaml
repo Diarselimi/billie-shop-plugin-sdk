@@ -138,7 +138,7 @@ services:
             debtor_identified: '@App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedCheck'
             debtor_identified_strict: '@App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedStrictCheck'
             debtor_identified_billing_address: '@App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedBillingAddressCheck'
-            debtor_is_trusted: '@App\DomainModel\OrderRiskCheck\Checker\DebtorIsTrusted'
+            debtor_is_trusted: '@App\DomainModel\OrderRiskCheck\Checker\DebtorIsTrustedCheck'
             delivery_address: '@App\DomainModel\OrderRiskCheck\Checker\DeliveryAddressCheck'
             fraud_score: '@App\DomainModel\OrderRiskCheck\Checker\FraudScoreCheck'
 

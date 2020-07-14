@@ -15,6 +15,8 @@ use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntity;
+use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
 use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonRepositoryInterface;
 use Ramsey\Uuid\Uuid;
@@ -145,6 +147,63 @@ trait RandomDataTrait
         return $merchant;
     }
 
+    private function getRandomOrderEntity(): OrderEntity
+    {
+        $order = new OrderEntity();
+        $this->fillObject($order);
+        $merchantDebtor = new MerchantDebtorEntity();
+        $this->fillObject($merchantDebtor);
+
+        $merchantId = $this->getMerchantFromSeed()->getId();
+        $merchantDebtor->setMerchantId((string) $merchantId);
+
+        $address = new AddressEntity();
+        $this->fillObject($address);
+        $this->createAddress($address);
+
+        $person = new PersonEntity();
+        $this->fillObject($person);
+        $this->createPerson($person);
+
+        $externalData = new DebtorExternalDataEntity();
+        $this->fillObject($externalData);
+        $externalData
+            ->setAddressId($address->getId())
+            ->setBillingAddressId($address->getId());
+        $this->createDebtorExternalData($externalData);
+
+        $this->createMerchantDebtor($merchantDebtor);
+        $order->setMerchantDebtorId($merchantDebtor->getId());
+        $order->setMerchantId($merchantId);
+        $order->setDebtorExternalDataId($externalData->getId());
+        $order->setDeliveryAddressId($address->getId());
+        $order->setDebtorPersonId($person->getId());
+
+        $this->createOrder($order);
+
+        return $order;
+    }
+
+    private function generateSomeFailingOrderRiskChecks(int $orderId): array
+    {
+        $riskChecks = $this->getRiskChecksDefinitionsFromSeed();
+        $uniqueFailedRiskChecks = [];
+
+        foreach ($riskChecks as $check) {
+            $orderRiskCheck = new OrderRiskCheckEntity();
+            $this->fillObject($orderRiskCheck);
+            $orderRiskCheck->setOrderId($orderId);
+            $orderRiskCheck->setRiskCheckDefinition($check);
+            $this->createOrderRiskCheck($orderRiskCheck);
+
+            if (!$orderRiskCheck->isPassed()) {
+                $uniqueFailedRiskChecks[$orderRiskCheck->getRiskCheckDefinition()->getName()] = $orderRiskCheck;
+            }
+        }
+
+        return $uniqueFailedRiskChecks;
+    }
+
     private function createDebtorExternalData(DebtorExternalDataEntity $entity): DebtorExternalDataEntity
     {
         $this->getContainer()->get(DebtorExternalDataRepositoryInterface::class)->insert($entity);
@@ -188,6 +247,13 @@ trait RandomDataTrait
     private function createMerchantDebtor(MerchantDebtorEntity $entity): MerchantDebtorEntity
     {
         $this->getContainer()->get(MerchantDebtorRepositoryInterface::class)->insert($entity);
+
+        return $entity;
+    }
+
+    private function createOrderRiskCheck(OrderRiskCheckEntity $entity): OrderRiskCheckEntity
+    {
+        $this->getContainer()->get(OrderRiskCheckRepositoryInterface::class)->insert($entity);
 
         return $entity;
     }

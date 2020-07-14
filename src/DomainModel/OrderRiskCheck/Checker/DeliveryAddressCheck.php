@@ -4,6 +4,7 @@ namespace App\DomainModel\OrderRiskCheck\Checker;
 
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
+use App\DomainModel\OrderRiskCheck\CheckResult;
 use App\Helper\Hasher\ArrayHasherInterface;
 
 class DeliveryAddressCheck implements CheckInterface

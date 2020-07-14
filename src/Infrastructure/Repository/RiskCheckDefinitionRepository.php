@@ -11,7 +11,7 @@ class RiskCheckDefinitionRepository extends AbstractPdoRepository implements Ris
 {
     public const TABLE_NAME = "risk_check_definitions";
 
-    private const SELECT_FIELDS = 'id, name, created_at, updated_at';
+    private const SELECT_FIELDS = ['id', 'name', 'created_at', 'updated_at'];
 
     private $factory;
 
@@ -22,8 +22,9 @@ class RiskCheckDefinitionRepository extends AbstractPdoRepository implements Ris
 
     public function insert(RiskCheckDefinitionEntity $riskCheckDefinitionEntity): void
     {
+        $fields = self::SELECT_FIELDS;
         $id = $this->doInsert(
-            'INSERT INTO '.self::TABLE_NAME.' (name, created_at, updated_at) VALUES (:name, :created_at, :updated_at)',
+            $this->generateInsertQuery(self::TABLE_NAME, array_slice($fields, 1)),
             [
                 'name' => $riskCheckDefinitionEntity->getName(),
                 'created_at' => $riskCheckDefinitionEntity->getCreatedAt()->format(self::DATE_FORMAT),
@@ -37,10 +38,29 @@ class RiskCheckDefinitionRepository extends AbstractPdoRepository implements Ris
     public function getByName(string $name): ?RiskCheckDefinitionEntity
     {
         $row = $this->doFetchOne(
-            'SELECT ' . self::SELECT_FIELDS . ' FROM '.self::TABLE_NAME.' WHERE name = :name',
+            $this->generateSelectQuery(self::TABLE_NAME, self::SELECT_FIELDS) . ' WHERE name = :name',
             ['name' => $name]
         );
 
         return $row ? $this->factory->createFromDatabaseRow($row) : null;
+    }
+
+    public function getById(int $id): ?RiskCheckDefinitionEntity
+    {
+        $row = $this->doFetchOne(
+            $this->generateSelectQuery(self::TABLE_NAME, self::SELECT_FIELDS) . ' WHERE id = :id',
+            ['id' => $id]
+        );
+
+        return $row ? $this->factory->createFromDatabaseRow($row) : null;
+    }
+
+    public function getAll(): array
+    {
+        $rows = $this->doFetchAll(
+            $this->generateSelectQuery(self::TABLE_NAME, self::SELECT_FIELDS)
+        );
+
+        return $rows ? $this->factory->createFromDatabaseRows($rows) : [];
     }
 }
