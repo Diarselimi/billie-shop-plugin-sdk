@@ -2,7 +2,7 @@
   "decision_uuid": "0771833a-4c08-4ecc-b70a-15b8f1da728d",
   "created_at": "2020-06-01 10:00:00",
   "expires_at": "2020-06-15 10:00:00",
-  "is_eligible": true,
+  "is_eligible": false,
   "scores": [
     {
       "id": 101,
@@ -16,6 +16,13 @@
       "source_uuid": "f6aafe86-78d2-495b-950d-1af81d3cae31",
       "name": "ecrefo",
       "status": "not_available",
+      "score": null
+    },
+    {
+      "id": 103,
+      "source_uuid": "579df473-38d9-4def-8c9e-b2766929d867",
+      "name": "crefo",
+      "status": "failed",
       "score": null
     }
   ]

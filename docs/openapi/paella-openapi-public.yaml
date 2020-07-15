@@ -552,6 +552,7 @@ components:
       type: string
       enum:
         - risk_policy
+        - risk_scoring_failed
         - debtor_not_identified
         - debtor_address
         - debtor_limit_exceeded
@@ -959,6 +960,7 @@ components:
           type: string
           enum:
             - risk_policy
+            - risk_scoring_failed
             - debtor_not_identified
             - debtor_address
             - debtor_limit_exceeded

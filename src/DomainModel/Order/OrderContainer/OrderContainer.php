@@ -6,6 +6,7 @@ use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorCompany\IdentifiedDebtorCompany;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
+use App\DomainModel\DebtorScoring\DebtorScoringResponseDTO;
 use App\DomainModel\DebtorSettings\DebtorSettingsEntity;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
@@ -54,6 +55,8 @@ class OrderContainer
     private $relationLoader;
 
     private $riskCheckResultCollection;
+
+    private $debtorScoringResponse;
 
     public function __construct(OrderEntity $order, OrderContainerRelationLoader $relationLoader)
     {
@@ -259,6 +262,18 @@ class OrderContainer
     public function setRiskCheckResultCollection(CheckResultCollection $checkResultCollection)
     {
         $this->riskCheckResultCollection = $checkResultCollection;
+
+        return $this;
+    }
+
+    public function getDebtorScoringResponse(): ?DebtorScoringResponseDTO
+    {
+        return $this->debtorScoringResponse;
+    }
+
+    public function setDebtorScoringResponse(DebtorScoringResponseDTO $debtorScoringResponse): OrderContainer
+    {
+        $this->debtorScoringResponse = $debtorScoringResponse;
 
         return $this;
     }

@@ -4,5 +4,5 @@ namespace App\DomainModel\DebtorScoring;
 
 interface ScoringServiceInterface
 {
-    public function isEligibleForPayAfterDelivery(DebtorScoringRequestDTO $requestDTO): bool;
+    public function scoreDebtor(DebtorScoringRequestDTO $requestDTO): DebtorScoringResponseDTO;
 }

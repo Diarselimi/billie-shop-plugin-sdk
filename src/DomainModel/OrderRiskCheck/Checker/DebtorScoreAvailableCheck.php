@@ -7,9 +7,9 @@ namespace App\DomainModel\OrderRiskCheck\Checker;
 use App\DomainModel\DebtorScoring\DebtorScoringResponseDTO;
 use App\DomainModel\OrderRiskCheck\CheckResult;
 
-class DebtorScoreCheck extends AbstractDebtorScoreCheck
+class DebtorScoreAvailableCheck extends AbstractDebtorScoreCheck
 {
-    public const NAME = 'company_b2b_score';
+    public const NAME = 'debtor_score_available';
 
     protected function getName(): string
     {
@@ -18,6 +18,6 @@ class DebtorScoreCheck extends AbstractDebtorScoreCheck
 
     protected function createCheckResult(DebtorScoringResponseDTO $scoringResponse): CheckResult
     {
-        return new CheckResult($scoringResponse->isEligible(), $this->getName());
+        return new CheckResult($scoringResponse->hasFailed() === false, $this->getName());
     }
 }

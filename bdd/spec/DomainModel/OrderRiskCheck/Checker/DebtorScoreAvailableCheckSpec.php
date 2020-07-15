@@ -9,11 +9,11 @@ use App\DomainModel\DebtorScoring\DebtorScoringRequestDTOFactory;
 use App\DomainModel\DebtorScoring\DebtorScoringResponseDTO;
 use App\DomainModel\DebtorScoring\ScoringServiceInterface;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
-use App\DomainModel\OrderRiskCheck\Checker\DebtorScoreCheck;
+use App\DomainModel\OrderRiskCheck\Checker\DebtorScoreAvailableCheck;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
-class DebtorScoreCheckSpec extends ObjectBehavior
+class DebtorScoreAvailableCheckSpec extends ObjectBehavior
 {
     use RiskCheckSpecHelperTrait;
 
@@ -29,7 +29,7 @@ class DebtorScoreCheckSpec extends ObjectBehavior
 
     public function it_is_initializable()
     {
-        $this->shouldHaveType(DebtorScoreCheck::class);
+        $this->shouldHaveType(DebtorScoreAvailableCheck::class);
     }
 
     public function it_will_return_true_and_avoid_scoring_if_the_debtor_is_not_trusted_source(
@@ -37,7 +37,7 @@ class DebtorScoreCheckSpec extends ObjectBehavior
     ) {
         $this->setDebtorIsTrustedSourceFlag(false, $orderContainer);
         $this->setDebtorIsWhitelistedSourceFlag(false, $orderContainer);
-        $this->check($orderContainer)->shouldBeLike($this->passCheckResult(DebtorScoreCheck::NAME));
+        $this->check($orderContainer)->shouldBeLike($this->passCheckResult(DebtorScoreAvailableCheck::NAME));
     }
 
     public function it_will_return_true_and_avoid_scoring_if_the_debtor_is_whitelisted(
@@ -45,7 +45,7 @@ class DebtorScoreCheckSpec extends ObjectBehavior
     ) {
         $this->setDebtorIsTrustedSourceFlag(true, $orderContainer);
         $this->setDebtorIsWhitelistedSourceFlag(true, $orderContainer);
-        $this->check($orderContainer)->shouldBeLike($this->passCheckResult(DebtorScoreCheck::NAME));
+        $this->check($orderContainer)->shouldBeLike($this->passCheckResult(DebtorScoreAvailableCheck::NAME));
     }
 
     public function it_should_not_score_again_if_order_container_has_scoring_response(
@@ -55,10 +55,10 @@ class DebtorScoreCheckSpec extends ObjectBehavior
         $this->setDebtorIsTrustedSourceFlag(true, $orderContainer);
         $this->setDebtorIsWhitelistedSourceFlag(false, $orderContainer);
 
-        $response = (new DebtorScoringResponseDTO())->setIsEligible(true);
+        $response = (new DebtorScoringResponseDTO())->setHasFailed(false);
         $orderContainer->getDebtorScoringResponse()->willReturn($response);
         $scoringService->scoreDebtor(Argument::type(DebtorScoringRequestDTO::class))->shouldNotBeCalled();
-        $this->check($orderContainer)->shouldBeLike($this->passCheckResult(DebtorScoreCheck::NAME));
+        $this->check($orderContainer)->shouldBeLike($this->passCheckResult(DebtorScoreAvailableCheck::NAME));
     }
 
     public function it_should_request_score_if_order_container_has_no_scoring_response(
@@ -70,14 +70,14 @@ class DebtorScoreCheckSpec extends ObjectBehavior
 
         $orderContainer->getDebtorScoringResponse()->willReturn(null);
         $orderContainer->setDebtorScoringResponse(Argument::any())->willReturn($orderContainer);
-        $response = (new DebtorScoringResponseDTO())->setIsEligible(true);
+        $response = (new DebtorScoringResponseDTO())->setHasFailed(false);
         $scoringService->scoreDebtor(Argument::type(DebtorScoringRequestDTO::class))
             ->shouldBeCalled()
             ->willReturn($response);
-        $this->check($orderContainer)->shouldBeLike($this->passCheckResult(DebtorScoreCheck::NAME));
+        $this->check($orderContainer)->shouldBeLike($this->passCheckResult(DebtorScoreAvailableCheck::NAME));
     }
 
-    public function it_should_not_pass_if_score_is_not_eligible(
+    public function it_should_not_pass_if_score_is_failed(
         ScoringServiceInterface $scoringService,
         OrderContainer $orderContainer
     ) {
@@ -86,13 +86,13 @@ class DebtorScoreCheckSpec extends ObjectBehavior
 
         $orderContainer->getDebtorScoringResponse()->willReturn(null);
         $orderContainer->setDebtorScoringResponse(Argument::any())->willReturn($orderContainer);
-        $response = (new DebtorScoringResponseDTO())->setIsEligible(false);
+        $response = (new DebtorScoringResponseDTO())->setHasFailed(true);
         $scoringService->scoreDebtor(Argument::type(DebtorScoringRequestDTO::class))
             ->shouldBeCalled()->willReturn($response);
-        $this->check($orderContainer)->shouldBeLike($this->notPassCheckResult(DebtorScoreCheck::NAME));
+        $this->check($orderContainer)->shouldBeLike($this->notPassCheckResult(DebtorScoreAvailableCheck::NAME));
     }
 
-    public function it_should_pass_if_score_is_eligible(
+    public function it_should_pass_if_score_is_not_failed(
         ScoringServiceInterface $scoringService,
         OrderContainer $orderContainer
     ) {
@@ -101,9 +101,9 @@ class DebtorScoreCheckSpec extends ObjectBehavior
 
         $orderContainer->getDebtorScoringResponse()->willReturn(null);
         $orderContainer->setDebtorScoringResponse(Argument::any())->willReturn($orderContainer);
-        $response = (new DebtorScoringResponseDTO())->setIsEligible(true);
+        $response = (new DebtorScoringResponseDTO())->setHasFailed(false);
         $scoringService->scoreDebtor(Argument::type(DebtorScoringRequestDTO::class))
             ->shouldBeCalled()->willReturn($response);
-        $this->check($orderContainer)->shouldBeLike($this->passCheckResult(DebtorScoreCheck::NAME));
+        $this->check($orderContainer)->shouldBeLike($this->passCheckResult(DebtorScoreAvailableCheck::NAME));
     }
 }

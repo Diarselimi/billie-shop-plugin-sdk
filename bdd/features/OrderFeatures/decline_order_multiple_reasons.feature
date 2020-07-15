@@ -1,5 +1,5 @@
 Feature:
-  If the order creation fails with multiple reasons then the one that was declined with first should be returned as a reason.
+  If the order creation fails with multiple reasons then the one that was declined with should be returned as a reason.
 
   Background:
     Given I add "Content-type" header equal to "application/json"
@@ -23,7 +23,8 @@ Feature:
     And I get from companies service get debtor response
     And I get from payments service get debtor response
 
-  Scenario: When multiple reasons fail then we should return the first reason that was declined for
+  Scenario: When multiple reasons fail then we should return the reason that was declined for,
+  the first one one that is declinable.
     Given The following merchant risk check settings exist for merchant 1:
       | risk_check_name           | enabled | decline_on_failure |
       | available_financing_limit | 1       | 0                  |
@@ -93,7 +94,8 @@ Feature:
     And the response status code should be 200
     And the JSON at "decline_reason" should be "risk_policy"
 
-  Scenario: When multiple reasons fail then we should return the reason that was declined for.
+  Scenario: When multiple reasons fail then we should return the reason that was declined for,
+  the first one one that is declinable.
     Given The following merchant risk check settings exist for merchant 1:
       | risk_check_name           | enabled | decline_on_failure |
       | available_financing_limit | 1       | 1                  |
@@ -110,7 +112,7 @@ Feature:
       | debtor_overdue            | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
     And I get from companies service identify match response
-    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
+    And I get from scoring service bad debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And Debtor has insufficient limit
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:

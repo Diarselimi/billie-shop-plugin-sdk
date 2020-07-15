@@ -20,7 +20,7 @@ class ScoringServiceContext implements Context
      */
     public function iGetFromScoringServiceGoodDebtorScoringDecisionForDebtor($uuid)
     {
-        $this->mockRequest("/debtor-scoring/$uuid", new ResponseStack(
+        $this->mockRequest("/debtor-scoring/{$uuid}", new ResponseStack(
             new MockResponse(file_get_contents(__DIR__.'/../resources/scoring_service_decision_good.json'))
         ));
     }
@@ -30,8 +30,28 @@ class ScoringServiceContext implements Context
      */
     public function iGetFromScoringServiceBadDebtorScoringDecisionForDebtor($uuid)
     {
-        $this->mockRequest("/debtor-scoring/$uuid", new ResponseStack(
+        $this->mockRequest("/debtor-scoring/{$uuid}", new ResponseStack(
             new MockResponse(file_get_contents(__DIR__.'/../resources/scoring_service_decision_bad.json'))
+        ));
+    }
+
+    /**
+     * @Given I get from scoring service a failed debtor scoring decision for debtor :uuid
+     */
+    public function iGetFromScoringServiceFailedDebtorScoringDecisionForDebtor($uuid)
+    {
+        $this->mockRequest("/debtor-scoring/{$uuid}", new ResponseStack(
+            new MockResponse(file_get_contents(__DIR__.'/../resources/scoring_service_decision_failed.json'))
+        ));
+    }
+
+    /**
+     * @Given I get from scoring service a response with status code :status and body :body for debtor :uuid
+     */
+    public function iGetFromScoringService($status, $body, $uuid)
+    {
+        $this->mockRequest("/debtor-scoring/{$uuid}", new ResponseStack(
+            new MockResponse($body, [], $status)
         ));
     }
 }

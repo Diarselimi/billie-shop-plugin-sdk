@@ -1,3 +1,22 @@
 {
-    "is_eligible": false
+  "decision_uuid": "0771833a-4c08-4ecc-b70a-15b8f1da728d",
+  "created_at": "2020-06-01 10:00:00",
+  "expires_at": "2020-06-15 10:00:00",
+  "is_eligible": false,
+  "scores": [
+    {
+      "id": 101,
+      "source_uuid": "a2d55f79-dea9-493b-ae23-ffb53d5c25bf",
+      "name": "schufa",
+      "status": "available",
+      "score": 400
+    },
+    {
+      "id": 102,
+      "source_uuid": "f6aafe86-78d2-495b-950d-1af81d3cae31",
+      "name": "ecrefo",
+      "status": "not_available",
+      "score": null
+    }
+  ]
 }

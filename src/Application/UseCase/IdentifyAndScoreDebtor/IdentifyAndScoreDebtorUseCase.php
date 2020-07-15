@@ -142,7 +142,7 @@ class IdentifyAndScoreDebtorUseCase
             $debtorScoreThresholds
         );
 
-        return $this->scoringService->isEligibleForPayAfterDelivery($debtorScoringRequestDTO);
+        return $this->scoringService->scoreDebtor($debtorScoringRequestDTO)->isEligible();
     }
 
     private function setLimit(MerchantEntity $merchant, MerchantDebtorEntity $merchantDebtor, float $limit)

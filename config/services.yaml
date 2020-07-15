@@ -119,6 +119,7 @@ services:
         - 'debtor_blacklisted'
         - 'debtor_overdue'
         - 'limit'
+        - 'debtor_score_available'
         - 'company_b2b_score'
       $checkLoader: !service
         class: Symfony\Component\DependencyInjection\ServiceLocator
@@ -132,6 +133,7 @@ services:
             debtor_overdue: '@App\DomainModel\OrderRiskCheck\Checker\DebtorOverdueCheck'
             debtor_blacklisted: '@App\DomainModel\OrderRiskCheck\Checker\DebtorBlacklistedCheck'
             available_financing_limit: '@App\DomainModel\OrderRiskCheck\Checker\AvailableFinancingLimitCheck'
+            debtor_score_available: '@App\DomainModel\OrderRiskCheck\Checker\DebtorScoreAvailableCheck'
             company_b2b_score: '@App\DomainModel\OrderRiskCheck\Checker\DebtorScoreCheck'
             limit: '@App\DomainModel\OrderRiskCheck\Checker\LimitCheck'
             line_items: '@App\DomainModel\OrderRiskCheck\Checker\LineItemsCheck'
