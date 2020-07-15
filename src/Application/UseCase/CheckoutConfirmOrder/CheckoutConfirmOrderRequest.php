@@ -89,7 +89,7 @@ class CheckoutConfirmOrderRequest implements ValidatedRequestInterface
         return $this->debtorCompanyRequest;
     }
 
-    public function setDebtorCompanyRequest(DebtorCompanyRequest $debtorCompanyRequest): CheckoutConfirmOrderRequest
+    public function setDebtorCompanyRequest(?DebtorCompanyRequest $debtorCompanyRequest): CheckoutConfirmOrderRequest
     {
         $this->debtorCompanyRequest = $debtorCompanyRequest;
 

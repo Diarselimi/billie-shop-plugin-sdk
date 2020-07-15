@@ -2,11 +2,12 @@
 
 namespace spec\App\Application\UseCase\CheckoutConfirmOrder;
 
-use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmDataMismatchException;
+use App\Application\Exception\RequestValidationException;
 use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmOrderRequest;
 use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmOrderUseCase;
 use App\DomainModel\CheckoutSession\CheckoutOrderMatcherInterface;
 use App\DomainModel\CheckoutSession\CheckoutOrderRequestDTO;
+use App\DomainModel\CheckoutSession\CheckoutOrderMatcherViolationList;
 use App\DomainModel\DebtorCompany\DebtorCompanyRequest;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
@@ -34,7 +35,8 @@ class CheckoutConfirmOrderUseCaseSpec extends ObjectBehavior
         $this->beConstructedWith(...func_get_args());
 
         $this->setValidator($validator);
-        $validator->validate(Argument::any(), Argument::any(), Argument::any())->willReturn(new ConstraintViolationList());
+        $validator->validate(Argument::any(), Argument::any(), Argument::any())
+            ->willReturn(new ConstraintViolationList());
 
         $orderContainer->getOrder()->willReturn($order);
         $orderContainerFactory->loadNotYetConfirmedByCheckoutSessionUuid('test123')->willReturn($orderContainer);
@@ -62,9 +64,9 @@ class CheckoutConfirmOrderUseCaseSpec extends ObjectBehavior
 
         $dataMatcher->matches(Argument::type(CheckoutOrderRequestDTO::class), $orderContainer)
             ->shouldBeCalled()
-            ->willReturn(false);
+            ->willReturn(new CheckoutOrderMatcherViolationList(['foo' => 'bar']));
 
-        $this->shouldThrow(CheckoutConfirmDataMismatchException::class)->during('execute', [$request, $checkoutSessionUuid]);
+        $this->shouldThrow(RequestValidationException::class)->during('execute', [$request, $checkoutSessionUuid]);
     }
 
     public function it_should_approve_order_if_data_is_valid_and_not_in_pre_waiting(
@@ -84,7 +86,7 @@ class CheckoutConfirmOrderUseCaseSpec extends ObjectBehavior
 
         $dataMatcher->matches(Argument::type(CheckoutOrderRequestDTO::class), $orderContainer)
                     ->shouldBeCalled()
-                    ->willReturn(true);
+                    ->willReturn(new CheckoutOrderMatcherViolationList());
 
         $orderStateManager->isPreWaiting($order)->shouldBeCalled()->willReturn(false);
         $orderStateManager->wait($orderContainer)->shouldNotBeCalled();
@@ -111,7 +113,7 @@ class CheckoutConfirmOrderUseCaseSpec extends ObjectBehavior
 
         $dataMatcher->matches(Argument::type(CheckoutOrderRequestDTO::class), $orderContainer)
                     ->shouldBeCalled()
-                    ->willReturn(true);
+                    ->willReturn(new CheckoutOrderMatcherViolationList());
 
         $orderStateManager->isPreWaiting($order)->shouldBeCalled()->willReturn(true);
         $orderStateManager->wait($orderContainer)->shouldBeCalled();

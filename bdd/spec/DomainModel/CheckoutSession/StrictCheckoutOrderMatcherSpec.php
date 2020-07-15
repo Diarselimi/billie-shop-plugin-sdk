@@ -4,6 +4,7 @@ namespace spec\App\DomainModel\CheckoutSession;
 
 use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
 use App\DomainModel\Address\AddressEntity;
+use App\DomainModel\CheckoutSession\CheckoutOrderMatcherViolationList;
 use App\DomainModel\CheckoutSession\CheckoutOrderRequestDTO;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\CompanyRequestFactory;
@@ -29,11 +30,15 @@ class StrictCheckoutOrderMatcherSpec extends ObjectBehavior
         $this->beConstructedWith($companiesService, $requestFactory);
         $this->setLogger($logger);
 
-        $requestFactory->createCompanyStrictMatchRequestDTO(Argument::cetera())->willReturn(new StrictMatchRequestDTO([1], []));
-        $requestFactory->createCompanyStrictMatchRequestDTOFromAddress(Argument::cetera())->willReturn(new StrictMatchRequestDTO([2], []));
+        $requestFactory->createCompanyStrictMatchRequestDTO(Argument::cetera())->willReturn(
+            new StrictMatchRequestDTO(['foo' => 'bar'], [])
+        );
+        $requestFactory->createCompanyStrictMatchRequestDTOFromAddress(Argument::cetera())->willReturn(
+            new StrictMatchRequestDTO(['foo2' => 'bar2'], [])
+        );
     }
 
-    public function it_should_return_false_when_billing_address_does_not_match(
+    public function it_should_have_mismatches_when_address_does_not_match(
         CheckoutOrderRequestDTO $requestDTO,
         OrderContainer $orderContainer,
         OrderFinancialDetailsEntity $orderFinancialDetails,
@@ -45,6 +50,10 @@ class StrictCheckoutOrderMatcherSpec extends ObjectBehavior
         CreateOrderAddressRequest $addressRequest,
         OrderEntity $orderEntity
     ) {
+        $companyRequest->toArray()->willReturn(['address_street' => 'test']);
+        $addressRequest->toArray()->willReturn(['street' => 'test']);
+        $orderEntity->getCompanyBillingAddressUuid()->willReturn('some-uuid');
+
         $orderFinancialDetails->getAmountNet()->willReturn(new Money(4));
         $orderFinancialDetails->getAmountTax()->willReturn(new Money(4));
         $orderFinancialDetails->getAmountGross()->willReturn(new Money(8));
@@ -66,12 +75,20 @@ class StrictCheckoutOrderMatcherSpec extends ObjectBehavior
         $orderContainer->getDebtorExternalData()->willReturn($debtorExternalDataEntity);
         $orderContainer->getOrder()->willReturn($orderEntity);
 
-        $companiesService->strictMatchDebtor(new StrictMatchRequestDTO([1], []))->willReturn(true);
-        $companiesService->strictMatchDebtor(new StrictMatchRequestDTO([2], []))->willReturn(false);
+        $companiesService->strictMatchDebtor(Argument::type(StrictMatchRequestDTO::class))->willReturn(false);
 
         $requestDTO->getDeliveryAddress()->willReturn($addressRequest);
+        $orderContainer->getBillingAddress()->willReturn($addressEntity);
         $orderContainer->getDeliveryAddress()->willReturn($addressEntity);
 
-        $this->matches($requestDTO, $orderContainer)->shouldBe(false);
+        $mismatches = [
+            'delivery_address' => ['street' => 'test'],
+            'debtor_company' => ['address_street' => 'test'],
+        ];
+
+        $expectedViolationList = new CheckoutOrderMatcherViolationList($mismatches);
+
+        $this->matches($requestDTO, $orderContainer)->getIterator()->getArrayCopy()
+            ->shouldBeLike($expectedViolationList->getIterator()->getArrayCopy());
     }
 }

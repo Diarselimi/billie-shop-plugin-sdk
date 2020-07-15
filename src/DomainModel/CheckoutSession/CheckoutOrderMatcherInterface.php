@@ -8,5 +8,8 @@ use App\DomainModel\Order\OrderContainer\OrderContainer;
 
 interface CheckoutOrderMatcherInterface
 {
-    public function matches(CheckoutOrderRequestDTO $request, OrderContainer $orderContainer): bool;
+    public function matches(
+        CheckoutOrderRequestDTO $request,
+        OrderContainer $orderContainer
+    ): CheckoutOrderMatcherViolationList;
 }

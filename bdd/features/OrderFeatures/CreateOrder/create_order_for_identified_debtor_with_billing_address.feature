@@ -103,7 +103,6 @@ Feature:
     """
     Then the response status code should be 200
     And the order A1 is in state created
-    And print last JSON response
     And the JSON response should be:
     """
     {

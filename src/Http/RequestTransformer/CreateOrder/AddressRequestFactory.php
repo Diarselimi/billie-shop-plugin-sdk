@@ -9,9 +9,9 @@ class AddressRequestFactory
 {
     public function create(Request $request, string $fieldName): ?CreateOrderAddressRequest
     {
-        $data = $request->request->get($fieldName, []);
+        $data = $request->request->get($fieldName);
 
-        if (empty($data)) {
+        if (!is_array($data) || empty($data)) {
             return null;
         }
 

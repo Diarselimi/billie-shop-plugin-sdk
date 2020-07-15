@@ -19,16 +19,27 @@ class CompanyRequestFactory
     }
 
     public function createCompanyStrictMatchRequestDTO(
-        DebtorCompanyRequest $companyRequest,
-        AddressEntity $debtorAddress,
-        string $companyName
+        DebtorCompanyRequest $company,
+        AddressEntity $addressToCompare,
+        string $nameToCompare
     ): StrictMatchRequestDTO {
         return new StrictMatchRequestDTO(
             $this->createDebtorCompanyData(
-                $this->entityFactory->createFromAddressRequest($companyRequest->getAddressRequest()),
-                $companyRequest->getName()
+                $this->entityFactory->createFromAddressRequest($company->getAddressRequest()),
+                $company->getName()
             ),
-            $this->createDebtorCompanyData($debtorAddress, $companyName)
+            $this->createDebtorCompanyData($addressToCompare, $nameToCompare)
+        );
+    }
+
+    public function createCompanyStrictMatchRequestDTOFromAddress(
+        CreateOrderAddressRequest $address,
+        AddressEntity $addressToCompare,
+        ?string $nameToCompare = 'default'
+    ) {
+        return new StrictMatchRequestDTO(
+            $this->createDebtorCompanyData($this->entityFactory->createFromAddressRequest($address), $nameToCompare),
+            $this->createDebtorCompanyData($addressToCompare, $nameToCompare)
         );
     }
 
@@ -42,16 +53,5 @@ class CompanyRequestFactory
             'address_city' => $address->getCity(),
             'address_country' => $address->getCountry(),
         ];
-    }
-
-    public function createCompanyStrictMatchRequestDTOFromAddress(
-        CreateOrderAddressRequest $addressRequest,
-        AddressEntity $addressEntity,
-        ?string $companyName = 'default'
-    ) {
-        return new StrictMatchRequestDTO(
-            $this->createDebtorCompanyData($this->entityFactory->createFromAddressRequest($addressRequest), $companyName),
-            $this->createDebtorCompanyData($addressEntity, $companyName)
-        );
     }
 }

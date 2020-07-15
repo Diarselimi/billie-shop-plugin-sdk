@@ -2,6 +2,7 @@
 
 namespace App\Application\UseCase\CreateOrder\Request;
 
+use App\DomainModel\ArrayableInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use OpenApi\Annotations as OA;
 
@@ -22,7 +23,7 @@ use OpenApi\Annotations as OA;
  *     }
  * )
  */
-class CreateOrderAddressRequest
+class CreateOrderAddressRequest implements ArrayableInterface
 {
     /**
      * @Assert\Length(max=255)
@@ -128,5 +129,17 @@ class CreateOrderAddressRequest
         $this->country = $country;
 
         return $this;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'addition' => $this->getAddition(),
+            'house_number' => $this->getHouseNumber(),
+            'street' => $this->getStreet(),
+            'city' => $this->getCity(),
+            'postal_code' => $this->getPostalCode(),
+            'country' => $this->getCountry(),
+        ];
     }
 }

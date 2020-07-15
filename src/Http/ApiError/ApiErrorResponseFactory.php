@@ -3,6 +3,7 @@
 namespace App\Http\ApiError;
 
 use App\Application\Exception\RequestValidationException;
+use App\DomainModel\CheckoutSession\CheckoutOrderMatcherViolationList;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
@@ -45,13 +46,20 @@ class ApiErrorResponseFactory
     private function createFromRequestValidationException(RequestValidationException $exception): ApiErrorResponse
     {
         $errors = [];
+        $violationList = $exception->getValidationErrors();
+        $useInvalidValues = ($violationList instanceof CheckoutOrderMatcherViolationList);
 
         /** @var ConstraintViolationInterface $validationError */
         foreach ($exception->getValidationErrors() as $validationError) {
+            $additionalData = [];
+            if ($useInvalidValues) {
+                $additionalData = ['source_value' => $validationError->getInvalidValue()];
+            }
             $errors[] = new ApiError(
                 $validationError->getMessage(),
                 ApiError::CODE_REQUEST_VALIDATION_ERROR,
-                $this->propertyNameConverter->normalize($validationError->getPropertyPath())
+                $this->propertyNameConverter->normalize($validationError->getPropertyPath()),
+                $additionalData
             );
         }
 

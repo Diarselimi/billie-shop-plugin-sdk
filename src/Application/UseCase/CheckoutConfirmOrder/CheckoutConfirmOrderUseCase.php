@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\UseCase\CheckoutConfirmOrder;
 
 use App\Application\Exception\OrderNotFoundException;
+use App\Application\Exception\RequestValidationException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\CheckoutSession\CheckoutOrderMatcherInterface;
@@ -52,9 +53,7 @@ class CheckoutConfirmOrderUseCase implements ValidatedUseCaseInterface
             throw new OrderNotFoundException($exception);
         }
 
-        if (!$this->hasMatchingData($request, $orderContainer)) {
-            throw new CheckoutConfirmDataMismatchException();
-        }
+        $this->assureDataMatches($request, $orderContainer);
 
         if ($this->stateManager->isPreWaiting($orderContainer->getOrder())) {
             $this->stateManager->wait($orderContainer);
@@ -65,7 +64,7 @@ class CheckoutConfirmOrderUseCase implements ValidatedUseCaseInterface
         return $this->orderResponseFactory->create($orderContainer);
     }
 
-    private function hasMatchingData(CheckoutConfirmOrderRequest $request, OrderContainer $orderContainer): bool
+    private function assureDataMatches(CheckoutConfirmOrderRequest $request, OrderContainer $orderContainer): void
     {
         $orderRequestDto = (new CheckoutOrderRequestDTO())
             ->setSessionUuid($request->getSessionUuid())
@@ -74,6 +73,10 @@ class CheckoutConfirmOrderUseCase implements ValidatedUseCaseInterface
             ->setDeliveryAddress($request->getDeliveryAddress())
             ->setDuration($request->getDuration());
 
-        return $this->dataMatcher->matches($orderRequestDto, $orderContainer);
+        $mismatchViolationList = $this->dataMatcher->matches($orderRequestDto, $orderContainer);
+
+        if ($mismatchViolationList->hasMismatches()) {
+            throw new RequestValidationException($mismatchViolationList);
+        }
     }
 }

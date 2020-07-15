@@ -25,7 +25,7 @@ class CheckoutConfirmOrderRequestFactory
 
     public function create(Request $request, string $sessionUuid): CheckoutConfirmOrderRequest
     {
-        $debtorCompanyData = $request->request->get('debtor_company', []);
+        $debtorCompanyData = $request->request->get('debtor_company');
         $duration = $request->request->getInt('duration', 0);
 
         return (new CheckoutConfirmOrderRequest())
@@ -36,8 +36,12 @@ class CheckoutConfirmOrderRequestFactory
             ->setSessionUuid($sessionUuid);
     }
 
-    private function buildDebtorCompanyRequest(array $requestData): DebtorCompanyRequest
+    private function buildDebtorCompanyRequest($requestData): ?DebtorCompanyRequest
     {
+        if (!is_array($requestData) || empty($requestData)) {
+            return null;
+        }
+
         $addressRequest = $this->addressRequestFactory->createFromOldFormat($requestData);
 
         return (new DebtorCompanyRequest())

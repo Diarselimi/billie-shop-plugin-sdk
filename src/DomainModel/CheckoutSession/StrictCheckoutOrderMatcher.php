@@ -8,9 +8,11 @@ use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\CompanyRequestFactory;
+use App\DomainModel\DebtorCompany\DebtorCompanyRequest;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
+use Ozean12\Money\TaxedMoney\TaxedMoney;
 
 class StrictCheckoutOrderMatcher implements CheckoutOrderMatcherInterface, LoggingInterface
 {
@@ -26,78 +28,135 @@ class StrictCheckoutOrderMatcher implements CheckoutOrderMatcherInterface, Loggi
         $this->requestFactory = $requestFactory;
     }
 
-    public function matches(CheckoutOrderRequestDTO $request, OrderContainer $orderContainer): bool
-    {
-        $orderFinancialDetails = $orderContainer->getOrderFinancialDetails();
+    public function matches(
+        CheckoutOrderRequestDTO $request,
+        OrderContainer $orderContainer
+    ): CheckoutOrderMatcherViolationList {
+        $result = new CheckoutOrderMatcherViolationList();
+        $financialDetails = $orderContainer->getOrderFinancialDetails();
 
-        $matchAmount = $orderFinancialDetails->getAmountGross()->equals($request->getAmount()->getGross()) &&
-            $orderFinancialDetails->getAmountNet()->equals($request->getAmount()->getNet()) &&
-            $orderFinancialDetails->getAmountTax()->equals($request->getAmount()->getTax());
+        $matchAmount = (new TaxedMoney(
+            $financialDetails->getAmountGross(),
+            $financialDetails->getAmountNet(),
+            $financialDetails->getAmountTax()
+        ))->equals($request->getAmount());
 
         if (!$matchAmount) {
             $this->logInfo('[StrictCheckoutOrderMatcher] Amount mismatch');
-
-            return false;
+            $result->addMismatch(
+                'amount',
+                [
+                    'gross' => $request->getAmount()->getGross()->getMoneyValue(),
+                    'net' => $request->getAmount()->getNet()->getMoneyValue(),
+                    'tax' => $request->getAmount()->getTax()->getMoneyValue(),
+                ]
+            );
         }
 
-        $matchDuration = $request->getDuration() === $orderFinancialDetails->getDuration();
+        $matchDuration = $request->getDuration() === $financialDetails->getDuration();
 
         if (!$matchDuration) {
             $this->logInfo('[StrictCheckoutOrderMatcher] Duration mismatch');
-
-            return false;
+            $result->addMismatch('duration', $request->getDuration());
         }
 
-        $companyNameFromDB = $orderContainer->getDebtorExternalData()->getName();
+        if ($request->getDeliveryAddress() !== null && $this->isDeliveryAddressMismatch($request, $orderContainer)) {
+            $result->addMismatch('delivery_address', $request->getDeliveryAddress()->toArray());
+        }
 
-        $isMatch = $this->strictMatchCompanyAddress($request, $orderContainer->getDebtorExternalDataAddress(), $companyNameFromDB);
-        if (!$isMatch && $orderContainer->getOrder()->getCompanyBillingAddressUuid()) {
-            $this->logInfo('Debtor company address mismatch, falling back to billing address');
+        if ($this->isCompanyAddressMismatch($request, $orderContainer)) {
+            $hasBillingAddress = ($orderContainer->getOrder()->getCompanyBillingAddressUuid() !== null);
 
-            $isMatch = $this->strictMatchCompanyAddress($request, $orderContainer->getBillingAddress(), $companyNameFromDB);
-            if (!$isMatch) {
-                $this->logInfo('[StrictCheckoutOrderMatcher] Debtor mismatch');
-
-                return false;
+            if ($hasBillingAddress) {
+                $this->logInfo(
+                    '[StrictCheckoutOrderMatcher] Debtor company address mismatch, falling back to billing address'
+                );
+                if ($this->isCompanyBillingAddressMismatch($request, $orderContainer)) {
+                    $result->addMismatch('debtor_company', $request->getDebtorCompany()->toArray());
+                } else {
+                    $this->logInfo('[StrictCheckoutOrderMatcher] Matching billing address found.');
+                }
+            } else {
+                $result->addMismatch('debtor_company', $request->getDebtorCompany()->toArray());
             }
         }
 
-        $isMatch = $this->strictMatchDeliveryAddress(
-            $request->getDeliveryAddress(),
-            $orderContainer->getDeliveryAddress(),
-            $companyNameFromDB
-        );
-
-        if (!$isMatch) {
-            $this->logInfo('[StrictCheckoutOrderMatcher] Delivery address mismatch');
-        }
-
-        return $isMatch;
+        return $result;
     }
 
-    private function strictMatchCompanyAddress(CheckoutOrderRequestDTO $request, AddressEntity $addressEntity, string $companyNameFromDB): bool
-    {
-        $requestCompanyDTO = $this->requestFactory->createCompanyStrictMatchRequestDTO(
+    private function isCompanyAddressMismatch(
+        CheckoutOrderRequestDTO $request,
+        OrderContainer $orderContainer
+    ): bool {
+        $externalDataCompanyName = $orderContainer->getDebtorExternalData()->getName();
+
+        return !$this->checkCompanyMatch(
             $request->getDebtorCompany(),
-            $addressEntity,
-            $companyNameFromDB
+            $orderContainer->getDebtorExternalDataAddress(),
+            $externalDataCompanyName
+        );
+    }
+
+    private function isCompanyBillingAddressMismatch(
+        CheckoutOrderRequestDTO $request,
+        OrderContainer $orderContainer
+    ): bool {
+        $externalDataCompanyName = $orderContainer->getDebtorExternalData()->getName();
+
+        $isMatch = $this->checkCompanyMatch(
+            $request->getDebtorCompany(),
+            $orderContainer->getBillingAddress(),
+            $externalDataCompanyName
+        );
+        if (!$isMatch) {
+            $this->logInfo('[StrictCheckoutOrderMatcher] Debtor billing address mismatch');
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private function isDeliveryAddressMismatch(
+        CheckoutOrderRequestDTO $request,
+        OrderContainer $orderContainer
+    ): bool {
+        $isMatch = $this->checkAddressMatch(
+            $request->getDeliveryAddress(),
+            $orderContainer->getDeliveryAddress()
+        );
+        if (!$isMatch) {
+            $this->logInfo('[StrictCheckoutOrderMatcher] Debtor delivery address mismatch');
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private function checkCompanyMatch(
+        DebtorCompanyRequest $requestCompany,
+        AddressEntity $addressToCompare,
+        string $nameToCompare
+    ): bool {
+        $requestCompanyDTO = $this->requestFactory->createCompanyStrictMatchRequestDTO(
+            $requestCompany,
+            $addressToCompare,
+            $nameToCompare
         );
 
         return $this->companiesService->strictMatchDebtor($requestCompanyDTO);
     }
 
-    private function strictMatchDeliveryAddress(?CreateOrderAddressRequest $requestDeliveryAddress, AddressEntity $existingDeliveryAddress, string $companyNameFromDB): bool
-    {
-        if ($requestDeliveryAddress === null) {
-            return true;
-        }
-
-        $strictMatchDeliveryDTO = $this->requestFactory->createCompanyStrictMatchRequestDTOFromAddress(
-            $requestDeliveryAddress,
-            $existingDeliveryAddress,
-            $companyNameFromDB
+    private function checkAddressMatch(
+        CreateOrderAddressRequest $requestAddress,
+        AddressEntity $addressToCompare
+    ): bool {
+        $requestCompanyDTO = $this->requestFactory->createCompanyStrictMatchRequestDTOFromAddress(
+            $requestAddress,
+            $addressToCompare
         );
 
-        return $this->companiesService->strictMatchDebtor($strictMatchDeliveryDTO);
+        return $this->companiesService->strictMatchDebtor($requestCompanyDTO);
     }
 }

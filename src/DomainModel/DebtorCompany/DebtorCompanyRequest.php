@@ -3,6 +3,7 @@
 namespace App\DomainModel\DebtorCompany;
 
 use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
+use App\DomainModel\ArrayableInterface;
 use OpenApi\Annotations as OA;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -22,7 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     }
  * )
  */
-class DebtorCompanyRequest
+class DebtorCompanyRequest implements ArrayableInterface
 {
     /**
      * @Assert\NotBlank()
@@ -99,5 +100,20 @@ class DebtorCompanyRequest
         $this->addressRequest = $addressRequest;
 
         return $this;
+    }
+
+    public function toArray(): array
+    {
+        $address = $this->getAddressRequest();
+
+        return [
+            'name' => $this->getName(),
+            'address_addition' => $address->getAddition(),
+            'address_house_number' => $address->getHouseNumber(),
+            'address_street' => $address->getStreet(),
+            'address_city' => $address->getCity(),
+            'address_postal_code' => $address->getPostalCode(),
+            'address_country' => $address->getCountry(),
+        ];
     }
 }

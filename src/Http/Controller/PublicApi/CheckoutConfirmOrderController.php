@@ -3,14 +3,12 @@
 namespace App\Http\Controller\PublicApi;
 
 use App\Application\Exception\OrderNotFoundException;
-use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmDataMismatchException;
-use App\Http\RequestTransformer\CheckoutConfirmOrderRequestFactory;
 use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmOrderUseCase;
+use App\Http\RequestTransformer\CheckoutConfirmOrderRequestFactory;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -43,26 +41,24 @@ class CheckoutConfirmOrderController
 {
     private $useCase;
 
-    private $requestFactory;
+    private $confirmOrderRequestFactory;
 
     public function __construct(
         CheckoutConfirmOrderUseCase $checkoutSessionUseCase,
-        CheckoutConfirmOrderRequestFactory $factory
+        CheckoutConfirmOrderRequestFactory $confirmOrderRequestFactory
     ) {
         $this->useCase = $checkoutSessionUseCase;
-        $this->requestFactory = $factory;
+        $this->confirmOrderRequestFactory = $confirmOrderRequestFactory;
     }
 
     public function execute(Request $request, string $sessionUuid): JsonResponse
     {
-        $checkoutRequest = $this->requestFactory->create($request, $sessionUuid);
+        $checkoutRequest = $this->confirmOrderRequestFactory->create($request, $sessionUuid);
 
         try {
             $orderResponse = $this->useCase->execute($checkoutRequest);
         } catch (OrderNotFoundException $exception) {
             throw new NotFoundHttpException($exception->getMessage());
-        } catch (CheckoutConfirmDataMismatchException $exception) {
-            throw new BadRequestHttpException($exception->getMessage());
         }
 
         return new JsonResponse($orderResponse->toArray(), JsonResponse::HTTP_ACCEPTED);

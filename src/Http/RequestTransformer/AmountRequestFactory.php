@@ -12,9 +12,9 @@ class AmountRequestFactory
 {
     public function create(Request $request): TaxedMoney
     {
-        $amountData = $request->request->get('amount', []);
+        $amountData = $request->request->get('amount');
 
-        return $this->createFromArray($amountData);
+        return $this->createFromArray(is_array($amountData) ? $amountData : []);
     }
 
     public function createFromArray(array $amountData): TaxedMoney

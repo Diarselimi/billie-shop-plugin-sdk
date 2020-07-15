@@ -37,7 +37,7 @@ Feature: As a merchant, I should be able to create an order by providing a valid
     Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
     And I get from companies service a good debtor strict match response
     And I get from companies service get debtor response
-		And I get from payments service get order details response
+    And I get from payments service get order details response
     And Debtor lock limit call succeeded
     And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
     # for debtor_company, use data from \PaellaCoreContext::iHaveADebtorWithoutOrders
@@ -132,27 +132,7 @@ Feature: As a merchant, I should be able to create an order by providing a valid
         {
           "title": "This value should not be blank.",
           "code": "request_validation_error",
-          "source": "debtor_company_request.name"
-        },
-        {
-          "title": "This value should not be blank.",
-          "code": "request_validation_error",
-          "source": "debtor_company_request.address_street"
-        },
-        {
-          "title": "This value should not be blank.",
-          "code": "request_validation_error",
-          "source": "debtor_company_request.address_city"
-        },
-        {
-          "title": "This value should not be blank.",
-          "code": "request_validation_error",
-          "source": "debtor_company_request.address_postal_code"
-        },
-        {
-          "title": "This value should not be blank.",
-          "code": "request_validation_error",
-          "source": "debtor_company_request.address_country"
+          "source": "debtor_company_request"
         }
       ]
     }
@@ -183,7 +163,7 @@ Feature: As a merchant, I should be able to create an order by providing a valid
     """
     And the response status code should be 404
 
-  Scenario: I fail to confirm the order if I send the wrong gross amount
+  Scenario: I fail to confirm the order if I send a different amount
     Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
     And I get from companies service a good debtor strict match response
     And I get from companies service get debtor response
@@ -191,8 +171,8 @@ Feature: As a merchant, I should be able to create an order by providing a valid
     """
     {
        "amount":{
-          "gross":80.0,
-          "net":90.0,
+          "gross":101.0,
+          "net":91.0,
           "tax":10.0
        },
        "duration":30,
@@ -209,62 +189,23 @@ Feature: As a merchant, I should be able to create an order by providing a valid
     }
     """
     Then the order CO123 is in state authorized
-    And the response status code should be 400
-
-  Scenario: I fail to confirm the order if I send the wrong net amount
-    Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
-    And I get from companies service a good debtor strict match response
-    And I get from companies service get debtor response
-    And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
+    Then the JSON response should be:
     """
     {
-       "amount":{
-          "gross":100.0,
-          "net":85.0,
-          "tax":10.0
-       },
-       "duration":30,
-       "debtor_company":{
-          "name":"Test User Company",
-          "legal_form": "GmbH",
-          "address_addition":"lorem ipsum",
-          "address_house_number":"10",
-          "address_street":"Heinrich-Heine-Platz",
-          "address_city":"Berlin",
-          "address_postal_code":"10179",
-          "address_country":"DE"
-       }
+      "errors": [
+        {
+          "title": "Value of [amount] does not match the original one.",
+          "code": "request_validation_error",
+          "source": "amount",
+          "source_value": {
+            "gross":101.0,
+            "net":91.0,
+            "tax":10.0
+         }
+        }
+      ]
     }
     """
-    Then the order CO123 is in state authorized
-    And the response status code should be 400
-
-  Scenario: I fail to confirm the order if I send the wrong tax amount
-    Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
-    And I get from companies service a good debtor strict match response
-    And I get from companies service get debtor response
-    And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
-    """
-    {
-       "amount":{
-          "gross":100.0,
-          "net":90.0,
-          "tax":15.0
-       },
-       "duration":30,
-       "debtor_company":{
-          "name":"Test User Company",
-          "legal_form": "GmbH",
-          "address_addition":"lorem ipsum",
-          "address_house_number":"10",
-          "address_street":"Heinrich-Heine-Platz",
-          "address_city":"Berlin",
-          "address_postal_code":"10179",
-          "address_country":"DE"
-       }
-    }
-    """
-    Then the order CO123 is in state authorized
     And the response status code should be 400
 
   Scenario: I fail to confirm the order if I send the wrong duration
@@ -293,6 +234,19 @@ Feature: As a merchant, I should be able to create an order by providing a valid
     }
     """
     Then the order CO123 is in state authorized
+    Then the JSON response should be:
+    """
+    {
+      "errors": [
+        {
+          "title": "Value of [duration] does not match the original one.",
+          "code": "request_validation_error",
+          "source": "duration",
+          "source_value": 40
+        }
+      ]
+    }
+    """
     And the response status code should be 400
 
   Scenario: I fail to confirm the order if I send mismatched debtor company
@@ -320,6 +274,112 @@ Feature: As a merchant, I should be able to create an order by providing a valid
     }
     """
     Then the order CO123 is in state authorized
+    Then the JSON response should be:
+    """
+    {
+      "errors": [
+        {
+          "title": "Value of [debtor_company] does not match the original one.",
+          "code": "request_validation_error",
+          "source": "debtor_company",
+          "source_value": {
+              "name":"Different Company",
+              "address_addition":"lorem ipsum",
+              "address_house_number":"10",
+              "address_street":"Heinrich-Heine-Platz",
+              "address_city":"Somewhere",
+              "address_postal_code":"10179",
+              "address_country":"DE"
+           }
+        }
+      ]
+    }
+    """
+    And the response status code should be 400
+
+  Scenario: Multiple mismatch errors returned when multiple properties have mismatches
+    Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
+    And I get from companies service a bad debtor strict match response
+    And I get from companies service get debtor response
+    And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
+    """
+    {
+       "amount":{
+          "gross":101.0,
+          "net":91.0,
+          "tax":10.0
+       },
+       "duration":31,
+       "debtor_company":{
+          "name":"Different Company",
+          "address_addition":"lorem ipsum",
+          "address_house_number":"10",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_city":"Somewhere",
+          "address_postal_code":"10179",
+          "address_country":"DE"
+       },
+       "delivery_address":{
+          "addition":"lorem ipsum",
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city":"Somewhere",
+          "postal_code":"10179",
+          "country":"DE"
+       }
+    }
+    """
+    Then the order CO123 is in state authorized
+    Then the JSON response should be:
+    """
+    {
+      "errors": [
+        {
+          "title": "Value of [amount] does not match the original one.",
+          "code": "request_validation_error",
+          "source": "amount",
+          "source_value": {
+            "gross": 101,
+            "net": 91,
+            "tax": 10
+          }
+        },
+        {
+          "title": "Value of [duration] does not match the original one.",
+          "code": "request_validation_error",
+          "source": "duration",
+          "source_value": 31
+        },
+        {
+          "title": "Value of [delivery_address] does not match the original one.",
+          "code": "request_validation_error",
+          "source": "delivery_address",
+          "source_value": {
+            "addition": null,
+            "house_number": "10",
+            "street": "Heinrich-Heine-Platz",
+            "city": "Somewhere",
+            "postal_code": "10179",
+            "country": "DE"
+          }
+        },
+        {
+          "title": "Value of [debtor_company] does not match the original one.",
+          "code": "request_validation_error",
+          "source": "debtor_company",
+          "source_value": {
+            "name": "Different Company",
+            "address_addition": "lorem ipsum",
+            "address_house_number": "10",
+            "address_street": "Heinrich-Heine-Platz",
+            "address_city": "Somewhere",
+            "address_postal_code": "10179",
+            "address_country": "DE"
+          }
+        }
+      ]
+    }
+    """
     And the response status code should be 400
 
   Scenario: Successfully order confirmation returns exactly the same decimal numbers for amounts
@@ -354,3 +414,88 @@ Feature: As a merchant, I should be able to create an order by providing a valid
     And the JSON at "amount" should be 100.3
     And the JSON at "amount_net" should be 99.1
     And the JSON at "amount_tax" should be 1.2
+
+  Scenario: Returns proper errors when data is null
+    Given I have a authorized order "CO123" with amounts 100.3/99.1/1.2, duration 30 and checkout session "123123CO123"
+    And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
+    """
+    {
+       "amount": null,
+       "duration": null,
+       "debtor_company": null,
+       "delivery_address": null
+    }
+    """
+    Then the JSON response should be:
+    """
+    {
+      "errors": [
+        {
+          "title": "This value should not be blank.",
+          "code": "request_validation_error",
+          "source": "amount.gross"
+        },
+        {
+          "title": "This value should not be blank.",
+          "code": "request_validation_error",
+          "source": "amount.net"
+        },
+        {
+          "title": "This value should not be blank.",
+          "code": "request_validation_error",
+          "source": "amount.tax"
+        },
+        {
+          "title": "This value should be between 1 and 120.",
+          "code": "request_validation_error",
+          "source": "duration"
+        },
+        {
+          "title": "This value should not be blank.",
+          "code": "request_validation_error",
+          "source": "debtor_company_request"
+        }
+      ]
+    }
+    """
+    And the response status code should be 400
+
+  Scenario: Returns proper errors when data is not provided
+    Given I have a authorized order "CO123" with amounts 100.3/99.1/1.2, duration 30 and checkout session "123123CO123"
+    And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
+    """
+    {}
+    """
+    Then the JSON response should be:
+    """
+    {
+      "errors": [
+        {
+          "title": "This value should not be blank.",
+          "code": "request_validation_error",
+          "source": "amount.gross"
+        },
+        {
+          "title": "This value should not be blank.",
+          "code": "request_validation_error",
+          "source": "amount.net"
+        },
+        {
+          "title": "This value should not be blank.",
+          "code": "request_validation_error",
+          "source": "amount.tax"
+        },
+        {
+          "title": "This value should be between 1 and 120.",
+          "code": "request_validation_error",
+          "source": "duration"
+        },
+        {
+          "title": "This value should not be blank.",
+          "code": "request_validation_error",
+          "source": "debtor_company_request"
+        }
+      ]
+    }
+    """
+    And the response status code should be 400
