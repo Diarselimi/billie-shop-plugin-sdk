@@ -40,6 +40,8 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class CreateDashboardOrderController
 {
+    private const DEFAULT_LEGAL_FORM = '99999';
+
     private $createOrderUseCase;
 
     private $orderRequestFactory;
@@ -62,6 +64,10 @@ class CreateDashboardOrderController
             HttpConstantsInterface::REQUEST_ATTRIBUTE_CREATION_SOURCE,
             OrderEntity::CREATION_SOURCE_DASHBOARD
         );
+        $debtorCompany = $request->request->get('debtor_company', []);
+        $debtorCompany['legal_form'] = $debtorCompany['legal_form'] ? $debtorCompany['legal_form'] : self::DEFAULT_LEGAL_FORM;
+        $request->request->set('debtor_company', $debtorCompany);
+
         $useCaseRequest = $this->orderRequestFactory->createForCreateOrder($request);
 
         return $this->createOrderUseCase->execute($useCaseRequest);
