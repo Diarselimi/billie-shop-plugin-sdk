@@ -151,4 +151,18 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
             'updated_at' => $externalData->getUpdatedAt()->format(self::DATE_FORMAT),
         ]);
     }
+
+    public function getMerchantDebtorExternalIds(int $merchantDebtorId): array
+    {
+        return $this->doFetchAll(
+            '
+            SELECT DISTINCT ' . self::TABLE_NAME.'.merchant_external_id as external_id' . ' FROM ' . self::TABLE_NAME . '
+            INNER JOIN orders ON orders.debtor_external_data_id = ' . self::TABLE_NAME . '.id
+            WHERE orders.merchant_debtor_id = :merchant_debtor_id
+            ORDER BY  ' . self::TABLE_NAME . '.created_at DESC',
+            [
+                'merchant_debtor_id' => $merchantDebtorId,
+            ]
+        );
+    }
 }

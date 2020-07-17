@@ -20,4 +20,6 @@ interface DebtorExternalDataRepositoryInterface
     public function invalidateMerchantExternalIdAndDebtorHashForCompanyUuid(string $companyUuid): void;
 
     public function update(DebtorExternalDataEntity $externalData): void;
+
+    public function getMerchantDebtorExternalIds(int $id): array;
 }

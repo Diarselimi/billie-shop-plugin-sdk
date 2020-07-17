@@ -1353,6 +1353,37 @@ paths:
       security:
         -
           oauth2: []
+  '/debtor/{uuid}/external-ids':
+    get:
+      tags:
+        - 'Dashboard Debtors'
+      summary: 'Get Debtor External Ids'
+      operationId: debtor_get_external_ids
+      parameters:
+        -
+          name: uuid
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: 'Debtor details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantDebtorExternalIdsListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
   /debtors:
     get:
       tags:
@@ -3829,6 +3860,17 @@ components:
       allOf:
         -
           $ref: '#/components/schemas/MerchantDebtorResponse'
+    MerchantDebtorExternalIdsListResponse:
+      properties:
+        total:
+          type: integer
+          minimum: 0
+        items:
+          type: array
+          items:
+            type: string
+            $ref: '#/components/schemas/TinyText'
+      type: object
     MerchantDebtorListResponse:
       properties:
         total:
