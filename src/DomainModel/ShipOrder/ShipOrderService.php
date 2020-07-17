@@ -15,7 +15,6 @@ use App\DomainModel\OrderPayment\OrderPaymentService;
 use App\DomainModel\OrderResponse\OrderResponse;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
 use App\DomainModel\Payment\PaymentsServiceRequestException;
-use App\Helper\Uuid\UuidGeneratorInterface;
 
 class ShipOrderService implements ValidatedUseCaseInterface
 {
@@ -32,13 +31,11 @@ class ShipOrderService implements ValidatedUseCaseInterface
     private $orderPaymentService;
 
     public function __construct(
-        UuidGeneratorInterface $uuidGenerator,
         OrderStateManager $orderStateManager,
         OrderResponseFactory $orderResponseFactory,
         OrderRepositoryInterface $orderRepository,
         OrderPaymentService $orderPaymentService
     ) {
-        $this->uuidGenerator = $uuidGenerator;
         $this->orderStateManager = $orderStateManager;
         $this->orderResponseFactory = $orderResponseFactory;
         $this->orderRepository = $orderRepository;
@@ -47,7 +44,7 @@ class ShipOrderService implements ValidatedUseCaseInterface
 
     public function validate(AbstractShipOrderRequest $request, OrderEntity $order)
     {
-        $validationGroups = $order->getExternalCode() === null ? ['Default', 'RequiredExternalCode'] : ['Default'];
+        $validationGroups = $order->getExternalCode() ? ['Default'] : ['Default', 'RequiredExternalCode'];
         $this->validateRequest($request, null, $validationGroups);
 
         if (!$this->orderStateManager->can($order, OrderStateManager::TRANSITION_SHIP)) {

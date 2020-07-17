@@ -36,7 +36,6 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
         OrderInvoiceManager $invoiceManager,
         OrderContainerFactory $orderContainerFactory,
         UuidGeneratorInterface $uuidGenerator,
-        OrderStateManager $orderStateManager,
         ShipOrderService $shipOrderService,
         OrderContainer $orderContainer,
         OrderEntity $order,

@@ -10,7 +10,6 @@ use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderInvoice\InvoiceUploadHandlerInterface;
 use App\DomainModel\OrderInvoice\OrderInvoiceManager;
 use App\DomainModel\OrderInvoice\OrderInvoiceUploadException;
@@ -29,21 +28,17 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface
 
     private $uuidGenerator;
 
-    private $orderStateManager;
-
     private $shipOrderService;
 
     public function __construct(
         OrderInvoiceManager $invoiceManager,
         OrderContainerFactory $orderContainerFactory,
         UuidGeneratorInterface $uuidGenerator,
-        OrderStateManager $orderStateManager,
         ShipOrderService $shipOrderService
     ) {
         $this->invoiceManager = $invoiceManager;
         $this->orderContainerFactory = $orderContainerFactory;
         $this->uuidGenerator = $uuidGenerator;
-        $this->orderStateManager = $orderStateManager;
         $this->shipOrderService = $shipOrderService;
     }
 

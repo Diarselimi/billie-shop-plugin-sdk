@@ -124,6 +124,28 @@ Feature: APIS-1077
     {"errors":[{"title":"Order was marked as fraud","code":"forbidden"}]}
     """
 
+  Scenario: Order external id is blank
+    Given I have a created order with amounts 1000/900/100, duration 30 and comment "test order"
+    When I send a PATCH request to "/order/test-order-uuid" with body:
+    """
+    {
+      "order_id": ""
+    }
+    """
+    Then the response status code should be 400
+    And the JSON response should be:
+    """
+    {
+     "errors":[
+      {
+        "title": "This value should be null or non-blank string.",
+        "code": "request_validation_error",
+        "source": "external_code"
+      }
+     ]
+    }
+    """
+
   Scenario Template: Provided amount is wrong: tax is wrongly calculated
     Given I have a new order "abc123" with amounts 1000/900/100, duration 30 and comment "test order"
     When I send a PATCH request to "/order/abc123" with body:
@@ -256,7 +278,6 @@ Feature: APIS-1077
     """
     {"errors":[{"title":"This value should be between 1 and 120.","code":"request_validation_error","source":"duration"}]}
     """
-
 
   Scenario: Changing external code is not allowed because it was already set
     Given I have a created order "abc123" with amounts 1000/900/100, duration 30 and comment "test order"

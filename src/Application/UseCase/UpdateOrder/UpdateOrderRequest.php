@@ -23,9 +23,9 @@ class UpdateOrderRequest extends AbstractOrderRequest implements
     UpdateOrderAmountInterface
 {
     /**
+     * @Assert\NotBlank(allowNull=true, message="This value should be null or non-blank string.")
      * @PaellaAssert\OrderExternalCode()
      * @Assert\Type(type="string")
-     * @Assert\NotBlank(allowNull = true)
      * @Assert\Length(max=255)
      */
     private $externalCode;

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Application\UseCase\ShipOrderWithInvoice;
 
-use App\Application\UseCase\ValidatedRequestInterface;
 use App\DomainModel\ArrayableInterface;
 use App\DomainModel\ShipOrder\AbstractShipOrderRequest;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -19,7 +18,7 @@ use OpenApi\Annotations as OA;
  *     }
  * )
  */
-class ShipOrderWithInvoiceRequest extends AbstractShipOrderRequest implements ValidatedRequestInterface, ArrayableInterface
+class ShipOrderWithInvoiceRequest extends AbstractShipOrderRequest implements ArrayableInterface
 {
     /**
      * @Assert\NotBlank()

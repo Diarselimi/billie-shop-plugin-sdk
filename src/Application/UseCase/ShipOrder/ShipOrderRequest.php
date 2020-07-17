@@ -2,7 +2,6 @@
 
 namespace App\Application\UseCase\ShipOrder;
 
-use App\Application\UseCase\ValidatedRequestInterface;
 use App\DomainModel\ArrayableInterface;
 use App\DomainModel\ShipOrder\AbstractShipOrderRequest;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -16,7 +15,7 @@ use OpenApi\Annotations as OA;
  *      @OA\Property(property="shipping_document_url", ref="#/components/schemas/URL")
  * })
  */
-class ShipOrderRequest extends AbstractShipOrderRequest implements ValidatedRequestInterface, ArrayableInterface
+class ShipOrderRequest extends AbstractShipOrderRequest implements ArrayableInterface
 {
     /**
      * @var string

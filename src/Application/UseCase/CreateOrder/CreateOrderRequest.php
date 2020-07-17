@@ -57,9 +57,9 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
     private $duration;
 
     /**
+     * @Assert\NotBlank(allowNull=true, message="This value should be null or non-blank string.")
      * @CustomConstrains\OrderExternalCode()
      * @Assert\Type(type="string")
-     * @Assert\NotBlank(allowNull = true)
      * @Assert\Length(max=255)
      */
     private $externalCode;

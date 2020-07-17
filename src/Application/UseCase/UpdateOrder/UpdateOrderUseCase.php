@@ -32,10 +32,6 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
     {
         $this->validateRequest($request);
 
-        if ($request->getExternalCode() === '') {
-            $this->logInfo('[test] Update order empty external code');
-        }
-
         try {
             $orderContainer = $this->orderContainerFactory->loadByMerchantIdAndExternalIdOrUuid(
                 $request->getMerchantId(),
