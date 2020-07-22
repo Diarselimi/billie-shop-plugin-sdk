@@ -40,6 +40,7 @@ Feature: APIS-1077
 
   Scenario Template: Success 1: Partial provided data is OK and update is successful on any non-final state
     Given I have a "<state>" order with amounts 1000/900/100, duration 30 and comment "test order"
+    And Salesforce DCI API responded for the order UUID "test-order-uuid" with no collections taking place
     And Debtor release limit call succeeded
     When I send a PATCH request to "/order/test-order-uuid" with body:
     """
@@ -67,6 +68,7 @@ Feature: APIS-1077
 
   Scenario Template: Success 2: Full provided data is OK and update is successful only when state is or was shipped
     Given I have a "<state>" order with amounts 1000/900/100, duration 30 and comment "test order"
+    And Salesforce DCI API responded for the order UUID "test-order-uuid" with no collections taking place
     When I send a PATCH request to "/order/test-order-uuid" with body:
     """
     {
@@ -122,6 +124,26 @@ Feature: APIS-1077
     And the JSON response should be:
     """
     {"errors":[{"title":"Order was marked as fraud","code":"forbidden"}]}
+    """
+
+  Scenario: Update late order when it's passed to DCI collections
+    Given I have a late order "abc123" with amounts 1000/900/100, duration 30 and comment "test order"
+    And Salesforce DCI API responded for the order UUID "test-order-uuidabc123" with the ongoing collections
+    When I send a PATCH request to "/order/abc123" with body:
+    """
+    {
+      "duration": 30,
+      "amount": {
+        "gross": 500,
+        "net": 400,
+        "tax": 100
+      }
+    }
+    """
+    Then the response status code should be 403
+    And the JSON response should be:
+    """
+    {"errors":[{"title":"Order amount cannot be updated","code":"forbidden"}]}
     """
 
   Scenario: Order external id is blank

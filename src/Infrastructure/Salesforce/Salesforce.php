@@ -45,9 +45,7 @@ class Salesforce implements SalesforceInterface
 
             $decodedResponse = $this->decodeResponse($response);
 
-            if (!isset($decodedResponse['result']) || !is_array($decodedResponse['result'])) {
-                throw new ClientResponseDecodeException('Unexpected decoded response from Salesforce client.');
-            }
+            $this->validateDecodedResponseRoot($decodedResponse);
 
             foreach ($decodedResponse['result'] as $result) {
                 if ($orderUuid === $result['referenceUuid']) {
@@ -56,6 +54,19 @@ class Salesforce implements SalesforceInterface
             }
 
             return null;
+        } catch (RequestException $exception) {
+            $this->handleException($exception);
+        }
+    }
+
+    public function getOrderCollectionsStatus(string $orderUuid): ?string
+    {
+        try {
+            $response = $this->client->get("api/services/apexrest/v1/dci/$orderUuid");
+            $decodedResponse = $this->decodeResponse($response);
+            $this->validateDecodedResponseRoot($decodedResponse);
+
+            return $decodedResponse['result'][0]['collection']['stage'] ?? null;
         } catch (RequestException $exception) {
             $this->handleException($exception);
         }
@@ -74,6 +85,13 @@ class Salesforce implements SalesforceInterface
                 throw new SalesforcePauseDunningException($decodedResponse['message']);
             default:
                 throw new SalesforceException($exception->getMessage());
+        }
+    }
+
+    private function validateDecodedResponseRoot(array $decodedResponse): void
+    {
+        if (!isset($decodedResponse['result']) || !is_array($decodedResponse['result'])) {
+            throw new ClientResponseDecodeException('Unexpected decoded response from Salesforce client.');
         }
     }
 }

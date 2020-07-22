@@ -3,6 +3,7 @@
 namespace App\Http\Controller\PublicApi;
 
 use App\Application\Exception\FraudOrderException;
+use App\Application\Exception\OrderBeingCollectedException;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\UpdateOrder\UpdateOrderRequest;
 use App\Application\UseCase\UpdateOrder\UpdateOrderUseCase;
@@ -71,7 +72,7 @@ class UpdateOrderController
                 ->setExternalCode($request->request->get('order_id'));
 
             $this->useCase->execute($orderRequest);
-        } catch (UpdateOrderException | FraudOrderException $e) {
+        } catch (UpdateOrderException | FraudOrderException | OrderBeingCollectedException $e) {
             throw new AccessDeniedHttpException($e->getMessage());
         } catch (OrderNotFoundException $exception) {
             throw new NotFoundHttpException();

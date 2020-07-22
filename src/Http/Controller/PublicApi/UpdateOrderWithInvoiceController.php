@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controller\PublicApi;
 
 use App\Application\Exception\FraudOrderException;
+use App\Application\Exception\OrderBeingCollectedException;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\UpdateOrderWithInvoice\UpdateOrderWithInvoiceRequest;
 use App\Application\UseCase\UpdateOrderWithInvoice\UpdateOrderWithInvoiceUseCase;
@@ -77,7 +78,7 @@ class UpdateOrderWithInvoiceController
                 ->setInvoiceNumber($request->request->get('invoice_number'))
                 ->setInvoiceFile($request->files->get('invoice_file'));
             $this->useCase->execute($orderRequest);
-        } catch (UpdateOrderException | FraudOrderException $exception) {
+        } catch (UpdateOrderException | FraudOrderException | OrderBeingCollectedException $exception) {
             throw new AccessDeniedHttpException($exception->getMessage());
         } catch (OrderNotFoundException $exception) {
             throw new NotFoundHttpException();

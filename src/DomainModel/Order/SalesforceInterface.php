@@ -7,4 +7,6 @@ interface SalesforceInterface
     public function pauseOrderDunning(string $orderUuid, int $numberOfDays): void;
 
     public function getOrderDunningStatus(string $orderUuid): ? string;
+
+    public function getOrderCollectionsStatus(string $orderUuid): ?string;
 }
