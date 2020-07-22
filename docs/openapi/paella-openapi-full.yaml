@@ -2513,6 +2513,34 @@ paths:
       security:
         -
           oauth2: []
+  '/merchant/verify-new-external-code/{external-code}':
+    post:
+      tags:
+        - 'Dashboard Merchants'
+      summary: 'Verify new External Code for Merchant'
+      operationId: verify_new_external_code
+      parameters:
+        -
+          name: externalCode
+          in: path
+          description: 'Merchant debtor external code'
+          required: true
+          schema:
+            $ref: '#/components/schemas/TinyText'
+      responses:
+        '204':
+          description: 'Valid new external code'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/ResourceConflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
 components:
   schemas:
     UUID:

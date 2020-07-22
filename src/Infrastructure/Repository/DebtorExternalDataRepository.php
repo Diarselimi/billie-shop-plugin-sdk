@@ -165,4 +165,25 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
             ]
         );
     }
+
+    public function getOneByMerchantIdAndExternalCode(int $merchantId, string $externalCode): ?DebtorExternalDataEntity
+    {
+        $debtorExternalData = $this->doFetchOne(
+            '
+            SELECT ' . self::SELECT_FIELDS . ' FROM ' . self::TABLE_NAME . '
+            INNER JOIN orders ON orders.debtor_external_data_id = ' . self::TABLE_NAME . '.id
+            WHERE 
+                orders.merchant_id = :merchant_id
+                AND merchant_external_id = :merchant_debtor_external_id
+                ORDER BY  ' . self::TABLE_NAME . '.created_at DESC LIMIT 1',
+            [
+                'merchant_id' => $merchantId,
+                'merchant_debtor_external_id' => $externalCode,
+            ]
+        );
+
+        return $debtorExternalData ? $this->debtorExternalDataEntityFactory->createFromDatabaseRow(
+            $debtorExternalData
+        ) : null;
+    }
 }

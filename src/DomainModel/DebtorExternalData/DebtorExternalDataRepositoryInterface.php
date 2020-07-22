@@ -22,4 +22,6 @@ interface DebtorExternalDataRepositoryInterface
     public function update(DebtorExternalDataEntity $externalData): void;
 
     public function getMerchantDebtorExternalIds(int $id): array;
+
+    public function getOneByMerchantIdAndExternalCode(int $merchantId, string $externalCode): ?DebtorExternalDataEntity;
 }
