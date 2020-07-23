@@ -8,6 +8,7 @@ use App\DomainModel\CheckoutSession\CheckoutOrderMatcherViolationList;
 use App\DomainModel\CheckoutSession\CheckoutOrderRequestDTO;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\CompanyRequestFactory;
+use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorCompany\DebtorCompanyRequest;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
@@ -48,11 +49,15 @@ class StrictCheckoutOrderMatcherSpec extends ObjectBehavior
         DebtorCompanyRequest $companyRequest,
         AddressEntity $addressEntity,
         CreateOrderAddressRequest $addressRequest,
-        OrderEntity $orderEntity
+        OrderEntity $orderEntity,
+        DebtorCompany $debtorCompany
     ) {
         $companyRequest->toArray()->willReturn(['address_street' => 'test']);
         $addressRequest->toArray()->willReturn(['street' => 'test']);
         $orderEntity->getCompanyBillingAddressUuid()->willReturn('some-uuid');
+
+        $debtorCompany->getName()->willReturn('test');
+        $debtorCompany->getDebtorAddress()->willReturn($addressEntity);
 
         $orderFinancialDetails->getAmountNet()->willReturn(new Money(4));
         $orderFinancialDetails->getAmountTax()->willReturn(new Money(4));
@@ -68,6 +73,7 @@ class StrictCheckoutOrderMatcherSpec extends ObjectBehavior
 
         $requestDTO->getDebtorCompany()->willReturn($companyRequest);
         $orderContainer->getDebtorExternalDataAddress()->willReturn($addressEntity);
+        $orderContainer->getDebtorCompany()->willReturn($debtorCompany);
 
         $orderContainer->getOrderFinancialDetails()->willReturn($orderFinancialDetails);
 

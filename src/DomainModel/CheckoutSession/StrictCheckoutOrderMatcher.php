@@ -88,12 +88,13 @@ class StrictCheckoutOrderMatcher implements CheckoutOrderMatcherInterface, Loggi
         CheckoutOrderRequestDTO $request,
         OrderContainer $orderContainer
     ): bool {
-        $externalDataCompanyName = $orderContainer->getDebtorExternalData()->getName();
+        $companyName = $orderContainer->getDebtorCompany()->getName();
+        $companyAddress = $orderContainer->getDebtorCompany()->getDebtorAddress();
 
         return !$this->checkCompanyMatch(
             $request->getDebtorCompany(),
-            $orderContainer->getDebtorExternalDataAddress(),
-            $externalDataCompanyName
+            $companyAddress,
+            $companyName
         );
     }
 
@@ -101,12 +102,12 @@ class StrictCheckoutOrderMatcher implements CheckoutOrderMatcherInterface, Loggi
         CheckoutOrderRequestDTO $request,
         OrderContainer $orderContainer
     ): bool {
-        $externalDataCompanyName = $orderContainer->getDebtorExternalData()->getName();
+        $companyName = $orderContainer->getDebtorCompany()->getName();
 
         $isMatch = $this->checkCompanyMatch(
             $request->getDebtorCompany(),
             $orderContainer->getBillingAddress(),
-            $externalDataCompanyName
+            $companyName
         );
         if (!$isMatch) {
             $this->logInfo('[StrictCheckoutOrderMatcher] Debtor billing address mismatch');
