@@ -11,6 +11,8 @@ use App\DomainModel\DebtorCompany\DebtorCreationDTO;
 use App\DomainModel\DebtorCompany\IdentifiedDebtorCompany;
 use App\DomainModel\DebtorCompany\IdentifyDebtorRequestDTO;
 use App\DomainModel\ExternalDebtorResponse\ExternalDebtorFactory;
+use App\DomainModel\IdentityVerification\IdentityVerificationCaseDTO;
+use App\DomainModel\IdentityVerification\IdentityVerificationCaseDTOFactory;
 use App\DomainModel\MerchantDebtor\MerchantDebtorDuplicateDTO;
 use App\DomainModel\SignatoryPower\SignatoryPowerDTO;
 use App\DomainModel\SignatoryPower\SignatoryPowerDTOFactory;
@@ -47,16 +49,20 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
 
     private $externalDebtorFactory;
 
+    private $identityVerificationCaseDTOFactory;
+
     public function __construct(
         Client $alfredClient,
         DebtorCompanyFactory $debtorFactory,
         SignatoryPowerDTOFactory $signatoryPowersDTOFactory,
-        ExternalDebtorFactory $externalDebtorFactory
+        ExternalDebtorFactory $externalDebtorFactory,
+        IdentityVerificationCaseDTOFactory $identityVerificationCaseDTOFactory
     ) {
         $this->client = $alfredClient;
         $this->factory = $debtorFactory;
         $this->signatoryPowersDTOFactory = $signatoryPowersDTOFactory;
         $this->externalDebtorFactory = $externalDebtorFactory;
+        $this->identityVerificationCaseDTOFactory = $identityVerificationCaseDTOFactory;
     }
 
     public function getDebtor(int $debtorCompanyId): ?DebtorCompany
@@ -371,5 +377,18 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         $decodedResponse = $this->decodeResponse($response);
 
         return $this->externalDebtorFactory->createFromArrayCollection(isset($decodedResponse['items']) ? $decodedResponse['items'] : []);
+    }
+
+    public function getIdentityVerificationCase(string $caseUuid): IdentityVerificationCaseDTO
+    {
+        try {
+            $response = $this->client->get("identity-verification/{$caseUuid}");
+        } catch (TransferException $exception) {
+            throw new CompaniesServiceRequestException($exception);
+        }
+
+        $decodedResponse = $this->decodeResponse($response);
+
+        return $this->identityVerificationCaseDTOFactory->createFromArray($decodedResponse);
     }
 }

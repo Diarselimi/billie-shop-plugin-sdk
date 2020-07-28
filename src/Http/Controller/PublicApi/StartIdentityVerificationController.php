@@ -9,6 +9,7 @@ use App\Application\UseCase\StartIdentityVerification\StartIdentityVerificationE
 use App\Application\UseCase\StartIdentityVerification\StartIdentityVerificationRequest;
 use App\Application\UseCase\StartIdentityVerification\StartIdentityVerificationUseCase;
 use App\Application\UseCase\StartIdentityVerificationResponse;
+use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepNotFoundException;
 use App\Http\Authentication\UserProvider;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -80,7 +81,7 @@ class StartIdentityVerificationController
             return $this->useCase->execute($useCaseRequest);
         } catch (StartIdentityVerificationException $exception) {
             throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, "Identity verification can't be started", $exception);
-        } catch (MerchantOnboardingStepTransitionException $exception) {
+        } catch (MerchantOnboardingStepTransitionException | MerchantOnboardingStepNotFoundException $exception) {
             throw new AccessDeniedHttpException($exception->getMessage());
         }
     }

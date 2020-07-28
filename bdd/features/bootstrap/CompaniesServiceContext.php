@@ -276,4 +276,14 @@ class CompaniesServiceContext implements Context
             new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_external_debtors.json'))
         ));
     }
+
+    /**
+     * @Given /^I get from companies service identity verification response$/
+     */
+    public function iGetFromCompaniesServiceIdentityVerificationResponse()
+    {
+        $this->mockRequest('/identity-verification/d46af5c4-7f78-494e-8005-d732310e3641', new ResponseStack(
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_identity_verification.json'))
+        ));
+    }
 }

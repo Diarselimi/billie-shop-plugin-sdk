@@ -12,8 +12,10 @@ use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\IdentityVerification\IdentityVerificationServiceException;
 use App\DomainModel\IdentityVerification\IdentityVerificationServiceInterface;
 use App\DomainModel\IdentityVerification\IdentityVerificationStartRequestDTO;
+use App\DomainModel\IdentityVerification\StartIdentityVerificationGuard;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepEntity;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepNotFoundException;
+use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepRepositoryInterface;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepTransitionEntity;
 use App\DomainModel\MerchantOnboarding\MerchantStepTransitionService;
 use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
@@ -28,28 +30,56 @@ class StartIdentityVerificationUseCase implements ValidatedUseCaseInterface
 
     private $stepTransitionService;
 
+    private $merchantOnboardingStepRepository;
+
+    private $startIdentityVerificationGuard;
+
     public function __construct(
         IdentityVerificationServiceInterface $identityVerificationService,
         MerchantUserRepositoryInterface $merchantUserRepository,
-        MerchantStepTransitionService $stepTransitionService
+        MerchantStepTransitionService $stepTransitionService,
+        MerchantOnboardingStepRepositoryInterface $merchantOnboardingStepRepository,
+        StartIdentityVerificationGuard $startIdentityVerificationGuard
     ) {
         $this->identityVerificationService = $identityVerificationService;
         $this->merchantUserRepository = $merchantUserRepository;
         $this->stepTransitionService = $stepTransitionService;
+        $this->merchantOnboardingStepRepository = $merchantOnboardingStepRepository;
+        $this->startIdentityVerificationGuard = $startIdentityVerificationGuard;
     }
 
     public function execute(StartIdentityVerificationRequest $request): StartIdentityVerificationResponse
     {
         $this->validateRequest($request);
+        $step = $this->merchantOnboardingStepRepository->getOneByStepNameAndMerchant(
+            MerchantOnboardingStepEntity::STEP_IDENTITY_VERIFICATION,
+            $request->getMerchantId()
+        );
+        if (!$step) {
+            throw new MerchantOnboardingStepNotFoundException();
+        }
 
-        try {
-            $this->stepTransitionService->transition(
-                MerchantOnboardingStepEntity::STEP_IDENTITY_VERIFICATION,
-                MerchantOnboardingStepTransitionEntity::TRANSITION_REQUEST_CONFIRMATION,
-                $request->getMerchantId()
-            );
-        } catch (MerchantOnboardingStepNotFoundException | WorkflowException $exception) {
-            throw new MerchantOnboardingStepTransitionException();
+        switch ($step->getState()) {
+            case MerchantOnboardingStepEntity::STATE_NEW:
+                try {
+                    $this->stepTransitionService->transitionStepEntity(
+                        $step,
+                        MerchantOnboardingStepTransitionEntity::TRANSITION_REQUEST_CONFIRMATION,
+                        $request->getMerchantId()
+                    );
+                } catch (WorkflowException $exception) {
+                    throw new MerchantOnboardingStepTransitionException();
+                }
+
+                break;
+            case MerchantOnboardingStepEntity::STATE_PENDING:
+                if (!$this->startIdentityVerificationGuard->startIdentityVerificationAllowed()) {
+                    throw new StartIdentityVerificationException('There is a valid case already');
+                }
+
+                break;
+            case MerchantOnboardingStepEntity::STATE_COMPLETE:
+                throw new MerchantOnboardingStepTransitionException();
         }
 
         $identificationRequest = $this->buildIdentityVerificationStartRequestDTO($request);

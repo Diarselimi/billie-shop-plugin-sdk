@@ -3,6 +3,7 @@
 namespace App\DomainModel\DebtorCompany;
 
 use App\DomainModel\Address\AddressEntity;
+use App\DomainModel\IdentityVerification\IdentityVerificationCaseDTO;
 use App\DomainModel\MerchantDebtor\MerchantDebtorDuplicateDTO;
 use App\DomainModel\SignatoryPower\SignatoryPowerDTO;
 use App\DomainModel\SignatoryPower\SignatoryPowerSelectionDTO;
@@ -60,4 +61,6 @@ interface CompaniesServiceInterface
     public function blacklistCompany(string $companyUuid): void;
 
     public function searchExternalDebtors(string $searchQuery, int $limit = 10): array;
+
+    public function getIdentityVerificationCase(string $caseUuid): ?IdentityVerificationCaseDTO;
 }

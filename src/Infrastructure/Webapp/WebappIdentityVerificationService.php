@@ -22,6 +22,8 @@ class WebappIdentityVerificationService implements IdentityVerificationServiceIn
 {
     use DecodeResponseTrait, LoggingTrait;
 
+    private const IDENTIFICATION_REQUEST_TIMEOUT = 15;
+
     private $client;
 
     private $merchantUserRepository;
@@ -53,6 +55,7 @@ class WebappIdentityVerificationService implements IdentityVerificationServiceIn
                 'on_stats' => function (TransferStats $stats) {
                     $this->logServiceRequestStats($stats, 'webapp_identity_verification_start');
                 },
+                'timeout' => self::IDENTIFICATION_REQUEST_TIMEOUT,
             ]);
 
             $decodedResponse = $this->decodeResponse($response)['data'] ?? [];

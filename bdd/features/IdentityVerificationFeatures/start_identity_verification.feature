@@ -136,28 +136,6 @@ Feature: API endpoint for "POST /merchant/user/start-identity-verification" (tic
     """
     Then the response status code should be 500
 
-  Scenario: Failed call when step is not new
-    Given a merchant user exists with permission MANAGE_ONBOARDING
-    And I get from Oauth service a valid user token
-    And I get from Oauth service revoke token endpoint a successful response
-    And The following onboarding steps are in states for merchant 1:
-      | name                   | state     |
-      | identity_verification  |  confirmation_pending |
-    And I add "Authorization" header equal to "Bearer SomeTokenHere"
-    When I send a POST request to "/merchant/user/start-identity-verification" with body:
-    """
-     {
-        "redirect_url_coupon_requested": "http://localhost/a",
-        "redirect_url_review_pending": "http://localhost/b",
-        "redirect_url_declined": "http://localhost/c"
-     }
-    """
-    Then the JSON response should be:
-    """
-      {"errors":[{"title":"Merchant Onboarding Step transition is not possible.","code":"forbidden"}]}
-    """
-    And the response status code should be 403
-
   Scenario: Successful call
     Given a merchant user exists with permission MANAGE_ONBOARDING
     And I get from Oauth service a valid user token

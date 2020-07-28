@@ -1,0 +1,15 @@
+{
+  "id": 1,
+  "user_id": null,
+  "external_code": "0AAAAAA0AAAA",
+  "url": "https://postident.deutschepost.de/identportal/?vorgangsnummer=0AAAAAA0AAAA",
+  "valid_till": "2050-01-01 00:00:00",
+  "response": "{\"caseId\":\"0AAAAAA0AAAA\",\"otherField\":\"otherData\"}",
+  "case_status": "new",
+  "identification_status": null,
+  "identification_method": "video",
+  "uuid": "d46af5c4-7f78-494e-8005-d732310e3641",
+  "is_current": 1,
+  "created_at": "2020-01-01 00:00:00",
+  "updated_at": "2020-01-01 00:00:00"
+}

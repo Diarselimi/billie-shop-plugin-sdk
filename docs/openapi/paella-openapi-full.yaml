@@ -1719,6 +1719,32 @@ paths:
       security:
         -
           oauth2: []
+  /merchant/user/identity-verification:
+    get:
+      tags:
+        - 'Dashboard Users'
+      summary: 'Get Merchant User Identity Verification'
+      operationId: merchant_user_identity_verification
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantUserIdentityVerificationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
   /merchant/users:
     get:
       tags:
@@ -3747,6 +3773,22 @@ components:
         address_country:
           example: DE
           $ref: '#/components/schemas/CountryCode'
+      type: object
+    MerchantUserIdentityVerificationResponse:
+      title: 'Merchant User Identity Verification Response'
+      properties:
+        url:
+          type: string
+          example: 'https://postident.deutschepost.de/identportal/?vorgangsnummer=0AAAAAA0AAAA'
+        valid_till:
+          type: string
+          example: '2020-01-01 00:00:00'
+        case_status:
+          type: string
+          example: closed
+        identification_status:
+          type: string
+          example: declined
       type: object
     MerchantEntity:
       properties:
