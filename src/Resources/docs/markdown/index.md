@@ -41,6 +41,7 @@ An order could be declined by any of these reasons:
 | debtor_address        | Debtor address or name mismatch                           |
 | debtor_not_identified | Debtor could not be identified with the information given |
 | risk_policy           | Risk decline                                              |
+| risk_scoring_failed   | Not enough data available to make a decision              |
 | debtor_limit_exceeded | Financing limit of debtor currently exceeded              |
 
 

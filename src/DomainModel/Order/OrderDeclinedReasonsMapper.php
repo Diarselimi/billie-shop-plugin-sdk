@@ -16,6 +16,7 @@ class OrderDeclinedReasonsMapper
         self::REASON_RISK_SCORING_FAILED,
         self::REASON_DEBTOR_NOT_IDENTIFIED,
         self::REASON_ADDRESS_MISMATCH,
+        self::REASON_RISK_SCORING_FAILED,
         self::REASON_DEBTOR_LIMIT_EXCEEDED,
     ];
 

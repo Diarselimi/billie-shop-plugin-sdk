@@ -4,11 +4,12 @@ namespace App\Application\UseCase\ShipOrder;
 
 use App\DomainModel\ArrayableInterface;
 use App\DomainModel\ShipOrder\AbstractShipOrderRequest;
-use Symfony\Component\Validator\Constraints as Assert;
 use OpenApi\Annotations as OA;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @OA\Schema(schema="ShipOrderRequest", title="Order Shipping Object", type="object",
+ *     required={"invoice_url"},
  *     allOf={@OA\Schema(ref="#/components/schemas/AbstractShipOrderRequest")},
  *     properties={
  *      @OA\Property(property="invoice_url", ref="#/components/schemas/URL"),

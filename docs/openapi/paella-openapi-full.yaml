@@ -45,6 +45,7 @@ info:
     | debtor_address        | Debtor address or name mismatch                           |
     | debtor_not_identified | Debtor could not be identified with the information given |
     | risk_policy           | Risk decline                                              |
+    | risk_scoring_failed   | Not enough data available to make a decision              |
     | debtor_limit_exceeded | Financing limit of debtor currently exceeded              |
     
     
@@ -2539,8 +2540,8 @@ paths:
       security:
         -
           oauth2: []
-  '/merchant/verify-new-external-code/{external-code}':
-    post:
+  '/merchant/verify-new-external-code/{externalCode}':
+    get:
       tags:
         - 'Dashboard Merchants'
       summary: 'Verify new External Code for Merchant'
@@ -2640,6 +2641,7 @@ components:
         - risk_scoring_failed
         - debtor_not_identified
         - debtor_address
+        - risk_scoring_failed
         - debtor_limit_exceeded
       example: debtor_not_identified
     OrderDunningStatus:
@@ -3644,6 +3646,8 @@ components:
       type: object
     ShipOrderRequest:
       title: 'Order Shipping Object'
+      required:
+        - invoice_url
       properties:
         invoice_url:
           $ref: '#/components/schemas/URL'
@@ -4090,6 +4094,7 @@ components:
             - risk_scoring_failed
             - debtor_not_identified
             - debtor_address
+            - risk_scoring_failed
             - debtor_limit_exceeded
           nullable: true
           deprecated: true
@@ -4145,6 +4150,7 @@ components:
             - risk_scoring_failed
             - debtor_not_identified
             - debtor_address
+            - risk_scoring_failed
             - debtor_limit_exceeded
           nullable: true
           deprecated: true
@@ -4712,7 +4718,7 @@ tags:
       - `state` **[string]** `<= 255 characters`   
       &nbsp;&nbsp;&nbsp;&nbsp;Enum: `authorized` `declined` `pre_waiting`
       - `decline_reason` **[string]** `<= 255 characters`   
-      &nbsp;&nbsp;&nbsp;&nbsp;Enum: `risk_policy` `debtor_not_identified` `debtor_address` `debtor_limit_exceeded`
+      &nbsp;&nbsp;&nbsp;&nbsp;Enum: `risk_policy` `debtor_not_identified` `debtor_address` `risk_scoring_failed` `debtor_limit_exceeded`
       - `debtor_company` **[object]**  
         - `name` **[string]** `<= 255 characters`
         - `address_street` **[string]** `<= 255 characters`

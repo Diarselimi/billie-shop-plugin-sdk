@@ -193,7 +193,7 @@ After submitting the widget, following data will be returned to either `then` or
 - `state` **[string]** `<= 255 characters`   
 &nbsp;&nbsp;&nbsp;&nbsp;Enum: `authorized` `declined` `pre_waiting`
 - `decline_reason` **[string]** `<= 255 characters`   
-&nbsp;&nbsp;&nbsp;&nbsp;Enum: `risk_policy` `debtor_not_identified` `debtor_address` `debtor_limit_exceeded`
+&nbsp;&nbsp;&nbsp;&nbsp;Enum: `risk_policy` `debtor_not_identified` `debtor_address` `risk_scoring_failed` `debtor_limit_exceeded`
 - `debtor_company` **[object]**  
   - `name` **[string]** `<= 255 characters`
   - `address_street` **[string]** `<= 255 characters`
