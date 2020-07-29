@@ -3,12 +3,14 @@
 namespace App\Http\Controller\PublicApi;
 
 use App\Application\Exception\OrderNotFoundException;
+use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmOrderUseCase;
 use App\Http\RequestTransformer\CheckoutConfirmOrderRequestFactory;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -59,6 +61,8 @@ class CheckoutConfirmOrderController
             $orderResponse = $this->useCase->execute($checkoutRequest);
         } catch (OrderNotFoundException $exception) {
             throw new NotFoundHttpException($exception->getMessage());
+        } catch (WorkflowException $exception) {
+            throw new AccessDeniedHttpException($exception->getMessage());
         }
 
         return new JsonResponse($orderResponse->toArray(), JsonResponse::HTTP_ACCEPTED);

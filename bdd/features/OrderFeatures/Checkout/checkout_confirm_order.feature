@@ -499,3 +499,41 @@ Feature: As a merchant, I should be able to create an order by providing a valid
     }
     """
     And the response status code should be 400
+
+  Scenario: I fail to confirm the order if there is not enough limits
+    Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
+    And I get from companies service a good debtor strict match response
+    And I get from companies service get debtor response
+    And I get from payments service get order details response
+    And Debtor lock limit call failed
+    And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
+    """
+    {
+       "amount":{
+          "gross":100.0,
+          "net":90.0,
+          "tax":10.0
+       },
+       "duration":30,
+       "debtor_company":{
+          "name":"Test User Company",
+          "legal_form": "GmbH",
+          "address_addition":"lorem ipsum",
+          "address_house_number":"10",
+          "address_street":"Heinrich-Heine-Platz",
+          "address_city":"Berlin",
+          "address_postal_code":"10179",
+          "address_country":"DE"
+       },
+        "billing_address":{
+          "addition":"lorem ipsum",
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city":"Berlin",
+          "postal_code":"10179",
+          "country":"DE"
+       }
+    }
+    """
+    Then the response status code should be 403
+    And the order CO123 is in state authorized
