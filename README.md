@@ -58,6 +58,13 @@ Usage:
 make docs
 ```
 
+### Migrations
+
+We use Phinx for migrations, you can list the available commands by running:
+```bash
+./bin/docker/app vendor/bin/phinx
+```
+
 ## Tests
 
 ### Test types

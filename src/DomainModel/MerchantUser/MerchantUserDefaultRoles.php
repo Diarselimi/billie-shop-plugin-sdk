@@ -14,6 +14,7 @@ interface MerchantUserDefaultRoles
         self::ROLE_VIEW_ONLY,
         self::ROLE_SUPPORT,
         self::ROLE_SALES,
+        self::ROLE_DEVELOPER,
     ];
 
     public const ROLE_NONE = [
@@ -66,6 +67,20 @@ interface MerchantUserDefaultRoles
             MerchantUserPermissions::VIEW_ONBOARDING,
             // write:
             MerchantUserPermissions::CREATE_ORDERS,
+        ],
+    ];
+
+    public const ROLE_DEVELOPER = [
+        'name' => 'developer',
+        'permissions' => [
+            // read:
+            MerchantUserPermissions::VIEW_ORDERS,
+            MerchantUserPermissions::VIEW_DEBTORS,
+            MerchantUserPermissions::VIEW_PAYMENTS,
+            MerchantUserPermissions::VIEW_USERS,
+            MerchantUserPermissions::VIEW_ONBOARDING,
+            // read (special):
+            MerchantUserPermissions::VIEW_CREDENTIALS,
         ],
     ];
 }
