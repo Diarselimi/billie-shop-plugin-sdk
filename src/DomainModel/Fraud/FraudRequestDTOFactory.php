@@ -15,13 +15,16 @@ final class FraudRequestDTOFactory
     ): FraudRequestDTO {
         return new FraudRequestDTO(
             $orderContainer->getOrder()->getUuid(),
+            $orderContainer->getMerchant()->getCompanyUuid(),
+            $orderContainer->getDebtorCompany()->getUuid(),
             $orderContainer->getDebtorPerson(),
             $orderContainer->getDebtorExternalData()->isEstablishedCustomer() ?? false,
-            $orderContainer->getDebtorCompany()->getUuid(),
             new Money($orderContainer->getOrderFinancialDetails()->getAmountGross()),
             $ipAddress,
             $orderContainer->getBillingAddress(),
-            $orderContainer->getDeliveryAddress()
+            $orderContainer->getDeliveryAddress(),
+            $orderContainer->getOrder()->getCreatedAt(),
+            $orderContainer->getDebtorCompany()->getSchufaId()
         );
     }
 }

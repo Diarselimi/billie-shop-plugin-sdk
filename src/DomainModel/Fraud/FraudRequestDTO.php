@@ -13,11 +13,13 @@ class FraudRequestDTO implements ArrayableInterface
 {
     private $invoiceUuid;
 
+    private $merchantCompanyUuid;
+
+    private $debtorCompanyUuid;
+
     private $person;
 
     private $isExistingCustomer;
-
-    private $customerId;
 
     private $invoiceAmount;
 
@@ -27,36 +29,49 @@ class FraudRequestDTO implements ArrayableInterface
 
     private $shippingAddress;
 
+    private $invoiceCreatedAt;
+
+    private $debtorCompanySchufaId;
+
     public function __construct(
         string $invoiceUuid,
+        string $merchantCompanyUuid,
+        string $debtorCompanyUuid,
         PersonEntity $person,
         bool $isExistingCustomer,
-        ?string $customerId,
         Money $invoiceAmount,
         ?string $ipAddress,
         AddressEntity $billingAddress,
-        AddressEntity $shippingAddress
+        AddressEntity $shippingAddress,
+        \DateTime $invoiceCreatedAt,
+        ?string $debtorCompanySchufaId = null
     ) {
         $this->invoiceUuid = $invoiceUuid;
+        $this->merchantCompanyUuid = $merchantCompanyUuid;
+        $this->debtorCompanyUuid = $debtorCompanyUuid;
         $this->person = $person;
         $this->isExistingCustomer = $isExistingCustomer;
-        $this->customerId = $customerId;
         $this->invoiceAmount = $invoiceAmount;
         $this->ipAddress = $ipAddress;
         $this->billingAddress = $billingAddress;
         $this->shippingAddress = $shippingAddress;
+        $this->invoiceCreatedAt = $invoiceCreatedAt;
+        $this->debtorCompanySchufaId = $debtorCompanySchufaId;
     }
 
     public function toArray(): array
     {
         return [
             'invoice_uuid' => $this->invoiceUuid,
+            'customer_company_uuid' => $this->merchantCompanyUuid,
+            'debtor_company_uuid' => $this->debtorCompanyUuid,
+            'debtor_schufa_id' => $this->debtorCompanySchufaId,
+            'invoice_created_at' => $this->invoiceCreatedAt->format('Y-m-d H:i:s'),
             'email' => $this->person->getEmail(),
             'first_name' => $this->person->getFirstName(),
             'last_name' => $this->person->getLastName(),
             'phone_number' => $this->person->getPhoneNumber(),
             'is_existing_customer' => $this->isExistingCustomer,
-            'customer_id' => $this->customerId,
             'invoice_amount' => $this->invoiceAmount,
             'ip_address' => $this->ipAddress,
             'billing_address' => [
