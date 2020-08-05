@@ -167,4 +167,17 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
 
         return $rows ? $this->factory->createFromArrayCollection($rows) : null;
     }
+
+    /**
+     * @return MerchantEntity[]
+     */
+    public function getMerchantsWithoutSandbox(): array
+    {
+        $rows = $this->doFetchAll(
+            $this->generateSelectQuery(self::TABLE_NAME, self::SELECT_FIELDS) .
+            ' WHERE sandbox_payment_merchant_id IS NULL'
+        );
+
+        return $rows ? $this->factory->createFromArrayCollection($rows) : [];
+    }
 }

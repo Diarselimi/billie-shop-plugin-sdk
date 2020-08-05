@@ -2,7 +2,6 @@
 
 namespace App\Http\Controller\PublicApi;
 
-use App\Application\UseCase\MerchantStartIntegration\MerchantStartIntegrationException;
 use App\Application\UseCase\MerchantStartIntegration\MerchantStartIntegrationNotAllowedException;
 use App\Application\UseCase\MerchantStartIntegration\MerchantStartIntegrationRequest;
 use App\Application\UseCase\MerchantStartIntegration\MerchantStartIntegrationResponse;
@@ -10,9 +9,7 @@ use App\Application\UseCase\MerchantStartIntegration\MerchantStartIntegrationUse
 use App\Http\Authentication\UserProvider;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * @IsGranted({"ROLE_MANAGE_ONBOARDING"})
@@ -55,8 +52,6 @@ class MerchantStartIntegrationController
             return $this->useCase->execute($useCaseRequest);
         } catch (MerchantStartIntegrationNotAllowedException $exception) {
             throw new AccessDeniedHttpException('Start integration not allowed', $exception);
-        } catch (MerchantStartIntegrationException $exception) {
-            throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, 'Integration cannot be started', $exception);
         }
     }
 }

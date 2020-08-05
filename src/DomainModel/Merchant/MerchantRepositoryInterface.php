@@ -23,4 +23,6 @@ interface MerchantRepositoryInterface
     public function getOneByMerchantOnboardingId(int $merchantOnboardingId): ?MerchantEntity;
 
     public function findActiveWithFinancingPowerBelowPercentage(float $percentage): ?array;
+
+    public function getMerchantsWithoutSandbox(): array;
 }

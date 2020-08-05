@@ -23,3 +23,4 @@ ozean12_amqp_pack:
     identity.identity_verification_succeeded: Ozean12\Transfer\Message\Identity\IdentityVerificationSucceeded
     order.order_dunning_step_changed: Ozean12\Transfer\Message\Order\OrderDunningStepChanged
     company_information_change_request.company_information_change_request_decision_issued: Ozean12\Transfer\Message\CompanyInformationChangeRequest\CompanyInformationChangeRequestDecisionIssued
+    customer.customer_created: Ozean12\Transfer\Message\Customer\CustomerCreated

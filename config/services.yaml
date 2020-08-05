@@ -46,6 +46,7 @@ services:
       $debtorInformationChangeRequestWorkflow: '@state_machine.debtor_information_change_request'
       $segmentIoProvider: '@segment_io.analytics'
       $redocJsUrl: '%redoc_js_url%'
+      $paellaSandboxUrl: '%env(string:PAELLA_SANDBOX_URL)%'
 
   _instanceof:
     App\Application\UseCase\ValidatedUseCaseInterface:
