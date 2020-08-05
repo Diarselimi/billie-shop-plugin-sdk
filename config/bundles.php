@@ -15,4 +15,5 @@ return [
     Ozean12\GraphQLBundle\GraphQLBundle::class => ['all' => true],
     Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle::class => ['all' => true],
     Farmatholin\SegmentIoBundle\SegmentIoBundle::class => ['all' => true],
+    Flagception\Bundle\FlagceptionBundle\FlagceptionBundle::class => ['all' => true],
 ];

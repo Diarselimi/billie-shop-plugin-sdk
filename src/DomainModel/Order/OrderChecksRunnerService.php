@@ -7,10 +7,13 @@ use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositor
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\OrderRiskCheck\Checker\CheckInterface;
 use App\DomainModel\OrderRiskCheck\CheckResult;
+use App\DomainModel\OrderRiskCheck\Flagception\FeatureActivator\DummyRiskChecksFeatureActivator;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntityFactory;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
+use Flagception\Manager\FeatureManagerInterface;
+use Flagception\Model\Context;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -32,6 +35,8 @@ class OrderChecksRunnerService implements LoggingInterface
 
     private $dispatcher;
 
+    private $featureManager;
+
     public function __construct(
         OrderRiskCheckRepositoryInterface $orderRiskCheckRepository,
         OrderRiskCheckEntityFactory $riskCheckFactory,
@@ -39,7 +44,8 @@ class OrderChecksRunnerService implements LoggingInterface
         MerchantRiskCheckSettingsRepositoryInterface $merchantRiskCheckSettingsRepository,
         EventDispatcherInterface $dispatcher,
         array $preIdentificationChecks,
-        array $postIdentificationChecks
+        array $postIdentificationChecks,
+        FeatureManagerInterface $featureManager
     ) {
         $this->orderRiskCheckRepository = $orderRiskCheckRepository;
         $this->riskCheckFactory = $riskCheckFactory;
@@ -48,6 +54,7 @@ class OrderChecksRunnerService implements LoggingInterface
         $this->preIdentificationChecks = $preIdentificationChecks;
         $this->postIdentificationChecks = $postIdentificationChecks;
         $this->dispatcher = $dispatcher;
+        $this->featureManager = $featureManager;
     }
 
     public function passesPreIdentificationChecks(OrderContainer $orderContainer): bool
@@ -122,7 +129,7 @@ class OrderChecksRunnerService implements LoggingInterface
             return (new CheckResult(true, $riskCheckName))->setDeclineOnFailure(false);
         }
 
-        $check = $this->getCheck($riskCheckName);
+        $check = $this->getCheck($orderContainer, $riskCheckName);
         $result = $check->check($orderContainer)
             ->setDeclineOnFailure($merchantRiskCheckSetting->isDeclineOnFailure());
 
@@ -147,8 +154,17 @@ class OrderChecksRunnerService implements LoggingInterface
         $this->orderRiskCheckRepository->insert($riskCheckEntity);
     }
 
-    private function getCheck($name): CheckInterface
+    private function getCheck(OrderContainer $orderContainer, $name): CheckInterface
     {
+        // wrap it into the factory
+        $context = new Context();
+        $context->add(DummyRiskChecksFeatureActivator::ORDER_CONTAINER, $orderContainer);
+        $context->add(DummyRiskChecksFeatureActivator::RISK_CHECK_NAME, $name);
+
+        if ($this->featureManager->isActive(DummyRiskChecksFeatureActivator::FEATURE_ACTIVATOR_NAME, $context)) {
+            $name .= '_dummy';
+        }
+
         if (!$this->checkLoader->has($name)) {
             throw new \RuntimeException("Risk check {$name} not registered");
         }
