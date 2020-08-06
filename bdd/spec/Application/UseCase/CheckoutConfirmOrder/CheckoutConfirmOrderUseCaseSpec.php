@@ -6,12 +6,13 @@ use App\Application\Exception\RequestValidationException;
 use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmOrderRequest;
 use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmOrderUseCase;
 use App\DomainModel\CheckoutSession\CheckoutOrderMatcherInterface;
-use App\DomainModel\CheckoutSession\CheckoutOrderRequestDTO;
 use App\DomainModel\CheckoutSession\CheckoutOrderMatcherViolationList;
+use App\DomainModel\CheckoutSession\CheckoutOrderRequestDTO;
 use App\DomainModel\DebtorCompany\DebtorCompanyRequest;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderResponse\OrderResponse;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
@@ -28,6 +29,7 @@ class CheckoutConfirmOrderUseCaseSpec extends ObjectBehavior
         OrderContainerFactory $orderContainerFactory,
         OrderStateManager $orderStateManager,
         CheckoutOrderMatcherInterface $dataMatcher,
+        OrderRepositoryInterface $orderRepository,
         ValidatorInterface $validator,
         OrderEntity $order,
         OrderContainer $orderContainer
@@ -82,11 +84,12 @@ class CheckoutConfirmOrderUseCaseSpec extends ObjectBehavior
         $amountTax = 10.0;
         $amountGross = 110.0;
 
+        $order->getExternalCode()->willReturn(null);
         $request = $this->createRequest($checkoutSessionUuid, $duration, $amountGross, $amountNet, $amountTax);
 
         $dataMatcher->matches(Argument::type(CheckoutOrderRequestDTO::class), $orderContainer)
-                    ->shouldBeCalled()
-                    ->willReturn(new CheckoutOrderMatcherViolationList());
+            ->shouldBeCalled()
+            ->willReturn(new CheckoutOrderMatcherViolationList());
 
         $orderStateManager->isPreWaiting($order)->shouldBeCalled()->willReturn(false);
         $orderStateManager->wait($orderContainer)->shouldNotBeCalled();
@@ -110,10 +113,11 @@ class CheckoutConfirmOrderUseCaseSpec extends ObjectBehavior
         $amountGross = 110.0;
 
         $request = $this->createRequest($checkoutSessionUuid, $duration, $amountGross, $amountNet, $amountTax);
+        $order->setExternalCode(Argument::any())->willReturn($order);
 
         $dataMatcher->matches(Argument::type(CheckoutOrderRequestDTO::class), $orderContainer)
-                    ->shouldBeCalled()
-                    ->willReturn(new CheckoutOrderMatcherViolationList());
+            ->shouldBeCalled()
+            ->willReturn(new CheckoutOrderMatcherViolationList());
 
         $orderStateManager->isPreWaiting($order)->shouldBeCalled()->willReturn(true);
         $orderStateManager->wait($orderContainer)->shouldBeCalled();

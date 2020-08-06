@@ -233,7 +233,7 @@ class PaellaCoreContext extends MinkContext
      */
     public function orderBelongsToCompany($orderId, $companyUuid)
     {
-        $order = $this->getOrderRepository()->getOneByExternalCode($orderId, $this->merchant->getId());
+        $order = $this->getOrderRepository()->getOneByExternalCodeAndMerchantId($orderId, $this->merchant->getId());
         $merchantDebtor = $this->getMerchantDebtorRepository()->getOneById($order->getMerchantDebtorId());
         Assert::eq($merchantDebtor->getCompanyUuid(), $companyUuid);
     }
@@ -432,7 +432,7 @@ class PaellaCoreContext extends MinkContext
      */
     public function orderWasShipped($externalCode, $date)
     {
-        $order = $this->getOrderRepository()->getOneByExternalCode($externalCode, 1);
+        $order = $this->getOrderRepository()->getOneByExternalCodeAndMerchantId($externalCode, 1);
         $order->setShippedAt(new DateTime($date));
         $this->getOrderRepository()->update($order);
     }
@@ -442,7 +442,7 @@ class PaellaCoreContext extends MinkContext
      */
     public function orderIsInState($orderId, $state)
     {
-        $order = $this->getOrderRepository()->getOneByExternalCode($orderId, $this->merchant->getId());
+        $order = $this->getOrderRepository()->getOneByExternalCodeAndMerchantId($orderId, $this->merchant->getId());
         if ($order === null) {
             if ($state === 'null') {
                 return;
@@ -464,7 +464,7 @@ class PaellaCoreContext extends MinkContext
      */
     public function orderHasCreationSource(string $orderId, string $creationSource)
     {
-        $order = $this->getOrderRepository()->getOneByExternalCode($orderId, $this->merchant->getId());
+        $order = $this->getOrderRepository()->getOneByExternalCodeAndMerchantId($orderId, $this->merchant->getId());
         Assert::eq($order->getCreationSource(), $creationSource);
     }
 
@@ -510,7 +510,7 @@ class PaellaCoreContext extends MinkContext
      */
     public function orderRiskCheckHasFailed($orderId, $check)
     {
-        $order = $this->getOrderRepository()->getOneByExternalCode($orderId, 1);
+        $order = $this->getOrderRepository()->getOneByExternalCodeAndMerchantId($orderId, 1);
         Assert::notNull($order);
 
         $check = $this->getOrderRiskCheckRepositoryInterface()->findByOrderAndCheckName($order->getId(), $check);
@@ -524,7 +524,7 @@ class PaellaCoreContext extends MinkContext
      */
     public function orderHasTheSameHash($orderId, $hash)
     {
-        $order = $this->getOrderRepository()->getOneByExternalCode($orderId, 1);
+        $order = $this->getOrderRepository()->getOneByExternalCodeAndMerchantId($orderId, 1);
         if ($order === null) {
             throw new RuntimeException('Order not found');
         }
@@ -573,7 +573,7 @@ class PaellaCoreContext extends MinkContext
      */
     public function orderDurationIs($orderId, $key, $expectedValue)
     {
-        $order = $this->getOrderRepository()->getOneByExternalCode($orderId, 1);
+        $order = $this->getOrderRepository()->getOneByExternalCodeAndMerchantId($orderId, 1);
 
         Assert::notNull($order);
 
@@ -754,7 +754,7 @@ class PaellaCoreContext extends MinkContext
 
     private function getOrder($orderExternalCode): OrderEntity
     {
-        $order = $this->getOrderRepository()->getOneByExternalCode($orderExternalCode, $this->merchant->getId());
+        $order = $this->getOrderRepository()->getOneByExternalCodeAndMerchantId($orderExternalCode, $this->merchant->getId());
 
         if ($order === null) {
             throw new RuntimeException('Order not found');
@@ -967,7 +967,7 @@ class PaellaCoreContext extends MinkContext
      */
     public function orderNotificationShouldExistForOrderWithType($orderCode, $notificationType)
     {
-        $order = $this->getOrderRepository()->getOneByExternalCode($orderCode, $this->merchant->getId());
+        $order = $this->getOrderRepository()->getOneByExternalCodeAndMerchantId($orderCode, $this->merchant->getId());
 
         $notification = $this
             ->getOrderNotificationRepository()
@@ -981,7 +981,7 @@ class PaellaCoreContext extends MinkContext
      */
     public function orderNotificationShouldNotExistForOrderWithType($orderCode, $notificationType)
     {
-        $order = $this->getOrderRepository()->getOneByExternalCode($orderCode, $this->merchant->getId());
+        $order = $this->getOrderRepository()->getOneByExternalCodeAndMerchantId($orderCode, $this->merchant->getId());
 
         $notification = $this
             ->getOrderNotificationRepository()
@@ -1525,7 +1525,7 @@ class PaellaCoreContext extends MinkContext
      */
     public function theOrderBillingAddressUUIDShouldBe($code, $addressUuid)
     {
-        $order = $this->getOrderRepository()->getOneByExternalCode($code, $this->merchant->getId());
+        $order = $this->getOrderRepository()->getOneByExternalCodeAndMerchantId($code, $this->merchant->getId());
         Assert::eq($order->getCompanyBillingAddressUuid(), $addressUuid);
     }
 
@@ -1534,7 +1534,7 @@ class PaellaCoreContext extends MinkContext
      */
     public function theDebtorExternalDataForOrderWithCodeShouldHaveABillingAddress($code)
     {
-        $order = $this->getOrderRepository()->getOneByExternalCode($code, $this->merchant->getId());
+        $order = $this->getOrderRepository()->getOneByExternalCodeAndMerchantId($code, $this->merchant->getId());
         $extData = $this->getDebtorExternalDataRepository()->getOneById(
             $order->getDebtorExternalDataId()
         );

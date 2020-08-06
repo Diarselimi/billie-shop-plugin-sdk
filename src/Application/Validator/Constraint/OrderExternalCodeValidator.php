@@ -23,13 +23,11 @@ class OrderExternalCodeValidator extends ConstraintValidator
         }
 
         $request = $this->context->getRoot();
-
         if (!$value || !$request->getMerchantId()) {
             return;
         }
 
-        $order = $this->orderRepository->getOneByExternalCode($value, $request->getMerchantId());
-
+        $order = $this->orderRepository->getOneByExternalCodeAndMerchantId($value, $request->getMerchantId());
         if (!$order) {
             return;
         }

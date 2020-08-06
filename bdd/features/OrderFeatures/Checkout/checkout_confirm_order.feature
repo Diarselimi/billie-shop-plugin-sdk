@@ -66,11 +66,12 @@ Feature: As a merchant, I should be able to create an order by providing a valid
           "city":"Berlin",
           "postal_code":"10179",
           "country":"DE"
-       }
+       },
+       "order_id": "CO333"
     }
     """
     Then the response status code should be 202
-    And the order CO123 is in state created
+    And the order CO333 is in state created
 
   Scenario: I successfully confirm the order that is in pre_waiting state. Order is moved to waiting state.
     Given I have a pre_waiting order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"

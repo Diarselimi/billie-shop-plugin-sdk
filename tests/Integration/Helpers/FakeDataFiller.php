@@ -69,7 +69,7 @@ trait FakeDataFiller
                         break;
                     default:
                         $val = new $valueType();
-                        $this->fillObject($valueType);
+                        $this->fillObject($val, true);
 
                         break;
                 }

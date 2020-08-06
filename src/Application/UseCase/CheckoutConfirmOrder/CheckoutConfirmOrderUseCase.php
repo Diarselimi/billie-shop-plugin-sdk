@@ -13,6 +13,7 @@ use App\DomainModel\CheckoutSession\CheckoutOrderRequestDTO;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
+use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderResponse\OrderResponse;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
@@ -29,16 +30,20 @@ class CheckoutConfirmOrderUseCase implements ValidatedUseCaseInterface
 
     private $dataMatcher;
 
+    private $orderRepository;
+
     public function __construct(
         OrderResponseFactory $orderResponseFactory,
         OrderContainerFactory $orderContainerFactory,
         OrderStateManager $orderStateManager,
-        CheckoutOrderMatcherInterface $dataMatcher
+        CheckoutOrderMatcherInterface $dataMatcher,
+        OrderRepositoryInterface $orderRepository
     ) {
         $this->orderResponseFactory = $orderResponseFactory;
         $this->orderContainerFactory = $orderContainerFactory;
         $this->stateManager = $orderStateManager;
         $this->dataMatcher = $dataMatcher;
+        $this->orderRepository = $orderRepository;
     }
 
     public function execute(CheckoutConfirmOrderRequest $request): OrderResponse
@@ -54,6 +59,10 @@ class CheckoutConfirmOrderUseCase implements ValidatedUseCaseInterface
         }
 
         $this->assureDataMatches($request, $orderContainer);
+
+        if ($request->getExternalCode() !== null) {
+            $this->updateOrderExternalCode($request, $orderContainer);
+        }
 
         if ($this->stateManager->isPreWaiting($orderContainer->getOrder())) {
             $this->stateManager->wait($orderContainer);
@@ -78,5 +87,11 @@ class CheckoutConfirmOrderUseCase implements ValidatedUseCaseInterface
         if ($mismatchViolationList->hasMismatches()) {
             throw new RequestValidationException($mismatchViolationList);
         }
+    }
+
+    private function updateOrderExternalCode(CheckoutConfirmOrderRequest $request, OrderContainer $orderContainer): void
+    {
+        $orderContainer->getOrder()->setExternalCode($request->getExternalCode());
+        $this->orderRepository->updateOrderExternalCode($orderContainer->getOrder());
     }
 }

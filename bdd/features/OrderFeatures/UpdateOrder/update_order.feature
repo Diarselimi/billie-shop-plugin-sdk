@@ -162,7 +162,7 @@ Feature: APIS-1077
       {
         "title": "This value should be null or non-blank string.",
         "code": "request_validation_error",
-        "source": "external_code"
+        "source": "order_id"
       }
      ]
     }

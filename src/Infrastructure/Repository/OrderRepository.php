@@ -134,7 +134,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
         $this->dispatchCreatedEvent($order);
     }
 
-    public function getOneByExternalCode(string $externalCode, int $merchantId): ?OrderEntity
+    public function getOneByExternalCodeAndMerchantId(string $externalCode, int $merchantId): ?OrderEntity
     {
         $order = $this->doFetchOne('
           SELECT ' . implode(', ', self::SELECT_FIELDS) . '
@@ -214,6 +214,19 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
         ]);
 
         return $order ? $this->orderFactory->createFromDatabaseRow($order) : null;
+    }
+
+    public function updateOrderExternalCode(OrderEntity $orderEntity): void
+    {
+        $this->doUpdate(
+            'UPDATE '. self::TABLE_NAME .
+            ' SET external_code = :external_code '.
+            ' WHERE id = :id ',
+            [
+                'external_code' => $orderEntity->getExternalCode(),
+                'id' => $orderEntity->getId(),
+            ]
+        );
     }
 
     public function update(OrderEntity $order): void

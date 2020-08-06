@@ -28,7 +28,7 @@ class UpdateOrderRequest extends AbstractOrderRequest implements
      * @Assert\Type(type="string")
      * @Assert\Length(max=255)
      */
-    private $externalCode;
+    private $orderId;
 
     /**
      * @Assert\Type(type="string")
@@ -102,12 +102,12 @@ class UpdateOrderRequest extends AbstractOrderRequest implements
 
     public function getExternalCode(): ?string
     {
-        return $this->externalCode;
+        return $this->orderId;
     }
 
     public function setExternalCode($externalCode): UpdateOrderRequest
     {
-        $this->externalCode = $externalCode;
+        $this->orderId = $externalCode;
 
         return $this;
     }

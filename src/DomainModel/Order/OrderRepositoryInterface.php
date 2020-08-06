@@ -3,7 +3,6 @@
 namespace App\DomainModel\Order;
 
 use Generator;
-use Symfony\Component\HttpFoundation\ParameterBag;
 
 interface OrderRepositoryInterface
 {
@@ -11,17 +10,19 @@ interface OrderRepositoryInterface
 
     public function update(OrderEntity $order): void;
 
+    public function updateOrderExternalCode(OrderEntity $orderEntity): void;
+
     public function updateMerchantDebtor(int $orderId, int $merchantDebtorId): void;
 
     public function updateIdentificationBillingAddress(int $orderId, string $billingAddressUuid): void;
 
-    public function getOneByExternalCode(string $externalCode, int $merchantId): ?OrderEntity;
+    public function getOneByExternalCodeAndMerchantId(string $externalCode, int $merchantId): ?OrderEntity;
 
     public function getNotYetConfirmedByCheckoutSessionUuid(string $checkoutSessionUuid): ?OrderEntity;
 
-    public function getOneByMerchantIdAndExternalCodeOrUUID(string $id, int $merchantId): ? OrderEntity;
+    public function getOneByMerchantIdAndExternalCodeOrUUID(string $id, int $merchantId): ?OrderEntity;
 
-    public function getOneByMerchantIdAndUUID(string $uuid, int $merchantId): ? OrderEntity;
+    public function getOneByMerchantIdAndUUID(string $uuid, int $merchantId): ?OrderEntity;
 
     public function getOneByPaymentId(string $paymentId): ?OrderEntity;
 
@@ -64,5 +65,9 @@ interface OrderRepositoryInterface
 
     public function getOrdersCountByMerchantDebtorAndState(int $merchantDebtorId, string $state): int;
 
-    public function getOrdersCountByCompanyBillingAddressAndState(string $companyUuid, string $addressUuid, string $state): int;
+    public function getOrdersCountByCompanyBillingAddressAndState(
+        string $companyUuid,
+        string $addressUuid,
+        string $state
+    ): int;
 }
