@@ -2961,6 +2961,9 @@ components:
           $ref: '#/components/schemas/TinyText'
         is_onboarding_complete:
           type: boolean
+        fee_rates:
+          type: string
+          nullable: true
       type: object
     CreateOrderRequest:
       title: 'Order Creation Request'

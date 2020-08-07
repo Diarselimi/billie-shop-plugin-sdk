@@ -368,7 +368,8 @@ Feature: Create a new merchant specifying the data of the company that will be c
         "webhook_authorization": "X-Api-Key: hola",
         "is_onboarding_complete": false,
         "iban": "DE87500105173872482875",
-        "bic": "AABSDE31"
+        "bic": "AABSDE31",
+        "fee_rates": "{\"14\": 10, \"30\": 15}"
       }
       """
     Then the response status code should be 201

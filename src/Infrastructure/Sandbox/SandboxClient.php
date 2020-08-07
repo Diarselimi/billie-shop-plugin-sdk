@@ -19,6 +19,8 @@ class SandboxClient implements SandboxClientInterface
 {
     use LoggingTrait, DecodeResponseTrait;
 
+    private const FEE_RATES = '{"14": 299, "30": 349, "45": 459, "60": 579, "75": 709, "90": 839, "105": 969, "120": 1099}';
+
     private $paellaSandboxClient;
 
     private $merchantEntityFactory;
@@ -36,7 +38,10 @@ class SandboxClient implements SandboxClientInterface
     {
         try {
             $response = $this->paellaSandboxClient->post("api/merchant/with-company", [
-                'json' => $creationDTO->toArray(),
+                'json' => array_merge(
+                    $creationDTO->toArray(),
+                    ['fee_rates' => self::FEE_RATES]
+                ),
             ]);
 
             $response = $this->decodeResponse($response);

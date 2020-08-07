@@ -27,6 +27,8 @@ class MerchantCreationDTO
 
     private $isOnboardingComplete;
 
+    private $feeRates;
+
     public function __construct(
         DebtorCompany $company,
         string $apiKey,
@@ -122,6 +124,18 @@ class MerchantCreationDTO
     public function setIsOnboardingComplete(bool $isOnboardingComplete): MerchantCreationDTO
     {
         $this->isOnboardingComplete = $isOnboardingComplete;
+
+        return $this;
+    }
+
+    public function getFeeRates(): ?string
+    {
+        return $this->feeRates;
+    }
+
+    public function setFeeRates($feeRates): MerchantCreationDTO
+    {
+        $this->feeRates = $feeRates;
 
         return $this;
     }

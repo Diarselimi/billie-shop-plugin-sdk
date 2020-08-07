@@ -5,8 +5,9 @@ namespace App\DomainModel\Merchant;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
-use Ozean12\Transfer\Message\Customer\CustomerCreated;
 use Ozean12\Transfer\Message\Company\RequestSchufaB2BReport;
+use Ozean12\Transfer\Message\Customer\CustomerCreated;
+use Ozean12\Transfer\Message\Customer\CustomerFeeRatesUpdated;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class MerchantAnnouncer implements LoggingInterface
@@ -31,7 +32,7 @@ class MerchantAnnouncer implements LoggingInterface
         string $companyUuid,
         string $companyName,
         string $paymentUuid
-    ) {
+    ): void {
         $message = (new CustomerCreated())
             ->setCompanyUuid($companyUuid)
             ->setName($companyName)
@@ -44,7 +45,7 @@ class MerchantAnnouncer implements LoggingInterface
         $this->logInfo('CustomerCreated event announced');
     }
 
-    public function announceRequestSchufaB2BReport(DebtorCompany $debtorCompany)
+    public function announceRequestSchufaB2BReport(DebtorCompany $debtorCompany): void
     {
         $message = (new RequestSchufaB2BReport())
             ->setCompanyUuid($debtorCompany->getUuid())
@@ -59,5 +60,18 @@ class MerchantAnnouncer implements LoggingInterface
 
         $this->bus->dispatch($message);
         $this->logInfo('RequestSchufaB2BReport event announced');
+    }
+
+    public function announceCustomerFeeRatesUpdated(string $companyUuid, array $feeRates): void
+    {
+        $this->logInfo('Fee rates to be set', ['json' => json_encode($feeRates)]);
+
+        $message = (new CustomerFeeRatesUpdated())
+            ->setCompanyUuid($companyUuid)
+            ->setFeeRates($feeRates)
+        ;
+
+        $this->bus->dispatch($message);
+        $this->logInfo('CustomerFeeRatesUpdated event announced');
     }
 }

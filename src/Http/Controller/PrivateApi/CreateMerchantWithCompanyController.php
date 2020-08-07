@@ -71,7 +71,8 @@ class CreateMerchantWithCompanyController
             ->setCrefoId($request->get('crefo_id'))
             ->setSchufaId($request->get('schufa_id'))
             ->setTaxId($request->get('tax_id'))
-            ->setRegistrationNumber($request->get('registration_number'));
+            ->setRegistrationNumber($request->get('registration_number'))
+            ->setFeeRates($request->get('fee_rates'));
 
         try {
             /** @var CreateMerchantWithCompanyRequest $useCaseRequest */

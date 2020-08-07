@@ -111,6 +111,13 @@ class MerchantCreationService
 
         $this->merchantAnnouncer->announceRequestSchufaB2BReport($creationDTO->getCompany());
 
+        if ($creationDTO->getFeeRates() !== null && $creationDTO->getFeeRates() !== "") {
+            $this->merchantAnnouncer->announceCustomerFeeRatesUpdated(
+                $creationDTO->getCompany()->getUuid(),
+                json_decode($creationDTO->getFeeRates(), true)
+            );
+        }
+
         return $creationDTO;
     }
 

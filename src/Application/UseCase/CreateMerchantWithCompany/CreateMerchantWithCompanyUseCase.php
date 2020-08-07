@@ -79,18 +79,19 @@ class CreateMerchantWithCompanyUseCase implements ValidatedUseCaseInterface
             throw new DuplicateMerchantCompanyException();
         }
 
-        $creationDTO = $this->merchantCreationService->create(
-            (new MerchantCreationDTO(
-                $company,
-                $this->uuidGenerator->uuid4(),
-                $this->uuidGenerator->uuid4(),
-                $request->getMerchantFinancingLimit(),
-                $request->getInitialDebtorFinancingLimit()
-            ))
-                ->setWebhookUrl($request->getWebhookUrl())
-                ->setWebhookAuthorization($request->getWebhookAuthorization())
-                ->setIsOnboardingComplete($request->isOnboardingComplete())
-        );
+        $merchantCreationDTO = (new MerchantCreationDTO(
+            $company,
+            $this->uuidGenerator->uuid4(),
+            $this->uuidGenerator->uuid4(),
+            $request->getMerchantFinancingLimit(),
+            $request->getInitialDebtorFinancingLimit()
+        ))
+            ->setWebhookUrl($request->getWebhookUrl())
+            ->setWebhookAuthorization($request->getWebhookAuthorization())
+            ->setIsOnboardingComplete($request->isOnboardingComplete())
+            ->setFeeRates($request->getFeeRates());
+
+        $creationDTO = $this->merchantCreationService->create($merchantCreationDTO);
 
         $bankAccount = $this->bankAccountDTOFactory->create(
             $creationDTO->getCompany()->getName(),

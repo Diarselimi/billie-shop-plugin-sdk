@@ -6,5 +6,9 @@ framework:
         default:
           middleware:
             - 'Ozean12\AmqpPackBundle\Middleware\TransportConfigurationMiddleware'
-      transports: ~
-      routing: ~
+      transports:
+        customer.customer_fee_rates_updated: enqueue://default?topic[name]=customer&topic[type]=topic&queue[name]=customer.customer_fee_rates_updated&deliveryDelay=30000&delayStrategy=Enqueue\AmqpTools\RabbitMqDlxDelayStrategy&timeToLive=30000&receiveTimeout=1000&queue[bindingKey]=customer.customer_fee_rates_updated
+
+      routing:
+        Ozean12\Transfer\Message\Customer\CustomerFeeRatesUpdated: customer.customer_fee_rates_updated
+

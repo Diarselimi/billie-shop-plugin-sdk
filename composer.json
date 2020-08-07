@@ -21,7 +21,7 @@
         "globalcitizen/php-iban": "^2.8",
         "illuminate/support": "^7.13",
         "ozean12/amqp-pack": "^1.0",
-        "ozean12/amqp-transfers": "~0.3.35",
+        "ozean12/amqp-transfers": "~0.3.38",
         "ozean12/graphql-repository-client": "^1.0",
         "ozean12/money": "^3.0",
         "ramsey/uuid": "^3.9",

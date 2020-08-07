@@ -33,10 +33,24 @@ use OpenApi\Annotations as OA;
  *          @OA\Property(property="iban", ref="#/components/schemas/TinyText", example="DE87500105173872482875"),
  *          @OA\Property(property="bic", ref="#/components/schemas/TinyText", example="AABSDE31"),
  *          @OA\Property(property="is_onboarding_complete", type="boolean"),
+ *          @OA\Property(property="fee_rates", type="string", nullable=true),
  *      },
  *      required={"name", "legal_form", "address_street", "address_city", "address_postal_code", "address_country", "crefo_id", "schufa_id"}
  * )
  */
 class CreateMerchantWithCompanyRequest extends MerchantWithCompanyCreationDTO implements ValidatedRequestInterface
 {
+    private $feeRates;
+
+    public function getFeeRates(): ?string
+    {
+        return $this->feeRates;
+    }
+
+    public function setFeeRates($feeRates): self
+    {
+        $this->feeRates = $feeRates;
+
+        return $this;
+    }
 }

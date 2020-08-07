@@ -4,6 +4,7 @@ namespace spec\App\DomainModel\Merchant;
 
 use App\DomainModel\Merchant\MerchantAnnouncer;
 use Ozean12\Transfer\Message\Customer\CustomerCreated;
+use Ozean12\Transfer\Message\Customer\CustomerFeeRatesUpdated;
 use PhpSpec\ObjectBehavior;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
@@ -16,6 +17,8 @@ class MerchantAnnouncerSpec extends ObjectBehavior
     const PAYMENT_UUID = 'payment_uuid';
 
     const COMPANY_NAME = 'billie';
+
+    const FEE_RATES = ["14" => 299, "30" => 349];
 
     public function let(
         MessageBusInterface $bus,
@@ -30,7 +33,7 @@ class MerchantAnnouncerSpec extends ObjectBehavior
         $this->shouldHaveType(MerchantAnnouncer::class);
     }
 
-    public function it_should_send_message_successfully(
+    public function it_should_send_customer_created_message_successfully(
         MessageBusInterface $bus
     ) {
         $message = (new CustomerCreated())
@@ -46,6 +49,21 @@ class MerchantAnnouncerSpec extends ObjectBehavior
             self::COMPANY_UUID,
             self::COMPANY_NAME,
             self::PAYMENT_UUID
+        );
+    }
+
+    public function it_should_send_customer_fee_rates_updated_message_successfully(
+        MessageBusInterface $bus
+    ) {
+        $message = (new CustomerFeeRatesUpdated())
+            ->setFeeRates(self::FEE_RATES)
+            ->setCompanyUuid(self::COMPANY_UUID);
+
+        $bus->dispatch($message)->shouldBeCalledOnce()->willReturn(new Envelope($message));
+
+        $this->announceCustomerFeeRatesUpdated(
+            self::COMPANY_UUID,
+            self::FEE_RATES
         );
     }
 }
