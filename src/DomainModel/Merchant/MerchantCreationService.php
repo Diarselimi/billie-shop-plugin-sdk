@@ -111,12 +111,16 @@ class MerchantCreationService
 
         $this->merchantAnnouncer->announceRequestSchufaB2BReport($creationDTO->getCompany());
 
+        /**
+         * TODO: temporal fix, as amqp-pack doesn't support serialization we need
+         * https://ozean12.atlassian.net/browse/DASH-83
         if ($creationDTO->getFeeRates() !== null && $creationDTO->getFeeRates() !== "") {
             $this->merchantAnnouncer->announceCustomerFeeRatesUpdated(
                 $creationDTO->getCompany()->getUuid(),
                 json_decode($creationDTO->getFeeRates(), true)
             );
         }
+         */
 
         return $creationDTO;
     }
