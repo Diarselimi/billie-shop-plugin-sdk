@@ -100,7 +100,7 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
                 AND merchant_external_id = :merchant_debtor_external_id
                 AND ' . self::TABLE_NAME . '.id != :id
                 AND DATE_ADD( ' . self::TABLE_NAME . '.created_at, INTERVAL :minutes MINUTE) > :now
-                ORDER BY  ' . self::TABLE_NAME . '.created_at DESC LIMIT 1',
+                ORDER BY  ' . self::TABLE_NAME . '.id DESC LIMIT 1',
             [
                 'hash' => $hash,
                 'minutes' => $maxMinutes,
@@ -159,7 +159,7 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
             SELECT DISTINCT ' . self::TABLE_NAME.'.merchant_external_id as external_id' . ' FROM ' . self::TABLE_NAME . '
             INNER JOIN orders ON orders.debtor_external_data_id = ' . self::TABLE_NAME . '.id
             WHERE orders.merchant_debtor_id = :merchant_debtor_id
-            ORDER BY  ' . self::TABLE_NAME . '.created_at DESC',
+            ORDER BY  ' . self::TABLE_NAME . '.id DESC',
             [
                 'merchant_debtor_id' => $merchantDebtorId,
             ]
@@ -175,7 +175,7 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
             WHERE 
                 orders.merchant_id = :merchant_id
                 AND merchant_external_id = :merchant_debtor_external_id
-                ORDER BY  ' . self::TABLE_NAME . '.created_at DESC LIMIT 1',
+                ORDER BY  ' . self::TABLE_NAME . '.id DESC LIMIT 1',
             [
                 'merchant_id' => $merchantId,
                 'merchant_debtor_external_id' => $externalCode,

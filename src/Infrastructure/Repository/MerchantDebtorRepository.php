@@ -195,7 +195,7 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
         return (float) $row['amount'] ?? 0;
     }
 
-    public function getMerchantDebtorIdentifierDtos(string $where = ''): ?\Generator
+    private function getMerchantDebtorIdentifierDtos(string $where = ''): ?\Generator
     {
         $where = $where ? "WHERE {$where}" : '';
         $tableName = self::TABLE_NAME;
@@ -210,7 +210,7 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
         INNER JOIN {$tableName} ON (merchant_debtor_id = merchants_debtors.id)
     {$where}
     GROUP BY debtor_id, merchant_id, merchant_external_id, merchant_debtor_id
-    ORDER BY merchant_id, merchant_external_id, debtor_id
+    ORDER BY orders.id DESC
 SQL;
         $stmt = $this->doExecute($sql);
         $count = 0;
@@ -230,7 +230,7 @@ SQL;
         }
     }
 
-    public function getOneMerchantDebtorIdentifierDto(int $merchantDebtorId): ?MerchantDebtorIdentifierDTO
+    private function getOneMerchantDebtorIdentifierDto(int $merchantDebtorId): ?MerchantDebtorIdentifierDTO
     {
         return $this->getMerchantDebtorIdentifierDtos(self::TABLE_NAME . ".id={$merchantDebtorId}")->current();
     }

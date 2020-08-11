@@ -22,14 +22,6 @@ interface MerchantDebtorRepositoryInterface
 
     public function getMerchantDebtorOrdersAmountByState(int $merchantDebtorId, string $state): float;
 
-    /**
-     * @param  string                                   $where
-     * @return MerchantDebtorIdentifierDTO[]|\Generator
-     */
-    public function getMerchantDebtorIdentifierDtos(string $where = ''): ?\Generator;
-
-    public function getOneMerchantDebtorIdentifierDto(int $merchantDebtorId): ?MerchantDebtorIdentifierDTO;
-
     public function findExternalId(int $merchantDebtorId): ?string;
 
     /**
