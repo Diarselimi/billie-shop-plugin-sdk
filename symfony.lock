@@ -1,4 +1,7 @@
 {
+    "billie/monitoring-bundle": {
+        "version": "v2.10.3"
+    },
     "flagception/flagception": {
         "version": "1.5.0"
     },
@@ -13,6 +16,9 @@
         "files": [
             "config/packages/flagception.yaml"
         ]
+    },
+    "fzaninotto/faker": {
+        "version": "v1.9.1"
     },
     "php": {
         "version": "7.3"
