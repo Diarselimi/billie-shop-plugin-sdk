@@ -39,6 +39,8 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
 
     private const UPDATE_COMPANY_TIMEOUT = 2;
 
+    private const SEARCH_EXTERNAL_DEBTORS_TIMEOUT = 3;
+
     private const HEADER_X_TRACKER_USER_ID = 'X-Tracker-User-Id';
 
     private $client;
@@ -369,6 +371,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
                     'query' => $searchQuery,
                     'limit' => $limit,
                 ],
+                'timeout' => self::SEARCH_EXTERNAL_DEBTORS_TIMEOUT,
             ]);
         } catch (TransferException $exception) {
             throw new CompaniesServiceRequestException();
