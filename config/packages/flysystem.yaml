@@ -1,0 +1,28 @@
+# Read the documentation at https://github.com/thephpleague/flysystem-bundle/blob/master/docs/1-getting-started.md
+flysystem:
+  storages:
+    events.uploads.storage.s3:
+      adapter: 'aws'
+      options:
+        client: 'Aws\S3\S3Client'
+        bucket: '%env(EVENTS_AWS_S3_BUCKET_NAME)%'
+        prefix: '/'
+
+    events.uploads.storage.local:
+      adapter: 'local'
+      options:
+        directory: '%kernel.project_dir%/var/storage/uploads'
+
+    events.uploads.storage:
+      adapter: 'lazy'
+      options:
+        source: '%env(EVENTS_UPLOADS_STORAGE)%'
+
+services:
+  Aws\S3\S3Client:
+    arguments:
+      - version: '2006-03-01'
+        region: '%env(AWS_REGION)%'
+        credentials:
+          key: '%env(AWS_ACCESS_KEY_ID)%'
+          secret: '%env(AWS_SECRET_ACCESS_KEY)%'
