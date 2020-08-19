@@ -19,6 +19,9 @@ ozean12_amqp_pack:
     company_information_change_request.company_information_change_request_created: Ozean12\Transfer\Message\CompanyInformationChangeRequest\CompanyInformationChangeRequestCreated
     company.request_schufa_b2b_report: Ozean12\Transfer\Message\Company\RequestSchufaB2BReport
     merchant_onboarding.merchant_onboarding_step_transition: Ozean12\Transfer\Message\MerchantOnboarding\MerchantOnboardingStepTransition
+    customer.customer_fee_rates_updated:
+      class: Ozean12\Transfer\Message\Customer\CustomerFeeRatesUpdated
+      delay: 15000
   subscribe:
     identity.identity_verification_succeeded: Ozean12\Transfer\Message\Identity\IdentityVerificationSucceeded
     order.order_dunning_step_changed: Ozean12\Transfer\Message\Order\OrderDunningStepChanged

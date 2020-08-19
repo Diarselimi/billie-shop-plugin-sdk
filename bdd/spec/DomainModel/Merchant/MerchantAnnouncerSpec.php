@@ -57,12 +57,12 @@ class MerchantAnnouncerSpec extends ObjectBehavior
     ) {
         $message = (new CustomerFeeRatesUpdated())
             ->setFeeRates(self::FEE_RATES)
-            ->setCompanyUuid(self::COMPANY_UUID);
+            ->setCompanyUuid(self::PAYMENT_UUID);
 
         $bus->dispatch($message)->shouldBeCalledOnce()->willReturn(new Envelope($message));
 
         $this->announceCustomerFeeRatesUpdated(
-            self::COMPANY_UUID,
+            self::PAYMENT_UUID,
             self::FEE_RATES
         );
     }

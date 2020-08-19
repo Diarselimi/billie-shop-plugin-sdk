@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3ad65e237a8ef0489b002b92ae207ae9",
+    "content-hash": "7d2a96e5f3ec499684a10eeff8432e88",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -2694,16 +2694,16 @@
         },
         {
             "name": "ozean12/amqp-pack",
-            "version": "1.0.0",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/amqp-pack.git",
-                "reference": "0bd35c966f2f7eb9b9b3b4756de0db37379843a9"
+                "reference": "6305a559b1c1a9bb865d14b9002ca641eaeedf5f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/amqp-pack/zipball/0bd35c966f2f7eb9b9b3b4756de0db37379843a9",
-                "reference": "0bd35c966f2f7eb9b9b3b4756de0db37379843a9",
+                "url": "https://api.github.com/repos/ozean12/amqp-pack/zipball/6305a559b1c1a9bb865d14b9002ca641eaeedf5f",
+                "reference": "6305a559b1c1a9bb865d14b9002ca641eaeedf5f",
                 "shasum": ""
             },
             "require": {
@@ -2738,10 +2738,10 @@
             ],
             "description": "A pack for using the AMQP transport within Billie",
             "support": {
-                "source": "https://github.com/ozean12/amqp-pack/tree/1.0.0",
+                "source": "https://github.com/ozean12/amqp-pack/tree/1.1.0",
                 "issues": "https://github.com/ozean12/amqp-pack/issues"
             },
-            "time": "2019-12-05T14:12:16+00:00"
+            "time": "2020-08-17T11:45:25+00:00"
         },
         {
             "name": "ozean12/amqp-transfers",

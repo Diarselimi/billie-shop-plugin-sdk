@@ -62,12 +62,12 @@ class MerchantAnnouncer implements LoggingInterface
         $this->logInfo('RequestSchufaB2BReport event announced');
     }
 
-    public function announceCustomerFeeRatesUpdated(string $companyUuid, array $feeRates): void
+    public function announceCustomerFeeRatesUpdated(string $merchantPaymentUuid, array $feeRates): void
     {
         $this->logInfo('Fee rates to be set', ['json' => json_encode($feeRates)]);
 
         $message = (new CustomerFeeRatesUpdated())
-            ->setCompanyUuid($companyUuid)
+            ->setCompanyUuid($merchantPaymentUuid)
             ->setFeeRates($feeRates)
         ;
 
