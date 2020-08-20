@@ -4,6 +4,7 @@ use Behat\Gherkin\Node\PyStringNode;
 use donatj\MockWebServer\Response;
 use donatj\MockWebServer\ResponseByMethod;
 use donatj\MockWebServer\ResponseInterface;
+use donatj\MockWebServer\ResponseStack;
 
 trait MockServerTrait
 {
@@ -15,21 +16,46 @@ trait MockServerTrait
     }
 
     /**
-     * @param string                    $uri
-     * @param string|array|PyStringNode $body
+     * @param string                    $requestUri
+     * @param string|array|PyStringNode $responseBody
      * @param array                     $headers
      * @param int                       $status
      * @param string|null               $method
      */
-    public function mockRequestWith(string $uri, $body, array $headers = [], int $status = 200, ?string $method = null)
-    {
-        if (is_array($body)) {
-            $body = json_encode($body);
+    public function mockRequestWith(
+        string $requestUri,
+        $responseBody,
+        array $headers = [],
+        int $status = 200,
+        ?string $method = null
+    ) {
+        if (is_array($responseBody)) {
+            $responseBody = json_encode($responseBody);
         }
 
-        $response = new Response((string) $body, $headers, $status);
+        $response = new Response((string) $responseBody, $headers, $status);
         $responseByMethod = $method ? new ResponseByMethod([$method => $response], $response) : $response;
 
-        $this->mockRequest($uri, $responseByMethod);
+        $this->mockRequest($requestUri, $responseByMethod);
+    }
+
+    public function mockRequestWithResponseStack(
+        string $requestUri,
+        array $responseBodies,
+        array $headers = [],
+        int $status = 200,
+        ?string $method = null
+    ) {
+        $responsesByMethod = [];
+        foreach ($responseBodies as $responseBody) {
+            if (is_array($responseBody)) {
+                $responseBody = json_encode($responseBody);
+            }
+
+            $response = new Response((string) $responseBody, $headers, $status);
+            $responsesByMethod[] = $method ? new ResponseByMethod([$method => $response], $response) : $response;
+        }
+
+        $this->mockRequest($requestUri, new ResponseStack(...$responsesByMethod));
     }
 }

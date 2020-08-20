@@ -9,6 +9,7 @@ default:
         - behatch:context:rest
         - json_spec
         - MockServerContext
+        - GraphQLContext
         - PaellaCoreContext:
             kernel: '@kernel'
             connection: '@billie_pdo.default_connection'

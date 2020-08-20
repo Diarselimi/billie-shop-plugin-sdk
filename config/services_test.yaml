@@ -88,9 +88,6 @@ services:
   App\DomainModel\OrderNotification\OrderNotificationRepositoryInterface:
     alias: 'App\Infrastructure\Repository\OrderNotificationRepository'
     public: true
-  App\DomainModel\Payment\PaymentsRepositoryInterface:
-    alias: 'App\DomainModel\Payment\DummyPaymentsRepository'
-    public: true
   App\DomainModel\MerchantOnboarding\MerchantOnboardingRepositoryInterface:
     alias: 'App\Infrastructure\Repository\MerchantOnboarding\MerchantOnboardingRepository'
     public: true
@@ -112,7 +109,4 @@ services:
     public: true
   App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestRepositoryInterface:
     alias: 'App\Infrastructure\Repository\DebtorInformationChangeRequestRepository'
-    public: true
-  App\DomainModel\MerchantDebtor\SearchMerchantDebtorsRepositoryInterface:
-    alias: 'App\DomainModel\MerchantDebtor\DummySearchMerchantDebtorsRepository'
     public: true

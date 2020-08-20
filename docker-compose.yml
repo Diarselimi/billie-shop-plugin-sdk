@@ -31,7 +31,7 @@ services:
       - AWS_SECRET_ACCESS_KEY=test
       - BORSCHT_URL=
       - GRAPHQL_API_KEY=test
-      - GRAPHQL_ENDPOINT=
+      - GRAPHQL_ENDPOINT=http://localhost:7070
       - LIMES_URL=
       - MOCKSERVER_URL=
       - NACHOS_URL=

@@ -15,6 +15,38 @@ Feature:
         And I get from companies service get debtor response
         And I get from limit service get debtor limit successful response for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
         And the debtor has an information change request with state complete
+        And GraphQL will respond to getPadMerchantDebtors with 200 and responses:
+        """
+        [
+            {
+                "data": {
+                    "getPadMerchantDebtors": [
+                        {
+                            "total": 1
+                        }
+                    ]
+                }
+            },
+            {
+                "data": {
+                    "getPadMerchantDebtors": [
+                        {
+                            "id": "1",
+                            "merchant_id": 1,
+                            "uuid": "ad74bbc4-509e-47d5-9b50-a0320ce3d715",
+                            "debtor_id": 1,
+                            "company_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
+                            "payment_debtor_id": "test",
+                            "score_thresholds_configuration_id": null,
+                            "created_at": "2019-01-01T12:00:00Z",
+                            "updated_at": "2019-01-01T12:00:00Z",
+                            "debtor_information_change_request_state": null
+                        }
+                    ]
+                }
+            }
+        ]
+        """
         When I send a GET request to "/debtors"
         Then the response status code should be 200
         And the JSON response should be:
