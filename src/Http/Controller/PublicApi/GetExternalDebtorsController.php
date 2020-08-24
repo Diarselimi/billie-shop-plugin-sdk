@@ -13,17 +13,18 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
- * @IsGranted("ROLE_CREATE_ORDERS")
+ * @IsGranted({"ROLE_CREATE_ORDERS", "ROLE_AUTHENTICATED_AS_CHECKOUT_USER"})
  * @OA\Get(
  *     path="/external-debtors",
  *     operationId="external_debtors_get",
  *     summary="Get External Debtors",
  *     security={{"oauth2"={}}},
  *
- *     tags={"Dashboard Debtors"},
+ *     tags={"Dashboard Debtors", "Checkout Client"},
  *     x={"groups":{"private"}},
  *
  *     @OA\Parameter(in="query", name="search", description="Search text.", @OA\Schema(ref="#/components/schemas/TinyText"), required=true),
+ *     @OA\Parameter(in="query", name="sessionUuid", @OA\Schema(ref="#/components/schemas/UUID"), required=false),
  *
  *     @OA\Response(response=200, @OA\JsonContent(ref="#/components/schemas/GetExternalDebtorsResponse"), description="External Debtors List"),
  *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),

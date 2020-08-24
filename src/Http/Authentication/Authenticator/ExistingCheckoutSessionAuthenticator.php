@@ -25,12 +25,12 @@ class ExistingCheckoutSessionAuthenticator extends AbstractAuthenticator
 
     public function supports(Request $request)
     {
-        return $request->attributes->has(HttpConstantsInterface::REQUEST_ATTRIBUTE_CHECKOUT_SESSION_ID);
+        return !empty($request->get(HttpConstantsInterface::REQUEST_ATTRIBUTE_CHECKOUT_SESSION_ID));
     }
 
     public function getCredentials(Request $request)
     {
-        return $request->attributes->get(HttpConstantsInterface::REQUEST_ATTRIBUTE_CHECKOUT_SESSION_ID);
+        return $request->get(HttpConstantsInterface::REQUEST_ATTRIBUTE_CHECKOUT_SESSION_ID);
     }
 
     protected function validateSession(?CheckoutSessionEntity $checkoutSession): void

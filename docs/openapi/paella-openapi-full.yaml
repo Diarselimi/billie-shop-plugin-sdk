@@ -1229,6 +1229,7 @@ paths:
     get:
       tags:
         - 'Dashboard Debtors'
+        - 'Checkout Client'
       summary: 'Get External Debtors'
       operationId: external_debtors_get
       parameters:

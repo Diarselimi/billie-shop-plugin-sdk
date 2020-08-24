@@ -50,6 +50,16 @@ security:
             authenticators:
               - App\Http\Authentication\Authenticator\ExistingCheckoutSessionAuthenticator
 
+        get_external_debtors:
+          pattern: ^/(public/)?external-debtors
+          anonymous: false
+          stateless: true
+          guard:
+            authenticators:
+              - App\Http\Authentication\Authenticator\ActiveCheckoutSessionAuthenticator
+              - App\Http\Authentication\Authenticator\OAuthTokenAuthenticator
+            entry_point: App\Http\Authentication\Authenticator\ActiveCheckoutSessionAuthenticator
+
         invited_user:
             pattern: ^/(public/)?merchant/users/invitations/([a-z0-9])+/(signup|details)$
             methods: [GET, POST, OPTIONS]
