@@ -553,7 +553,7 @@ Feature:
           "street":"Heinrich-Heine-Platz",
           "city":"Berlin",
           "postal_code":"10179",
-          "country":"de"
+          "country":"DE"
        },
        "amount":{
           "net":900.00,
@@ -616,7 +616,7 @@ Feature:
           "street":"Heinrich-Heine-Platz",
           "city":"Berlin",
           "postal_code":"10179",
-          "country":"de"
+          "country":"DE"
        },
        "billing_address":{
           "house_number":"10",

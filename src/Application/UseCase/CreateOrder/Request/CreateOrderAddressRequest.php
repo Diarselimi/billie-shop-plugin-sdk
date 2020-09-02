@@ -55,7 +55,7 @@ class CreateOrderAddressRequest implements ArrayableInterface
 
     /**
      * @Assert\NotBlank()
-     * @Assert\Regex(pattern="/^[A-Za-z]{2}$/", match=true)
+     * @Assert\Regex(pattern="/^[A-Z]{2}$/", match=true)
      */
     private $country;
 
