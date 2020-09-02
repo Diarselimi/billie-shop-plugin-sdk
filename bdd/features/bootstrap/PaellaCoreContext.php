@@ -773,6 +773,43 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
+     * @Given a merchant user exists with uuid :uuid and role :roleName and permission :permission
+     */
+    public function aMerchantUserExistsWithUuidAndRole(string $userUuid, string $roleName, string $permission)
+    {
+        $role = $this->createRole($roleName, $roleName . '_uuid', [$permission]);
+        $this->createUser($role->getId(), [], $userUuid, 'complete', uniqid() . '@billie.dev');
+    }
+
+    /**
+     * @Given a role :roleName exists with uuid :roleUuid and permission :permission
+     */
+    public function aRoleExistsWithUuidAndPermission(string $roleName, string $roleUuid, string $permission)
+    {
+        $this->createRole($roleName, $roleUuid, [$permission]);
+    }
+
+    /**
+     * @Then the user with uuid :userUuid has role :roleName
+     */
+    public function theUserWithUuidHasRole(string $userUuid, string $roleName)
+    {
+        $user = $this->getMerchantUserRepository()->getOneByUuid($userUuid);
+        $role = $this->getMerchantUserRoleRepository()->getOneByName($roleName, 1);
+        Assert::eq($user->getRoleId(), $role->getId());
+    }
+
+    /**
+     * @Then the invitation with token :token has role :roleName
+     */
+    public function theInvitationWithTokenHasRole(string $token, string $roleName)
+    {
+        $invitation = $this->getMerchantUserInvitationRepository()->findValidByToken($token);
+        $role = $this->getMerchantUserRoleRepository()->getOneByName($roleName, 1);
+        Assert::eq($invitation->getMerchantUserRoleId(), $role->getId());
+    }
+
+    /**
      * @Given a merchant user exists with permission :permission
      */
     public function aMerchantUserExistsWithPermission(string $permission)
@@ -877,11 +914,23 @@ class PaellaCoreContext extends MinkContext
         $this->createInvitation($email, 1, $roleId, null, $invitationStatus, null, $token);
     }
 
+    /**
+     * @Given an invitation with token :token for user uuid :userUuid exists for role uuid :roleUuid
+     */
+    public function anInvitationForUserUuidExistsForRoleUuid(string $token, string $userUuid, string $roleUuid)
+    {
+        $roleId = $this->getMerchantUserRoleRepository()->getOneByUuid($roleUuid)->getId();
+        $userId = $this->getMerchantUserRepository()->getOneByUuid($userUuid)->getId();
+
+        $this->createInvitation('another_test@billie.dev', 1, $roleId, $userId, 'pending', null, $token);
+    }
+
     private function createUser(
         int $roleId,
         array $userPermissions = [],
         $userUuid = 'oauthUserId',
-        string $invitationStatus = 'complete'
+        string $invitationStatus = 'complete',
+        string $invitationEmail = 'test@billie.dev'
     ): MerchantUserEntity {
         $user = (new MerchantUserEntity())
             ->setUuid($userUuid)
@@ -891,7 +940,7 @@ class PaellaCoreContext extends MinkContext
             ->setFirstName('test')
             ->setLastName('test');
         $this->getMerchantUserRepository()->create($user);
-        $this->createInvitation('test@billie.dev', 1, $roleId, $user->getId(), $invitationStatus);
+        $this->createInvitation($invitationEmail, 1, $roleId, $user->getId(), $invitationStatus);
 
         $this->lastCreatedUser = $user;
 

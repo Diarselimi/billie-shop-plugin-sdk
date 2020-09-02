@@ -88,16 +88,17 @@ class MerchantUserInvitationRepository extends AbstractPdoRepository implements 
         );
     }
 
-    public function findValidByEmailAndMerchant(string $email, int $merchantId): ?MerchantUserInvitationEntity
+    public function findByEmailAndMerchant(string $email, int $merchantId, bool $validOnly): ?MerchantUserInvitationEntity
     {
-        $now = (new \DateTime())->format(self::DATE_FORMAT);
         $query = 'SELECT ' . implode(', ', self::SELECT_FIELDS) .
             ' FROM ' . self::TABLE_NAME .
-            " WHERE email = :email AND revoked_at IS NULL AND expires_at > :now
-              AND merchant_id = :merchant_id ";
+            " WHERE email = :email AND merchant_id = :merchant_id";
+        $params = ['email' => $email, 'merchant_id' => $merchantId];
 
-        $params = ['email' => $email, 'merchant_id' => $merchantId, 'now' => $now];
-
+        if ($validOnly) {
+            $query .= " AND revoked_at IS NULL AND expires_at > :now";
+            $params['now'] = (new \DateTime())->format(self::DATE_FORMAT);
+        }
         $row = $this->doFetchOne($query, $params);
 
         return $row ? $this->factory->createFromArray($row) : null;
@@ -213,6 +214,28 @@ class MerchantUserInvitationRepository extends AbstractPdoRepository implements 
             ' WHERE token = :token AND revoked_at IS NULL AND expires_at > :now';
         $params = ['token' => $token, 'now' => $now];
         $row = $this->doFetchOne($query, $params);
+
+        return $row ? $this->factory->createFromArray($row) : null;
+    }
+
+    public function assignRoleToInvitation(int $id, int $roleId): void
+    {
+        $this->update($id, ['merchant_user_role_id' => $roleId]);
+    }
+
+    private function update(int $id, array $columnValuePairs): void
+    {
+        $sql = $this->generateUpdateQuery(self::TABLE_NAME, array_keys($columnValuePairs)). ' WHERE id = :id';
+        $this->doExecute($sql, array_merge(['id' => $id], $columnValuePairs));
+    }
+
+    public function findOneByMerchantUserId(int $merchantUserId): ?MerchantUserInvitationEntity
+    {
+        $row = $this->doFetchOne(
+            $this->generateSelectQuery(self::TABLE_NAME, self::SELECT_FIELDS)
+            . ' WHERE merchant_user_id = :merchant_user_id',
+            ['merchant_user_id' => $merchantUserId]
+        );
 
         return $row ? $this->factory->createFromArray($row) : null;
     }

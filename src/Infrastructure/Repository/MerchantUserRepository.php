@@ -77,6 +77,11 @@ class MerchantUserRepository extends AbstractPdoRepository implements MerchantUs
         return $this->getOneBy('user_id', $uuid);
     }
 
+    public function getOneByUuidAndMerchantId(string $uuid, int $merchantId): ?MerchantUserEntity
+    {
+        return $this->getOneBy('user_id', $uuid, $merchantId);
+    }
+
     public function getOneByIdentityVerificationCaseUuid(string $caseUuid): ?MerchantUserEntity
     {
         return $this->getOneBy('identity_verification_case_uuid', $caseUuid);
@@ -95,6 +100,11 @@ class MerchantUserRepository extends AbstractPdoRepository implements MerchantUs
     public function assignIdentityVerificationCaseToUser(int $id, string $identityVerificationCaseUuid): void
     {
         $this->update($id, ['identity_verification_case_uuid' => $identityVerificationCaseUuid]);
+    }
+
+    public function assignRoleToUser(int $id, int $roleId): void
+    {
+        $this->update($id, ['role_id' => $roleId]);
     }
 
     private function update(int $id, array $columnValuePairs): void

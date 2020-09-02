@@ -26,11 +26,15 @@ interface MerchantUserInvitationRepositoryInterface
 
     public function registerToMerchantUser(MerchantUserInvitationEntity $invitation): void;
 
-    public function findValidByEmailAndMerchant(string $email, int $merchantId): ?MerchantUserInvitationEntity;
+    public function findByEmailAndMerchant(string $email, int $merchantId, bool $validOnly): ?MerchantUserInvitationEntity;
 
     public function findNonRevokedByUuidAndMerchant(string $uuid, int $merchantId): ?MerchantUserInvitationEntity;
 
     public function revokeValidByEmailAndMerchant(string $email, int $merchantId): void;
 
     public function findValidByToken(string $token): ?MerchantUserInvitationEntity;
+
+    public function assignRoleToInvitation(int $id, int $roleId): void;
+
+    public function findOneByMerchantUserId(int $merchantUserId): ?MerchantUserInvitationEntity;
 }

@@ -2509,6 +2509,30 @@ paths:
       security:
         -
           oauth2: []
+  /merchant/users/invitations/role:
+    post:
+      tags:
+        - 'Dashboard Users'
+      summary: 'Update Invitation Role'
+      operationId: role_invitation_update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInvitationRoleRequest'
+      responses:
+        '204':
+          description: 'Role successfully updated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
   '/order-with-invoice/{uuid}':
     post:
       tags:
@@ -2532,6 +2556,30 @@ paths:
       responses:
         '204':
           description: 'Order successfully updated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+  /merchant/user/role:
+    post:
+      tags:
+        - 'Dashboard Users'
+      summary: 'Update User Role'
+      operationId: role_user_update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRoleRequest'
+      responses:
+        '204':
+          description: 'Role successfully updated'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -3707,6 +3755,18 @@ components:
           type: string
           format: url
       type: object
+    UpdateInvitationRoleRequest:
+      title: 'Role Update Object'
+      required:
+        - email
+        - role_uuid
+      properties:
+        email:
+          type: string
+          format: email
+        role_uuid:
+          $ref: '#/components/schemas/UUID'
+      type: object
     UpdateMerchantDebtorCompanyRequest:
       properties:
         name:
@@ -3753,6 +3813,17 @@ components:
           description: 'The invoice file. Required when invoice number has changed.'
           type: string
           format: binary
+      type: object
+    UpdateUserRoleRequest:
+      title: 'Role Update Object'
+      required:
+        - user_uuid
+        - role_uuid
+      properties:
+        user_uuid:
+          $ref: '#/components/schemas/UUID'
+        role_uuid:
+          $ref: '#/components/schemas/UUID'
       type: object
     DebtorCompanyRequest:
       title: 'Debtor Company Request'

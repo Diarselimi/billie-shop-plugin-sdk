@@ -36,7 +36,7 @@ class MerchantUserInvitationPersistenceService
             throw new RoleNotFoundException();
         }
 
-        if ($this->invitationRepository->findValidByEmailAndMerchant($email, $merchantId)) {
+        if ($this->invitationRepository->findByEmailAndMerchant($email, $merchantId, true)) {
             throw new MerchantUserInvitationAlreadyExistsException();
         }
 
