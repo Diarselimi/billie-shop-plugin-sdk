@@ -2,6 +2,8 @@
 
 namespace App\DomainModel\MerchantUser;
 
+use App\DomainModel\PasswordResetRequest\RequestPasswordResetDTO;
+
 interface AuthenticationServiceInterface
 {
     public function authorizeToken(string $token): ?AuthenticationServiceAuthorizeTokenResponseDTO;
@@ -14,11 +16,7 @@ interface AuthenticationServiceInterface
 
     public function revokeToken(string $token): void;
 
-    /**
-     * @param  array                                  $uuids
-     * @return AuthenticationServiceUserResponseDTO[]
-     */
-    public function getUsersByUuids(array $uuids): array;
-
     public function getCredentials(string $clientId): ?GetMerchantCredentialsDTO;
+
+    public function requestNewPassword(string $email): RequestPasswordResetDTO;
 }

@@ -10,6 +10,7 @@ use App\DomainModel\MerchantUser\AuthenticationServiceRequestException;
 use App\DomainModel\MerchantUser\AuthenticationServiceTokenResponseDTO;
 use App\DomainModel\MerchantUser\AuthenticationServiceUserResponseDTO;
 use App\DomainModel\MerchantUser\GetMerchantCredentialsDTO;
+use App\DomainModel\PasswordResetRequest\RequestPasswordResetDTO;
 use App\Infrastructure\DecodeResponseTrait;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -201,37 +202,26 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
         }
     }
 
-    public function getUsersByUuids(array $uuids): array
+    public function requestNewPassword(string $email): RequestPasswordResetDTO
     {
-        if (empty($uuids)) {
-            throw new AuthenticationServiceRequestException(null, 'User UUIDs cannot be empty');
-        }
-
         try {
-            $response = $this->client->request(
-                'get',
-                'users',
+            $response = $this->client->post(
+                'users/request-new-password',
                 [
-                    'query' => ['uuids' => $uuids],
+                    'json' => [
+                        'email' => $email,
+                    ],
                     'on_stats' => function (TransferStats $stats) {
-                        $this->logServiceRequestStats($stats, 'get_oauth_users');
+                        $this->logServiceRequestStats($stats, 'request_new_password');
                     },
                 ]
             );
 
             $decodedResponse = $this->decodeResponse($response);
 
-            $dtos = [];
-            foreach ($decodedResponse as $userData) {
-                $dtos[$userData['user_id']] = new AuthenticationServiceUserResponseDTO(
-                    $userData['user_id'],
-                    $userData['user_email']
-                );
-            }
-
-            return $dtos;
+            return new RequestPasswordResetDTO($decodedResponse['user_id'], $decodedResponse['token']);
         } catch (TransferException $exception) {
-            $this->logSuppressedException($exception, 'Failed to get OAuth users', ['exception' => $exception]);
+            $this->logSuppressedException($exception, 'Failed to request new password', ['exception' => $exception]);
 
             throw new AuthenticationServiceRequestException($exception);
         }

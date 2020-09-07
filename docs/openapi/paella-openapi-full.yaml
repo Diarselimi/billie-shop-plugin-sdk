@@ -2245,6 +2245,26 @@ paths:
       security:
         -
           oauth2: []
+  /merchant/user/request-new-password:
+    post:
+      tags:
+        - 'Dashboard Users'
+      summary: 'Request New Password'
+      operationId: request_new_password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestNewPasswordRequest'
+      responses:
+        '200':
+          description: 'New password successfully requested'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
   '/merchant/users/invitations/{uuid}/resend':
     post:
       tags:
@@ -3645,6 +3665,16 @@ components:
             $ref: '#/components/schemas/MerchantUserPermissions'
           default: []
           nullable: true
+      type: object
+    RequestNewPasswordRequest:
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 180
+          minLength: 3
       type: object
     SaveMerchantFinancialAssessmentRequest:
       title: 'Request for submitting finnancial assessment'

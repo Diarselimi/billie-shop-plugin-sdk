@@ -57,6 +57,16 @@ class OAuthServiceContext implements Context
     }
 
     /**
+     * @Given /^I get from Oauth service a request password response$/
+     */
+    public function iGetFromOauthServiceRequestPasswordResponse()
+    {
+        $this->mockRequest('/users/request-new-password', new ResponseStack(
+            new MockResponse(json_encode(['token' => 'resetPasswordToken', 'user_id' => 'oauthUserId', 'email' => 'test@billie.dev']))
+        ));
+    }
+
+    /**
      * @Given I get a successful OAuth client creation response
      * @Given I successfully create OAuth client with id :id and secret :secret
      * @Given I have an OAuth client with id :id and secret :secret

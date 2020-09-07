@@ -30,6 +30,10 @@ security:
                 authenticators:
                     - App\Http\Authentication\Authenticator\OAuthTokenAuthenticator
 
+        merchant_user_request_new_password:
+          pattern: ^/(public/)?merchant/user/request-new-password
+          security: false
+
         legal_forms:
             pattern: ^/(public/)?legal-forms
             security: false
