@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Tests\Functional\Context;
+
 use Behat\Behat\Context\Context;
 use donatj\MockWebServer\ResponseStack;
 use donatj\MockWebServer\Response as MockResponse;

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace App\Tests\Functional\Context;
+
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\Order\OrderStateManager;

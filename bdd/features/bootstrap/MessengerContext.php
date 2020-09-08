@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Tests\Functional\Context;
+
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
 use Google\Protobuf\Internal\Message;

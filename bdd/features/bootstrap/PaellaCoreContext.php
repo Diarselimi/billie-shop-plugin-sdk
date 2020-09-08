@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Tests\Functional\Context;
+
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\Address\AddressRepositoryInterface;
 use App\DomainModel\CheckoutSession\CheckoutSessionEntity;
@@ -383,8 +385,8 @@ class PaellaCoreContext extends MinkContext
                 ->setAmountNet(new Money($net))
                 ->setAmountTax(new Money($tax))
                 ->setDuration($duration)
-                ->setCreatedAt(new DateTime())
-                ->setUpdatedAt(new DateTime())
+                ->setCreatedAt(new \DateTime())
+                ->setUpdatedAt(new \DateTime())
         );
     }
 
@@ -421,8 +423,8 @@ class PaellaCoreContext extends MinkContext
             ->setMerchantDebtorExternalId($sessionId)
             ->setUuid($sessionId)
             ->setIsActive($active)
-            ->setCreatedAt(new DateTime())
-            ->setUpdatedAt(new DateTime());
+            ->setCreatedAt(new \DateTime())
+            ->setUpdatedAt(new \DateTime());
 
         return $this->getCheckoutSessionRepository()->create($checkoutSession);
     }
@@ -433,7 +435,7 @@ class PaellaCoreContext extends MinkContext
     public function orderWasShipped($externalCode, $date)
     {
         $order = $this->getOrderRepository()->getOneByExternalCodeAndMerchantId($externalCode, 1);
-        $order->setShippedAt(new DateTime($date));
+        $order->setShippedAt(new \DateTime($date));
         $this->getOrderRepository()->update($order);
     }
 
@@ -448,10 +450,10 @@ class PaellaCoreContext extends MinkContext
                 return;
             }
 
-            throw new RuntimeException('Order not found by Behat in ' . __METHOD__ . ':' . __LINE__);
+            throw new \RuntimeException('Order not found by Behat in ' . __METHOD__ . ':' . __LINE__);
         }
         if ($order->getState() !== $state) {
-            throw new RuntimeException(sprintf(
+            throw new \RuntimeException(sprintf(
                 'Order is in %s state, but %s was expected.',
                 $order->getState(),
                 $state
@@ -475,10 +477,10 @@ class PaellaCoreContext extends MinkContext
     {
         $order = $this->getOrderRepository()->getOneByMerchantIdAndExternalCodeOrUUID($orderId, 1);
         if ($order === null) {
-            throw new RuntimeException('Order not found');
+            throw new \RuntimeException('Order not found');
         }
         if (!$order->getInvoiceNumber()) {
-            throw new RuntimeException(sprintf(
+            throw new \RuntimeException(sprintf(
                 'Order %s should have invoice data',
                 $order->getId()
             ));
@@ -526,20 +528,20 @@ class PaellaCoreContext extends MinkContext
     {
         $order = $this->getOrderRepository()->getOneByExternalCodeAndMerchantId($orderId, 1);
         if ($order === null) {
-            throw new RuntimeException('Order not found');
+            throw new \RuntimeException('Order not found');
         }
 
         $debtorExternalData = $this->getDebtorExternalDataRepository()->getOneById($order->getDebtorExternalDataId());
         if ($debtorExternalData === null) {
-            throw new RuntimeException('Debtor External Data not found');
+            throw new \RuntimeException('Debtor External Data not found');
         }
 
         if ($debtorExternalData->getDataHash() == '') {
-            throw new RuntimeException('The hash is not generated!');
+            throw new \RuntimeException('The hash is not generated!');
         }
 
         if ($debtorExternalData->getDataHash() !== md5($hash)) {
-            throw new RuntimeException(sprintf("The generated hash is: %s, but %s was expected.", $debtorExternalData->getDataHash(), md5($hash)));
+            throw new \RuntimeException(sprintf("The generated hash is: %s, but %s was expected.", $debtorExternalData->getDataHash(), md5($hash)));
         }
     }
 
@@ -551,7 +553,7 @@ class PaellaCoreContext extends MinkContext
         $debtorSettings = $this->getDebtorSettingsRepository()->getOneByCompanyUuid($companyUuid);
 
         if (!$debtorSettings->isWhitelisted()) {
-            throw new RuntimeException(sprintf(
+            throw new \RuntimeException(sprintf(
                 'DebtorSettings for companyUuid %s is not whitelisted.',
                 $debtorSettings->getCompanyUuid()
             ));
@@ -594,7 +596,7 @@ class PaellaCoreContext extends MinkContext
     {
         $order = $order = $this->getOrder($orderExternalCode);
 
-        $order->setMarkedAsFraudAt(new DateTime());
+        $order->setMarkedAsFraudAt(new \DateTime());
 
         $this->getOrderRepository()->update($order);
     }
@@ -661,7 +663,7 @@ class PaellaCoreContext extends MinkContext
         $pdoQuery = $this->getConnection()
             ->prepare("select (select count(*) from merchant_risk_check_settings where merchant_id = :merchant_id) = (select count(*) from risk_check_definitions where name != 'debtor_address') as merchant_has_risk_settings", []);
         $pdoQuery->execute(['merchant_id' => $merchant->getId()]);
-        $results = $pdoQuery->fetch(PDO::FETCH_ASSOC);
+        $results = $pdoQuery->fetch(\PDO::FETCH_ASSOC);
 
         Assert::eq($results['merchant_has_risk_settings'], 1);
     }
@@ -757,7 +759,7 @@ class PaellaCoreContext extends MinkContext
         $order = $this->getOrderRepository()->getOneByExternalCodeAndMerchantId($orderExternalCode, $this->merchant->getId());
 
         if ($order === null) {
-            throw new RuntimeException('Order not found');
+            throw new \RuntimeException('Order not found');
         }
 
         return $order;
@@ -1330,7 +1332,7 @@ class PaellaCoreContext extends MinkContext
             []
         );
         $pdoQuery->execute(['merchant_id' => $merchant->getId(), 'email' => $email, 'role_id' => $role->getId()]);
-        $results = $pdoQuery->fetch(PDO::FETCH_ASSOC);
+        $results = $pdoQuery->fetch(\PDO::FETCH_ASSOC);
 
         Assert::eq($results['total'], 1);
     }

@@ -8,29 +8,29 @@ default:
       contexts:
         - behatch:context:rest
         - json_spec
-        - MockServerContext
-        - GraphQLContext
-        - PaellaCoreContext:
+        - App\Tests\Functional\Context\MockServerContext
+        - App\Tests\Functional\Context\GraphQLContext
+        - App\Tests\Functional\Context\PaellaCoreContext:
             kernel: '@kernel'
             connection: '@billie_pdo.default_connection'
-        - PaymentsServiceContext
-        - CompaniesServiceContext
-        - OAuthServiceContext
-        - SalesforceContext
-        - LimitServiceContext
-        - SandboxServiceContext
-        - WebappServiceContext
-        - BicLookupServiceContext
-        - DocumentGeneratorContext
-        - NachosContext
-        - ScoringServiceContext
-        - FraudServiceContext
-        - MessengerContext:
+        - App\Tests\Functional\Context\PaymentsServiceContext
+        - App\Tests\Functional\Context\CompaniesServiceContext
+        - App\Tests\Functional\Context\OAuthServiceContext
+        - App\Tests\Functional\Context\SalesforceContext
+        - App\Tests\Functional\Context\LimitServiceContext
+        - App\Tests\Functional\Context\SandboxServiceContext
+        - App\Tests\Functional\Context\WebappServiceContext
+        - App\Tests\Functional\Context\BicLookupServiceContext
+        - App\Tests\Functional\Context\DocumentGeneratorContext
+        - App\Tests\Functional\Context\NachosContext
+        - App\Tests\Functional\Context\ScoringServiceContext
+        - App\Tests\Functional\Context\FraudServiceContext
+        - App\Tests\Functional\Context\MessengerContext:
             kernel: '@kernel'
             amqpMapper: '@Ozean12\AmqpPackBundle\Mapping\AmqpMapperInterface'
             changeRequestDecisionIssuesHandler: '@App\Amqp\Handler\CompanyInformationChangeRequestDecisionIssuedHandler'
             identityVerificationSucceededHandler: '@App\Amqp\Handler\IdentityVerificationSucceededHandler'
-        - RepositoryIntegrationContext:
+        - App\Tests\Functional\Context\RepositoryIntegrationContext:
             kernel: '@kernel'
 
   extensions:
