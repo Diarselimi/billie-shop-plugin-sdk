@@ -29,6 +29,7 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
             'sortBy' => $paymentsDTO->getSortBy(),
             'sortDirection' => $paymentsDTO->getSortDirection(),
             'searchString' => $paymentsDTO->getSearchString(),
+            'searchCompanyString' => $paymentsDTO->getSearchCompanyString(),
         ];
 
         $countParams = [
@@ -36,6 +37,7 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
             'paymentDebtorUuid' => $paymentsDTO->getPaymentDebtorUuid(),
             'transactionUuid' => $paymentsDTO->getTransactionUuid(),
             'searchString' => $paymentsDTO->getSearchString(),
+            'searchCompanyString' => $paymentsDTO->getSearchCompanyString(),
         ];
 
         $countResult = $this->query(self::GET_MERCHANT_PAYMENTS_TOTAL_QUERY, $countParams);

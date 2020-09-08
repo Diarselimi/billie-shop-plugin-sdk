@@ -28,6 +28,9 @@ class SearchPaymentsDTOFactory
             ->setSortBy($sortBy)
             ->setSortDirection($request->getSortDirection())
             ->setSearchString($this->stringSearch->cleanString($request->getSearchKeyword()))
+            ->setSearchCompanyString($this->stringSearch->getGermanRegexpSearchKeyword(
+                strtolower($request->getSearchKeyword())
+            ))
         ;
     }
 }

@@ -7,12 +7,14 @@ query q(
     $sortBy: String
     $sortDirection: String
     $searchString: String
+    $searchCompanyString: String
 ){
     getPadPayments(
         merchant_uuid: $merchantUuid
         debtor_uuids: $paymentDebtorUuid
         transaction_uuids: $transactionUuid
         search_keyword: $searchString
+        search_company_keyword: $searchCompanyString
         limit: $limit
         offset: $offset
         order_by: $sortBy

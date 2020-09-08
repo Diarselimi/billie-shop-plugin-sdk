@@ -12,6 +12,8 @@ class SearchPaymentsDTO extends AbstractSearchGraphQLDTO
 
     private $paymentDebtorUuid;
 
+    private $searchCompanyString;
+
     public function getMerchantPaymentUuid(): string
     {
         return $this->merchantPaymentUuid;
@@ -44,6 +46,18 @@ class SearchPaymentsDTO extends AbstractSearchGraphQLDTO
     public function setPaymentDebtorUuid(?string $paymentDebtorUuid): SearchPaymentsDTO
     {
         $this->paymentDebtorUuid = $paymentDebtorUuid;
+
+        return $this;
+    }
+
+    public function getSearchCompanyString(): ?string
+    {
+        return $this->searchCompanyString;
+    }
+
+    public function setSearchCompanyString(?string $searchCompanyString): self
+    {
+        $this->searchCompanyString = $searchCompanyString;
 
         return $this;
     }
