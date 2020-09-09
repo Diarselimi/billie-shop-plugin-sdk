@@ -792,6 +792,14 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
+     * @Given a role none exists with uuid :roleUuid
+     */
+    public function aRoleNoneExistsWithUuid(string $roleUuid)
+    {
+        $this->createRole('none', $roleUuid, []);
+    }
+
+    /**
      * @Then the user with uuid :userUuid has role :roleName
      */
     public function theUserWithUuidHasRole(string $userUuid, string $roleName)

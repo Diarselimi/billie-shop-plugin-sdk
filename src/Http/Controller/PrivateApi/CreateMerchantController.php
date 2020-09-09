@@ -32,6 +32,7 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
  *     @OA\Response(response=201, description="Merchant successfully created", @OA\JsonContent(ref="#/components/schemas/CreateMerchantResponse")),
  *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),
  *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+ *     @OA\Response(response=404, ref="#/components/responses/NotFound"),
  *     @OA\Response(response=409, @OA\JsonContent(ref="#/components/schemas/ErrorsObject"), description="Request conflicts with the current state of the server."),
  *     @OA\Response(response=500, ref="#/components/responses/ServerError")
  * )

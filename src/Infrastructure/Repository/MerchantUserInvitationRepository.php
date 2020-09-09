@@ -150,6 +150,12 @@ class MerchantUserInvitationRepository extends AbstractPdoRepository implements 
                NULL
            ) AS invitation_status";
 
+        $userRoleId = "
+            IF({$merchantUsers}.role_id IS NULL,
+                {$table}.merchant_user_role_id,
+                {$merchantUsers}.role_id
+            )";
+
         $queryColumns = implode(', ', [
             $invitationStatus,
             "{$merchantUsers}.first_name",
@@ -157,7 +163,7 @@ class MerchantUserInvitationRepository extends AbstractPdoRepository implements 
             "{$merchantUsers}.user_id as merchant_user_uuid",
             "{$table}.merchant_id",
             "{$table}.merchant_user_id",
-            "{$table}.merchant_user_role_id",
+            $userRoleId . "AS merchant_user_role_id",
             "{$table}.uuid as invitation_uuid",
             "{$table}.email as invitation_email",
             "{$table}.created_at as invitation_created_at",
@@ -168,10 +174,10 @@ class MerchantUserInvitationRepository extends AbstractPdoRepository implements 
         $query = "
             SELECT %s FROM {$table} 
             LEFT JOIN {$merchantUsers} ON {$table}.merchant_user_id = {$merchantUsers}.id
-            LEFT JOIN {$rolesTable} ON {$table}.merchant_user_role_id = {$rolesTable}.id
+            LEFT JOIN {$rolesTable} ON {$rolesTable}.id = {$userRoleId}
             WHERE 
                 ({$table}.merchant_id = :merchant_id) 
-                AND ({$rolesTable}.name != :billie_role_name)
+                AND ({$rolesTable}.name NOT IN (:billie_role_name, :none_role_name))
                 AND (
                     ({$table}.merchant_user_id IS NOT NULL) 
                     OR 
@@ -183,8 +189,9 @@ class MerchantUserInvitationRepository extends AbstractPdoRepository implements 
         ";
 
         $params['merchant_id'] = $params['merchant_id2'] = $merchantId;
-        // never show the internal billie users
+        // never show the internal billie users or users without access/role (none role users should be deactivated)
         $params['billie_role_name'] = MerchantUserDefaultRoles::ROLE_BILLIE_ADMIN['name'];
+        $params['none_role_name'] = MerchantUserDefaultRoles::ROLE_NONE['name'];
         $totalCount = $this->fetchCount(sprintf($query, "COUNT({$table}.id) as total"), $params);
         $query .= " ORDER BY {$sorting} LIMIT {$offset},{$limit}";
         $rows = $this->doFetchAll(sprintf($query, $queryColumns), $params);

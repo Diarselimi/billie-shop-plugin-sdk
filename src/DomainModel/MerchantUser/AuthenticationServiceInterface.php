@@ -18,5 +18,7 @@ interface AuthenticationServiceInterface
 
     public function getCredentials(string $clientId): ?GetMerchantCredentialsDTO;
 
+    public function deactivateUser(string $uuid): void;
+
     public function requestNewPassword(string $email): RequestPasswordResetDTO;
 }

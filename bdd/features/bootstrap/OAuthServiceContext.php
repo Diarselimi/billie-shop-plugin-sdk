@@ -49,6 +49,16 @@ class OAuthServiceContext implements Context
     }
 
     /**
+     * @Given I get from Oauth service a valid user token with user uuid :uuid
+     */
+    public function iGetFromOauthServiceAValidUserTokenWithUserUuid(string $uuid)
+    {
+        $this->mockRequest('/oauth/authorization', new ResponseStack(
+            new MockResponse(json_encode(['client_id' => 'oauthClientId', 'user_id' => $uuid, 'email' => 'test@billie.dev']))
+        ));
+    }
+
+    /**
      * @Given /^I get from Oauth service a valid client token response$/
      */
     public function iGetFromOauthServiceValidTokenResponseWithClient_id()

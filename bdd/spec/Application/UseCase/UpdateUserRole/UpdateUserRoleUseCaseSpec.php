@@ -11,8 +11,6 @@ use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
 use App\DomainModel\MerchantUser\MerchantUserRoleEntity;
 use App\DomainModel\MerchantUser\MerchantUserRoleRepositoryInterface;
 use App\DomainModel\MerchantUser\RoleNotFoundException;
-use App\DomainModel\MerchantUserInvitation\MerchantUserInvitationEntity;
-use App\DomainModel\MerchantUserInvitation\MerchantUserInvitationRepositoryInterface;
 use App\Http\Authentication\MerchantUser;
 use App\Http\Authentication\UserProvider;
 use PhpSpec\ObjectBehavior;
@@ -26,7 +24,6 @@ class UpdateUserRoleUseCaseSpec extends ObjectBehavior
     public function let(
         MerchantUserRepositoryInterface $merchantUserRepository,
         MerchantUserRoleRepositoryInterface $merchantUserRoleRepository,
-        MerchantUserInvitationRepositoryInterface $merchantUserInvitationRepository,
         UserProvider $userProvider,
         ValidatorInterface $validator
     ): void {
@@ -36,10 +33,9 @@ class UpdateUserRoleUseCaseSpec extends ObjectBehavior
         $this->setValidator($validator);
     }
 
-    public function it_should_assign_role_to_user_and_invitation(
+    public function it_should_assign_role_to_user(
         MerchantUserRepositoryInterface $merchantUserRepository,
         MerchantUserRoleRepositoryInterface $merchantUserRoleRepository,
-        MerchantUserInvitationRepositoryInterface $merchantUserInvitationRepository,
         UserProvider $userProvider,
         MerchantUser $merchantUser
     ): void {
@@ -49,7 +45,6 @@ class UpdateUserRoleUseCaseSpec extends ObjectBehavior
         $merchantId = 2;
         $userToUpdateId = 3;
         $newRoleId = 4;
-        $invitationId = 5;
         $userToUpdate = (new MerchantUserEntity())
             ->setId($userToUpdateId)
             ->setRoleId($currentRoleId);
@@ -62,12 +57,9 @@ class UpdateUserRoleUseCaseSpec extends ObjectBehavior
         $merchantUserRepository->getOneByUuidAndMerchantId($userUuid, $merchantId)->willReturn($userToUpdate);
         $merchantUserRoleRepository->getOneByUuid($roleUuid)->willReturn($newRole);
         $merchantUserRoleRepository->getOneById($currentRoleId)->willReturn($currentRole);
-        $invitation = (new MerchantUserInvitationEntity())->setId($invitationId);
-        $merchantUserInvitationRepository->findOneByMerchantUserId($userToUpdateId)->willReturn($invitation);
         $userProvider->getMerchantUser()->willReturn($merchantUser);
 
         $merchantUserRepository->assignRoleToUser($userToUpdateId, $newRoleId)->shouldBeCalledOnce();
-        $merchantUserInvitationRepository->assignRoleToInvitation($invitationId, $newRoleId)->shouldBeCalledOnce();
 
         $request = (new UpdateUserRoleRequest())
             ->setMerchantId($merchantId)

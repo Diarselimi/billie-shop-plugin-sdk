@@ -226,4 +226,17 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
             throw new AuthenticationServiceRequestException($exception);
         }
     }
+
+    public function deactivateUser(string $uuid): void
+    {
+        try {
+            $this->client->post("users/{$uuid}/deactivate", [
+                'on_stats' => function (TransferStats $stats) {
+                    $this->logServiceRequestStats($stats, 'deactivate_user');
+                },
+            ]);
+        } catch (TransferException $exception) {
+            throw new AuthenticationServiceRequestException($exception);
+        }
+    }
 }

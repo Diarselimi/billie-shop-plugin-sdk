@@ -11,7 +11,6 @@ use App\DomainModel\MerchantUser\MerchantUserNotFoundException;
 use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
 use App\DomainModel\MerchantUser\MerchantUserRoleRepositoryInterface;
 use App\DomainModel\MerchantUser\RoleNotFoundException;
-use App\DomainModel\MerchantUserInvitation\MerchantUserInvitationRepositoryInterface;
 use App\Http\Authentication\UserProvider;
 
 class UpdateUserRoleUseCase implements ValidatedUseCaseInterface
@@ -29,12 +28,10 @@ class UpdateUserRoleUseCase implements ValidatedUseCaseInterface
     public function __construct(
         MerchantUserRepositoryInterface $merchantUserRepository,
         MerchantUserRoleRepositoryInterface $merchantUserRoleRepository,
-        MerchantUserInvitationRepositoryInterface $merchantUserInvitationRepository,
         UserProvider $userProvider
     ) {
         $this->merchantUserRepository = $merchantUserRepository;
         $this->merchantUserRoleRepository = $merchantUserRoleRepository;
-        $this->merchantUserInvitationRepository = $merchantUserInvitationRepository;
         $this->userProvider = $userProvider;
     }
 
@@ -73,10 +70,6 @@ class UpdateUserRoleUseCase implements ValidatedUseCaseInterface
             throw new UpdateUserRoleException('Users cannot edit themselves');
         }
 
-        $invitation = $this->merchantUserInvitationRepository->findOneByMerchantUserId($merchantUser->getId());
-        if ($invitation) {
-            $this->merchantUserInvitationRepository->assignRoleToInvitation($invitation->getId(), $newRole->getId());
-        }
         $this->merchantUserRepository->assignRoleToUser($merchantUser->getId(), $newRole->getId());
     }
 }
