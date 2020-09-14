@@ -28,7 +28,7 @@ class IdentityVerificationSucceededHandler implements MessageHandlerInterface, L
             $this->identityVerificationSucceeder->succeedIdentifcationVerification($message->getCaseUuid());
         } catch (WorkflowException $exception) {
             $this->logInfo('Identity verification step already transitioned', [
-                'case_uuid' => $message->getCaseUuid(),
+                LoggingInterface::KEY_UUID => $message->getCaseUuid(),
             ]);
         } catch (\Exception $exception) {
             $this->logSuppressedException($exception, $exception->getMessage());

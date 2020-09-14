@@ -10,7 +10,7 @@
         "ext-json": "*",
         "ext-pdo": "*",
         "aws/aws-sdk-php-symfony": "^2.2",
-        "billie/monitoring-bundle": "^2.10.2",
+        "billie/monitoring-bundle": "^3.0",
         "billie/pdo-bundle": "^2.1",
         "doctrine/annotations": "^1.10",
         "egulias/email-validator": "^2.1",

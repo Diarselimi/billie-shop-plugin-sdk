@@ -54,20 +54,22 @@ class UpdateMerchantDebtorCompanyUseCase implements LoggingInterface, ValidatedU
         DebtorCompany $updatedDebtor
     ) {
         $this->logInfo('Merchant debtor {external_id} (id:{id}) company data updated', [
-            'id' => $merchantDebtor->getId(),
-            'uuid' => $merchantDebtor->getUuid(),
-            'merchant_id' => $merchantDebtor->getMerchantId(),
-            'company_id' => $merchantDebtor->getDebtorId(),
-            'old_name' => $originalDebtor->getName(),
-            'new_name' => $updatedDebtor->getName(),
-            'old_house' => $originalDebtor->getAddressHouse(),
-            'new_house' => $updatedDebtor->getAddressHouse(),
-            'old_street' => $originalDebtor->getAddressStreet(),
-            'new_street' => $updatedDebtor->getAddressStreet(),
-            'old_city' => $originalDebtor->getAddressCity(),
-            'new_city' => $updatedDebtor->getAddressCity(),
-            'old_postal_code' => $originalDebtor->getAddressPostalCode(),
-            'new_postal_code' => $updatedDebtor->getAddressPostalCode(),
+            LoggingInterface::KEY_ID => $merchantDebtor->getId(),
+            LoggingInterface::KEY_SOBAKA => [
+                'uuid' => $merchantDebtor->getUuid(),
+                'merchant_id' => $merchantDebtor->getMerchantId(),
+                'company_id' => $merchantDebtor->getDebtorId(),
+                'old_name' => $originalDebtor->getName(),
+                'new_name' => $updatedDebtor->getName(),
+                'old_house' => $originalDebtor->getAddressHouse(),
+                'new_house' => $updatedDebtor->getAddressHouse(),
+                'old_street' => $originalDebtor->getAddressStreet(),
+                'new_street' => $updatedDebtor->getAddressStreet(),
+                'old_city' => $originalDebtor->getAddressCity(),
+                'new_city' => $updatedDebtor->getAddressCity(),
+                'old_postal_code' => $originalDebtor->getAddressPostalCode(),
+                'new_postal_code' => $updatedDebtor->getAddressPostalCode(),
+            ],
         ]);
     }
 

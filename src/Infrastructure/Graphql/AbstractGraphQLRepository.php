@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Graphql;
 
-use Ozean12\GraphQLBundle\Query;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
+use Ozean12\GraphQLBundle\Query;
 use Symfony\Component\Config\FileLocator;
 
 abstract class AbstractGraphQLRepository extends \Ozean12\GraphQLBundle\AbstractGraphQLRepository implements LoggingInterface
@@ -33,7 +33,15 @@ abstract class AbstractGraphQLRepository extends \Ozean12\GraphQLBundle\Abstract
     {
         $response = $this->executeQuery($name, $params);
         $total = $response['total'] ?? count($response);
-        $this->logInfo('GraphQL "' . $name . '" query', ['params' => $params, 'total_results' => $total, 'response' => $response]);
+
+        $this->logInfo('GraphQL "{name}" query', [
+            LoggingInterface::KEY_NAME => $name,
+            LoggingInterface::KEY_SOBAKA => [
+                'params' => $params,
+                'total_results' => $total,
+                'response' => $response,
+            ],
+        ]);
 
         return $response;
     }

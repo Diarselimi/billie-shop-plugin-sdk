@@ -70,10 +70,10 @@ class HttpInvoiceUploadUseCase implements LoggingInterface
         $orderInvoice = $this->orderInvoiceFactory->create($order->getId(), $file->getFileId(), $request->getInvoiceNumber());
         $this->orderInvoiceRepository->insert($orderInvoice);
 
-        $this->logInfo('Invoice {invoice_number} for order {order_id} uploaded with file id {file_id}', [
-           'invoice_number' => $request->getInvoiceNumber(),
-           'order_id' => $order->getId(),
-           'file_id' => $file->getFileId(),
+        $this->logInfo('Invoice {number} for order {id} uploaded with file id {count}', [
+           LoggingInterface::KEY_NUMBER => $request->getInvoiceNumber(),
+           LoggingInterface::KEY_ID => $order->getId(),
+           LoggingInterface::KEY_COUNT => $file->getFileId(),
         ]);
     }
 }

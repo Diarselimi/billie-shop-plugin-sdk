@@ -60,7 +60,7 @@ class DebtorInformationChangeRequestManualApprover implements LoggingInterface
 
         $this->logInfo(
             'Debtor information change request {id} sent for manual approval',
-            ['id' => $changeRequestEntity->getId()]
+            [LoggingInterface::KEY_ID => $changeRequestEntity->getId()]
         );
     }
 }

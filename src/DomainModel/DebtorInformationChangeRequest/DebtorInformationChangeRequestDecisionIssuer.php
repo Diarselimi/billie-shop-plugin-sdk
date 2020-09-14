@@ -106,7 +106,7 @@ class DebtorInformationChangeRequestDecisionIssuer implements LoggingInterface
 
         $this->logInfo(
             'Debtor information change request {id} decision issued',
-            ['id' => $changeRequest->getId()]
+            [LoggingInterface::KEY_ID => $changeRequest->getId()]
         );
     }
 

@@ -65,12 +65,14 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 
         $changes = $this->updateOrderPersistenceService->update($orderContainer, $request);
 
-        $this->logInfo('Start order update, state {state}.', [
-            'state' => $order->getState(),
-            'duration_changed' => (int) $changes->getDuration() !== null,
-            'invoice_changed' => (int) ($changes->getInvoiceNumber() !== null) || ($changes->getInvoiceUrl() !== null),
-            'amount_changed' => (int) $changes->getAmount() !== null,
-            'external_code_changed' => (int) $changes->getExternalCode() !== null,
+        $this->logInfo('Start order update, state {name}.', [
+            LoggingInterface::KEY_NAME => $order->getState(),
+            LoggingInterface::KEY_SOBAKA => [
+                'duration_changed' => (int) $changes->getDuration() !== null,
+                'invoice_changed' => (int) ($changes->getInvoiceNumber() !== null) || ($changes->getInvoiceUrl() !== null),
+                'amount_changed' => (int) $changes->getAmount() !== null,
+                'external_code_changed' => (int) $changes->getExternalCode() !== null,
+            ],
         ]);
     }
 

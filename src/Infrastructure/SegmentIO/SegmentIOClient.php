@@ -21,9 +21,11 @@ class SegmentIOClient implements TrackingAnalyticsServiceInterface, LoggingInter
     public function track(string $eventName, string $merchantId, array $payload = []): void
     {
         $this->logInfo('Segment call started', [
-            'eventName' => $eventName,
-            'merchantId' => $merchantId,
-            'payload' => $payload,
+            LoggingInterface::KEY_SOBAKA => [
+                'eventName' => $eventName,
+                'merchantId' => $merchantId,
+                'payload' => $payload,
+            ],
         ]);
 
         try {
@@ -36,8 +38,7 @@ class SegmentIOClient implements TrackingAnalyticsServiceInterface, LoggingInter
             );
         } catch (\Exception $e) {
             $this->logError('Segment call failed', [
-                'exception' => $e,
-                'message' => $e->getMessage(),
+                LoggingInterface::KEY_EXCEPTION => $e,
             ]);
         }
     }

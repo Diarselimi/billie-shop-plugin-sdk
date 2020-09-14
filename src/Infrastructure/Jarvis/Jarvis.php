@@ -55,7 +55,7 @@ class Jarvis implements ScoringServiceInterface, LoggingInterface
             );
 
             $response = $this->decodeResponse($response);
-            $this->logInfo('Debtor Scoring Response received', $response);
+            $this->logInfo('Debtor Scoring Response received', [LoggingInterface::KEY_SOBAKA => $response]);
 
             return $this->responseFactory->createFromJarvisResponse($response);
         } catch (ClientException $exception) {

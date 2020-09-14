@@ -54,7 +54,7 @@ class RequestNewPasswordUseCase implements LoggingInterface, ValidatedUseCaseInt
         $userUuid = $requestPasswordResetDTO->getUserUuid();
         $merchantUser = $this->merchantUserRepository->getOneByUuid($userUuid);
         if (!$merchantUser) {
-            $this->logError('Smaug user not found in Paella', ['user_uuid' => $userUuid]);
+            $this->logError('Smaug user not found in Paella', [LoggingInterface::KEY_UUID => $userUuid]);
 
             return;
         }

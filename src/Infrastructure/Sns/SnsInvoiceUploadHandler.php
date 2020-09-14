@@ -68,9 +68,9 @@ class SnsInvoiceUploadHandler extends AbstractSettingsAwareInvoiceUploadHandler 
                 ],
             ]);
         } catch (SnsException $ex) {
-            $this->logError("Failed to publish invoice receive SNS topic for order #{order_id} with error: {error}", [
-                'order_id' => $orderUuid,
-                'error' => $ex->getAwsErrorMessage(),
+            $this->logError("Failed to publish invoice receive SNS topic for order #{uuid} with error: {reason}", [
+                LoggingInterface::KEY_UUID => $orderUuid,
+                LoggingInterface::KEY_REASON => $ex->getAwsErrorMessage(),
             ]);
         }
     }

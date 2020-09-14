@@ -24,8 +24,8 @@ class NotificationSender implements NotificationSenderInterface, LoggingInterfac
     public function send(string $url, ?string $authorisation, array $data): NotificationDeliveryResultDTO
     {
         $this->logInfo('Webhook request', [
-            'url' => $url,
-            'request' => $data,
+            LoggingInterface::KEY_URL => $url,
+            LoggingInterface::KEY_SOBAKA => $data,
         ]);
 
         $headers = ['Content-Type' => 'application/json'];

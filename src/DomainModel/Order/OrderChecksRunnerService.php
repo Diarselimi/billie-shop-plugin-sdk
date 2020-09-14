@@ -135,9 +135,9 @@ class OrderChecksRunnerService implements LoggingInterface
 
         $this->dispatcher->dispatch(new RiskCheckResultEvent($orderContainer, $result));
 
-        $this->logInfo('Check result: {check} -> {result}', [
-            'check' => $riskCheckName,
-            'result' => (int) $result->isPassed(),
+        $this->logInfo('Check result: {name} -> {number}', [
+            LoggingInterface::KEY_NAME => $riskCheckName,
+            LoggingInterface::KEY_NUMBER => (int) $result->isPassed(),
         ]);
 
         $this->persistCheckResult($result, $orderContainer);

@@ -92,8 +92,8 @@ class UpdateOrderWithInvoiceUseCase implements LoggingInterface, ValidatedUseCas
         }
 
         $this->logInfo('Order updated, state {state}.', [
-            'state' => $order->getState(),
-            'amount_changed' => (int) $changes->getAmount() !== null,
+            LoggingInterface::KEY_NAME => $order->getState(),
+            LoggingInterface::KEY_NUMBER => (int) $changes->getAmount() !== null,
         ]);
     }
 

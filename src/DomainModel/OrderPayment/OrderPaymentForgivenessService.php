@@ -2,11 +2,11 @@
 
 namespace App\DomainModel\OrderPayment;
 
-use App\DomainModel\Payment\PaymentRequestFactory;
-use App\DomainModel\Payment\PaymentsServiceInterface;
-use App\DomainModel\Payment\OrderAmountChangeDTO;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Payment\OrderAmountChangeDTO;
+use App\DomainModel\Payment\PaymentRequestFactory;
+use App\DomainModel\Payment\PaymentsServiceInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
@@ -41,11 +41,13 @@ class OrderPaymentForgivenessService implements LoggingInterface
         $debtorForgivenessThreshold = $orderContainer->getMerchantSettings()->getDebtorForgivenessThreshold();
 
         $this->logInfo('Begging for forgiveness of {outstanding_amount} in order {order_id}', [
-            'order_id' => $order->getId(),
-            'forgiveness_threshold' => $debtorForgivenessThreshold,
-            'outstanding_amount' => $outstandingAmount,
-            'paid_amount' => $amountChange->getPaidAmount(),
-            'amount_higher_than_threshold' => $outstandingAmount > $debtorForgivenessThreshold,
+            LoggingInterface::KEY_ID => $order->getId(),
+            LoggingInterface::KEY_NUMBER => $outstandingAmount,
+            LoggingInterface::KEY_SOBAKA => [
+                'forgiveness_threshold' => $debtorForgivenessThreshold,
+                'paid_amount' => $amountChange->getPaidAmount(),
+                'amount_higher_than_threshold' => $outstandingAmount > $debtorForgivenessThreshold,
+            ],
         ]);
 
         if (

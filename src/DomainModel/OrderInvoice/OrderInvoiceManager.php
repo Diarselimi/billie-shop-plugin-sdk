@@ -45,9 +45,9 @@ class OrderInvoiceManager implements LoggingInterface
     {
         foreach ($this->uploadHandlers as $name => $handler) {
             if ($handler->supports($order->getMerchantId())) {
-                $this->logInfo('Handling invoice {invoice_number} using {handler} handler', [
-                    'invoice_number' => $order->getInvoiceNumber(),
-                    'handler' => $name,
+                $this->logInfo('Handling invoice {number} using {name} handler', [
+                    LoggingInterface::KEY_NUMBER => $order->getInvoiceNumber(),
+                    LoggingInterface::KEY_NAME => $name,
                 ]);
 
                 $handler->handleInvoice($order, $event);
@@ -56,8 +56,8 @@ class OrderInvoiceManager implements LoggingInterface
             }
         }
 
-        $this->logInfo('No supported handler for {invoice_number} found', [
-            'invoice_number' => $order->getInvoiceNumber(),
+        $this->logInfo('No supported handler for {number} found', [
+            LoggingInterface::KEY_NUMBER => $order->getInvoiceNumber(),
         ]);
 
         throw new OrderInvoiceUploadException('No supported handler found');
@@ -74,10 +74,10 @@ class OrderInvoiceManager implements LoggingInterface
         $orderInvoice = $this->orderInvoiceFactory->create($order->getId(), $file->getFileId(), $order->getInvoiceNumber());
         $this->orderInvoiceRepository->insert($orderInvoice);
 
-        $this->logInfo('Invoice {invoice_number} for order id {order_id} uploaded with file id {file_id}', [
-            'invoice_number' => $order->getInvoiceNumber(),
-            'order_id' => $order->getId(),
-            'file_id' => $file->getFileId(),
+        $this->logInfo('Invoice {number} for order id {id} uploaded with file id {count}', [
+            LoggingInterface::KEY_NUMBER => $order->getInvoiceNumber(),
+            LoggingInterface::KEY_ID => $order->getId(),
+            LoggingInterface::KEY_COUNT => $file->getFileId(),
         ]);
     }
 }

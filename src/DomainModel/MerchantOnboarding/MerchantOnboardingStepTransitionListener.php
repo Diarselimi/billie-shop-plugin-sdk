@@ -45,7 +45,7 @@ class MerchantOnboardingStepTransitionListener implements LoggingInterface, Even
         $step = $event->getSubject();
         $lastTransition = $this->transitionRepository->findNewestByStepId($step->getId());
         if ($lastTransition === null) {
-            $this->logError('No transition found for step to publish to queue', ['stepId' => $step->getId()]);
+            $this->logError('No transition found for step to publish to queue', [LoggingInterface::KEY_ID => $step->getId()]);
 
             return;
         }
@@ -53,7 +53,7 @@ class MerchantOnboardingStepTransitionListener implements LoggingInterface, Even
         if ($merchant === null) {
             $this->logError(
                 'No merchant found to publish transition to queue',
-                ['onboardingId' => $step->getMerchantOnboardingId()]
+                [LoggingInterface::KEY_ID => $step->getMerchantOnboardingId()]
             );
 
             return;

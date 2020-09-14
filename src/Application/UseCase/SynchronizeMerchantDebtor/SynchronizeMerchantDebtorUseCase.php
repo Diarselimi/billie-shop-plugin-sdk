@@ -46,8 +46,8 @@ class SynchronizeMerchantDebtorUseCase implements LoggingInterface, ValidatedUse
             $debtorCompany = $this->companiesService->synchronizeDebtor($merchantDebtorEntity->getDebtorId());
         } catch (CompaniesServiceRequestException $exception) {
             $this->logError("Request for synchronization failed", [
-                'merchant_debtor' => $merchantDebtorUuid,
-                'exception' => $exception,
+                LoggingInterface::KEY_UUID => $merchantDebtorUuid,
+                LoggingInterface::KEY_SOBAKA => ['exception' => $exception],
             ]);
 
             throw new DebtorNotSynchronizedException();

@@ -3,13 +3,13 @@
 namespace App\Infrastructure\Borscht;
 
 use App\DomainModel\MerchantDebtor\RegisterDebtorDTO;
-use App\DomainModel\Payment\PaymentsServiceInterface;
+use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Payment\DebtorPaymentDetailsDTO;
 use App\DomainModel\Payment\DebtorPaymentRegistrationDTO;
 use App\DomainModel\Payment\OrderPaymentDetailsDTO;
 use App\DomainModel\Payment\OrderPaymentDetailsFactory;
+use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Payment\PaymentsServiceRequestException;
-use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Payment\RequestDTO\ConfirmRequestDTO;
 use App\DomainModel\Payment\RequestDTO\CreateRequestDTO;
 use App\DomainModel\Payment\RequestDTO\ModifyRequestDTO;
@@ -100,7 +100,7 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
         $json = ['ticket_id' => $order->getPaymentId()];
 
         $this->logInfo('Cancel borscht ticket', [
-            'json' => $json,
+            LoggingInterface::KEY_SOBAKA => $json,
         ]);
 
         try {
@@ -115,8 +115,10 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
     public function modifyOrder(ModifyRequestDTO $requestDTO): void
     {
         $this->logInfo('Modify borscht ticket', [
-            'json' => $requestDTO->toArray(),
-            'timeout' => self::EXTENDED_REQUEST_TIMEOUT,
+            LoggingInterface::KEY_SOBAKA => [
+                    'request' => $requestDTO->toArray(),
+                    'timeout' => self::EXTENDED_REQUEST_TIMEOUT,
+                ],
         ]);
 
         try {
@@ -129,7 +131,7 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
     public function confirmPayment(ConfirmRequestDTO $requestDTO): void
     {
         $this->logInfo('Confirm borscht ticket payment', [
-            'json' => $requestDTO->toArray(),
+            LoggingInterface::KEY_SOBAKA => $requestDTO->toArray(),
         ]);
 
         try {
@@ -145,7 +147,7 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
     {
         $json = $requestDTO->toArray();
 
-        $this->logInfo('Create borscht ticket', ['json' => $json]);
+        $this->logInfo('Create borscht ticket', [LoggingInterface::KEY_SOBAKA => $json]);
 
         try {
             $response = $this->client->post('order.json', [

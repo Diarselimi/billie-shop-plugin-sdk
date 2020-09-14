@@ -48,8 +48,8 @@ class NotificationDeliveryUseCase implements LoggingInterface
     public function execute(NotificationDeliveryRequest $request)
     {
         $notificationId = $request->getOrderNotificationId();
-        $this->logInfo('Notification delivery request {notification_id} received', [
-            'notification_id' => $notificationId,
+        $this->logInfo('Notification delivery request {id} received', [
+            LoggingInterface::KEY_ID => $notificationId,
         ]);
 
         $notification = $this->notificationRepository->getOneById($notificationId);

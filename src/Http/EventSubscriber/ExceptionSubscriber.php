@@ -41,12 +41,12 @@ class ExceptionSubscriber implements EventSubscriberInterface, LoggingInterface
             return;
         }
 
-        $this->logError('Critical Exception', $response->getErrors());
+        $this->logError('Critical Exception', [LoggingInterface::KEY_SOBAKA => $response->getErrors()]);
         if ($exception->getPrevious()) {
             $prevResponse = $this->errorResponseFactory->createFromException($exception->getPrevious());
             $this->logError(
                 'Critical Exception (previous)',
-                $prevResponse->getErrors()
+                [LoggingInterface::KEY_SOBAKA => $prevResponse->getErrors()]
             );
         }
     }

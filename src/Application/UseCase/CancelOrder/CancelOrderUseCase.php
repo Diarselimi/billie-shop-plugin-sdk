@@ -65,7 +65,7 @@ class CancelOrderUseCase implements LoggingInterface
         }
 
         if ($this->workflow->can($order, OrderStateManager::TRANSITION_CANCEL)) {
-            $this->logInfo('Cancel order {id}', ['id' => $order->getId()]);
+            $this->logInfo('Cancel order {id}', [LoggingInterface::KEY_ID => $order->getId()]);
 
             $orderContainer->getMerchant()->increaseFinancingLimit(
                 $orderContainer->getOrderFinancialDetails()->getAmountGross()
@@ -80,12 +80,12 @@ class CancelOrderUseCase implements LoggingInterface
 
             $this->orderStateManager->cancel($orderContainer);
         } elseif ($this->workflow->can($order, OrderStateManager::TRANSITION_CANCEL_SHIPPED)) {
-            $this->logInfo('Cancel shipped order {id}', ['id' => $order->getId()]);
+            $this->logInfo('Cancel shipped order {id}', [LoggingInterface::KEY_ID => $order->getId()]);
 
             $this->paymentsService->cancelOrder($order);
             $this->orderStateManager->cancelShipped($orderContainer);
         } elseif ($this->workflow->can($order, OrderStateManager::TRANSITION_CANCEL_WAITING)) {
-            $this->logInfo('Cancel waiting order {id}', ['id' => $order->getId()]);
+            $this->logInfo('Cancel waiting order {id}', [LoggingInterface::KEY_ID => $order->getId()]);
 
             $this->orderStateManager->cancelWaiting($orderContainer);
         } else {

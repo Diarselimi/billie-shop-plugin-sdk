@@ -59,7 +59,7 @@ class MerchantDebtorFinder implements LoggingInterface
         if ($merchantDebtor) {
             $this->logInfo(
                 'Found an existing merchant debtor by merchant external id',
-                ['id' => $merchantDebtor->getId()]
+                [LoggingInterface::KEY_ID => $merchantDebtor->getId()]
             );
             $identifyRequest->setCompanyId((int) $merchantDebtor->getDebtorId());
             $identifyRequest->setCompanyUuid($merchantDebtor->getCompanyUuid());
@@ -81,8 +81,10 @@ class MerchantDebtorFinder implements LoggingInterface
                     'A recent debtor external data hash has been found. '
                     . 'Trying to find the merchant debtor using the merchant external ID...',
                     [
-                        'external_data_id' => $existingDebtorExternalData->getId(),
-                        'external_data_timestamp' => $existingDebtorExternalData->getCreatedAt()->format(DateFormat::FORMAT_YMD_HIS),
+                        LoggingInterface::KEY_SOBAKA => [
+                            'external_data_id' => $existingDebtorExternalData->getId(),
+                            'external_data_timestamp' => $existingDebtorExternalData->getCreatedAt()->format(DateFormat::FORMAT_YMD_HIS),
+                        ],
                     ]
                 );
 
@@ -104,16 +106,16 @@ class MerchantDebtorFinder implements LoggingInterface
                 $identifyRequest->setCompanyUuid($merchantDebtor->getCompanyUuid());
                 $this->logInfo(
                     'Merchant Debtor found using external ID. The associated company will be used for identification.',
-                    ['company_uuid' => $merchantDebtor->getCompanyUuid()]
+                    [LoggingInterface::KEY_UUID => $merchantDebtor->getCompanyUuid()]
                 );
             } else {
                 $this->logInfo('Try to identify new debtor');
             }
         }
 
-        $this->logInfo('Starting {algorithm} debtor identification algorithm for order {order_external_code}', [
-            'algorithm' => $identifyRequest->isExperimental() ? 'experimental' : 'normal',
-            'order_external_code' => $orderContainer->getOrder()->getExternalCode(),
+        $this->logInfo('Starting {name} debtor identification algorithm for order {number}', [
+            LoggingInterface::KEY_NAME => $identifyRequest->isExperimental() ? 'experimental' : 'normal',
+            LoggingInterface::KEY_NUMBER => $orderContainer->getOrder()->getExternalCode(),
         ]);
 
         $debtorCompany = $this->companiesService->identifyDebtor($identifyRequest);

@@ -64,7 +64,7 @@ class MerchantAnnouncer implements LoggingInterface
 
     public function announceCustomerFeeRatesUpdated(string $merchantPaymentUuid, array $feeRates): void
     {
-        $this->logInfo('Fee rates to be set', ['json' => json_encode($feeRates)]);
+        $this->logInfo('Fee rates to be set', [LoggingInterface::KEY_SOBAKA => $feeRates]);
 
         $message = (new CustomerFeeRatesUpdated())
             ->setCompanyUuid($merchantPaymentUuid)

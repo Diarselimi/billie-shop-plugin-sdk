@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a2001862e2d50661b4628f690d74420b",
+    "content-hash": "35dc013860d3f2449093107597ae1a3a",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -146,22 +146,22 @@
         },
         {
             "name": "billie/monitoring-bundle",
-            "version": "v2.10.3",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/MonitoringBundle.git",
-                "reference": "bbd0e06bacbab45cdd6401fd795eed77e1995636"
+                "reference": "e1af0dde08653122c5f6639661addec592d84473"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/MonitoringBundle/zipball/bbd0e06bacbab45cdd6401fd795eed77e1995636",
-                "reference": "bbd0e06bacbab45cdd6401fd795eed77e1995636",
+                "url": "https://api.github.com/repos/ozean12/MonitoringBundle/zipball/e1af0dde08653122c5f6639661addec592d84473",
+                "reference": "e1af0dde08653122c5f6639661addec592d84473",
                 "shasum": ""
             },
             "require": {
                 "eightpoints/guzzle-bundle": "^8.0",
                 "ext-json": "*",
-                "guzzlehttp/guzzle": "~6.3",
+                "guzzlehttp/guzzle": "^6.3|^7.0",
                 "monolog/monolog": "^1.24",
                 "php": "^7.3",
                 "ramsey/uuid": "^3.8",
@@ -184,26 +184,26 @@
                 }
             ],
             "support": {
-                "source": "https://github.com/ozean12/MonitoringBundle/tree/v2.10.3"
+                "source": "https://github.com/ozean12/MonitoringBundle/tree/3.0.0"
             },
-            "time": "2020-08-12T13:28:05+00:00"
+            "time": "2020-08-31T16:09:29+00:00"
         },
         {
             "name": "billie/pdo-bundle",
-            "version": "2.1.0",
+            "version": "2.1.1",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/PdoBundle.git",
-                "reference": "10e70ea8456d4d13b8b6910e3efe42a72810d1dd"
+                "reference": "67ca0061656390b086ee0be536e9d057c7aa6c50"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/PdoBundle/zipball/10e70ea8456d4d13b8b6910e3efe42a72810d1dd",
-                "reference": "10e70ea8456d4d13b8b6910e3efe42a72810d1dd",
+                "url": "https://api.github.com/repos/ozean12/PdoBundle/zipball/67ca0061656390b086ee0be536e9d057c7aa6c50",
+                "reference": "67ca0061656390b086ee0be536e9d057c7aa6c50",
                 "shasum": ""
             },
             "require": {
-                "billie/monitoring-bundle": "^2.8",
+                "billie/monitoring-bundle": "^2.9.0|^3.0.0",
                 "doctrine/dbal": "^2.10",
                 "ext-pdo": "*",
                 "php": "^7.2",
@@ -243,9 +243,9 @@
             ],
             "description": "Minimal ORM built on top of PDO",
             "support": {
-                "source": "https://github.com/ozean12/PdoBundle/tree/2.1.0"
+                "source": "https://github.com/ozean12/PdoBundle/tree/2.1.1"
             },
-            "time": "2020-04-15T09:36:46+00:00"
+            "time": "2020-08-31T16:30:14+00:00"
         },
         {
             "name": "bunny/bunny",
@@ -2210,6 +2210,12 @@
                 "sftp",
                 "storage"
             ],
+            "funding": [
+                {
+                    "url": "https://offset.earth/frankdejonge",
+                    "type": "other"
+                }
+            ],
             "time": "2020-08-09T15:57:10+00:00"
         },
         {
@@ -2362,6 +2368,16 @@
                 }
             ],
             "description": "Mime-type detection for Flysystem",
+            "funding": [
+                {
+                    "url": "https://github.com/frankdejonge",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/league/flysystem",
+                    "type": "tidelift"
+                }
+            ],
             "time": "2020-08-09T10:34:01+00:00"
         },
         {

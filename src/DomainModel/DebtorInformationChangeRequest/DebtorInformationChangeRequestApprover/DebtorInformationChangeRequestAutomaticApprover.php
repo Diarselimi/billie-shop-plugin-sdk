@@ -56,6 +56,6 @@ class DebtorInformationChangeRequestAutomaticApprover implements LoggingInterfac
         $this->workflow->apply($changeRequest, DebtorInformationChangeRequestTransitionEntity::TRANSITION_COMPLETE_AUTOMATICALLY);
         $this->changeRequestRepository->update($changeRequest);
 
-        $this->logInfo('Debtor information change request {id} approved automatically', ['id' => $changeRequest->getId()]);
+        $this->logInfo('Debtor information change request {id} approved automatically', [LoggingInterface::KEY_ID => $changeRequest->getId()]);
     }
 }
