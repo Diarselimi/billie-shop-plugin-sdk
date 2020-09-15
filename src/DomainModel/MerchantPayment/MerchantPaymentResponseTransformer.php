@@ -31,7 +31,7 @@ class MerchantPaymentResponseTransformer
         $overpayment = 0;
         $orders = [];
 
-        if (empty($item['orders'])) {
+        if (!empty($item['orders'])) {
             $orders = array_filter($item['orders'], static function (array $order) use (&$overpayment) {
                 if ($order['uuid'] !== null) {
                     return $order;
