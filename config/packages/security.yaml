@@ -34,6 +34,14 @@ security:
           pattern: ^/(public/)?merchant/user/request-new-password
           security: false
 
+        merchant_user_confirm_password_reset:
+          pattern: ^/(public/)?merchant/user/confirm-password-reset
+          security: false
+
+        merchant_user_reset_password:
+          pattern: ^/(public/)?merchant/user/reset-password
+          security: false
+
         legal_forms:
             pattern: ^/(public/)?legal-forms
             security: false

@@ -42,11 +42,11 @@
     "league/mime-type-detection": {
         "version": "1.4.0"
     },
-    "ozean12/amqp-transfers": {
-        "version": "0.3.55"
-    },
     "ozean12/amqp-pack": {
         "version": "1.1.0"
+    },
+    "ozean12/amqp-transfers": {
+        "version": "0.3.55"
     },
     "php": {
         "version": "7.3"

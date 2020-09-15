@@ -21,4 +21,8 @@ interface AuthenticationServiceInterface
     public function deactivateUser(string $uuid): void;
 
     public function requestNewPassword(string $email): RequestPasswordResetDTO;
+
+    public function confirmPasswordResetToken(string $token): void;
+
+    public function resetPassword(string $plainPlainPassword, string $token): void;
 }

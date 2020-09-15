@@ -227,6 +227,43 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
         }
     }
 
+    public function confirmPasswordResetToken(string $token): void
+    {
+        try {
+            $this->client->request(
+                'get',
+                'users/confirm-password-token',
+                [
+                    'query' => ['token' => $token],
+                    'on_stats' => function (TransferStats $stats) {
+                        $this->logServiceRequestStats($stats, 'confirm_password_token');
+                    },
+                ]
+            );
+        } catch (TransferException $exception) {
+            $this->logSuppressedException($exception, 'Failed to confirm password token', ['exception' => $exception]);
+
+            throw new AuthenticationServiceRequestException($exception);
+        }
+    }
+
+    public function resetPassword(string $plainPassword, string $token): void
+    {
+        try {
+            $this->client->post(
+                'users/reset-password',
+                [
+                    'json' => ['token' => $token, 'password' => $plainPassword],
+                    'on_stats' => function (TransferStats $stats) {
+                        $this->logServiceRequestStats($stats, 'reset_password');
+                    },
+                ]
+            );
+        } catch (TransferException $exception) {
+            $this->logSuppressedException($exception, 'Failed to reset password', ['exception' => $exception]);
+        }
+    }
+
     public function deactivateUser(string $uuid): void
     {
         try {

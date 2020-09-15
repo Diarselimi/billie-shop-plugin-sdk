@@ -1129,6 +1129,32 @@ paths:
       security:
         -
           oauth2: []
+  /merchant/user/confirm-password-reset:
+    get:
+      tags:
+        - 'Dashboard Users'
+      summary: 'Confirm Password Reset'
+      operationId: confirm_password_reset
+      parameters:
+        -
+          name: token
+          in: query
+          description: Token
+          required: true
+          schema:
+            $ref: '#/components/schemas/TinyText'
+      responses:
+        '204':
+          description: 'Password confirm valid'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
   /order-dashboard:
     post:
       tags:
@@ -2331,6 +2357,26 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/ResourceConflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+  /merchant/user/reset-password:
+    post:
+      tags:
+        - 'Dashboard Users'
+      summary: 'Reset Password'
+      operationId: reset_password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        '204':
+          description: 'Password successfully reset'
         '500':
           $ref: '#/components/responses/ServerError'
       security:
@@ -3727,6 +3773,19 @@ components:
           format: email
           maxLength: 180
           minLength: 3
+      type: object
+    ResetPasswordRequest:
+      required:
+        - password
+        - token
+      properties:
+        password:
+          type: string
+          format: password
+          maxLength: 200
+          minLength: 8
+        token:
+          type: string
       type: object
     SaveMerchantFinancialAssessmentRequest:
       title: 'Request for submitting finnancial assessment'

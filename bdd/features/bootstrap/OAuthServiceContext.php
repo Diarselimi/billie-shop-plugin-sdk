@@ -69,12 +69,32 @@ class OAuthServiceContext implements Context
     }
 
     /**
-     * @Given /^I get from Oauth service a request password response$/
+     * @Given I get from Oauth service a request password response for user :uuid
      */
-    public function iGetFromOauthServiceRequestPasswordResponse()
+    public function iGetFromOauthServiceRequestPasswordResponse(string $uuid)
     {
         $this->mockRequest('/users/request-new-password', new ResponseStack(
-            new MockResponse(json_encode(['token' => 'resetPasswordToken', 'user_id' => 'oauthUserId', 'email' => 'test@billie.dev']))
+            new MockResponse(json_encode(['token' => 'resetPasswordToken', 'user_id' => $uuid, 'email' => 'test@billie.dev']))
+        ));
+    }
+
+    /**
+     * @Given /^I get from Oauth service a confirm password token response$/
+     */
+    public function iGetFromOauthServiceConfirmPasswordResetResponse()
+    {
+        $this->mockRequest('/users/confirm-password-token', new ResponseStack(
+            new MockResponse('', [], 204)
+        ));
+    }
+
+    /**
+     * @Given /^I get from Oauth service a reset password response$/
+     */
+    public function iGetFromOauthServiceResetPasswordResponse()
+    {
+        $this->mockRequest('/users/reset-password', new ResponseStack(
+            new MockResponse('', [], 204)
         ));
     }
 
