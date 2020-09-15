@@ -29,13 +29,17 @@ class MerchantPaymentResponseTransformer
     public function addOverpaidAmount(array &$item): void
     {
         $overpayment = 0;
-        $orders = array_filter($item['orders'], static function (array $order) use (&$overpayment) {
-            if ($order['uuid'] !== null) {
-                return $order;
-            }
+        $orders = [];
 
-            $overpayment += $order['mapped_amount'];
-        });
+        if (empty($item['orders'])) {
+            $orders = array_filter($item['orders'], static function (array $order) use (&$overpayment) {
+                if ($order['uuid'] !== null) {
+                    return $order;
+                }
+
+                $overpayment += $order['mapped_amount'];
+            });
+        }
 
         $item['orders'] = array_values($orders);
         $item['overpaid_amount'] = $overpayment;
