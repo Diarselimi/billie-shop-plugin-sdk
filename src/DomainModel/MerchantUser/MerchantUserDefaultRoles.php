@@ -81,6 +81,8 @@ interface MerchantUserDefaultRoles
             MerchantUserPermissions::VIEW_ONBOARDING,
             // read (special):
             MerchantUserPermissions::VIEW_CREDENTIALS,
+            // access (special)
+            MerchantUserPermissions::ACCESS_TEST_DATA,
         ],
     ];
 }

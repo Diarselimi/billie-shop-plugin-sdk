@@ -41,6 +41,13 @@ eight_points_guzzle:
         headers:
           Content-Type: "application/json"
           X-Api-Key: "%env(string:PAELLA_SANDBOX_API_KEY)%"
+    paella_prod:
+      base_url: "%env(string:PAELLA_PROD_URL)%"
+      options:
+        timeout: 2
+        headers:
+          Content-Type: "application/json"
+          X-Api-Key: "%env(string:PAELLA_PROD_API_KEY)%"
     webapp:
       base_url: "%env(string:WEBAPP_URL)%"
       options:

@@ -25,4 +25,6 @@ interface MerchantRepositoryInterface
     public function findActiveWithFinancingPowerBelowPercentage(float $percentage): ?array;
 
     public function getMerchantsWithoutSandbox(): array;
+
+    public function getOneByPaymentUuid(string $paymentUuid): ?MerchantEntity;
 }

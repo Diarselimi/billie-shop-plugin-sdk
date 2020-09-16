@@ -180,4 +180,13 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
 
         return $rows ? $this->factory->createFromArrayCollection($rows) : [];
     }
+
+    public function getOneByPaymentUuid(string $paymentUuid): ?MerchantEntity
+    {
+        $row = $this->doFetchOne($this->generateSelectQuery(self::TABLE_NAME, self::SELECT_FIELDS) . '
+          WHERE payment_merchant_id = :paymentUuid
+        ', ['paymentUuid' => $paymentUuid]);
+
+        return $row ? $this->factory->createFromArray($row) : null;
+    }
 }

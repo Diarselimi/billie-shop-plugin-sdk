@@ -69,7 +69,7 @@ security:
           guard:
             authenticators:
               - App\Http\Authentication\Authenticator\ActiveCheckoutSessionAuthenticator
-              - App\Http\Authentication\Authenticator\OAuthTokenAuthenticator
+              - App\Http\Authentication\Authenticator\SandboxAuthenticator
             entry_point: App\Http\Authentication\Authenticator\ActiveCheckoutSessionAuthenticator
 
         invited_user:
@@ -89,6 +89,16 @@ security:
             guard:
                 authenticators:
                     - App\Http\Authentication\Authenticator\SignatoryPowerTokenAuthenticator
+
+        sandbox_security:
+            anonymous: false
+            stateless: true
+            request_matcher: sandbox_request_matcher
+            guard:
+                authenticators:
+                    - App\Http\Authentication\Authenticator\SandboxAuthenticator
+                    - App\Http\Authentication\Authenticator\ApiKeyAuthenticator
+                entry_point: App\Http\Authentication\Authenticator\SandboxAuthenticator
 
         default_security:
             anonymous: false

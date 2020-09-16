@@ -16,6 +16,8 @@ interface MerchantUserPermissions
 
     public const VIEW_CREDENTIALS = 'VIEW_CREDENTIALS';
 
+    public const ACCESS_TEST_DATA = 'ACCESS_TEST_DATA';
+
     public const CONFIRM_ORDER_PAYMENT = 'CONFIRM_ORDER_PAYMENT';
 
     public const PAUSE_DUNNING = 'PAUSE_DUNNING';
@@ -43,6 +45,8 @@ interface MerchantUserPermissions
         self::VIEW_ONBOARDING,
         // read (special):
         self::VIEW_CREDENTIALS,
+        // access (special)
+        self::ACCESS_TEST_DATA,
         // write:
         self::CONFIRM_ORDER_PAYMENT,
         self::PAUSE_DUNNING,

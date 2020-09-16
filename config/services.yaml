@@ -30,6 +30,7 @@ services:
       $notificationSenderClient: '@eight_points_guzzle.client.webhook'
       $salesforceClient: '@eight_points_guzzle.client.salesforce'
       $paellaSandboxClient: '@eight_points_guzzle.client.paella_sandbox'
+      $paellaProdClient: '@eight_points_guzzle.client.paella_prod'
       $webappClient: '@eight_points_guzzle.client.webapp'
       $bicLookupClient: '@eight_points_guzzle.client.fintech_toolbox'
       $documentGeneratorClient: '@eight_points_guzzle.client.document_generator'
@@ -168,3 +169,6 @@ services:
   App\Infrastructure\Repository\DebtorInformationChangeRequestTransitionRepository:
     tags:
       - { name: billie_pdo.state_transition_repository, entity: App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestTransitionEntity }
+
+  sandbox_request_matcher:
+    class: App\Http\RequestMatcher\SandboxRequestMatcher

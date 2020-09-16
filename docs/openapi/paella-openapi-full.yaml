@@ -353,6 +353,24 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/ServerError'
+  /authorize-sandbox:
+    post:
+      tags:
+        - 'Dashboard Users'
+      summary: 'Authorize sandbox'
+      description: 'Authorize production users for a sandbox'
+      operationId: authorize-sandbox
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizeSandboxDTO'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
   /merchant:
     post:
       tags:
@@ -2880,6 +2898,7 @@ components:
         - VIEW_USERS
         - VIEW_ONBOARDING
         - VIEW_CREDENTIALS
+        - ACCESS_TEST_DATA
         - CONFIRM_ORDER_PAYMENT
         - PAUSE_DUNNING
         - MANAGE_USERS
@@ -2896,6 +2915,7 @@ components:
         - VIEW_USERS
         - VIEW_ONBOARDING
         - VIEW_CREDENTIALS
+        - ACCESS_TEST_DATA
         - CONFIRM_ORDER_PAYMENT
         - PAUSE_DUNNING
         - MANAGE_USERS
@@ -2971,6 +2991,15 @@ components:
           description: 'JWT signed with the authorization server''s private key'
           type: string
           nullable: false
+      type: object
+    AuthorizeSandboxDTO:
+      properties:
+        user_entity:
+          $ref: '#/components/schemas/MerchantUserEntity'
+        email:
+          $ref: '#/components/schemas/TinyText'
+        sandbox_merchant_payment_uuid:
+          $ref: '#/components/schemas/UUID'
       type: object
     CheckoutConfirmOrderRequest:
       required:
@@ -4284,6 +4313,25 @@ components:
           format: date
           example: '2019-03-20'
           nullable: true
+      type: object
+    MerchantUserEntity:
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        merchant_id:
+          type: integer
+        signatory_power_uuid:
+          $ref: '#/components/schemas/UUID'
+        identity_verification_case_uuid:
+          $ref: '#/components/schemas/UUID'
+        role_id:
+          type: integer
+        first_name:
+          $ref: '#/components/schemas/TinyText'
+        last_name:
+          $ref: '#/components/schemas/TinyText'
+        permissions:
+          type: array
       type: object
     OrderPaymentDTO:
       properties:
