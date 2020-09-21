@@ -6,15 +6,15 @@ use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\WorkflowException;
 use App\DomainModel\Order\OrderChecksRunnerService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
-use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
+use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedBillingAddressCheck;
+use App\DomainModel\OrderRiskCheck\Checker\DebtorOverdueCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DeliveryAddressCheck;
 use App\DomainModel\OrderRiskCheck\Checker\FraudScoreCheck;
 use App\DomainModel\OrderRiskCheck\Checker\LimitCheck;
-use App\DomainModel\OrderRiskCheck\CheckResult;
 
 class ApproveOrderUseCase
 {
@@ -23,6 +23,7 @@ class ApproveOrderUseCase
         DebtorIdentifiedBillingAddressCheck::NAME,
         FraudScoreCheck::NAME,
         LimitCheck::NAME,
+        DebtorOverdueCheck::NAME,
     ];
 
     private $orderContainerFactory;
