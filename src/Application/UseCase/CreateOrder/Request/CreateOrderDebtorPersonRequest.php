@@ -46,7 +46,7 @@ class CreateOrderDebtorPersonRequest
 
     /**
      * @Assert\NotBlank()
-     * @Assert\Email(mode="strict")
+     * @Assert\Email(mode="loose")
      */
     private $email;
 
