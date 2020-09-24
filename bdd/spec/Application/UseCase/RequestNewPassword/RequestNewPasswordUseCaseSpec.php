@@ -51,10 +51,12 @@ class RequestNewPasswordUseCaseSpec extends ObjectBehavior
         $merchantId = 1;
         $firstName = 'Roel';
         $lastName = 'Philipsen';
+        $merchantUserUuid = Uuid::uuid4()->toString();
         $user = (new MerchantUserEntity())
             ->setMerchantId($merchantId)
             ->setFirstName($firstName)
-            ->setLastName($lastName);
+            ->setLastName($lastName)
+            ->setUuid($merchantUserUuid);
         $merchantUserRepository->getOneByUuid($userUuid)->willReturn($user);
         $merchantPaymentUuid = Uuid::uuid4()->toString();
         $merchant = (new MerchantEntity())->setPaymentUuid($merchantPaymentUuid);
@@ -65,7 +67,8 @@ class RequestNewPasswordUseCaseSpec extends ObjectBehavior
             $token,
             $email,
             $firstName,
-            $lastName
+            $lastName,
+            $merchantUserUuid
         )->shouldBeCalledOnce();
 
         $this->execute(new RequestNewPasswordRequest($email));

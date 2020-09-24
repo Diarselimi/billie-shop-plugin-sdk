@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "35dc013860d3f2449093107597ae1a3a",
+    "content-hash": "305e2ccbb4ec0b2bf449c4808d9af432",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -2210,12 +2210,6 @@
                 "sftp",
                 "storage"
             ],
-            "funding": [
-                {
-                    "url": "https://offset.earth/frankdejonge",
-                    "type": "other"
-                }
-            ],
             "time": "2020-08-09T15:57:10+00:00"
         },
         {
@@ -2368,16 +2362,6 @@
                 }
             ],
             "description": "Mime-type detection for Flysystem",
-            "funding": [
-                {
-                    "url": "https://github.com/frankdejonge",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/league/flysystem",
-                    "type": "tidelift"
-                }
-            ],
             "time": "2020-08-09T10:34:01+00:00"
         },
         {
@@ -2761,16 +2745,16 @@
         },
         {
             "name": "ozean12/amqp-transfers",
-            "version": "0.3.55",
+            "version": "0.3.61",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/amqp-transfers.git",
-                "reference": "e0c382c73112e36872a35d121831af209cc2fec6"
+                "reference": "3c77adafbb7ff9e71e68b64a5bbe185fbcb42e8f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/amqp-transfers/zipball/e0c382c73112e36872a35d121831af209cc2fec6",
-                "reference": "e0c382c73112e36872a35d121831af209cc2fec6",
+                "url": "https://api.github.com/repos/ozean12/amqp-transfers/zipball/3c77adafbb7ff9e71e68b64a5bbe185fbcb42e8f",
+                "reference": "3c77adafbb7ff9e71e68b64a5bbe185fbcb42e8f",
                 "shasum": ""
             },
             "require": {
@@ -2806,10 +2790,10 @@
             ],
             "description": "Transfer objects across Billie universe",
             "support": {
-                "source": "https://github.com/ozean12/amqp-transfers/tree/0.3.55",
+                "source": "https://github.com/ozean12/amqp-transfers/tree/0.3.61",
                 "issues": "https://github.com/ozean12/amqp-transfers/issues"
             },
-            "time": "2020-09-01T15:12:57+00:00"
+            "time": "2020-09-17T13:56:21+00:00"
         },
         {
             "name": "ozean12/amqp-transfers-serializer",

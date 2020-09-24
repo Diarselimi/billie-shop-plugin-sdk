@@ -64,7 +64,8 @@ class RequestNewPasswordUseCase implements LoggingInterface, ValidatedUseCaseInt
             $requestPasswordResetDTO->getToken(),
             $request->getEmail(),
             $merchantUser->getFirstName(),
-            $merchantUser->getLastName()
+            $merchantUser->getLastName(),
+            $merchantUser->getUuid()
         );
     }
 }

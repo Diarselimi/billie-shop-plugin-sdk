@@ -25,14 +25,16 @@ class PasswordResetRequestAnnouncer implements LoggingInterface
         string $token,
         string $email,
         string $firstName,
-        string $lastName
+        string $lastName,
+        string $merchantUserUuid
     ): void {
         $message = (new MerchantUserNewPasswordRequested())
             ->setMerchantPaymentUuid($merchantPaymentUuid)
             ->setToken($token)
             ->setEmail($email)
             ->setFirstName($firstName)
-            ->setLastName($lastName);
+            ->setLastName($lastName)
+            ->setMerchantUserUuid($merchantUserUuid);
 
         $this->bus->dispatch($message);
         $this->logInfo('MerchantUserNewPasswordRequested event announced');

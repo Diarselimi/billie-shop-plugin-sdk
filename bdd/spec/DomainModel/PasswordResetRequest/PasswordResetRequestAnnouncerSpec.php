@@ -25,19 +25,22 @@ class PasswordResetRequestAnnouncerSpec extends ObjectBehavior
         $email = 'test@billie.dev';
         $firstName = 'Roel';
         $lastName = 'Philipsen';
+        $merchantUserUuid = Uuid::uuid4()->toString();
         $bus->dispatch(Argument::that(
             function (MerchantUserNewPasswordRequested $message) use (
                 $merchantPaymentUuid,
                 $token,
                 $email,
                 $firstName,
-                $lastName
+                $lastName,
+                $merchantUserUuid
             ) {
                 return $message->getMerchantPaymentUuid() === $merchantPaymentUuid
                     && $message->getToken() === $token
                     && $message->getEmail() === $email
                     && $message->getFirstName() === $firstName
-                    && $message->getLastName() === $lastName;
+                    && $message->getLastName() === $lastName
+                    && $message->getMerchantUserUuid() === $merchantUserUuid;
             }
         ))->shouldBeCalledOnce()->willReturn(new Envelope(new MerchantUserNewPasswordRequested()));
 
@@ -46,7 +49,8 @@ class PasswordResetRequestAnnouncerSpec extends ObjectBehavior
             $token,
             $email,
             $firstName,
-            $lastName
+            $lastName,
+            $merchantUserUuid
         );
     }
 }

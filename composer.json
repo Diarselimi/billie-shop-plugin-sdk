@@ -23,7 +23,7 @@
         "league/flysystem-aws-s3-v3": "^1.0",
         "league/flysystem-bundle": "^1.5",
         "ozean12/amqp-pack": "^1.1.0",
-        "ozean12/amqp-transfers": "^0.3.55",
+        "ozean12/amqp-transfers": "^0.3.61",
         "ozean12/graphql-repository-client": "^1.0",
         "ozean12/money": "^3.0",
         "ramsey/uuid": "^3.9",
