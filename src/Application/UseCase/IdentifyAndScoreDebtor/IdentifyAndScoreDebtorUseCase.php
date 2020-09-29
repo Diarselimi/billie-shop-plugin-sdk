@@ -88,7 +88,8 @@ class IdentifyAndScoreDebtorUseCase
             ->setBillingAddress($this->createBillingAddress($request))
         ;
 
-        $identifiedDebtor = $this->companiesService->identifyDebtor($identifyRequest);
+        $identifyDebtorResponseDTO = $this->companiesService->identifyDebtor($identifyRequest);
+        $identifiedDebtor = $identifyDebtorResponseDTO->getIdentifiedDebtorCompany();
         if (!$identifiedDebtor || !$identifiedDebtor->isStrictMatch()) {
             throw new DebtorNotIdentifiedException();
         }

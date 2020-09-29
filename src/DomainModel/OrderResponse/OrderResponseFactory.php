@@ -214,6 +214,7 @@ class OrderResponseFactory
             ->setState($order->getState());
 
         $response = $this->addReasons($orderContainer->getRiskCheckResultCollection(), $response);
+        $response->setDebtorCompanySuggestion($orderContainer->getMostSimilarCandidateDTO());
 
         $statesAccepted = [OrderStateManager::STATE_AUTHORIZED, OrderStateManager::STATE_PRE_WAITING];
         if (in_array($order->getState(), $statesAccepted, true)) {

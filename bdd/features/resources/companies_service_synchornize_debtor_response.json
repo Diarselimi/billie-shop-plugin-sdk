@@ -1,5 +1,4 @@
 {
-  "identified_company": {
     "id": 1,
     "uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
     "crefo_id": "123",
@@ -18,16 +17,15 @@
     "billing_addresses": [
       {
         "uuid": "c7be46c0-e049-4312-b274-258ec5aeeb71",
-        "house_number": "4",
-        "postal_code": "10639",
-        "street": "Billing Street name",
+        "house_number": "12",
+        "postal_code": "12345",
+        "street": "street name",
         "city": "Berlin",
         "country": "DE",
         "addition": null
       }
     ],
-    "billing_address_match_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb71",
-    "identification_type": "billing_address",
-    "identified_address_uuid": "something-very-random-123"
-  }
+    "billing_address_match_uuid": null,
+    "identification_type": "company_address",
+    "identified_address_uuid": "some-address-uuid-123"
 }

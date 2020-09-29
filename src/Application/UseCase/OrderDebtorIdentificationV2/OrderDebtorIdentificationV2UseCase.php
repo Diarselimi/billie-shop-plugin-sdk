@@ -47,7 +47,7 @@ class OrderDebtorIdentificationV2UseCase
         $debtorPerson = $orderContainer->getDebtorPerson();
 
         try {
-            $identifiedDebtor = $this->companiesService->identifyDebtor(
+            $identifyDebtorResponseDTO = $this->companiesService->identifyDebtor(
                 (new IdentifyDebtorRequestDTO())
                 ->setName($debtorExternalData->getName())
                 ->setHouseNumber($debtorExternalAddress->getHouseNumber())
@@ -65,6 +65,7 @@ class OrderDebtorIdentificationV2UseCase
                 ->setIsExperimental(true)
                 ->setBillingAddress($orderContainer->getBillingAddress())
             );
+            $identifiedDebtor = $identifyDebtorResponseDTO->getIdentifiedDebtorCompany();
 
             $this->orderIdentificationRepository->insert(
                 (new OrderIdentificationEntity())

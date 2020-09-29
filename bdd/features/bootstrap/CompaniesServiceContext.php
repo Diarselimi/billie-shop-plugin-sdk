@@ -84,16 +84,16 @@ class CompaniesServiceContext implements Context
     public function iGetFromCompaniesServiceGetDebtorResponse()
     {
         $this->mockRequest('/debtor/1', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match_trusted_source.json')),
-            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match_trusted_source.json'))
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_get_debtor_response.json')),
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_get_debtor_response.json'))
         ));
 
         $this->mockRequest('/debtor/10', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match_trusted_source.json'))
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_get_debtor_response.json'))
         ));
 
         $this->mockRequest('/debtor/' . PaellaCoreContext::DEBTOR_COMPANY_UUID, new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match_trusted_source.json'))
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_get_debtor_response.json'))
         ));
     }
 
@@ -103,12 +103,12 @@ class CompaniesServiceContext implements Context
     public function iGetFromCompaniesServiceUpdateDebtorPositiveResponse()
     {
         $this->mockRequest('/companies/1', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_match_trusted_source.json'))
+            new MockResponse(file_get_contents(__DIR__.'/../resources/companies_service_get_debtor_response.json'))
         ));
 
         $this->mockRequestWith(
             '/companies/c7be46c0-e049-4312-b274-258ec5aeeb70',
-            file_get_contents(__DIR__.'/../resources/companies_service_match_trusted_source.json'),
+            file_get_contents(__DIR__.'/../resources/companies_service_get_debtor_response.json'),
             [],
             200,
             'PUT'

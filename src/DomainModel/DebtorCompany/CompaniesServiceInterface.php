@@ -22,7 +22,7 @@ interface CompaniesServiceInterface
      */
     public function getDebtorsByCrefoId(string $crefoId): array;
 
-    public function identifyDebtor(IdentifyDebtorRequestDTO $requestDTO): ?IdentifiedDebtorCompany;
+    public function identifyDebtor(IdentifyDebtorRequestDTO $requestDTO): IdentifyDebtorResponseDTO;
 
     public function identifyFirmenwissen(string $crefoId): DebtorCompany;
 

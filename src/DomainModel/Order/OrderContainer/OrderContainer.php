@@ -5,6 +5,8 @@ namespace App\DomainModel\Order\OrderContainer;
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorCompany\IdentifiedDebtorCompany;
+use App\DomainModel\DebtorCompany\MostSimilarCandidateDTO;
+use App\DomainModel\DebtorCompany\NullMostSimilarCandidateDTO;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorScoring\DebtorScoringResponseDTO;
 use App\DomainModel\DebtorSettings\DebtorSettingsEntity;
@@ -44,6 +46,8 @@ class OrderContainer
 
     private $identifiedDebtorCompany;
 
+    private $mostSimilarCandidateDTO;
+
     private $dunningStatus;
 
     private $lineItems;
@@ -62,6 +66,7 @@ class OrderContainer
     {
         $this->relationLoader = $relationLoader;
         $this->order = $order;
+        $this->mostSimilarCandidateDTO = new NullMostSimilarCandidateDTO();
     }
 
     public function getOrder(): OrderEntity
@@ -274,6 +279,18 @@ class OrderContainer
     public function setDebtorScoringResponse(DebtorScoringResponseDTO $debtorScoringResponse): OrderContainer
     {
         $this->debtorScoringResponse = $debtorScoringResponse;
+
+        return $this;
+    }
+
+    public function getMostSimilarCandidateDTO(): MostSimilarCandidateDTO
+    {
+        return $this->mostSimilarCandidateDTO;
+    }
+
+    public function setMostSimilarCandidateDTO(MostSimilarCandidateDTO $mostSimilarCandidateDTO)
+    {
+        $this->mostSimilarCandidateDTO = $mostSimilarCandidateDTO;
 
         return $this;
     }

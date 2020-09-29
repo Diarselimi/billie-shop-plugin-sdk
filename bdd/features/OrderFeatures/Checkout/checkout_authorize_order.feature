@@ -134,7 +134,15 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
         "address_country":"DE"
       },
       "reasons":"debtor_limit_exceeded",
-      "decline_reason":"debtor_limit_exceeded"
+      "decline_reason":"debtor_limit_exceeded",
+      "debtor_company_suggestion":{
+        "name":"Test User Company",
+        "address_house_number":"10",
+        "address_street":"Heinrich-Heine-Platz",
+        "address_postal_code":"10179",
+        "address_city":"Berlin",
+        "address_country":"DE"
+      }
     }
     """
     And the order A1 is in state declined
@@ -227,7 +235,15 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
         "address_country":"DE"
       },
       "reasons":null,
-      "decline_reason":null
+      "decline_reason":null,
+      "debtor_company_suggestion":{
+        "name":"Test User Company",
+        "address_house_number":"4",
+        "address_street":"Billing Street name",
+        "address_postal_code":"10639",
+        "address_city":"Berlin",
+        "address_country":"DE"
+      }
     }
     """
 
@@ -316,7 +332,15 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
         "address_country":"DE"
       },
       "reasons":null,
-      "decline_reason":null
+      "decline_reason":null,
+      "debtor_company_suggestion":{
+        "name":"Test User Company",
+        "address_house_number":"10",
+        "address_street":"Heinrich-Heine-Platz",
+        "address_postal_code":"10179",
+        "address_city":"Berlin",
+        "address_country":"DE"
+      }
     }
     """
 
@@ -475,7 +499,15 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
         "address_country":"DE"
       },
       "reasons":null,
-      "decline_reason":null
+      "decline_reason":null,
+      "debtor_company_suggestion":{
+        "name":"Test User Company",
+        "address_house_number":"10",
+        "address_street":"Heinrich-Heine-Platz",
+        "address_postal_code":"10179",
+        "address_city":"Berlin",
+        "address_country":"DE"
+      }
     }
     """
 
@@ -560,7 +592,8 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
           "address_country":null
        },
       "reasons":"debtor_not_identified",
-      "decline_reason":"debtor_not_identified"
+      "decline_reason":"debtor_not_identified",
+      "debtor_company_suggestion":null
     }
     """
 

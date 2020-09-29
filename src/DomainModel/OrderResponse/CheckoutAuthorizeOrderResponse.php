@@ -3,6 +3,8 @@
 namespace App\DomainModel\OrderResponse;
 
 use App\DomainModel\ArrayableInterface;
+use App\DomainModel\DebtorCompany\MostSimilarCandidateDTO;
+use App\DomainModel\DebtorCompany\NullMostSimilarCandidateDTO;
 use OpenApi\Annotations as OA;
 
 /**
@@ -12,6 +14,14 @@ use OpenApi\Annotations as OA;
  *      @OA\Property(property="reasons", enum=\App\DomainModel\Order\OrderDeclinedReasonsMapper::REASONS, type="string", nullable=true, deprecated=true),
  *      @OA\Property(property="decline_reason", ref="#/components/schemas/OrderDeclineReason", nullable=true),
  *      @OA\Property(property="debtor_company", type="object", description="Identified company", properties={
+ *          @OA\Property(property="name", ref="#/components/schemas/TinyText", nullable=true, example="Billie GmbH"),
+ *          @OA\Property(property="address_house_number", ref="#/components/schemas/TinyText", nullable=true, example="4"),
+ *          @OA\Property(property="address_street", ref="#/components/schemas/TinyText", nullable=true, example="Charlottenstr."),
+ *          @OA\Property(property="address_postal_code", type="string", nullable=true, maxLength=5, example="10969"),
+ *          @OA\Property(property="address_city", ref="#/components/schemas/TinyText", nullable=true, example="Berlin"),
+ *          @OA\Property(property="address_country", type="string", nullable=true, maxLength=2),
+ *      }),
+ *      @OA\Property(property="debtor_company_suggestion", type="object", description="Debtor company suggestion", properties={
  *          @OA\Property(property="name", ref="#/components/schemas/TinyText", nullable=true, example="Billie GmbH"),
  *          @OA\Property(property="address_house_number", ref="#/components/schemas/TinyText", nullable=true, example="4"),
  *          @OA\Property(property="address_street", ref="#/components/schemas/TinyText", nullable=true, example="Charlottenstr."),
@@ -37,12 +47,19 @@ class CheckoutAuthorizeOrderResponse implements ArrayableInterface
 
     private $companyAddressCountry;
 
+    private $debtorCompanySuggestion;
+
     /**
      * @deprecated
      */
     private $reasons;
 
     private $declineReason;
+
+    public function __construct()
+    {
+        $this->debtorCompanySuggestion = new NullMostSimilarCandidateDTO();
+    }
 
     public function getState(): string
     {
@@ -158,8 +175,24 @@ class CheckoutAuthorizeOrderResponse implements ArrayableInterface
         return $this;
     }
 
+    public function getDebtorCompanySuggestion(): MostSimilarCandidateDTO
+    {
+        return $this->debtorCompanySuggestion;
+    }
+
+    public function setDebtorCompanySuggestion(MostSimilarCandidateDTO $debtorCompanySuggestion): CheckoutAuthorizeOrderResponse
+    {
+        $this->debtorCompanySuggestion = $debtorCompanySuggestion;
+
+        return $this;
+    }
+
     public function toArray(): array
     {
+        $debtorCompanySuggestion = $this->getDebtorCompanySuggestion() instanceof NullMostSimilarCandidateDTO
+            ? null
+            : $this->getDebtorCompanySuggestion()->toArray();
+
         return [
             'state' => $this->getState(),
             'debtor_company' => [
@@ -172,6 +205,14 @@ class CheckoutAuthorizeOrderResponse implements ArrayableInterface
             ],
             'reasons' => $this->getReasons() ? implode(', ', $this->getReasons()) : null,
             'decline_reason' => $this->getDeclineReason(),
+            'debtor_company_suggestion' => $this->getCompanyName() ? [ // shadow release
+                'name' => $this->getCompanyName(),
+                'address_house_number' => $this->getCompanyAddressHouseNumber(),
+                'address_street' => $this->getCompanyAddressStreet(),
+                'address_postal_code' => $this->getCompanyAddressPostalCode(),
+                'address_city' => $this->getCompanyAddressCity(),
+                'address_country' => $this->getCompanyAddressCountry(),
+            ] : null,
         ];
     }
 }

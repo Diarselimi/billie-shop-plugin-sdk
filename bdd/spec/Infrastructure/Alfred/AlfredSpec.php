@@ -5,6 +5,7 @@ namespace spec\App\Infrastructure\Alfred;
 use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorCompany\DebtorCompanyFactory;
+use App\DomainModel\DebtorCompany\IdentifyDebtorResponseDTOFactory;
 use App\DomainModel\ExternalDebtorResponse\ExternalDebtorFactory;
 use App\DomainModel\IdentityVerification\IdentityVerificationCaseDTO;
 use App\DomainModel\IdentityVerification\IdentityVerificationCaseDTOFactory;
@@ -26,7 +27,8 @@ class AlfredSpec extends ObjectBehavior
         DebtorCompanyFactory $debtorFactory,
         SignatoryPowerDTOFactory $signatoryPowersDTOFactory,
         ExternalDebtorFactory $externalDebtorFactory,
-        IdentityVerificationCaseDTOFactory $identityVerificationCaseDTOFactory
+        IdentityVerificationCaseDTOFactory $identityVerificationCaseDTOFactory,
+        IdentifyDebtorResponseDTOFactory $similarCandidateDTOFactory
     ) {
         $this->beConstructedWith(...func_get_args());
     }

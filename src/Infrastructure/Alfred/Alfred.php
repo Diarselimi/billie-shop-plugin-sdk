@@ -8,8 +8,10 @@ use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorCompany\DebtorCompanyFactory;
 use App\DomainModel\DebtorCompany\DebtorCreationDTO;
-use App\DomainModel\DebtorCompany\IdentifiedDebtorCompany;
 use App\DomainModel\DebtorCompany\IdentifyDebtorRequestDTO;
+use App\DomainModel\DebtorCompany\IdentifyDebtorResponseDTO;
+use App\DomainModel\DebtorCompany\IdentifyDebtorResponseDTOFactory;
+use App\DomainModel\DebtorCompany\NullMostSimilarCandidateDTO;
 use App\DomainModel\ExternalDebtorResponse\ExternalDebtorFactory;
 use App\DomainModel\IdentityVerification\IdentityVerificationCaseDTO;
 use App\DomainModel\IdentityVerification\IdentityVerificationCaseDTOFactory;
@@ -45,7 +47,9 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
 
     private $client;
 
-    private $factory;
+    private $identifiedDebtorCompanyFactory;
+
+    private $identifyDebtorResponseDTOFactory;
 
     private $signatoryPowersDTOFactory;
 
@@ -55,16 +59,18 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
 
     public function __construct(
         Client $alfredClient,
-        DebtorCompanyFactory $debtorFactory,
+        DebtorCompanyFactory $debtorCompanyFactory,
         SignatoryPowerDTOFactory $signatoryPowersDTOFactory,
         ExternalDebtorFactory $externalDebtorFactory,
-        IdentityVerificationCaseDTOFactory $identityVerificationCaseDTOFactory
+        IdentityVerificationCaseDTOFactory $identityVerificationCaseDTOFactory,
+        IdentifyDebtorResponseDTOFactory $identifyDebtorResponseDTOFactory
     ) {
         $this->client = $alfredClient;
-        $this->factory = $debtorFactory;
+        $this->identifiedDebtorCompanyFactory = $debtorCompanyFactory;
         $this->signatoryPowersDTOFactory = $signatoryPowersDTOFactory;
         $this->externalDebtorFactory = $externalDebtorFactory;
         $this->identityVerificationCaseDTOFactory = $identityVerificationCaseDTOFactory;
+        $this->identifyDebtorResponseDTOFactory = $identifyDebtorResponseDTOFactory;
     }
 
     public function getDebtor(int $debtorCompanyId): ?DebtorCompany
@@ -92,7 +98,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
             throw new CompaniesServiceRequestException();
         }
 
-        return $this->factory->createFromMultipleDebtorCompaniesResponse($this->decodeResponse($response));
+        return $this->identifiedDebtorCompanyFactory->createFromMultipleDebtorCompaniesResponse($this->decodeResponse($response));
     }
 
     public function getDebtorByUuid(string $debtorCompanyUuid): ?DebtorCompany
@@ -105,7 +111,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         try {
             $response = $this->client->get("debtor/crefo/{$crefoId}");
 
-            return $this->factory->createFromMultipleDebtorCompaniesResponse($this->decodeResponse($response));
+            return $this->identifiedDebtorCompanyFactory->createFromMultipleDebtorCompaniesResponse($this->decodeResponse($response));
         } catch (TransferException | ClientResponseDecodeException $exception) {
             if ($exception->getCode() === Response::HTTP_NOT_FOUND) {
                 return [];
@@ -120,7 +126,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         try {
             $response = $this->client->get("debtor/{$identifier}");
 
-            return $this->factory->createFromAlfredResponse($this->decodeResponse($response));
+            return $this->identifiedDebtorCompanyFactory->createFromAlfredResponse($this->decodeResponse($response));
         } catch (TransferException | ClientResponseDecodeException $exception) {
             if ($exception->getCode() === Response::HTTP_NOT_FOUND) {
                 return null;
@@ -138,7 +144,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
                 'timeout' => self::UPDATE_COMPANY_TIMEOUT,
             ]);
 
-            return $this->factory->createFromAlfredResponse($this->decodeResponse($response));
+            return $this->identifiedDebtorCompanyFactory->createFromAlfredResponse($this->decodeResponse($response));
         } catch (TransferException | ClientResponseDecodeException $exception) {
             throw new CompaniesServiceRequestException($exception);
         }
@@ -170,7 +176,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
                 'json' => $debtorCreationDTO->toArray(),
             ]);
 
-            return $this->factory->createFromAlfredResponse($this->decodeResponse($response));
+            return $this->identifiedDebtorCompanyFactory->createFromAlfredResponse($this->decodeResponse($response));
         } catch (TransferException | ClientResponseDecodeException $exception) {
             throw new CompaniesServiceRequestException($exception);
         }
@@ -183,13 +189,13 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
                 "debtor/$debtorId/synchronize"
             );
 
-            return $this->factory->createFromAlfredResponse($this->decodeResponse($response));
+            return $this->identifiedDebtorCompanyFactory->createFromAlfredResponse($this->decodeResponse($response));
         } catch (TransferException | ClientResponseDecodeException $exception) {
             throw new CompaniesServiceRequestException($exception);
         }
     }
 
-    public function identifyDebtor(IdentifyDebtorRequestDTO $requestDTO): ?IdentifiedDebtorCompany
+    public function identifyDebtor(IdentifyDebtorRequestDTO $requestDTO): IdentifyDebtorResponseDTO
     {
         try {
             $response = $this->client->post('debtor/identify', [
@@ -205,19 +211,15 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
 
             $decodedResponse = $this->decodeResponse($response);
 
-            return $this->factory->createIdentifiedFromAlfredResponse($decodedResponse);
+            return $this->identifyDebtorResponseDTOFactory->createFromCompaniesServiceResponse($decodedResponse);
         } catch (ClientException $exception) {
-            if ($exception->getCode() === Response::HTTP_NOT_FOUND) {
-                $decodedResponse = $this->decodeResponse($exception->getResponse());
-
-                if (isset($decodedResponse['suggestions']) && !empty($decodedResponse['suggestions'])) {
-                    return $this->factory->createIdentifiedFromAlfredResponse(reset($decodedResponse['suggestions']), false);
-                }
-
-                return null;
+            if ($exception->getCode() !== Response::HTTP_NOT_FOUND) {
+                throw new CompaniesServiceRequestException($exception);
             }
 
-            throw new CompaniesServiceRequestException($exception);
+            $decodedResponse = $this->decodeResponse($exception->getResponse());
+
+            return $this->identifyDebtorResponseDTOFactory->createFromCompaniesServiceResponse($decodedResponse, false);
         } catch (TransferException | ClientResponseDecodeException $exception) {
             throw new CompaniesServiceRequestException($exception);
         }
@@ -236,7 +238,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
 
             $decodedResponse = $this->decodeResponse($response);
 
-            return $this->factory->createFromAlfredResponse($decodedResponse);
+            return $this->identifiedDebtorCompanyFactory->createFromAlfredResponse($decodedResponse);
         } catch (ClientException | TransferException | ClientResponseDecodeException $exception) {
             throw new CompaniesServiceRequestException($exception);
         }

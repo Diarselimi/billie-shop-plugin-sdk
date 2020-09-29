@@ -27,27 +27,30 @@ class IdentifyAndTriggerAsyncIdentification implements LoggingInterface
 
     public function identifyDebtor(OrderContainer $orderContainer): bool
     {
-        $debtorFinderResult = $this->debtorFinderService->findDebtor($orderContainer);
+        $merchantDebtorFinderResult = $this->debtorFinderService->findDebtor($orderContainer);
 
         if (!$orderContainer->getMerchantSettings()->useExperimentalDebtorIdentification()) {
             $this->triggerV2DebtorIdentificationAsync(
                 $orderContainer->getOrder(),
-                $debtorFinderResult->getIdentifiedDebtorCompany() ? $debtorFinderResult->getIdentifiedDebtorCompany() : null
+                $merchantDebtorFinderResult->getIdentifiedDebtorCompany() ? $merchantDebtorFinderResult->getIdentifiedDebtorCompany() : null
             );
         }
 
-        if ($debtorFinderResult->getMerchantDebtor() === null) {
+        $orderContainer
+            ->setMostSimilarCandidateDTO($merchantDebtorFinderResult->getMostSimilarCandidateDTO());
+
+        if ($merchantDebtorFinderResult->getMerchantDebtor() === null) {
             return false;
         }
 
         $orderContainer
-            ->setMerchantDebtor($debtorFinderResult->getMerchantDebtor())
-            ->setIdentifiedDebtorCompany($debtorFinderResult->getIdentifiedDebtorCompany())
+            ->setMerchantDebtor($merchantDebtorFinderResult->getMerchantDebtor())
+            ->setIdentifiedDebtorCompany($merchantDebtorFinderResult->getIdentifiedDebtorCompany())
         ;
 
-        $orderContainer->getOrder()->setMerchantDebtorId($debtorFinderResult->getMerchantDebtor()->getId());
+        $orderContainer->getOrder()->setMerchantDebtorId($merchantDebtorFinderResult->getMerchantDebtor()->getId());
         $orderContainer->getOrder()->setCompanyBillingAddressUuid(
-            $debtorFinderResult->getIdentifiedDebtorCompany()->getBillingAddressMatchUuid()
+            $merchantDebtorFinderResult->getIdentifiedDebtorCompany()->getBillingAddressMatchUuid()
         );
 
         return true;

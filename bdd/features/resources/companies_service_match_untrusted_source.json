@@ -1,4 +1,5 @@
 {
+  "identified_company": {
     "id": 1,
     "uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
     "crefo_id": null,
@@ -16,4 +17,5 @@
     "is_from_trusted_source": 0,
     "identification_type": "company_address",
     "identified_address_uuid": "some-address-uuid-123"
+  }
 }

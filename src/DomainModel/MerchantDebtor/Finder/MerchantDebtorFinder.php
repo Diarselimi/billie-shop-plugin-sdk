@@ -118,11 +118,12 @@ class MerchantDebtorFinder implements LoggingInterface
             LoggingInterface::KEY_NUMBER => $orderContainer->getOrder()->getExternalCode(),
         ]);
 
-        $debtorCompany = $this->companiesService->identifyDebtor($identifyRequest);
+        $identifyDebtorResponseDTO = $this->companiesService->identifyDebtor($identifyRequest);
+        $debtorCompany = $identifyDebtorResponseDTO->getIdentifiedDebtorCompany();
         if (!$debtorCompany) {
             $this->logInfo('Debtor could not be identified');
 
-            return new MerchantDebtorFinderResult();
+            return new MerchantDebtorFinderResult(null, null, $identifyDebtorResponseDTO->getMostSimilarCandidate());
         }
 
         $this->logInfo('Debtor identified');
@@ -143,6 +144,10 @@ class MerchantDebtorFinder implements LoggingInterface
             );
         }
 
-        return new MerchantDebtorFinderResult($merchantDebtor, $debtorCompany);
+        return new MerchantDebtorFinderResult(
+            $merchantDebtor,
+            $debtorCompany,
+            $identifyDebtorResponseDTO->getMostSimilarCandidate()
+        );
     }
 }
