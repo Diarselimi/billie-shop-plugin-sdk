@@ -28,9 +28,14 @@ class SearchPaymentsDTOFactory
             ->setSortBy($sortBy)
             ->setSortDirection($request->getSortDirection())
             ->setSearchString($this->stringSearch->cleanString($request->getSearchKeyword()))
+            ->setSearchCompanyString(null)
+        /**
+         * DISABLED due to slow query, implementation kept so it can be revisited,
+         * search by company name is highly requested feature by many customers
             ->setSearchCompanyString($this->stringSearch->getGermanRegexpSearchKeyword(
                 strtolower($request->getSearchKeyword())
             ))
+         */
         ;
     }
 }
