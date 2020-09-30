@@ -28,7 +28,7 @@ class MostSimilarCandidateDTO implements ArrayableInterface
         ?string $schufaId,
         ?string $googlePlacesId,
         ?string $taxId,
-        string $addressHouseNumber,
+        ?string $addressHouseNumber,
         string $addressStreet,
         string $addressCity,
         string $addressPostalCode,
