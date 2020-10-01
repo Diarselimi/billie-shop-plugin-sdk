@@ -24,6 +24,14 @@ class IdentityVerificationSucceededHandler implements MessageHandlerInterface, L
 
     public function __invoke(IdentityVerificationSucceeded $message): void
     {
+        if (!empty($message->getUserPersonUuid())) {
+            $this->logInfo('Identity verification case is for Flow customer, Skipping..', [
+                LoggingInterface::KEY_UUID => $message->getCaseUuid(),
+            ]);
+
+            return;
+        }
+
         try {
             $this->identityVerificationSucceeder->succeedIdentifcationVerification($message->getCaseUuid());
         } catch (WorkflowException $exception) {
