@@ -9,22 +9,21 @@ use Billie\MonitoringBundle\Service\Alerting\Sentry\Raven\RavenClient;
 use Ozean12\Transfer\Message\Identity\IdentityVerificationSucceeded;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
-use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 class IdentityVerificationSucceededHandlerSpec extends ObjectBehavior
 {
     public function let(
-        IdentityVerificationSucceeder $succeeder,
-        LoggerInterface $logger,
+        IdentityVerificationSucceeder $identityVerificationSucceeder,
         RavenClient $sentry
     ) {
-        $this->beConstructedWith($succeeder);
-        $this->setLogger($logger);
-        $this->setSentry($sentry);
+        $this->beConstructedWith($identityVerificationSucceeder);
+
+        $this->setLogger(new NullLogger())->setSentry($sentry);
     }
 
     public function it_should_catch_exceptions(
-        IdentityVerificationSucceeder $succeeder,
+        IdentityVerificationSucceeder $identityVerificationSucceeder,
         RavenClient $sentry
     ) {
         $caseUuid = 'dummy-uuid';
@@ -33,10 +32,25 @@ class IdentityVerificationSucceededHandlerSpec extends ObjectBehavior
 
         $sentry->captureException(Argument::any())->shouldBeCalled();
 
-        $succeeder
+        $identityVerificationSucceeder
             ->succeedIdentifcationVerification($caseUuid)
             ->shouldBeCalledOnce()
             ->willThrow(\Exception::class);
+
+        $this->__invoke($message);
+    }
+
+    public function it_ignores_the_message_if_its_for_flow_customer(IdentityVerificationSucceeder $identityVerificationSucceeder)
+    {
+        $caseUuid = 'dummy-uuid';
+        $message = new IdentityVerificationSucceeded();
+        $message->setCaseUuid($caseUuid);
+        $message->setUserPersonUuid('person-uuid');
+
+        $identityVerificationSucceeder
+            ->succeedIdentifcationVerification($caseUuid)
+            ->shouldNotBeCalled();
+
         $this->__invoke($message);
     }
 }
