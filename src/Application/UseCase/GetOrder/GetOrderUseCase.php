@@ -33,6 +33,9 @@ class GetOrderUseCase
             throw new OrderNotFoundException($exception);
         }
 
-        return $this->orderResponseFactory->create($orderContainer);
+        $response = $this->orderResponseFactory->create($orderContainer);
+        $response->setDebtorUuid($orderContainer->getMerchantDebtor()->getUuid());
+
+        return $response;
     }
 }

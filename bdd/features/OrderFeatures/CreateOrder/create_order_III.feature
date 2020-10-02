@@ -289,7 +289,8 @@ Feature:
           "country":"DE"
        },
        "created_at":"2020-02-18T12:28:46+0100",
-       "shipped_at":null
+       "shipped_at":null,
+       "debtor_uuid":null
     }
     """
 

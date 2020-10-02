@@ -1117,6 +1117,8 @@ components:
           $ref: '#/components/schemas/DateTime'
         shipped_at:
           $ref: '#/components/schemas/DateTime'
+        debtor_uuid:
+          $ref: '#/components/schemas/UUID'
       type: object
     AbstractShipOrderRequest:
       title: 'Order Shipping plain Object'

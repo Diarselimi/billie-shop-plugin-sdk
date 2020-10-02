@@ -150,7 +150,8 @@ Feature:
           "country":"DE"
        },
        "created_at":"2020-02-18T12:13:14+0100",
-       "shipped_at":null
+       "shipped_at":null,
+       "debtor_uuid":null
     }
     """
 
@@ -274,7 +275,8 @@ Feature:
           "country":"FR"
        },
        "created_at":"2020-02-18T12:14:44+0100",
-       "shipped_at":null
+       "shipped_at":null,
+       "debtor_uuid":null
     }
     """
     And the order "A1" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz 10 de"
@@ -392,7 +394,8 @@ Feature:
           "country":"DE"
        },
        "created_at":"2020-02-18T12:16:07+0100",
-       "shipped_at":null
+       "shipped_at":null,
+       "debtor_uuid":null
     }
     """
     And the order "A1" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz 10 de"
@@ -503,7 +506,8 @@ Feature:
           "country":"DE"
        },
        "created_at":"2020-02-18T12:17:44+0100",
-       "shipped_at":null
+       "shipped_at":null,
+       "debtor_uuid":null
     }
     """
     And the order "A1" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz 10 de"
@@ -622,7 +626,8 @@ Feature:
           "country":"DE"
        },
        "created_at":"2020-02-18T12:19:53+0100",
-       "shipped_at":null
+       "shipped_at":null,
+       "debtor_uuid":null
     }
     """
     And the order "A1" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz 10 de"
@@ -740,6 +745,7 @@ Feature:
           "country":"DE"
        },
        "created_at":"2020-02-18T12:21:17+0100",
-       "shipped_at":null
+       "shipped_at":null,
+       "debtor_uuid":null
     }
     """

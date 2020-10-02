@@ -161,7 +161,8 @@ Feature:
           "country":"DE"
        },
        "created_at":"2020-02-18T12:28:46+0100",
-       "shipped_at":null
+       "shipped_at":null,
+       "debtor_uuid":null
     }
     """
     And the order A1 belongs to company "c7be46c0-e049-4312-b274-258ec5aeeb70"

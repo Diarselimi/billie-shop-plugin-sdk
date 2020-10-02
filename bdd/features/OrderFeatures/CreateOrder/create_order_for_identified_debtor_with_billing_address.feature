@@ -161,7 +161,8 @@ Feature:
         "postal_code":"98765",
         "country":"FR"
       },
-      "shipped_at":null
+      "shipped_at":null,
+      "debtor_uuid":null
     }
     """
 
@@ -282,7 +283,8 @@ Feature:
         "postal_code":"98765",
         "country":"FR"
       },
-      "shipped_at":null
+      "shipped_at":null,
+      "debtor_uuid":null
     }
     """
     Then the response status code should be 200

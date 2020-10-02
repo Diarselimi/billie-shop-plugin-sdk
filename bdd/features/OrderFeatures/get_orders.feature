@@ -3,9 +3,9 @@ Feature: Retrieve and search all orders of a merchant
   Background:
     Given I add "Content-type" header equal to "application/json"
     And I add "X-Test" header equal to 1
-	  And I add "Authorization" header equal to "Bearer someToken"
-	  And I get from Oauth service a valid user token
-	  And a merchant user exists with permission VIEW_ORDERS
+    And I add "Authorization" header equal to "Bearer someToken"
+    And I get from Oauth service a valid user token
+    And a merchant user exists with permission VIEW_ORDERS
     And I get from payments service get orders details response
 
   Scenario: Successfully retrieve orders that are not in state new
@@ -96,7 +96,8 @@ Feature: Retrieve and search all orders of a merchant
                     "postal_code": "test"
                 },
                 "amount_tax": 100,
-                "amount": 1000
+                "amount": 1000,
+                "debtor_uuid":null
             },
             {
                 "reasons": null,
@@ -156,7 +157,8 @@ Feature: Retrieve and search all orders of a merchant
                     "postal_code": "test"
                 },
                 "amount_tax": 100,
-                "amount": 1000
+                "amount": 1000,
+                "debtor_uuid":null
             }
         ]
     }
@@ -198,14 +200,14 @@ Feature: Retrieve and search all orders of a merchant
 				"bic":"BICISHERE"
 			 },
 			 "invoice":{
-        "invoice_number": null,
-        "payout_amount": 1000,
-        "outstanding_amount":1000,
-        "fee_amount": 10,
-        "fee_rate": 1,
-        "due_date": "1978-11-20",
-        "pending_merchant_payment_amount": 0,
-        "pending_cancellation_amount": 0
+               "invoice_number": null,
+               "payout_amount": 1000,
+               "outstanding_amount":1000,
+               "fee_amount": 10,
+               "fee_rate": 1,
+               "due_date": "1978-11-20",
+               "pending_merchant_payment_amount": 0,
+               "pending_cancellation_amount": 0
 			 },
 			 "debtor_external_data":{
 				"name":"test",
@@ -233,7 +235,8 @@ Feature: Retrieve and search all orders of a merchant
 			    "city":"test",
 			    "postal_code":"test",
 			    "country":"TE"
-             }
+             },
+             "debtor_uuid":null
 		  }
 		]
 	  }
@@ -260,7 +263,7 @@ Feature: Retrieve and search all orders of a merchant
 			 "decline_reason":null,
 			 "amount":1000,
 			 "amount_net": 900.00,
-       "amount_tax": 100.00,
+             "amount_tax": 100.00,
 			 "created_at":"2019-05-07",
 			 "debtor_company":{
 				"name":"Test User Company",
@@ -275,14 +278,14 @@ Feature: Retrieve and search all orders of a merchant
 				"bic":"BICISHERE"
 			 },
 			 "invoice":{
-        "invoice_number": null,
-        "payout_amount": 1000,
-        "outstanding_amount":1000,
-        "fee_amount": 10,
-        "fee_rate": 1,
-        "due_date": "1978-11-20",
-        "pending_merchant_payment_amount": 0,
-        "pending_cancellation_amount": 0
+               "invoice_number": null,
+               "payout_amount": 1000,
+               "outstanding_amount":1000,
+               "fee_amount": 10,
+               "fee_rate": 1,
+               "due_date": "1978-11-20",
+               "pending_merchant_payment_amount": 0,
+               "pending_cancellation_amount": 0
 			 },
 			 "debtor_external_data":{
 				"name":"test",
@@ -310,7 +313,8 @@ Feature: Retrieve and search all orders of a merchant
 				"city": "test",
 				"postal_code":"test",
 				"country":"TE"
-             }
+             },
+             "debtor_uuid":null
 		  }
 		]
 	  }
@@ -387,7 +391,8 @@ Feature: Retrieve and search all orders of a merchant
 				"city": "test",
 				"postal_code":"test",
 				"country":"TE"
-             }
+             },
+             "debtor_uuid":null
 		  }
 		]
 	  }
@@ -443,14 +448,14 @@ Feature: Retrieve and search all orders of a merchant
 				"bic":"BICISHERE"
 			 },
 			 "invoice":{
-        "invoice_number": null,
-        "payout_amount": 1000,
-        "outstanding_amount":1000,
-        "fee_amount": 10,
-        "fee_rate": 1,
-        "due_date": "1978-11-20",
-        "pending_merchant_payment_amount": 0,
-        "pending_cancellation_amount": 0
+               "invoice_number": null,
+               "payout_amount": 1000,
+               "outstanding_amount":1000,
+               "fee_amount": 10,
+               "fee_rate": 1,
+               "due_date": "1978-11-20",
+               "pending_merchant_payment_amount": 0,
+               "pending_cancellation_amount": 0
 			 },
 			 "debtor_external_data":{
 				"name":"test",
@@ -478,7 +483,8 @@ Feature: Retrieve and search all orders of a merchant
 			    "city":"test",
 			    "postal_code":"test",
 			    "country":"TE"
-             }
+             },
+             "debtor_uuid":null
 		  }
 		]
 	  }
@@ -558,14 +564,14 @@ Feature: Retrieve and search all orders of a merchant
 				"bic":"BICISHERE"
 			 },
 			 "invoice":{
-        "invoice_number": null,
-        "payout_amount": 1000,
-        "outstanding_amount":1000,
-        "fee_amount": 10,
-        "fee_rate": 1,
-        "due_date": "1978-11-20",
-        "pending_merchant_payment_amount": 0,
-        "pending_cancellation_amount": 0
+               "invoice_number": null,
+               "payout_amount": 1000,
+               "outstanding_amount":1000,
+               "fee_amount": 10,
+               "fee_rate": 1,
+               "due_date": "1978-11-20",
+               "pending_merchant_payment_amount": 0,
+               "pending_cancellation_amount": 0
 			 },
 			 "debtor_external_data":{
 				"name":"test",
@@ -593,7 +599,8 @@ Feature: Retrieve and search all orders of a merchant
 			    "city":"test",
 			    "postal_code":"test",
 			    "country":"TE"
-             }
+             },
+             "debtor_uuid":null
 		  }
 		]
 	  }

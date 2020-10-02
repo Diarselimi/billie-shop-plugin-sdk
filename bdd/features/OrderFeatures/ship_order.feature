@@ -82,10 +82,10 @@ Feature:
             "address_house": "test",
             "industry_sector": "test",
             "merchant_customer_id":"ext_id"
-         },
-         "duration":30,
-         "dunning_status": null,
-         "delivery_address":{
+          },
+          "duration":30,
+          "dunning_status": null,
+          "delivery_address":{
             "house_number":"test",
             "street":"test",
             "city": "test",
@@ -98,7 +98,8 @@ Feature:
             "city":"test",
             "postal_code":"test",
             "country":"TE"
-          }
+          },
+          "debtor_uuid":null
         }
         """
         And the response status code should be 200
@@ -206,7 +207,8 @@ Feature:
             "city":"test",
             "postal_code":"test",
             "country":"TE"
-          }
+          },
+          "debtor_uuid":null
         }
         """
 
@@ -286,7 +288,8 @@ Feature:
             "city":"test",
             "postal_code":"test",
             "country":"TE"
-          }
+          },
+          "debtor_uuid":null
         }
         """
 

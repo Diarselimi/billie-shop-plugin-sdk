@@ -60,6 +60,7 @@ use OpenApi\Annotations as OA;
  *      @OA\Property(property="billing_address", type="object", ref="#/components/schemas/CreateOrderAddressRequest"),
  *      @OA\Property(property="created_at", ref="#/components/schemas/DateTime"),
  *      @OA\Property(property="shipped_at", ref="#/components/schemas/DateTime"),
+ *      @OA\Property(property="debtor_uuid", ref="#/components/schemas/UUID"),
  * })
  */
 class OrderResponse implements ArrayableInterface
@@ -154,6 +155,8 @@ class OrderResponse implements ArrayableInterface
     private $duration;
 
     private $dunningStatus;
+
+    private $debtorUuid;
 
     public function getExternalCode(): ? string
     {
@@ -689,6 +692,18 @@ class OrderResponse implements ArrayableInterface
         return $this;
     }
 
+    public function getDebtorUuid(): ?string
+    {
+        return $this->debtorUuid;
+    }
+
+    public function setDebtorUuid(?string $debtorUuid): OrderResponse
+    {
+        $this->debtorUuid = $debtorUuid;
+
+        return $this;
+    }
+
     public function toArray(): array
     {
         return [
@@ -750,6 +765,7 @@ class OrderResponse implements ArrayableInterface
             ],
             'created_at' => $this->getCreatedAt()->format(\DateTime::ISO8601),
             'shipped_at' => ($this->getShippedAt() ? $this->getShippedAt()->format(\DateTime::ISO8601) : null),
+            'debtor_uuid' => $this->getDebtorUuid(),
         ];
     }
 }
