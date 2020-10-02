@@ -34,7 +34,10 @@ class GetOrderUseCase
         }
 
         $response = $this->orderResponseFactory->create($orderContainer);
-        $response->setDebtorUuid($orderContainer->getMerchantDebtor()->getUuid());
+
+        if ($orderContainer->getOrder()->getMerchantDebtorId() !== null) {
+            $response->setDebtorUuid($orderContainer->getMerchantDebtor()->getUuid());
+        }
 
         return $response;
     }
