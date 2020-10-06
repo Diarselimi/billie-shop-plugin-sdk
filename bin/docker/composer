@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-# executes composer commands on a running "app" container
-
-if [[ ! -f composer.phar ]]; then
-  echo "> Installing composer..."
-  bin/docker/setup-composer
-fi
-bin/docker/app ./composer.phar "${@}"

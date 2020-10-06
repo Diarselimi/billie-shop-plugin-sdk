@@ -1,6 +1,3 @@
-extensions:
-  Memio\SpecGen\MemioSpecGenExtension: ~
-
 suites:
   main_suite:
     namespace: App

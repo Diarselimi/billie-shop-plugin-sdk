@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
 
 # executes commands on a running "app" container
-bin/docker/exec --workdir /var/www/paella-core app "${@}"
+
+if [ -z $(docker ps -q --no-trunc | grep $(docker-compose ps -q app)) ]; then
+  # app service not running, use a new temporary container
+  bin/docker/run-rm --workdir /var/www/paella-core app "${@}"
+else
+  # app service is running, use existing container
+  bin/docker/exec --workdir /var/www/paella-core app "${@}"
+fi

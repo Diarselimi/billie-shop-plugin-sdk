@@ -3,11 +3,11 @@
 CURR_DATE=$(date +"%Y.%m")
 SPEC_VERSION="v${CURR_DATE}"
 SPEC_DIR="docs/openapi"
-SPEC_TITLE="Billie - PaD API Documentation"
+SPEC_TITLE="Billie Boost API Documentation"
 SPEC_GROUP=${1:-"full"}
-SPEC_FILE="${SPEC_DIR}/paella-openapi-${SPEC_GROUP}.yaml"
+SPEC_FILE="${SPEC_DIR}/paella-core-openapi-${SPEC_GROUP}.yaml"
 
-echo "   Generating OpenAPI 3.0 YAML specification for group '${SPEC_GROUP}'."
+echo "   Generating OpenAPI 3.0 YAML specification for API group '${SPEC_GROUP}'."
 
 mkdir -p ${SPEC_DIR}
 rm -f ${SPEC_FILE}

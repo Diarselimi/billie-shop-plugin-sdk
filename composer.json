@@ -2,7 +2,7 @@
     "type": "project",
     "license": "proprietary",
     "require": {
-        "php": "^7.3",
+        "php": "^7.4",
         "ext-bcmath": "*",
         "ext-ctype": "*",
         "ext-iconv": "*",
@@ -50,10 +50,11 @@
         "behatch/contexts": "^3.3",
         "donatj/mock-webserver": "^2.1",
         "duxet/json_spec": "^1.2",
-        "memio/spec-gen": "^0.9.0",
-        "phpspec/phpspec": "^5.1",
-        "symfony/phpunit-bridge": "^5.1",
-        "fzaninotto/faker": "^1.9"
+        "fzaninotto/faker": "^1.9",
+        "ozean12/php-cs-fixer": "^1.2",
+        "ozean12/pre-commit-hooks": "^2.0",
+        "phpspec/phpspec": "^6.2",
+        "symfony/phpunit-bridge": "^5.1"
     },
     "config": {
         "preferred-install": {
@@ -81,44 +82,50 @@
         "symfony/polyfill-php70": "*",
         "symfony/polyfill-php56": "*"
     },
-    "repositories": [
-        {
+    "repositories": {
+        "0": {
             "type": "vcs",
             "url": "https://github.com/ozean12/MonitoringBundle"
         },
-        {
+        "1": {
             "type": "vcs",
             "url": "https://github.com/ozean12/PdoBundle"
         },
-        {
+        "2": {
             "type": "vcs",
             "url": "https://github.com/ozean12/amqp-pack"
         },
-        {
+        "3": {
             "type": "vcs",
             "url": "https://github.com/ozean12/amqp-transfers"
         },
-        {
+        "4": {
             "type": "vcs",
             "url": "https://github.com/ozean12/amqp-transfers-serializer"
         },
-        {
+        "5": {
             "type": "vcs",
             "url": "https://github.com/ozean12/graphql-repository-client"
         },
-        {
-          "type": "vcs",
-          "url": "https://github.com/ozean12/money-php"
+        "6": {
+            "type": "vcs",
+            "url": "https://github.com/ozean12/money-php"
+        },
+        "ozean12-php-cs-fixer": {
+            "type": "vcs",
+            "url": "https://github.com/ozean12/php-cs-fixer"
+        },
+        "ozean12-pre-commit-hooks": {
+            "type": "vcs",
+            "url": "https://github.com/ozean12/php-pre-commit-hooks"
         }
-    ],
+    },
     "scripts": {
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
             "assets:install --symlink --relative %PUBLIC_DIR%": "symfony-cmd"
         },
-        "post-install-cmd": [
-            "@auto-scripts"
-        ],
+        "post-install-cmd": ["@auto-scripts", "./vendor/bin/install-pre-commit-hook"],
         "post-update-cmd": [
             "@auto-scripts"
         ]

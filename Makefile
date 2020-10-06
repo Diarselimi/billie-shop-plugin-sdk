@@ -1,75 +1,94 @@
-default:install
+COMPOSER_COMMAND=composer install --no-interaction --no-scripts
+ifeq ($(APP_ENV), prod)
+	COMPOSER_COMMAND=composer install --no-interaction --no-scripts --no-dev --optimize-autoloader --classmap-authoritative
+endif
+CHECK_FILES='.'
 
-# START Jenkins provisioner required targets:
-docker-ftest:test
-docker-ftest-clean:
-	docker-compose down
-# END Jenkins provisioner required targets
+default: test-local-init
 
-install:
-	# A valid COMPOSER_AUTH env var is required in the app container for installing private repos.
-	# Set it in your docker-compose.override.yml
-	docker-compose down
-	docker-compose build # rebuild in case of Dockerfile changes
-	docker-compose up -d
-	bin/docker/composer install --ignore-platform-reqs --no-interaction
-	bin/docker/composer dumpautoload
-	make clear-cache
-	make test-migrate
+# START Jenkins CI required targets:
+code-check:
+	echo " > Checking code... "
+	php-cs-check-changed "$(CHECK_FILES)"
+	make openapi # checks if openapi files are still valid when regenerated
 
-clear-cache:
-	rm -rf var/cache
-	bin/docker/app bin/console cache:warmup
+deps:
+	echo " > Installing dependencies... "
+	$(COMPOSER_COMMAND)
 
-start:
-	docker-compose down
-	docker-compose up -d
+test-ci: test-migrations test-unit test-integration test-functional
+# END Jenkins CI required targets
 
-test:
-	make start
-	make docs
-	make test-migrate
-	make test-phpspec
-	make test-phpunit
-	make test-behat
+clean:
+	echo " > Cleaning... "
+	rm -rf ./var/cache
+	rm -rf ./var/logs
+	rm -rf ./var/tests/_output
 
-docs:
-	echo " > Running OpenAPI Specification generator + validator... "
-	make clear-cache
-	# full (internal)
-	bin/docker/app bin/generate-api-docs full
-	bin/docker/run-rm swagger-cli validate /openapi/paella-openapi-full.yaml
-	# public (the one in developers.billie.io)
-	bin/docker/app bin/generate-api-docs public
-	bin/docker/run-rm swagger-cli validate /openapi/paella-openapi-public.yaml
-	# checkout-client (internal)
-	bin/docker/app bin/generate-api-docs checkout-client --with-extra-config
-	bin/docker/run-rm swagger-cli validate /openapi/paella-openapi-checkout-client.yaml
-
-test-migrate:
+test-migrations:
 	echo " > Running DB migrations... "
 	sleep 15 # give time to the mysql server to be ready
-	bin/docker/app vendor/bin/phinx migrate
+	./vendor/bin/phinx migrate
 
-test-phpspec:
-	echo " > Running PHPSpec... "
-	bin/docker/app vendor/bin/phpspec run --stop-on-failure -vvv
+test-local-migrations:
+	bin/docker/app make test-migrations
 
 test-seed:
 	echo " > Running DB seeds... "
-	bin/docker/app vendor/bin/phinx seed:run
+	vendor/bin/phinx seed:run
 
-test-phpunit:
+test-functional:
+	echo " > Running functional tests... "
+	./vendor/bin/behat --stop-on-failure --strict --format progress -vvv
+
+test-integration:
 	make test-seed
 	echo " > Setting up PHPUnit... "
-	bin/docker/app ./.ci/scripts/install-composer.sh
-	bin/docker/app bin/phpunit install -q -n
+	bin/phpunit install -q -n
 	echo " > Running PHPUnit... "
-	bin/docker/app bin/phpunit --stop-on-failure -vvv
+	bin/phpunit --stop-on-failure -vvv
 
-test-behat:
-	echo " > Running Behat... "
-	bin/docker/app vendor/bin/behat --stop-on-failure --strict --format progress -vvv
+test-unit:
+	echo " > Running unit tests... "
+	vendor/bin/phpspec run --stop-on-failure -vvv
+
+openapi:
+	echo " > Running OpenAPI Specification generator + validator... "
+	composer dumpautoload
+	bin/console cache:clear
+	# full (no x-group filtering)
+	bin/openapi-generate full
+	bin/docker/app swagger-cli validate ./docs/openapi/paella-core-openapi-full.yaml
+	# public (the one in developers.billie.io)
+	bin/openapi-generate public
+	bin/docker/app swagger-cli validate ./docs/openapi/paella-core-openapi-public.yaml
+	# checkout-client (internal)
+	bin/openapi-generate checkout-client --with-extra-config
+	bin/docker/app swagger-cli validate ./docs/openapi/paella-core-openapi-checkout-client.yaml
+
+test-local-init:
+	echo " > Recreating containers and starting... "
+	if [[ ! -f ./docker-compose.override.yml ]]; then \
+  		cp docker-compose.override.dist.yml docker-compose.override.yml; \
+  	fi; \
+	docker-compose up -d --build --force-recreate --remove-orphans
+	if [[ ! -d ./vendor/composer ]]; then \
+  		bin/docker/app make deps; \
+  		rm -rf ./bin/.phpunit; \
+  		bin/docker/app ./bin/phpunit --version; \
+  	else \
+  		bin/docker/app composer dumpautoload; \
+  	fi;
+
+test-local: test-local-init test-local-migrations
+	bin/docker/app make openapi
+	bin/docker/app make test-unit
+	bin/docker/app make test-integration
+	bin/docker/app make test-functional
+
+pre-commit-hook:
+	vendor/bin/cs-fix-staged-files
+	make openapi
 
 $(V).SILENT:
-.PHONY: docs
+.PHONY: docs tests test
