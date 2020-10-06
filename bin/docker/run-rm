@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # executes commands on a new temporary container, deleting it afterwards.
-# any added file will be lost if it's not in the mounted volume.
+# any added file will be lost if it's not in a mounted volume.
 
 if [[ -t 1 ]]; then
   # stdout is a terminal

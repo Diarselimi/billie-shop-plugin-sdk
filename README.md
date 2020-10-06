@@ -15,8 +15,8 @@ if you haven't done it yet.
 [`docker-compose.override.dist.yml`](docker-compose.override.dist.yml), named `docker-compose.override.yml`,
 to be able to install private repositories.
 
-4. Run `make` or `make install`. It will build and freshly start all containers, running composer install 
-and all migrations. If you only wish a fresh container (re)start and nothing else, use `make start` instead.
+4. Run `make`. It will build and freshly start all containers, running composer install 
+and all migrations.
 
 You have many helpers to use dockerized versions of some tools, under this directory: `bin/docker/*`.
 
@@ -109,14 +109,14 @@ Used by Jenkins.
 
 Usage:
 ```bash
-make test
+make test-local
 ```
 
-#### Behat
+#### Functional
 
 Usage:
 ```bash
-make test-behat
+bin/docker/app make test-functional
 ```
 
 Running behat directly with custom arguments:
@@ -124,22 +124,22 @@ Running behat directly with custom arguments:
 ./bin/docker/app vendor/bin/behat -vvv --stop-on-failure bdd/specs/foobar.feature
 ```
 
-#### PHPUnit
+#### Integration
 Usage:
 ```bash
-make test-phpunit
+bin/docker/app make test-integration
 ```
 
-Running phpunit directly with custom arguments:
+Running integration directly with custom arguments:
 ```bash
 ./bin/docker/app bin/phpunit tests/MyTestCase.php
 ```
 
-#### PHPSpec
+#### Unit
 
 Usage:
 ```bash
-make test-phpspec
+bin/docker/app make test-unit
 ```
 
 Running phpspec directly with custom arguments:
@@ -152,5 +152,3 @@ Running phpspec directly with custom arguments:
 You can also run anything else inside the containers using the helper scripts, for example:
 
 -  `./bin/docker/app php -v`
--  `./bin/docker/console cache:clear` same as: `./bin/docker/app bin/console cache:clear`
--  `./bin/docker/composer dumpautoload`

@@ -1,1 +1,1 @@
-deliveryPipeline(name: 'paellacore', lang: 'php')
+deliveryPipelineV2()

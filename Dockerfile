@@ -1,18 +1,23 @@
 ARG APP_ENV=dev
 ARG APP_DOCKER_REGISTRY=912850810755.dkr.ecr.eu-central-1.amazonaws.com
-FROM ${APP_DOCKER_REGISTRY}/php:7.3-${APP_ENV}-latest
 
-ENV APP_ROOT=/var/www/paella-core
+# >>> base
+FROM ${APP_DOCKER_REGISTRY}/php:7.4-${APP_ENV}-latest as base
 ENV APP_NAME=paella-core
+ENV APP_ROOT=/var/www/${APP_NAME}
 WORKDIR $APP_ROOT
 
-# bcmath
-RUN docker-php-ext-install bcmath
+# >>> builder (installs tools)
+FROM base as builder
+ENV COMPOSER_VERSION 1.10.8
+RUN docker-install-composer && \
+    docker-install-php-cs-fixer && \
+    docker-install-swagger-cli
+ENTRYPOINT []
 
-# intl
-RUN apt-get update && \
-    apt-get install -y libicu-dev && \
-    apt-get clean -y && rm -rf /var/lib/apt/lists/* && \
-    docker-php-ext-install intl
+# >>> nosource
+FROM base as nosource
 
-#ansible-remove-me#COPY . $APP_ROOT
+# >>> (default build target, with source code)
+FROM base
+COPY . $APP_ROOT

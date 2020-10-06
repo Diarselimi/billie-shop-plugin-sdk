@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-# executes SF console commands on a running "app" container
-
-bin/docker/app bin/console "${@}"

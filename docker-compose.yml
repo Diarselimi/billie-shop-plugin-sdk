@@ -4,6 +4,9 @@ services:
   app: # Do not rename this service: it is required by provisioner/jenkins.
     build:
       context: .
+      target: builder
+    entrypoint: "/usr/local/bin/docker-php-entrypoint"
+    command: "sleep 1h" # keep-alive, specially for the CI
     volumes:
       - './:/var/www/paella-core'
     depends_on:
