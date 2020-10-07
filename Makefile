@@ -10,7 +10,6 @@ default: test-local-init
 code-check:
 	echo " > Checking code... "
 	php-cs-check-changed "$(CHECK_FILES)"
-	make openapi # checks if openapi files are still valid when regenerated
 
 deps:
 	echo " > Installing dependencies... "
