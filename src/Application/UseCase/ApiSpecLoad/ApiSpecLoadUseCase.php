@@ -18,7 +18,7 @@ class ApiSpecLoadUseCase
 
     public function execute(string $specGroupName = 'all'): string
     {
-        $filename = "paella-openapi-{$specGroupName}.yaml";
+        $filename = "paella-core-openapi-{$specGroupName}.yaml";
 
         if ($this->apiSpecFileReader->exists($filename)) {
             $spec = $this->apiSpecFileReader->read($filename);
