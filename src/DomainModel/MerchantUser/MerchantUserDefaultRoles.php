@@ -53,6 +53,7 @@ interface MerchantUserDefaultRoles
             MerchantUserPermissions::CHANGE_DEBTOR_INFORMATION,
             MerchantUserPermissions::UPDATE_ORDERS,
             MerchantUserPermissions::SHIP_ORDERS,
+            MerchantUserPermissions::CREATE_ORDERS,
         ],
     ];
 
