@@ -76,18 +76,27 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         OrderEventPayloadFactory $orderEventPayloadFactory
     ) {
         $amountChange->isPayment()->shouldBeCalledOnce()->willReturn(true);
+        $amountChange->getIban()->willReturn('DE123');
+        $amountChange->getAccountHolder()->willReturn('John Smith');
         $eventPayload = [
             'event' => 'payment',
             'order_id' => 'ABCD123',
             'order_uuid' => 'ABCD123123',
             'amount' => 75,
             'open_amount' => 25,
+            'iban' => 'DE123',
+            'account_holder' => 'John Smith',
         ];
 
         $orderEventPayloadFactory->create(
             $order,
             OrderNotificationEntity::NOTIFICATION_TYPE_PAYMENT,
-            ['amount' => 75, 'open_amount' => 25]
+            [
+                'amount' => 75,
+                'open_amount' => 25,
+                'iban' => 'DE123',
+                'account_holder' => 'John Smith',
+            ]
         )->willReturn($eventPayload);
 
         $order->getAmountForgiven()->shouldBeCalledOnce()->willReturn(0);
@@ -139,18 +148,26 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
 
         $amountChange->isPayment()->shouldBeCalledOnce()->willReturn(true);
         $amountChange->getOutstandingAmount()->willReturn(0);
+        $amountChange->getIban()->willReturn('DE123');
+        $amountChange->getAccountHolder()->willReturn('John Smith');
 
         $eventPayload = [
             'event' => 'payment',
             'order_id' => 'ABCD123',
             'amount' => 75,
             'open_amount' => 0,
+            'iban' => 'DE123',
+            'account_holder' => 'John Smith',
         ];
 
         $orderEventPayloadFactory->create(
             $order,
             OrderNotificationEntity::NOTIFICATION_TYPE_PAYMENT,
-            ['amount' => 75, 'open_amount' => 0]
+            [
+                'amount' => 75, 'open_amount' => 0,
+                'iban' => 'DE123',
+                'account_holder' => 'John Smith',
+            ]
         )->willReturn($eventPayload);
 
         $order->getAmountForgiven()->shouldBeCalledOnce()->willReturn(0);

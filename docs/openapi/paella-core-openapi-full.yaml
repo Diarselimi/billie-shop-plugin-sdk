@@ -4334,6 +4334,8 @@ components:
           $ref: '#/components/schemas/TinyText'
         permissions:
           type: array
+          items:
+            type: string
       type: object
     OrderPaymentDTO:
       properties:
@@ -5120,7 +5122,7 @@ tags:
       
       | Event Name |  Description |
       |------------|--------------|
-      |payments    |The outstanding amount for an order changed. This message is sent for full as well as partial payments for orders|
+      | payment    |The outstanding amount for an order changed. This message is sent for full as well as partial payments for orders|
   -
     name: 'Dashboard Orders'
   -

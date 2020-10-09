@@ -12,6 +12,8 @@ class OrderAmountChangeFactory
             ->setAmountChange($response['amount_change'])
             ->setOutstandingAmount($response['outstanding_amount'])
             ->setPaidAmount($response['paid_amount'])
+            ->setIban($response['debtor_iban'] ?? null)
+            ->setAccountHolder($response['remittance_information'] ?? null)
         ;
     }
 }

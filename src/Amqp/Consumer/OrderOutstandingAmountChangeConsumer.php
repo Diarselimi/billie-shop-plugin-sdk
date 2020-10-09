@@ -31,8 +31,5 @@ class OrderOutstandingAmountChangeConsumer implements ConsumerInterface
 
         $request = new OrderOutstandingAmountChangeRequest($paymentDetails);
         $this->useCase->execute($request);
-
-        // dead loop prevention is disabled
-//        throw new AckStopConsumerException();
     }
 }

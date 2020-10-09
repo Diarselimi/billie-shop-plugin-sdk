@@ -9,28 +9,28 @@ class RemoveGroups implements ProcessorInterface
 {
     public function __invoke(Analysis $analysis)
     {
-        foreach ($analysis->openapi->paths as $annotation) {
+        foreach ((array) $analysis->openapi->paths as $annotation) {
             foreach (self::HTTP_METHODS as $method) {
                 $this->removeGroups($annotation->{$method});
             }
             $this->removeGroups($annotation);
         }
-        foreach ($analysis->openapi->tags as $annotation) {
+        foreach ((array) $analysis->openapi->tags as $annotation) {
             $this->removeGroups($annotation);
         }
-        foreach ($analysis->openapi->components->schemas as $annotation) {
+        foreach ((array) $analysis->openapi->components->schemas as $annotation) {
             $this->removeGroups($annotation);
         }
-        foreach ($analysis->openapi->components->responses as $annotation) {
+        foreach ((array) $analysis->openapi->components->responses as $annotation) {
             $this->removeGroups($annotation);
         }
-        foreach ($analysis->openapi->components->requestBodies as $annotation) {
+        foreach ((array) $analysis->openapi->components->requestBodies as $annotation) {
             $this->removeGroups($annotation);
         }
-        foreach ($analysis->openapi->components->securitySchemes as $annotation) {
+        foreach ((array) $analysis->openapi->components->securitySchemes as $annotation) {
             $this->removeGroups($annotation);
         }
-        foreach ($analysis->openapi->components->parameters as $annotation) {
+        foreach ((array) $analysis->openapi->components->parameters as $annotation) {
             $this->removeGroups($annotation);
         }
     }

@@ -17,7 +17,7 @@ use OpenApi\Annotations as OA;
  *      @OA\Property(property="role_id", type="integer"),
  *      @OA\Property(property="first_name", ref="#/components/schemas/TinyText"),
  *      @OA\Property(property="last_name", ref="#/components/schemas/TinyText"),
- *      @OA\Property(property="permissions", type="array"),
+ *      @OA\Property(property="permissions", type="array", @OA\Items(type="string")),
  * })
  */
 class MerchantUserEntity extends AbstractTimestampableEntity

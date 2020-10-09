@@ -41,7 +41,10 @@ class AddAmazonApiGatewayConfig implements ProcessorInterface
                 $config['uri'] .= ltrim($op->path, '/');
                 $config['httpMethod'] = strtoupper($op->method);
 
-                foreach ($op->parameters as $param) {
+                foreach ((array) $op->parameters as $param) {
+                    if (!is_object($param)) {
+                        continue;
+                    }
                     $config['requestParameters']['integration.request.path.' . $param->name] =
                         'method.request.path.' . $param->name;
                 }

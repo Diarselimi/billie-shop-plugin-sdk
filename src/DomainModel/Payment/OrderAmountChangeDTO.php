@@ -18,6 +18,10 @@ class OrderAmountChangeDTO
 
     private $paidAmount;
 
+    private $iban;
+
+    private $accountHolder;
+
     public function getId(): string
     {
         return $this->id;
@@ -81,5 +85,29 @@ class OrderAmountChangeDTO
     public function isPayment(): bool
     {
         return $this->getType() === self::TYPE_PAYMENT;
+    }
+
+    public function getIban(): ?string
+    {
+        return $this->iban;
+    }
+
+    public function setIban(?string $iban): self
+    {
+        $this->iban = $iban;
+
+        return $this;
+    }
+
+    public function getAccountHolder(): ?string
+    {
+        return $this->accountHolder;
+    }
+
+    public function setAccountHolder(?string $accountHolder): self
+    {
+        $this->accountHolder = $accountHolder;
+
+        return $this;
     }
 }

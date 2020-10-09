@@ -63,4 +63,4 @@ the `application/json` Content-Type and the following body format:
 
 | Event Name |  Description |
 |------------|--------------|
-|payments    |The outstanding amount for an order changed. This message is sent for full as well as partial payments for orders| 
+| payment    |The outstanding amount for an order changed. This message is sent for full as well as partial payments for orders| 

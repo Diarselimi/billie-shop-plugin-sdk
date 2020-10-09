@@ -147,6 +147,8 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
                 [
                     'amount' => $amountChange->getPaidAmount(),
                     'open_amount' => $amountChange->getOutstandingAmount(),
+                    'iban' => $amountChange->getIban(),
+                    'account_holder' => $amountChange->getAccountHolder(),
                 ]
             )
         );
