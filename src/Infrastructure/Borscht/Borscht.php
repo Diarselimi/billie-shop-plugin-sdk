@@ -27,7 +27,7 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
 
     private const ERR_BODY_DECODE_MESSAGE = 'Payments API response decode failed';
 
-    private const EXTENDED_REQUEST_TIMEOUT = 2;
+    private const EXTENDED_REQUEST_TIMEOUT = 5;
 
     private $client;
 
