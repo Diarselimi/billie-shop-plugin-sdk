@@ -38,7 +38,7 @@ trait FakeDataFiller
         $values = [];
 
         foreach ($method->getParameters() as $parameter) {
-            $valueType = (string) $parameter->getType();
+            $valueType = $parameter->getType() ? $parameter->getType()->getName() : null;
             $faker = Factory::create('de_DE');
 
             $methodName = strtolower($faker->parse(str_replace('set', '', $methodName)));

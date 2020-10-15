@@ -113,7 +113,6 @@ class GenerateOpenApiSpec extends Command
         $processors = [
             new Processors\MergeIntoOpenApi(),
             new Processors\MergeIntoComponents(),
-            new Processors\ImportTraits(),
             new Processors\AugmentSchemas(),
             new Processors\AugmentProperties(),
             new CustomProcessors\AddServers(),

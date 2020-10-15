@@ -66,9 +66,3 @@ services:
       interval: 5s
       timeout: 20s
       retries: 20
-
-  swagger-cli:
-    build:
-      context: .ci/docker/swagger-cli
-    volumes:
-      - './docs/openapi/:/openapi'

@@ -2,153 +2,112 @@
 
 The heart of Billie Pay-After-Delivery (PaD).
 
-## Install
+## Table of Contents
 
-How to install paella-core locally:
+- [paella-core](#paella-core)
+  * [Installation](#installation)
+  * [Usage](#usage)
+    + [API](#api)
+    + [Makefile](#makefile)
+    + [Docker helper script](#docker-helper-script)
+  * [Testing](#testing)
+    + [Running tests](#running-tests)
+  * [Maintainers](#maintainers)
+  * [Contributing](#contributing)
 
-1. Clone this repository and `cd` to the folder. Make sure you have Docker installed.
 
-2. Configure your laptop [as described in this guide](https://ozean12.atlassian.net/wiki/spaces/INFRA/pages/868385662/Local+Development)
-if you haven't done it yet.
-   
-3. Have a [Github token](https://github.com/settings/tokens) set in your local copy of 
-[`docker-compose.override.dist.yml`](docker-compose.override.dist.yml), named `docker-compose.override.yml`,
-to be able to install private repositories.
+## Installation
 
-4. Run `make`. It will build and freshly start all containers, running composer install 
-and all migrations.
+In order to install this application for local development, 
+first you need to make sure that you have access to the ozean12's 
+[Docker registry](https://ozean12.atlassian.net/wiki/spaces/INFRA/pages/1109098718/Using+AWS+Docker+images+locally).
+to pull PHP images.
 
-You have many helpers to use dockerized versions of some tools, under this directory: `bin/docker/*`.
+Clone, initialize and start this application:
+
+```
+git clone git@github.com:ozean12/paella-core.git && \
+cd paella-core && \
+make
+```
 
 ## Order State Workflow
 
 ![orders_workflow](src/Resources/docs/orders-workflow.png)
 
-## API Documentation
-
-More info here:
-
-https://ozean12.atlassian.net/wiki/spaces/PAELLA/pages/954173858/Paella+API#Documentation
-
-## Maintenance Scripts
-
-To run any command involving `make`, first make sure that your containers are running,
-like mentioned in the "install" section.
-
-### Update Workflow Diagrams
-Requirements: `graphviz`.
+To update the diagram, run the following (requires `graphviz`): 
 
 ```bash
 bin/generate-workflow-diagram
 ```
 
-The generated images will be stored under the `docs` folder as PNG files.
+## Usage
 
-Every time there is a change in the state machines (e.g. Symfony Workflow for orders),
-this command needs to be run to update the diagrams.
+### API
 
-### Update API Documentation
+The API documentation can be found as OpenAPI 3.0 YAML under [docs/openapi](docs/openapi)
+or rendered as HTML navigating to the `/docs` HTTP route.
 
-Generates and validates all OpenAPI specification groups at once (for public and internal docs).
-The generated YAML files live under the `docs/openapi` folder.
+More info here:
 
-Usage:
+https://ozean12.atlassian.net/wiki/spaces/PAELLA/pages/954173858/Paella+API#Documentation
 
-```bash
-make docs
-```
+### Makefile
 
-### Migrations
+You can use any target defined in the [docs/openapi](docs/openapi) with `make`, 
+e.g. `make local-test-unit`.
+Just be aware that the targets starting with `local-` will be executed
+inside the Docker containers, while the others will be run directly on the machine, 
+with the exception of `make test` (which is a shortcut for running all local tests).
 
-We use Phinx for migrations, you can list the available commands by running:
-```bash
-./bin/docker/app vendor/bin/phinx
-```
+### Docker helper script
 
-## Tests
+You have a Docker Compose helper script under `bin/docker/app`. With that you are able to execute
+any command available in your PHP docker image, e.g:
 
-### Test types
+- `bin/docker/app composer install`
+- `bin/docker/app bin/console list`
+- `bin/docker/app php -v`
 
-We have 3 test types:
-* Functional
-* Integration
-* Unit
+## Testing
 
-We implement the testing pyramid principle which means we should have many unit tests, some integration tests and little functional tests.
-When you want to test something you should test it as low level as possible. This drastically increases speed, setup time and debug time.
-Some examples:
-* You want to test that the sorting of a DB table works. This can be tested with a functional test but we shouldn't do that, because we can also test it with an integration test.
-* You want to test that postal code validation works. This can be tested with a functional or an integration test but we shouldn't do that, because we can also test it with a unit test.
-
-#### Functional tests
-
-* How to write them: Behat
-* Where to write them: bdd/features/
-* What do they test: the whole system from start to finish, e.g. an API call, RabbitMQ consumer or executing a console command
-
-#### Integration tests
-
-* How to write them: PHPUnit
-* Where to write them: tests/Integration/
-* What do they test: how different components work together, but not the whole system from start to finish: e.g. use case using other components or a repository method which interacts with the database
-
-#### Unit tests
-
-* How to write them: PHPSpec
-* Where to write them: bdd/spec/
-* What do they test: a single class method in isolation
+Tests in this application use the 
+[Testing Pyramid](https://github.com/ozean12/code-guidelines/blob/master/php/testing.md) principle.
 
 ### Running tests
 
-#### All tests
+Run all test suites in a fresh setup:
 
-This command will start the docker containers, run migrations and run all test suites,
-including OpenAPI spec validation.
-This is useful when you want to freshly test everything in one run.
-Used by Jenkins.
-
-Usage:
 ```bash
-make test-local
+make test
 ```
 
-#### Functional
+Run all test suites (without setting up the containers again):
 
-Usage:
 ```bash
-bin/docker/app make test-functional
+make local-test
 ```
 
-Running behat directly with custom arguments:
+Run a single test suite:
+
 ```bash
-./bin/docker/app vendor/bin/behat -vvv --stop-on-failure bdd/specs/foobar.feature
+make local-test-unit
+make local-test-integration
+make local-test-functional
 ```
 
-#### Integration
-Usage:
+Run a single test file:
+
 ```bash
-bin/docker/app make test-integration
+bin/docker/app vendor/bin/phpunit tests/Integration/FooTestCase.php
 ```
 
-Running integration directly with custom arguments:
-```bash
-./bin/docker/app bin/phpunit tests/MyTestCase.php
-```
+> TIP: running `make` will also recreate the application in a clean state.
 
-#### Unit
+## Contributing
 
-Usage:
-```bash
-bin/docker/app make test-unit
-```
-
-Running phpspec directly with custom arguments:
-```bash
-./bin/docker/app vendor/bin/phpspec run -vvv --stop-on-failure
-```
-
-#### Running other commands
-
-You can also run anything else inside the containers using the helper scripts, for example:
-
--  `./bin/docker/app php -v`
+This application follows 
+[ozean12's PHP Coding Guidelines](https://github.com/ozean12/code-guidelines/tree/master/php)
+and the
+[Onion Architecture](https://github.com/ozean12/code-guidelines/blob/master/php/architectures/onion-architecture.md)
+guidelines as well.

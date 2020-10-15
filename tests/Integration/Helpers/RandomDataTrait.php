@@ -184,6 +184,10 @@ trait RandomDataTrait
         return $order;
     }
 
+    /**
+     * @param  int                    $orderId
+     * @return OrderRiskCheckEntity[]
+     */
     private function generateSomeFailingOrderRiskChecks(int $orderId): array
     {
         $riskChecks = $this->getRiskChecksDefinitionsFromSeed();

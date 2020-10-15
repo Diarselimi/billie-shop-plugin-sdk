@@ -12,10 +12,6 @@ class Seed001AddMerchants extends AbstractSeed
     {
         $testApiKey = 'billie';
 
-        if ($this->merchantExists($testApiKey)) {
-            return;
-        }
-
         $now = (new \DateTime())->format('Y-m-d H:i:s');
 
         $this->table('merchants')->insert([
@@ -99,14 +95,6 @@ class Seed001AddMerchants extends AbstractSeed
         ])->saveData();
 
         return (int) $this->getAdapter()->getConnection()->lastInsertId();
-    }
-
-    private function merchantExists($apiKey): bool
-    {
-        $stmt = $this->query("SELECT id FROM merchants WHERE api_key='{$apiKey}'");
-        $result = $stmt ? $stmt->fetch() : null;
-
-        return !!$result;
     }
 
     private function createDefaultOnboarding(int $merchantId, string $state)
