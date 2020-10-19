@@ -5009,7 +5009,7 @@ tags:
       ### 4. Handle Widget Responses
       
       When submitted, the checkout widget will evaluate if an order with the given data can be accepted. 
-      - If an order can not be accepted, the widget will return the state `declined` with a specified `decline_reason`
+      - If an order cannot be accepted, the widget will return the state `declined` with a specified `decline_reason`
       - If an order can be accepted immediately the widget will return the state `authorized`. 
       - It is also possible that some additional checks need to be conducted by Billie in order to accept the order. In this case the widget will return the state `pre_waiting`. 
       
@@ -5021,7 +5021,8 @@ tags:
       - `state` **[string]** `<= 255 characters`   
       &nbsp;&nbsp;&nbsp;&nbsp;Enum: `authorized` `declined` `pre_waiting`
       - `decline_reason` **[string]** `<= 255 characters`   
-      &nbsp;&nbsp;&nbsp;&nbsp;Enum: `risk_policy` `debtor_not_identified` `debtor_address` `risk_scoring_failed` `debtor_limit_exceeded`
+      &nbsp;&nbsp;&nbsp;&nbsp;Enum: `validation_error` `risk_policy` `debtor_not_identified` `debtor_address` `risk_scoring_failed` `debtor_limit_exceeded` `unknown_error`
+      - `validation_error_source` **[string]**  `<= 255 characters`
       - `debtor_company` **[object]**  
         - `name` **[string]** `<= 255 characters`
         - `address_street` **[string]** `<= 255 characters`
@@ -5029,8 +5030,10 @@ tags:
         - `address_city` **[string]** `<= 255 characters`
         - `address_postal_code` **[string]** `<= 5 characters`
         - `address_country` **[string]** `2 characters` `^[A-Za-z]{2}$`
-        
-      `decline_reason` will be set only when `state` value is `declined`
+      
+      _**Special note**_  
+      * `decline_reason` will be set only when `state` value is `declined`
+      * `validation_error_source` will be set only when `decline_reason` value is `validation_error`. We will fill this property with information to help you find which fields are failing validation checks. 
       
       #### 5. Apply Customized Styling
       
