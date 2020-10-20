@@ -4,30 +4,8 @@ namespace App\DomainModel\DebtorCompany;
 
 use App\DomainModel\Address\AddressEntity;
 
-class DebtorCompany
+class DebtorCompany extends Company
 {
-    private $id;
-
-    private $uuid;
-
-    private $name;
-
-    private $debtorAddress;
-
-    private $addressHouse;
-
-    private $addressStreet;
-
-    private $addressPostalCode;
-
-    private $addressCity;
-
-    private $addressCountry;
-
-    private $crefoId;
-
-    private $schufaId;
-
     private $isBlacklisted;
 
     private $isStrictMatch;
@@ -74,74 +52,6 @@ class DebtorCompany
     public function setName(string $name): DebtorCompany
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getDebtorAddress(): ?AddressEntity
-    {
-        return $this->debtorAddress;
-    }
-
-    public function setDebtorAddress(AddressEntity $debtorAddress): DebtorCompany
-    {
-        //TODO: support the old format; refactor later everything.
-        $this->addressHouse = $debtorAddress->getHouseNumber();
-        $this->addressCity = $debtorAddress->getCity();
-        $this->addressPostalCode = $debtorAddress->getPostalCode();
-        $this->addressStreet = $debtorAddress->getStreet();
-        $this->addressCountry = $debtorAddress->getCountry();
-
-        $this->debtorAddress = $debtorAddress;
-
-        return $this;
-    }
-
-    public function getAddressHouse(): ?string
-    {
-        return $this->addressHouse;
-    }
-
-    public function getAddressStreet(): string
-    {
-        return $this->addressStreet;
-    }
-
-    public function getAddressPostalCode(): string
-    {
-        return $this->addressPostalCode;
-    }
-
-    public function getAddressCity(): string
-    {
-        return $this->addressCity;
-    }
-
-    public function getAddressCountry(): string
-    {
-        return $this->addressCountry;
-    }
-
-    public function getCrefoId(): ?string
-    {
-        return $this->crefoId;
-    }
-
-    public function setCrefoId(?string $crefoId): DebtorCompany
-    {
-        $this->crefoId = $crefoId;
-
-        return $this;
-    }
-
-    public function getSchufaId(): ?string
-    {
-        return $this->schufaId;
-    }
-
-    public function setSchufaId(?string $schufaId): DebtorCompany
-    {
-        $this->schufaId = $schufaId;
 
         return $this;
     }

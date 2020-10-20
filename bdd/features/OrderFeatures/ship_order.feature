@@ -30,8 +30,7 @@ Feature:
         And I get from payments service get order details not found response
         And I get from payments service create ticket response
         And I get from companies service identify match response
-        And I get from payments service get debtor response
-        And I get from companies service get debtor response
+        And GraphQL will respond to getMerchantDebtorDetails query
         When I send a POST request to "/order/CO123/ship" with body:
         """
         {
@@ -135,8 +134,7 @@ Feature:
         And I get from payments service get order details not found response
         And I get from payments service create ticket response
         And I get from companies service identify match response
-        And I get from payments service get debtor response
-        And I get from companies service get debtor response
+        And GraphQL will respond to getMerchantDebtorDetails query
         When I send a POST request to "/order/test-order-uuid/ship" with body:
         """
         {
@@ -215,9 +213,8 @@ Feature:
   Scenario: Order shipped after previous shipment attempt failed with a time out
     Given I have a created order with amounts 1000/900/100, duration 30 and comment "test order"
     And I get from companies service identify match response
-    And I get from payments service get debtor response
     And I get from payments service get order details response
-    And I get from companies service get debtor response
+    And GraphQL will respond to getMerchantDebtorDetails query
     When I send a POST request to "/order/test-order-uuid/ship" with body:
         """
         {

@@ -34,8 +34,6 @@ Feature:
       | debtor_blacklisted        | 1       | 1                  |
       | debtor_overdue            | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
-    And I get from companies service get debtor response
-    And I get from payments service get debtor response
 
   Scenario: Successful order creation
     Given I get from companies service identify match response

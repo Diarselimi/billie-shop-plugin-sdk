@@ -27,4 +27,35 @@ class GraphQLContext implements Context
         $responses = json_decode((string) $responses, true);
         $this->mockRequestWithResponseStack('', $responses, ['json' => $query], (int) $statusCode);
     }
+
+    /**
+     * @Given GraphQL will respond to getMerchantDebtorDetails query
+     */
+    public function graphQLWillRespondToGetMerchantDebtorDetailsQuery()
+    {
+        $response = <<<EOF
+{
+  "data": {
+    "getMerchantDebtorDetails": [
+      {
+        "company_id": "1",
+        "company_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
+        "name": "Test User Company",
+        "house_number": "10",
+        "street": "Heinrich-Heine-Platz",
+        "city": "Berlin",
+        "postal_code": "10179",
+        "country": "DE",
+        "schufa_id": "123",
+        "crefo_id": "123",
+        "iban": "DE1234",
+        "bic": "BICISHERE"
+      }
+    ]
+  }
+}
+EOF;
+
+        $this->mockRequestWith('', $response, ['json' => 'getMerchantDebtorDetails'], 200);
+    }
 }

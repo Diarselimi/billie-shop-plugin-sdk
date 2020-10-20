@@ -30,13 +30,11 @@ Feature: As a merchant, I should be able to create an order by providing a valid
       | debtor_overdue            | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
       | debtor_identified_strict  | 1       | 1                  |
-    And I get from companies service get debtor response
-    And I get from payments service get debtor response
+    And GraphQL will respond to getMerchantDebtorDetails query
 
   Scenario: I successfully confirm the order by sending the same expected data. Order is moved to created state.
     Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
     And I get from companies service a good debtor strict match response
-    And I get from companies service get debtor response
     And I get from payments service get order details response
     And Debtor lock limit call succeeded
     And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
@@ -76,7 +74,6 @@ Feature: As a merchant, I should be able to create an order by providing a valid
   Scenario: I successfully confirm the order that is in pre_waiting state. Order is moved to waiting state.
     Given I have a pre_waiting order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
     And I get from companies service a good debtor strict match response
-    And I get from companies service get debtor response
     And I get from payments service get order details response
     And Debtor lock limit call succeeded
     And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
@@ -167,7 +164,6 @@ Feature: As a merchant, I should be able to create an order by providing a valid
   Scenario: I fail to confirm the order if I send a different amount
     Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
     And I get from companies service a good debtor strict match response
-    And I get from companies service get debtor response
     And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
     """
     {
@@ -212,7 +208,6 @@ Feature: As a merchant, I should be able to create an order by providing a valid
   Scenario: I fail to confirm the order if I send the wrong duration
     Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
     And I get from companies service a good debtor strict match response
-    And I get from companies service get debtor response
     And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
     """
     {
@@ -253,7 +248,6 @@ Feature: As a merchant, I should be able to create an order by providing a valid
   Scenario: I fail to confirm the order if I send mismatched debtor company
     Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
     And I get from companies service a bad debtor strict match response
-    And I get from companies service get debtor response
     And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
     """
     {
@@ -301,7 +295,6 @@ Feature: As a merchant, I should be able to create an order by providing a valid
   Scenario: Multiple mismatch errors returned when multiple properties have mismatches
     Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
     And I get from companies service a bad debtor strict match response
-    And I get from companies service get debtor response
     And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
     """
     {
@@ -386,7 +379,6 @@ Feature: As a merchant, I should be able to create an order by providing a valid
   Scenario: Successfully order confirmation returns exactly the same decimal numbers for amounts
     Given I have a authorized order "CO123" with amounts 100.3/99.1/1.2, duration 30 and checkout session "123123CO123"
     And I get from companies service a good debtor strict match response
-    And I get from companies service get debtor response
     And I get from payments service get order details response
     And Debtor lock limit call succeeded
     And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
@@ -504,7 +496,6 @@ Feature: As a merchant, I should be able to create an order by providing a valid
   Scenario: I fail to confirm the order if there is not enough limits
     Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
     And I get from companies service a good debtor strict match response
-    And I get from companies service get debtor response
     And I get from payments service get order details response
     And Debtor lock limit call failed
     And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:

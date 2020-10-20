@@ -47,7 +47,7 @@ abstract class AbstractDebtorScoreCheck implements CheckInterface
     private function shouldBeScored(OrderContainer $orderContainer): bool
     {
         // If debtor is not from trusted source, we can't do scoring
-        if (!$orderContainer->getDebtorCompany()->isTrustedSource()) {
+        if (!$orderContainer->getIdentifiedDebtorCompany()->isTrustedSource()) {
             return false;
         }
 

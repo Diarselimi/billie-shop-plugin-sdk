@@ -53,7 +53,6 @@ Feature:
     And Debtor has sufficient limit
     And Debtor lock limit call succeeded
     And I get from payments service register debtor positive response
-    And I get from payments service get debtor response
     When I send a POST request to "/order" with body:
     """
     {

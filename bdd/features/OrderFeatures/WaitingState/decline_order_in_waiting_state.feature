@@ -21,10 +21,10 @@ Feature: Endpoint to decline an order in waiting state
 
 	Scenario: Successfully decline order in waiting state
 		Given I have a waiting order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-		And I get from companies service get debtor response
 		And The following notification settings exist for merchant 1:
 			| notification_type | enabled |
 			| order_declined    | 1       |
+    And GraphQL will respond to getMerchantDebtorDetails query
 		When I send a POST request to "/private/order/test-order-uuidCO123/decline"
 		Then the response status code should be 204
 		And the order CO123 is in state declined
@@ -32,10 +32,10 @@ Feature: Endpoint to decline an order in waiting state
 
 	Scenario: Successfully decline order in pre_waiting state
 		Given I have a pre_waiting order "CO456" with amounts 1000/900/100, duration 30 and comment "test order"
-		And I get from companies service get debtor response
 		And The following notification settings exist for merchant 1:
 			| notification_type | enabled |
 			| order_declined    | 1       |
+    And GraphQL will respond to getMerchantDebtorDetails query
 		When I send a POST request to "/private/order/test-order-uuidCO456/decline"
 		Then the response status code should be 204
 		And the order CO456 is in state declined

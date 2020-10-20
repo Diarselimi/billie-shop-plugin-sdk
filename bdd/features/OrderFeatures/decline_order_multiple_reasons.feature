@@ -20,8 +20,7 @@ Feature:
       | debtor_is_trusted         |
       | debtor_identified_strict  |
       | delivery_address          |
-    And I get from companies service get debtor response
-    And I get from payments service get debtor response
+    And GraphQL will respond to getMerchantDebtorDetails query
 
   Scenario: When multiple reasons fail then we should return the reason that was declined for,
   the first one one that is declinable.

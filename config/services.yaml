@@ -102,6 +102,7 @@ services:
   App\Helper\Uuid\UuidGeneratorInterface: '@App\Helper\Uuid\UuidGenerator'
   App\DomainModel\Payment\PaymentsRepositoryInterface: '@App\Infrastructure\Graphql\PaymentsGraphQLRepository'
   App\DomainModel\MerchantDebtor\SearchMerchantDebtorsRepositoryInterface: '@App\Infrastructure\Graphql\MerchantDebtorsGraphQLRepository'
+  App\DomainModel\MerchantDebtor\Details\MerchantDebtorDetailsRepositoryInterface: '@App\Infrastructure\Graphql\MerchantDebtorDetailsGraphQLRepository'
 
   App\DomainModel\Order\OrderChecksRunnerService:
     arguments:

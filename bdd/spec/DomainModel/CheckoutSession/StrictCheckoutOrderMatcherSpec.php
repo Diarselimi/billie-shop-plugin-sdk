@@ -57,7 +57,7 @@ class StrictCheckoutOrderMatcherSpec extends ObjectBehavior
         $orderEntity->getCompanyBillingAddressUuid()->willReturn('some-uuid');
 
         $debtorCompany->getName()->willReturn('test');
-        $debtorCompany->getDebtorAddress()->willReturn($addressEntity);
+        $debtorCompany->getAddress()->willReturn($addressEntity);
 
         $orderFinancialDetails->getAmountNet()->willReturn(new Money(4));
         $orderFinancialDetails->getAmountTax()->willReturn(new Money(4));

@@ -12,7 +12,7 @@ class DebtorIdentifiedStrictCheck implements CheckInterface
     public function check(OrderContainer $orderContainer): CheckResult
     {
         return new CheckResult(
-            !is_null($orderContainer->getMerchantDebtor()) && $orderContainer->getDebtorCompany()->isStrictMatch(),
+            !is_null($orderContainer->getMerchantDebtor()) && $orderContainer->getIdentifiedDebtorCompany()->isStrictMatch(),
             self::NAME
         );
     }

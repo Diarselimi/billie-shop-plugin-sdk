@@ -32,7 +32,7 @@ Feature: As a merchant debtor, I want to use my initially provided address (whic
       | debtor_overdue            | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
       | debtor_identified_strict  | 1       | 1                  |
-    And I get from companies service get debtor response
+    And GraphQL will respond to getMerchantDebtorDetails query
     And I get from companies service "/companies/c7be46c0-e049-4312-b274-258ec5aeeb70/billing-address" endpoint response with status 200 and body
       """
       {

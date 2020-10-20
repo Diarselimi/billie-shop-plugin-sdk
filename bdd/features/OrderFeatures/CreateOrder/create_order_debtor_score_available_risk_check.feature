@@ -43,11 +43,10 @@ Feature:
 
   Scenario: Order creation fails with "risk_scoring_failed" reason when scoring call fails
     Given I get from companies service identify match response
-    And I get from companies service get debtor response
     And Debtor has sufficient limit
     And Debtor lock limit call succeeded
     And I get from payments service register debtor positive response
-    And I get from payments service get debtor response
+    And GraphQL will respond to getMerchantDebtorDetails query
     And I get from scoring service a response with status code 500 and body "{}" for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     When I send a POST request to "/order" with body:
     """
@@ -101,11 +100,10 @@ Feature:
 
   Scenario: Order creation fails with "risk_scoring_failed" reason when scoring call returns failed status
     Given I get from companies service identify match response
-    And I get from companies service get debtor response
     And Debtor has sufficient limit
     And Debtor lock limit call succeeded
     And I get from payments service register debtor positive response
-    And I get from payments service get debtor response
+    And GraphQL will respond to getMerchantDebtorDetails query
     And I get from scoring service a failed debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     When I send a POST request to "/order" with body:
     """

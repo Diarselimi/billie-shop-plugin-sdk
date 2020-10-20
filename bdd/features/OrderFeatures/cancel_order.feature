@@ -10,10 +10,10 @@ Feature:
     And The following notification settings exist for merchant 1:
       | notification_type | enabled |
       | order_canceled    | 1       |
+    And GraphQL will respond to getMerchantDebtorDetails query
 
   Scenario: Successful new order cancellation
     Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-    And I get from companies service get debtor response
     And Debtor release limit call succeeded
     When I send a POST request to "/order/CO123/cancel"
     Then the response status code should be 204
@@ -23,11 +23,9 @@ Feature:
 
   Scenario: Successful created order cancellation
     Given I have a created order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-    And I get from companies service get debtor response
     And I get from payments service get order details not found response
     And I get from payments service create ticket response
     And I get from companies service identify match response
-    And I get from payments service get debtor response
     When I send a POST request to "/order/CO123/ship" with body:
     """
     {
@@ -49,7 +47,6 @@ Feature:
 
   Scenario: Successful waiting order cancellation
     Given I have a waiting order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-    And I get from companies service get debtor response
     When I send a POST request to "/order/CO123/cancel"
     Then the response status code should be 204
     And the response should be empty
@@ -58,7 +55,6 @@ Feature:
 
   Scenario: Successful created order cancellation
     Given I have a created order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-    And I get from companies service get debtor response
     And Debtor release limit call succeeded
     When I send a POST request to "/order/CO123/cancel"
     Then the response status code should be 204

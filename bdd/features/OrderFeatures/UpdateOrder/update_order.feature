@@ -8,7 +8,7 @@ Feature: APIS-1077
     And I add "X-Test" header equal to 1
     And I add "X-Api-Key" header equal to test
     And I get from payments service modify ticket response
-    And I get from companies service get debtor response
+    And GraphQL will respond to getMerchantDebtorDetails query
     And I get from companies service "/debtor/1/unlock" endpoint response with status 200 and body
     """
     """

@@ -11,7 +11,7 @@ class DebtorIsTrustedCheck implements CheckInterface
 
     public function check(OrderContainer $orderContainer): CheckResult
     {
-        if ($orderContainer->getDebtorCompany()->isTrustedSource()) {
+        if ($orderContainer->getIdentifiedDebtorCompany()->isTrustedSource()) {
             return new CheckResult(true, self::NAME);
         }
 

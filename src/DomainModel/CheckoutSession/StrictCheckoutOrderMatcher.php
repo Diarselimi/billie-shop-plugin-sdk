@@ -89,7 +89,7 @@ class StrictCheckoutOrderMatcher implements CheckoutOrderMatcherInterface, Loggi
         OrderContainer $orderContainer
     ): bool {
         $companyName = $orderContainer->getDebtorCompany()->getName();
-        $companyAddress = $orderContainer->getDebtorCompany()->getDebtorAddress();
+        $companyAddress = $orderContainer->getDebtorCompany()->getAddress();
 
         return !$this->checkCompanyMatch(
             $request->getDebtorCompany(),

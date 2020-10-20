@@ -2,7 +2,7 @@
 
 namespace spec\App\DomainModel\OrderRiskCheck\Checker;
 
-use App\DomainModel\DebtorCompany\DebtorCompany;
+use App\DomainModel\DebtorCompany\IdentifiedDebtorCompany;
 use App\DomainModel\DebtorSettings\DebtorSettingsEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
@@ -20,17 +20,17 @@ class DebtorIsTrustedCheckSpec extends ObjectBehavior
     public function let(
         OrderContainer $orderContainer,
         MerchantDebtorEntity $merchantDebtor,
-        DebtorCompany $debtorCompany,
+        IdentifiedDebtorCompany $debtorCompany,
         DebtorSettingsEntity $debtorSettings
     ) {
         $orderContainer->getMerchantDebtor()->willReturn($merchantDebtor);
-        $orderContainer->getDebtorCompany()->willReturn($debtorCompany);
+        $orderContainer->getIdentifiedDebtorCompany()->willReturn($debtorCompany);
         $orderContainer->getDebtorSettings()->willReturn($debtorSettings);
     }
 
     public function it_returns_true_if_is_trusted_source(
         OrderContainer $orderContainer,
-        DebtorCompany $debtorCompany
+        IdentifiedDebtorCompany $debtorCompany
     ) {
         $debtorCompany->isTrustedSource()->willReturn(true);
 
@@ -40,7 +40,7 @@ class DebtorIsTrustedCheckSpec extends ObjectBehavior
     public function it_returns_false_if_debtor_is_not_whitelisted(
         OrderContainer $orderContainer,
         DebtorSettingsEntity $debtorSettings,
-        DebtorCompany $debtorCompany
+        IdentifiedDebtorCompany $debtorCompany
     ) {
         $debtorCompany->isTrustedSource()->willReturn(false);
         $debtorSettings->isWhitelisted()->willReturn(false);
@@ -51,7 +51,7 @@ class DebtorIsTrustedCheckSpec extends ObjectBehavior
     public function it_returns_true_if_debtor_is_whitelisted(
         OrderContainer $orderContainer,
         DebtorSettingsEntity $debtorSettings,
-        DebtorCompany $debtorCompany
+        IdentifiedDebtorCompany $debtorCompany
     ) {
         $debtorCompany->isTrustedSource()->willReturn(false);
         $debtorSettings->isWhitelisted()->willReturn(true);

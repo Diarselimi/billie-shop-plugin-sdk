@@ -1,0 +1,20 @@
+query q(
+    $merchant_debtor_id: String!
+){
+    getMerchantDebtorDetails(
+        merchant_debtor_id: $merchant_debtor_id
+    ) {
+        company_id
+        company_uuid
+        name
+        street
+        house_number
+        city
+        postal_code
+        country
+        schufa_id
+        crefo_id
+        iban
+        bic
+    }
+}

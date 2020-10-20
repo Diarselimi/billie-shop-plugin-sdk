@@ -3,7 +3,7 @@ Feature: Update order with invoice to reduce the order amount
 	Background:
 		Given I add "Content-type" header equal to "application/json"
 		And I add "X-Test" header equal to 1
-		And I get from companies service get debtor response
+    And GraphQL will respond to getMerchantDebtorDetails query
 
 	Scenario: Order amount can be updated before shipment
 		Given I have a "created" order with amounts 1000/900/100, duration 30 and comment "test order"

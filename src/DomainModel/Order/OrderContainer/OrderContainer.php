@@ -3,6 +3,7 @@
 namespace App\DomainModel\Order\OrderContainer;
 
 use App\DomainModel\Address\AddressEntity;
+use App\DomainModel\DebtorCompany\Company;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorCompany\IdentifiedDebtorCompany;
 use App\DomainModel\DebtorCompany\MostSimilarCandidateDTO;
@@ -17,6 +18,7 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderLineItem\OrderLineItemEntity;
 use App\DomainModel\OrderRiskCheck\CheckResultCollection;
+use App\DomainModel\Payment\DebtorPaymentDetailsDTO;
 use App\DomainModel\Payment\OrderPaymentDetailsDTO;
 use App\DomainModel\Person\PersonEntity;
 
@@ -61,6 +63,8 @@ class OrderContainer
     private $riskCheckResultCollection;
 
     private $debtorScoringResponse;
+
+    private ?DebtorPaymentDetailsDTO $debtorPaymentDetails = null;
 
     public function __construct(OrderEntity $order, OrderContainerRelationLoader $relationLoader)
     {
@@ -143,11 +147,13 @@ class OrderContainer
         ;
     }
 
-    public function getDebtorCompany(): DebtorCompany
+    public function getDebtorCompany(): Company
     {
-        return $this->debtorCompany
-            ?: $this->debtorCompany = $this->relationLoader->loadDebtorCompany($this)
-        ;
+        if (!$this->debtorCompany) {
+            $this->loadDebtorCompanyAndPaymentDetails();
+        }
+
+        return $this->debtorCompany;
     }
 
     public function getDebtorSettings(): ?DebtorSettingsEntity
@@ -198,14 +204,14 @@ class OrderContainer
         return $this;
     }
 
-    public function setDebtorCompany(DebtorCompany $debtorCompany): OrderContainer
+    public function setDebtorCompany(Company $debtorCompany): OrderContainer
     {
         $this->debtorCompany = $debtorCompany;
 
         return $this;
     }
 
-    public function setIdentifiedDebtorCompany(IdentifiedDebtorCompany $identifiedDebtorCompany): OrderContainer
+    public function setIdentifiedDebtorCompany(DebtorCompany $identifiedDebtorCompany): OrderContainer
     {
         $this->debtorCompany = $identifiedDebtorCompany;
         $this->identifiedDebtorCompany = $identifiedDebtorCompany;
@@ -213,8 +219,13 @@ class OrderContainer
         return $this;
     }
 
-    public function getIdentifiedDebtorCompany(): ?IdentifiedDebtorCompany
+    public function getIdentifiedDebtorCompany(): ?DebtorCompany
     {
+        if (!$this->identifiedDebtorCompany) {
+            $identifiedDebtor = $this->relationLoader->loadIdentifiedDebtorCompany($this);
+            $this->setIdentifiedDebtorCompany($identifiedDebtor);
+        }
+
         return $this->identifiedDebtorCompany;
     }
 
@@ -259,6 +270,15 @@ class OrderContainer
         return $this;
     }
 
+    public function getDebtorPaymentDetails(): DebtorPaymentDetailsDTO
+    {
+        if (!$this->debtorPaymentDetails) {
+            $this->loadDebtorCompanyAndPaymentDetails();
+        }
+
+        return $this->debtorPaymentDetails;
+    }
+
     public function getRiskCheckResultCollection(): CheckResultCollection
     {
         return $this->riskCheckResultCollection ?: $this->riskCheckResultCollection = $this->relationLoader->loadFailedRiskChecks($this);
@@ -293,5 +313,13 @@ class OrderContainer
         $this->mostSimilarCandidateDTO = $mostSimilarCandidateDTO;
 
         return $this;
+    }
+
+    private function loadDebtorCompanyAndPaymentDetails(): void
+    {
+        $debtorDetails = $this->relationLoader->loadDebtorDetails($this);
+
+        $this->debtorCompany = $debtorDetails->getCompany();
+        $this->debtorPaymentDetails = $debtorDetails->getPaymentDetails();
     }
 }

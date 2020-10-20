@@ -12,6 +12,8 @@ use App\DomainModel\DebtorSettings\DebtorSettingsEntity;
 use App\DomainModel\DebtorSettings\DebtorSettingsRepositoryInterface;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\MerchantDebtor\Details\MerchantDebtorDetailsDTO;
+use App\DomainModel\MerchantDebtor\Details\MerchantDebtorDetailsRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
@@ -22,6 +24,7 @@ use App\DomainModel\OrderLineItem\OrderLineItemEntity;
 use App\DomainModel\OrderLineItem\OrderLineItemRepositoryInterface;
 use App\DomainModel\OrderRiskCheck\CheckResultCollection;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
+use App\DomainModel\Payment\DebtorPaymentDetailsDTO;
 use App\DomainModel\Payment\OrderPaymentDetailsDTO;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Person\PersonEntity;
@@ -41,8 +44,6 @@ class OrderContainerRelationLoader
 
     private $merchantDebtorRepository;
 
-    private $companyService;
-
     private $orderFinancialDetailsRepository;
 
     private $orderDunningStatusService;
@@ -53,7 +54,11 @@ class OrderContainerRelationLoader
 
     private $debtorSettingsRepository;
 
+    private $companiesService;
+
     private $orderRiskCheckRepository;
+
+    private MerchantDebtorDetailsRepositoryInterface $merchantDebtorDetailsRepository;
 
     public function __construct(
         DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
@@ -62,13 +67,14 @@ class OrderContainerRelationLoader
         MerchantRepositoryInterface $merchantRepository,
         MerchantSettingsRepositoryInterface $merchantSettingsRepository,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
-        CompaniesServiceInterface $companiesService,
         OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
         OrderDunningStatusService $orderDunningStatusService,
         OrderRiskCheckRepositoryInterface $orderRiskCheckRepository,
         OrderLineItemRepositoryInterface $orderLineItemRepository,
         PaymentsServiceInterface $paymentsService,
-        DebtorSettingsRepositoryInterface $debtorSettingsRepository
+        DebtorSettingsRepositoryInterface $debtorSettingsRepository,
+        CompaniesServiceInterface $companiesService,
+        MerchantDebtorDetailsRepositoryInterface $merchantDebtorDetailsRepository
     ) {
         $this->debtorExternalDataRepository = $debtorExternalDataRepository;
         $this->addressRepository = $addressRepository;
@@ -76,13 +82,14 @@ class OrderContainerRelationLoader
         $this->merchantRepository = $merchantRepository;
         $this->merchantSettingsRepository = $merchantSettingsRepository;
         $this->merchantDebtorRepository = $merchantDebtorRepository;
-        $this->companyService = $companiesService;
         $this->orderFinancialDetailsRepository = $orderFinancialDetailsRepository;
         $this->orderDunningStatusService = $orderDunningStatusService;
         $this->orderLineItemRepository = $orderLineItemRepository;
         $this->paymentsService = $paymentsService;
         $this->debtorSettingsRepository = $debtorSettingsRepository;
         $this->orderRiskCheckRepository = $orderRiskCheckRepository;
+        $this->companiesService = $companiesService;
+        $this->merchantDebtorDetailsRepository = $merchantDebtorDetailsRepository;
     }
 
     public function loadMerchantDebtor(OrderContainer $orderContainer): MerchantDebtorEntity
@@ -125,11 +132,6 @@ class OrderContainerRelationLoader
         return $this->merchantSettingsRepository->getOneByMerchant($orderContainer->getOrder()->getMerchantId());
     }
 
-    public function loadDebtorCompany(OrderContainer $orderContainer): DebtorCompany
-    {
-        return $this->companyService->getDebtor($orderContainer->getMerchantDebtor()->getDebtorId());
-    }
-
     public function loadOrderFinancialDetails(OrderContainer $orderContainer): OrderFinancialDetailsEntity
     {
         return $this->orderFinancialDetailsRepository->getCurrentByOrderId($orderContainer->getOrder()->getId());
@@ -155,9 +157,19 @@ class OrderContainerRelationLoader
         return $this->paymentsService->getOrderPaymentDetails($orderContainer->getOrder()->getPaymentId());
     }
 
+    public function loadDebtorDetails(OrderContainer $orderContainer): MerchantDebtorDetailsDTO
+    {
+        return $this->merchantDebtorDetailsRepository->getMerchantDebtorDetails($orderContainer->getOrder()->getMerchantDebtorId());
+    }
+
     public function loadDebtorSettings(OrderContainer $orderContainer): ?DebtorSettingsEntity
     {
         return $this->debtorSettingsRepository->getOneByCompanyUuid($orderContainer->getDebtorCompany()->getUuid());
+    }
+
+    public function loadIdentifiedDebtorCompany(OrderContainer $orderContainer): DebtorCompany
+    {
+        return $this->companiesService->getDebtor($orderContainer->getMerchantDebtor()->getDebtorId());
     }
 
     public function loadFailedRiskChecks(OrderContainer $orderContainer): CheckResultCollection

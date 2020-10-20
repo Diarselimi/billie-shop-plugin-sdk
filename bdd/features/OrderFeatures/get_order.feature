@@ -51,8 +51,7 @@ Feature:
 
   Scenario: Successful new order retrieval
     Given I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
-    And I get from companies service get debtor response
-    And I get from payments service get debtor response
+    And GraphQL will respond to getMerchantDebtorDetails query
     And I get from payments service get order details response
     When I send a GET request to "/order/XF43Y"
     Then the response status code should be 200
@@ -122,8 +121,7 @@ Feature:
 
   Scenario: Successful created order with invoice data retrieval after shipping
     Given I have a created order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
-    And I get from companies service get debtor response
-    And I get from payments service get debtor response
+    And GraphQL will respond to getMerchantDebtorDetails query
     And I get from payments service get order details not found response
     And I get from payments service create ticket response
     And I get from companies service identify match response
@@ -137,7 +135,6 @@ Feature:
       """
     And I get from payments service create ticket response
     And I get from payments service get order details response
-    And I get from companies service get debtor response
     And I add "X-Test" header equal to 1
     And I add "X-Api-Key" header equal to test
     When I send a GET request to "/order/XF43Y"
@@ -213,8 +210,7 @@ Feature:
     | check_name | is_passed |
     | fraud_score| 0         |
     | limit      | 0         |
-    And I get from companies service get debtor response
-    And I get from companies service get debtor response
+    And GraphQL will respond to getMerchantDebtorDetails query
     And I get from payments service get order details response
     When I send a GET request to "/order/XF43Y"
     Then the response status code should be 200
@@ -285,10 +281,8 @@ Feature:
 
   Scenario: Successful late order retrieval
     Given I have a late order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
-    And I get from companies service identify match response
-    And I get from payments service get debtor response
     And I get from payments service get order details response
-    And I get from companies service get debtor response
+    And GraphQL will respond to getMerchantDebtorDetails query
     And I get from salesforce dunning status endpoint "Created" status for order "test-order-uuidXF43Y"
     When I send a GET request to "/order/XF43Y"
     Then the response status code should be 200
@@ -358,10 +352,8 @@ Feature:
 
   Scenario: Successful complete order retrieval
     Given I have a complete order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
-    And I get from companies service identify match response
-    And I get from payments service get debtor response
     And I get from payments service get order details response
-    And I get from companies service get debtor response
+    And GraphQL will respond to getMerchantDebtorDetails query
     When I send a GET request to "/order/XF43Y"
     Then the response status code should be 200
     And the JSON response should be:

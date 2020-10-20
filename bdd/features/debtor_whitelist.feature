@@ -8,8 +8,6 @@ Feature:
 
   Scenario: Successfully create Debtor Settings and mark as Whitelisted
     Given I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
-    And I get from companies service get debtor response
-    And I get from payments service get debtor response
     When I send a POST request to "/private/debtors/c7be46c0-e049-4312-b274-258ec5aeeb70/whitelist" with body:
     """
       {"is_whitelisted": true}

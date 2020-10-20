@@ -4,11 +4,11 @@ namespace App\DomainModel\Payment;
 
 class DebtorPaymentDetailsDTO
 {
-    private $bankAccountIban;
+    private string $bankAccountIban;
 
-    private $bankAccountBic;
+    private string $bankAccountBic;
 
-    private $outstandingAmount;
+    private float $outstandingAmount;
 
     public function getBankAccountIban(): string
     {
@@ -34,7 +34,7 @@ class DebtorPaymentDetailsDTO
         return $this;
     }
 
-    public function getOutstandingAmount(): float
+    public function getOutstandingAmount(): ?float
     {
         return $this->outstandingAmount;
     }

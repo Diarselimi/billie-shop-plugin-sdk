@@ -13,8 +13,7 @@ Feature:
     And I get from payments service get order details not found response
     And I get from payments service create ticket response
     And I get from companies service identify match response
-    And I get from payments service get debtor response
-    And I get from companies service get debtor response
+    And GraphQL will respond to getMerchantDebtorDetails query
     And I get from files service a good response
     And a merchant user exists with permission SHIP_ORDERS
     And I get from Oauth service a valid user token

@@ -3,7 +3,6 @@
 namespace App\DomainModel\OrderResponse;
 
 use App\DomainModel\Address\AddressEntity;
-use App\DomainModel\Address\AddressEntityFactory;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorCompany\IdentifiedDebtorCompany;
@@ -26,20 +25,16 @@ class OrderResponseFactory
 
     private $declinedReasonsMapper;
 
-    private $addressEntityFactory;
-
     public function __construct(
         CompaniesServiceInterface $companiesService,
         PaymentsServiceInterface $paymentsService,
         OrderStateManager $orderStateManager,
-        OrderDeclinedReasonsMapper $declinedReasonsMapper,
-        AddressEntityFactory $addressEntityFactory
+        OrderDeclinedReasonsMapper $declinedReasonsMapper
     ) {
         $this->companiesService = $companiesService;
         $this->paymentsService = $paymentsService;
         $this->orderStateManager = $orderStateManager;
         $this->declinedReasonsMapper = $declinedReasonsMapper;
-        $this->addressEntityFactory = $addressEntityFactory;
     }
 
     public function create(OrderContainer $orderContainer): OrderResponse
@@ -55,7 +50,7 @@ class OrderResponseFactory
 
         if ($order->getMerchantDebtorId()) {
             $this->addCompanyData(
-                $orderContainer->getDebtorCompany()->getDebtorAddress(),
+                $orderContainer->getDebtorCompany()->getAddress(),
                 $orderContainer->getDebtorCompany()->getName(),
                 $response
             );
@@ -184,7 +179,7 @@ class OrderResponseFactory
             return;
         }
 
-        $paymentDetails = $this->paymentsService->getDebtorPaymentDetails($orderContainer->getMerchantDebtor()->getPaymentDebtorId());
+        $paymentDetails = $orderContainer->getDebtorPaymentDetails();
 
         $response
             ->setBankAccountIban($paymentDetails->getBankAccountIban())
@@ -219,7 +214,7 @@ class OrderResponseFactory
         $statesAccepted = [OrderStateManager::STATE_AUTHORIZED, OrderStateManager::STATE_PRE_WAITING];
         if (in_array($order->getState(), $statesAccepted, true)) {
             if ($orderContainer->getIdentifiedDebtorCompany()->getIdentificationType() === IdentifiedDebtorCompany::IDENTIFIED_BY_COMPANY_ADDRESS) {
-                $identifiedAddress = $orderContainer->getIdentifiedDebtorCompany()->getDebtorAddress();
+                $identifiedAddress = $orderContainer->getIdentifiedDebtorCompany()->getAddress();
             } else {
                 $identifiedAddress = $orderContainer->getIdentifiedDebtorCompany()->getDebtorBillingAddressByUuid(
                     $orderContainer->getIdentifiedDebtorCompany()->getIdentifiedAddressUuid()
@@ -237,7 +232,7 @@ class OrderResponseFactory
 
         if ($order->getMerchantDebtorId()) {
             $this->addCompanyData(
-                $orderContainer->getDebtorCompany()->getDebtorAddress(),
+                $orderContainer->getDebtorCompany()->getAddress(),
                 $orderContainer->getDebtorCompany()->getName(),
                 $response
             );

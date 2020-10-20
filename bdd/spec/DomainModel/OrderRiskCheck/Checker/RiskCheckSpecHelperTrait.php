@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace spec\App\DomainModel\OrderRiskCheck\Checker;
 
-use App\DomainModel\DebtorCompany\DebtorCompany;
+use App\DomainModel\DebtorCompany\IdentifiedDebtorCompany;
 use App\DomainModel\DebtorSettings\DebtorSettingsEntity;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\OrderRiskCheck\CheckResult;
@@ -28,11 +28,11 @@ trait RiskCheckSpecHelperTrait
      */
     private function setDebtorIsTrustedSourceFlag(bool $isTrustedSource, $orderContainer)
     {
-        $debtorCompany = new DebtorCompany();
+        $debtorCompany = new IdentifiedDebtorCompany();
         $debtorCompany->setIsTrustedSource($isTrustedSource);
 
         /** @var MethodProphecy $prophecy */
-        $prophecy = $orderContainer->getDebtorCompany();
+        $prophecy = $orderContainer->getIdentifiedDebtorCompany();
         $prophecy->willReturn($debtorCompany);
     }
 

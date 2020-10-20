@@ -50,7 +50,7 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
                 ->setBankAccountBic($decodedResponse['bic'])
                 ->setBankAccountIban($decodedResponse['iban'])
                 ->setOutstandingAmount($decodedResponse['outstanding_amount'])
-                ;
+            ;
         } catch (TransferException $exception) {
             throw new PaymentsServiceRequestException($exception);
         } catch (ClientResponseDecodeException $exception) {

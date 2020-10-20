@@ -34,6 +34,7 @@ Feature: Endpoint to approve an order in waiting state
 		And The following notification settings exist for merchant 1:
 			| notification_type | enabled |
 			| order_approved    | 1       |
+    And GraphQL will respond to getMerchantDebtorDetails query
 
 	Scenario: Order doesn't exists
 		Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
@@ -73,7 +74,6 @@ Feature: Endpoint to approve an order in waiting state
 			| debtor_blacklisted        | 1         |
 			| debtor_overdue            | 1         |
 			| company_b2b_score         | 1         |
-		And I get from companies service get debtor response
     And Debtor has insufficient limit
 		When I send a POST request to "/private/order/test-order-uuidCO123/approve"
 		Then the response status code should be 403
@@ -99,7 +99,6 @@ Feature: Endpoint to approve an order in waiting state
 			| debtor_blacklisted        | 1         |
 			| debtor_overdue            | 1         |
 			| company_b2b_score         | 1         |
-		And I get from companies service get debtor response
 		And Debtor has sufficient limit
 		And Debtor lock limit call succeeded
 		When I send a POST request to "/private/order/test-order-uuidCO123/approve"
@@ -121,7 +120,6 @@ Feature: Endpoint to approve an order in waiting state
 			| debtor_blacklisted        | 1         |
 			| debtor_overdue            | 1         |
 			| company_b2b_score         | 1         |
-		And I get from companies service get debtor response
 		And Debtor has insufficient limit
 		When I send a POST request to "/private/order/test-order-uuidCO123/approve"
 		Then the response status code should be 403
@@ -142,9 +140,9 @@ Feature: Endpoint to approve an order in waiting state
 			| debtor_blacklisted        | 0         |
 			| debtor_overdue            | 1         |
 			| company_b2b_score         | 1         |
-		And I get from companies service get debtor response
 		And Debtor has sufficient limit
 		And Debtor lock limit call succeeded
+    And I get from companies service get debtor response
 		When I send a POST request to "/private/order/test-order-uuidCO123/approve"
 		Then the response status code should be 204
 		And the order CO123 is in state created
@@ -165,7 +163,6 @@ Feature: Endpoint to approve an order in waiting state
 			| debtor_overdue            | 1         |
 			| company_b2b_score         | 1         |
 		And Debtor has insufficient limit
-		And I get from companies service get debtor response
 		When I send a POST request to "/private/order/test-order-uuidCO123/approve"
 		Then the JSON response should be:
     """
@@ -191,7 +188,6 @@ Feature: Endpoint to approve an order in waiting state
 			| debtor_blacklisted        | 1         |
 			| debtor_overdue            | 1         |
 			| company_b2b_score         | 1         |
-		And I get from companies service get debtor response
 		And Debtor has sufficient limit
 		And Debtor lock limit call succeeded
 		When I send a POST request to "/private/order/test-order-uuidCO123/approve"

@@ -20,9 +20,7 @@ Feature:
       | debtor_overdue            |
       | company_b2b_score         |
       | delivery_address          |
-      | fraud_score 						        |
-    And I get from companies service get debtor response
-    And I get from payments service get debtor response
+      | fraud_score 						  |
     And The following notification settings exist for merchant 1:
       | notification_type | enabled |
       | order_waiting     | 1       |

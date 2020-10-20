@@ -124,7 +124,7 @@ trait RandomDataTrait
             ->setId(mt_rand(100, 10000))
             ->setUuid(Uuid::uuid4()->toString())
             ->setName("Fake Merchant GmbH")
-            ->setDebtorAddress($address);
+            ->setAddress($address);
 
         return $company;
     }
