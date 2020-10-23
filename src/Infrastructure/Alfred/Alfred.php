@@ -39,7 +39,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
 
     private const IDENTIFICATION_REQUEST_TIMEOUT = 15;
 
-    private const UPDATE_COMPANY_TIMEOUT = 2;
+    private const EXTENDED_TIMEOUT = 2;
 
     private const SEARCH_EXTERNAL_DEBTORS_TIMEOUT = 3;
 
@@ -141,7 +141,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         try {
             $response = $this->client->put("companies/{$companyUuid}", [
                 'json' => $updateData,
-                'timeout' => self::UPDATE_COMPANY_TIMEOUT,
+                'timeout' => self::EXTENDED_TIMEOUT,
             ]);
 
             return $this->identifiedDebtorCompanyFactory->createFromAlfredResponse($this->decodeResponse($response));
@@ -157,7 +157,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
                 "companies/{$companyUuid}/billing-address",
                 [
                     'json' => $addressEntity->toArray(),
-                    'timeout' => self::UPDATE_COMPANY_TIMEOUT,
+                    'timeout' => self::EXTENDED_TIMEOUT,
                 ]
             );
 
@@ -174,6 +174,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
         try {
             $response = $this->client->post('debtors', [
                 'json' => $debtorCreationDTO->toArray(),
+                'timeout' => self::EXTENDED_TIMEOUT,
             ]);
 
             return $this->identifiedDebtorCompanyFactory->createFromAlfredResponse($this->decodeResponse($response));
