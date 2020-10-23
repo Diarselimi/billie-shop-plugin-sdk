@@ -619,6 +619,27 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
+  /publish-to-amqp:
+    post:
+      summary: 'Publish a message to the amqp broker'
+      operationId: publish_to_amqp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                class_name:
+                  description: 'What message to publish'
+                  type: string
+                json:
+                  description: 'Message''s body'
+                  type: array
+              type: object
+      responses:
+        '202': {  }
+        '500':
+          $ref: '#/components/responses/ServerError'
   '/order/{uuid}/identify-debtor':
     get:
       tags:
