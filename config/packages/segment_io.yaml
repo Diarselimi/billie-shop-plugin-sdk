@@ -5,7 +5,7 @@ segment_io:
   options:
     consumer: socket
     debug: false
-    ssl: false
+    ssl: true
     max_queue_size: 10000
     batch_size: 100
     timeout: 0.5
