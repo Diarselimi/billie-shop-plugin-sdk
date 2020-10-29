@@ -34,6 +34,8 @@ Feature:
         "shipping_document_url": "http://example.com/proove/is/here"
     }
     """
+    And the response status code should be 200
+    And the order "CO123" is in state shipped
     And Debtor release limit call succeeded
     And I add "X-Api-Key" header equal to test
     And I add "X-Test" header equal to 1

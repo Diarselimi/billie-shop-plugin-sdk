@@ -2,10 +2,21 @@
 
 namespace App\DomainModel\MerchantSettings;
 
+use Ozean12\Money\Percent;
+
 class MerchantSettingsEntityFactory
 {
     public function createFromArray(array $data): MerchantSettingsEntity
     {
+        $feeRates = [];
+        $jsonFeeRates = $data['fee_rates'];
+        if ($jsonFeeRates !== null) {
+            $decodedFeeRates = \GuzzleHttp\json_decode($jsonFeeRates, true);
+            foreach ($decodedFeeRates as $key => $decodedFeeRate) {
+                $feeRates[$key] = new Percent($decodedFeeRate);
+            }
+        }
+
         return (new MerchantSettingsEntity())
             ->setId((int) $data['id'])
             ->setMerchantId((int) $data['merchant_id'])
@@ -16,6 +27,7 @@ class MerchantSettingsEntityFactory
             ->setUseExperimentalDebtorIdentification(boolval($data['use_experimental_identification']))
             ->setInvoiceHandlingStrategy($data['invoice_handling_strategy'])
             ->setDebtorForgivenessThreshold((float) $data['debtor_forgiveness_threshold'])
+            ->setFeeRates($feeRates)
             ->setCreatedAt(new \DateTime($data['created_at']))
             ->setUpdatedAt(new \DateTime($data['updated_at']));
     }

@@ -3,6 +3,7 @@
 namespace App\DomainModel\MerchantSettings;
 
 use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
+use Ozean12\Money\Percent;
 
 class MerchantSettingsEntity extends AbstractTimestampableEntity
 {
@@ -31,6 +32,8 @@ class MerchantSettingsEntity extends AbstractTimestampableEntity
     private $useExperimentalDebtorIdentification;
 
     private $debtorForgivenessThreshold;
+
+    private $feeRates;
 
     public function getMerchantId(): int
     {
@@ -124,6 +127,21 @@ class MerchantSettingsEntity extends AbstractTimestampableEntity
     public function setDebtorForgivenessThreshold(float $debtorForgivenessThreshold): MerchantSettingsEntity
     {
         $this->debtorForgivenessThreshold = $debtorForgivenessThreshold;
+
+        return $this;
+    }
+
+    public function getFeeRates(): array
+    {
+        return $this->feeRates;
+    }
+
+    /**
+     * @param array|Percent[] $feeRates
+     */
+    public function setFeeRates(array $feeRates): MerchantSettingsEntity
+    {
+        $this->feeRates = $feeRates;
 
         return $this;
     }

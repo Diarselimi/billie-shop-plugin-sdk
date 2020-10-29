@@ -12,7 +12,7 @@ class MerchantSettingsRepository extends AbstractPdoRepository implements Mercha
     public const TABLE_NAME = "merchant_settings";
 
     private const SELECT_FIELDS = 'id, merchant_id, initial_debtor_financing_limit, debtor_financing_limit, min_order_amount, score_thresholds_configuration_id, '.
-    'use_experimental_identification, debtor_forgiveness_threshold, invoice_handling_strategy, created_at, updated_at';
+    'use_experimental_identification, debtor_forgiveness_threshold, invoice_handling_strategy, created_at, updated_at, fee_rates';
 
     private $factory;
 
@@ -66,7 +66,7 @@ class MerchantSettingsRepository extends AbstractPdoRepository implements Mercha
         $merchantSettingsEntity->setId($id);
     }
 
-    public function getOneByMerchant(int $merchantId): MerchantSettingsEntity
+    public function getOneByMerchant(int $merchantId): ?MerchantSettingsEntity
     {
         $row = $this->doFetchOne('
           SELECT ' . self::SELECT_FIELDS . '

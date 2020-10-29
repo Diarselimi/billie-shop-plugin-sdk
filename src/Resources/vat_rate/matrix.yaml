@@ -1,0 +1,5 @@
+# Keep the vat_rates here sorted by valid_from DESC for simplicity in the code.
+vat_rates:
+  - {vat_rate: 19, valid_from: "2021-01-01 00:00:00"}
+  - {vat_rate: 16, valid_from: "2020-07-01 00:00:00"}
+  - {vat_rate: 19, valid_from: "2007-01-01 00:00:00"}
