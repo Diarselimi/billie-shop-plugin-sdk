@@ -8,18 +8,21 @@ use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class OrderInvoiceRepository extends AbstractPdoRepository implements OrderInvoiceRepositoryInterface
 {
+    public const TABLE_NAME = 'order_invoices';
+
     public function insert(OrderInvoiceEntity $orderInvoiceEntity): OrderInvoiceEntity
     {
         $id = $this->doInsert('
-            INSERT INTO order_invoices
-            (order_id, file_id, invoice_number, created_at)
+            INSERT INTO ' . self::TABLE_NAME . '
+            (order_id, file_id, invoice_number, invoice_uuid, created_at)
             VALUES
-            (:order_id, :file_id, :invoice_number, :created_at)
+            (:order_id, :file_id, :invoice_number, :invoice_uuid, :created_at)
             
         ', [
             'order_id' => $orderInvoiceEntity->getOrderId(),
             'file_id' => $orderInvoiceEntity->getFileId(),
             'invoice_number' => $orderInvoiceEntity->getInvoiceNumber(),
+            'invoice_uuid' => $orderInvoiceEntity->getInvoiceUuid(),
             'created_at' => $orderInvoiceEntity->getCreatedAt()->format(self::DATE_FORMAT),
         ]);
 

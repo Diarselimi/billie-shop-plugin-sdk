@@ -17,6 +17,9 @@ class OrderFinancialDetailsFactory
             ->setAmountGross($amount->getGross())
             ->setAmountNet($amount->getNet())
             ->setAmountTax($amount->getTax())
+            ->setUnshippedAmountGross(new Money())
+            ->setUnshippedAmountNet(new Money())
+            ->setUnshippedAmountTax(new Money())
             ->setDuration($duration)
             ->setCreatedAt(new \DateTime())
             ->setUpdatedAt(new \DateTime())
@@ -26,14 +29,17 @@ class OrderFinancialDetailsFactory
     public function createFromDatabaseRow(array $row): OrderFinancialDetailsEntity
     {
         return (new OrderFinancialDetailsEntity)
-            ->setId(intval($row['id']))
-            ->setOrderId(intval($row['order_id']))
-            ->setAmountGross(new Money(floatval($row['amount_gross'])))
-            ->setAmountNet(new Money(floatval($row['amount_net'])))
-            ->setAmountTax(new Money(floatval($row['amount_tax'])))
-            ->setDuration(intval($row['duration']))
+            ->setId((int) $row['id'])
+            ->setOrderId((int) $row['order_id'])
+            ->setAmountGross(new Money((float) $row['amount_gross']))
+            ->setAmountNet(new Money((float) $row['amount_net']))
+            ->setAmountTax(new Money((float) $row['amount_tax']))
+            ->setDuration((int) $row['duration'])
             ->setCreatedAt(new \DateTime($row['created_at']))
             ->setUpdatedAt(new \DateTime($row['updated_at']))
+            ->setUnshippedAmountGross(new Money((float) ($row['unshipped_amount_gross'] ?? 0)))
+            ->setUnshippedAmountNet(new Money((float) ($row['unshipped_amount_net'] ?? 0)))
+            ->setUnshippedAmountTax(new Money((float) ($row['unshipped_amount_tax'] ?? 0)))
         ;
     }
 }

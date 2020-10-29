@@ -14,6 +14,8 @@ class OrderInvoiceEntity
 
     private $createdAt;
 
+    private $invoiceUuid;
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();
@@ -29,6 +31,11 @@ class OrderInvoiceEntity
         $this->id = $id;
 
         return $this;
+    }
+
+    public function getCreatedAt(): \DateTime
+    {
+        return $this->createdAt;
     }
 
     public function getOrderId(): int
@@ -67,8 +74,15 @@ class OrderInvoiceEntity
         return $this;
     }
 
-    public function getCreatedAt(): \DateTime
+    public function getInvoiceUuid(): ?string
     {
-        return $this->createdAt;
+        return $this->invoiceUuid;
+    }
+
+    public function setInvoiceUuid(string $invoiceUuid): self
+    {
+        $this->invoiceUuid = $invoiceUuid;
+
+        return $this;
     }
 }

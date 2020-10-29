@@ -40,6 +40,9 @@ class OrderFinancialDetailsPersistenceServiceSpec extends ObjectBehavior
                 ->setAmountGross(new Money(100.0))
                 ->setAmountNet(new Money(81.0))
                 ->setAmountTax(new Money(19.0))
+                ->setUnshippedAmountGross(new Money())
+                ->setUnshippedAmountNet(new Money())
+                ->setUnshippedAmountTax(new Money())
                 ->setOrderId($orderId)
         );
 

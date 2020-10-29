@@ -52,6 +52,7 @@ class OrderLineItemFactory
             ->setAmountNet(floatval($row['amount_net']))
             ->setCreatedAt(new \DateTime($row['created_at']))
             ->setUpdatedAt(new \DateTime($row['updated_at']))
+            ->setOrderInvoiceId(empty($row['order_invoice_id']) ? null : (int) $row['order_invoice_id'])
         ;
     }
 }

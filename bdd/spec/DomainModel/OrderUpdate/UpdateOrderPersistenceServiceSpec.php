@@ -70,12 +70,18 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
             ->setAmountGross(new Money(200))
             ->setAmountNet(new Money(200))
             ->setAmountTax(new Money(0))
+            ->setUnshippedAmountGross(new Money())
+            ->setUnshippedAmountNet(new Money())
+            ->setUnshippedAmountTax(new Money())
             ->setDuration(30)
             ->setOrderId(1);
         $newOrderFinancialDetails = (new OrderFinancialDetailsEntity())
             ->setAmountGross(new Money(150))
             ->setAmountNet(new Money(150))
             ->setAmountTax(new Money(0))
+            ->setUnshippedAmountGross(new Money())
+            ->setUnshippedAmountNet(new Money())
+            ->setUnshippedAmountTax(new Money())
             ->setDuration(30)
             ->setOrderId(1);
 

@@ -20,6 +20,9 @@ class OrderFinancialDetailsRepository extends AbstractPdoRepository implements O
         'duration',
         'created_at',
         'updated_at',
+        'unshipped_amount_gross',
+        'unshipped_amount_net',
+        'unshipped_amount_tax',
     ];
 
     private $factory;
@@ -40,7 +43,10 @@ class OrderFinancialDetailsRepository extends AbstractPdoRepository implements O
                 amount_tax, 
                 duration, 
                 created_at, 
-                updated_at
+                updated_at,
+                unshipped_amount_gross,
+                unshipped_amount_net,
+                unshipped_amount_tax
             ) VALUES (
                 :order_id,
                 :amount_gross,
@@ -48,13 +54,19 @@ class OrderFinancialDetailsRepository extends AbstractPdoRepository implements O
                 :amount_tax, 
                 :duration, 
                 :created_at, 
-                :updated_at
+                :updated_at,
+                :unshipped_amount_gross,
+                :unshipped_amount_net,
+                :unshipped_amount_tax
             )
         ', [
             'order_id' => $orderFinancialDetailsEntity->getOrderId(),
             'amount_gross' => $orderFinancialDetailsEntity->getAmountGross()->getMoneyValue(),
             'amount_net' => $orderFinancialDetailsEntity->getAmountNet()->getMoneyValue(),
             'amount_tax' => $orderFinancialDetailsEntity->getAmountTax()->getMoneyValue(),
+            'unshipped_amount_gross' => $orderFinancialDetailsEntity->getUnshippedAmountGross()->getMoneyValue(),
+            'unshipped_amount_net' => $orderFinancialDetailsEntity->getUnshippedAmountNet()->getMoneyValue(),
+            'unshipped_amount_tax' => $orderFinancialDetailsEntity->getUnshippedAmountTax()->getMoneyValue(),
             'duration' => $orderFinancialDetailsEntity->getDuration(),
             'created_at' => $orderFinancialDetailsEntity->getCreatedAt()->format(self::DATE_FORMAT),
             'updated_at' => $orderFinancialDetailsEntity->getUpdatedAt()->format(self::DATE_FORMAT),

@@ -27,6 +27,7 @@ class OrderLineItemRepository extends AbstractPdoRepository implements OrderLine
         'amount_tax',
         'created_at',
         'updated_at',
+        'order_invoice_id',
     ];
 
     private $factory;
@@ -54,7 +55,8 @@ class OrderLineItemRepository extends AbstractPdoRepository implements OrderLine
                 amount_net,  
                 amount_tax, 
                 created_at, 
-                updated_at
+                updated_at,
+                order_invoice_id
             ) VALUES (
                 :order_id,
                 :external_id,
@@ -69,7 +71,8 @@ class OrderLineItemRepository extends AbstractPdoRepository implements OrderLine
                 :amount_net,  
                 :amount_tax, 
                 :created_at, 
-                :updated_at
+                :updated_at,
+                :order_invoice_id
             )
         ', [
             'order_id' => $orderLineItemEntity->getOrderId(),
@@ -86,6 +89,7 @@ class OrderLineItemRepository extends AbstractPdoRepository implements OrderLine
             'amount_net' => $orderLineItemEntity->getAmountNet(),
             'created_at' => $orderLineItemEntity->getCreatedAt()->format(self::DATE_FORMAT),
             'updated_at' => $orderLineItemEntity->getUpdatedAt()->format(self::DATE_FORMAT),
+            'order_invoice_id' => $orderLineItemEntity->getOrderInvoiceId(),
         ]);
 
         $orderLineItemEntity->setId($id);

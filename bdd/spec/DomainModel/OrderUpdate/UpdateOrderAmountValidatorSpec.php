@@ -43,7 +43,10 @@ class UpdateOrderAmountValidatorSpec extends ObjectBehavior
         $financialDetails = (new OrderFinancialDetailsEntity())
             ->setAmountGross(new Money(50.0))
             ->setAmountNet(new Money(40.5))
-            ->setAmountTax(new Money(9.5));
+            ->setAmountTax(new Money(9.5))
+            ->setUnshippedAmountGross(new Money())
+            ->setUnshippedAmountNet(new Money())
+            ->setUnshippedAmountTax(new Money());
         $orderContainer->getOrderFinancialDetails()->willReturn($financialDetails);
 
         $order = (new OrderEntity())

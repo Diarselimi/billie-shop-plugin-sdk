@@ -17,6 +17,12 @@ class OrderFinancialDetailsEntity extends AbstractTimestampableEntity
 
     private $duration;
 
+    private ?Money $unshippedAmountGross;
+
+    private ?Money $unshippedAmountNet;
+
+    private ?Money $unshippedAmountTax;
+
     public function getOrderId(): int
     {
         return $this->orderId;
@@ -73,6 +79,42 @@ class OrderFinancialDetailsEntity extends AbstractTimestampableEntity
     public function setDuration(int $duration): OrderFinancialDetailsEntity
     {
         $this->duration = $duration;
+
+        return $this;
+    }
+
+    public function getUnshippedAmountGross(): Money
+    {
+        return $this->unshippedAmountGross;
+    }
+
+    public function setUnshippedAmountGross(Money $unshippedAmountGross): self
+    {
+        $this->unshippedAmountGross = $unshippedAmountGross;
+
+        return $this;
+    }
+
+    public function getUnshippedAmountNet(): Money
+    {
+        return $this->unshippedAmountNet;
+    }
+
+    public function setUnshippedAmountNet(Money $unshippedAmountNet): self
+    {
+        $this->unshippedAmountNet = $unshippedAmountNet;
+
+        return $this;
+    }
+
+    public function getUnshippedAmountTax(): Money
+    {
+        return $this->unshippedAmountTax;
+    }
+
+    public function setUnshippedAmountTax(Money $unshippedAmountTax): self
+    {
+        $this->unshippedAmountTax = $unshippedAmountTax;
 
         return $this;
     }

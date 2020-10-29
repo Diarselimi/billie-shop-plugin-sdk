@@ -30,6 +30,8 @@ class OrderLineItemEntity extends AbstractTimestampableEntity
 
     private $amountTax;
 
+    private $orderInvoiceId;
+
     public function getOrderId(): int
     {
         return $this->orderId;
@@ -170,6 +172,18 @@ class OrderLineItemEntity extends AbstractTimestampableEntity
     public function setAmountTax(float $amountTax): OrderLineItemEntity
     {
         $this->amountTax = $amountTax;
+
+        return $this;
+    }
+
+    public function getOrderInvoiceId(): ?int
+    {
+        return $this->orderInvoiceId;
+    }
+
+    public function setOrderInvoiceId(?int $orderInvoiceId): self
+    {
+        $this->orderInvoiceId = $orderInvoiceId;
 
         return $this;
     }
