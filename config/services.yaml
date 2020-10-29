@@ -50,6 +50,7 @@ services:
       $paellaSandboxUrl: '%env(string:PAELLA_SANDBOX_URL)%'
       $isDummyChecksEnabled: '%env(bool:DUMMY_CHECKS_ENABLED)%'
       $vatRatesYamlPath: "%kernel.root_dir%/Resources/vat_rate/matrix.yaml"
+      $invoiceButlerFeatureFlag: '%env(bool:INVOICE_BUTLER_ENABLED)%'
 
   _instanceof:
     App\Application\UseCase\ValidatedUseCaseInterface:
