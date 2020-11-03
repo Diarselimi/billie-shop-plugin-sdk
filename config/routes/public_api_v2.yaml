@@ -1,0 +1,15 @@
+## Overridden routes:
+## v2 routes overridden from v1, should be defined before public_api_prefixed_v2_from_v1. example:
+#order_create_v2:
+#  path: /public/api/v2/order
+#  controller:  App\Http\Controller\PublicApiV2\CreateOrderController::execute
+#  methods: [POST]
+
+
+## Fallback routes:
+
+public_api_prefixed_v2_from_v1:
+  resource: ../src/Http/Controller/PublicApi
+  type: openapi_annotation
+  prefix: /public/api/v2
+  name_prefix: public_api_v2_

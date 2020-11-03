@@ -634,10 +634,11 @@ paths:
                   type: string
                 json:
                   description: 'Message''s body'
-                  type: array
+                  type: object
               type: object
       responses:
-        '202': {  }
+        '202':
+          description: 'Successful response'
         '500':
           $ref: '#/components/responses/ServerError'
   '/order/{uuid}/identify-debtor':
@@ -2766,6 +2767,15 @@ paths:
       security:
         -
           oauth2: []
+  /version:
+    get:
+      tags:
+        - Support
+      summary: 'Get API version'
+      operationId: get_api_version
+      responses:
+        '200':
+          description: 'Successful response'
 components:
   schemas:
     UUID:

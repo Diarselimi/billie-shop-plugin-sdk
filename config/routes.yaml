@@ -1,22 +1,20 @@
-billie_monitoring:
+healthcheck:
   resource: '@BillieMonitoringBundle/Resources/config/routes.yaml'
 
-public_api_controllers:
-  resource: ../src/Http/Controller/PublicApi
-  type: openapi_annotation
+public_health_check:
+  path: /public/healthcheck
+  controller:  Billie\MonitoringBundle\Controller\HealthCheckController::execute
+  methods: [GET]
 
-prefixed_public_api_controllers:
-  resource: ../src/Http/Controller/PublicApi
-  type: openapi_annotation
-  prefix: /public
-  name_prefix: public_
-
-private_api_controllers:
-  resource: ../src/Http/Controller/PrivateApi
-  type: openapi_annotation
-  prefix: /private
-  name_prefix: private_
-
-api_docs_controllers:
+api_docs:
   resource: ../src/Http/Controller/ApiDocs
   type: openapi_annotation
+
+api_v1:
+  resource: 'routes/public_api_v1.yaml'
+
+api_v2:
+  resource: 'routes/public_api_v2.yaml'
+
+api_private:
+  resource: 'routes/private_api.yaml'

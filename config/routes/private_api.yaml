@@ -1,0 +1,5 @@
+private_api_controllers:
+  resource: ../src/Http/Controller/PrivateApi
+  type: openapi_annotation
+  prefix: /private
+  name_prefix: private_

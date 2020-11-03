@@ -29,11 +29,11 @@ use OpenApi\Annotations as OA;
  *          @OA\MediaType(mediaType="application/json",
  *          @OA\Schema(type="object", properties={
  *              @OA\Property(property="class_name", type="string", description="What message to publish"),
- *              @OA\Property(property="json", type="array", description="Message's body")
+ *              @OA\Property(property="json", type="object", description="Message's body")
  *          }))
  *     ),
  *
- *     @OA\Response(response=202),
+ *     @OA\Response(response=202, description="Successful response"),
  *     @OA\Response(response=500, ref="#/components/responses/ServerError")
  * )
  */

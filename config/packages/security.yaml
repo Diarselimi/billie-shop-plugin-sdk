@@ -7,7 +7,7 @@ security:
             security: false
 
         healthcheck:
-            pattern: ^/healthcheck
+            pattern: ^/(public/)?healthcheck
             security: false
 
         private_api:
