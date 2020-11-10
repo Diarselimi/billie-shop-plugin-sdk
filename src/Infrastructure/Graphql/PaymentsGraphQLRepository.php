@@ -24,6 +24,8 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
             'merchantUuid' => $paymentsDTO->getMerchantPaymentUuid(),
             'paymentDebtorUuid' => $paymentsDTO->getPaymentDebtorUuid(),
             'transactionUuid' => $paymentsDTO->getTransactionUuid(),
+            'isAllocated' => $paymentsDTO->isAllocated() === null ? null : (int) $paymentsDTO->isAllocated(),
+            'isOverpayment' => $paymentsDTO->isOverpayment() === null ? null : (int) $paymentsDTO->isOverpayment(),
             'offset' => (string) $paymentsDTO->getOffset(),
             'limit' => (string) $paymentsDTO->getLimit(),
             'sortBy' => $paymentsDTO->getSortBy(),
@@ -36,6 +38,8 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
             'merchantUuid' => $paymentsDTO->getMerchantPaymentUuid(),
             'paymentDebtorUuid' => $paymentsDTO->getPaymentDebtorUuid(),
             'transactionUuid' => $paymentsDTO->getTransactionUuid(),
+            'isAllocated' => $paymentsDTO->isAllocated() === null ? null : $this->boolToString($paymentsDTO->isAllocated()),
+            'isOverpayment' => $paymentsDTO->isOverpayment() === null ? null : $this->boolToString($paymentsDTO->isOverpayment()),
             'searchString' => $paymentsDTO->getSearchString(),
             'searchCompanyString' => $paymentsDTO->getSearchCompanyString(),
         ];
@@ -72,5 +76,10 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
         $result = $this->query(self::GET_ORDER_PAYMENTS_QUERY, $params);
 
         return new PaginatedCollection($result, count($result));
+    }
+
+    private function boolToString(bool $bool): string
+    {
+        return $bool ? '1' : '0';
     }
 }

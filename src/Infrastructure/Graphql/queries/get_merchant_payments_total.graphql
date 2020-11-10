@@ -4,11 +4,15 @@ query q(
     $transactionUuid: String
     $searchString: String
     $searchCompanyString: String
+    $isAllocated: String
+    $isOverpayment: String
 ){
     getPadPayments(
         merchant_uuid: $merchantUuid
         debtor_uuids: $paymentDebtorUuid
         transaction_uuids: $transactionUuid
+        is_allocated: $isAllocated
+        is_overpayment: $isOverpayment
         search_keyword: $searchString
         search_company_keyword: $searchCompanyString
         as_count: "yes"

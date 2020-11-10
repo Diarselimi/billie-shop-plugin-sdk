@@ -7,7 +7,6 @@ use App\Application\UseCase\GetMerchant\MerchantNotFoundException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
-use App\DomainModel\MerchantPayment\MerchantPaymentResponseTransformer;
 use App\DomainModel\Payment\PaymentsRepositoryInterface;
 use App\DomainModel\Payment\SearchPaymentsDTOFactory;
 use App\Infrastructure\Repository\MerchantRepository;
@@ -21,8 +20,6 @@ class GetMerchantPaymentsUseCase implements ValidatedUseCaseInterface
 
     private $paymentsRepository;
 
-    private $paymentFactory;
-
     private $paymentsDTOFactory;
 
     private $merchantDebtorRepository;
@@ -30,13 +27,11 @@ class GetMerchantPaymentsUseCase implements ValidatedUseCaseInterface
     public function __construct(
         MerchantRepository $merchantRepository,
         PaymentsRepositoryInterface $paymentsRepository,
-        MerchantPaymentResponseTransformer $paymentFactory,
         SearchPaymentsDTOFactory $paymentsDTOFactory,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository
     ) {
         $this->merchantRepository = $merchantRepository;
         $this->paymentsRepository = $paymentsRepository;
-        $this->paymentFactory = $paymentFactory;
         $this->paymentsDTOFactory = $paymentsDTOFactory;
         $this->merchantDebtorRepository = $merchantDebtorRepository;
     }
@@ -63,8 +58,6 @@ class GetMerchantPaymentsUseCase implements ValidatedUseCaseInterface
 
         $request->setMerchantPaymentUuid($merchant->getPaymentUuid());
 
-        $result = $this->paymentsRepository->searchMerchantPayments($this->paymentsDTOFactory->create($request));
-
-        return $this->paymentFactory->expandPaymentsCollection($result);
+        return $this->paymentsRepository->searchMerchantPayments($this->paymentsDTOFactory->create($request));
     }
 }

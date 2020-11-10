@@ -14,6 +14,10 @@ class SearchPaymentsDTO extends AbstractSearchGraphQLDTO
 
     private $searchCompanyString;
 
+    private $isAllocated;
+
+    private $isOverpayment;
+
     public function getMerchantPaymentUuid(): string
     {
         return $this->merchantPaymentUuid;
@@ -58,6 +62,30 @@ class SearchPaymentsDTO extends AbstractSearchGraphQLDTO
     public function setSearchCompanyString(?string $searchCompanyString): self
     {
         $this->searchCompanyString = $searchCompanyString;
+
+        return $this;
+    }
+
+    public function isAllocated(): ?bool
+    {
+        return $this->isAllocated;
+    }
+
+    public function setIsAllocated(?bool $isAllocated): self
+    {
+        $this->isAllocated = $isAllocated;
+
+        return $this;
+    }
+
+    public function isOverpayment(): ?bool
+    {
+        return $this->isOverpayment;
+    }
+
+    public function setIsOverpayment(?bool $isOverpayment): self
+    {
+        $this->isOverpayment = $isOverpayment;
 
         return $this;
     }

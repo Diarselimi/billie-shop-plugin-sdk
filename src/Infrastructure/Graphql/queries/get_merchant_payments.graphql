@@ -8,6 +8,8 @@ query q(
     $sortDirection: String
     $searchString: String
     $searchCompanyString: String
+    $isAllocated: String
+    $isOverpayment: String
 ){
     getPadPayments(
         merchant_uuid: $merchantUuid
@@ -15,6 +17,8 @@ query q(
         transaction_uuids: $transactionUuid
         search_keyword: $searchString
         search_company_keyword: $searchCompanyString
+        is_allocated: $isAllocated
+        is_overpayment: $isOverpayment
         limit: $limit
         offset: $offset
         order_by: $sortBy
@@ -24,17 +28,10 @@ query q(
         amount
         transaction_date
         is_allocated
+        overpaid_amount
         transaction_counterparty_iban: bank_transaction_counterparty_iban
         transaction_counterparty_name: bank_transaction_counterparty_name
         transaction_reference: bank_transaction_reference
         merchant_debtor_uuid
-        orders: sub_items {
-            uuid: order_uuid
-            amount
-            mapped_amount
-            outstanding_amount
-            external_id: order_external_id
-            invoice_number
-        }
     }
 }

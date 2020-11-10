@@ -54,6 +54,16 @@ class GetMerchantPaymentsRequest implements ValidatedRequestInterface, Paginatio
      */
     private $merchantDebtorUuid;
 
+    /**
+     * @Assert\Type(type="boolean")
+     */
+    private ?bool $isAllocated = null;
+
+    /**
+     * @Assert\Type(type="boolean")
+     */
+    private ?bool $isOverpayment = null;
+
     public function getMerchantId(): int
     {
         return $this->merchantId;
@@ -146,6 +156,30 @@ class GetMerchantPaymentsRequest implements ValidatedRequestInterface, Paginatio
     public function setMerchantPaymentUuid(?string $merchantPaymentUuid): GetMerchantPaymentsRequest
     {
         $this->merchantPaymentUuid = $merchantPaymentUuid;
+
+        return $this;
+    }
+
+    public function isAllocated(): ?bool
+    {
+        return $this->isAllocated;
+    }
+
+    public function setIsAllocated(?bool $isAllocated): GetMerchantPaymentsRequest
+    {
+        $this->isAllocated = $isAllocated;
+
+        return $this;
+    }
+
+    public function isOverpayment(): ?bool
+    {
+        return $this->isOverpayment;
+    }
+
+    public function setIsOverpayment(?bool $isOverpayment): GetMerchantPaymentsRequest
+    {
+        $this->isOverpayment = $isOverpayment;
 
         return $this;
     }

@@ -4,6 +4,12 @@ namespace App\DomainModel\MerchantPayment;
 
 use App\Support\PaginatedCollection;
 
+/**
+ * @deprecated
+ * This class was used in GetMerchantPaymentsUseCase & GetMerchantPaymentDetailsUseCase
+ * After the refactoring done in scope of CORE-457, it's now only used in GetMerchantPaymentDetailsUseCase
+ * One more refactoring and it can be killed for the sake of humanity
+ */
 class MerchantPaymentResponseTransformer
 {
     public function expandPaymentsCollection(PaginatedCollection $collection): PaginatedCollection

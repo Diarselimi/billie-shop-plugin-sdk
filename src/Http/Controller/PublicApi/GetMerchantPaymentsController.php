@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     @OA\Property(property="items", type="array", description="Merchant payment item", @OA\Items({
  *          @OA\Property(property="uuid", ref="#/components/schemas/UUID"),
  *          @OA\Property(property="amount", ref="#/components/schemas/Money"),
+ *          @OA\Property(property="overpaid_amount", ref="#/components/schemas/Money"),
  *          @OA\Property(property="transaction_date", ref="#/components/schemas/Date"),
  *          @OA\Property(property="is_allocated", type="boolean"),
  *          @OA\Property(property="transaction_counterparty_iban", ref="#/components/schemas/IBAN"),
@@ -46,6 +47,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     @OA\Parameter(in="query", name="merchant_debtor_uuid", @OA\Schema(ref="#/components/schemas/UUID"), description="Merchant Debtor Uuid", required=false),
  *     @OA\Parameter(in="query", name="search", description="Search text.", @OA\Schema(ref="#/components/schemas/TinyText"), required=false),
  *
+ *     @OA\Parameter(in="query", name="filters", style="deepObject", explode=true, @OA\Schema(type="object", properties={
+ *          @OA\Property(property="is_allocated", type="boolean"),
+ *          @OA\Property(property="is_overpayment", type="boolean")
+ *     }), required=false),
+ *
  *     @OA\Response(
  *          response=200,
  *          description="Successful response",
@@ -60,17 +66,17 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class GetMerchantPaymentsController
 {
-    private $useCase;
+    private GetMerchantPaymentsUseCase $useCase;
 
-    public function __construct(
-        GetMerchantPaymentsUseCase $useCase
-    ) {
+    public function __construct(GetMerchantPaymentsUseCase $useCase)
+    {
         $this->useCase = $useCase;
     }
 
     public function execute(Request $request): PaginatedCollection
     {
         $merchantId = $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID);
+        $filters = $request->query->get('filters', []);
         $data = $request->query->all();
 
         $useCaseRequest = (new GetMerchantPaymentsRequest())
@@ -80,8 +86,11 @@ class GetMerchantPaymentsController
             ->setSortBy($data['sort_by'] ?? GetMerchantPaymentsRequest::DEFAULT_SORTING_FIELD)
             ->setSortDirection($data['sort_direction'] ?? 'desc')
             ->setSearchKeyword($data['search'] ?? '')
+            ->setIsAllocated(isset($filters['is_allocated']) ? (bool) $filters['is_allocated'] : null)
+            ->setIsOverpayment(isset($filters['is_overpayment']) ? (bool) $filters['is_overpayment'] : null)
             ->setLimit((int) ($data['limit'] ?? GetMerchantPaymentsRequest::DEFAULT_LIMIT))
-            ->setOffset((int) ($data['offset'] ?? 0));
+            ->setOffset((int) ($data['offset'] ?? 0))
+        ;
 
         try {
             $response = $this->useCase->execute($useCaseRequest);
