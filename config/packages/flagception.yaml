@@ -3,5 +3,5 @@ flagception:
     features:
         dummy_risk_checks:
             default: false
-        invoice_butler_enabled:
+        invoice_butler:
             env: INVOICE_BUTLER_ENABLED

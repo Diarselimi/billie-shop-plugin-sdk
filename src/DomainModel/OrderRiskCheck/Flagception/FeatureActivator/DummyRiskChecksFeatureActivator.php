@@ -4,33 +4,34 @@ declare(strict_types=1);
 
 namespace App\DomainModel\OrderRiskCheck\Flagception\FeatureActivator;
 
+use App\DomainModel\FeatureFlag\FeatureFlagManager;
 use App\DomainModel\OrderRiskCheck\Flagception\DummyRiskCheckStrategyManager;
 use Flagception\Activator\FeatureActivatorInterface;
 use Flagception\Model\Context;
 
 final class DummyRiskChecksFeatureActivator implements FeatureActivatorInterface
 {
-    public const RISK_CHECK_NAME = 'risk_check_name';
+    public const FEATURE_NAME = FeatureFlagManager::FEATURE_DUMMY_RISK_CHECKS;
 
-    public const ORDER_CONTAINER = 'order_container';
+    private const FEATURE_ACTIVATOR_NAME = 'dummy_risk_checks_feature_activator';
 
-    public const FEATURE_ACTIVATOR_NAME = 'dummy_risk_checks';
+    public const CONTEXT_RISK_CHECK_NAME = 'risk_check_name';
 
-    private const DUMMY_RISK_CHECKS_FEATURE_ACTIVATOR = 'dummy_risk_checks_feature_activator';
+    public const CONTEXT_ORDER_CONTAINER = 'order_container';
 
-    private $isDummyChecksEnabled;
+    private bool $isDummyChecksEnabled;
 
-    private $dummyStrategyManager;
+    private DummyRiskCheckStrategyManager $dummyStrategyManager;
 
-    public function __construct(DummyRiskCheckStrategyManager $dummyStrategyManager, bool $isDummyChecksEnabled)
+    public function __construct(DummyRiskCheckStrategyManager $dummyStrategyManager, bool $isDummyRiskChecksFeatureEnabled)
     {
-        $this->isDummyChecksEnabled = $isDummyChecksEnabled;
+        $this->isDummyChecksEnabled = $isDummyRiskChecksFeatureEnabled;
         $this->dummyStrategyManager = $dummyStrategyManager;
     }
 
     public function getName()
     {
-        return self::DUMMY_RISK_CHECKS_FEATURE_ACTIVATOR;
+        return self::FEATURE_ACTIVATOR_NAME;
     }
 
     public function isActive($name, Context $context)
@@ -39,13 +40,13 @@ final class DummyRiskChecksFeatureActivator implements FeatureActivatorInterface
             return false;
         }
 
-        if ($name !== self::FEATURE_ACTIVATOR_NAME) {
+        if ($name !== self::FEATURE_NAME) {
             return false;
         }
 
         return $this->dummyStrategyManager->isActive(
-            $context->get(self::RISK_CHECK_NAME),
-            $context->get(self::ORDER_CONTAINER)
+            $context->get(self::CONTEXT_RISK_CHECK_NAME),
+            $context->get(self::CONTEXT_ORDER_CONTAINER)
         );
     }
 }
