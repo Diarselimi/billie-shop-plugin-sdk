@@ -4,7 +4,6 @@ namespace spec\App\Http\RequestTransformer\CreateOrder;
 
 use App\Application\UseCase\CreateOrder\Request\CreateOrderDebtorCompanyRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderDebtorPersonRequest;
-use App\DomainModel\CheckoutSession\CheckoutSessionEntity;
 use App\DomainModel\Order\OrderEntity;
 use App\Http\HttpConstantsInterface;
 use App\Http\RequestTransformer\AmountRequestFactory;

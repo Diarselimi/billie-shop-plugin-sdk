@@ -4,6 +4,9 @@ namespace spec\App\Application\UseCase\CreateOrder;
 
 use App\Application\UseCase\CreateOrder\CreateOrderRequest;
 use App\Application\UseCase\CreateOrder\CreateOrderUseCase;
+use App\DomainModel\Order\Lifecycle\ApproveOrderService;
+use App\DomainModel\Order\Lifecycle\DeclineOrderService;
+use App\DomainModel\Order\Lifecycle\WaitingOrderService;
 use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
@@ -15,7 +18,6 @@ use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderResponse\OrderResponse;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
 use PhpSpec\ObjectBehavior;
@@ -31,7 +33,9 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
         OrderChecksRunnerService $orderChecksRunnerService,
         OrderRepositoryInterface $orderRepository,
         OrderResponseFactory $orderResponseFactory,
-        OrderStateManager $orderStateManager,
+        ApproveOrderService $approveOrderService,
+        WaitingOrderService $waitingOrderService,
+        DeclineOrderService $declineOrderService,
         IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification,
         ValidatorInterface $validator,
         OrderEntity $order,
@@ -66,15 +70,18 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
 
     public function it_should_be_declined_if_some_pre_identification_check_fail(
         OrderChecksRunnerService $orderChecksRunnerService,
-        OrderStateManager $orderStateManager,
+        ApproveOrderService $approveOrderService,
+        DeclineOrderService $declineOrderService,
         OrderContainer $orderContainer,
         CreateOrderRequest $request,
         OrderEntity $order,
         OrderResponseFactory $orderResponseFactory
     ) {
         $orderChecksRunnerService->passesPreIdentificationChecks($orderContainer)->shouldBeCalledOnce()->willReturn(false);
-        $orderStateManager->isDeclined($order)->shouldBeCalledOnce()->willReturn(true);
-        $orderStateManager->decline($orderContainer)->shouldBeCalledOnce();
+        $order->isDeclined()->shouldBeCalledOnce()->willReturn(true);
+
+        $approveOrderService->approve($orderContainer)->shouldNotBeCalled();
+        $declineOrderService->decline($orderContainer)->shouldBeCalledOnce();
         $orderResponseFactory->create($orderContainer)->shouldBeCalledOnce()->willReturn(new OrderResponse());
 
         $this->execute($request);
@@ -82,7 +89,8 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
 
     public function it_should_be_declined_if_post_identifications_checks_fail(
         OrderChecksRunnerService $orderChecksRunnerService,
-        OrderStateManager $orderStateManager,
+        ApproveOrderService $approveOrderService,
+        DeclineOrderService $declineOrderService,
         OrderContainer $orderContainer,
         CreateOrderRequest $request,
         OrderEntity $order,
@@ -96,8 +104,10 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
         $identifyAndTriggerAsyncIdentification->identifyDebtor($orderContainer)->shouldBeCalledOnce()->willReturn(true);
         $orderChecksRunnerService->passesPostIdentificationChecks($orderContainer)->shouldBeCalledOnce()->willReturn(false);
 
-        $orderStateManager->isDeclined($order)->shouldBeCalledOnce()->willReturn(true);
-        $orderStateManager->decline($orderContainer)->shouldBeCalledOnce();
+        $order->isDeclined()->shouldBeCalledOnce()->willReturn(true);
+
+        $approveOrderService->approve($orderContainer)->shouldNotBeCalled();
+        $declineOrderService->decline($orderContainer)->shouldBeCalledOnce();
         $orderResponseFactory->create($orderContainer)->shouldBeCalledOnce()->willReturn(new OrderResponse());
 
         $this->execute($request);
@@ -105,9 +115,9 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
 
     public function it_should_put_the_order_in_waiting_state_if_has_soft_declinable_checks(
         OrderChecksRunnerService $orderChecksRunnerService,
-        OrderStateManager $orderStateManager,
         OrderContainer $orderContainer,
         CreateOrderRequest $request,
+        WaitingOrderService $waitingOrderService,
         OrderEntity $order,
         OrderResponseFactory $orderResponseFactory,
         IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification
@@ -120,8 +130,8 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
         $orderChecksRunnerService->passesPostIdentificationChecks($orderContainer)->shouldBeCalledOnce()->willReturn(true);
         $orderChecksRunnerService->hasFailedSoftDeclinableChecks($orderContainer)->shouldBeCalledOnce()->willReturn(true);
 
-        $orderStateManager->isDeclined($order)->shouldBeCalledOnce()->willReturn(false);
-        $orderStateManager->wait($orderContainer)->shouldBeCalledOnce();
+        $order->isDeclined()->shouldBeCalledOnce()->willReturn(false);
+        $waitingOrderService->wait($orderContainer)->shouldBeCalledOnce();
         $orderResponseFactory->create($orderContainer)->shouldBeCalledOnce()->willReturn(new OrderResponse());
 
         $this->execute($request);
@@ -129,7 +139,8 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
 
     public function it_should_succeed_if_all_is_fine(
         OrderChecksRunnerService $orderChecksRunnerService,
-        OrderStateManager $orderStateManager,
+        ApproveOrderService $approveOrderService,
+        DeclineOrderService $declineOrderService,
         OrderContainer $orderContainer,
         CreateOrderRequest $request,
         OrderEntity $order,
@@ -144,8 +155,9 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
         $orderChecksRunnerService->passesPostIdentificationChecks($orderContainer)->shouldBeCalledOnce()->willReturn(true);
         $orderChecksRunnerService->hasFailedSoftDeclinableChecks($orderContainer)->shouldBeCalledOnce()->willReturn(false);
 
-        $orderStateManager->isDeclined($order)->shouldBeCalledOnce()->willReturn(false);
-        $orderStateManager->approve($orderContainer)->shouldBeCalledOnce();
+        $order->isDeclined()->shouldBeCalledOnce()->willReturn(false);
+        $approveOrderService->approve($orderContainer)->shouldBeCalledOnce();
+        $declineOrderService->decline($orderContainer)->shouldNotBeCalled();
         $orderResponseFactory->create($orderContainer)->shouldBeCalledOnce()->willReturn(new OrderResponse());
 
         $this->execute($request);

@@ -6,13 +6,13 @@ use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\ApproveOrder\ApproveOrderRequest;
 use App\Application\UseCase\ApproveOrder\ApproveOrderUseCase;
+use App\DomainModel\Order\Lifecycle\ApproveOrderService;
 use App\DomainModel\Order\OrderChecksRunnerService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderRiskCheck\Checker\LimitCheck;
 use App\DomainModel\OrderRiskCheck\CheckResult;
 use App\DomainModel\OrderRiskCheck\CheckResultCollection;
@@ -25,7 +25,7 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
 
     public function let(
         OrderContainerFactory $orderContainerFactory,
-        OrderStateManager $orderStateManager,
+        ApproveOrderService $approveOrderService,
         OrderChecksRunnerService $orderChecksRunnerService,
         OrderDeclinedReasonsMapper $declinedReasonsMapper,
         OrderContainer $orderContainer,
@@ -58,7 +58,6 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
     public function it_throws_exception_if_order_is_not_in_waiting_state(
         OrderContainerFactory $orderContainerFactory,
         ApproveOrderRequest $request,
-        OrderStateManager $orderStateManager,
         OrderEntity $order,
         OrderContainer $orderContainer
     ) {
@@ -67,8 +66,8 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn($orderContainer);
 
-        $orderStateManager
-            ->isWaiting($order)
+        $order
+            ->isWaiting()
             ->shouldBeCalled()
             ->willReturn(false);
 
@@ -78,7 +77,6 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
     public function it_throws_exception_if_limit_check_fails(
         OrderContainerFactory $orderContainerFactory,
         ApproveOrderRequest $request,
-        OrderStateManager $orderStateManager,
         OrderChecksRunnerService $orderChecksRunnerService,
         OrderEntity $order,
         OrderContainer $orderContainer
@@ -88,8 +86,8 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn($orderContainer);
 
-        $orderStateManager
-            ->isWaiting($order)
+        $order
+            ->isWaiting()
             ->shouldBeCalled()
             ->willReturn(true);
 
@@ -103,7 +101,7 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
 
     public function it_successfully_approves_the_order(
         OrderContainerFactory $orderContainerFactory,
-        OrderStateManager $orderStateManager,
+        ApproveOrderService $approveOrderService,
         OrderChecksRunnerService $orderChecksRunnerService,
         OrderEntity $order,
         OrderContainer $orderContainer,
@@ -114,8 +112,8 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn($orderContainer);
 
-        $orderStateManager
-            ->isWaiting($order)
+        $order
+            ->isWaiting()
             ->shouldBeCalled()
             ->willReturn(true);
 
@@ -129,13 +127,12 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn(true);
 
-        $orderStateManager->approve($orderContainer)->shouldBeCalledOnce();
+        $approveOrderService->approve($orderContainer)->shouldBeCalledOnce();
         $this->execute($request);
     }
 
     public function it_throws_exception_if_risk_checks_fail_again(
         OrderContainerFactory $orderContainerFactory,
-        OrderStateManager $orderStateManager,
         OrderChecksRunnerService $orderChecksRunnerService,
         OrderEntity $order,
         OrderContainer $orderContainer,
@@ -151,8 +148,8 @@ class ApproveOrderUseCaseSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn($orderContainer);
 
-        $orderStateManager
-            ->isWaiting($order)
+        $order
+            ->isWaiting()
             ->shouldBeCalled()
             ->willReturn(true);
 

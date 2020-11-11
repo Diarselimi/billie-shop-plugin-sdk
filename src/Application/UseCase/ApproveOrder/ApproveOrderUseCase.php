@@ -4,12 +4,11 @@ namespace App\Application\UseCase\ApproveOrder;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\WorkflowException;
+use App\DomainModel\Order\Lifecycle\ApproveOrderService;
 use App\DomainModel\Order\OrderChecksRunnerService;
-use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderDeclinedReasonsMapper;
-use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedBillingAddressCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorOverdueCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DeliveryAddressCheck;
@@ -26,22 +25,22 @@ class ApproveOrderUseCase
         DebtorOverdueCheck::NAME,
     ];
 
-    private $orderContainerFactory;
+    private OrderContainerFactory $orderContainerFactory;
 
-    private $orderStateManager;
+    private ApproveOrderService $approveOrderService;
 
-    private $orderChecksRunnerService;
+    private OrderChecksRunnerService $orderChecksRunnerService;
 
-    private $declinedReasonsMapper;
+    private OrderDeclinedReasonsMapper $declinedReasonsMapper;
 
     public function __construct(
         OrderContainerFactory $orderContainerFactory,
-        OrderStateManager $orderStateManager,
+        ApproveOrderService $approveOrderService,
         OrderChecksRunnerService $orderChecksRunnerService,
         OrderDeclinedReasonsMapper $declinedReasonsMapper
     ) {
         $this->orderContainerFactory = $orderContainerFactory;
-        $this->orderStateManager = $orderStateManager;
+        $this->approveOrderService = $approveOrderService;
         $this->orderChecksRunnerService = $orderChecksRunnerService;
         $this->declinedReasonsMapper = $declinedReasonsMapper;
     }
@@ -54,11 +53,13 @@ class ApproveOrderUseCase
             throw new OrderNotFoundException($exception);
         }
 
-        if (!$this->orderStateManager->isWaiting($orderContainer->getOrder())) {
+        $order = $orderContainer->getOrder();
+
+        if (!$order->isWaiting()) {
             throw new WorkflowException("Cannot approve the order. Order is not in waiting state.");
         }
 
-        if (!$this->rerunLimitCheck($orderContainer)) {
+        if (!$this->orderChecksRunnerService->rerunChecks($orderContainer, [LimitCheck::NAME])) {
             throw new WorkflowException("Cannot approve the order. Limit check failed");
         }
 
@@ -73,11 +74,6 @@ class ApproveOrderUseCase
             );
         }
 
-        $this->orderStateManager->approve($orderContainer);
-    }
-
-    private function rerunLimitCheck(OrderContainer $orderContainer): bool
-    {
-        return $this->orderChecksRunnerService->rerunChecks($orderContainer, [LimitCheck::NAME]);
+        $this->approveOrderService->approve($orderContainer);
     }
 }

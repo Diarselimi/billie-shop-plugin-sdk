@@ -8,7 +8,6 @@ use App\Application\UseCase\PauseOrderDunning\PauseOrderDunningRequest;
 use App\Application\UseCase\PauseOrderDunning\PauseOrderDunningUseCase;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\Order\SalesforceInterface;
 use App\Infrastructure\Salesforce\Exception\SalesforcePauseDunningException;
 use PhpSpec\ObjectBehavior;
@@ -28,10 +27,9 @@ class PauseOrderDunningUseCaseSpec extends ObjectBehavior
     public function let(
         OrderRepositoryInterface $orderRepository,
         SalesforceInterface $salesforce,
-        OrderStateManager $orderStateManager,
         ValidatorInterface $validator
     ) {
-        $this->beConstructedWith($orderRepository, $salesforce, $orderStateManager);
+        $this->beConstructedWith($orderRepository, $salesforce);
 
         $validator->validate(Argument::any(), Argument::any(), Argument::any())->willReturn(new ConstraintViolationList());
 
@@ -58,7 +56,6 @@ class PauseOrderDunningUseCaseSpec extends ObjectBehavior
 
     public function it_throws_exception_if_order_is_not_in_state_late(
         OrderRepositoryInterface $orderRepository,
-        OrderStateManager $orderStateManager,
         OrderEntity $order
     ) {
         $request = $this->mockRequest(10);
@@ -69,18 +66,13 @@ class PauseOrderDunningUseCaseSpec extends ObjectBehavior
             ->willReturn($order)
         ;
 
-        $orderStateManager
-            ->isLate($order)
-            ->shouldBeCalled()
-            ->willReturn(false)
-        ;
+        $order->isLate()->shouldBeCalled()->willReturn(false);
 
         $this->shouldThrow(PauseOrderDunningException::class)->during('execute', [$request]);
     }
 
     public function it_throws_exception_if_salesforce_call_failed(
         OrderRepositoryInterface $orderRepository,
-        OrderStateManager $orderStateManager,
         SalesforceInterface $salesforce,
         OrderEntity $order
     ) {
@@ -94,11 +86,7 @@ class PauseOrderDunningUseCaseSpec extends ObjectBehavior
             ->willReturn($order)
         ;
 
-        $orderStateManager
-            ->isLate($order)
-            ->shouldBeCalled()
-            ->willReturn(true)
-        ;
+        $order->isLate()->shouldBeCalled()->willReturn(true);
 
         $salesforce
             ->pauseOrderDunning(self::ORDER_UUID, 10)
@@ -111,7 +99,6 @@ class PauseOrderDunningUseCaseSpec extends ObjectBehavior
 
     public function it_successfully_calls_salesforce_to_pause_order_dunning(
         OrderRepositoryInterface $orderRepository,
-        OrderStateManager $orderStateManager,
         SalesforceInterface $salesforce,
         OrderEntity $order
     ) {
@@ -125,16 +112,8 @@ class PauseOrderDunningUseCaseSpec extends ObjectBehavior
             ->willReturn($order)
         ;
 
-        $orderStateManager
-            ->isLate($order)
-            ->shouldBeCalled()
-            ->willReturn(true)
-        ;
-
-        $salesforce
-            ->pauseOrderDunning(self::ORDER_UUID, 10)
-            ->shouldBeCalled()
-        ;
+        $order->isLate()->shouldBeCalled()->willReturn(true);
+        $salesforce->pauseOrderDunning(self::ORDER_UUID, 10)->shouldBeCalled();
 
         $this->execute($request);
     }

@@ -10,11 +10,12 @@ use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\CheckoutSession\CheckoutOrderMatcherInterface;
 use App\DomainModel\CheckoutSession\CheckoutOrderRequestDTO;
+use App\DomainModel\Order\Lifecycle\ApproveOrderService;
+use App\DomainModel\Order\Lifecycle\WaitingOrderService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderResponse\OrderResponse;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
 
@@ -22,26 +23,30 @@ class CheckoutConfirmOrderUseCase implements ValidatedUseCaseInterface
 {
     use ValidatedUseCaseTrait;
 
-    private $orderResponseFactory;
+    private OrderResponseFactory $orderResponseFactory;
 
-    private $orderContainerFactory;
+    private OrderContainerFactory $orderContainerFactory;
 
-    private $stateManager;
+    private ApproveOrderService $approveOrderService;
 
-    private $dataMatcher;
+    private WaitingOrderService $waitingOrderService;
 
-    private $orderRepository;
+    private CheckoutOrderMatcherInterface $dataMatcher;
+
+    private OrderRepositoryInterface $orderRepository;
 
     public function __construct(
         OrderResponseFactory $orderResponseFactory,
         OrderContainerFactory $orderContainerFactory,
-        OrderStateManager $orderStateManager,
+        ApproveOrderService $approveOrderService,
+        WaitingOrderService $waitingOrderService,
         CheckoutOrderMatcherInterface $dataMatcher,
         OrderRepositoryInterface $orderRepository
     ) {
         $this->orderResponseFactory = $orderResponseFactory;
         $this->orderContainerFactory = $orderContainerFactory;
-        $this->stateManager = $orderStateManager;
+        $this->approveOrderService = $approveOrderService;
+        $this->waitingOrderService = $waitingOrderService;
         $this->dataMatcher = $dataMatcher;
         $this->orderRepository = $orderRepository;
     }
@@ -64,10 +69,11 @@ class CheckoutConfirmOrderUseCase implements ValidatedUseCaseInterface
             $this->updateOrderExternalCode($request, $orderContainer);
         }
 
-        if ($this->stateManager->isPreWaiting($orderContainer->getOrder())) {
-            $this->stateManager->wait($orderContainer);
+        $order = $orderContainer->getOrder();
+        if ($order->isPreWaiting()) {
+            $this->waitingOrderService->wait($orderContainer);
         } else {
-            $this->stateManager->approve($orderContainer);
+            $this->approveOrderService->approve($orderContainer);
         }
 
         return $this->orderResponseFactory->create($orderContainer);

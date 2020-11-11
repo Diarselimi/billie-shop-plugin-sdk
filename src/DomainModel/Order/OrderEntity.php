@@ -2,6 +2,7 @@
 
 namespace App\DomainModel\Order;
 
+use App\DomainModel\Order\OrderContainer\OrderContainer;
 use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 use Billie\PdoBundle\DomainModel\StatefulEntity\StatefulEntityInterface;
 use Billie\PdoBundle\DomainModel\StatefulEntity\StatefulEntityTrait;
@@ -10,7 +11,65 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
 {
     use StatefulEntityTrait;
 
-    private const STATE_LATE = 'late';
+    public const STATE_NEW = 'new';
+
+    public const STATE_PRE_WAITING = 'pre_waiting';
+
+    public const STATE_AUTHORIZED = 'authorized';
+
+    public const STATE_WAITING = 'waiting';
+
+    public const STATE_CREATED = 'created';
+
+    public const STATE_DECLINED = 'declined';
+
+    public const STATE_SHIPPED = 'shipped';
+
+    public const STATE_PAID_OUT = 'paid_out';
+
+    public const STATE_LATE = 'late';
+
+    public const STATE_COMPLETE = 'complete';
+
+    public const STATE_CANCELED = 'canceled';
+
+    public const TRANSITION_PRE_WAITING = 'pre_waiting';
+
+    public const TRANSITION_AUTHORIZE = 'authorize';
+
+    public const TRANSITION_WAITING = 'waiting';
+
+    public const TRANSITION_CREATE = 'create';
+
+    public const TRANSITION_DECLINE = 'decline';
+
+    public const TRANSITION_PAY_OUT = 'pay_out';
+
+    public const TRANSITION_SHIP = 'ship';
+
+    public const TRANSITION_LATE = 'late';
+
+    public const TRANSITION_COMPLETE = 'complete';
+
+    public const TRANSITION_CANCEL = 'cancel';
+
+    public const TRANSITION_CANCEL_SHIPPED = 'cancel_shipped';
+
+    public const TRANSITION_CANCEL_WAITING = 'cancel_waiting';
+
+    public const ALL_STATES = [
+        self::STATE_NEW,
+        self::STATE_PRE_WAITING,
+        self::STATE_AUTHORIZED,
+        self::STATE_WAITING,
+        self::STATE_CREATED,
+        self::STATE_DECLINED,
+        self::STATE_SHIPPED,
+        self::STATE_PAID_OUT,
+        self::STATE_LATE,
+        self::STATE_COMPLETE,
+        self::STATE_CANCELED,
+    ];
 
     public const MAX_DURATION_IN_PRE_WAITING_STATE = '1 days';
 
@@ -24,45 +83,72 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
 
     public const CREATION_SOURCE_DASHBOARD = 'dashboard';
 
+    public const WORKFLOW_NAME_V1 = 'order_v1';
+
+    public const WORKFLOW_NAME_V2 = 'order_v2';
+
     private const STATE_TRANSITION_ENTITY_CLASS = OrderStateTransitionEntity::class;
 
-    private $uuid;
+    private string $uuid;
 
-    private $amountForgiven;
+    /**
+     * @deprecated
+     */
+    private float $amountForgiven;
 
-    private $externalCode;
+    private ?string $externalCode = null;
 
-    private $externalComment;
+    private ?string $externalComment = null;
 
-    private $internalComment;
+    private ?string $internalComment = null;
 
-    private $invoiceNumber;
+    /**
+     * @deprecated
+     */
+    private ?string $invoiceNumber = null;
 
-    private $invoiceUrl;
+    /**
+     * @deprecated
+     */
+    private ?string $invoiceUrl = null;
 
-    private $proofOfDeliveryUrl;
+    /**
+     * @deprecated
+     */
+    private ?string $proofOfDeliveryUrl = null;
 
-    private $merchantDebtorId;
+    private ?int $merchantDebtorId = null;
 
-    private $merchantId;
+    private int $merchantId;
 
-    private $deliveryAddressId;
+    private int $deliveryAddressId;
 
-    private $debtorPersonId;
+    private int $debtorPersonId;
 
-    private $debtorExternalDataId;
+    private int $debtorExternalDataId;
 
-    private $paymentId;
+    /**
+     * @deprecated
+     */
+    private ?string $paymentId = null;
 
-    private $shippedAt;
+    /**
+     * @deprecated probably
+     */
+    private ?\DateTime $shippedAt = null;
 
-    private $markedAsFraudAt;
+    /**
+     * @deprecated
+     */
+    private ?\DateTime $markedAsFraudAt = null;
 
-    private $checkoutSessionId;
+    private ?int $checkoutSessionId = null;
 
-    private $creationSource;
+    private string $creationSource;
 
-    private $companyBillingAddressUuid;
+    private ?string $companyBillingAddressUuid = null;
+
+    private string $workflowName;
 
     public function getUuid(): string
     {
@@ -76,11 +162,13 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
         return $this;
     }
 
+    /** @deprecated  */
     public function getAmountForgiven(): float
     {
         return $this->amountForgiven;
     }
 
+    /** @deprecated  */
     public function setAmountForgiven(float $amountForgiven): OrderEntity
     {
         $this->amountForgiven = $amountForgiven;
@@ -208,7 +296,7 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
         return $this;
     }
 
-    public function getDebtorExternalDataId(): ?int
+    public function getDebtorExternalDataId(): int
     {
         return $this->debtorExternalDataId;
     }
@@ -295,5 +383,61 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
     public function getCompanyBillingAddressUuid(): ?string
     {
         return $this->companyBillingAddressUuid;
+    }
+
+    public function getWorkflowName(): string
+    {
+        return $this->workflowName;
+    }
+
+    public function setWorkflowName(string $workflowName): OrderEntity
+    {
+        $this->workflowName = $workflowName;
+
+        return $this;
+    }
+
+    public function wasShipped(): bool
+    {
+        return in_array($this->state, [
+            self::STATE_SHIPPED,
+            self::STATE_PAID_OUT,
+            self::STATE_LATE,
+        ], true);
+    }
+
+    public function isPreWaiting(): bool
+    {
+        return $this->state === self::STATE_PRE_WAITING;
+    }
+
+    public function isLate(): bool
+    {
+        return $this->state === self::STATE_LATE;
+    }
+
+    public function isDeclined(): bool
+    {
+        return $this->state === self::STATE_DECLINED;
+    }
+
+    public function isComplete(): bool
+    {
+        return $this->state === self::STATE_COMPLETE;
+    }
+
+    public function isCanceled(): bool
+    {
+        return $this->state === self::STATE_CANCELED;
+    }
+
+    public function isPaidOut(): bool
+    {
+        return $this->state === self::STATE_PAID_OUT;
+    }
+
+    public function isWaiting(): bool
+    {
+        return $this->state === self::STATE_WAITING;
     }
 }

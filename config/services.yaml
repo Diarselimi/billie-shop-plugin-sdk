@@ -41,7 +41,6 @@ services:
       $resourcesFileReader: '@resources_file_reader'
       $apiSpecFileReader: '@api_spec_file_reader'
       $investorUuid: '%env(string:INVESTOR_UUID)%'
-      $orderWorkflow: '@state_machine.order'
       $onboardingStepWorkflow: '@state_machine.merchant_onboarding_step'
       $onboardingWorkflow: '@state_machine.merchant_onboarding'
       $debtorInformationChangeRequestWorkflow: '@state_machine.debtor_information_change_request'

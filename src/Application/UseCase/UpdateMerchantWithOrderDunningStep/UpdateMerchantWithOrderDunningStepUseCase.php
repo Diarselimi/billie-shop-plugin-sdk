@@ -3,10 +3,10 @@
 namespace App\Application\UseCase\UpdateMerchantWithOrderDunningStep;
 
 use App\Application\Exception\OrderNotFoundException;
-use App\DomainEvent\Order\OrderEventPayloadFactory;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderNotification\NotificationScheduler;
 use App\DomainModel\OrderNotification\OrderNotificationEntity;
+use App\DomainModel\OrderNotification\OrderNotificationPayloadFactory;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
@@ -14,16 +14,16 @@ class UpdateMerchantWithOrderDunningStepUseCase implements LoggingInterface
 {
     use LoggingTrait;
 
-    private $orderRepository;
+    private OrderRepositoryInterface $orderRepository;
 
-    private $notificationScheduler;
+    private NotificationScheduler $notificationScheduler;
 
-    private $orderEventPayloadFactory;
+    private OrderNotificationPayloadFactory $orderEventPayloadFactory;
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         NotificationScheduler $notificationScheduler,
-        OrderEventPayloadFactory $orderEventPayloadFactory
+        OrderNotificationPayloadFactory $orderEventPayloadFactory
     ) {
         $this->orderRepository = $orderRepository;
         $this->notificationScheduler = $notificationScheduler;

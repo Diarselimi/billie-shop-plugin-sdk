@@ -3,8 +3,8 @@
 namespace App\DomainModel\MerchantDebtor\Finder;
 
 use App\DomainModel\DebtorCompany\IdentifiedDebtorCompany;
+use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\Order\OrderStateManager;
 
 trait MerchantDebtorBillingAddressIdentificationTrait
 {
@@ -19,7 +19,7 @@ trait MerchantDebtorBillingAddressIdentificationTrait
             return $this->orderRepository->getOrdersCountByCompanyBillingAddressAndState(
                 $debtorCompany->getUuid(),
                 $debtorCompany->getIdentifiedAddressUuid(),
-                OrderStateManager::STATE_COMPLETE
+                OrderEntity::STATE_COMPLETE
             ) > 0;
         }
 

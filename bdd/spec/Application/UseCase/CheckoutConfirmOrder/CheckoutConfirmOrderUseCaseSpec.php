@@ -9,11 +9,12 @@ use App\DomainModel\CheckoutSession\CheckoutOrderMatcherInterface;
 use App\DomainModel\CheckoutSession\CheckoutOrderMatcherViolationList;
 use App\DomainModel\CheckoutSession\CheckoutOrderRequestDTO;
 use App\DomainModel\DebtorCompany\DebtorCompanyRequest;
+use App\DomainModel\Order\Lifecycle\ApproveOrderService;
+use App\DomainModel\Order\Lifecycle\WaitingOrderService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderResponse\OrderResponse;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
 use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
@@ -27,7 +28,8 @@ class CheckoutConfirmOrderUseCaseSpec extends ObjectBehavior
     public function let(
         OrderResponseFactory $orderResponseFactory,
         OrderContainerFactory $orderContainerFactory,
-        OrderStateManager $orderStateManager,
+        ApproveOrderService $approveOrderService,
+        WaitingOrderService $waitingOrderService,
         CheckoutOrderMatcherInterface $dataMatcher,
         OrderRepositoryInterface $orderRepository,
         ValidatorInterface $validator,
@@ -43,7 +45,7 @@ class CheckoutConfirmOrderUseCaseSpec extends ObjectBehavior
         $orderContainer->getOrder()->willReturn($order);
         $orderContainerFactory->loadNotYetConfirmedByCheckoutSessionUuid('test123')->willReturn($orderContainer);
 
-        $order->getState()->willReturn(OrderStateManager::STATE_AUTHORIZED);
+        $order->getState()->willReturn(OrderEntity::STATE_AUTHORIZED);
         $orderContainer->getOrder()->willReturn($order);
     }
 
@@ -74,8 +76,9 @@ class CheckoutConfirmOrderUseCaseSpec extends ObjectBehavior
     public function it_should_approve_order_if_data_is_valid_and_not_in_pre_waiting(
         OrderContainer $orderContainer,
         OrderResponseFactory $orderResponseFactory,
+        ApproveOrderService $approveOrderService,
+        WaitingOrderService $waitingOrderService,
         OrderEntity $order,
-        OrderStateManager $orderStateManager,
         CheckoutOrderMatcherInterface $dataMatcher
     ) {
         $checkoutSessionUuid = 'test123';
@@ -91,9 +94,9 @@ class CheckoutConfirmOrderUseCaseSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn(new CheckoutOrderMatcherViolationList());
 
-        $orderStateManager->isPreWaiting($order)->shouldBeCalled()->willReturn(false);
-        $orderStateManager->wait($orderContainer)->shouldNotBeCalled();
-        $orderStateManager->approve($orderContainer)->shouldBeCalled();
+        $order->isPreWaiting()->shouldBeCalled()->willReturn(false);
+        $waitingOrderService->wait($orderContainer)->shouldNotBeCalled();
+        $approveOrderService->approve($orderContainer)->shouldBeCalled();
 
         $orderResponseFactory->create($orderContainer)->shouldBeCalled()->willReturn(new OrderResponse());
         $this->execute($request);
@@ -102,8 +105,9 @@ class CheckoutConfirmOrderUseCaseSpec extends ObjectBehavior
     public function it_should_move_order_to_waiting_if_data_is_valid_and_in_pre_waiting(
         OrderContainer $orderContainer,
         OrderResponseFactory $orderResponseFactory,
+        ApproveOrderService $approveOrderService,
+        WaitingOrderService $waitingOrderService,
         OrderEntity $order,
-        OrderStateManager $orderStateManager,
         CheckoutOrderMatcherInterface $dataMatcher
     ) {
         $checkoutSessionUuid = 'test123';
@@ -119,9 +123,9 @@ class CheckoutConfirmOrderUseCaseSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn(new CheckoutOrderMatcherViolationList());
 
-        $orderStateManager->isPreWaiting($order)->shouldBeCalled()->willReturn(true);
-        $orderStateManager->wait($orderContainer)->shouldBeCalled();
-        $orderStateManager->approve($orderContainer)->shouldNotBeCalled();
+        $order->isPreWaiting()->shouldBeCalled()->willReturn(true);
+        $waitingOrderService->wait($orderContainer)->shouldBeCalled();
+        $approveOrderService->approve($orderContainer)->shouldNotBeCalled();
 
         $orderResponseFactory->create($orderContainer)->shouldBeCalled()->willReturn(new OrderResponse());
         $this->execute($request);

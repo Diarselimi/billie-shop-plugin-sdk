@@ -4,15 +4,15 @@ namespace App\DomainModel\OrderRiskCheck\Checker;
 
 use App\DomainModel\DebtorCompany\IdentifiedDebtorCompany;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
+use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderRiskCheck\CheckResult;
 
 class DebtorIdentifiedBillingAddressCheck implements CheckInterface
 {
     const NAME = 'debtor_identified_billing_address';
 
-    private $orderRepository;
+    private OrderRepositoryInterface $orderRepository;
 
     public function __construct(OrderRepositoryInterface $orderRepository)
     {
@@ -30,7 +30,7 @@ class DebtorIdentifiedBillingAddressCheck implements CheckInterface
             $count = $this->orderRepository->getOrdersCountByCompanyBillingAddressAndState(
                 $debtorCompany->getUuid(),
                 $debtorCompany->getIdentifiedAddressUuid(),
-                OrderStateManager::STATE_COMPLETE
+                OrderEntity::STATE_COMPLETE
             );
 
             return new CheckResult($count > 0, self::NAME);

@@ -6,7 +6,7 @@ namespace App\Tests\Functional\Context;
 
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
-use App\DomainModel\Order\OrderStateManager;
+use App\DomainModel\Order\OrderEntity;
 use App\Tests\Integration\Helpers\RandomDataTrait;
 use Behat\Behat\Context\Context;
 use Behat\Symfony2Extension\Context\KernelDictionary;
@@ -70,7 +70,7 @@ class RepositoryIntegrationContext implements Context
             $externalData->getMerchantExternalId(),
             $this->getLastMerchantCreationDTO()->getMerchant()->getId(),
             $newExternalDataId,
-            OrderStateManager::STATE_DECLINED,
+            OrderEntity::STATE_DECLINED,
             (int) $maxMinutes
         );
 

@@ -6,58 +6,46 @@ namespace App\Application\UseCase;
 
 use App\Application\UseCase\CreateOrder\CreateOrderRequest;
 use App\DomainModel\Order\IdentifyAndTriggerAsyncIdentification;
+use App\DomainModel\Order\Lifecycle\ApproveOrderService;
+use App\DomainModel\Order\Lifecycle\DeclineOrderService;
+use App\DomainModel\Order\Lifecycle\WaitingOrderService;
 use App\DomainModel\Order\NewOrder\OrderPersistenceService;
 use App\DomainModel\Order\OrderChecksRunnerService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
+use Symfony\Component\Workflow\Registry;
 
 trait OrderCreationUseCaseTrait
 {
-    /**
-     * @var OrderPersistenceService
-     */
-    private $persistNewOrderService;
+    private OrderPersistenceService $orderPersistenceService;
 
-    /**
-     * @var OrderContainerFactory
-     */
-    private $orderContainerFactory;
+    private OrderContainerFactory $orderContainerFactory;
 
-    /**
-     * @var OrderChecksRunnerService
-     */
-    private $orderChecksRunnerService;
+    private OrderChecksRunnerService $orderChecksRunnerService;
 
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
+    private OrderRepositoryInterface $orderRepository;
 
-    /**
-     * @var OrderStateManager
-     */
-    private $orderStateManager;
+    private Registry $workflowRegistry;
 
-    /**
-     * @var IdentifyAndTriggerAsyncIdentification
-     */
-    private $identifyAndTriggerAsyncIdentification;
+    private ApproveOrderService $approveOrderService;
 
-    /**
-     * @var OrderResponseFactory
-     */
-    private $orderResponseFactory;
+    private DeclineOrderService $declineOrderService;
+
+    private WaitingOrderService $waitingOrderService;
+
+    private IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification;
+
+    private OrderResponseFactory $orderResponseFactory;
 
     private function createIdentifiedOrder(CreateOrderRequest $request): OrderContainer
     {
-        $orderCreationDTO = $this->persistNewOrderService->persistFromRequest($request);
+        $orderCreationDTO = $this->orderPersistenceService->persistFromRequest($request);
         $orderContainer = $this->orderContainerFactory->createFromNewOrderDTO($orderCreationDTO);
 
         if (!$this->orderChecksRunnerService->passesPreIdentificationChecks($orderContainer)) {
-            $this->orderStateManager->decline($orderContainer);
+            $this->declineOrderService->decline($orderContainer);
 
             return $orderContainer;
         }
@@ -70,7 +58,7 @@ trait OrderCreationUseCaseTrait
         }
 
         if (!$this->orderChecksRunnerService->passesPostIdentificationChecks($orderContainer)) {
-            $this->orderStateManager->decline($orderContainer);
+            $this->declineOrderService->decline($orderContainer);
         }
 
         return $orderContainer;

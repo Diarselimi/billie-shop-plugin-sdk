@@ -15,7 +15,6 @@ use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
 use App\Application\Exception\OrderNotFoundException;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use Ozean12\Money\Money;
 use PhpSpec\ObjectBehavior;
@@ -47,7 +46,6 @@ class MarkOrderAsFraudUseCaseSpec extends ObjectBehavior
 
     public function let(
         OrderRepositoryInterface $orderRepository,
-        OrderStateManager $orderStateManager,
         OrderContainerFactory $orderContainerFactory,
         PaymentsServiceInterface $borscht,
         MarkOrderAsFraudRequest $request,
@@ -104,7 +102,6 @@ class MarkOrderAsFraudUseCaseSpec extends ObjectBehavior
         MarkOrderAsFraudRequest $request,
         OrderRepositoryInterface $orderRepository,
         OrderContainerFactory $orderContainerFactory,
-        OrderStateManager $orderStateManager,
         PaymentsServiceInterface $borscht,
         DebtorExternalDataEntity $debtorExternalData,
         OrderEntity $order,
@@ -116,8 +113,8 @@ class MarkOrderAsFraudUseCaseSpec extends ObjectBehavior
             ->willReturn($orderContainer)
         ;
 
-        $orderStateManager->isLate($order)->willReturn(true);
-        $orderStateManager->isPaidOut($order)->willReturn(true);
+        $order->isLate()->willReturn(true);
+        $order->isPaidOut()->willReturn(true);
 
         $order->setMarkedAsFraudAt(Argument::type(\DateTime::class))->shouldBeCalled();
         $orderRepository->update($order)->shouldBeCalled();
@@ -132,7 +129,6 @@ class MarkOrderAsFraudUseCaseSpec extends ObjectBehavior
     public function it_throws_fraud_reclaim_exception_if_order_is_not_late_nor_paid_out(
         MarkOrderAsFraudRequest $request,
         OrderRepositoryInterface $orderRepository,
-        OrderStateManager $orderStateManager,
         OrderContainerFactory $orderContainerFactory,
         PaymentsServiceInterface $borscht,
         DebtorExternalDataEntity $debtorExternalData,
@@ -145,8 +141,8 @@ class MarkOrderAsFraudUseCaseSpec extends ObjectBehavior
             ->willReturn($orderContainer)
         ;
 
-        $orderStateManager->isLate($order)->willReturn(false);
-        $orderStateManager->isPaidOut($order)->willReturn(false);
+        $order->isLate()->willReturn(false);
+        $order->isPaidOut()->willReturn(false);
 
         $order->setMarkedAsFraudAt(Argument::type(\DateTime::class))->shouldBeCalled();
         $orderRepository->update($order)->shouldBeCalled();
@@ -161,7 +157,6 @@ class MarkOrderAsFraudUseCaseSpec extends ObjectBehavior
     public function it_throws_fraud_reclaim_exception_if_order_delivery_address_is_same_as_debtor_address(
         MarkOrderAsFraudRequest $request,
         OrderRepositoryInterface $orderRepository,
-        OrderStateManager $orderStateManager,
         OrderContainerFactory $orderContainerFactory,
         PaymentsServiceInterface $borscht,
         DebtorExternalDataEntity $debtorExternalData,
@@ -177,8 +172,8 @@ class MarkOrderAsFraudUseCaseSpec extends ObjectBehavior
 
         $orderContainer->getDeliveryAddress()->willReturn($debtorAddress);
 
-        $orderStateManager->isLate($order)->willReturn(true);
-        $orderStateManager->isPaidOut($order)->willReturn(true);
+        $order->isLate()->willReturn(true);
+        $order->isPaidOut()->willReturn(true);
 
         $order->setMarkedAsFraudAt(Argument::type(\DateTime::class))->shouldBeCalled();
         $orderRepository->update($order)->shouldBeCalled();
@@ -193,7 +188,6 @@ class MarkOrderAsFraudUseCaseSpec extends ObjectBehavior
     public function it_throws_fraud_reclaim_exception_if_order_amount_is_less_than_the_limit_and_established_customer_is_not_null(
         MarkOrderAsFraudRequest $request,
         OrderRepositoryInterface $orderRepository,
-        OrderStateManager $orderStateManager,
         OrderContainerFactory $orderContainerFactory,
         PaymentsServiceInterface $borscht,
         DebtorExternalDataEntity $debtorExternalData,
@@ -207,10 +201,10 @@ class MarkOrderAsFraudUseCaseSpec extends ObjectBehavior
             ->willReturn($orderContainer)
         ;
 
-        $orderFinancialDetails->getAmountGross()->willReturn((new Money(MarkOrderAsFraudUseCase::ORDER_AMOUNT_LIMIT))->subtract(1000));
+        $orderFinancialDetails->getAmountGross()->willReturn((new Money(2000))->subtract(1000));
 
-        $orderStateManager->isLate($order)->willReturn(true);
-        $orderStateManager->isPaidOut($order)->willReturn(true);
+        $order->isLate()->willReturn(true);
+        $order->isPaidOut()->willReturn(true);
 
         $order->setMarkedAsFraudAt(Argument::type(\DateTime::class))->shouldBeCalled();
         $orderRepository->update($order)->shouldBeCalled();

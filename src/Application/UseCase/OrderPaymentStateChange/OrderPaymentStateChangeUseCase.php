@@ -3,31 +3,27 @@
 namespace App\Application\UseCase\OrderPaymentStateChange;
 
 use App\Application\Exception\OrderNotFoundException;
-use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
+use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\Order\OrderStateManager;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\Workflow\Exception\NotEnabledTransitionException;
+use Symfony\Component\Workflow\Registry;
 
 class OrderPaymentStateChangeUseCase implements LoggingInterface
 {
     use LoggingTrait;
 
-    private $orderRepository;
+    private OrderRepositoryInterface $orderRepository;
 
-    private $orderContainerFactory;
-
-    private $orderStateManager;
+    private Registry $workflowRegistry;
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
-        OrderContainerFactory $orderContainerFactory,
-        OrderStateManager $orderStateManager
+        Registry $workflowRegistry
     ) {
         $this->orderRepository = $orderRepository;
-        $this->orderContainerFactory = $orderContainerFactory;
-        $this->orderStateManager = $orderStateManager;
+        $this->workflowRegistry = $workflowRegistry;
     }
 
     public function execute(OrderPaymentStateChangeRequest $request)
@@ -45,16 +41,15 @@ class OrderPaymentStateChangeUseCase implements LoggingInterface
             return;
         }
 
-        $orderContainer = $this->orderContainerFactory->createFromOrderEntity($order);
-        if ($this->orderStateManager->isCanceled($order)) {
+        if ($order->isCanceled()) {
             $this->logInfo('Canceled order has been paid back by merchant');
         }
 
         try {
-            if ($orderPaymentDetails->isLate() && !$this->orderStateManager->isLate($order)) {
-                $this->orderStateManager->late($orderContainer);
+            if ($orderPaymentDetails->isLate() && !$order->isLate()) {
+                $this->workflowRegistry->get($order)->apply($order, OrderEntity::TRANSITION_LATE);
             } elseif ($orderPaymentDetails->isPaidOut()) {
-                $this->orderStateManager->payOut($orderContainer);
+                $this->workflowRegistry->get($order)->apply($order, OrderEntity::TRANSITION_PAY_OUT);
             }
         } catch (NotEnabledTransitionException $exception) {
             $this->logSuppressedException($exception, '[suppressed] State transition for order not available', [

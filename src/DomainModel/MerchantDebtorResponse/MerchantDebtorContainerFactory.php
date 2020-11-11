@@ -9,7 +9,7 @@ use App\DomainModel\DebtorLimit\DebtorLimitServiceRequestException;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
-use App\DomainModel\Order\OrderStateManager;
+use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -18,17 +18,17 @@ class MerchantDebtorContainerFactory implements LoggingInterface
 {
     use LoggingTrait;
 
-    private $merchantDebtorRepository;
+    private MerchantDebtorRepositoryInterface $merchantDebtorRepository;
 
-    private $merchantRepository;
+    private MerchantRepositoryInterface $merchantRepository;
 
-    private $paymentService;
+    private PaymentsServiceInterface $paymentService;
 
-    private $companiesService;
+    private CompaniesServiceInterface $companiesService;
 
-    private $debtorLimitService;
+    private DebtorLimitServiceInterface $debtorLimitService;
 
-    private $debtorInformationChangeRequestRepository;
+    private DebtorInformationChangeRequestRepositoryInterface $debtorInformationChangeRequestRepository;
 
     public function __construct(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
@@ -64,10 +64,10 @@ class MerchantDebtorContainerFactory implements LoggingInterface
         $paymentsDetails = $this->paymentService->getDebtorPaymentDetails($merchantDebtor->getPaymentDebtorId());
 
         $totalCreatedOrdersAmount = $this->merchantDebtorRepository
-            ->getMerchantDebtorOrdersAmountByState($merchantDebtor->getId(), OrderStateManager::STATE_CREATED);
+            ->getMerchantDebtorOrdersAmountByState($merchantDebtor->getId(), OrderEntity::STATE_CREATED);
 
         $totalLateOrdersAmount = $this->merchantDebtorRepository
-            ->getMerchantDebtorOrdersAmountByState($merchantDebtor->getId(), OrderStateManager::STATE_LATE);
+            ->getMerchantDebtorOrdersAmountByState($merchantDebtor->getId(), OrderEntity::STATE_LATE);
 
         $debtorInformationChangeRequest = $this
             ->debtorInformationChangeRequestRepository

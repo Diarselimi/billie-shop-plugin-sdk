@@ -10,7 +10,6 @@ use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderInvoice\OrderInvoiceManager;
 use App\DomainModel\ShipOrder\ShipOrderService;
 use App\Helper\Uuid\UuidGeneratorInterface;
@@ -82,7 +81,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn($orderContainer);
 
-        $order->getState()->willReturn(OrderStateManager::STATE_CREATED);
+        $order->getState()->willReturn(OrderEntity::STATE_CREATED);
         $order->getExternalCode()->shouldBeCalled()->willReturn(self::EXTERNAL_CODE);
         $order->getPaymentId()->shouldBeCalled()->willReturn(self::PAYMENT_DETAILS_ID);
         $order->setInvoiceNumber(self::INVOICE_NUMBER)
@@ -115,7 +114,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn($orderContainer);
 
-        $order->getState()->willReturn(OrderStateManager::STATE_CANCELED);
+        $order->getState()->willReturn(OrderEntity::STATE_CANCELED);
 
         $shipOrderService->validate($request, $order)->shouldBeCalledOnce()->willThrow(WorkflowException::class);
 
@@ -136,7 +135,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn($orderContainer);
 
-        $order->getState()->willReturn(OrderStateManager::STATE_CREATED);
+        $order->getState()->willReturn(OrderEntity::STATE_CREATED);
         $order->getExternalCode()->shouldBeCalled()->willReturn(self::EXTERNAL_CODE);
         $order->getPaymentId()->shouldBeCalled()->willReturn(self::PAYMENT_DETAILS_ID);
         $order->setInvoiceNumber(self::INVOICE_NUMBER)

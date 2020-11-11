@@ -3,15 +3,10 @@
 namespace App\DomainModel\OrderUpdate;
 
 use App\Application\UseCase\UpdateOrder\UpdateOrderRequest;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
-use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\Order\OrderStateManager;
-use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsFactory;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsPersistenceService;
-use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface;
 use App\DomainModel\OrderInvoice\InvoiceUploadHandlerInterface;
 use App\DomainModel\OrderInvoice\OrderInvoiceManager;
 use App\DomainModel\OrderInvoice\OrderInvoiceUploadException;
@@ -20,26 +15,23 @@ use App\DomainModel\Payment\PaymentsServiceInterface;
 
 class UpdateOrderPersistenceService
 {
-    private $paymentsService;
+    private PaymentsServiceInterface $paymentsService;
 
-    private $orderRepository;
+    private OrderRepositoryInterface $orderRepository;
 
-    private $orderStateManager;
+    private OrderInvoiceManager $invoiceManager;
 
-    private $invoiceManager;
+    private OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService;
 
-    private $financialDetailsPersistenceService;
+    private UpdateOrderLimitsService $updateOrderLimitsService;
 
-    private $updateOrderLimitsService;
+    private PaymentRequestFactory $paymentRequestFactory;
 
-    private $paymentRequestFactory;
-
-    private $updateOrderRequestValidator;
+    private UpdateOrderRequestValidator $updateOrderRequestValidator;
 
     public function __construct(
         PaymentsServiceInterface $paymentsService,
         OrderRepositoryInterface $orderRepository,
-        OrderStateManager $orderStateManager,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderInvoiceManager $invoiceManager,
         PaymentRequestFactory $paymentRequestFactory,
@@ -48,7 +40,6 @@ class UpdateOrderPersistenceService
     ) {
         $this->paymentsService = $paymentsService;
         $this->orderRepository = $orderRepository;
-        $this->orderStateManager = $orderStateManager;
         $this->financialDetailsPersistenceService = $financialDetailsPersistenceService;
         $this->invoiceManager = $invoiceManager;
         $this->paymentRequestFactory = $paymentRequestFactory;
@@ -68,7 +59,7 @@ class UpdateOrderPersistenceService
 
         // Persist only what was changed:
 
-        if ($amountChanged && !$this->orderStateManager->wasShipped($order)) {
+        if ($amountChanged && !$order->wasShipped()) {
             $this->updateOrderLimitsService->unlockLimits($orderContainer, $changeSet);
         }
 
@@ -91,7 +82,7 @@ class UpdateOrderPersistenceService
             $this->updateInvoice($order);
         }
 
-        if (($amountChanged || $invoiceChanged || $durationChanged) && $this->orderStateManager->wasShipped($order)) {
+        if (($amountChanged || $invoiceChanged || $durationChanged) && $order->wasShipped()) {
             $this->paymentsService->modifyOrder(
                 $this->paymentRequestFactory->createModifyRequestDTO($orderContainer)
             );
@@ -100,7 +91,7 @@ class UpdateOrderPersistenceService
         return $changeSet;
     }
 
-    private function updateOrder(OrderContainer $orderContainer, UpdateOrderRequest $changeSet)
+    private function updateOrder(OrderContainer $orderContainer, UpdateOrderRequest $changeSet): void
     {
         $order = $orderContainer->getOrder();
 
@@ -116,7 +107,7 @@ class UpdateOrderPersistenceService
         $this->orderRepository->update($order);
     }
 
-    private function updateInvoice(OrderEntity $order)
+    private function updateInvoice(OrderEntity $order): void
     {
         try {
             $this->invoiceManager->upload($order, InvoiceUploadHandlerInterface::EVENT_UPDATE);

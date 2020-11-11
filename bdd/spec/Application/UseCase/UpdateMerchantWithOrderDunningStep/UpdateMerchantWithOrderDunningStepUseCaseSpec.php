@@ -4,11 +4,11 @@ namespace spec\App\Application\UseCase\UpdateMerchantWithOrderDunningStep;
 
 use App\Application\UseCase\UpdateMerchantWithOrderDunningStep\UpdateMerchantWithOrderDunningStepRequest;
 use App\Application\UseCase\UpdateMerchantWithOrderDunningStep\UpdateMerchantWithOrderDunningStepUseCase;
-use App\DomainEvent\Order\OrderEventPayloadFactory;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderNotification\NotificationScheduler;
 use App\DomainModel\OrderNotification\OrderNotificationEntity;
+use App\DomainModel\OrderNotification\OrderNotificationPayloadFactory;
 use Billie\MonitoringBundle\Service\Alerting\Sentry\Raven\RavenClient;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -25,7 +25,7 @@ class UpdateMerchantWithOrderDunningStepUseCaseSpec extends ObjectBehavior
     public function let(
         OrderRepositoryInterface $orderRepository,
         NotificationScheduler $notificationScheduler,
-        OrderEventPayloadFactory $orderEventPayloadFactory,
+        OrderNotificationPayloadFactory $orderEventPayloadFactory,
         RavenClient $sentry
     ) {
         $this->beConstructedWith($orderRepository, $notificationScheduler, $orderEventPayloadFactory);
@@ -55,7 +55,7 @@ class UpdateMerchantWithOrderDunningStepUseCaseSpec extends ObjectBehavior
         OrderRepositoryInterface $orderRepository,
         NotificationScheduler $notificationScheduler,
         OrderEntity $orderEntity,
-        OrderEventPayloadFactory $orderEventPayloadFactory
+        OrderNotificationPayloadFactory $orderEventPayloadFactory
     ) {
         $request = new UpdateMerchantWithOrderDunningStepRequest(self::ORDER_UUID, 'Dunning');
 

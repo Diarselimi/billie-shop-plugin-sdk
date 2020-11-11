@@ -4,21 +4,27 @@ namespace App\Application\UseCase\DeclineOrder;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\WorkflowException;
+use App\DomainModel\Order\Lifecycle\DeclineOrderService;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
-use App\DomainModel\Order\OrderStateManager;
+use App\DomainModel\Order\OrderEntity;
+use Symfony\Component\Workflow\Registry;
 
 class DeclineOrderUseCase
 {
-    private $orderStateManager;
+    private Registry $workflowRegistry;
 
-    private $orderContainerFactory;
+    private DeclineOrderService $declineOrderService;
+
+    private OrderContainerFactory $orderContainerFactory;
 
     public function __construct(
-        OrderStateManager $orderStateManager,
+        Registry $workflowRegistry,
+        DeclineOrderService $declineOrderService,
         OrderContainerFactory $orderManagerFactory
     ) {
-        $this->orderStateManager = $orderStateManager;
+        $this->workflowRegistry = $workflowRegistry;
+        $this->declineOrderService = $declineOrderService;
         $this->orderContainerFactory = $orderManagerFactory;
     }
 
@@ -32,10 +38,10 @@ class DeclineOrderUseCase
 
         $order = $orderContainer->getOrder();
 
-        if (!$this->orderStateManager->can($order, OrderStateManager::TRANSITION_DECLINE)) {
+        if (!$this->workflowRegistry->get($order)->can($order, OrderEntity::TRANSITION_DECLINE)) {
             throw new WorkflowException('Cannot decline the order. Order is in \'' . $order->getState() . '\' state.');
         }
 
-        $this->orderStateManager->decline($orderContainer);
+        $this->declineOrderService->decline($orderContainer);
     }
 }

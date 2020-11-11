@@ -7,7 +7,7 @@ use App\Helper\Uuid\UuidGeneratorInterface;
 
 class OrderEntityFactory
 {
-    private $uuidGenerator;
+    private UuidGeneratorInterface $uuidGenerator;
 
     public function __construct(UuidGeneratorInterface $uuidGenerator)
     {
@@ -21,10 +21,11 @@ class OrderEntityFactory
             ->setExternalComment($request->getComment())
             ->setExternalCode($request->getExternalCode())
             ->setMerchantId($request->getMerchantId())
-            ->setState(OrderStateManager::STATE_NEW)
+            ->setState(OrderEntity::STATE_NEW)
             ->setUuid($this->uuidGenerator->uuid4())
             ->setCheckoutSessionId($request->getCheckoutSessionId())
             ->setCreationSource($request->getCreationSource())
+            ->setWorkflowName($request->getWorkflowName())
         ;
     }
 
@@ -54,6 +55,7 @@ class OrderEntityFactory
             ->setCheckoutSessionId($row['checkout_session_id'])
             ->setCreationSource($row['creation_source'])
             ->setCompanyBillingAddressUuid($row['company_billing_address_uuid'])
+            ->setWorkflowName($row['workflow_name'])
         ;
     }
 }

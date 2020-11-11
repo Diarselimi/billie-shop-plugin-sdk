@@ -4,8 +4,8 @@ namespace App\Application\UseCase\OrderOutstandingAmountChange;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\WorkflowException;
-use App\DomainEvent\Order\OrderEventPayloadFactory;
 use App\DomainModel\OrderNotification\OrderNotificationEntity;
+use App\DomainModel\OrderNotification\OrderNotificationPayloadFactory;
 use App\DomainModel\Payment\OrderAmountChangeDTO;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
@@ -13,50 +13,45 @@ use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsException;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
-use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderNotification\NotificationScheduler;
-use App\DomainModel\OrderPayment\OrderPaymentForgivenessService;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Ozean12\Money\Money;
+use Symfony\Component\Workflow\Registry;
 
 class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 {
     use LoggingTrait;
 
-    private $merchantRepository;
+    private MerchantRepositoryInterface $merchantRepository;
 
-    private $orderContainerFactory;
+    private OrderContainerFactory $orderContainerFactory;
 
-    private $notificationScheduler;
+    private NotificationScheduler $notificationScheduler;
 
-    private $limitsService;
+    private MerchantDebtorLimitsService $limitsService;
 
-    private $paymentForgivenessService;
+    private Registry $workflowRegistry;
 
-    private $orderStateManager;
-
-    private $orderEventPayloadFactory;
+    private OrderNotificationPayloadFactory $orderEventPayloadFactory;
 
     public function __construct(
         OrderContainerFactory $orderContainerFactory,
         MerchantRepositoryInterface $merchantRepository,
         NotificationScheduler $notificationScheduler,
         MerchantDebtorLimitsService $limitsService,
-        OrderPaymentForgivenessService $paymentForgivenessService,
-        OrderStateManager $orderStateManager,
-        OrderEventPayloadFactory $orderEventPayloadFactory
+        Registry $workflowRegistry,
+        OrderNotificationPayloadFactory $orderEventPayloadFactory
     ) {
         $this->orderContainerFactory = $orderContainerFactory;
         $this->merchantRepository = $merchantRepository;
         $this->notificationScheduler = $notificationScheduler;
         $this->limitsService = $limitsService;
-        $this->paymentForgivenessService = $paymentForgivenessService;
-        $this->orderStateManager = $orderStateManager;
+        $this->workflowRegistry = $workflowRegistry;
         $this->orderEventPayloadFactory = $orderEventPayloadFactory;
     }
 
-    public function execute(OrderOutstandingAmountChangeRequest $request)
+    public function execute(OrderOutstandingAmountChangeRequest $request): void
     {
         $amountChange = $request->getOrderAmountChangeDetails();
 
@@ -74,7 +69,7 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 
         $order = $orderContainer->getOrder();
 
-        if (!$this->orderStateManager->wasShipped($order) && !$this->orderStateManager->isCanceled($order)) {
+        if (!$order->wasShipped() && !$order->isCanceled()) {
             $this->logSuppressedException(
                 new WorkflowException('Order amount change not possible'),
                 '[suppressed] Outstanding amount change not possible for order {order_id}',
@@ -83,20 +78,6 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
                     'state' => $order->getState(),
                 ]
             );
-
-            return;
-        }
-
-        /**
-         * This check is deprecated and will be removed, no Money refactoring needed
-         * @deprecated
-         */
-        if ($order->getAmountForgiven() > 0 && $amountChange->getOutstandingAmount() > 0) {
-            $this->logInfo("Order {id} has been already forgiven by a total of {number}. Current outstanding amount is {count}.", [
-                LoggingInterface::KEY_ID => $order->getId(),
-                LoggingInterface::KEY_NUMBER => $order->getAmountForgiven(),
-                LoggingInterface::KEY_COUNT => $amountChange->getOutstandingAmount(),
-            ]);
 
             return;
         }
@@ -120,19 +101,8 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 
         $this->scheduleMerchantNotification($order, $amountChange);
 
-        if ($this->paymentForgivenessService->begForgiveness($orderContainer, $amountChange)) {
-            $this->logInfo(
-                "Order {id} outstanding amount of {count} will be forgiven and paid by the merchant {number}",
-                [
-                    LoggingInterface::KEY_ID => $order->getId(),
-                    LoggingInterface::KEY_COUNT => $amountChange->getOutstandingAmount(),
-                    LoggingInterface::KEY_NUMBER => $merchant->getId(),
-                ]
-            );
-        }
-
-        if ($amountChange->getOutstandingAmount() <= 0 && !$this->orderStateManager->isCanceled($order)) {
-            $this->orderStateManager->complete($orderContainer);
+        if ($amountChange->getOutstandingAmount() <= 0 && !$order->isCanceled()) {
+            $this->workflowRegistry->get($order)->apply($order, OrderEntity::TRANSITION_COMPLETE);
         }
     }
 

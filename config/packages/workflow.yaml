@@ -1,11 +1,11 @@
 framework:
   workflows:
-    order:
+    order_v1:
       type: state_machine
       marking_store:
         type: method
         property: state
-      supports: App\DomainModel\Order\OrderEntity
+      support_strategy: App\DomainModel\Order\Workflow\OrderWorkflowSupportsStrategy
       places:
         - new
         - waiting
@@ -51,6 +51,55 @@ framework:
           to: canceled
         cancel_shipped:
           from: [shipped, paid_out, late]
+          to: canceled
+        authorize:
+          from: [new]
+          to: authorized
+
+    order_v2:
+      type: state_machine
+      marking_store:
+        type: method
+        property: state
+      support_strategy: App\DomainModel\Order\Workflow\OrderWorkflowSupportsStrategy
+      places:
+        - new
+        - waiting
+        - created
+        - declined
+        - partially_shipped
+        - shipped
+        - complete
+        - canceled
+        - pre_waiting
+        - authorized
+      transitions:
+        pre_waiting:
+          from: new
+          to: pre_waiting
+        waiting:
+          from: [new, pre_waiting]
+          to: waiting
+        create:
+          from: [new, waiting, authorized]
+          to: created
+        decline:
+          from: [new, waiting, authorized, pre_waiting]
+          to: declined
+        ship_partially:
+          from: created
+          to: partially_shipped
+        ship_fully:
+          from: [created, partially_shipped]
+          to: shipped
+        complete:
+          from: shipped
+          to: complete
+        cancel:
+          from: [new, created, shipped, partially_shipped]
+          to: canceled
+        cancel_waiting:
+          from: [waiting]
           to: canceled
         authorize:
           from: [new]

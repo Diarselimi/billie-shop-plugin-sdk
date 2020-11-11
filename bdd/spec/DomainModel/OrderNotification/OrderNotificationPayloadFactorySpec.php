@@ -1,6 +1,6 @@
 <?php
 
-namespace spec\App\DomainEvent\Order;
+namespace spec\App\DomainModel\OrderNotification;
 
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderNotification\OrderNotificationEntity;
@@ -8,7 +8,7 @@ use App\Support\DateFormat;
 use PhpSpec\ObjectBehavior;
 use Webmozart\Assert\Assert;
 
-class OrderEventPayloadFactorySpec extends ObjectBehavior
+class OrderNotificationPayloadFactorySpec extends ObjectBehavior
 {
     public function let(
         OrderEntity $order

@@ -18,7 +18,7 @@ use OpenApi\Annotations as OA;
  *     schema="OrderState",
  *     title="Order State",
  *     type="string",
- *     enum=\App\DomainModel\Order\OrderStateManager::ALL_STATES,
+ *     enum=\App\DomainModel\Order\OrderEntity::ALL_STATES,
  *     example="created"
  * )
  */

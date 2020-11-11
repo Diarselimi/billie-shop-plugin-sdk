@@ -13,15 +13,17 @@ use Symfony\Component\HttpFoundation\Request;
 
 class CreateOrderRequestFactory
 {
-    private $addressRequestFactory;
+    private const DEFAULT_WORKFLOW = OrderEntity::WORKFLOW_NAME_V1;
 
-    private $debtorRequestFactory;
+    private AddressRequestFactory $addressRequestFactory;
 
-    private $debtorPersonRequestFactory;
+    private DebtorRequestFactory $debtorRequestFactory;
 
-    private $lineItemsRequestFactory;
+    private DebtorPersonRequestFactory $debtorPersonRequestFactory;
 
-    private $amountRequestFactory;
+    private OrderLineItemsRequestFactory $lineItemsRequestFactory;
+
+    private AmountRequestFactory $amountRequestFactory;
 
     public function __construct(
         DebtorRequestFactory $debtorRequestFactory,
@@ -46,6 +48,7 @@ class CreateOrderRequestFactory
                 HttpConstantsInterface::REQUEST_ATTRIBUTE_CREATION_SOURCE,
                 OrderEntity::CREATION_SOURCE_API
             ))
+            ->setWorkflowName($request->attributes->get('workflow_name', self::DEFAULT_WORKFLOW))
             ->setMerchantId($request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID))
             ->setDuration($request->request->getInt('duration'))
             ->setComment($request->request->get('comment'))

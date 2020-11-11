@@ -4,7 +4,6 @@ namespace spec\App\Application\UseCase\OrderOutstandingAmountChange;
 
 use App\Application\UseCase\OrderOutstandingAmountChange\OrderOutstandingAmountChangeRequest;
 use App\Application\UseCase\OrderOutstandingAmountChange\OrderOutstandingAmountChangeUseCase;
-use App\DomainEvent\Order\OrderEventPayloadFactory;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
@@ -12,16 +11,17 @@ use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderNotification\NotificationScheduler;
 use App\DomainModel\OrderNotification\OrderNotificationEntity;
-use App\DomainModel\OrderPayment\OrderPaymentForgivenessService;
+use App\DomainModel\OrderNotification\OrderNotificationPayloadFactory;
 use App\DomainModel\Payment\OrderAmountChangeDTO;
 use Billie\MonitoringBundle\Service\Alerting\Sentry\Raven\RavenClient;
 use Ozean12\Money\Money;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Workflow\Registry;
+use Symfony\Component\Workflow\Workflow;
 
 class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
 {
@@ -39,9 +39,9 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         MerchantRepositoryInterface $merchantRepository,
         NotificationScheduler $notificationScheduler,
         MerchantDebtorLimitsService $limitsService,
-        OrderPaymentForgivenessService $paymentForgivenessService,
-        OrderStateManager $orderStateManager,
-        OrderEventPayloadFactory $orderEventPayloadFactory,
+        Registry $workflowRegistry,
+        OrderNotificationPayloadFactory $orderEventPayloadFactory,
+        Workflow $workflow,
         OrderContainer $orderContainer,
         OrderEntity $order,
         OrderAmountChangeDTO $amountChange,
@@ -55,6 +55,8 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         $order->getId()->willReturn(1);
         $order->getExternalCode()->willReturn('ABCD123');
 
+        $workflowRegistry->get($order)->willReturn($workflow);
+
         $amountChange->getId()->willReturn(self::TICKET_ID);
         $amountChange->getAmountChange()->willReturn(self::AMOUNT_CHANGE);
         $amountChange->getOutstandingAmount()->willReturn(25);
@@ -66,14 +68,13 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         MerchantRepositoryInterface $merchantRepository,
         NotificationScheduler $notificationScheduler,
         MerchantDebtorLimitsService $limitsService,
-        OrderPaymentForgivenessService $paymentForgivenessService,
-        OrderStateManager $orderStateManager,
+        Workflow $workflow,
         MerchantEntity $merchant,
         OrderEntity $order,
         OrderAmountChangeDTO $amountChange,
         OrderContainer $orderContainer,
         OrderOutstandingAmountChangeRequest $request,
-        OrderEventPayloadFactory $orderEventPayloadFactory
+        OrderNotificationPayloadFactory $orderEventPayloadFactory
     ) {
         $amountChange->isPayment()->shouldBeCalledOnce()->willReturn(true);
         $amountChange->getIban()->willReturn('DE123');
@@ -99,7 +100,6 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
             ]
         )->willReturn($eventPayload);
 
-        $order->getAmountForgiven()->shouldBeCalledOnce()->willReturn(0);
         $orderContainerFactory
             ->createFromPaymentId(self::TICKET_ID)
             ->shouldBeCalled()
@@ -119,9 +119,8 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
             ->shouldBeCalledOnce()
             ->willReturn(true);
 
-        $paymentForgivenessService->begForgiveness($orderContainer, $amountChange)->shouldBeCalledOnce()->willReturn(true);
-        $orderStateManager->wasShipped($order)->shouldBeCalledOnce()->willReturn(true);
-        $orderStateManager->complete($orderContainer)->shouldNotBeCalled();
+        $order->wasShipped()->shouldBeCalledOnce()->willReturn(true);
+        $workflow->apply($order, OrderEntity::TRANSITION_COMPLETE)->shouldNotBeCalled();
 
         $request->getOrderAmountChangeDetails()->willReturn($amountChange);
         $this->execute($request);
@@ -132,14 +131,13 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         MerchantRepositoryInterface $merchantRepository,
         NotificationScheduler $notificationScheduler,
         MerchantDebtorLimitsService $limitsService,
-        OrderPaymentForgivenessService $paymentForgivenessService,
-        OrderStateManager $orderStateManager,
+        Workflow $workflow,
         MerchantEntity $merchant,
         OrderEntity $order,
         OrderAmountChangeDTO $amountChange,
         OrderContainer $orderContainer,
         OrderOutstandingAmountChangeRequest $request,
-        OrderEventPayloadFactory $orderEventPayloadFactory
+        OrderNotificationPayloadFactory $orderEventPayloadFactory
     ) {
         $orderContainerFactory
             ->createFromPaymentId(self::TICKET_ID)
@@ -170,14 +168,13 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
             ]
         )->willReturn($eventPayload);
 
-        $order->getAmountForgiven()->shouldBeCalledOnce()->willReturn(0);
         $orderContainer->getMerchant()->shouldBeCalledOnce()->willReturn($merchant);
 
         $limitsService->unlock($orderContainer, new Money(25))->shouldBeCalledOnce();
         $merchantRepository->update($merchant)->shouldBeCalledOnce();
 
-        $orderStateManager->wasShipped($order)->shouldBeCalledOnce()->willReturn(true);
-        $orderStateManager->isCanceled($order)->shouldBeCalledOnce()->willReturn(false);
+        $order->wasShipped()->shouldBeCalledOnce()->willReturn(true);
+        $order->isCanceled()->shouldBeCalledOnce()->willReturn(false);
 
         $notificationScheduler
             ->createAndSchedule(
@@ -188,8 +185,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
             ->shouldBeCalledOnce()
             ->willReturn(true);
 
-        $paymentForgivenessService->begForgiveness($orderContainer, $amountChange)->shouldBeCalledOnce()->willReturn(true);
-        $orderStateManager->complete($orderContainer)->shouldBeCalledOnce();
+        $workflow->apply($order, OrderEntity::TRANSITION_COMPLETE)->shouldBeCalledOnce();
 
         $request->getOrderAmountChangeDetails()->willReturn($amountChange);
         $this->execute($request);
@@ -200,8 +196,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         MerchantRepositoryInterface $merchantRepository,
         NotificationScheduler $notificationScheduler,
         MerchantDebtorLimitsService $limitsService,
-        OrderPaymentForgivenessService $paymentForgivenessService,
-        OrderStateManager $orderStateManager,
+        Workflow $workflow,
         OrderAmountChangeDTO $amountChange,
         OrderContainer $orderContainer,
         OrderEntity $order,
@@ -213,15 +208,15 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
             ->willReturn($orderContainer);
 
         $order->getState()->willReturn('complete');
-        $orderStateManager->wasShipped($order)->shouldBeCalledOnce()->willReturn(false);
-        $orderStateManager->isCanceled($order)->shouldBeCalledOnce()->willReturn(false);
+
+        $order->wasShipped()->shouldBeCalledOnce()->willReturn(false);
+        $order->isCanceled()->shouldBeCalledOnce()->willReturn(false);
 
         $limitsService->unlock($orderContainer, new Money(self::AMOUNT_CHANGE))->shouldNotBeCalled();
         $merchantRepository->update($orderContainer->getMerchant())->shouldNotBeCalled();
 
         $notificationScheduler->createAndSchedule(Argument::any(), Argument::any())->shouldNotBeCalled();
-        $paymentForgivenessService->begForgiveness($orderContainer, $amountChange)->shouldNotBeCalled();
-        $orderStateManager->complete($orderContainer)->shouldNotBeCalled();
+        $workflow->apply($order, OrderEntity::TRANSITION_COMPLETE)->shouldNotBeCalled();
 
         $request->getOrderAmountChangeDetails()->willReturn($amountChange);
         $this->execute($request);
@@ -232,10 +227,10 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         MerchantRepositoryInterface $merchantRepository,
         NotificationScheduler $notificationScheduler,
         MerchantDebtorLimitsService $limitsService,
-        OrderPaymentForgivenessService $paymentForgivenessService,
-        OrderStateManager $orderStateManager,
+        Workflow $workflow,
         OrderAmountChangeDTO $amountChange,
         OrderContainer $orderContainer,
+        OrderEntity $order,
         OrderOutstandingAmountChangeRequest $request
     ) {
         $orderContainerFactory
@@ -247,40 +242,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         $merchantRepository->update($orderContainer->getMerchant())->shouldNotBeCalled();
 
         $notificationScheduler->createAndSchedule(Argument::any(), Argument::any())->shouldNotBeCalled();
-        $paymentForgivenessService->begForgiveness($orderContainer, $amountChange)->shouldNotBeCalled();
-        $orderStateManager->complete($orderContainer)->shouldNotBeCalled();
-
-        $request->getOrderAmountChangeDetails()->willReturn($amountChange);
-        $this->execute($request);
-    }
-
-    public function it_should_not_schedule_event_if_amount_forgiven_greater_than_zero(
-        OrderContainerFactory $orderContainerFactory,
-        MerchantRepositoryInterface $merchantRepository,
-        NotificationScheduler $notificationScheduler,
-        MerchantDebtorLimitsService $limitsService,
-        OrderPaymentForgivenessService $paymentForgivenessService,
-        OrderStateManager $orderStateManager,
-        OrderEntity $order,
-        OrderAmountChangeDTO $amountChange,
-        OrderContainer $orderContainer,
-        OrderOutstandingAmountChangeRequest $request
-    ) {
-        $orderContainerFactory
-            ->createFromPaymentId(self::TICKET_ID)
-            ->shouldBeCalled()
-            ->willReturn($orderContainer);
-
-        $order->getAmountForgiven()->shouldBeCalledTimes(2)->willReturn(0.01);
-
-        $limitsService->unlock($orderContainer, new Money(self::AMOUNT_CHANGE))->shouldNotBeCalled();
-        $merchantRepository->update($orderContainer->getMerchant())->shouldNotBeCalled();
-
-        $notificationScheduler->createAndSchedule(Argument::any(), Argument::any())->shouldNotBeCalled();
-        $paymentForgivenessService->begForgiveness($order, $amountChange)->shouldNotBeCalled();
-
-        $orderStateManager->wasShipped($order)->shouldBeCalledOnce()->willReturn(true);
-        $orderStateManager->complete($orderContainer)->shouldNotBeCalled();
+        $workflow->apply($order, OrderEntity::TRANSITION_COMPLETE)->shouldNotBeCalled();
 
         $request->getOrderAmountChangeDetails()->willReturn($amountChange);
         $this->execute($request);
@@ -291,8 +253,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         MerchantRepositoryInterface $merchantRepository,
         NotificationScheduler $notificationScheduler,
         MerchantDebtorLimitsService $limitsService,
-        OrderPaymentForgivenessService $paymentForgivenessService,
-        OrderStateManager $orderStateManager,
+        Workflow $workflow,
         MerchantEntity $merchant,
         OrderEntity $order,
         OrderAmountChangeDTO $amountChange,
@@ -309,16 +270,13 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
 
         $orderContainer->getMerchant()->shouldBeCalledOnce()->willReturn($merchant);
 
-        $order->getAmountForgiven()->shouldBeCalledOnce()->willReturn(0);
-
         $limitsService->unlock($orderContainer, Argument::any())->shouldNotBeCalled();
         $merchantRepository->update($merchant)->shouldBeCalledOnce();
 
         $notificationScheduler->createAndSchedule(Argument::any(), Argument::any())->shouldNotBeCalled();
-        $paymentForgivenessService->begForgiveness($order, $amountChange)->shouldNotBeCalled();
 
-        $orderStateManager->wasShipped($order)->shouldBeCalledOnce()->willReturn(true);
-        $orderStateManager->complete($orderContainer)->shouldNotBeCalled();
+        $order->wasShipped()->shouldBeCalledOnce()->willReturn(true);
+        $workflow->apply($order, OrderEntity::TRANSITION_COMPLETE)->shouldNotBeCalled();
 
         $request->getOrderAmountChangeDetails()->willReturn($amountChange);
         $this->execute($request);

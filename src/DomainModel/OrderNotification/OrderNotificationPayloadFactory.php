@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\DomainEvent\Order;
+namespace App\DomainModel\OrderNotification;
 
 use App\DomainModel\Order\OrderEntity;
 use App\Support\DateFormat;
 
-class OrderEventPayloadFactory
+class OrderNotificationPayloadFactory
 {
     public function create(OrderEntity $order, string $notificationType, array $extraPayload = []): array
     {

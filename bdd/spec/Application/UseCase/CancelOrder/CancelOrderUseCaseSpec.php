@@ -13,11 +13,11 @@ use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\Workflow;
 
 /**
@@ -32,12 +32,12 @@ class CancelOrderUseCaseSpec extends ObjectBehavior
     private const MERCHANT_ID = 14;
 
     public function let(
-        Workflow $orderWorkflow,
         MerchantDebtorLimitsService $limitsService,
         PaymentsServiceInterface $paymentsService,
         OrderContainerFactory $orderContainerFactory,
         MerchantRepositoryInterface $merchantRepository,
-        OrderStateManager $orderStateManager,
+        Registry $workflowRegistry,
+        Workflow $workflow,
         LoggerInterface $logger,
         CancelOrderRequest $request,
         OrderContainer $orderContainer,
@@ -48,6 +48,8 @@ class CancelOrderUseCaseSpec extends ObjectBehavior
 
         $request->getOrderId()->willReturn(self::ORDER_UUID);
         $request->getMerchantId()->willReturn(self::MERCHANT_ID);
+
+        $workflowRegistry->get($order)->willReturn($workflow);
 
         $orderContainer->getOrder()->willReturn($order);
         $order->getId()->willReturn(self::ORDER_ID);
@@ -102,7 +104,7 @@ class CancelOrderUseCaseSpec extends ObjectBehavior
         PaymentsServiceInterface $paymentsService,
         OrderContainerFactory $orderContainerFactory,
         CancelOrderRequest $request,
-        Workflow $orderWorkflow,
+        Workflow $workflow,
         OrderEntity $order,
         OrderContainer $orderContainer
     ) {
@@ -118,7 +120,7 @@ class CancelOrderUseCaseSpec extends ObjectBehavior
             ->willReturn(null)
         ;
 
-        $orderWorkflow
+        $workflow
             ->can($order, Argument::any())
             ->shouldBeCalled()
             ->willReturn(false)
@@ -135,8 +137,7 @@ class CancelOrderUseCaseSpec extends ObjectBehavior
         PaymentsServiceInterface $paymentsService,
         OrderContainerFactory $orderContainerFactory,
         CancelOrderRequest $request,
-        Workflow $orderWorkflow,
-        OrderStateManager $orderStateManager,
+        Workflow $workflow,
         OrderEntity $order,
         OrderContainer $orderContainer
     ) {
@@ -152,19 +153,19 @@ class CancelOrderUseCaseSpec extends ObjectBehavior
             ->willReturn(null)
         ;
 
-        $orderWorkflow
+        $workflow
             ->can($order, 'cancel')
             ->shouldBeCalledOnce()
             ->willReturn(false)
         ;
 
-        $orderWorkflow
+        $workflow
             ->can($order, 'cancel_shipped')
             ->shouldBeCalledOnce()
             ->willReturn(false)
         ;
 
-        $orderWorkflow
+        $workflow
             ->can($order, 'cancel_waiting')
             ->shouldBeCalledOnce()
             ->willReturn(true)
@@ -172,7 +173,7 @@ class CancelOrderUseCaseSpec extends ObjectBehavior
 
         $limitsService->unlock($orderContainer)->shouldNotBeCalled();
         $paymentsService->cancelOrder($order)->shouldNotBeCalled();
-        $orderStateManager->cancelWaiting($orderContainer)->shouldBeCalledOnce();
+        $workflow->apply($order, OrderEntity::TRANSITION_CANCEL_WAITING)->shouldBeCalledOnce();
 
         $this->execute($request);
     }

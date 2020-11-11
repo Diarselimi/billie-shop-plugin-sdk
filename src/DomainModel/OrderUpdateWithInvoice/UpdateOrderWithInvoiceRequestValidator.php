@@ -6,23 +6,23 @@ namespace App\DomainModel\OrderUpdateWithInvoice;
 
 use App\Application\UseCase\UpdateOrderWithInvoice\UpdateOrderWithInvoiceRequest;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
-use App\DomainModel\Order\OrderStateManager;
+use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderUpdate\UpdateOrderAmountValidator;
 use App\DomainModel\OrderUpdate\UpdateOrderInvoiceNumberValidator;
 
 class UpdateOrderWithInvoiceRequestValidator
 {
     private const ORDER_UPDATE_ALLOWED_STATES = [
-        OrderStateManager::STATE_CREATED,
-        OrderStateManager::STATE_WAITING,
-        OrderStateManager::STATE_SHIPPED,
-        OrderStateManager::STATE_PAID_OUT,
-        OrderStateManager::STATE_LATE,
+        OrderEntity::STATE_CREATED,
+        OrderEntity::STATE_WAITING,
+        OrderEntity::STATE_SHIPPED,
+        OrderEntity::STATE_PAID_OUT,
+        OrderEntity::STATE_LATE,
     ];
 
-    private $amountValidator;
+    private UpdateOrderAmountValidator $amountValidator;
 
-    private $invoiceNumberValidator;
+    private UpdateOrderInvoiceNumberValidator $invoiceNumberValidator;
 
     public function __construct(
         UpdateOrderAmountValidator $amountValidator,

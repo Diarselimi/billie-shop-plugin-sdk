@@ -34,8 +34,6 @@ interface OrderRepositoryInterface
 
     public function debtorHasAtLeastOneFullyPaidOrder(string $companyUuid): bool;
 
-    public function merchantDebtorHasAtLeastOneApprovedOrder(int $merchantDebtorId): bool;
-
     public function countOrdersByState(int $merchantDebtorId): OrderStateCounterDTO;
 
     /**

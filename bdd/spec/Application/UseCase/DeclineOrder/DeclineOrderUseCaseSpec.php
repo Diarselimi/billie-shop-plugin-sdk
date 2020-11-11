@@ -6,25 +6,31 @@ use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\DeclineOrder\DeclineOrderRequest;
 use App\Application\UseCase\DeclineOrder\DeclineOrderUseCase;
+use App\DomainModel\Order\Lifecycle\DeclineOrderService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderStateManager;
 use PhpSpec\ObjectBehavior;
+use Symfony\Component\Workflow\Registry;
+use Symfony\Component\Workflow\Workflow;
 
 class DeclineOrderUseCaseSpec extends ObjectBehavior
 {
     private const ORDER_UUID = 'test-order-uuid';
 
     public function let(
-        OrderStateManager $orderStateManager,
+        Registry $workflowRegistry,
+        DeclineOrderService $declineOrderService,
         OrderContainerFactory $orderContainerFactory,
+        Workflow $workflow,
         OrderContainer $orderContainer,
         OrderEntity $order,
         DeclineOrderRequest $request
     ) {
         $this->beConstructedWith(...func_get_args());
+
+        $workflowRegistry->get($order)->willReturn($workflow);
 
         $orderContainer->getOrder()->willReturn($order);
         $request->getUuid()->willReturn(self::ORDER_UUID);
@@ -51,7 +57,7 @@ class DeclineOrderUseCaseSpec extends ObjectBehavior
     public function it_throws_exception_if_transition_not_supported(
         OrderContainerFactory $orderContainerFactory,
         DeclineOrderRequest $request,
-        OrderStateManager $orderStateManager,
+        Workflow $workflow,
         OrderEntity $order,
         OrderContainer $orderContainer
     ) {
@@ -61,8 +67,8 @@ class DeclineOrderUseCaseSpec extends ObjectBehavior
             ->willReturn($orderContainer)
         ;
 
-        $orderStateManager
-            ->can($order, OrderStateManager::TRANSITION_DECLINE)
+        $workflow
+            ->can($order, OrderEntity::TRANSITION_DECLINE)
             ->shouldBeCalled()
             ->willReturn(false)
         ;
@@ -73,7 +79,8 @@ class DeclineOrderUseCaseSpec extends ObjectBehavior
     public function it_successfully_declines_if_transition_is_supported(
         OrderContainerFactory $orderContainerFactory,
         DeclineOrderRequest $request,
-        OrderStateManager $orderStateManager,
+        DeclineOrderService $declineOrderService,
+        Workflow $workflow,
         OrderEntity $order,
         OrderContainer $orderContainer
     ) {
@@ -83,13 +90,13 @@ class DeclineOrderUseCaseSpec extends ObjectBehavior
             ->willReturn($orderContainer)
         ;
 
-        $orderStateManager
-            ->can($order, OrderStateManager::TRANSITION_DECLINE)
+        $workflow
+            ->can($order, OrderEntity::TRANSITION_DECLINE)
             ->shouldBeCalled()
             ->willReturn(true)
         ;
 
-        $orderStateManager->decline($orderContainer)->shouldBeCalledOnce();
+        $declineOrderService->decline($orderContainer)->shouldBeCalledOnce();
         $this->execute($request);
     }
 }

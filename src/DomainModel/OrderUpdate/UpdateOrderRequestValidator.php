@@ -4,7 +4,7 @@ namespace App\DomainModel\OrderUpdate;
 
 use App\Application\UseCase\UpdateOrder\UpdateOrderRequest;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
-use App\DomainModel\Order\OrderStateManager;
+use App\DomainModel\Order\OrderEntity;
 
 /**
  * Validates an UpdateOrderRequest together with the associated order data
@@ -12,22 +12,22 @@ use App\DomainModel\Order\OrderStateManager;
 class UpdateOrderRequestValidator
 {
     private const ORDER_UPDATE_ALLOWED_STATES = [
-        OrderStateManager::STATE_SHIPPED,
-        OrderStateManager::STATE_PAID_OUT,
-        OrderStateManager::STATE_LATE,
-        OrderStateManager::STATE_WAITING,
-        OrderStateManager::STATE_CREATED,
+        OrderEntity::STATE_SHIPPED,
+        OrderEntity::STATE_PAID_OUT,
+        OrderEntity::STATE_LATE,
+        OrderEntity::STATE_WAITING,
+        OrderEntity::STATE_CREATED,
     ];
 
-    private $amountValidator;
+    private UpdateOrderAmountValidator $amountValidator;
 
-    private $durationValidator;
+    private UpdateOrderDurationValidator $durationValidator;
 
-    private $externalCodeValidator;
+    private UpdateOrderExternalCodeValidator $externalCodeValidator;
 
-    private $invoiceNumberValidator;
+    private UpdateOrderInvoiceNumberValidator $invoiceNumberValidator;
 
-    private $invoiceUrlValidator;
+    private UpdateOrderInvoiceUrlValidator $invoiceUrlValidator;
 
     public function __construct(
         UpdateOrderAmountValidator $amountValidator,

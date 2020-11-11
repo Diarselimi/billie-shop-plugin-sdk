@@ -89,6 +89,8 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
 
     private $creationSource;
 
+    private $workflowName;
+
     /**
      * @Assert\Valid()
      */
@@ -201,7 +203,7 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
         return $this->checkoutSessionId;
     }
 
-    public function setCheckoutSessionId(?int $checkoutSessionId)
+    public function setCheckoutSessionId(?int $checkoutSessionId): CreateOrderRequest
     {
         $this->checkoutSessionId = $checkoutSessionId;
 
@@ -213,9 +215,21 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
         return $this->creationSource;
     }
 
-    public function setCreationSource(string $creationSource)
+    public function setCreationSource(string $creationSource): CreateOrderRequest
     {
         $this->creationSource = $creationSource;
+
+        return $this;
+    }
+
+    public function getWorkflowName(): string
+    {
+        return $this->workflowName;
+    }
+
+    public function setWorkflowName(string $workflowName): CreateOrderRequest
+    {
+        $this->workflowName = $workflowName;
 
         return $this;
     }

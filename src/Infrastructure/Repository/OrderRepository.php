@@ -6,7 +6,6 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderEntityFactory;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateCounterDTO;
-use App\DomainModel\Order\OrderStateManager;
 use Billie\MonitoringBundle\Service\RidProvider;
 use Billie\PdoBundle\DomainModel\StatefulEntity\StatefulEntityRepositoryInterface;
 use Billie\PdoBundle\DomainModel\StatefulEntity\StatefulEntityRepositoryTrait;
@@ -38,6 +37,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
         'debtor_person_id',
         'debtor_external_data_id',
         'payment_id',
+        'workflow_name',
         'created_at',
         'updated_at',
         'shipped_at',
@@ -47,9 +47,9 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
         'creation_source',
     ];
 
-    private $orderFactory;
+    private OrderEntityFactory $orderFactory;
 
-    private $ridProvider;
+    private RidProvider $ridProvider;
 
     public function __construct(OrderEntityFactory $orderFactory, RidProvider $ridProvider)
     {
@@ -77,6 +77,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
               merchant_debtor_id,
               payment_id,
               checkout_session_id, 
+              workflow_name,
               uuid, 
               rid, 
               company_billing_address_uuid,
@@ -99,6 +100,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
               :merchant_debtor_id,
               :payment_id, 
               :checkout_session_id,
+              :workflow_name,
               :uuid, 
               :rid,
               :company_billing_address_uuid,
@@ -123,6 +125,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
             'uuid' => $order->getUuid(),
             'rid' => $this->ridProvider->getRid(),
             'checkout_session_id' => $order->getCheckoutSessionId(),
+            'workflow_name' => $order->getWorkflowName(),
             'created_at' => $order->getCreatedAt()->format(self::DATE_FORMAT),
             'updated_at' => $order->getUpdatedAt()->format(self::DATE_FORMAT),
             'merchant_debtor_id' => $order->getMerchantDebtorId(),
@@ -312,7 +315,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
             [
                 'current_time' => time(),
                 'company_uuid' => $companyUuid,
-                'state' => OrderStateManager::STATE_LATE,
+                'state' => OrderEntity::STATE_LATE,
             ]
         );
 
@@ -327,29 +330,8 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
               WHERE state = :state
               AND orders.merchant_debtor_id IN (SELECT id FROM merchants_debtors WHERE company_uuid = :company_uuid)',
             [
-                'state' => OrderStateManager::STATE_COMPLETE,
+                'state' => OrderEntity::STATE_COMPLETE,
                 'company_uuid' => $companyUuid,
-            ]
-        );
-
-        if (!$result) {
-            return false;
-        }
-
-        return $result['total'] > 0;
-    }
-
-    public function merchantDebtorHasAtLeastOneApprovedOrder(int $merchantDebtorId): bool
-    {
-        $result = $this->doFetchOne(
-            'SELECT COUNT(id) as total
-              FROM ' . self::TABLE_NAME . '
-              WHERE state NOT IN (:state_new, :state_declined)
-              AND orders.merchant_debtor_id = :merchant_debtor_id',
-            [
-                'state_new' => OrderStateManager::STATE_NEW,
-                'state_declined' => OrderStateManager::STATE_DECLINED,
-                'merchant_debtor_id' => $merchantDebtorId,
             ]
         );
 
@@ -438,7 +420,7 @@ SQL;
     {
         $states = array_map(function ($state) {
             return "'{$state}'";
-        }, [OrderStateManager::STATE_PRE_WAITING, OrderStateManager::STATE_AUTHORIZED]);
+        }, [OrderEntity::STATE_PRE_WAITING, OrderEntity::STATE_AUTHORIZED]);
 
         $sql = 'SELECT orders.' . implode(', orders.', self::SELECT_FIELDS) . ' FROM orders
             INNER JOIN checkout_sessions ch ON ch.id = orders.checkout_session_id
@@ -469,7 +451,7 @@ SQL;
             return false;
         }
 
-        return intval($result['total']);
+        return (int) $result['total'];
     }
 
     public function getOrdersCountByCompanyBillingAddressAndState(string $companyUuid, string $addressUuid, string $state): int
@@ -489,7 +471,7 @@ SQL;
             return 0;
         }
 
-        return intval($result['total']);
+        return (int) $result['total'];
     }
 
     public function search(
@@ -516,7 +498,7 @@ SQL;
 
         $query .= ' WHERE orders.merchant_id = :merchant_id AND state != :state_new';
         $queryParameters['merchant_id'] = $merchantId;
-        $queryParameters['state_new'] = OrderStateManager::STATE_NEW;
+        $queryParameters['state_new'] = OrderEntity::STATE_NEW;
 
         if ($searchString) {
             $query .= ' AND (orders.external_code LIKE :search OR orders.uuid LIKE :search OR orders.invoice_number LIKE :search )';

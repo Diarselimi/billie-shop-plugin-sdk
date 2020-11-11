@@ -4,47 +4,43 @@ namespace App\Application\UseCase\CancelOrder;
 
 use App\Application\Exception\FraudOrderException;
 use App\Application\Exception\OrderNotFoundException;
+use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsException;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
-use App\DomainModel\Order\OrderStateManager;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
-use Symfony\Component\Workflow\Workflow;
+use Symfony\Component\Workflow\Registry;
 
 class CancelOrderUseCase implements LoggingInterface
 {
     use LoggingTrait;
 
-    private $limitsService;
+    private MerchantDebtorLimitsService $limitsService;
 
-    private $paymentsService;
+    private PaymentsServiceInterface $paymentsService;
 
-    private $workflow;
+    private OrderContainerFactory $orderContainerFactory;
 
-    private $orderContainerFactory;
+    private MerchantRepositoryInterface $merchantRepository;
 
-    private $merchantRepository;
-
-    private $orderStateManager;
+    private Registry $workflowRegistry;
 
     public function __construct(
-        Workflow $orderWorkflow,
         MerchantDebtorLimitsService $limitsService,
         PaymentsServiceInterface $paymentsService,
         OrderContainerFactory $orderContainerFactory,
         MerchantRepositoryInterface $merchantRepository,
-        OrderStateManager $orderStateManager
+        Registry $workflowRegistry
     ) {
-        $this->workflow = $orderWorkflow;
         $this->limitsService = $limitsService;
         $this->paymentsService = $paymentsService;
         $this->orderContainerFactory = $orderContainerFactory;
         $this->merchantRepository = $merchantRepository;
-        $this->orderStateManager = $orderStateManager;
+        $this->workflowRegistry = $workflowRegistry;
     }
 
     public function execute(CancelOrderRequest $request): void
@@ -59,12 +55,13 @@ class CancelOrderUseCase implements LoggingInterface
         }
 
         $order = $orderContainer->getOrder();
+        $workflow = $this->workflowRegistry->get($order);
 
         if ($order->getMarkedAsFraudAt()) {
             throw new FraudOrderException();
         }
 
-        if ($this->workflow->can($order, OrderStateManager::TRANSITION_CANCEL)) {
+        if ($workflow->can($order, OrderEntity::TRANSITION_CANCEL)) {
             $this->logInfo('Cancel order {id}', [LoggingInterface::KEY_ID => $order->getId()]);
 
             $orderContainer->getMerchant()->increaseFinancingLimit(
@@ -78,16 +75,16 @@ class CancelOrderUseCase implements LoggingInterface
                 throw new LimitUnlockException("Limits cannot be unlocked for merchant #{$orderContainer->getMerchantDebtor()->getId()}");
             }
 
-            $this->orderStateManager->cancel($orderContainer);
-        } elseif ($this->workflow->can($order, OrderStateManager::TRANSITION_CANCEL_SHIPPED)) {
+            $workflow->apply($order, OrderEntity::TRANSITION_CANCEL);
+        } elseif ($workflow->can($order, OrderEntity::TRANSITION_CANCEL_SHIPPED)) {
             $this->logInfo('Cancel shipped order {id}', [LoggingInterface::KEY_ID => $order->getId()]);
 
             $this->paymentsService->cancelOrder($order);
-            $this->orderStateManager->cancelShipped($orderContainer);
-        } elseif ($this->workflow->can($order, OrderStateManager::TRANSITION_CANCEL_WAITING)) {
+            $workflow->apply($order, OrderEntity::TRANSITION_CANCEL_SHIPPED);
+        } elseif ($workflow->can($order, OrderEntity::TRANSITION_CANCEL_WAITING)) {
             $this->logInfo('Cancel waiting order {id}', [LoggingInterface::KEY_ID => $order->getId()]);
 
-            $this->orderStateManager->cancelWaiting($orderContainer);
+            $workflow->apply($order, OrderEntity::TRANSITION_CANCEL_WAITING);
         } else {
             throw new CancelOrderException("Order #{$request->getOrderId()} can not be cancelled");
         }

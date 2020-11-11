@@ -9,7 +9,6 @@ use App\DomainModel\DebtorCompany\IdentifiedDebtorCompany;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderRiskCheck\CheckResultCollection;
 use App\DomainModel\Payment\OrderPaymentDetailsDTO;
 use App\DomainModel\Payment\PaymentsServiceInterface;
@@ -17,23 +16,19 @@ use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
 
 class OrderResponseFactory
 {
-    private $companiesService;
+    private CompaniesServiceInterface $companiesService;
 
-    private $paymentsService;
+    private PaymentsServiceInterface $paymentsService;
 
-    private $orderStateManager;
-
-    private $declinedReasonsMapper;
+    private OrderDeclinedReasonsMapper $declinedReasonsMapper;
 
     public function __construct(
         CompaniesServiceInterface $companiesService,
         PaymentsServiceInterface $paymentsService,
-        OrderStateManager $orderStateManager,
         OrderDeclinedReasonsMapper $declinedReasonsMapper
     ) {
         $this->companiesService = $companiesService;
         $this->paymentsService = $paymentsService;
-        $this->orderStateManager = $orderStateManager;
         $this->declinedReasonsMapper = $declinedReasonsMapper;
     }
 
@@ -61,7 +56,7 @@ class OrderResponseFactory
             $this->addInvoiceData($orderContainer, $response);
         }
 
-        if ($this->orderStateManager->isLate($order)) {
+        if ($order->isLate()) {
             $response->setDunningStatus($orderContainer->getDunningStatus());
         }
 
@@ -172,10 +167,7 @@ class OrderResponseFactory
 
     private function addPaymentData(OrderContainer $orderContainer, OrderResponse $response)
     {
-        if (
-            $this->orderStateManager->isDeclined($orderContainer->getOrder())
-            || $this->orderStateManager->isWaiting($orderContainer->getOrder())
-        ) {
+        if ($orderContainer->getOrder()->isDeclined() || $orderContainer->getOrder()->isWaiting()) {
             return;
         }
 
@@ -211,7 +203,7 @@ class OrderResponseFactory
         $response = $this->addReasons($orderContainer->getRiskCheckResultCollection(), $response);
         $response->setDebtorCompanySuggestion($orderContainer->getMostSimilarCandidateDTO());
 
-        $statesAccepted = [OrderStateManager::STATE_AUTHORIZED, OrderStateManager::STATE_PRE_WAITING];
+        $statesAccepted = [OrderEntity::STATE_AUTHORIZED, OrderEntity::STATE_PRE_WAITING];
         if (in_array($order->getState(), $statesAccepted, true)) {
             if ($orderContainer->getIdentifiedDebtorCompany()->getIdentificationType() === IdentifiedDebtorCompany::IDENTIFIED_BY_COMPANY_ADDRESS) {
                 $identifiedAddress = $orderContainer->getIdentifiedDebtorCompany()->getAddress();

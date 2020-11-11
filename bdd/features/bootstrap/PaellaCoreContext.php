@@ -348,7 +348,8 @@ class PaellaCoreContext extends MinkContext
         $comment,
         $paymentUuid = null,
         $checkoutSession = null,
-        string $creationSource = OrderEntity::CREATION_SOURCE_API
+        string $creationSource = OrderEntity::CREATION_SOURCE_API,
+        string $workflowName = OrderEntity::WORKFLOW_NAME_V1
     ) {
         [$person, $deliveryAddress, $debtor, $merchantDebtor] = $this->debtorData ?? $this->iHaveADebtorWithoutOrders();
 
@@ -366,7 +367,9 @@ class PaellaCoreContext extends MinkContext
             ->setCreatedAt(new \DateTime('2019-05-20 13:00:00'))
             ->setUuid('test-order-uuid' . $externalCode)
             ->setCompanyBillingAddressUuid('c7be46c0-e049-4312-b274-258ec5aeeb71')
-            ->setCreationSource($creationSource);
+            ->setCreationSource($creationSource)
+            ->setWorkflowName($workflowName)
+        ;
 
         if ($checkoutSession) {
             $checkoutSession = $this->iHaveASessionId(
@@ -460,6 +463,25 @@ class PaellaCoreContext extends MinkContext
                 'Order is in %s state, but %s was expected.',
                 $order->getState(),
                 $state
+            ));
+        }
+    }
+
+    /**
+     * @Given the order :orderId workflow name is :workflow_name
+     */
+    public function orderWorkflowNameIs($orderId, $workflowName)
+    {
+        $order = $this->getOrderRepository()->getOneByExternalCodeAndMerchantId($orderId, $this->merchant->getId());
+        if ($order === null) {
+            throw new \RuntimeException('Order not found by Behat in ' . __METHOD__ . ':' . __LINE__);
+        }
+
+        if ($order->getWorkflowName() !== $workflowName) {
+            throw new \RuntimeException(sprintf(
+                'Order workflow name is %s, but %s was expected.',
+                $order->getWorkflowName(),
+                $workflowName
             ));
         }
     }

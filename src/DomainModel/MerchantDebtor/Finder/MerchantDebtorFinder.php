@@ -8,7 +8,7 @@ use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRegistrationService;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
-use App\DomainModel\Order\OrderStateManager;
+use App\DomainModel\Order\OrderEntity;
 use App\Support\DateFormat;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -53,7 +53,7 @@ class MerchantDebtorFinder implements LoggingInterface
         $merchantDebtor = $this->merchantDebtorRepository->getOneByExternalIdAndMerchantId(
             $debtorExternalData->getMerchantExternalId(),
             $merchantId,
-            [OrderStateManager::STATE_NEW, OrderStateManager::STATE_DECLINED]
+            [OrderEntity::STATE_NEW, OrderEntity::STATE_DECLINED]
         );
 
         if ($merchantDebtor) {
@@ -72,7 +72,7 @@ class MerchantDebtorFinder implements LoggingInterface
                     $debtorExternalData->getMerchantExternalId(),
                     $merchantId,
                     $debtorExternalData->getId(),
-                    OrderStateManager::STATE_DECLINED,
+                    OrderEntity::STATE_DECLINED,
                     self::DEBTOR_HASH_MAX_MINUTES
                 );
 

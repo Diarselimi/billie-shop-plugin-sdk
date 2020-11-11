@@ -10,38 +10,27 @@ use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Payment\PaymentRequestFactory;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\Order\OrderStateManager;
 
 class ConfirmOrderPaymentUseCase implements ValidatedUseCaseInterface
 {
     use ValidatedUseCaseTrait;
 
-    private $orderRepository;
+    private OrderRepositoryInterface $orderRepository;
 
-    private $paymentService;
+    private PaymentsServiceInterface $paymentService;
 
-    private $orderStateManager;
-
-    private $paymentRequestFactory;
+    private PaymentRequestFactory $paymentRequestFactory;
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         PaymentsServiceInterface $paymentService,
-        OrderStateManager $orderStateManager,
         PaymentRequestFactory $paymentRequestFactory
     ) {
         $this->orderRepository = $orderRepository;
         $this->paymentService = $paymentService;
-        $this->orderStateManager = $orderStateManager;
         $this->paymentRequestFactory = $paymentRequestFactory;
     }
 
-    /**
-     * @param  ConfirmOrderPaymentRequest   $request
-     * @throws FraudOrderException
-     * @throws OrderNotFoundException
-     * @throws PaymentOrderConfirmException
-     */
     public function execute(ConfirmOrderPaymentRequest $request): void
     {
         $this->validateRequest($request);
@@ -56,7 +45,7 @@ class ConfirmOrderPaymentUseCase implements ValidatedUseCaseInterface
             throw new FraudOrderException();
         }
 
-        if ($this->orderStateManager->wasShipped($order)) {
+        if ($order->wasShipped()) {
             $requestDTO = $this->paymentRequestFactory->createConfirmRequestDTO($order, $request->getAmount());
 
             $this->paymentService->confirmPayment($requestDTO);

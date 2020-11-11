@@ -6,7 +6,6 @@ use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\Order\SalesforceInterface;
 use App\Infrastructure\Salesforce\Exception\SalesforceException;
 use App\Infrastructure\Salesforce\Exception\SalesforcePauseDunningException;
@@ -17,20 +16,16 @@ class PauseOrderDunningUseCase implements ValidatedUseCaseInterface, LoggingInte
 {
     use ValidatedUseCaseTrait, LoggingTrait;
 
-    private $orderRepository;
+    private OrderRepositoryInterface $orderRepository;
 
-    private $salesforce;
-
-    private $orderStateManager;
+    private SalesforceInterface $salesforce;
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
-        SalesforceInterface $salesforce,
-        OrderStateManager $orderStateManager
+        SalesforceInterface $salesforce
     ) {
         $this->orderRepository = $orderRepository;
         $this->salesforce = $salesforce;
-        $this->orderStateManager = $orderStateManager;
     }
 
     public function execute(PauseOrderDunningRequest $request): void
@@ -43,7 +38,7 @@ class PauseOrderDunningUseCase implements ValidatedUseCaseInterface, LoggingInte
             throw new OrderNotFoundException();
         }
 
-        if (!$this->orderStateManager->isLate($order)) {
+        if (!$order->isLate()) {
             throw new PauseOrderDunningException('Cannot pause dunning. Order is not in state late');
         }
 

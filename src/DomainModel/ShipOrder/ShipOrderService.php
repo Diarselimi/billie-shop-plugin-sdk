@@ -10,44 +10,42 @@ use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderPayment\OrderPaymentService;
 use App\DomainModel\OrderResponse\OrderResponse;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
 use App\DomainModel\Payment\PaymentsServiceRequestException;
+use Symfony\Component\Workflow\Registry;
 
 class ShipOrderService implements ValidatedUseCaseInterface
 {
     use ValidatedUseCaseTrait;
 
-    private $uuidGenerator;
+    private Registry $workflowRegistry;
 
-    private $orderStateManager;
+    private OrderResponseFactory $orderResponseFactory;
 
-    private $orderResponseFactory;
+    private OrderRepositoryInterface $orderRepository;
 
-    private $orderRepository;
-
-    private $orderPaymentService;
+    private OrderPaymentService $orderPaymentService;
 
     public function __construct(
-        OrderStateManager $orderStateManager,
+        Registry $workflowRegistry,
         OrderResponseFactory $orderResponseFactory,
         OrderRepositoryInterface $orderRepository,
         OrderPaymentService $orderPaymentService
     ) {
-        $this->orderStateManager = $orderStateManager;
+        $this->workflowRegistry = $workflowRegistry;
         $this->orderResponseFactory = $orderResponseFactory;
         $this->orderRepository = $orderRepository;
         $this->orderPaymentService = $orderPaymentService;
     }
 
-    public function validate(AbstractShipOrderRequest $request, OrderEntity $order)
+    public function validate(AbstractShipOrderRequest $request, OrderEntity $order): void
     {
         $validationGroups = $order->getExternalCode() ? ['Default'] : ['Default', 'RequiredExternalCode'];
         $this->validateRequest($request, null, $validationGroups);
 
-        if (!$this->orderStateManager->can($order, OrderStateManager::TRANSITION_SHIP)) {
+        if (!$this->workflowRegistry->get($order)->can($order, OrderEntity::TRANSITION_SHIP)) {
             throw new WorkflowException("Order state '{$order->getState()}' does not support shipment");
         }
     }
@@ -61,9 +59,9 @@ class ShipOrderService implements ValidatedUseCaseInterface
             $orderContainer->setPaymentDetails($paymentDetails);
 
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     public function shipOrder(OrderContainer $orderContainer, bool $shippedInPayments): OrderResponse
@@ -78,7 +76,8 @@ class ShipOrderService implements ValidatedUseCaseInterface
             }
         }
 
-        $this->orderStateManager->ship($orderContainer);
+        $order = $orderContainer->getOrder();
+        $this->workflowRegistry->get($order)->apply($order, OrderEntity::TRANSITION_SHIP);
 
         return $this->orderResponseFactory->create($orderContainer);
     }

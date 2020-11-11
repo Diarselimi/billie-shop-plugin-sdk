@@ -46,7 +46,7 @@ class GetOrdersRequest implements ValidatedRequestInterface, PaginationAwareInte
      *             @Assert\Uuid()
      *         },
      *         "state" = {
-     *             @Assert\Choice(choices=\App\DomainModel\Order\OrderStateManager::ALL_STATES, multiple=true, min=1)
+     *             @Assert\Choice(choices=\App\DomainModel\Order\OrderEntity::ALL_STATES, multiple=true, min=1)
      *         }
      *     },
      *     allowMissingFields = true

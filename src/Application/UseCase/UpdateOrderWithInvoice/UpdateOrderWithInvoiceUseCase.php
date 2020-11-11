@@ -9,11 +9,9 @@ use App\Application\Exception\OrderBeingCollectedException;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
-use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\Order\SalesforceInterface;
 use App\DomainModel\OrderInvoice\OrderInvoiceManager;
 use App\DomainModel\OrderUpdateWithInvoice\UpdateOrderWithInvoicePersistenceService;
@@ -24,28 +22,24 @@ class UpdateOrderWithInvoiceUseCase implements LoggingInterface, ValidatedUseCas
 {
     use LoggingTrait, ValidatedUseCaseTrait;
 
-    private $orderContainerFactory;
+    private OrderContainerFactory $orderContainerFactory;
 
-    private $updateOrderWithInvoicePersistenceService;
+    private UpdateOrderWithInvoicePersistenceService $updateOrderWithInvoicePersistenceService;
 
-    private $invoiceManager;
+    private OrderInvoiceManager $invoiceManager;
 
-    private $salesforce;
-
-    private $orderStateManager;
+    private SalesforceInterface $salesforce;
 
     public function __construct(
         OrderContainerFactory $orderContainerFactory,
         UpdateOrderWithInvoicePersistenceService $updateOrderWithInvoicePersistenceService,
         OrderInvoiceManager $invoiceManager,
-        SalesforceInterface $salesforce,
-        OrderStateManager $orderStateManager
+        SalesforceInterface $salesforce
     ) {
         $this->orderContainerFactory = $orderContainerFactory;
         $this->updateOrderWithInvoicePersistenceService = $updateOrderWithInvoicePersistenceService;
         $this->invoiceManager = $invoiceManager;
         $this->salesforce = $salesforce;
-        $this->orderStateManager = $orderStateManager;
     }
 
     public function execute(UpdateOrderWithInvoiceRequest $request): void
@@ -63,7 +57,7 @@ class UpdateOrderWithInvoiceUseCase implements LoggingInterface, ValidatedUseCas
             throw new OrderNotFoundException($exception);
         }
 
-        if ($this->isOrderAfterShipment($orderContainer)) {
+        if ($orderContainer->getOrder()->wasShipped()) {
             $this->validateRequest($request, null, ['InvoiceNumber']);
 
             if ($request->getInvoiceNumber() !== $order->getInvoiceNumber()) {
@@ -84,7 +78,7 @@ class UpdateOrderWithInvoiceUseCase implements LoggingInterface, ValidatedUseCas
             $request
         );
 
-        if ($this->isOrderAfterShipment($orderContainer) && $request->getInvoiceFile()) {
+        if ($request->getInvoiceFile() !== null && $orderContainer->getOrder()->wasShipped()) {
             $this->invoiceManager->uploadInvoiceFile(
                 $order,
                 $request->getInvoiceFile()
@@ -97,20 +91,12 @@ class UpdateOrderWithInvoiceUseCase implements LoggingInterface, ValidatedUseCas
         ]);
     }
 
-    private function isOrderAfterShipment(OrderContainer $orderContainer): bool
-    {
-        return in_array(
-            $orderContainer->getOrder()->getState(),
-            [OrderStateManager::STATE_SHIPPED, OrderStateManager::STATE_PAID_OUT, OrderStateManager::STATE_LATE]
-        );
-    }
-
     private function isOrderLateAndInCollections(OrderEntity $order): bool
     {
-        if (!$this->orderStateManager->isLate($order)) {
+        if (!$order->isLate()) {
             return false;
         }
 
-        return null !== $this->salesforce->getOrderCollectionsStatus($order->getUuid());
+        return $this->salesforce->getOrderCollectionsStatus($order->getUuid()) !== null;
     }
 }

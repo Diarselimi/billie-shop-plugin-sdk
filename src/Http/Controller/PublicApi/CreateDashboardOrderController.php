@@ -7,12 +7,10 @@ namespace App\Http\Controller\PublicApi;
 use App\Application\UseCase\CreateOrder\CreateOrderUseCase;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderResponse\OrderResponse;
-use App\DomainModel\OrderResponse\OrderResponseFactory;
 use App\Http\HttpConstantsInterface;
 use App\Http\RequestTransformer\CreateOrder\CreateOrderRequestFactory;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -42,20 +40,16 @@ class CreateDashboardOrderController
 {
     private const DEFAULT_LEGAL_FORM = '99999';
 
-    private $createOrderUseCase;
+    private CreateOrderUseCase $createOrderUseCase;
 
-    private $orderRequestFactory;
-
-    private $orderResponseFactory;
+    private CreateOrderRequestFactory $orderRequestFactory;
 
     public function __construct(
         CreateOrderUseCase $createOrderUseCase,
-        CreateOrderRequestFactory $orderRequestFactory,
-        OrderResponseFactory $orderResponseFactory
+        CreateOrderRequestFactory $orderRequestFactory
     ) {
         $this->createOrderUseCase = $createOrderUseCase;
         $this->orderRequestFactory = $orderRequestFactory;
-        $this->orderResponseFactory = $orderResponseFactory;
     }
 
     public function execute(Request $request): OrderResponse

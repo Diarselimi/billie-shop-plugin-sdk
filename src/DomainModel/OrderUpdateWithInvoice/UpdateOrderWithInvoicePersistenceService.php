@@ -7,7 +7,6 @@ namespace App\DomainModel\OrderUpdateWithInvoice;
 use App\Application\UseCase\UpdateOrderWithInvoice\UpdateOrderWithInvoiceRequest;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsPersistenceService;
 use App\DomainModel\OrderUpdate\UpdateOrderLimitsService;
 use App\DomainModel\Payment\PaymentRequestFactory;
@@ -15,23 +14,20 @@ use App\DomainModel\Payment\PaymentsServiceInterface;
 
 class UpdateOrderWithInvoicePersistenceService
 {
-    private $paymentsService;
+    private PaymentsServiceInterface $paymentsService;
 
-    private $orderStateManager;
+    private PaymentRequestFactory $paymentRequestFactory;
 
-    private $paymentRequestFactory;
+    private UpdateOrderWithInvoiceRequestValidator $updateOrderWithInvoiceRequestValidator;
 
-    private $updateOrderWithInvoiceRequestValidator;
+    private OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService;
 
-    private $financialDetailsPersistenceService;
+    private UpdateOrderLimitsService $updateOrderLimitsService;
 
-    private $updateOrderLimitsService;
-
-    private $orderRepository;
+    private OrderRepositoryInterface $orderRepository;
 
     public function __construct(
         PaymentsServiceInterface $paymentsService,
-        OrderStateManager $orderStateManager,
         PaymentRequestFactory $paymentRequestFactory,
         UpdateOrderWithInvoiceRequestValidator $updateOrderWithInvoiceRequestValidator,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
@@ -39,7 +35,6 @@ class UpdateOrderWithInvoicePersistenceService
         OrderRepositoryInterface $orderRepository
     ) {
         $this->paymentsService = $paymentsService;
-        $this->orderStateManager = $orderStateManager;
         $this->paymentRequestFactory = $paymentRequestFactory;
         $this->updateOrderWithInvoiceRequestValidator = $updateOrderWithInvoiceRequestValidator;
         $this->financialDetailsPersistenceService = $financialDetailsPersistenceService;
@@ -60,7 +55,7 @@ class UpdateOrderWithInvoicePersistenceService
         $amountChanged = $changeSet->getAmount() !== null;
         $invoiceNumberChanged = $changeSet->getInvoiceNumber() !== null;
 
-        if ($amountChanged && !$this->orderStateManager->wasShipped($order)) {
+        if ($amountChanged && !$order->wasShipped()) {
             $this->updateOrderLimitsService->unlockLimits($orderContainer, $changeSet);
         }
 
@@ -77,7 +72,7 @@ class UpdateOrderWithInvoicePersistenceService
             $this->orderRepository->update($order);
         }
 
-        if (($amountChanged || $invoiceNumberChanged) && $this->orderStateManager->wasShipped($order)) {
+        if (($amountChanged || $invoiceNumberChanged) && $order->wasShipped()) {
             $this->paymentsService->modifyOrder(
                 $this->paymentRequestFactory->createModifyRequestDTO($orderContainer)
             );

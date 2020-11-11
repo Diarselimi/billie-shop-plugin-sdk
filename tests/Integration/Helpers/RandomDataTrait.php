@@ -73,7 +73,8 @@ trait RandomDataTrait
             ->setMerchantId($merchantId)
             ->setPaymentId(Uuid::uuid4()->toString())
             ->setUuid(Uuid::uuid4()->toString())
-            ->setCreationSource(OrderEntity::CREATION_SOURCE_API);
+            ->setCreationSource(OrderEntity::CREATION_SOURCE_API)
+            ->setWorkflowName(OrderEntity::WORKFLOW_NAME_V1);
     }
 
     private function getRandomAddress(): AddressEntity

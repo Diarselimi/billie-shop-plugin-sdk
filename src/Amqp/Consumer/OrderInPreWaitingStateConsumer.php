@@ -2,12 +2,12 @@
 
 namespace App\Amqp\Consumer;
 
-use App\DomainModel\Order\OrderStateManager;
+use App\DomainModel\Order\OrderEntity;
 
 class OrderInPreWaitingStateConsumer extends AbstractOrderDeclineByStateConsumer
 {
     protected function getTargetedStates(): array
     {
-        return [OrderStateManager::STATE_PRE_WAITING];
+        return [OrderEntity::STATE_PRE_WAITING];
     }
 }

@@ -6,15 +6,11 @@ use App\Application\UseCase\UpdateOrder\UpdateOrderRequest;
 use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
-use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
-use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsFactory;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsPersistenceService;
-use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface;
 use App\DomainModel\OrderInvoice\InvoiceUploadHandlerInterface;
 use App\DomainModel\OrderInvoice\OrderInvoiceManager;
 use App\DomainModel\OrderInvoice\OrderInvoiceUploadException;
@@ -39,18 +35,25 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
     public function let(
         PaymentsServiceInterface $paymentsService,
         OrderRepositoryInterface $orderRepository,
-        OrderStateManager $orderStateManager,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderInvoiceManager $invoiceManager,
         PaymentRequestFactory $paymentRequestFactory,
         UpdateOrderLimitsService $updateOrderLimitsService,
-        UpdateOrderRequestValidator $updateOrderRequestValidator
+        UpdateOrderRequestValidator $updateOrderRequestValidator,
+        OrderContainer $orderContainer,
+        OrderEntity $order
     ) {
         $this->beConstructedWith(...func_get_args());
+
+        $orderContainer->getOrder()->willReturn($order);
+        $order->setInvoiceNumber(Argument::any())->willReturn($order);
+        $order->setInvoiceUrl(Argument::any())->willReturn($order);
+        $order->setExternalCode(Argument::any())->willReturn($order);
     }
 
     public function it_updates_amount_but_not_limits_if_order_was_shipped(
         OrderContainer $orderContainer,
+        OrderEntity $order,
         UpdateOrderRequest $request,
         UpdateOrderRequestValidator $updateOrderRequestValidator,
         UpdateOrderLimitsService $updateOrderLimitsService,
@@ -59,7 +62,6 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
         OrderInvoiceManager $invoiceManager,
-        OrderStateManager $orderStateManager,
         PaymentRequestFactory $paymentRequestFactory,
         PaymentsServiceInterface $paymentsService
     ) {
@@ -86,9 +88,6 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
             ->setOrderId(1);
 
         $grossDiff = new Money(50);
-        $order = new OrderEntity();
-
-        $orderContainer->getOrder()->shouldBeCalled()->willReturn($order);
         $updateOrderRequestValidator->getValidatedRequest($orderContainer, $request)->shouldBeCalled()->willReturn($changeSet);
         $orderContainer->getOrderFinancialDetails()->shouldBeCalled()->willReturn($orderFinancialDetails);
         $orderContainer->getMerchant()->shouldNotBeCalled();
@@ -112,7 +111,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         $invoiceManager->upload(Argument::any(), Argument::any())->shouldNotBeCalled();
 
         // calls payments service
-        $orderStateManager->wasShipped($order)->shouldBeCalled()->willReturn(true);
+        $order->wasShipped()->shouldBeCalled()->willReturn(true);
         $paymentsModifyRequest = new ModifyRequestDTO();
         $paymentRequestFactory->createModifyRequestDTO($orderContainer)->shouldBeCalled()->willReturn($paymentsModifyRequest);
         $paymentsService->modifyOrder($paymentsModifyRequest)->shouldBeCalled();
@@ -123,13 +122,13 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
 
     public function it_updates_amount_and_limits_if_order_was_not_shipped(
         OrderContainer $orderContainer,
+        OrderEntity $order,
         UpdateOrderRequest $request,
         UpdateOrderRequestValidator $updateOrderRequestValidator,
         UpdateOrderLimitsService $updateOrderLimitsService,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
         OrderInvoiceManager $invoiceManager,
-        OrderStateManager $orderStateManager,
         PaymentRequestFactory $paymentRequestFactory,
         PaymentsServiceInterface $paymentsService
     ) {
@@ -149,9 +148,6 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
             ->setDuration(30)
             ->setOrderId(1);
 
-        $order = new OrderEntity();
-
-        $orderContainer->getOrder()->shouldBeCalled()->willReturn($order);
         $updateOrderRequestValidator->getValidatedRequest($orderContainer, $request)->shouldBeCalled()->willReturn($changeSet);
         $orderContainer->getOrderFinancialDetails()->shouldBeCalled()->willReturn($orderFinancialDetails);
 
@@ -170,7 +166,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         $invoiceManager->upload(Argument::any(), Argument::any())->shouldNotBeCalled();
 
         // should NOT call payments service
-        $orderStateManager->wasShipped($order)->shouldBeCalled()->willReturn(false);
+        $order->wasShipped()->shouldBeCalled()->willReturn(false);
         $paymentRequestFactory->createModifyRequestDTO(Argument::any())->shouldNotBeCalled();
         $paymentsService->modifyOrder(Argument::any())->shouldNotBeCalled();
 
@@ -180,13 +176,13 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
 
     public function it_updates_duration(
         OrderContainer $orderContainer,
+        OrderEntity $order,
         UpdateOrderRequest $request,
         UpdateOrderRequestValidator $updateOrderRequestValidator,
         UpdateOrderLimitsService $updateOrderLimitsService,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
         OrderInvoiceManager $invoiceManager,
-        OrderStateManager $orderStateManager,
         PaymentRequestFactory $paymentRequestFactory,
         PaymentsServiceInterface $paymentsService
     ) {
@@ -198,9 +194,6 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
             ->setDuration(60)
             ->setOrderId(1);
 
-        $order = new OrderEntity();
-
-        $orderContainer->getOrder()->shouldBeCalled()->willReturn($order);
         $updateOrderRequestValidator->getValidatedRequest($orderContainer, $request)->shouldBeCalled()->willReturn($changeSet);
 
         // it does NOT unlock limits
@@ -218,7 +211,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         $invoiceManager->upload(Argument::any(), Argument::any())->shouldNotBeCalled();
 
         // calls payments service
-        $orderStateManager->wasShipped($order)->shouldBeCalled()->willReturn(true);
+        $order->wasShipped()->shouldBeCalled()->willReturn(true);
         $paymentsModifyRequest = new ModifyRequestDTO();
         $paymentRequestFactory->createModifyRequestDTO($orderContainer)->shouldBeCalled()->willReturn($paymentsModifyRequest);
         $paymentsService->modifyOrder($paymentsModifyRequest)->shouldBeCalled();
@@ -229,20 +222,17 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
 
     public function it_updates_invoice(
         OrderContainer $orderContainer,
+        OrderEntity $order,
         UpdateOrderRequest $request,
         UpdateOrderRequestValidator $updateOrderRequestValidator,
         UpdateOrderLimitsService $updateOrderLimitsService,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
         OrderInvoiceManager $invoiceManager,
-        OrderStateManager $orderStateManager,
         PaymentRequestFactory $paymentRequestFactory,
         PaymentsServiceInterface $paymentsService
     ) {
         $changeSet = (new UpdateOrderRequest('order123', 1))->setInvoiceNumber('foobar')->setInvoiceUrl('foobar.pdf');
-        $order = new OrderEntity();
-
-        $orderContainer->getOrder()->shouldBeCalled()->willReturn($order);
         $updateOrderRequestValidator->getValidatedRequest($orderContainer, $request)->shouldBeCalled()->willReturn($changeSet);
 
         // it does NOT unlock limits
@@ -258,7 +248,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         $invoiceManager->upload($order, InvoiceUploadHandlerInterface::EVENT_UPDATE)->shouldBeCalled();
 
         // calls payments service
-        $orderStateManager->wasShipped($order)->shouldBeCalled()->willReturn(true);
+        $order->wasShipped()->shouldBeCalled()->willReturn(true);
         $paymentsModifyRequest = new ModifyRequestDTO();
         $paymentRequestFactory->createModifyRequestDTO($orderContainer)->shouldBeCalled()->willReturn($paymentsModifyRequest);
         $paymentsService->modifyOrder($paymentsModifyRequest)->shouldBeCalled();
@@ -269,20 +259,18 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
 
     public function it_updates_external_code(
         OrderContainer $orderContainer,
+        OrderEntity $order,
         UpdateOrderRequest $request,
         UpdateOrderRequestValidator $updateOrderRequestValidator,
         UpdateOrderLimitsService $updateOrderLimitsService,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
         OrderInvoiceManager $invoiceManager,
-        OrderStateManager $orderStateManager,
         PaymentRequestFactory $paymentRequestFactory,
         PaymentsServiceInterface $paymentsService
     ) {
         $changeSet = (new UpdateOrderRequest('order123', 1))->setExternalCode('foobar001');
-        $order = new OrderEntity();
 
-        $orderContainer->getOrder()->shouldBeCalled()->willReturn($order);
         $updateOrderRequestValidator->getValidatedRequest($orderContainer, $request)->shouldBeCalled()->willReturn($changeSet);
 
         // it does NOT unlock limits
@@ -300,7 +288,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         $invoiceManager->upload(Argument::any(), Argument::any())->shouldNotBeCalled();
 
         // it does not call payments service
-        $orderStateManager->wasShipped(Argument::any())->shouldNotBeCalled();
+        $order->wasShipped()->shouldNotBeCalled();
         $paymentRequestFactory->createModifyRequestDTO(Argument::any())->shouldNotBeCalled();
         $paymentsService->modifyOrder(Argument::any())->shouldNotBeCalled();
 
@@ -316,12 +304,11 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
         OrderInvoiceManager $invoiceManager,
-        OrderStateManager $orderStateManager,
+        OrderEntity $order,
         PaymentRequestFactory $paymentRequestFactory,
         PaymentsServiceInterface $paymentsService
     ) {
         $changeSet = (new UpdateOrderRequest('order123', 1));
-        $orderContainer->getOrder()->shouldBeCalled()->willReturn(new OrderEntity());
         $updateOrderRequestValidator->getValidatedRequest($orderContainer, $request)->shouldBeCalled()->willReturn($changeSet);
 
         // it does NOT unlock limits
@@ -339,7 +326,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         $invoiceManager->upload(Argument::any(), Argument::any())->shouldNotBeCalled();
 
         // it does not call payments service
-        $orderStateManager->wasShipped(Argument::any())->shouldNotBeCalled();
+        $order->wasShipped(Argument::any())->shouldNotBeCalled();
         $paymentRequestFactory->createModifyRequestDTO(Argument::any())->shouldNotBeCalled();
         $paymentsService->modifyOrder(Argument::any())->shouldNotBeCalled();
 
@@ -349,13 +336,13 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
 
     public function it_does_not_call_payments_if_order_was_not_shipped(
         OrderContainer $orderContainer,
+        OrderEntity $order,
         UpdateOrderRequest $request,
         UpdateOrderRequestValidator $updateOrderRequestValidator,
         UpdateOrderLimitsService $updateOrderLimitsService,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
         OrderInvoiceManager $invoiceManager,
-        OrderStateManager $orderStateManager,
         PaymentRequestFactory $paymentRequestFactory,
         PaymentsServiceInterface $paymentsService
     ) {
@@ -375,10 +362,6 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
             ->setDuration(30)
             ->setOrderId(1);
 
-        $grossDiff = new Money(50);
-        $order = new OrderEntity();
-
-        $orderContainer->getOrder()->shouldBeCalled()->willReturn($order);
         $updateOrderRequestValidator->getValidatedRequest($orderContainer, $request)->shouldBeCalled()->willReturn($changeSet);
         $orderContainer->getOrderFinancialDetails()->shouldBeCalled()->willReturn($orderFinancialDetails);
 
@@ -397,7 +380,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         $invoiceManager->upload(Argument::any(), Argument::any())->shouldNotBeCalled();
 
         // it does NOT call payments service
-        $orderStateManager->wasShipped($order)->shouldBeCalled()->willReturn(false);
+        $order->wasShipped()->shouldBeCalled()->willReturn(false);
         $paymentRequestFactory->createModifyRequestDTO(Argument::any())->shouldNotBeCalled();
         $paymentsService->modifyOrder(Argument::any())->shouldNotBeCalled();
 
@@ -407,20 +390,17 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
 
     public function it_fails_on_upload_invoice(
         OrderContainer $orderContainer,
+        OrderEntity $order,
         UpdateOrderRequest $request,
         UpdateOrderRequestValidator $updateOrderRequestValidator,
         UpdateOrderLimitsService $updateOrderLimitsService,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
         OrderInvoiceManager $invoiceManager,
-        OrderStateManager $orderStateManager,
         PaymentRequestFactory $paymentRequestFactory,
         PaymentsServiceInterface $paymentsService
     ) {
         $changeSet = (new UpdateOrderRequest('order123', 1))->setInvoiceNumber('foobar')->setInvoiceUrl('foobar.pdf');
-        $order = new OrderEntity();
-
-        $orderContainer->getOrder()->shouldBeCalled()->willReturn($order);
         $updateOrderRequestValidator->getValidatedRequest($orderContainer, $request)->shouldBeCalled()->willReturn($changeSet);
 
         // it does NOT unlock limits
@@ -437,7 +417,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
             ->shouldBeCalled()->willThrow(OrderInvoiceUploadException::class);
 
         // it does NOT call payments service
-        $orderStateManager->wasShipped($order)->shouldNotBeCalled();
+        $order->wasShipped()->shouldNotBeCalled();
         $paymentRequestFactory->createModifyRequestDTO(Argument::any())->shouldNotBeCalled();
         $paymentsService->modifyOrder(Argument::any())->shouldNotBeCalled();
 

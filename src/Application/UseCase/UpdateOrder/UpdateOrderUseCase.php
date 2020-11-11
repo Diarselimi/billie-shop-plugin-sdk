@@ -10,7 +10,6 @@ use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderStateManager;
 use App\DomainModel\Order\SalesforceInterface;
 use App\DomainModel\OrderUpdate\UpdateOrderPersistenceService;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
@@ -20,24 +19,20 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 {
     use LoggingTrait, ValidatedUseCaseTrait;
 
-    private $orderContainerFactory;
+    private OrderContainerFactory $orderContainerFactory;
 
-    private $updateOrderPersistenceService;
+    private UpdateOrderPersistenceService $updateOrderPersistenceService;
 
-    private $salesforce;
-
-    private $orderStateManager;
+    private SalesforceInterface $salesforce;
 
     public function __construct(
         OrderContainerFactory $orderContainerFactory,
         UpdateOrderPersistenceService $updateOrderPersistenceService,
-        SalesforceInterface $salesforce,
-        OrderStateManager $orderStateManager
+        SalesforceInterface $salesforce
     ) {
         $this->orderContainerFactory = $orderContainerFactory;
         $this->updateOrderPersistenceService = $updateOrderPersistenceService;
         $this->salesforce = $salesforce;
-        $this->orderStateManager = $orderStateManager;
     }
 
     public function execute(UpdateOrderRequest $request): void
@@ -78,10 +73,10 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 
     private function isOrderLateAndInCollections(OrderEntity $order): bool
     {
-        if (!$this->orderStateManager->isLate($order)) {
+        if (!$order->isLate()) {
             return false;
         }
 
-        return null !== $this->salesforce->getOrderCollectionsStatus($order->getUuid());
+        return $this->salesforce->getOrderCollectionsStatus($order->getUuid()) !== null;
     }
 }

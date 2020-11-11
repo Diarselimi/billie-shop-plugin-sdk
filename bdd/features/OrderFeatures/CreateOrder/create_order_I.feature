@@ -92,6 +92,7 @@ Feature:
     }
     """
     Then the order A1 is in state declined
+    And the order A1 workflow name is order_v1
     And the response status code should be 200
     And the JSON response should be:
     """
@@ -210,6 +211,7 @@ Feature:
     }
     """
     Then the order A1 is in state created
+    And the order A1 workflow name is order_v1
     And the order A1 has creation source "api"
     And the response status code should be 200
     And the JSON response should be:
@@ -277,13 +279,13 @@ Feature:
     """
     And the order "A1" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz 10 de"
 
-  Scenario: Successful order creation without house
+  Scenario: Successful order creation without house and workflow v2
     Given I get from companies service identify match response
     And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And Debtor has sufficient limit
     And Debtor lock limit call succeeded
     And I get from payments service register debtor positive response
-    When I send a POST request to "/order" with body:
+    When I send a POST request to "/public/api/v2/order" with body:
     """
     {
        "debtor_person":{
@@ -330,6 +332,7 @@ Feature:
     }
     """
     Then the order A1 is in state created
+    And the order A1 workflow name is order_v2
     And the response status code should be 200
     And the JSON response should be:
     """

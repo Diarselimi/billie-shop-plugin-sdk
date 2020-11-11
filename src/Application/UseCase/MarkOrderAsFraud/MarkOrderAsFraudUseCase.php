@@ -10,28 +10,26 @@ use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\Order\OrderStateManager;
 
+/**
+ * @deprecated not used anymore, can be removed
+ */
 class MarkOrderAsFraudUseCase
 {
-    const ORDER_AMOUNT_LIMIT = 2000;
+    private const ORDER_AMOUNT_LIMIT = 2000;
 
-    private $orderRepository;
+    private OrderRepositoryInterface $orderRepository;
 
-    private $orderStateManager;
+    private OrderContainerFactory $orderContainerFactory;
 
-    private $orderContainerFactory;
-
-    private $paymentsService;
+    private PaymentsServiceInterface $paymentsService;
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
-        OrderStateManager $orderStateManager,
         OrderContainerFactory $orderContainerFactory,
         PaymentsServiceInterface $paymentsService
     ) {
         $this->orderRepository = $orderRepository;
-        $this->orderStateManager = $orderStateManager;
         $this->orderContainerFactory = $orderContainerFactory;
         $this->paymentsService = $paymentsService;
     }
@@ -72,7 +70,7 @@ class MarkOrderAsFraudUseCase
     {
         $order = $orderContainer->getOrder();
 
-        return ($this->orderStateManager->isLate($order) || $this->orderStateManager->isPaidOut($order)) &&
+        return ($order->isLate() || $order->isPaidOut()) &&
             $this->isDeliveryAddressDifferentToDebtorAddress($orderContainer->getDeliveryAddress(), $orderContainer->getDebtorExternalDataAddress()) &&
             ($orderContainer->getDebtorExternalData()->isEstablishedCustomer() === null ||
                 $orderContainer->getOrderFinancialDetails()->getAmountGross()->greaterThan(self::ORDER_AMOUNT_LIMIT))

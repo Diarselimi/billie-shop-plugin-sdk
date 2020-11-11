@@ -8,7 +8,7 @@ use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntityFactory;
 use App\DomainModel\MerchantDebtor\MerchantDebtorIdentifierDTO;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
-use App\DomainModel\Order\OrderStateManager;
+use App\DomainModel\Order\OrderEntity;
 use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class MerchantDebtorRepository extends AbstractPdoRepository implements MerchantDebtorRepositoryInterface
@@ -27,7 +27,7 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
         'updated_at',
     ];
 
-    private $factory;
+    private MerchantDebtorEntityFactory $factory;
 
     public function __construct(MerchantDebtorEntityFactory $factory)
     {
@@ -178,7 +178,7 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
 
     public function getMerchantDebtorCreatedOrdersAmount(int $merchantDebtorId): float
     {
-        return $this->getMerchantDebtorOrdersAmountByState($merchantDebtorId, OrderStateManager::STATE_CREATED);
+        return $this->getMerchantDebtorOrdersAmountByState($merchantDebtorId, OrderEntity::STATE_CREATED);
     }
 
     public function getMerchantDebtorOrdersAmountByState(int $merchantDebtorId, string $state): float
