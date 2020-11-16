@@ -1,0 +1,47 @@
+{
+  "identified_company": {
+    "id": 1,
+    "uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
+    "crefo_id": "123",
+    "schufa_id": "123",
+    "google_places_id": null,
+    "name": "Test User Company",
+    "legal_form": "GmbH",
+    "address_house": "10",
+    "address_street": "Heinrich-Heine-Platz",
+    "address_city": "Berlin",
+    "address_postal_code": "10179",
+    "address_country": "DE",
+    "address_addition": null,
+    "is_blacklisted": 0,
+    "is_from_trusted_source": 1,
+    "billing_addresses": [
+      {
+        "uuid": "c7be46c0-e049-4312-b274-258ec5aeeb71",
+        "house_number": "12",
+        "postal_code": "12345",
+        "street": "street name",
+        "city": "Berlin",
+        "country": "DE",
+        "addition": null
+      }
+    ],
+    "billing_address_match_uuid": null,
+    "identification_type": "company_address",
+    "identified_address_uuid": "some-address-uuid-123"
+  },
+  "most_similar_candidate" : {
+    "uuid": "a12d6c74-2471-4b11-b671-14c0de6ccd85",
+    "name": "Foo Bar GmbH",
+    "registration_number": "REG-456",
+    "crefo_id": "CREFO-456",
+    "schufa_id": "SCHUFA-456",
+    "google_places_id": "GOOGLEPL-456",
+    "tax_id": "TAX-456",
+    "address_house": "20",
+    "address_street": "Otto-Braun-Str.",
+    "address_city": "Berlin",
+    "address_postal_code": "10001",
+    "address_country": "DE"
+  }
+}

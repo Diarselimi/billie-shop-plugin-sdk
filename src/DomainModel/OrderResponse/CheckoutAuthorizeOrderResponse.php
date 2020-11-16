@@ -205,14 +205,7 @@ class CheckoutAuthorizeOrderResponse implements ArrayableInterface
             ],
             'reasons' => $this->getReasons() ? implode(', ', $this->getReasons()) : null,
             'decline_reason' => $this->getDeclineReason(),
-            'debtor_company_suggestion' => $this->getCompanyName() ? [ // shadow release
-                'name' => $this->getCompanyName(),
-                'address_house_number' => $this->getCompanyAddressHouseNumber(),
-                'address_street' => $this->getCompanyAddressStreet(),
-                'address_postal_code' => $this->getCompanyAddressPostalCode(),
-                'address_city' => $this->getCompanyAddressCity(),
-                'address_country' => $this->getCompanyAddressCountry(),
-            ] : null,
+            'debtor_company_suggestion' => $debtorCompanySuggestion,
         ];
     }
 }

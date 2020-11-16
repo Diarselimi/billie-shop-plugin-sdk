@@ -53,7 +53,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
     And I get from payments service get debtor response
 
   Scenario: The order gets declined because of the limit exceeded.
-    Given I get from companies service identify match response
+    Given I get from companies service identify match response with similar candidate
     And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And I get from payments service register debtor positive response
     And Debtor has insufficient limit
@@ -136,12 +136,12 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
       "reasons":"debtor_limit_exceeded",
       "decline_reason":"debtor_limit_exceeded",
       "debtor_company_suggestion":{
-        "name":"Test User Company",
-        "address_house_number":"10",
-        "address_street":"Heinrich-Heine-Platz",
-        "address_postal_code":"10179",
-        "address_city":"Berlin",
-        "address_country":"DE"
+        "address_city": "Berlin",
+        "address_country": "DE",
+        "address_house_number": "20",
+        "address_postal_code": "10001",
+        "address_street": "Otto-Braun-Str.",
+        "name": "Foo Bar GmbH"
       }
     }
     """
@@ -236,14 +236,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
       },
       "reasons":null,
       "decline_reason":null,
-      "debtor_company_suggestion":{
-        "name":"Test User Company",
-        "address_house_number":"4",
-        "address_street":"Billing Street name",
-        "address_postal_code":"10639",
-        "address_city":"Berlin",
-        "address_country":"DE"
-      }
+      "debtor_company_suggestion": null
     }
     """
 
@@ -333,14 +326,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
       },
       "reasons":null,
       "decline_reason":null,
-      "debtor_company_suggestion":{
-        "name":"Test User Company",
-        "address_house_number":"10",
-        "address_street":"Heinrich-Heine-Platz",
-        "address_postal_code":"10179",
-        "address_city":"Berlin",
-        "address_country":"DE"
-      }
+      "debtor_company_suggestion": null
     }
     """
 
@@ -500,14 +486,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
       },
       "reasons":null,
       "decline_reason":null,
-      "debtor_company_suggestion":{
-        "name":"Test User Company",
-        "address_house_number":"10",
-        "address_street":"Heinrich-Heine-Platz",
-        "address_postal_code":"10179",
-        "address_city":"Berlin",
-        "address_country":"DE"
-      }
+      "debtor_company_suggestion": null
     }
     """
 

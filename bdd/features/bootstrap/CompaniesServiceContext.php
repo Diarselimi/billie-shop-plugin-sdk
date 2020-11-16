@@ -39,6 +39,16 @@ class CompaniesServiceContext implements Context
     }
 
     /**
+     * @Given /^I get from companies service identify match response with similar candidate$/
+     */
+    public function iGetFromCompaniesServiceIdentifyMatchResponseWithSimilarCandidate()
+    {
+        $this->mockRequest('/debtor/identify', new ResponseStack(
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_match_trusted_source_similar.json'))
+        ));
+    }
+
+    /**
      * @Given /^I get from companies service identify with billing address match response$/
      */
     public function iGetFromCompaniesServiceIdentifyMatchWithBillingAddressResponse()
