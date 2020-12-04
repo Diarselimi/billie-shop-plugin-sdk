@@ -20,10 +20,10 @@ test-ci: openapi-validation test-migrations test-unit test-integration test-func
 #################################################################
 
 pre-commit-hook:
-	docker-compose run -T --rm app make openapi
-	docker-compose run -T --rm app make openapi-validation
-	docker-compose run -T --rm app vendor/bin/cs-fix-staged-files
-
+	docker-compose up -d app
+	docker-compose exec -T app make openapi
+	docker-compose exec -T app make openapi-validation
+	docker-compose exec -T app vendor/bin/cs-fix-staged-files
 cache:
 	echo " > Cleaning and warming up caches... "
 	composer dumpautoload
@@ -74,13 +74,13 @@ test-unit:
 
 ######################## Docker-wrapped targets #################################
 local-start:
+	if [[ ! -f ./docker-compose.override.yml ]]; then \
+  		cp docker-compose.override.dist.yml docker-compose.override.yml; \
+	fi; \
 	echo " > Recreating containers and starting... "
 	docker-compose up -d --build --force-recreate --remove-orphans
 
 local-deps:
-	if [[ ! -f ./docker-compose.override.yml ]]; then \
-		cp docker-compose.override.dist.yml docker-compose.override.yml; \
-	fi; \
 	bin/docker/app make deps
 
 local-openapi:
