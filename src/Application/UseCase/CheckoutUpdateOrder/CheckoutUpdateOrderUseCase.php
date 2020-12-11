@@ -15,33 +15,38 @@ use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderRepositoryInterface;
+use App\Infrastructure\Repository\OrderFinancialDetailsRepository;
 
 class CheckoutUpdateOrderUseCase implements ValidatedUseCaseInterface
 {
     use ValidatedUseCaseTrait;
 
-    private $orderContainerFactory;
+    private OrderContainerFactory $orderContainerFactory;
 
-    private $companiesService;
+    private CompaniesServiceInterface $companiesService;
 
-    private $addressRepository;
+    private AddressRepositoryInterface $addressRepository;
 
-    private $debtorExternalDataRepository;
+    private DebtorExternalDataRepositoryInterface $debtorExternalDataRepository;
 
-    private $orderRepository;
+    private OrderRepositoryInterface $orderRepository;
+
+    private OrderFinancialDetailsRepository $financialDetailsRepository;
 
     public function __construct(
         OrderContainerFactory $orderContainerFactory,
         CompaniesServiceInterface $companiesService,
         AddressRepositoryInterface $addressRepository,
         DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
-        OrderRepositoryInterface $orderRepository
+        OrderRepositoryInterface $orderRepository,
+        OrderFinancialDetailsRepository $financialDetailsRepository
     ) {
         $this->orderContainerFactory = $orderContainerFactory;
         $this->companiesService = $companiesService;
         $this->addressRepository = $addressRepository;
         $this->debtorExternalDataRepository = $debtorExternalDataRepository;
         $this->orderRepository = $orderRepository;
+        $this->financialDetailsRepository = $financialDetailsRepository;
     }
 
     public function execute(CheckoutUpdateOrderRequest $request): void
@@ -56,16 +61,13 @@ class CheckoutUpdateOrderUseCase implements ValidatedUseCaseInterface
             throw new OrderNotFoundException($exception);
         }
 
-        $billingAddress = (new AddressEntity())
-            ->setStreet($request->getBillingAddress()->getStreet())
-            ->setHouseNumber($request->getBillingAddress()->getHouseNumber())
-            ->setAddition($request->getBillingAddress()->getAddition())
-            ->setPostalCode($request->getBillingAddress()->getPostalCode())
-            ->setCity($request->getBillingAddress()->getCity())
-            ->setCountry($request->getBillingAddress()->getCountry());
+        if ($request->getBillingAddress() !== null) {
+            $this->saveAndAssociateBillingAddressToOrder($request, $orderContainer);
+        }
 
-        $this->associateBillingAddressWithIdentifiedCompany($orderContainer, $billingAddress);
-        $this->associateBillingAddressWithExternalData($orderContainer, $billingAddress);
+        if ($request->getDuration() !== null) {
+            $this->updateDurationForOrder($orderContainer, $request->getDuration());
+        }
     }
 
     private function associateBillingAddressWithIdentifiedCompany(
@@ -92,5 +94,33 @@ class CheckoutUpdateOrderUseCase implements ValidatedUseCaseInterface
         $externalData = $orderContainer->getDebtorExternalData();
         $externalData->setBillingAddressId($billingAddress->getId());
         $this->debtorExternalDataRepository->update($externalData);
+    }
+
+    private function updateDurationForOrder(OrderContainer $orderContainer, int $duration): void
+    {
+        $orderFinancialDetailsEntity = clone $orderContainer->getOrderFinancialDetails();
+        $orderFinancialDetailsEntity
+            ->setDuration($duration)
+            ->setCreatedAt(new \DateTime())
+            ->setUpdatedAt(new \DateTime());
+
+        $this->financialDetailsRepository->insert($orderFinancialDetailsEntity);
+        $orderContainer->setOrderFinancialDetails($orderFinancialDetailsEntity);
+    }
+
+    private function saveAndAssociateBillingAddressToOrder(
+        CheckoutUpdateOrderRequest $request,
+        OrderContainer $orderContainer
+    ) {
+        $billingAddress = (new AddressEntity())
+            ->setStreet($request->getBillingAddress()->getStreet())
+            ->setHouseNumber($request->getBillingAddress()->getHouseNumber())
+            ->setAddition($request->getBillingAddress()->getAddition())
+            ->setPostalCode($request->getBillingAddress()->getPostalCode())
+            ->setCity($request->getBillingAddress()->getCity())
+            ->setCountry($request->getBillingAddress()->getCountry());
+
+        $this->associateBillingAddressWithIdentifiedCompany($orderContainer, $billingAddress);
+        $this->associateBillingAddressWithExternalData($orderContainer, $billingAddress);
     }
 }

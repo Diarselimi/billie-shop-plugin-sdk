@@ -68,4 +68,34 @@ class CheckoutConfirmOrderRequestTest extends IntegrationTestCase
 
         $this->assertTrue(true);
     }
+
+    /**
+     * @test
+     */
+    public function shouldPassWhenThereIsNoDurationProvided()
+    {
+        $debtorCompanyRequest = new DebtorCompanyRequest();
+        $this->fillObject($debtorCompanyRequest, true);
+        $debtorCompanyRequest
+            ->setAddressRequest(
+                (new CreateOrderAddressRequest())
+                ->setPostalCode('12345')
+                ->setCountry('DE')
+                ->setHouseNumber('123')
+                ->setStreet('test123')
+                ->setCity('Stuttgart')
+            );
+
+        $request = new CheckoutConfirmOrderRequest();
+        $request
+            ->setAmount(new TaxedMoney(new Money(3), new Money(2), new Money(1)))
+            ->setDebtorCompanyRequest($debtorCompanyRequest)
+            ->setDuration(90);
+
+        $validator = $this->getContainer()->get(ValidatorInterface::class);
+        $this->setValidator($validator);
+        $this->validateRequest($request);
+
+        $this->assertTrue(true);
+    }
 }

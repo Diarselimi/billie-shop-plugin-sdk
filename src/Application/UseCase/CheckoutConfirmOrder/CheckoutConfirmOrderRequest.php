@@ -44,7 +44,6 @@ class CheckoutConfirmOrderRequest implements ValidatedRequestInterface
     /**
      * @Assert\NotBlank()
      * @Assert\Type(type="integer")
-     * @CustomConstrains\OrderDuration()
      */
     private $duration;
 

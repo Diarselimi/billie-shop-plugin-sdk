@@ -3086,6 +3086,8 @@ components:
       properties:
         billing_address:
           $ref: '#/components/schemas/CreateOrderAddressRequest'
+        duration:
+          $ref: '#/components/schemas/OrderDuration'
       type: object
     CreateMerchantRequest:
       title: 'Merchant Data'

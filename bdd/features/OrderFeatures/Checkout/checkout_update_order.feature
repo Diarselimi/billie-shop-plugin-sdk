@@ -106,13 +106,6 @@ Feature: As a merchant debtor, I want to use my initially provided address (whic
     """
     Then the response status code should be 401
 
-  Scenario: The checkout update call fails when billing address is missing
-    Given I have a checkout_session_id "123123"
-    When I send a POST request to "/checkout-session/123123/update" with body:
-    """
-      {}
-    """
-    Then the response status code should be 400
 
   Scenario Template: The checkout update call fails when the order is not in authorized state
     Examples:

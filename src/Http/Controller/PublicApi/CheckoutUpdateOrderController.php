@@ -57,6 +57,7 @@ class CheckoutUpdateOrderController
     {
         $useCaseRequest = (new CheckoutUpdateOrderRequest())
             ->setSessionUuid($sessionUuid)
+            ->setDuration($request->request->get('duration'))
             ->setBillingAddress($this->addressRequestFactory->create($request, 'billing_address'));
 
         try {

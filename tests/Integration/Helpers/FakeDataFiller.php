@@ -3,6 +3,7 @@
 namespace App\Tests\Integration\Helpers;
 
 use Faker\Factory;
+use Ozean12\Money\Money;
 
 trait FakeDataFiller
 {
@@ -42,6 +43,9 @@ trait FakeDataFiller
             $faker = Factory::create('de_DE');
 
             $methodName = strtolower($faker->parse(str_replace('set', '', $methodName)));
+            if (stripos($methodName, 'uuid') !== false) {
+                $methodName = 'uuid';
+            }
 
             try {
                 $val = $faker->$methodName;
@@ -49,6 +53,10 @@ trait FakeDataFiller
                 switch ($valueType) {
                     case 'float':
                         $val = $faker->randomFloat(2);
+
+                        break;
+                    case Money::class:
+                        $val = new Money($faker->randomFloat(2));
 
                         break;
                     case 'int':
@@ -59,6 +67,7 @@ trait FakeDataFiller
                         $val = $faker->randomElement([0, 1]);
 
                         break;
+                    case 'DateTimeInterface':
                     case 'DateTime':
                         $val = new \DateTime($faker->date('Y-m-d H:i:s'));
 

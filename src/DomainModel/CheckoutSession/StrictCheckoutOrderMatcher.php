@@ -56,8 +56,7 @@ class StrictCheckoutOrderMatcher implements CheckoutOrderMatcherInterface, Loggi
         $matchDuration = $request->getDuration() === $financialDetails->getDuration();
 
         if (!$matchDuration) {
-            $this->logInfo('[StrictCheckoutOrderMatcher] Duration mismatch');
-            $result->addMismatch('duration', $request->getDuration());
+            $this->logInfo('[StrictCheckoutOrderMatcher] Duration mismatch, skipped.');
         }
 
         if ($request->getDeliveryAddress() !== null && $this->isDeliveryAddressMismatch($request, $orderContainer)) {

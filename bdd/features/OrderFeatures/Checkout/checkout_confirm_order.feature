@@ -123,11 +123,6 @@ Feature: As a merchant, I should be able to create an order by providing a valid
           "source": "amount.tax"
         },
         {
-          "title": "This value should be between 1 and 120.",
-          "code": "request_validation_error",
-          "source": "duration"
-        },
-        {
           "title": "This value should not be blank.",
           "code": "request_validation_error",
           "source": "debtor_company_request"
@@ -199,46 +194,6 @@ Feature: As a merchant, I should be able to create an order by providing a valid
             "net":91.0,
             "tax":10.0
          }
-        }
-      ]
-    }
-    """
-    And the response status code should be 400
-
-  Scenario: I fail to confirm the order if I send the wrong duration
-    Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
-    And I get from companies service a good debtor strict match response
-    And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
-    """
-    {
-       "amount":{
-          "gross":100.0,
-          "net":90.0,
-          "tax":10.0
-       },
-       "duration":40,
-       "debtor_company":{
-          "name":"Test User Company",
-          "legal_form": "GmbH",
-          "address_addition":"lorem ipsum",
-          "address_house_number":"10",
-          "address_street":"Heinrich-Heine-Platz",
-          "address_city":"Berlin",
-          "address_postal_code":"10179",
-          "address_country":"DE"
-       }
-    }
-    """
-    Then the order CO123 is in state authorized
-    Then the JSON response should be:
-    """
-    {
-      "errors": [
-        {
-          "title": "Value of [duration] does not match the original one.",
-          "code": "request_validation_error",
-          "source": "duration",
-          "source_value": 40
         }
       ]
     }
@@ -339,12 +294,6 @@ Feature: As a merchant, I should be able to create an order by providing a valid
           }
         },
         {
-          "title": "Value of [duration] does not match the original one.",
-          "code": "request_validation_error",
-          "source": "duration",
-          "source_value": 31
-        },
-        {
           "title": "Value of [delivery_address] does not match the original one.",
           "code": "request_validation_error",
           "source": "delivery_address",
@@ -439,11 +388,6 @@ Feature: As a merchant, I should be able to create an order by providing a valid
           "source": "amount.tax"
         },
         {
-          "title": "This value should be between 1 and 120.",
-          "code": "request_validation_error",
-          "source": "duration"
-        },
-        {
           "title": "This value should not be blank.",
           "code": "request_validation_error",
           "source": "debtor_company_request"
@@ -477,11 +421,6 @@ Feature: As a merchant, I should be able to create an order by providing a valid
           "title": "This value should not be blank.",
           "code": "request_validation_error",
           "source": "amount.tax"
-        },
-        {
-          "title": "This value should be between 1 and 120.",
-          "code": "request_validation_error",
-          "source": "duration"
         },
         {
           "title": "This value should not be blank.",

@@ -12,18 +12,22 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @OA\Schema(schema="CheckoutUpdateOrderRequest", required={"billing_address"}, properties={
  *      @OA\Property(property="billing_address", ref="#/components/schemas/CreateOrderAddressRequest"),
+ *      @OA\Property(property="duration", ref="#/components/schemas/OrderDuration"),
  * })
  */
 class CheckoutUpdateOrderRequest implements ValidatedRequestInterface
 {
-    private $sessionUuid;
+    private string $sessionUuid;
 
     /**
-     * @Assert\NotBlank()
      * @Assert\Valid()
-     * @var CreateOrderAddressRequest
      */
-    private $billingAddress;
+    private ?CreateOrderAddressRequest $billingAddress = null;
+
+    /**
+     * @Assert\Choice(choices={null, 30, 45, 60, 90, 120}, message="Duration is not valid.")
+     */
+    private ?int $duration = null;
 
     public function getSessionUuid(): string
     {
@@ -37,7 +41,7 @@ class CheckoutUpdateOrderRequest implements ValidatedRequestInterface
         return $this;
     }
 
-    public function getBillingAddress(): CreateOrderAddressRequest
+    public function getBillingAddress(): ?CreateOrderAddressRequest
     {
         return $this->billingAddress;
     }
@@ -45,6 +49,18 @@ class CheckoutUpdateOrderRequest implements ValidatedRequestInterface
     public function setBillingAddress(?CreateOrderAddressRequest $billingAddress): CheckoutUpdateOrderRequest
     {
         $this->billingAddress = $billingAddress;
+
+        return $this;
+    }
+
+    public function getDuration(): ?int
+    {
+        return $this->duration;
+    }
+
+    public function setDuration(?int $duration): CheckoutUpdateOrderRequest
+    {
+        $this->duration = $duration;
 
         return $this;
     }
