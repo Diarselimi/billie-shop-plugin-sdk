@@ -2,7 +2,6 @@
 
 namespace App\DomainModel\Order;
 
-use App\DomainModel\Order\OrderContainer\OrderContainer;
 use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 use Billie\PdoBundle\DomainModel\StatefulEntity\StatefulEntityInterface;
 use Billie\PdoBundle\DomainModel\StatefulEntity\StatefulEntityTrait;
@@ -46,6 +45,10 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
     public const TRANSITION_PAY_OUT = 'pay_out';
 
     public const TRANSITION_SHIP = 'ship';
+
+    public const TRANSITION_SHIP_PARTIALLY = 'ship_partially';
+
+    public const TRANSITION_SHIP_FULLY = 'ship_fully';
 
     public const TRANSITION_LATE = 'late';
 
@@ -439,5 +442,15 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
     public function isWaiting(): bool
     {
         return $this->state === self::STATE_WAITING;
+    }
+
+    public function isWorkflowV1(): bool
+    {
+        return $this->workflowName === self::WORKFLOW_NAME_V1;
+    }
+
+    public function isWorkflowV2(): bool
+    {
+        return $this->workflowName === self::WORKFLOW_NAME_V2;
     }
 }

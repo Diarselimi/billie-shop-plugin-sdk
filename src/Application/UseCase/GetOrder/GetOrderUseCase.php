@@ -5,7 +5,7 @@ namespace App\Application\UseCase\GetOrder;
 use App\Application\Exception\OrderNotFoundException;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
-use App\DomainModel\OrderResponse\OrderResponse;
+use App\DomainModel\OrderResponse\OrderResponseV1;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
 
 class GetOrderUseCase
@@ -22,7 +22,7 @@ class GetOrderUseCase
         $this->orderResponseFactory = $orderResponseFactory;
     }
 
-    public function execute(GetOrderRequest $request): OrderResponse
+    public function execute(GetOrderRequest $request): OrderResponseV1
     {
         try {
             $orderContainer = $this->orderContainerFactory->loadByMerchantIdAndExternalIdOrUuid(
@@ -33,7 +33,7 @@ class GetOrderUseCase
             throw new OrderNotFoundException($exception);
         }
 
-        $response = $this->orderResponseFactory->create($orderContainer);
+        $response = $this->orderResponseFactory->createV1($orderContainer);
 
         if ($orderContainer->getOrder()->getMerchantDebtorId() !== null) {
             $response->setDebtorUuid($orderContainer->getMerchantDebtor()->getUuid());

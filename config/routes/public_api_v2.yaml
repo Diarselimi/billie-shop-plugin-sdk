@@ -7,6 +7,18 @@ order_create_v2:
   defaults:
     workflow_name: order_v2
 
+checkout_session_authorize_v2:
+  path: /public/api/v2/checkout-session/{sessionUuid}/authorize
+  controller: App\Http\Controller\PublicApi\CheckoutAuthorizeOrderController::execute
+  methods: [PUT]
+  defaults:
+    workflow_name: order_v2
+
+order_ship_v2:
+  path: /public/api/v2/order/{id}/ship
+  controller: App\Http\Controller\PublicApiV2\ShipOrderController::execute
+  methods: [POST]
+
 ## Fallback routes:
 public_api_prefixed_v2_from_v1:
   resource: ../src/Http/Controller/PublicApi

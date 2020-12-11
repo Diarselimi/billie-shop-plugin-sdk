@@ -2,18 +2,32 @@
 
 namespace spec\App\Application\UseCase\ShipOrder;
 
-use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\ShipOrder\ShipOrderRequest;
+use App\Application\UseCase\ShipOrder\ShipOrderRequestV1;
 use App\Application\UseCase\ShipOrder\ShipOrderUseCase;
+use App\DomainModel\FeatureFlag\FeatureFlagManager;
+use App\DomainModel\Invoice\Invoice;
+use App\DomainModel\Invoice\InvoiceFactory;
+use App\DomainModel\Order\Lifecycle\ShipOrder\ShipOrderInterface;
+use App\DomainModel\Order\Lifecycle\ShipOrder\ShipOrderService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
-use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderInvoice\OrderInvoiceManager;
-use App\DomainModel\ShipOrder\ShipOrderService;
-use App\Helper\Uuid\UuidGeneratorInterface;
+use App\DomainModel\OrderResponse\OrderResponse;
+use App\DomainModel\OrderResponse\OrderResponseFactory;
+use App\Infrastructure\Repository\OrderRepository;
+use Ozean12\Money\Money;
+use Ozean12\Money\TaxedMoney\TaxedMoney;
 use PhpSpec\ObjectBehavior;
+use Prophecy\Argument;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Workflow\Registry;
+use Symfony\Component\Workflow\Workflow;
 
 class ShipOrderUseCaseSpec extends ObjectBehavior
 {
@@ -34,12 +48,21 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
     public function let(
         OrderInvoiceManager $invoiceManager,
         OrderContainerFactory $orderContainerFactory,
-        UuidGeneratorInterface $uuidGenerator,
+        Registry $workflowRegistry,
         ShipOrderService $shipOrderService,
+        OrderResponseFactory $orderResponseFactory,
+        FeatureFlagManager $featureFlagManager,
+        InvoiceFactory $invoiceFactory,
         OrderContainer $orderContainer,
         OrderEntity $order,
-        ShipOrderRequest $request
+        OrderResponse $orderResponse,
+        ShipOrderRequestV1 $request,
+        ValidatorInterface $validator,
+        Workflow $workflow,
+        LoggerInterface $logger
     ) {
+        $order->isWorkflowV1()->willReturn(false);
+        $featureFlagManager->isEnabled(FeatureFlagManager::FEATURE_INVOICE_BUTLER)->willReturn(true);
         $orderContainer->getOrder()->willReturn($order);
 
         $request->getOrderId()->willReturn(self::ID);
@@ -49,7 +72,17 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
         $request->getInvoiceUrl()->willReturn(self::INVOICE_URL);
         $request->getShippingDocumentUrl()->willReturn(self::PROOF_OF_DELIVERY_URL);
 
+        $orderContainerFactory
+            ->loadByMerchantIdAndExternalIdOrUuid(Argument::any(), Argument::any())
+            ->willReturn($orderContainer);
+
+        $workflowRegistry->get($order)->willReturn($workflow);
+        $validator->validate(Argument::cetera())->willReturn(new ConstraintViolationList([]));
+        $orderResponseFactory->create($orderContainer)->willReturn($orderResponse);
+
         $this->beConstructedWith(...func_get_args());
+        $this->setLogger($logger);
+        $this->setValidator($validator);
     }
 
     public function it_is_initializable()
@@ -57,47 +90,46 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
         $this->shouldHaveType(ShipOrderUseCase::class);
     }
 
-    public function it_throws_exception_if_order_was_not_found(
-        OrderContainerFactory $orderContainerFactory,
-        ShipOrderRequest $request
-    ) {
-        $orderContainerFactory
-            ->loadByMerchantIdAndExternalIdOrUuid(self::MERCHANT_ID, self::ID)
-            ->shouldBeCalled()
-            ->willThrow(OrderContainerFactoryException::class);
-
-        $this->shouldThrow(OrderNotFoundException::class)->during('execute', [$request]);
-    }
-
     public function it_ships_order_if_already_has_payment_details_and_can_ship(
         OrderContainerFactory $orderContainerFactory,
         ShipOrderRequest $request,
         OrderContainer $orderContainer,
         OrderEntity $order,
-        ShipOrderService $shipOrderService
+        ShipOrderInterface $shipOrderService,
+        Workflow $workflow,
+        OrderFinancialDetailsEntity $financialDetailsEntity,
+        InvoiceFactory $invoiceFactory,
+        TaxedMoney $shipAmount,
+        Invoice $invoice
     ) {
-        $orderContainerFactory
-            ->loadByMerchantIdAndExternalIdOrUuid(self::MERCHANT_ID, self::ID)
-            ->shouldBeCalled()
-            ->willReturn($orderContainer);
+        $orderContainerFactory->loadByMerchantIdAndUuid(Argument::cetera())->willReturn($orderContainer);
+        $orderContainer->getOrderFinancialDetails()->willReturn($financialDetailsEntity);
+
+        $shipAmount->getGross()->willReturn(new Money(500));
+        $shipAmount->getNet()->willReturn(new Money(450));
+        $shipAmount->getTax()->willReturn(new Money(50));
+
+        $request->getAmount()->willReturn($shipAmount);
+        $request->getDuration()->willReturn(30);
+
+        $financialDetailsEntity->getUnshippedAmountGross()->willReturn(new Money(1000));
+        $financialDetailsEntity->getUnshippedAmountNet()->willReturn(new Money(1100));
+        $financialDetailsEntity->getUnshippedAmountTax()->willReturn(new Money(100));
+
+        $invoiceFactory->create(
+            $orderContainer,
+            $shipAmount,
+            30,
+            self::INVOICE_NUMBER,
+            self::PROOF_OF_DELIVERY_URL
+        )->willReturn($invoice);
 
         $order->getState()->willReturn(OrderEntity::STATE_CREATED);
-        $order->getExternalCode()->shouldBeCalled()->willReturn(self::EXTERNAL_CODE);
-        $order->getPaymentId()->shouldBeCalled()->willReturn(self::PAYMENT_DETAILS_ID);
-        $order->setInvoiceNumber(self::INVOICE_NUMBER)
-            ->shouldBeCalled()
-            ->willReturn($order);
-        $order->setInvoiceUrl(self::INVOICE_URL)
-            ->shouldBeCalled()
-            ->willReturn($order);
-        $order->setProofOfDeliveryUrl(self::PROOF_OF_DELIVERY_URL)
-            ->shouldBeCalled()
-            ->willReturn($order);
+        $order->getExternalCode()->willReturn(self::EXTERNAL_CODE);
+        $order->getPaymentId()->willReturn(self::PAYMENT_DETAILS_ID);
 
-        $shipOrderService->validate($request, $order)->shouldBeCalledOnce();
-        $shipOrderService->hasPaymentDetails($orderContainer)->willReturn(true);
-
-        $shipOrderService->shipOrder($orderContainer, true)->shouldBeCalled();
+        $workflow->can($order, OrderEntity::TRANSITION_SHIP_FULLY)->shouldBeCalled()->willReturn(true);
+        $shipOrderService->ship($orderContainer, $invoice)->shouldBeCalled();
 
         $this->execute($request);
     }
@@ -107,53 +139,18 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
         ShipOrderRequest $request,
         OrderContainer $orderContainer,
         OrderEntity $order,
-        ShipOrderService $shipOrderService
+        ShipOrderInterface $shipOrderService,
+        Workflow $workflow,
+        Invoice $invoice
     ) {
-        $orderContainerFactory
-            ->loadByMerchantIdAndExternalIdOrUuid(self::MERCHANT_ID, self::ID)
-            ->shouldBeCalled()
-            ->willReturn($orderContainer);
+        $orderContainerFactory->loadByMerchantIdAndUuid(Argument::cetera())->willReturn($orderContainer);
 
         $order->getState()->willReturn(OrderEntity::STATE_CANCELED);
 
-        $shipOrderService->validate($request, $order)->shouldBeCalledOnce()->willThrow(WorkflowException::class);
-
-        $shipOrderService->shipOrder($orderContainer, false)->shouldNotBeCalled();
+        $order->getExternalCode()->shouldBeCalled()->willReturn('some_code');
+        $workflow->can(Argument::cetera())->shouldBeCalled()->willReturn(false);
+        $shipOrderService->ship($orderContainer, $invoice)->shouldNotBeCalled();
 
         $this->shouldThrow(WorkflowException::class)->during('execute', [$request]);
-    }
-
-    public function it_updates_order_and_create_borscht_order(
-        OrderContainerFactory $orderContainerFactory,
-        ShipOrderRequest $request,
-        OrderContainer $orderContainer,
-        OrderEntity $order,
-        ShipOrderService $shipOrderService
-    ) {
-        $orderContainerFactory
-            ->loadByMerchantIdAndExternalIdOrUuid(self::MERCHANT_ID, self::ID)
-            ->shouldBeCalled()
-            ->willReturn($orderContainer);
-
-        $order->getState()->willReturn(OrderEntity::STATE_CREATED);
-        $order->getExternalCode()->shouldBeCalled()->willReturn(self::EXTERNAL_CODE);
-        $order->getPaymentId()->shouldBeCalled()->willReturn(self::PAYMENT_DETAILS_ID);
-        $order->setInvoiceNumber(self::INVOICE_NUMBER)
-            ->shouldBeCalled()
-            ->willReturn($order);
-        $order->setInvoiceUrl(self::INVOICE_URL)
-            ->shouldBeCalled()
-            ->willReturn($order);
-        $order->setProofOfDeliveryUrl(self::PROOF_OF_DELIVERY_URL)
-            ->shouldBeCalled()
-            ->willReturn($order);
-
-        $shipOrderService->validate($request, $order)->shouldBeCalledOnce();
-
-        $shipOrderService->hasPaymentDetails($orderContainer)->willReturn(false);
-
-        $shipOrderService->shipOrder($orderContainer, false)->shouldBeCalled();
-
-        $this->execute($request);
     }
 }

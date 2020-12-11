@@ -15,7 +15,7 @@ use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\OrderResponse\OrderResponse;
+use App\DomainModel\OrderResponse\OrderResponseV1;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
 use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
 use PhpSpec\ObjectBehavior;
@@ -98,7 +98,7 @@ class CheckoutConfirmOrderUseCaseSpec extends ObjectBehavior
         $waitingOrderService->wait($orderContainer)->shouldNotBeCalled();
         $approveOrderService->approve($orderContainer)->shouldBeCalled();
 
-        $orderResponseFactory->create($orderContainer)->shouldBeCalled()->willReturn(new OrderResponse());
+        $orderResponseFactory->createV1($orderContainer)->shouldBeCalled()->willReturn(new OrderResponseV1());
         $this->execute($request);
     }
 
@@ -127,7 +127,7 @@ class CheckoutConfirmOrderUseCaseSpec extends ObjectBehavior
         $waitingOrderService->wait($orderContainer)->shouldBeCalled();
         $approveOrderService->approve($orderContainer)->shouldNotBeCalled();
 
-        $orderResponseFactory->create($orderContainer)->shouldBeCalled()->willReturn(new OrderResponse());
+        $orderResponseFactory->createV1($orderContainer)->shouldBeCalled()->willReturn(new OrderResponseV1());
         $this->execute($request);
     }
 

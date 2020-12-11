@@ -1,20 +1,18 @@
 <?php
 
-namespace App\DomainModel\ShipOrder;
+namespace App\Application\UseCase;
 
-use App\Application\UseCase\AbstractOrderRequest;
-use App\Application\UseCase\ValidatedRequestInterface;
 use App\Application\Validator\Constraint as CustomAssert;
 use Symfony\Component\Validator\Constraints as Assert;
 use OpenApi\Annotations as OA;
 
 /**
- * @OA\Schema(schema="AbstractShipOrderRequest", title="Order Shipping plain Object", type="object", properties={
+ * @OA\Schema(schema="AbstractShipOrderRequestV1", title="Order Shipping plain Object", type="object", properties={
  *      @OA\Property(property="external_order_id", ref="#/components/schemas/TinyText", nullable=true, description="External Order ID. It should only be provided if it was not provided in the create order call."),
  *      @OA\Property(property="invoice_number", ref="#/components/schemas/TinyText"),
  * })
  */
-abstract class AbstractShipOrderRequest extends AbstractOrderRequest implements ValidatedRequestInterface
+abstract class AbstractShipOrderRequestV1 extends AbstractOrderRequest implements ValidatedRequestInterface
 {
     /**
      * @Assert\NotBlank(groups={"RequiredExternalCode"})
@@ -22,14 +20,14 @@ abstract class AbstractShipOrderRequest extends AbstractOrderRequest implements 
      * @Assert\Length(max="255")
      * @CustomAssert\OrderExternalCode()
      */
-    private $externalOrderId;
+    private ?string $externalOrderId = null;
 
     /**
      * @Assert\NotBlank()
      * @Assert\Type(type="string")
      * @Assert\Length(max="255")
      */
-    private $invoiceNumber;
+    private ?string $invoiceNumber = null;
 
     public function getExternalCode(): ?string
     {

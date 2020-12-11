@@ -131,6 +131,9 @@ class MerchantSettingsEntity extends AbstractTimestampableEntity
         return $this;
     }
 
+    /**
+     * @return array|Percent[]
+     */
     public function getFeeRates(): array
     {
         return $this->feeRates;

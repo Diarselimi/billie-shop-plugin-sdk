@@ -28,6 +28,7 @@ ozean12_amqp_pack:
     order.order_dunning_step_changed: Ozean12\Transfer\Message\Order\OrderDunningStepChanged
     company_information_change_request.company_information_change_request_decision_issued: Ozean12\Transfer\Message\CompanyInformationChangeRequest\CompanyInformationChangeRequestDecisionIssued
     customer.customer_created: Ozean12\Transfer\Message\Customer\CustomerCreated
+    invoice.create_invoice: Ozean12\Transfer\Message\Invoice\CreateInvoice
 
 billie_monitoring:
   strict_logging: true

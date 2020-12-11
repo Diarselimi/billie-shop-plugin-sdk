@@ -10,9 +10,9 @@ use App\DomainModel\FileService\FileServiceRequestException;
 use App\DomainModel\FileService\FileServiceResponseDTO;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\OrderInvoice\OrderInvoiceEntity;
-use App\DomainModel\OrderInvoice\OrderInvoiceFactory;
-use App\DomainModel\OrderInvoice\OrderInvoiceRepositoryInterface;
+use App\DomainModel\OrderInvoice\LegacyOrderInvoiceEntity;
+use App\DomainModel\OrderInvoice\LegacyOrderInvoiceFactory;
+use App\DomainModel\OrderInvoice\LegacyOrderInvoiceRepositoryInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Psr7\Response;
@@ -39,8 +39,8 @@ class HttpInvoiceUploadUseCaseSpec extends ObjectBehavior
         Client $invoiceUploadClient,
         FileServiceInterface $fileService,
         OrderRepositoryInterface $orderRepository,
-        OrderInvoiceRepositoryInterface $orderInvoiceRepository,
-        OrderInvoiceFactory $orderInvoiceFactory,
+        LegacyOrderInvoiceRepositoryInterface $orderInvoiceRepository,
+        LegacyOrderInvoiceFactory $orderInvoiceFactory,
         LoggerInterface $logger
     ) {
         $this->beConstructedWith(
@@ -113,11 +113,11 @@ class HttpInvoiceUploadUseCaseSpec extends ObjectBehavior
         Client $invoiceUploadClient,
         FileServiceInterface $fileService,
         OrderRepositoryInterface $orderRepository,
-        OrderInvoiceRepositoryInterface $orderInvoiceRepository,
-        OrderInvoiceFactory $orderInvoiceFactory,
+        LegacyOrderInvoiceRepositoryInterface $orderInvoiceRepository,
+        LegacyOrderInvoiceFactory $orderInvoiceFactory,
         HttpInvoiceUploadRequest $request,
         OrderEntity $order,
-        OrderInvoiceEntity $orderInvoice,
+        LegacyOrderInvoiceEntity $orderInvoice,
         Response $headResponse,
         Response $getResponse,
         FileServiceResponseDTO $file

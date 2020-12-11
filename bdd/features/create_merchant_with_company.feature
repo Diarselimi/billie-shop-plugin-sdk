@@ -21,6 +21,11 @@ Feature: Create a new merchant specifying the data of the company that will be c
       {
         "errors":[
           {
+            "code": "request_validation_error",
+            "source": "fee_rates",
+            "title": "This value should not be blank."
+          },
+          {
             "title":"The number should have have maximum 2 numbers after decimal.",
             "code":"request_validation_error",
             "source":"merchant_financing_limit"
@@ -112,6 +117,11 @@ Feature: Create a new merchant specifying the data of the company that will be c
       {
         "errors":[
           {
+            "code": "request_validation_error",
+            "source": "fee_rates",
+            "title": "This value should not be blank."
+          },
+          {
              "title":"This value should not be blank.",
              "code":"request_validation_error",
              "source":"iban"
@@ -148,7 +158,8 @@ Feature: Create a new merchant specifying the data of the company that will be c
         "webhook_authorization": "X-Api-Key: key",
         "is_onboarding_complete": false,
         "iban": "DE87500105173872482875",
-        "bic": "AABSDE31"
+        "bic": "AABSDE31",
+        "fee_rates": [123, 22, 33]
       }
       """
     Then the response status code should be 503
@@ -196,7 +207,8 @@ Feature: Create a new merchant specifying the data of the company that will be c
         "webhook_authorization": "X-Api-Key: key",
         "is_onboarding_complete": false,
         "iban": "DE87500105173872482875",
-        "bic": "AABSDE31"
+        "bic": "AABSDE31",
+        "fee_rates": [123, 22, 33]
       }
       """
     Then the response status code should be 409
@@ -245,7 +257,8 @@ Feature: Create a new merchant specifying the data of the company that will be c
         "webhook_authorization": "X-Api-Key: key",
         "is_onboarding_complete": false,
         "iban": "DE87500105173872482875",
-        "bic": "AABSDE31"
+        "bic": "AABSDE31",
+        "fee_rates": [123, 22, 33]
       }
       """
     Then the response status code should be 503
@@ -307,7 +320,8 @@ Feature: Create a new merchant specifying the data of the company that will be c
         "webhook_authorization": "X-Api-Key: Hola",
         "is_onboarding_complete": false,
         "iban": "DE87500105173872482875",
-        "bic": "AABSDE31"
+        "bic": "AABSDE31",
+        "fee_rates": [123, 22, 33]
       }
       """
     And the JSON response should be:
@@ -369,7 +383,7 @@ Feature: Create a new merchant specifying the data of the company that will be c
         "is_onboarding_complete": false,
         "iban": "DE87500105173872482875",
         "bic": "AABSDE31",
-        "fee_rates": "{\"14\": 10, \"30\": 15}"
+        "fee_rates": [123, 22, 33]
       }
       """
     Then the response status code should be 201

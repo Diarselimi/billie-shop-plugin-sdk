@@ -27,7 +27,7 @@ class MerchantCreationDTO
 
     private $isOnboardingComplete;
 
-    private $feeRates;
+    private $feeRates = [];
 
     public function __construct(
         DebtorCompany $company,
@@ -128,12 +128,12 @@ class MerchantCreationDTO
         return $this;
     }
 
-    public function getFeeRates(): ?string
+    public function getFeeRates(): array
     {
         return $this->feeRates;
     }
 
-    public function setFeeRates($feeRates): MerchantCreationDTO
+    public function setFeeRates(array $feeRates): MerchantCreationDTO
     {
         $this->feeRates = $feeRates;
 

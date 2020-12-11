@@ -12,7 +12,7 @@ interface InvoiceUploadHandlerInterface
 
     public const EVENT_SHIPMENT = 'order.shipment';
 
-    public function handleInvoice(OrderEntity $order, string $event): void;
+    public function handleInvoice(OrderEntity $order, string $invoiceUrl, string $invoiceNumber, string $event): void;
 
     public function supports(int $merchantId): bool;
 }

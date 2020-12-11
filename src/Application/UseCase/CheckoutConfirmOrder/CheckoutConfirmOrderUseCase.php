@@ -16,7 +16,7 @@ use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\OrderResponse\OrderResponse;
+use App\DomainModel\OrderResponse\OrderResponseV1;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
 
 class CheckoutConfirmOrderUseCase implements ValidatedUseCaseInterface
@@ -51,7 +51,7 @@ class CheckoutConfirmOrderUseCase implements ValidatedUseCaseInterface
         $this->orderRepository = $orderRepository;
     }
 
-    public function execute(CheckoutConfirmOrderRequest $request): OrderResponse
+    public function execute(CheckoutConfirmOrderRequest $request): OrderResponseV1
     {
         $this->validateRequest($request);
 
@@ -76,7 +76,7 @@ class CheckoutConfirmOrderUseCase implements ValidatedUseCaseInterface
             $this->approveOrderService->approve($orderContainer);
         }
 
-        return $this->orderResponseFactory->create($orderContainer);
+        return $this->orderResponseFactory->createV1($orderContainer);
     }
 
     private function assureDataMatches(CheckoutConfirmOrderRequest $request, OrderContainer $orderContainer): void

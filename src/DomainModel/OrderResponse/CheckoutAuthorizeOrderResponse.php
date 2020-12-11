@@ -11,7 +11,6 @@ use OpenApi\Annotations as OA;
  * @OA\Schema(schema="CheckoutAuthorizeOrderResponse", title="Authorize Checkout Order Response", type="object",
  *     properties={
  *      @OA\Property(property="state", ref="#/components/schemas/OrderState", example="created"),
- *      @OA\Property(property="reasons", enum=\App\DomainModel\Order\OrderDeclinedReasonsMapper::REASONS, type="string", nullable=true, deprecated=true),
  *      @OA\Property(property="decline_reason", ref="#/components/schemas/OrderDeclineReason", nullable=true),
  *      @OA\Property(property="debtor_company", type="object", description="Identified company", properties={
  *          @OA\Property(property="name", ref="#/components/schemas/TinyText", nullable=true, example="Billie GmbH"),
@@ -48,11 +47,6 @@ class CheckoutAuthorizeOrderResponse implements ArrayableInterface
     private $companyAddressCountry;
 
     private $debtorCompanySuggestion;
-
-    /**
-     * @deprecated
-     */
-    private $reasons;
 
     private $declineReason;
 
@@ -145,24 +139,6 @@ class CheckoutAuthorizeOrderResponse implements ArrayableInterface
         return $this;
     }
 
-    /**
-     * @deprecated
-     */
-    public function getReasons(): ?array
-    {
-        return $this->reasons;
-    }
-
-    /**
-     * @deprecated
-     */
-    public function setReasons(array $reasons): CheckoutAuthorizeOrderResponse
-    {
-        $this->reasons = $reasons;
-
-        return $this;
-    }
-
     public function getDeclineReason(): ?string
     {
         return $this->declineReason;
@@ -203,8 +179,8 @@ class CheckoutAuthorizeOrderResponse implements ArrayableInterface
                 'address_city' => $this->getCompanyAddressCity(),
                 'address_country' => $this->getCompanyAddressCountry(),
             ],
-            'reasons' => $this->getReasons() ? implode(', ', $this->getReasons()) : null,
             'decline_reason' => $this->getDeclineReason(),
+            'reasons' => $this->getDeclineReason(),
             'debtor_company_suggestion' => $debtorCompanySuggestion,
         ];
     }

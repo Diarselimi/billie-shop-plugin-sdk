@@ -2,19 +2,17 @@
 
 namespace App\DomainModel\OrderInvoice;
 
+use Billie\PdoBundle\DomainModel\CreatedAtEntityTrait;
+
 class OrderInvoiceEntity
 {
-    private $id;
+    use CreatedAtEntityTrait;
 
-    private $orderId;
+    private int $id;
 
-    private $fileId;
+    private int $orderId;
 
-    private $invoiceNumber;
-
-    private $createdAt;
-
-    private $invoiceUuid;
+    private string $invoiceUuid;
 
     public function __construct()
     {
@@ -26,7 +24,7 @@ class OrderInvoiceEntity
         return $this->id;
     }
 
-    public function setId(int $id): OrderInvoiceEntity
+    public function setId(int $id): self
     {
         $this->id = $id;
 
@@ -43,38 +41,14 @@ class OrderInvoiceEntity
         return $this->orderId;
     }
 
-    public function setOrderId(int $orderId): OrderInvoiceEntity
+    public function setOrderId(int $orderId): self
     {
         $this->orderId = $orderId;
 
         return $this;
     }
 
-    public function getFileId(): int
-    {
-        return $this->fileId;
-    }
-
-    public function setFileId(int $fileId): OrderInvoiceEntity
-    {
-        $this->fileId = $fileId;
-
-        return $this;
-    }
-
-    public function getInvoiceNumber(): string
-    {
-        return $this->invoiceNumber;
-    }
-
-    public function setInvoiceNumber(string $invoiceNumber): OrderInvoiceEntity
-    {
-        $this->invoiceNumber = $invoiceNumber;
-
-        return $this;
-    }
-
-    public function getInvoiceUuid(): ?string
+    public function getInvoiceUuid(): string
     {
         return $this->invoiceUuid;
     }

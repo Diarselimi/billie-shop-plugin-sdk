@@ -19,17 +19,18 @@ class SandboxClient implements SandboxClientInterface
 {
     use LoggingTrait, DecodeResponseTrait;
 
-    private const FEE_RATES = '{"14": 299, "30": 349, "45": 459, "60": 579, "75": 709, "90": 839, "105": 969, "120": 1099}';
+    private const FEE_RATES = ["14" => 299, "30" => 349, "45" => 459, "60" => 579, "75" => 709, "90" => 839, "105" => 969, "120" => 1099];
 
-    private $paellaSandboxClient;
+    private Client $paellaSandboxClient;
 
-    private $merchantEntityFactory;
+    private MerchantEntityFactory $merchantEntityFactory;
 
     public function __construct(Client $paellaSandboxClient, MerchantEntityFactory $merchantEntityFactory)
     {
         if (!$paellaSandboxClient->getConfig('base_uri')) {
             throw new SandboxClientNotAvailableException();
         }
+
         $this->paellaSandboxClient = $paellaSandboxClient;
         $this->merchantEntityFactory = $merchantEntityFactory;
     }

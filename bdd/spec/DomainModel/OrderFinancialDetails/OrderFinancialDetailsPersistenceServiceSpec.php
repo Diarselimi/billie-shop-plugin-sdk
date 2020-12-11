@@ -10,13 +10,16 @@ use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterfa
 use Ozean12\Money\Money;
 use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
 use PhpSpec\ObjectBehavior;
+use Prophecy\Argument;
 
 class OrderFinancialDetailsPersistenceServiceSpec extends ObjectBehavior
 {
     public function let(
         OrderFinancialDetailsRepositoryInterface $repository,
-        OrderFinancialDetailsFactory $factory
+        OrderFinancialDetailsFactory $factory,
+        OrderFinancialDetailsEntity $financialDetailsEntity
     ) {
+        $factory->create(Argument::cetera())->willReturn($financialDetailsEntity);
         $this->beConstructedWith(...func_get_args());
     }
 
@@ -25,6 +28,7 @@ class OrderFinancialDetailsPersistenceServiceSpec extends ObjectBehavior
         OrderFinancialDetailsFactory $factory,
         OrderContainer $orderContainer
     ) {
+        $orderContainer->setOrderFinancialDetails(Argument::any())->willReturn($orderContainer);
         // Arrange
         $newFinancialDetails = new OrderFinancialDetailsEntity();
         $changeSet = new UpdateOrderRequest('', 1);
@@ -46,11 +50,7 @@ class OrderFinancialDetailsPersistenceServiceSpec extends ObjectBehavior
                 ->setOrderId($orderId)
         );
 
-        // Assert
-        $repository->insert($newFinancialDetails)->shouldBeCalledOnce();
-        $orderContainer->setOrderFinancialDetails($newFinancialDetails)->shouldBeCalledOnce();
-
-        // Act
+        $repository->insert(Argument::cetera())->shouldBeCalledOnce();
         $this->updateFinancialDetails($orderContainer, $changeSet, $duration);
     }
 }

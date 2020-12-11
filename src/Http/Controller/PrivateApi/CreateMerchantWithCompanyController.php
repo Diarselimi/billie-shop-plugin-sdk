@@ -44,7 +44,7 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
  */
 class CreateMerchantWithCompanyController
 {
-    private $useCase;
+    private CreateMerchantWithCompanyUseCase $useCase;
 
     public function __construct(CreateMerchantWithCompanyUseCase $useCase)
     {
@@ -72,10 +72,9 @@ class CreateMerchantWithCompanyController
             ->setSchufaId($request->get('schufa_id'))
             ->setTaxId($request->get('tax_id'))
             ->setRegistrationNumber($request->get('registration_number'))
-            ->setFeeRates($request->get('fee_rates'));
+            ->setFeeRates($request->get('fee_rates') ?: []);
 
         try {
-            /** @var CreateMerchantWithCompanyRequest $useCaseRequest */
             $response = $this->useCase->execute($useCaseRequest);
 
             return new JsonResponse($response->toArray(), JsonResponse::HTTP_CREATED);

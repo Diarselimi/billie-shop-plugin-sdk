@@ -15,25 +15,22 @@ class OrderInvoiceManager implements LoggingInterface
 {
     use LoggingTrait;
 
-    private $uploadHandlers;
-
-    private $fileService;
-
-    private $orderInvoiceRepository;
-
-    private $orderInvoiceFactory;
-
     /**
-     * @param InvoiceUploadHandlerInterface[] $invoiceUploadHandlers
-     * @param FileServiceInterface            $fileService
-     * @param OrderInvoiceRepositoryInterface $orderInvoiceRepository
-     * @param OrderInvoiceFactory             $orderInvoiceFactory
+     * @var array|InvoiceUploadHandlerInterface[]
      */
+    private array $uploadHandlers;
+
+    private FileServiceInterface $fileService;
+
+    private LegacyOrderInvoiceRepositoryInterface $orderInvoiceRepository;
+
+    private LegacyOrderInvoiceFactory $orderInvoiceFactory;
+
     public function __construct(
         array $invoiceUploadHandlers,
         FileServiceInterface $fileService,
-        OrderInvoiceRepositoryInterface $orderInvoiceRepository,
-        OrderInvoiceFactory $orderInvoiceFactory
+        LegacyOrderInvoiceRepositoryInterface $orderInvoiceRepository,
+        LegacyOrderInvoiceFactory $orderInvoiceFactory
     ) {
         $this->uploadHandlers = $invoiceUploadHandlers;
         $this->fileService = $fileService;
@@ -41,23 +38,23 @@ class OrderInvoiceManager implements LoggingInterface
         $this->orderInvoiceFactory = $orderInvoiceFactory;
     }
 
-    public function upload(OrderEntity $order, string $event): void
+    public function upload(OrderEntity $order, string $invoiceUrl, string $invoiceNumber, string $event): void
     {
         foreach ($this->uploadHandlers as $name => $handler) {
             if ($handler->supports($order->getMerchantId())) {
                 $this->logInfo('Handling invoice {number} using {name} handler', [
-                    LoggingInterface::KEY_NUMBER => $order->getInvoiceNumber(),
+                    LoggingInterface::KEY_NUMBER => $invoiceNumber,
                     LoggingInterface::KEY_NAME => $name,
                 ]);
 
-                $handler->handleInvoice($order, $event);
+                $handler->handleInvoice($order, $invoiceUrl, $invoiceNumber, $event);
 
                 return;
             }
         }
 
         $this->logInfo('No supported handler for {number} found', [
-            LoggingInterface::KEY_NUMBER => $order->getInvoiceNumber(),
+            LoggingInterface::KEY_NUMBER => $invoiceNumber,
         ]);
 
         throw new OrderInvoiceUploadException('No supported handler found');

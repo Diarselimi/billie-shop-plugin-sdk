@@ -17,7 +17,7 @@ class HttpInvoiceUploadHandler extends AbstractSettingsAwareInvoiceUploadHandler
 
     protected const SUPPORTED_STRATEGY = MerchantSettingsEntity::INVOICE_HANDLING_STRATEGY_HTTP;
 
-    private $producer;
+    private ProducerInterface $producer;
 
     public function __construct(
         ProducerInterface $producer,
@@ -28,13 +28,13 @@ class HttpInvoiceUploadHandler extends AbstractSettingsAwareInvoiceUploadHandler
         parent::__construct($merchantSettingsRepository);
     }
 
-    public function handleInvoice(OrderEntity $order, string $event): void
+    public function handleInvoice(OrderEntity $order, string $invoiceUrl, string $invoiceNumber, string $event): void
     {
         $message = new HttpInvoiceUploadRequest(
             $order->getMerchantId(),
             $order->getExternalCode(),
-            $order->getInvoiceUrl(),
-            $order->getInvoiceNumber(),
+            $invoiceUrl,
+            $invoiceNumber,
             $event
         );
 

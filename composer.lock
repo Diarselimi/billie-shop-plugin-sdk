@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "aa5332952623a3748bd6780b2799a4d7",
+    "content-hash": "c4baab47336c41de15d6d330c59b099c",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -2989,20 +2989,20 @@
         },
         {
             "name": "ozean12/amqp-transfers",
-            "version": "0.3.65",
+            "version": "0.3.85",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/amqp-transfers.git",
-                "reference": "40c4d276aa39bd54734bc2e5bfdbbdf5a351b6b6"
+                "reference": "01a37bb2cd9fa8370363b419f139bdeb5c51004e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/amqp-transfers/zipball/40c4d276aa39bd54734bc2e5bfdbbdf5a351b6b6",
-                "reference": "40c4d276aa39bd54734bc2e5bfdbbdf5a351b6b6",
+                "url": "https://api.github.com/repos/ozean12/amqp-transfers/zipball/01a37bb2cd9fa8370363b419f139bdeb5c51004e",
+                "reference": "01a37bb2cd9fa8370363b419f139bdeb5c51004e",
                 "shasum": ""
             },
             "require": {
-                "google/protobuf": "3.7.1",
+                "google/protobuf": "^3.7.0",
                 "php": "^7.2"
             },
             "type": "library",
@@ -3017,10 +3017,10 @@
             ],
             "description": "Transfer objects across Billie universe",
             "support": {
-                "source": "https://github.com/ozean12/amqp-transfers/tree/0.3.65",
+                "source": "https://github.com/ozean12/amqp-transfers/tree/0.3.85",
                 "issues": "https://github.com/ozean12/amqp-transfers/issues"
             },
-            "time": "2020-10-13T08:17:57+00:00"
+            "time": "2020-11-23T10:09:06+00:00"
         },
         {
             "name": "ozean12/amqp-transfers-serializer",
@@ -9726,6 +9726,7 @@
                 "faker",
                 "fixtures"
             ],
+            "abandoned": true,
             "time": "2019-12-12T13:22:17+00:00"
         },
         {

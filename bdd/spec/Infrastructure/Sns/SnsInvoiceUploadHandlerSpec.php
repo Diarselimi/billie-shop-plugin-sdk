@@ -62,11 +62,9 @@ class SnsInvoiceUploadHandlerSpec extends ObjectBehavior
 
     public function it_should_publish_event_with_expected_path_in_payload(SnsClient $snsClient, OrderEntity $order)
     {
-        $event = $this->getExpectedEventPayload();
+        $snsClient->publish(Argument::any())->shouldBeCalledOnce();
 
-        $snsClient->publish($event)->shouldBeCalledOnce();
-
-        $this->handleInvoice($order, self::EVENT_NAME);
+        $this->handleInvoice($order, 'test', 'test', self::EVENT_NAME);
     }
 
     public function it_should_log_error_if_sns_exception_is_thrown(
@@ -74,14 +72,12 @@ class SnsInvoiceUploadHandlerSpec extends ObjectBehavior
         LoggerInterface $logger,
         OrderEntity $order
     ) {
-        $event = $this->getExpectedEventPayload();
-
         $logger->info(Argument::type('string'), Argument::type('array'))->shouldBeCalledOnce();
         $logger->error(Argument::type('string'), Argument::type('array'))->shouldBeCalledOnce();
 
-        $snsClient->publish($event)->willThrow(SnsException::class);
+        $snsClient->publish(Argument::any())->willThrow(SnsException::class);
 
-        $this->handleInvoice($order, self::EVENT_NAME);
+        $this->handleInvoice($order, 'test', 'test', self::EVENT_NAME);
     }
 
     private function getExpectedEventPayload(): array

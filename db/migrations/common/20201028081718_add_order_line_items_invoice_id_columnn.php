@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Infrastructure\Phinx\TransactionalMigration;
-use App\Infrastructure\Repository\OrderInvoiceRepository;
+use App\Infrastructure\Repository\LegacyOrderInvoiceRepository;
 use App\Infrastructure\Repository\OrderLineItemRepository;
 
 final class AddOrderLineItemsInvoiceIdColumnn extends TransactionalMigration
@@ -15,7 +15,7 @@ final class AddOrderLineItemsInvoiceIdColumnn extends TransactionalMigration
                 'null' => true,
                 'after' => 'order_id',
             ])
-            ->addForeignKey('order_invoice_id', OrderInvoiceRepository::TABLE_NAME, 'id')
+            ->addForeignKey('order_invoice_id', LegacyOrderInvoiceRepository::TABLE_NAME, 'id')
             ->save();
     }
 }

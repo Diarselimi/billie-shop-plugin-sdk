@@ -2,15 +2,25 @@
 
 namespace App\DomainModel\OrderInvoice;
 
-class OrderInvoiceFactory
+use App\Support\AbstractFactory;
+
+class OrderInvoiceFactory extends AbstractFactory
 {
-    public function create(int $orderId, int $fileId, string $invoiceNumber): OrderInvoiceEntity
+    public function create(int $orderId, string $invoiceUuid): OrderInvoiceEntity
     {
-        // TODO: call invoice-butler before calling this method and pass the invoiceUuid to it
         return (new OrderInvoiceEntity())
             ->setOrderId($orderId)
-            ->setFileId($fileId)
-            ->setInvoiceNumber($invoiceNumber)
+            ->setInvoiceUuid($invoiceUuid)
+        ;
+    }
+
+    public function createFromArray(array $data): OrderInvoiceEntity
+    {
+        return (new OrderInvoiceEntity())
+            ->setId($data['id'])
+            ->setOrderId($data['order_id'])
+            ->setInvoiceUuid($data['invoice_uuid'])
+            ->setCreatedAt(new \DateTime($data['created_at']))
         ;
     }
 }

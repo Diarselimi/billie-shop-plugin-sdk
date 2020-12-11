@@ -10,6 +10,8 @@ use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\DebtorSettings\DebtorSettingsEntity;
 use App\DomainModel\DebtorSettings\DebtorSettingsRepositoryInterface;
+use App\DomainModel\Invoice\Invoice;
+use App\DomainModel\Invoice\InvoiceServiceInterface;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Details\MerchantDebtorDetailsDTO;
@@ -20,11 +22,12 @@ use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface;
+use App\DomainModel\OrderInvoice\OrderInvoiceEntity;
+use App\DomainModel\OrderInvoice\OrderInvoiceRepositoryInterface;
 use App\DomainModel\OrderLineItem\OrderLineItemEntity;
 use App\DomainModel\OrderLineItem\OrderLineItemRepositoryInterface;
 use App\DomainModel\OrderRiskCheck\CheckResultCollection;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
-use App\DomainModel\Payment\DebtorPaymentDetailsDTO;
 use App\DomainModel\Payment\OrderPaymentDetailsDTO;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Person\PersonEntity;
@@ -60,6 +63,10 @@ class OrderContainerRelationLoader
 
     private MerchantDebtorDetailsRepositoryInterface $merchantDebtorDetailsRepository;
 
+    private OrderInvoiceRepositoryInterface $orderInvoiceRepository;
+
+    private InvoiceServiceInterface $invoiceRepository;
+
     public function __construct(
         DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
         AddressRepositoryInterface $addressRepository,
@@ -74,7 +81,9 @@ class OrderContainerRelationLoader
         PaymentsServiceInterface $paymentsService,
         DebtorSettingsRepositoryInterface $debtorSettingsRepository,
         CompaniesServiceInterface $companiesService,
-        MerchantDebtorDetailsRepositoryInterface $merchantDebtorDetailsRepository
+        MerchantDebtorDetailsRepositoryInterface $merchantDebtorDetailsRepository,
+        OrderInvoiceRepositoryInterface $orderInvoiceRepository,
+        InvoiceServiceInterface $invoiceRepository
     ) {
         $this->debtorExternalDataRepository = $debtorExternalDataRepository;
         $this->addressRepository = $addressRepository;
@@ -90,6 +99,8 @@ class OrderContainerRelationLoader
         $this->orderRiskCheckRepository = $orderRiskCheckRepository;
         $this->companiesService = $companiesService;
         $this->merchantDebtorDetailsRepository = $merchantDebtorDetailsRepository;
+        $this->orderInvoiceRepository = $orderInvoiceRepository;
+        $this->invoiceRepository = $invoiceRepository;
     }
 
     public function loadMerchantDebtor(OrderContainer $orderContainer): MerchantDebtorEntity
@@ -120,6 +131,23 @@ class OrderContainerRelationLoader
     public function loadBillingAddress(OrderContainer $orderContainer): AddressEntity
     {
         return $this->addressRepository->getOneById($orderContainer->getDebtorExternalData()->getBillingAddressId());
+    }
+
+    public function loadInvoices(OrderContainer $orderContainer): array
+    {
+        $orderInvoices = $this->orderInvoiceRepository->findByOrderId($orderContainer->getOrder()->getId());
+        if (empty($orderInvoices)) {
+            return [];
+        }
+
+        $uuids = array_map(fn (OrderInvoiceEntity $orderInvoice) => $orderInvoice->getInvoiceUuid(), $orderInvoices);
+
+        $invoices = $this->invoiceRepository->findByUuids($uuids);
+
+        return array_combine(
+            array_map(fn (Invoice $invoice) => $invoice->getUuid(), $invoices),
+            $invoices
+        );
     }
 
     public function loadMerchant(OrderContainer $orderContainer): MerchantEntity

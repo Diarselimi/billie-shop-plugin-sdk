@@ -5,8 +5,8 @@ namespace App\Application\UseCase\HttpInvoiceUpload;
 use App\DomainModel\FileService\FileServiceInterface;
 use App\DomainModel\FileService\FileServiceRequestException;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\OrderInvoice\OrderInvoiceFactory;
-use App\DomainModel\OrderInvoice\OrderInvoiceRepositoryInterface;
+use App\DomainModel\OrderInvoice\LegacyOrderInvoiceFactory;
+use App\DomainModel\OrderInvoice\LegacyOrderInvoiceRepositoryInterface;
 use App\Infrastructure\ClientResponseDecodeException;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -33,8 +33,8 @@ class HttpInvoiceUploadUseCase implements LoggingInterface
         Client $invoiceDownloadClient,
         FileServiceInterface $fileService,
         OrderRepositoryInterface $orderRepository,
-        OrderInvoiceRepositoryInterface $orderInvoiceRepository,
-        OrderInvoiceFactory $orderInvoiceFactory
+        LegacyOrderInvoiceRepositoryInterface $orderInvoiceRepository,
+        LegacyOrderInvoiceFactory $orderInvoiceFactory
     ) {
         $this->client = $invoiceDownloadClient;
         $this->fileService = $fileService;

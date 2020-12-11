@@ -4,7 +4,7 @@ default:
 
   suites:
     default:
-      paths: [ '%paths.base%/bdd/features' ]
+      paths: [ '%paths.base%/bdd/features/' ]
       contexts:
         - Behatch\Context\RestContext
         - json_spec

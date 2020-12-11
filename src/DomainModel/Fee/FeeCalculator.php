@@ -14,7 +14,7 @@ class FeeCalculator implements LoggingInterface
 
     private VatRateRepositoryInterface $vatRateRepository;
 
-    public function __construct($vatRateRepository)
+    public function __construct(VatRateRepositoryInterface $vatRateRepository)
     {
         $this->vatRateRepository = $vatRateRepository;
     }
@@ -32,6 +32,9 @@ class FeeCalculator implements LoggingInterface
         return new Fee($feeRate, $grossFeeAmount, $netFeeAmount, $taxFeeAmount);
     }
 
+    /**
+     * @param array|Percent[] $feeRates
+     */
     private function getFeeRate(int $duration, array $feeRates): Percent
     {
         $feeRatesSorted = $feeRates;

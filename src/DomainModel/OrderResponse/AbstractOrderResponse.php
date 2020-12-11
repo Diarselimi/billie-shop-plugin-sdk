@@ -1,0 +1,613 @@
+<?php
+
+namespace App\DomainModel\OrderResponse;
+
+use App\DomainModel\ArrayableInterface;
+use OpenApi\Annotations as OA;
+use Ozean12\Money\TaxedMoney\TaxedMoney;
+
+/**
+ * @OA\Schema(schema="AbstractOrderResponse", title="Order Entity", type="object", properties={
+ *      @OA\Property(property="order_id", type="string", nullable=true, example="C-10123456789-0001"),
+ *      @OA\Property(property="uuid", ref="#/components/schemas/UUID"),
+ *      @OA\Property(property="state", ref="#/components/schemas/OrderState", example="created"),
+ *      @OA\Property(property="decline_reason", ref="#/components/schemas/OrderDeclineReason", nullable=true),
+ *      @OA\Property(property="amount", type="number", format="float", nullable=false, example=123.57, description="Gross amount"),
+ *      @OA\Property(property="amount_net", type="number", format="float", nullable=false, example=100.12),
+ *      @OA\Property(property="amount_tax", type="number", format="float", nullable=false, example=23.45),
+ *      @OA\Property(property="duration", ref="#/components/schemas/OrderDuration", example=30),
+ *      @OA\Property(property="dunning_status", ref="#/components/schemas/OrderDunningStatus"),
+ *
+ *      @OA\Property(property="debtor_company", type="object", description="Identified company", properties={
+ *          @OA\Property(property="name", ref="#/components/schemas/TinyText", nullable=true, example="Billie GmbH"),
+ *          @OA\Property(property="address_house_number", ref="#/components/schemas/TinyText", nullable=true, example="4"),
+ *          @OA\Property(property="address_street", ref="#/components/schemas/TinyText", nullable=true, example="Charlottenstr."),
+ *          @OA\Property(property="address_postal_code", type="string", nullable=true, maxLength=5, example="10969"),
+ *          @OA\Property(property="address_city", ref="#/components/schemas/TinyText", nullable=true, example="Berlin"),
+ *          @OA\Property(property="address_country", type="string", nullable=true, maxLength=2),
+ *      }),
+ *
+ *      @OA\Property(property="bank_account", type="object", properties={
+ *          @OA\Property(property="iban", ref="#/components/schemas/TinyText", nullable=true, description="Virtual IBAN provided by Billie"),
+ *          @OA\Property(property="bic", ref="#/components/schemas/TinyText", nullable=true),
+ *      }),
+ *
+ *      @OA\Property(property="debtor_external_data", description="Data provided in the order creation", type="object", properties={
+ *          @OA\Property(property="merchant_customer_id", ref="#/components/schemas/TinyText", example="C-10123456789"),
+ *          @OA\Property(property="name", ref="#/components/schemas/TinyText", example="Billie G.m.b.H."),
+ *          @OA\Property(property="address_country", type="string", maxLength=2, example="DE"),
+ *          @OA\Property(property="address_city", ref="#/components/schemas/TinyText", example="Berlin"),
+ *          @OA\Property(property="address_postal_code", type="string", maxLength=5, example="10969"),
+ *          @OA\Property(property="address_street", ref="#/components/schemas/TinyText", example="Charlotten Straße"),
+ *          @OA\Property(property="address_house", ref="#/components/schemas/TinyText", example="4"),
+ *          @OA\Property(property="industry_sector", ref="#/components/schemas/TinyText", nullable=true),
+ *      }),
+ *
+ *      @OA\Property(property="delivery_address", type="object", ref="#/components/schemas/CreateOrderAddressRequest"),
+ *      @OA\Property(property="billing_address", type="object", ref="#/components/schemas/CreateOrderAddressRequest"),
+ *      @OA\Property(property="created_at", ref="#/components/schemas/DateTime"),
+ *      @OA\Property(property="shipped_at", ref="#/components/schemas/DateTime"),
+ *      @OA\Property(property="debtor_uuid", ref="#/components/schemas/UUID"),
+ * })
+ */
+class AbstractOrderResponse implements ArrayableInterface
+{
+    private $externalCode;
+
+    private $uuid;
+
+    private $state;
+
+    private $bankAccountIban;
+
+    private $bankAccountBic;
+
+    private $companyName;
+
+    private $companyAddressHouseNumber;
+
+    private $companyAddressStreet;
+
+    private $companyAddressCity;
+
+    private $companyAddressPostalCode;
+
+    private $companyAddressCountry;
+
+    private $debtorExternalDataCompanyName;
+
+    private $debtorExternalDataAddressCountry;
+
+    private $debtorExternalDataAddressCity;
+
+    private $debtorExternalDataAddressPostalCode;
+
+    private $debtorExternalDataAddressStreet;
+
+    private $debtorExternalDataAddressHouse;
+
+    private $debtorExternalDataIndustrySector;
+
+    private $declineReason;
+
+    private $amount;
+
+    private $createdAt;
+
+    private $debtorExternalDataCustomerId;
+
+    private $shippedAt;
+
+    private $deliveryAddressStreet;
+
+    private $deliveryAddressHouseNumber;
+
+    private $deliveryAddressPostalCode;
+
+    private $deliveryAddressCity;
+
+    private $deliveryAddressCountry;
+
+    private $billingAddressStreet;
+
+    private $billingAddressHouseNumber;
+
+    private $billingAddressPostalCode;
+
+    private $billingAddressCity;
+
+    private $billingAddressCountry;
+
+    private $duration;
+
+    private $dunningStatus;
+
+    private $debtorUuid;
+
+    public function getExternalCode(): ? string
+    {
+        return $this->externalCode;
+    }
+
+    public function setExternalCode(?string $externalCode): self
+    {
+        $this->externalCode = $externalCode;
+
+        return $this;
+    }
+
+    public function getUuid(): string
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid(string $uuid): self
+    {
+        $this->uuid = $uuid;
+
+        return $this;
+    }
+
+    public function getState(): string
+    {
+        return $this->state;
+    }
+
+    public function setState(string $state): self
+    {
+        $this->state = $state;
+
+        return $this;
+    }
+
+    public function getBankAccountIban(): ? string
+    {
+        return $this->bankAccountIban;
+    }
+
+    public function setBankAccountIban(string $bankAccountIban): self
+    {
+        $this->bankAccountIban = $bankAccountIban;
+
+        return $this;
+    }
+
+    public function getBankAccountBic(): ? string
+    {
+        return $this->bankAccountBic;
+    }
+
+    public function setBankAccountBic(string $bankAccountBic): self
+    {
+        $this->bankAccountBic = $bankAccountBic;
+
+        return $this;
+    }
+
+    public function getCompanyName(): ? string
+    {
+        return $this->companyName;
+    }
+
+    public function setCompanyName(string $companyName): self
+    {
+        $this->companyName = $companyName;
+
+        return $this;
+    }
+
+    public function getCompanyAddressHouseNumber(): ? string
+    {
+        return $this->companyAddressHouseNumber;
+    }
+
+    public function setCompanyAddressHouseNumber(?string $companyAddressHouseNumber): self
+    {
+        $this->companyAddressHouseNumber = $companyAddressHouseNumber;
+
+        return $this;
+    }
+
+    public function getCompanyAddressStreet(): ? string
+    {
+        return $this->companyAddressStreet;
+    }
+
+    public function setCompanyAddressStreet(string $companyAddressStreet): self
+    {
+        $this->companyAddressStreet = $companyAddressStreet;
+
+        return $this;
+    }
+
+    public function getCompanyAddressCity(): ? string
+    {
+        return $this->companyAddressCity;
+    }
+
+    public function setCompanyAddressCity(string $companyAddressCity): self
+    {
+        $this->companyAddressCity = $companyAddressCity;
+
+        return $this;
+    }
+
+    public function getCompanyAddressPostalCode(): ? string
+    {
+        return $this->companyAddressPostalCode;
+    }
+
+    public function setCompanyAddressPostalCode(string $companyAddressPostalCode): self
+    {
+        $this->companyAddressPostalCode = $companyAddressPostalCode;
+
+        return $this;
+    }
+
+    public function getCompanyAddressCountry(): ? string
+    {
+        return $this->companyAddressCountry;
+    }
+
+    public function setCompanyAddressCountry(string $companyAddressCountry): self
+    {
+        $this->companyAddressCountry = $companyAddressCountry;
+
+        return $this;
+    }
+
+    public function getDebtorExternalDataCompanyName(): string
+    {
+        return $this->debtorExternalDataCompanyName;
+    }
+
+    public function setDebtorExternalDataCompanyName(string $debtorExternalDataCompanyName): self
+    {
+        $this->debtorExternalDataCompanyName = $debtorExternalDataCompanyName;
+
+        return $this;
+    }
+
+    public function getDebtorExternalDataAddressCountry(): string
+    {
+        return $this->debtorExternalDataAddressCountry;
+    }
+
+    public function setDebtorExternalDataAddressCountry(string $debtorExternalDataAddressCountry): self
+    {
+        $this->debtorExternalDataAddressCountry = $debtorExternalDataAddressCountry;
+
+        return $this;
+    }
+
+    public function getDebtorExternalDataAddressCity(): string
+    {
+        return $this->debtorExternalDataAddressCity;
+    }
+
+    public function setDebtorExternalDataAddressCity(string $debtorExternalDataAddressCity): self
+    {
+        $this->debtorExternalDataAddressCity = $debtorExternalDataAddressCity;
+
+        return $this;
+    }
+
+    public function getDebtorExternalDataAddressPostalCode(): string
+    {
+        return $this->debtorExternalDataAddressPostalCode;
+    }
+
+    public function setDebtorExternalDataAddressPostalCode(string $debtorExternalDataAddressPostalCode): self
+    {
+        $this->debtorExternalDataAddressPostalCode = $debtorExternalDataAddressPostalCode;
+
+        return $this;
+    }
+
+    public function getDebtorExternalDataAddressStreet(): string
+    {
+        return $this->debtorExternalDataAddressStreet;
+    }
+
+    public function setDebtorExternalDataAddressStreet(string $debtorExternalDataAddressStreet): self
+    {
+        $this->debtorExternalDataAddressStreet = $debtorExternalDataAddressStreet;
+
+        return $this;
+    }
+
+    public function getDebtorExternalDataAddressHouse(): ? string
+    {
+        return $this->debtorExternalDataAddressHouse;
+    }
+
+    public function setDebtorExternalDataAddressHouse(?string $debtorExternalDataAddressHouse): self
+    {
+        $this->debtorExternalDataAddressHouse = $debtorExternalDataAddressHouse;
+
+        return $this;
+    }
+
+    public function getDebtorExternalDataIndustrySector(): ? string
+    {
+        return $this->debtorExternalDataIndustrySector;
+    }
+
+    public function setDebtorExternalDataIndustrySector(?string $debtorExternalDataIndustrySector): self
+    {
+        $this->debtorExternalDataIndustrySector = $debtorExternalDataIndustrySector;
+
+        return $this;
+    }
+
+    public function getDeclineReason(): ?string
+    {
+        return $this->declineReason;
+    }
+
+    public function setDeclineReason(string $declineReason): self
+    {
+        $this->declineReason = $declineReason;
+
+        return $this;
+    }
+
+    public function getAmount(): TaxedMoney
+    {
+        return $this->amount;
+    }
+
+    public function setAmount(TaxedMoney $amount): self
+    {
+        $this->amount = $amount;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): \DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTime $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getDebtorExternalDataCustomerId(): ?string
+    {
+        return $this->debtorExternalDataCustomerId;
+    }
+
+    public function setDebtorExternalDataCustomerId(?string $debtorExternalDataCustomerId): self
+    {
+        $this->debtorExternalDataCustomerId = $debtorExternalDataCustomerId;
+
+        return $this;
+    }
+
+    public function getShippedAt(): ?\DateTime
+    {
+        return $this->shippedAt;
+    }
+
+    public function setShippedAt(?\DateTime $shippedAt): self
+    {
+        $this->shippedAt = $shippedAt;
+
+        return $this;
+    }
+
+    public function getDeliveryAddressStreet(): ?string
+    {
+        return $this->deliveryAddressStreet;
+    }
+
+    public function setDeliveryAddressStreet(?string $street): self
+    {
+        $this->deliveryAddressStreet = $street;
+
+        return $this;
+    }
+
+    public function getDeliveryAddressHouseNumber(): ?string
+    {
+        return $this->deliveryAddressHouseNumber;
+    }
+
+    public function setDeliveryAddressHouseNumber(?string $deliveryAddressHouseNumber): self
+    {
+        $this->deliveryAddressHouseNumber = $deliveryAddressHouseNumber;
+
+        return $this;
+    }
+
+    public function getDeliveryAddressPostalCode(): ?string
+    {
+        return $this->deliveryAddressPostalCode;
+    }
+
+    public function setDeliveryAddressPostalCode(?string $deliveryAddressPostalCode): self
+    {
+        $this->deliveryAddressPostalCode = $deliveryAddressPostalCode;
+
+        return $this;
+    }
+
+    public function getDeliveryAddressCity(): ?string
+    {
+        return $this->deliveryAddressCity;
+    }
+
+    public function setDeliveryAddressCity(?string $deliveryAddressCity): self
+    {
+        $this->deliveryAddressCity = $deliveryAddressCity;
+
+        return $this;
+    }
+
+    public function getDeliveryAddressCountry(): ?string
+    {
+        return $this->deliveryAddressCountry;
+    }
+
+    public function setDeliveryAddressCountry(?string $deliveryAddressCountry): self
+    {
+        $this->deliveryAddressCountry = $deliveryAddressCountry;
+
+        return $this;
+    }
+
+    public function getBillingAddressStreet(): ?string
+    {
+        return $this->billingAddressStreet;
+    }
+
+    public function setBillingAddressStreet(?string $deliveryBillingStreet): self
+    {
+        $this->billingAddressStreet = $deliveryBillingStreet;
+
+        return $this;
+    }
+
+    public function getBillingAddressHouseNumber(): ?string
+    {
+        return $this->billingAddressHouseNumber;
+    }
+
+    public function setBillingAddressHouseNumber(?string $deliveryBillingHouseNumber): self
+    {
+        $this->billingAddressHouseNumber = $deliveryBillingHouseNumber;
+
+        return $this;
+    }
+
+    public function getBillingAddressPostalCode(): ?string
+    {
+        return $this->billingAddressPostalCode;
+    }
+
+    public function setBillingAddressPostalCode(?string $deliveryBillingPostalCode): self
+    {
+        $this->billingAddressPostalCode = $deliveryBillingPostalCode;
+
+        return $this;
+    }
+
+    public function getBillingAddressCity(): ?string
+    {
+        return $this->billingAddressCity;
+    }
+
+    public function setBillingAddressCity(?string $deliveryBillingCity): self
+    {
+        $this->billingAddressCity = $deliveryBillingCity;
+
+        return $this;
+    }
+
+    public function getBillingAddressCountry(): ?string
+    {
+        return $this->billingAddressCountry;
+    }
+
+    public function setBillingAddressCountry(?string $deliveryBillingCountry): self
+    {
+        $this->billingAddressCountry = $deliveryBillingCountry;
+
+        return $this;
+    }
+
+    public function getDuration(): ?int
+    {
+        return $this->duration;
+    }
+
+    public function setDuration(int $duration): self
+    {
+        $this->duration = $duration;
+
+        return $this;
+    }
+
+    public function getDunningStatus(): ? string
+    {
+        return $this->dunningStatus;
+    }
+
+    public function setDunningStatus(?string $dunningStatus): self
+    {
+        $this->dunningStatus = $dunningStatus;
+
+        return $this;
+    }
+
+    public function getDebtorUuid(): ?string
+    {
+        return $this->debtorUuid;
+    }
+
+    public function setDebtorUuid(?string $debtorUuid): self
+    {
+        $this->debtorUuid = $debtorUuid;
+
+        return $this;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'order_id' => $this->getExternalCode(), // This is very confusing because the api used to return the external_code as an order_id.
+            'uuid' => $this->getUuid(),
+            'state' => $this->getState(),
+            'decline_reason' => $this->getDeclineReason(),
+            'reasons' => null,
+            'amount' => $this->getAmount()->getGross()->getMoneyValue(),
+            'amount_net' => $this->getAmount()->getNet()->getMoneyValue(),
+            'amount_tax' => $this->getAmount()->getTax()->getMoneyValue(),
+            'duration' => $this->getDuration(),
+            'dunning_status' => $this->getDunningStatus(),
+            'debtor_company' => [
+                'name' => $this->getCompanyName(),
+                'address_house_number' => $this->getCompanyAddressHouseNumber(),
+                'address_street' => $this->getCompanyAddressStreet(),
+                'address_postal_code' => $this->getCompanyAddressPostalCode(),
+                'address_city' => $this->getCompanyAddressCity(),
+                'address_country' => $this->getCompanyAddressCountry(),
+            ],
+            'bank_account' => [
+                'iban' => $this->getBankAccountIban(),
+                'bic' => $this->getBankAccountBic(),
+            ],
+            'debtor_external_data' => [
+                'merchant_customer_id' => $this->getDebtorExternalDataCustomerId(),
+                'name' => $this->getDebtorExternalDataCompanyName(),
+                'address_country' => $this->getDebtorExternalDataAddressCountry(),
+                'address_city' => $this->getDebtorExternalDataAddressCity(),
+                'address_postal_code' => $this->getDebtorExternalDataAddressPostalCode(),
+                'address_street' => $this->getDebtorExternalDataAddressStreet(),
+                'address_house' => $this->getDebtorExternalDataAddressHouse(),
+                'industry_sector' => $this->getDebtorExternalDataIndustrySector(),
+            ],
+            'delivery_address' => [
+                'house_number' => $this->getDeliveryAddressHouseNumber(),
+                'street' => $this->getDeliveryAddressStreet(),
+                'city' => $this->getDeliveryAddressCity(),
+                'postal_code' => $this->getDeliveryAddressPostalCode(),
+                'country' => $this->getDeliveryAddressCountry(),
+            ],
+            'billing_address' => [
+                'house_number' => $this->getBillingAddressHouseNumber(),
+                'street' => $this->getBillingAddressStreet(),
+                'city' => $this->getBillingAddressCity(),
+                'postal_code' => $this->getBillingAddressPostalCode(),
+                'country' => $this->getBillingAddressCountry(),
+            ],
+            'created_at' => $this->getCreatedAt()->format(\DateTime::ISO8601),
+            'shipped_at' => ($this->getShippedAt() ? $this->getShippedAt()->format(\DateTime::ISO8601) : null),
+            'debtor_uuid' => $this->getDebtorUuid(),
+        ];
+    }
+}

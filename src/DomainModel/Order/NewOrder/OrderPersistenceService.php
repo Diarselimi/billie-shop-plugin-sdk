@@ -160,7 +160,8 @@ class OrderPersistenceService
         $orderFinancialDetails = $this->orderFinancialDetailsFactory->create(
             $orderId,
             $request->getAmount(),
-            $request->getDuration()
+            $request->getDuration(),
+            $request->getAmount()
         );
 
         $this->orderFinancialDetailsRepository->insert($orderFinancialDetails);

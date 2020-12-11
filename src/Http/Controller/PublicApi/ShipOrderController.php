@@ -2,24 +2,21 @@
 
 namespace App\Http\Controller\PublicApi;
 
-use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\WorkflowException;
-use App\Application\UseCase\ShipOrder\ShipOrderRequest;
-use App\Application\UseCase\ShipOrder\ShipOrderUseCase;
-use App\DomainModel\OrderResponse\OrderResponse;
+use App\Application\UseCase\ShipOrder\ShipOrderRequestV1;
+use App\Application\UseCase\ShipOrder\ShipOrderUseCaseV1;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
+use App\DomainModel\OrderResponse\OrderResponseV1;
 use App\DomainModel\ShipOrder\ShipOrderException;
 use App\Http\HttpConstantsInterface;
+use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use OpenApi\Annotations as OA;
 
 /**
  * @IsGranted("ROLE_AUTHENTICATED_AS_MERCHANT")
- *
  * @OA\Post(
  *     path="/order/{id}/ship",
  *     operationId="order_ship",
@@ -38,7 +35,7 @@ use OpenApi\Annotations as OA;
  *     @OA\RequestBody(
  *          required=true,
  *          @OA\MediaType(mediaType="application/json",
- *          @OA\Schema(ref="#/components/schemas/ShipOrderRequest"))
+ *          @OA\Schema(ref="#/components/schemas/ShipOrderRequestV1"))
  *     ),
  *
  *     @OA\Response(response=200, @OA\JsonContent(ref="#/components/schemas/OrderResponse"), description="Order successfully shipped. Order details."),
@@ -50,16 +47,19 @@ use OpenApi\Annotations as OA;
  */
 class ShipOrderController
 {
-    private $useCase;
+    private ShipOrderUseCaseV1 $useCase;
 
-    public function __construct(ShipOrderUseCase $useCase)
+    public function __construct(ShipOrderUseCaseV1 $useCase)
     {
         $this->useCase = $useCase;
     }
 
-    public function execute(string $id, Request $request): OrderResponse
+    public function execute(string $id, Request $request): OrderResponseV1
     {
-        $orderRequest = (new ShipOrderRequest($id, $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID)))
+        $orderRequest = (new ShipOrderRequestV1(
+            $id,
+            $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID)
+        ))
             ->setExternalCode($request->request->get('external_order_id'))
             ->setInvoiceNumber($request->request->get('invoice_number'))
             ->setInvoiceUrl($request->request->get('invoice_url'))
@@ -67,12 +67,10 @@ class ShipOrderController
 
         try {
             return $this->useCase->execute($orderRequest);
-        } catch (OrderNotFoundException $e) {
-            throw new NotFoundHttpException($e->getMessage());
-        } catch (WorkflowException $e) {
-            throw new BadRequestHttpException($e->getMessage());
-        } catch (ShipOrderException $exception) {
-            throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, "Order can not be shipped", $exception);
+        } catch (OrderContainerFactoryException $exception) {
+            throw new NotFoundHttpException($exception->getMessage());
+        } catch (WorkflowException | ShipOrderException $exception) {
+            throw new BadRequestHttpException('Shipment is not allowed', $exception);
         }
     }
 }

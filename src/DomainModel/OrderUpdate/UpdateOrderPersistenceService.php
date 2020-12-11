@@ -110,7 +110,7 @@ class UpdateOrderPersistenceService
     private function updateInvoice(OrderEntity $order): void
     {
         try {
-            $this->invoiceManager->upload($order, InvoiceUploadHandlerInterface::EVENT_UPDATE);
+            $this->invoiceManager->upload($order, $order->getInvoiceUrl(), $order->getInvoiceNumber(), InvoiceUploadHandlerInterface::EVENT_UPDATE);
         } catch (OrderInvoiceUploadException $exception) {
             throw new UpdateOrderException("Order invoice cannot be updated: upload failed.", 0, $exception);
         }

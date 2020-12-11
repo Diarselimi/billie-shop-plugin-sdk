@@ -4,13 +4,14 @@ namespace App\DomainModel\OrderFinancialDetails;
 
 use App\Application\UseCase\UpdateOrder\UpdateOrderAmountInterface;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
+use Ozean12\Money\TaxedMoney\TaxedMoney;
 use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
 
 class OrderFinancialDetailsPersistenceService
 {
-    private $repository;
+    private OrderFinancialDetailsRepositoryInterface $repository;
 
-    private $factory;
+    private OrderFinancialDetailsFactory $factory;
 
     public function __construct(
         OrderFinancialDetailsRepositoryInterface $repository,
@@ -24,7 +25,7 @@ class OrderFinancialDetailsPersistenceService
         OrderContainer $orderContainer,
         UpdateOrderAmountInterface $changeSet,
         int $duration
-    ) {
+    ): void {
         $financialDetails = $orderContainer->getOrderFinancialDetails();
 
         if ($changeSet->getAmount() !== null) {
@@ -37,9 +38,16 @@ class OrderFinancialDetailsPersistenceService
             );
         }
 
+        $unshippedAmount = new TaxedMoney(
+            $financialDetails->getUnshippedAmountGross(),
+            $financialDetails->getUnshippedAmountNet(),
+            $financialDetails->getUnshippedAmountTax()
+        );
+
         $newFinancialDetails = $this
             ->factory
-            ->create($financialDetails->getOrderId(), $amount, $duration);
+            ->create($financialDetails->getOrderId(), $amount, $duration, $unshippedAmount)
+        ;
 
         $this->repository->insert($newFinancialDetails);
         $orderContainer->setOrderFinancialDetails($newFinancialDetails);

@@ -1,17 +1,17 @@
 Feature:
-    In order to ship an order
-    I want to have an end point to ship my orders And expect empty response
+  In order to ship an order
+  I want to have an end point to ship my orders And expect empty response
 
-    Background:
-        Given I add "Content-type" header equal to "application/json"
-        And I add "X-Test" header equal to 1
-        And I add "X-Api-Key" header equal to test
-        And The following notification settings exist for merchant 1:
-        | notification_type | enabled |
-        | order_shipped     | 1       |
+  Background:
+    Given I add "Content-type" header equal to "application/json"
+    And I add "X-Test" header equal to 1
+    And I add "X-Api-Key" header equal to test
+    And The following notification settings exist for merchant 1:
+      | notification_type | enabled |
+      | order_shipped     | 1       |
 
-    Scenario: Order doesn't exist
-        When I send a POST request to "/order/ADDDD/ship" with body:
+  Scenario: Order doesn't exist
+    When I send a POST request to "/order/ADDDD/ship" with body:
         """
         {
             "invoice_number": "CO123",
@@ -19,19 +19,19 @@ Feature:
             "shipping_document_url": "http://example.com/proove/is/here"
         }
         """
-        Then the response status code should be 404
-        And the JSON response should be:
+    Then the response status code should be 404
+    And the JSON response should be:
         """
         {"errors":[{"title":"Order not found","code":"resource_not_found"}]}
         """
 
-    Scenario: Successful order shipment
-        Given I have a created order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-        And I get from payments service get order details not found response
-        And I get from payments service create ticket response
-        And I get from companies service identify match response
-        And GraphQL will respond to getMerchantDebtorDetails query
-        When I send a POST request to "/order/CO123/ship" with body:
+  Scenario: Successful order shipment
+    Given I have a created order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+    And I get from payments service get order details not found response
+    And I get from payments service create ticket response
+    And I get from companies service identify match response
+    And GraphQL will respond to getMerchantDebtorDetails query
+    When I send a POST request to "/order/CO123/ship" with body:
         """
         {
             "invoice_number": "CO123",
@@ -39,7 +39,7 @@ Feature:
             "shipping_document_url": "http://example.com/proove/is/here"
         }
         """
-        Then the JSON response should be:
+    Then the JSON response should be:
         """
         {
           "order_id": "CO123",
@@ -62,16 +62,7 @@ Feature:
             "iban": "DE1234",
             "bic": "BICISHERE"
           },
-          "invoice": {
-            "invoice_number": "CO123",
-            "payout_amount": 1000,
-            "outstanding_amount": 1000,
-            "fee_amount": 10,
-            "fee_rate": 1,
-            "due_date": "1978-11-20",
-            "pending_merchant_payment_amount": null,
-            "pending_cancellation_amount": null
-          },
+          "invoice": {"invoice_number":"CO123","payout_amount":1000,"outstanding_amount":1000,"fee_amount":10,"fee_rate":1,"due_date":"1978-11-20","pending_merchant_payment_amount":null,"pending_cancellation_amount":null},
           "debtor_external_data": {
             "name": "test",
             "address_country": "TE",
@@ -101,13 +92,13 @@ Feature:
           "debtor_uuid":null
         }
         """
-        And the response status code should be 200
-        And the order "CO123" is in state shipped
-        And Order notification should exist for order "CO123" with type "order_shipped"
+    And the response status code should be 200
+    And the order "CO123" is in state shipped
+    And Order notification should exist for order "CO123" with type "order_shipped"
 
-    Scenario: Order not shipped if no external code exists nor provided
-        Given I have a created order with amounts 1000/900/100, duration 30 and comment "test order"
-        When I send a POST request to "/order/test-order-uuid/ship" with body:
+  Scenario: Order not shipped if no external code exists nor provided
+    Given I have a created order with amounts 1000/900/100, duration 30 and comment "test order"
+    When I send a POST request to "/order/test-order-uuid/ship" with body:
         """
         {
             "invoice_number": "test",
@@ -115,8 +106,8 @@ Feature:
             "shipping_document_url": "http://example.com/proove/is/here"
         }
         """
-        Then the response status code should be 400
-        And the JSON response should be:
+    Then the response status code should be 400
+    And the JSON response should be:
         """
         {
             "errors":[
@@ -129,13 +120,13 @@ Feature:
         }
         """
 
-    Scenario: Order shipped if external code is provided
-        Given I have a created order with amounts 1000/900/100, duration 30 and comment "test order"
-        And I get from payments service get order details not found response
-        And I get from payments service create ticket response
-        And I get from companies service identify match response
-        And GraphQL will respond to getMerchantDebtorDetails query
-        When I send a POST request to "/order/test-order-uuid/ship" with body:
+  Scenario: Order shipped if external code is provided
+    Given I have a created order with amounts 1000/900/100, duration 30 and comment "test order"
+    And I get from payments service get order details not found response
+    And I get from payments service create ticket response
+    And I get from companies service identify match response
+    And GraphQL will respond to getMerchantDebtorDetails query
+    When I send a POST request to "/order/test-order-uuid/ship" with body:
         """
         {
             "invoice_number": "test",
@@ -144,10 +135,10 @@ Feature:
             "external_order_id": "DD123"
         }
         """
-        Then the response status code should be 200
-        And the order "DD123" is in state shipped
-        And Order notification should exist for order "DD123" with type "order_shipped"
-        And the JSON response should be:
+    Then the response status code should be 200
+    And the order "DD123" is in state shipped
+    And Order notification should exist for order "DD123" with type "order_shipped"
+    And the JSON response should be:
         """
         {
           "order_id": "DD123",
@@ -156,8 +147,8 @@ Feature:
           "reasons": null,
           "decline_reason": null,
           "amount": 1000,
-          "amount_net": 900.00,
-          "amount_tax": 100.00,
+          "amount_net": 900,
+          "amount_tax": 100,
           "debtor_company": {
             "name": "Test User Company",
             "address_house_number": "10",
@@ -170,16 +161,7 @@ Feature:
             "iban": "DE1234",
             "bic": "BICISHERE"
           },
-          "invoice": {
-            "invoice_number": "test",
-            "payout_amount": 1000,
-            "outstanding_amount": 1000,
-            "fee_amount": 10,
-            "fee_rate": 1,
-            "due_date": "1978-11-20",
-            "pending_merchant_payment_amount": null,
-            "pending_cancellation_amount": null
-          },
+          "invoice": {"invoice_number":"test","payout_amount":1000,"outstanding_amount":1000,"fee_amount":10,"fee_rate":1,"due_date":"1978-11-20","pending_merchant_payment_amount":null,"pending_cancellation_amount":null},
           "debtor_external_data": {
             "name": "test",
             "address_country": "TE",

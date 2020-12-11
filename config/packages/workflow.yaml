@@ -87,7 +87,7 @@ framework:
           from: [new, waiting, authorized, pre_waiting]
           to: declined
         ship_partially:
-          from: created
+          from: [created, partially_shipped]
           to: partially_shipped
         ship_fully:
           from: [created, partially_shipped]

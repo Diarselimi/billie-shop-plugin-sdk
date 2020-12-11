@@ -21,6 +21,7 @@ use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEnt
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntityFactory;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
 use App\Helper\Uuid\UuidGeneratorInterface;
+use Ozean12\Money\Percent;
 
 class MerchantCreationService
 {
@@ -111,10 +112,10 @@ class MerchantCreationService
 
         $this->merchantAnnouncer->announceRequestSchufaB2BReport($creationDTO->getCompany());
 
-        if ($creationDTO->getFeeRates() !== null && $creationDTO->getFeeRates() !== "") {
+        if (!empty($creationDTO->getFeeRates())) {
             $this->merchantAnnouncer->announceCustomerFeeRatesUpdated(
                 $creationDTO->getPaymentUuid(),
-                json_decode($creationDTO->getFeeRates(), true)
+                $creationDTO->getFeeRates()
             );
         }
 
@@ -128,7 +129,8 @@ class MerchantCreationService
         $this->createDefaultSettings(
             $merchantId,
             $scoringThresholdId,
-            $creationDTO->getInitialDebtorFinancingLimit()
+            $creationDTO->getInitialDebtorFinancingLimit(),
+            $creationDTO->getFeeRates()
         );
         $this->createDefaultRiskChecks($merchantId);
         $this->createDefaultNotificationSettings($merchantId);
@@ -154,8 +156,13 @@ class MerchantCreationService
         return $scoreThresholds;
     }
 
-    private function createDefaultSettings(int $merchantId, int $scoreThresholdsId, float $initialDebtorLimit): void
+    private function createDefaultSettings(int $merchantId, int $scoreThresholdsId, float $initialDebtorLimit, array $feeRates): void
     {
+        $percentRates = [];
+        foreach ($feeRates as $duration => $feeRate) {
+            $percentRates[$duration] = new Percent($feeRate);
+        }
+
         $merchantSettings = $this->merchantSettingsFactory->create(
             $merchantId,
             $initialDebtorLimit,
@@ -164,7 +171,8 @@ class MerchantCreationService
             false,
             MerchantSettingsEntity::INVOICE_HANDLING_STRATEGY_NONE,
             MerchantSettingsEntity::DEFAULT_DEBTOR_FORGIVENESS_THRESHOLD
-        );
+        )->setFeeRates($percentRates);
+
         $this->merchantSettingsRepository->insert($merchantSettings);
     }
 

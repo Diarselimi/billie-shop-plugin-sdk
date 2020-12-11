@@ -12,6 +12,5 @@ Feature: Deactivate user
     And I add "Authorization" header equal to "Bearer SomeTokenHere"
     When I send a POST request to "/merchant/user/fed64fa2-d591-43ae-b3b9-5f758dcc57ae/deactivate"
     Then the response status code should be 204
-    And print last JSON response
     And the user with uuid "fed64fa2-d591-43ae-b3b9-5f758dcc57ae" has role none
 

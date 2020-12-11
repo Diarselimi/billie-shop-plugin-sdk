@@ -13,7 +13,7 @@ use App\DomainModel\Order\NewOrder\OrderPersistenceService;
 use App\DomainModel\Order\OrderChecksRunnerService;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\OrderResponse\OrderResponse;
+use App\DomainModel\OrderResponse\OrderResponseV1;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -44,7 +44,7 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         $this->identifyAndTriggerAsyncIdentification = $identifyAndTriggerAsyncIdentification;
     }
 
-    public function execute(CreateOrderRequest $request): OrderResponse
+    public function execute(CreateOrderRequest $request): OrderResponseV1
     {
         $this->validateRequest($request);
 
@@ -52,17 +52,17 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         $order = $orderContainer->getOrder();
 
         if ($order->isDeclined()) {
-            return $this->orderResponseFactory->create($orderContainer);
+            return $this->orderResponseFactory->createV1($orderContainer);
         }
 
         if ($this->orderChecksRunnerService->hasFailedSoftDeclinableChecks($orderContainer)) {
             $this->waitingOrderService->wait($orderContainer);
 
-            return $this->orderResponseFactory->create($orderContainer);
+            return $this->orderResponseFactory->createV1($orderContainer);
         }
 
         $this->approveOrderService->approve($orderContainer);
 
-        return $this->orderResponseFactory->create($orderContainer);
+        return $this->orderResponseFactory->createV1($orderContainer);
     }
 }

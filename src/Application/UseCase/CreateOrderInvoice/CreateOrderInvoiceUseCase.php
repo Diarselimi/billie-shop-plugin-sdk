@@ -4,8 +4,8 @@ namespace App\Application\UseCase\CreateOrderInvoice;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\OrderInvoice\OrderInvoiceFactory;
-use App\DomainModel\OrderInvoice\OrderInvoiceRepositoryInterface;
+use App\DomainModel\OrderInvoice\LegacyOrderInvoiceFactory;
+use App\DomainModel\OrderInvoice\LegacyOrderInvoiceRepositoryInterface;
 
 class CreateOrderInvoiceUseCase
 {
@@ -17,8 +17,8 @@ class CreateOrderInvoiceUseCase
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
-        OrderInvoiceRepositoryInterface $orderInvoiceRepository,
-        OrderInvoiceFactory $orderInvoiceFactory
+        LegacyOrderInvoiceRepositoryInterface $orderInvoiceRepository,
+        LegacyOrderInvoiceFactory $orderInvoiceFactory
     ) {
         $this->orderRepository = $orderRepository;
         $this->orderInvoiceRepository = $orderInvoiceRepository;

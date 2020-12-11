@@ -47,7 +47,7 @@ security:
             security: false
 
         checkout_authorize:
-            pattern: ^/(public/)?checkout-session/.*/authorize
+            pattern: ^/(public/)?(api/)?(v[1-2]/)?checkout-session/.*/authorize
             anonymous: false
             stateless: true
             guard:
@@ -55,7 +55,7 @@ security:
                     - App\Http\Authentication\Authenticator\ActiveCheckoutSessionAuthenticator
 
         checkout_update:
-          pattern: ^/(public/)?checkout-session/.*/update
+          pattern: ^/(public/)?(api/)?(v1/)?checkout-session/.*/update
           anonymous: false
           stateless: true
           guard:
@@ -63,7 +63,7 @@ security:
               - App\Http\Authentication\Authenticator\ExistingCheckoutSessionAuthenticator
 
         get_external_debtors:
-          pattern: ^/(public/)?external-debtors
+          pattern: ^/(public/)?(api/)?(v1/)?external-debtors
           anonymous: false
           stateless: true
           guard:

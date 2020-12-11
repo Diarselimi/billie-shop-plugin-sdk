@@ -78,3 +78,9 @@ eight_points_guzzle:
         timeout: 5
         headers:
           Content-Type: "application/json"
+    invoice_butler:
+      base_url: "%env(string:INVOICE_BUTLER_URL)%"
+      options:
+        timeout: 1
+        headers:
+          Content-Type: "application/json"

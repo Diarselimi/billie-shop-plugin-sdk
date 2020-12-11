@@ -5,7 +5,7 @@ namespace App\Http\Controller\PublicApi;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\GetOrder\GetOrderRequest;
 use App\Application\UseCase\GetOrder\GetOrderUseCase;
-use App\DomainModel\OrderResponse\OrderResponse;
+use App\DomainModel\OrderResponse\OrderResponseV1;
 use App\Http\HttpConstantsInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
@@ -46,7 +46,7 @@ class GetOrderController
         $this->useCase = $useCase;
     }
 
-    public function execute(string $id, Request $request): OrderResponse
+    public function execute(string $id, Request $request): OrderResponseV1
     {
         try {
             $request = new GetOrderRequest($id, $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID));

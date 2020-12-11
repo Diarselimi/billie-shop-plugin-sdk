@@ -5,6 +5,7 @@ namespace App\Application\UseCase\CreateMerchantWithCompany;
 use App\Application\UseCase\ValidatedRequestInterface;
 use App\DomainModel\Merchant\MerchantWithCompanyCreationDTO;
 use OpenApi\Annotations as OA;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @OA\Schema(
@@ -33,21 +34,24 @@ use OpenApi\Annotations as OA;
  *          @OA\Property(property="iban", ref="#/components/schemas/TinyText", example="DE87500105173872482875"),
  *          @OA\Property(property="bic", ref="#/components/schemas/TinyText", example="AABSDE31"),
  *          @OA\Property(property="is_onboarding_complete", type="boolean"),
- *          @OA\Property(property="fee_rates", type="string", nullable=true),
+ *          @OA\Property(property="fee_rates", type="string"),
  *      },
  *      required={"name", "legal_form", "address_street", "address_city", "address_postal_code", "address_country", "crefo_id", "schufa_id"}
  * )
  */
 class CreateMerchantWithCompanyRequest extends MerchantWithCompanyCreationDTO implements ValidatedRequestInterface
 {
-    private $feeRates;
+    /**
+     * @Assert\NotBlank()
+     */
+    private ?array $feeRates = null;
 
-    public function getFeeRates(): ?string
+    public function getFeeRates(): ?array
     {
         return $this->feeRates;
     }
 
-    public function setFeeRates($feeRates): self
+    public function setFeeRates(?array $feeRates): self
     {
         $this->feeRates = $feeRates;
 

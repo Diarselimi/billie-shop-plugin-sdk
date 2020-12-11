@@ -5,12 +5,12 @@ namespace App\DomainModel\Order\OrderContainer;
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\DebtorCompany\Company;
 use App\DomainModel\DebtorCompany\DebtorCompany;
-use App\DomainModel\DebtorCompany\IdentifiedDebtorCompany;
 use App\DomainModel\DebtorCompany\MostSimilarCandidateDTO;
 use App\DomainModel\DebtorCompany\NullMostSimilarCandidateDTO;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorScoring\DebtorScoringResponseDTO;
 use App\DomainModel\DebtorSettings\DebtorSettingsEntity;
+use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
@@ -39,6 +39,8 @@ class OrderContainer
     private $deliveryAddress;
 
     private $billingAddress;
+
+    private $invoices;
 
     private $merchant;
 
@@ -129,6 +131,26 @@ class OrderContainer
     public function setBillingAddress(?AddressEntity $address): OrderContainer
     {
         $this->billingAddress = $address;
+
+        return $this;
+    }
+
+    /**
+     * @return array|Invoice[]
+     */
+    public function getInvoices(): array
+    {
+        return $this->invoices
+            ?? $this->invoices = $this->relationLoader->loadInvoices($this);
+    }
+
+    public function addInvoice(Invoice $invoice): OrderContainer
+    {
+        if (empty($this->invoices)) {
+            $this->invoices = $this->relationLoader->loadInvoices($this);
+        }
+
+        $this->invoices[$invoice->getUuid()] = $invoice;
 
         return $this;
     }

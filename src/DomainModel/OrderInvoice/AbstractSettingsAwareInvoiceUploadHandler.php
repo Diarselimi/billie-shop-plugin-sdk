@@ -8,7 +8,7 @@ abstract class AbstractSettingsAwareInvoiceUploadHandler implements InvoiceUploa
 {
     protected const SUPPORTED_STRATEGY = null;
 
-    private $merchantSettingsRepository;
+    private MerchantSettingsRepositoryInterface $merchantSettingsRepository;
 
     public function __construct(MerchantSettingsRepositoryInterface $merchantSettingsRepository)
     {

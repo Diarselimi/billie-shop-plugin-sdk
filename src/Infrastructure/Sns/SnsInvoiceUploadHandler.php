@@ -17,9 +17,9 @@ class SnsInvoiceUploadHandler extends AbstractSettingsAwareInvoiceUploadHandler 
 
     protected const SUPPORTED_STRATEGY = MerchantSettingsEntity::INVOICE_HANDLING_STRATEGY_FTP;
 
-    private $snsClient;
+    private SnsClient $snsClient;
 
-    private $topicArn;
+    private string $topicArn;
 
     public function __construct(
         SnsClient $snsClient,
@@ -32,7 +32,7 @@ class SnsInvoiceUploadHandler extends AbstractSettingsAwareInvoiceUploadHandler 
         parent::__construct($merchantSettingsRepository);
     }
 
-    public function handleInvoice(OrderEntity $order, string $event): void
+    public function handleInvoice(OrderEntity $order, string $invoiceUrl, string $invoiceNumber, string $event): void
     {
         $this->logInfo('Sending message to SNS');
 
@@ -55,11 +55,11 @@ class SnsInvoiceUploadHandler extends AbstractSettingsAwareInvoiceUploadHandler 
                     ],
                     "invoiceNumber" => [
                         "DataType" => "String",
-                        "StringValue" => $order->getInvoiceNumber(),
+                        "StringValue" => $invoiceNumber,
                     ],
                     "invoiceUrl" => [
                         "DataType" => "String",
-                        "StringValue" => $order->getInvoiceUrl(),
+                        "StringValue" => $invoiceUrl,
                     ],
                     "eventType" => [
                         "DataType" => "String",

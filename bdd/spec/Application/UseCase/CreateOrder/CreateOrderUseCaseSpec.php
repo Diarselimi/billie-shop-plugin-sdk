@@ -18,7 +18,7 @@ use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\OrderResponse\OrderResponse;
+use App\DomainModel\OrderResponse\OrderResponseV1;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -82,7 +82,7 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
 
         $approveOrderService->approve($orderContainer)->shouldNotBeCalled();
         $declineOrderService->decline($orderContainer)->shouldBeCalledOnce();
-        $orderResponseFactory->create($orderContainer)->shouldBeCalledOnce()->willReturn(new OrderResponse());
+        $orderResponseFactory->createV1($orderContainer)->shouldBeCalledOnce()->willReturn(new OrderResponseV1());
 
         $this->execute($request);
     }
@@ -108,7 +108,7 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
 
         $approveOrderService->approve($orderContainer)->shouldNotBeCalled();
         $declineOrderService->decline($orderContainer)->shouldBeCalledOnce();
-        $orderResponseFactory->create($orderContainer)->shouldBeCalledOnce()->willReturn(new OrderResponse());
+        $orderResponseFactory->createV1($orderContainer)->shouldBeCalledOnce()->willReturn(new OrderResponseV1());
 
         $this->execute($request);
     }
@@ -132,7 +132,7 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
 
         $order->isDeclined()->shouldBeCalledOnce()->willReturn(false);
         $waitingOrderService->wait($orderContainer)->shouldBeCalledOnce();
-        $orderResponseFactory->create($orderContainer)->shouldBeCalledOnce()->willReturn(new OrderResponse());
+        $orderResponseFactory->createV1($orderContainer)->shouldBeCalledOnce()->willReturn(new OrderResponseV1());
 
         $this->execute($request);
     }
@@ -158,7 +158,7 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
         $order->isDeclined()->shouldBeCalledOnce()->willReturn(false);
         $approveOrderService->approve($orderContainer)->shouldBeCalledOnce();
         $declineOrderService->decline($orderContainer)->shouldNotBeCalled();
-        $orderResponseFactory->create($orderContainer)->shouldBeCalledOnce()->willReturn(new OrderResponse());
+        $orderResponseFactory->createV1($orderContainer)->shouldBeCalledOnce()->willReturn(new OrderResponseV1());
 
         $this->execute($request);
     }

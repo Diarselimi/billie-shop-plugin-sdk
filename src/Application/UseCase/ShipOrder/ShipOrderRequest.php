@@ -2,8 +2,8 @@
 
 namespace App\Application\UseCase\ShipOrder;
 
-use App\DomainModel\ArrayableInterface;
-use App\DomainModel\ShipOrder\AbstractShipOrderRequest;
+use App\Application\UseCase\AbstractShipOrderRequest;
+use App\Application\Validator\Constraint as CustomConstrains;
 use OpenApi\Annotations as OA;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -16,20 +16,24 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      @OA\Property(property="shipping_document_url", ref="#/components/schemas/URL")
  * })
  */
-class ShipOrderRequest extends AbstractShipOrderRequest implements ArrayableInterface
+class ShipOrderRequest extends AbstractShipOrderRequest
 {
     /**
-     * @var string
      * @Assert\NotBlank()
      * @Assert\Length(max="255")
      */
-    private $invoiceUrl;
+    private ?string $invoiceUrl = null;
 
     /**
-     * @var string
      * @Assert\Length(max="255")
      */
-    private $shippingDocumentUrl;
+    private ?string $shippingDocumentUrl = null;
+
+    /**
+     * @Assert\Type(type="integer")
+     * @CustomConstrains\OrderDuration()
+     */
+    private ?int $duration = null;
 
     public function getInvoiceUrl(): string
     {
@@ -55,15 +59,15 @@ class ShipOrderRequest extends AbstractShipOrderRequest implements ArrayableInte
         return $this;
     }
 
-    public function toArray(): array
+    public function getDuration(): ?int
     {
-        return [
-            'order_id' => $this->getOrderId(),
-            'external_code' => $this->getExternalCode(),
-            'merchant_id' => $this->getMerchantId(),
-            'invoice_number' => $this->getInvoiceNumber(),
-            'invoice_url' => $this->getInvoiceUrl(),
-            'shipping_document_url' => $this->getShippingDocumentUrl(),
-        ];
+        return $this->duration;
+    }
+
+    public function setDuration(?int $duration): ShipOrderRequest
+    {
+        $this->duration = $duration;
+
+        return $this;
     }
 }

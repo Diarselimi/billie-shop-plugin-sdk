@@ -60,7 +60,7 @@ info:
   license:
     name: '© Billie GmbH, 2020'
     url: 'https://www.billie.io/agb/'
-  version: v2020.11
+  version: v2020.12
   x-logo:
     url: 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDIyLjAuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkViZW5lXzJfS29waWUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIKCSB5PSIwcHgiIHZpZXdCb3g9IjAgMCA0OC41IDY3LjYiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDQ4LjUgNjcuNjsiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPgoJLnN0MHtkaXNwbGF5Om5vbmU7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDo3O3N0cm9rZS1taXRlcmxpbWl0OjEwO30KCS5zdDF7ZmlsbDojMUYyNTMwO30KCS5zdDJ7ZmlsbDpub25lO30KCS5zdDN7ZGlzcGxheTpub25lO2VuYWJsZS1iYWNrZ3JvdW5kOm5ldyAgICA7fQoJLnN0NHtmb250LWZhbWlseTonQXZlbmlyTmV4dC1EZW1pQm9sZCc7fQoJLnN0NXtmb250LXNpemU6My4wMzAzcHg7fQoJLnN0NntsZXR0ZXItc3BhY2luZzoyO30KPC9zdHlsZT4KPHBhdGggY2xhc3M9InN0MCIgZD0iTTkuOCw0Ni4xYy0wLjUsMCwyNS4xLTEyLjYsMjUuMS0zMi43YzAtNi45LTUuNi0xMi42LTEyLjYtMTIuNlM5LjcsNi41LDkuNywxMy40TDkuOCw0Ni4xaDE4LjUKCWM2LjksMCwxMi42LTUuNiwxMi42LTEyLjZTMzUuMiwyMSwyOC4yLDIxSDkuNyIvPgo8Zz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0yOC4yLDQ3SDguOHYtMC44YzAtMC4xLDAtMC4yLDAtMC4zVjEzLjVDOC44LDYsMTQuOSwwLDIyLjMsMHMxMy41LDYsMTMuNSwxMy41YzAsMi44LTAuNSw1LjUtMS40LDguMgoJCWM0LjMsMi4yLDcuMyw2LjcsNy4zLDExLjlDNDEuNyw0MSwzNS42LDQ3LDI4LjIsNDd6IE0xMi45LDQ1LjJoMTUuM2M2LjQsMCwxMS43LTUuMywxMS43LTExLjdjMC00LjQtMi41LTguMy02LjEtMTAuMwoJCWMtMS44LDQuNC00LjgsOC43LTksMTIuOEMyMC40LDQwLjQsMTUuOCw0My41LDEyLjksNDUuMnogTTEwLjYsMjEuOXYyMi43YzEzLTcuNywxOC45LTE1LjYsMjEuNS0yMmMtMS4yLTAuNC0yLjUtMC43LTMuOS0wLjdIMTAuNgoJCXogTTEwLjYsMjAuMWgxNy42YzEuNiwwLDMuMSwwLjMsNC41LDAuOGMxLTIuOSwxLjMtNS41LDEuMy03LjRDMzQsNywyOC44LDEuOCwyMi4zLDEuOFMxMC42LDcsMTAuNiwxMy41VjIwLjF6Ii8+CjwvZz4KPHJlY3QgeD0iLTExLjEiIHk9Ii01OC43IiBjbGFzcz0ic3QyIiB3aWR0aD0iODUuNCIgaGVpZ2h0PSI0OS41Ii8+Cjx0ZXh0IHRyYW5zZm9ybT0ibWF0cml4KDEgMCAwIDEgLTEuMDQyNCA2Ny41NzcyKSIgY2xhc3M9InN0MyBzdDQgc3Q1IHN0NiI+QklMTElFPC90ZXh0Pgo8Zz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0wLDU4LjFoMy43YzAuNCwwLDAuNywwLjEsMS4xLDAuMWMwLjQsMC4xLDAuNywwLjIsMC45LDAuNGMwLjMsMC4yLDAuNSwwLjQsMC43LDAuN2MwLjIsMC4zLDAuMywwLjcsMC4zLDEuMQoJCWMwLDAuNS0wLjIsMS0wLjUsMS4zYy0wLjMsMC40LTAuNywwLjYtMS4yLDAuOHYwYzAuNiwwLjEsMS4xLDAuMywxLjUsMC43QzYuOCw2My42LDcsNjQuMiw3LDY0LjhjMCwwLjUtMC4xLDEtMC4zLDEuMwoJCWMtMC4yLDAuNC0wLjUsMC42LTAuOCwwLjljLTAuMywwLjItMC43LDAuNC0xLjIsMC41Yy0wLjQsMC4xLTAuOSwwLjItMS4zLDAuMkgwQzAsNjcuNiwwLDU4LjEsMCw1OC4xeiBNMS43LDYyaDEuNQoJCWMwLjYsMCwxLTAuMSwxLjMtMC4zYzAuMy0wLjIsMC40LTAuNSwwLjQtMWMwLTAuNC0wLjItMC43LTAuNS0wLjljLTAuMy0wLjItMC44LTAuMy0xLjQtMC4zSDEuN0wxLjcsNjJMMS43LDYyeiBNMS43LDY2LjFoMS41CgkJYzAuMiwwLDAuNSwwLDAuNy0wLjFzMC41LTAuMSwwLjctMC4yYzAuMi0wLjEsMC40LTAuMywwLjUtMC40YzAuMS0wLjIsMC4yLTAuNCwwLjItMC44YzAtMC41LTAuMi0wLjktMC41LTEKCQljLTAuMy0wLjItMC45LTAuMy0xLjUtMC4zSDEuN1Y2Ni4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTExLjEsNTguMWgxLjd2OS41aC0xLjdWNTguMXoiLz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0xNy4zLDU4LjFoMS43djhoNHYxLjVoLTUuN1Y1OC4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTI2LjUsNTguMWgxLjd2OGg0djEuNWgtNS43TDI2LjUsNTguMUwyNi41LDU4LjF6Ii8+Cgk8cGF0aCBjbGFzcz0ic3QxIiBkPSJNMzUuNyw1OC4xaDEuN3Y5LjVoLTEuN1Y1OC4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTQxLjksNTguMWg2LjN2MS41aC00LjZWNjJINDh2MS40aC00LjNWNjZoNC44djEuNWgtNi41VjU4LjF6Ii8+CjwvZz4KPC9zdmc+Cg=='
     href: '#'
@@ -2519,7 +2519,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ShipOrderRequest'
+              $ref: '#/components/schemas/ShipOrderRequestV1'
       responses:
         '200':
           description: 'Order successfully shipped. Order details.'
@@ -2557,7 +2557,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/ShipOrderWithInvoiceRequest'
+              $ref: '#/components/schemas/ShipOrderWithInvoiceRequestV1'
       responses:
         '200':
           description: 'Order successfully shipped. Order details.'
@@ -2780,15 +2780,6 @@ paths:
       security:
         -
           oauth2: []
-  /version:
-    get:
-      tags:
-        - Support
-      summary: 'Get API version'
-      operationId: get_api_version
-      responses:
-        '200':
-          description: 'Successful response'
 components:
   schemas:
     UUID:
@@ -3036,6 +3027,30 @@ components:
           type: string
           nullable: false
       type: object
+    AbstractShipOrderRequest:
+      allOf:
+        -
+          $ref: '#/components/schemas/AbstractShipOrderRequestV1'
+        -
+          title: 'Order Shipping plain Object'
+          properties:
+            external_order_id:
+              description: 'External Order ID. It should only be provided if it was not provided in the create order call.'
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            invoice_number:
+              $ref: '#/components/schemas/TinyText'
+          type: object
+    AbstractShipOrderRequestV1:
+      title: 'Order Shipping plain Object'
+      properties:
+        external_order_id:
+          description: 'External Order ID. It should only be provided if it was not provided in the create order call.'
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        invoice_number:
+          $ref: '#/components/schemas/TinyText'
+      type: object
     AuthorizeSandboxDTO:
       properties:
         user_entity:
@@ -3195,7 +3210,6 @@ components:
           type: boolean
         fee_rates:
           type: string
-          nullable: true
       type: object
     CreateOrderRequest:
       title: 'Order Creation Request'
@@ -3927,7 +3941,20 @@ components:
       allOf:
         -
           $ref: '#/components/schemas/AbstractShipOrderRequest'
-    ShipOrderWithInvoiceRequest:
+    ShipOrderRequestV1:
+      title: 'Order Shipping Object'
+      required:
+        - invoice_url
+      properties:
+        invoice_url:
+          $ref: '#/components/schemas/URL'
+        shipping_document_url:
+          $ref: '#/components/schemas/URL'
+      type: object
+      allOf:
+        -
+          $ref: '#/components/schemas/AbstractShipOrderRequestV1'
+    ShipOrderWithInvoiceRequestV1:
       title: 'Order Shipping With Invoice Object'
       properties:
         invoice_file:
@@ -3937,7 +3964,7 @@ components:
       type: object
       allOf:
         -
-          $ref: '#/components/schemas/AbstractShipOrderRequest'
+          $ref: '#/components/schemas/AbstractShipOrderRequestV1'
     SignatoryPowersSelectionRequest:
       title: 'Signatory powers selection request'
       properties:
@@ -4397,86 +4424,7 @@ components:
         debtor_name:
           type: string
       type: object
-    CheckoutAuthorizeOrderResponse:
-      title: 'Authorize Checkout Order Response'
-      properties:
-        state:
-          example: created
-          $ref: '#/components/schemas/OrderState'
-        reasons:
-          type: string
-          enum:
-            - risk_policy
-            - risk_scoring_failed
-            - debtor_not_identified
-            - debtor_address
-            - risk_scoring_failed
-            - debtor_limit_exceeded
-          nullable: true
-          deprecated: true
-        decline_reason:
-          nullable: true
-          $ref: '#/components/schemas/OrderDeclineReason'
-        debtor_company:
-          description: 'Identified company'
-          properties:
-            name:
-              example: 'Billie GmbH'
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            address_house_number:
-              example: '4'
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            address_street:
-              example: Charlottenstr.
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            address_postal_code:
-              type: string
-              maxLength: 5
-              example: '10969'
-              nullable: true
-            address_city:
-              example: Berlin
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            address_country:
-              type: string
-              maxLength: 2
-              nullable: true
-          type: object
-        debtor_company_suggestion:
-          description: 'Debtor company suggestion'
-          properties:
-            name:
-              example: 'Billie GmbH'
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            address_house_number:
-              example: '4'
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            address_street:
-              example: Charlottenstr.
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            address_postal_code:
-              type: string
-              maxLength: 5
-              example: '10969'
-              nullable: true
-            address_city:
-              example: Berlin
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            address_country:
-              type: string
-              maxLength: 2
-              nullable: true
-          type: object
-      type: object
-    OrderResponse:
+    AbstractOrderResponse:
       title: 'Order Entity'
       properties:
         order_id:
@@ -4488,17 +4436,6 @@ components:
         state:
           example: created
           $ref: '#/components/schemas/OrderState'
-        reasons:
-          type: string
-          enum:
-            - risk_policy
-            - risk_scoring_failed
-            - debtor_not_identified
-            - debtor_address
-            - risk_scoring_failed
-            - debtor_limit_exceeded
-          nullable: true
-          deprecated: true
         decline_reason:
           nullable: true
           $ref: '#/components/schemas/OrderDeclineReason'
@@ -4562,41 +4499,6 @@ components:
               nullable: true
               $ref: '#/components/schemas/TinyText'
           type: object
-        invoice:
-          properties:
-            invoice_number:
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            payout_amount:
-              type: number
-              format: float
-              nullable: true
-            outstanding_amount:
-              type: number
-              format: float
-              nullable: true
-            pending_merchant_payment_amount:
-              type: number
-              format: float
-              nullable: true
-            pending_cancellation_amount:
-              type: number
-              format: float
-              nullable: true
-            fee_amount:
-              type: number
-              format: float
-              nullable: true
-            fee_rate:
-              type: number
-              format: float
-              nullable: true
-            due_date:
-              type: string
-              format: date
-              example: '2019-03-20'
-              nullable: true
-          type: object
         debtor_external_data:
           description: 'Data provided in the order creation'
           properties:
@@ -4640,16 +4542,242 @@ components:
         debtor_uuid:
           $ref: '#/components/schemas/UUID'
       type: object
-    AbstractShipOrderRequest:
-      title: 'Order Shipping plain Object'
+    CheckoutAuthorizeOrderResponse:
+      title: 'Authorize Checkout Order Response'
       properties:
-        external_order_id:
-          description: 'External Order ID. It should only be provided if it was not provided in the create order call.'
+        state:
+          example: created
+          $ref: '#/components/schemas/OrderState'
+        decline_reason:
           nullable: true
-          $ref: '#/components/schemas/TinyText'
-        invoice_number:
-          $ref: '#/components/schemas/TinyText'
+          $ref: '#/components/schemas/OrderDeclineReason'
+        debtor_company:
+          description: 'Identified company'
+          properties:
+            name:
+              example: 'Billie GmbH'
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_house_number:
+              example: '4'
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_street:
+              example: Charlottenstr.
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_postal_code:
+              type: string
+              maxLength: 5
+              example: '10969'
+              nullable: true
+            address_city:
+              example: Berlin
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_country:
+              type: string
+              maxLength: 2
+              nullable: true
+          type: object
+        debtor_company_suggestion:
+          description: 'Debtor company suggestion'
+          properties:
+            name:
+              example: 'Billie GmbH'
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_house_number:
+              example: '4'
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_street:
+              example: Charlottenstr.
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_postal_code:
+              type: string
+              maxLength: 5
+              example: '10969'
+              nullable: true
+            address_city:
+              example: Berlin
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            address_country:
+              type: string
+              maxLength: 2
+              nullable: true
+          type: object
       type: object
+    OrderResponse:
+      allOf:
+        -
+          $ref: '#/components/schemas/AbstractOrderResponse'
+        -
+          title: 'Order Entity'
+          properties:
+            order_id:
+              type: string
+              example: C-10123456789-0001
+              nullable: true
+            uuid:
+              $ref: '#/components/schemas/UUID'
+            state:
+              example: created
+              $ref: '#/components/schemas/OrderState'
+            reasons:
+              type: string
+              enum:
+                - risk_policy
+                - risk_scoring_failed
+                - debtor_not_identified
+                - debtor_address
+                - risk_scoring_failed
+                - debtor_limit_exceeded
+              nullable: true
+              deprecated: true
+            decline_reason:
+              nullable: true
+              $ref: '#/components/schemas/OrderDeclineReason'
+            amount:
+              description: 'Gross amount'
+              type: number
+              format: float
+              example: 123.57
+              nullable: false
+            amount_net:
+              type: number
+              format: float
+              example: 100.12
+              nullable: false
+            amount_tax:
+              type: number
+              format: float
+              example: 23.45
+              nullable: false
+            duration:
+              example: 30
+              $ref: '#/components/schemas/OrderDuration'
+            dunning_status:
+              $ref: '#/components/schemas/OrderDunningStatus'
+            debtor_company:
+              description: 'Identified company'
+              properties:
+                name:
+                  example: 'Billie GmbH'
+                  nullable: true
+                  $ref: '#/components/schemas/TinyText'
+                address_house_number:
+                  example: '4'
+                  nullable: true
+                  $ref: '#/components/schemas/TinyText'
+                address_street:
+                  example: Charlottenstr.
+                  nullable: true
+                  $ref: '#/components/schemas/TinyText'
+                address_postal_code:
+                  type: string
+                  maxLength: 5
+                  example: '10969'
+                  nullable: true
+                address_city:
+                  example: Berlin
+                  nullable: true
+                  $ref: '#/components/schemas/TinyText'
+                address_country:
+                  type: string
+                  maxLength: 2
+                  nullable: true
+              type: object
+            bank_account:
+              properties:
+                iban:
+                  description: 'Virtual IBAN provided by Billie'
+                  nullable: true
+                  $ref: '#/components/schemas/TinyText'
+                bic:
+                  nullable: true
+                  $ref: '#/components/schemas/TinyText'
+              type: object
+            invoice:
+              properties:
+                invoice_number:
+                  nullable: true
+                  $ref: '#/components/schemas/TinyText'
+                payout_amount:
+                  type: number
+                  format: float
+                  nullable: true
+                outstanding_amount:
+                  type: number
+                  format: float
+                  nullable: true
+                pending_merchant_payment_amount:
+                  type: number
+                  format: float
+                  nullable: true
+                pending_cancellation_amount:
+                  type: number
+                  format: float
+                  nullable: true
+                fee_amount:
+                  type: number
+                  format: float
+                  nullable: true
+                fee_rate:
+                  type: number
+                  format: float
+                  nullable: true
+                due_date:
+                  type: string
+                  format: date
+                  example: '2019-03-20'
+                  nullable: true
+              type: object
+            debtor_external_data:
+              description: 'Data provided in the order creation'
+              properties:
+                merchant_customer_id:
+                  example: C-10123456789
+                  $ref: '#/components/schemas/TinyText'
+                name:
+                  example: 'Billie G.m.b.H.'
+                  $ref: '#/components/schemas/TinyText'
+                address_country:
+                  type: string
+                  maxLength: 2
+                  example: DE
+                address_city:
+                  example: Berlin
+                  $ref: '#/components/schemas/TinyText'
+                address_postal_code:
+                  type: string
+                  maxLength: 5
+                  example: '10969'
+                address_street:
+                  example: 'Charlotten Straße'
+                  $ref: '#/components/schemas/TinyText'
+                address_house:
+                  example: '4'
+                  $ref: '#/components/schemas/TinyText'
+                industry_sector:
+                  nullable: true
+                  $ref: '#/components/schemas/TinyText'
+              type: object
+            delivery_address:
+              type: object
+              $ref: '#/components/schemas/CreateOrderAddressRequest'
+            billing_address:
+              type: object
+              $ref: '#/components/schemas/CreateOrderAddressRequest'
+            created_at:
+              $ref: '#/components/schemas/DateTime'
+            shipped_at:
+              $ref: '#/components/schemas/DateTime'
+            debtor_uuid:
+              $ref: '#/components/schemas/UUID'
+          type: object
     SignatoryPowerDTO:
       title: 'Signatory Power Data transfer object'
       properties:

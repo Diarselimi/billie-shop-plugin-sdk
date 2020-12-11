@@ -3,7 +3,6 @@
 namespace spec\App\DomainModel\OrderUpdate;
 
 use App\Application\UseCase\UpdateOrder\UpdateOrderRequest;
-use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
@@ -22,6 +21,7 @@ use App\DomainModel\Payment\PaymentRequestFactory;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Payment\RequestDTO\ModifyRequestDTO;
 use Ozean12\Money\Money;
+use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -65,6 +65,8 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         PaymentRequestFactory $paymentRequestFactory,
         PaymentsServiceInterface $paymentsService
     ) {
+        $order->getInvoiceNumber()->willReturn('123');
+        $order->getInvoiceUrl()->willReturn('some_url');
         $changeSet = (new UpdateOrderRequest('order123', 1))->setAmount(
             TaxedMoneyFactory::create(150, 150, 0)
         );
@@ -88,7 +90,10 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
             ->setOrderId(1);
 
         $grossDiff = new Money(50);
-        $updateOrderRequestValidator->getValidatedRequest($orderContainer, $request)->shouldBeCalled()->willReturn($changeSet);
+        $updateOrderRequestValidator->getValidatedRequest(
+            $orderContainer,
+            $request
+        )->shouldBeCalled()->willReturn($changeSet);
         $orderContainer->getOrderFinancialDetails()->shouldBeCalled()->willReturn($orderFinancialDetails);
         $orderContainer->getMerchant()->shouldNotBeCalled();
 
@@ -108,7 +113,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
 
         // should NOT update order nor invoice
         $orderRepository->update(Argument::any())->shouldNotBeCalled();
-        $invoiceManager->upload(Argument::any(), Argument::any())->shouldNotBeCalled();
+        $invoiceManager->upload(Argument::cetera())->shouldNotBeCalled();
 
         // calls payments service
         $order->wasShipped()->shouldBeCalled()->willReturn(true);
@@ -148,7 +153,10 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
             ->setDuration(30)
             ->setOrderId(1);
 
-        $updateOrderRequestValidator->getValidatedRequest($orderContainer, $request)->shouldBeCalled()->willReturn($changeSet);
+        $updateOrderRequestValidator->getValidatedRequest(
+            $orderContainer,
+            $request
+        )->shouldBeCalled()->willReturn($changeSet);
         $orderContainer->getOrderFinancialDetails()->shouldBeCalled()->willReturn($orderFinancialDetails);
 
         // unlocks merchant debtor limit
@@ -163,7 +171,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
 
         // should NOT update order nor invoice
         $orderRepository->update(Argument::any())->shouldNotBeCalled();
-        $invoiceManager->upload(Argument::any(), Argument::any())->shouldNotBeCalled();
+        $invoiceManager->upload(Argument::cetera())->shouldNotBeCalled();
 
         // should NOT call payments service
         $order->wasShipped()->shouldBeCalled()->willReturn(false);
@@ -194,7 +202,10 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
             ->setDuration(60)
             ->setOrderId(1);
 
-        $updateOrderRequestValidator->getValidatedRequest($orderContainer, $request)->shouldBeCalled()->willReturn($changeSet);
+        $updateOrderRequestValidator->getValidatedRequest(
+            $orderContainer,
+            $request
+        )->shouldBeCalled()->willReturn($changeSet);
 
         // it does NOT unlock limits
         $updateOrderLimitsService->unlockLimits($orderContainer, Argument::any())->shouldNotBeCalled();
@@ -208,7 +219,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
 
         // should NOT update order nor invoice
         $orderRepository->update(Argument::any())->shouldNotBeCalled();
-        $invoiceManager->upload(Argument::any(), Argument::any())->shouldNotBeCalled();
+        $invoiceManager->upload(Argument::cetera())->shouldNotBeCalled();
 
         // calls payments service
         $order->wasShipped()->shouldBeCalled()->willReturn(true);
@@ -232,8 +243,13 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         PaymentRequestFactory $paymentRequestFactory,
         PaymentsServiceInterface $paymentsService
     ) {
+        $order->getInvoiceNumber()->willReturn('123');
+        $order->getInvoiceUrl()->willReturn('some_url');
         $changeSet = (new UpdateOrderRequest('order123', 1))->setInvoiceNumber('foobar')->setInvoiceUrl('foobar.pdf');
-        $updateOrderRequestValidator->getValidatedRequest($orderContainer, $request)->shouldBeCalled()->willReturn($changeSet);
+        $updateOrderRequestValidator->getValidatedRequest(
+            $orderContainer,
+            $request
+        )->shouldBeCalled()->willReturn($changeSet);
 
         // it does NOT unlock limits
         $updateOrderLimitsService->unlockLimits($orderContainer, Argument::any())->shouldNotBeCalled();
@@ -245,7 +261,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
 
         // update order and invoice
         $orderRepository->update($order)->shouldBeCalled();
-        $invoiceManager->upload($order, InvoiceUploadHandlerInterface::EVENT_UPDATE)->shouldBeCalled();
+        $invoiceManager->upload($order, 'some_url', '123', 'order.update')->shouldBeCalled();
 
         // calls payments service
         $order->wasShipped()->shouldBeCalled()->willReturn(true);
@@ -271,7 +287,10 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
     ) {
         $changeSet = (new UpdateOrderRequest('order123', 1))->setExternalCode('foobar001');
 
-        $updateOrderRequestValidator->getValidatedRequest($orderContainer, $request)->shouldBeCalled()->willReturn($changeSet);
+        $updateOrderRequestValidator->getValidatedRequest(
+            $orderContainer,
+            $request
+        )->shouldBeCalled()->willReturn($changeSet);
 
         // it does NOT unlock limits
         $updateOrderLimitsService->unlockLimits($orderContainer, Argument::any())->shouldNotBeCalled();
@@ -285,7 +304,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         $orderRepository->update($order)->shouldBeCalled();
 
         // it does NOT update invoice
-        $invoiceManager->upload(Argument::any(), Argument::any())->shouldNotBeCalled();
+        $invoiceManager->upload(Argument::cetera())->shouldNotBeCalled();
 
         // it does not call payments service
         $order->wasShipped()->shouldNotBeCalled();
@@ -309,7 +328,10 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         PaymentsServiceInterface $paymentsService
     ) {
         $changeSet = (new UpdateOrderRequest('order123', 1));
-        $updateOrderRequestValidator->getValidatedRequest($orderContainer, $request)->shouldBeCalled()->willReturn($changeSet);
+        $updateOrderRequestValidator->getValidatedRequest(
+            $orderContainer,
+            $request
+        )->shouldBeCalled()->willReturn($changeSet);
 
         // it does NOT unlock limits
         $updateOrderLimitsService->unlockLimits($orderContainer, Argument::any())->shouldNotBeCalled();
@@ -323,7 +345,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         $orderRepository->update(Argument::any())->shouldNotBeCalled();
 
         // it does NOT update invoice
-        $invoiceManager->upload(Argument::any(), Argument::any())->shouldNotBeCalled();
+        $invoiceManager->upload(Argument::cetera())->shouldNotBeCalled();
 
         // it does not call payments service
         $order->wasShipped(Argument::any())->shouldNotBeCalled();
@@ -362,7 +384,10 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
             ->setDuration(30)
             ->setOrderId(1);
 
-        $updateOrderRequestValidator->getValidatedRequest($orderContainer, $request)->shouldBeCalled()->willReturn($changeSet);
+        $updateOrderRequestValidator->getValidatedRequest(
+            $orderContainer,
+            $request
+        )->shouldBeCalled()->willReturn($changeSet);
         $orderContainer->getOrderFinancialDetails()->shouldBeCalled()->willReturn($orderFinancialDetails);
 
         // unlocks merchant debtor limit
@@ -377,7 +402,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
 
         // should NOT update order nor invoice
         $orderRepository->update(Argument::any())->shouldNotBeCalled();
-        $invoiceManager->upload(Argument::any(), Argument::any())->shouldNotBeCalled();
+        $invoiceManager->upload(Argument::cetera())->shouldNotBeCalled();
 
         // it does NOT call payments service
         $order->wasShipped()->shouldBeCalled()->willReturn(false);
@@ -400,20 +425,26 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         PaymentRequestFactory $paymentRequestFactory,
         PaymentsServiceInterface $paymentsService
     ) {
+        $order->getInvoiceNumber()->willReturn('123');
+        $order->getInvoiceUrl()->willReturn('some_url');
         $changeSet = (new UpdateOrderRequest('order123', 1))->setInvoiceNumber('foobar')->setInvoiceUrl('foobar.pdf');
-        $updateOrderRequestValidator->getValidatedRequest($orderContainer, $request)->shouldBeCalled()->willReturn($changeSet);
+        $updateOrderRequestValidator->getValidatedRequest(
+            $orderContainer,
+            $request
+        )->shouldBeCalled()->willReturn($changeSet);
 
         // it does NOT unlock limits
         $updateOrderLimitsService->unlockLimits($orderContainer, Argument::any())->shouldNotBeCalled();
 
         // it does NOT update financial details
         $financialDetailsPersistenceService->updateFinancialDetails(
-            Argument::cetera()
+            Argument::any(),
+            InvoiceUploadHandlerInterface::EVENT_UPDATE
         )->shouldNotBeCalled();
 
         // update order and invoice
         $orderRepository->update($order)->shouldBeCalled();
-        $invoiceManager->upload($order, InvoiceUploadHandlerInterface::EVENT_UPDATE)
+        $invoiceManager->upload(Argument::cetera())
             ->shouldBeCalled()->willThrow(OrderInvoiceUploadException::class);
 
         // it does NOT call payments service

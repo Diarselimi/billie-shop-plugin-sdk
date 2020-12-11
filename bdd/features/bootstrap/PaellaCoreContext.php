@@ -67,6 +67,7 @@ use Behat\MinkExtension\Context\MinkContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Billie\PdoBundle\Infrastructure\Pdo\PdoConnection;
 use Ozean12\Money\Money;
+use Ozean12\Money\Percent;
 use Symfony\Component\HttpKernel\HttpKernelBrowser;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
@@ -199,6 +200,7 @@ class PaellaCoreContext extends MinkContext
                 ->setUseExperimentalDebtorIdentification(false)
                 ->setDebtorForgivenessThreshold(1.0)
                 ->setInvoiceHandlingStrategy('http')
+                ->setFeeRates([new Percent(20)])
                 ->setCreatedAt($now)
                 ->setUpdatedAt($now)
         );

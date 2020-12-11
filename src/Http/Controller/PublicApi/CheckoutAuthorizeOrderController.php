@@ -39,11 +39,11 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class CheckoutAuthorizeOrderController
 {
-    private $useCase;
+    private CheckoutAuthorizeOrderUseCase $useCase;
 
-    private $userProvider;
+    private UserProvider $userProvider;
 
-    private $orderRequestFactory;
+    private CreateOrderRequestFactory $orderRequestFactory;
 
     public function __construct(
         CheckoutAuthorizeOrderUseCase $useCase,
