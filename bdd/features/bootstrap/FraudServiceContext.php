@@ -20,7 +20,7 @@ class FraudServiceContext implements Context
     /**
      * @Given /^I get from Fraud service a non fraud response$/
      */
-    public function fraudApiResponsdedWithSuccess()
+    public function fraudApiRespondedWithSuccess()
     {
         $this->mockRequest(
             '/check-invoice-fraud',

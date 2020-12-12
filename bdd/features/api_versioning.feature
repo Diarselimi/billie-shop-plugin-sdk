@@ -25,22 +25,22 @@ Feature: API should be able to be accessed as different versions
     Then the response status code should be 200
 
   Scenario: Cannot access private API from public/* route
-    When I send a POST request to "/public/order/XF43Y2/mark-as-fraud"
+    When I send a POST request to "/public/order/XF43Y2/approve"
     Then the response status code should be 404
     And the response should contain "No route found"
 
   Scenario: Cannot access private API from public/api/v1/* route
-    When I send a POST request to "/public/api/v1/order/XF43Y2/mark-as-fraud"
+    When I send a POST request to "/public/api/v1/order/XF43Y2/approve"
     Then the response status code should be 404
     And the response should contain "No route found"
 
   Scenario: Cannot access private API from public/api/v2/* route
-    When I send a POST request to "/public/api/v2/order/XF43Y2/mark-as-fraud"
+    When I send a POST request to "/public/api/v2/order/XF43Y2/approve"
     Then the response status code should be 404
     And the response should contain "No route found"
 
   Scenario: Can access private API from private/* route
     Given The order "XF43Y2" has UUID "test-uuid"
-    When I send a POST request to "/private/order/test-uuid/mark-as-fraud"
+    When I send a POST request to "/private/order/test-uuid/approve"
     Then the response status code should be 403
-    And the response should contain "No fraud reclaim"
+    And the response should contain "Cannot approve the order. Order is not in waiting state."

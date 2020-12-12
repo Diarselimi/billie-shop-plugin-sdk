@@ -41,7 +41,6 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
         'created_at',
         'updated_at',
         'shipped_at',
-        'marked_as_fraud_at',
         'checkout_session_id',
         'company_billing_address_uuid',
         'creation_source',
@@ -247,7 +246,6 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
               invoice_number = :invoice_number,
               invoice_url = :invoice_url,
               proof_of_delivery_url = :proof_of_delivery_url,
-              marked_as_fraud_at = :marked_as_fraud_at,
               company_billing_address_uuid = :company_billing_address_uuid,
               creation_source = :creation_source
             WHERE id = :id
@@ -262,8 +260,6 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
             'invoice_number' => $order->getInvoiceNumber(),
             'invoice_url' => $order->getInvoiceUrl(),
             'proof_of_delivery_url' => $order->getProofOfDeliveryUrl(),
-            'marked_as_fraud_at' => $order->getMarkedAsFraudAt() ? $order->getMarkedAsFraudAt()->format(self::DATE_FORMAT)
-                : null,
             'company_billing_address_uuid' => $order->getCompanyBillingAddressUuid(),
             'creation_source' => $order->getCreationSource(),
             'id' => $order->getId(),
@@ -365,7 +361,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
 
         $sql = <<<SQL
     SELECT state FROM orders
-    WHERE merchant_debtor_id = {$merchantDebtorId} AND marked_as_fraud_at IS NULL
+    WHERE merchant_debtor_id = {$merchantDebtorId}
 SQL;
         $stmt = $this->doExecute($sql);
         while ($stmt && $row = $stmt->fetch(PdoConnection::FETCH_ASSOC)) {

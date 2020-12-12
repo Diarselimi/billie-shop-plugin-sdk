@@ -617,18 +617,6 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
-     * @Given /^The order "([^"]*)" was already marked as fraud$/
-     */
-    public function theOrderWasAlreadyMarkedAsFraud($orderExternalCode)
-    {
-        $order = $order = $this->getOrder($orderExternalCode);
-
-        $order->setMarkedAsFraudAt(new \DateTime());
-
-        $this->getOrderRepository()->update($order);
-    }
-
-    /**
      * @Given The order :orderExternalCode has UUID :uuid
      */
     public function theOrderHasUUID($orderExternalCode, $uuid)
@@ -636,16 +624,6 @@ class PaellaCoreContext extends MinkContext
         $this->getConnection()
             ->prepare("UPDATE orders SET uuid = :uuid WHERE external_code = :orderExternalCode", [])
             ->execute([':uuid' => $uuid, ':orderExternalCode' => $orderExternalCode]);
-    }
-
-    /**
-     * @Given /^The order "([^"]*)" is marked as fraud$/
-     */
-    public function theOrderIsMarkedAsFraud($orderExternalCode)
-    {
-        $order = $this->getOrder($orderExternalCode);
-
-        Assert::notNull($order->getMarkedAsFraudAt());
     }
 
     /**

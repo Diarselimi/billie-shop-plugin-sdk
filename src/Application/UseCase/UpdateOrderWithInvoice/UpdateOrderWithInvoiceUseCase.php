@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Application\UseCase\UpdateOrderWithInvoice;
 
-use App\Application\Exception\FraudOrderException;
 use App\Application\Exception\OrderBeingCollectedException;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
@@ -63,10 +62,6 @@ class UpdateOrderWithInvoiceUseCase implements LoggingInterface, ValidatedUseCas
             if ($request->getInvoiceNumber() !== $order->getInvoiceNumber()) {
                 $this->validateRequest($request, null, ['InvoiceFile']);
             }
-        }
-
-        if ($order->getMarkedAsFraudAt()) {
-            throw new FraudOrderException();
         }
 
         if ($this->isOrderLateAndInCollections($order)) {

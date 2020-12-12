@@ -2,7 +2,6 @@
 
 namespace App\Http\Controller\PublicApi;
 
-use App\Application\Exception\FraudOrderException;
 use App\Application\Exception\OrderBeingCollectedException;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\UpdateOrder\UpdateOrderRequest;
@@ -49,9 +48,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class UpdateOrderController
 {
-    private $useCase;
+    private UpdateOrderUseCase $useCase;
 
-    private $updateOrderAmountRequestFactory;
+    private UpdateOrderAmountRequestFactory $updateOrderAmountRequestFactory;
 
     public function __construct(
         UpdateOrderUseCase $useCase,
@@ -73,7 +72,7 @@ class UpdateOrderController
                 ->setExternalCode($request->request->get('order_id'));
 
             $this->useCase->execute($orderRequest);
-        } catch (UpdateOrderException | FraudOrderException | OrderBeingCollectedException $e) {
+        } catch (UpdateOrderException | OrderBeingCollectedException $e) {
             throw new AccessDeniedHttpException($e->getMessage());
         } catch (OrderNotFoundException $exception) {
             throw new NotFoundHttpException();

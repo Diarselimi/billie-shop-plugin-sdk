@@ -2,7 +2,6 @@
 
 namespace App\Application\UseCase\UpdateOrder;
 
-use App\Application\Exception\FraudOrderException;
 use App\Application\Exception\OrderBeingCollectedException;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
@@ -48,10 +47,6 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
             $order = $orderContainer->getOrder();
         } catch (OrderContainerFactoryException $exception) {
             throw new OrderNotFoundException($exception);
-        }
-
-        if ($order->getMarkedAsFraudAt()) {
-            throw new FraudOrderException();
         }
 
         if ($this->isOrderLateAndInCollections($order)) {

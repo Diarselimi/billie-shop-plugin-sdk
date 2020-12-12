@@ -140,11 +140,6 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
      */
     private ?\DateTime $shippedAt = null;
 
-    /**
-     * @deprecated
-     */
-    private ?\DateTime $markedAsFraudAt = null;
-
     private ?int $checkoutSessionId = null;
 
     private string $creationSource;
@@ -331,18 +326,6 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
     public function setShippedAt(\DateTime $shippedAt = null): OrderEntity
     {
         $this->shippedAt = $shippedAt;
-
-        return $this;
-    }
-
-    public function getMarkedAsFraudAt(): ?\DateTime
-    {
-        return $this->markedAsFraudAt;
-    }
-
-    public function setMarkedAsFraudAt(\DateTime $markedAsFraudAt = null): OrderEntity
-    {
-        $this->markedAsFraudAt = $markedAsFraudAt;
 
         return $this;
     }

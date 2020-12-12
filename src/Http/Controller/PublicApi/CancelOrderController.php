@@ -2,14 +2,12 @@
 
 namespace App\Http\Controller\PublicApi;
 
-use App\Application\Exception\FraudOrderException;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\CancelOrder\CancelOrderException;
 use App\Application\UseCase\CancelOrder\CancelOrderRequest;
 use App\Application\UseCase\CancelOrder\CancelOrderUseCase;
 use App\Http\HttpConstantsInterface;
 use OpenApi\Annotations as OA;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -52,7 +50,7 @@ class CancelOrderController
                 $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID)
             );
             $this->useCase->execute($orderRequest);
-        } catch (FraudOrderException | CancelOrderException $e) {
+        } catch (CancelOrderException $e) {
             throw new AccessDeniedHttpException($e->getMessage());
         } catch (OrderNotFoundException $e) {
             throw new NotFoundHttpException($e->getMessage());

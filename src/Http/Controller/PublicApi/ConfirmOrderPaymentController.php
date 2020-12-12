@@ -2,7 +2,6 @@
 
 namespace App\Http\Controller\PublicApi;
 
-use App\Application\Exception\FraudOrderException;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\PaymentOrderConfirmException;
 use App\Application\UseCase\ConfirmOrderPayment\ConfirmOrderPaymentRequest;
@@ -46,7 +45,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class ConfirmOrderPaymentController
 {
-    private $useCase;
+    private ConfirmOrderPaymentUseCase $useCase;
 
     public function __construct(ConfirmOrderPaymentUseCase $useCase)
     {
@@ -62,8 +61,6 @@ class ConfirmOrderPaymentController
                 $request->request->get('paid_amount')
             );
             $this->useCase->execute($orderRequest);
-        } catch (FraudOrderException $e) {
-            throw new AccessDeniedHttpException($e->getMessage());
         } catch (OrderNotFoundException $exception) {
             throw new NotFoundHttpException($exception->getMessage(), $exception);
         } catch (PaymentOrderConfirmException $exception) {

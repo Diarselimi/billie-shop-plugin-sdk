@@ -2,7 +2,6 @@
 
 namespace spec\App\Application\UseCase\CancelOrder;
 
-use App\Application\Exception\FraudOrderException;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\CancelOrder\CancelOrderException;
 use App\Application\UseCase\CancelOrder\CancelOrderRequest;
@@ -73,32 +72,6 @@ class CancelOrderUseCaseSpec extends ObjectBehavior
         $this->shouldThrow(OrderNotFoundException::class)->during('execute', [$request]);
     }
 
-    public function it_throws_exception_if_order_is_marked_as_fraud(
-        MerchantDebtorLimitsService $limitsService,
-        PaymentsServiceInterface $paymentsService,
-        OrderContainerFactory $orderContainerFactory,
-        CancelOrderRequest $request,
-        OrderEntity $order,
-        OrderContainer $orderContainer
-    ) {
-        $orderContainerFactory
-            ->loadByMerchantIdAndExternalIdOrUuid(self::MERCHANT_ID, self::ORDER_UUID)
-            ->shouldBeCalled()
-            ->willReturn($orderContainer)
-        ;
-
-        $order
-            ->getMarkedAsFraudAt()
-            ->shouldBeCalled()
-            ->willReturn(new \DateTime())
-        ;
-
-        $limitsService->unlock($orderContainer)->shouldNotBeCalled();
-        $paymentsService->cancelOrder($order)->shouldNotBeCalled();
-
-        $this->shouldThrow(FraudOrderException::class)->during('execute', [$request]);
-    }
-
     public function it_throws_exception_if_order_is_in_wrong_state(
         MerchantDebtorLimitsService $limitsService,
         PaymentsServiceInterface $paymentsService,
@@ -112,12 +85,6 @@ class CancelOrderUseCaseSpec extends ObjectBehavior
             ->loadByMerchantIdAndExternalIdOrUuid(self::MERCHANT_ID, self::ORDER_UUID)
             ->shouldBeCalled()
             ->willReturn($orderContainer)
-        ;
-
-        $order
-            ->getMarkedAsFraudAt()
-            ->shouldBeCalled()
-            ->willReturn(null)
         ;
 
         $workflow
@@ -145,12 +112,6 @@ class CancelOrderUseCaseSpec extends ObjectBehavior
             ->loadByMerchantIdAndExternalIdOrUuid(self::MERCHANT_ID, self::ORDER_UUID)
             ->shouldBeCalled()
             ->willReturn($orderContainer)
-        ;
-
-        $order
-            ->getMarkedAsFraudAt()
-            ->shouldBeCalled()
-            ->willReturn(null)
         ;
 
         $workflow

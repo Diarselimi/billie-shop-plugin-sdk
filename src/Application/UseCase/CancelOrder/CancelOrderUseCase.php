@@ -2,7 +2,6 @@
 
 namespace App\Application\UseCase\CancelOrder;
 
-use App\Application\Exception\FraudOrderException;
 use App\Application\Exception\OrderNotFoundException;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Payment\PaymentsServiceInterface;
@@ -56,10 +55,6 @@ class CancelOrderUseCase implements LoggingInterface
 
         $order = $orderContainer->getOrder();
         $workflow = $this->workflowRegistry->get($order);
-
-        if ($order->getMarkedAsFraudAt()) {
-            throw new FraudOrderException();
-        }
 
         if ($workflow->can($order, OrderEntity::TRANSITION_CANCEL)) {
             $this->logInfo('Cancel order {id}', [LoggingInterface::KEY_ID => $order->getId()]);

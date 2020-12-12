@@ -2,7 +2,6 @@
 
 namespace App\Application\UseCase\ConfirmOrderPayment;
 
-use App\Application\Exception\FraudOrderException;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\PaymentOrderConfirmException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
@@ -39,10 +38,6 @@ class ConfirmOrderPaymentUseCase implements ValidatedUseCaseInterface
 
         if (!$order) {
             throw new OrderNotFoundException();
-        }
-
-        if ($order->getMarkedAsFraudAt()) {
-            throw new FraudOrderException();
         }
 
         if ($order->wasShipped()) {

@@ -63,18 +63,3 @@ Feature:
         """
         {"errors":[{"title":"Order not found","code":"resource_not_found"}]}
         """
-
-    Scenario: Confirm payment of fraud order
-        Given I have a created order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-        And The order "CO123" was already marked as fraud
-        When I send a POST request to "/order/CO123/confirm-payment" with body:
-        """
-        {
-          "paid_amount": 1000
-        }
-        """
-        Then the response status code should be 403
-        And the JSON response should be:
-        """
-        {"errors":[{"title":"Order was marked as fraud","code":"forbidden"}]}
-        """

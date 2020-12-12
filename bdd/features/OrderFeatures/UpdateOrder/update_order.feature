@@ -106,26 +106,6 @@ Feature: APIS-1077
     """
     Then the response status code should be 404
 
-  Scenario: Order is marked as fraud
-    Given I have a created order "abc123" with amounts 1000/900/100, duration 30 and comment "test order"
-    And The order "abc123" was already marked as fraud
-    When I send a PATCH request to "/order/abc123" with body:
-    """
-    {
-      "duration": 30,
-      "amount": {
-        "gross": 500,
-        "net": 400,
-        "tax": 100
-      }
-    }
-    """
-    Then the response status code should be 403
-    And the JSON response should be:
-    """
-    {"errors":[{"title":"Order was marked as fraud","code":"forbidden"}]}
-    """
-
   Scenario: Update late order when it's passed to DCI collections
     Given I have a late order "abc123" with amounts 1000/900/100, duration 30 and comment "test order"
     And Salesforce DCI API responded for the order UUID "test-order-uuidabc123" with the ongoing collections

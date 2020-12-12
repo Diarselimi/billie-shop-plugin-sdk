@@ -8,6 +8,8 @@ use Phinx\Seed\AbstractSeed;
 
 class Seed001AddMerchants extends AbstractSeed
 {
+    private const FEE_RATES = ["14" => 299, "30" => 349, "45" => 459, "60" => 579, "75" => 709, "90" => 839, "105" => 969, "120" => 1099];
+
     public function run()
     {
         $testApiKey = 'billie';
@@ -70,6 +72,7 @@ class Seed001AddMerchants extends AbstractSeed
                 min_order_amount, 
                 score_thresholds_configuration_id, 
                 invoice_handling_strategy, 
+                fee_rates
                 created_at, 
                 updated_at
             )
@@ -79,6 +82,7 @@ class Seed001AddMerchants extends AbstractSeed
                 0 as min_order_amount,
                 {$scoreThresholdsId} as score_thresholds_configuration_id,
                 '{$invoiceHandlingStrategy}' as invoice_handling_strategy,
+                '" . json_encode(self::FEE_RATES) . "' as fee_rates,
                 '{$now}' as created_at,
                 '{$now}' as updated_at
             FROM merchants WHERE merchants.id NOT IN (SELECT merchant_id FROM merchant_settings);
