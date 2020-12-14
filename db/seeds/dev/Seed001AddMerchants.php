@@ -72,7 +72,7 @@ class Seed001AddMerchants extends AbstractSeed
                 min_order_amount, 
                 score_thresholds_configuration_id, 
                 invoice_handling_strategy, 
-                fee_rates
+                fee_rates,
                 created_at, 
                 updated_at
             )
