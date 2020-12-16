@@ -8,7 +8,7 @@ use Phinx\Seed\AbstractSeed;
 
 class Seed001AddMerchants extends AbstractSeed
 {
-    private const FEE_RATES = ["14" => 299, "30" => 349, "45" => 459, "60" => 579, "75" => 709, "90" => 839, "105" => 969, "120" => 1099];
+    private const FEE_RATES = ["14" => 2.99, "30" => 3.49, "45" => 4.59, "60" => 5.79, "75" => 7.09, "90" => 8.39, "105" => 9.69, "120" => 10.99];
 
     public function run()
     {
