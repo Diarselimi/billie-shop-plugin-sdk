@@ -5,6 +5,7 @@ namespace App\DomainModel\Order\Lifecycle\ShipOrder;
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderPayment\OrderPaymentService;
 use App\DomainModel\Payment\PaymentsServiceRequestException;
 use App\DomainModel\ShipOrder\ShipOrderException;
@@ -23,14 +24,18 @@ class LegacyShipOrderService implements ShipOrderInterface, LoggingInterface
 
     private UuidGeneratorInterface $uuidGenerator;
 
+    private OrderRepositoryInterface $orderRepository;
+
     public function __construct(
         OrderPaymentService $orderPaymentService,
         Registry $workflowRegistry,
-        UuidGeneratorInterface $uuidGenerator
+        UuidGeneratorInterface $uuidGenerator,
+        OrderRepositoryInterface $orderRepository
     ) {
         $this->orderPaymentService = $orderPaymentService;
         $this->workflowRegistry = $workflowRegistry;
         $this->uuidGenerator = $uuidGenerator;
+        $this->orderRepository = $orderRepository;
     }
 
     public function ship(OrderContainer $orderContainer, Invoice $invoice): void
@@ -39,8 +44,10 @@ class LegacyShipOrderService implements ShipOrderInterface, LoggingInterface
         $workflow = $this->workflowRegistry->get($order);
 
         if (!$order->getPaymentId()) {
-            $order->setPaymentId($this->uuidGenerator->uuid4());
-            $order->setShippedAt(new \DateTime());
+            $order->setPaymentId($this->uuidGenerator->uuid4())
+                ->setShippedAt(new \DateTime())
+            ;
+            $this->orderRepository->update($order);
         }
 
         if (!$this->hasPaymentDetails($orderContainer)) {
