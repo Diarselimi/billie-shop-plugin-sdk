@@ -7,16 +7,15 @@ namespace App\Application\UseCase\ShipOrder;
 use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
-use App\DomainModel\FeatureFlag\FeatureFlagManager;
 use App\DomainModel\Fee\FeeCalculationException;
+use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceFactory;
 use App\DomainModel\Order\Lifecycle\ShipOrder\ShipOrderService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\OrderInvoice\InvoiceUploadHandlerInterface;
-use App\DomainModel\OrderInvoice\OrderInvoiceManager;
-use App\DomainModel\OrderInvoice\OrderInvoiceUploadException;
+use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentUploadException;
+use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerAggregator;
 use App\DomainModel\OrderResponse\OrderResponse;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
 use App\DomainModel\ShipOrder\ShipOrderException;
@@ -29,7 +28,7 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface, LoggingInterface
     use ValidatedUseCaseTrait,
         LoggingTrait;
 
-    private OrderInvoiceManager $invoiceManager;
+    private InvoiceDocumentUploadHandlerAggregator $invoiceManager;
 
     private OrderContainerFactory $orderContainerFactory;
 
@@ -41,15 +40,12 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface, LoggingInterface
 
     private InvoiceFactory $invoiceFactory;
 
-    private FeatureFlagManager $featureFlagManager;
-
     public function __construct(
-        OrderInvoiceManager $invoiceManager,
+        InvoiceDocumentUploadHandlerAggregator $invoiceManager,
         OrderContainerFactory $orderContainerFactory,
         Registry $workflowRegistry,
         ShipOrderService $shipOrderService,
         OrderResponseFactory $orderResponseFactory,
-        FeatureFlagManager $featureFlagManager,
         InvoiceFactory $invoiceFactory
     ) {
         $this->invoiceManager = $invoiceManager;
@@ -57,7 +53,6 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface, LoggingInterface
         $this->workflowRegistry = $workflowRegistry;
         $this->shipOrderService = $shipOrderService;
         $this->orderResponseFactory = $orderResponseFactory;
-        $this->featureFlagManager = $featureFlagManager;
         $this->invoiceFactory = $invoiceFactory;
     }
 
@@ -70,17 +65,27 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface, LoggingInterface
         $order = $orderContainer->getOrder();
 
         $this->validate($request, $orderContainer);
-        $this->uploadInvoice($order, $request);
-        $this->ship($orderContainer, $request);
+        $invoice = $this->makeInvoice($orderContainer, $request);
+
+        $this->logInfo('Ship order v2');
+        $this->shipOrderService->ship($orderContainer, $invoice);
+
+        $this->uploadInvoice($order, $request, $invoice->getUuid());
 
         return $this->orderResponseFactory->create($orderContainer);
     }
 
-    private function uploadInvoice(OrderEntity $order, ShipOrderRequest $request): void
+    private function uploadInvoice(OrderEntity $order, ShipOrderRequest $request, string $invoiceUuid): void
     {
         try {
-            $this->invoiceManager->upload($order, $request->getInvoiceUrl(), $request->getInvoiceNumber(), InvoiceUploadHandlerInterface::EVENT_SHIPMENT);
-        } catch (OrderInvoiceUploadException $exception) {
+            $this->invoiceManager->handle(
+                $order,
+                $invoiceUuid,
+                $request->getInvoiceUrl(),
+                $request->getInvoiceNumber(),
+                InvoiceDocumentUploadHandlerAggregator::EVENT_SOURCE_SHIPMENT
+            );
+        } catch (InvoiceDocumentUploadException $exception) {
             throw new ShipOrderException("Invoice can't be scheduled for upload", 0, $exception);
         }
     }
@@ -98,10 +103,6 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface, LoggingInterface
             throw new WorkflowException('Order workflow is not supported by api v2');
         }
 
-        if (!$this->featureFlagManager->isEnabled(FeatureFlagManager::FEATURE_INVOICE_BUTLER)) {
-            throw new ShipOrderException('Shipment v2 is supported only with invoice butler');
-        }
-
         $workflow = $this->workflowRegistry->get($order);
         if (!$workflow->can($order, OrderEntity::TRANSITION_SHIP_FULLY)
             && !$workflow->can($order, OrderEntity::TRANSITION_SHIP_PARTIALLY)) {
@@ -117,10 +118,10 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface, LoggingInterface
         }
     }
 
-    private function ship(OrderContainer $orderContainer, ShipOrderRequest $request): void
+    private function makeInvoice(OrderContainer $orderContainer, ShipOrderRequest $request): Invoice
     {
         try {
-            $invoice = $this->invoiceFactory->create(
+            return $this->invoiceFactory->create(
                 $orderContainer,
                 $request->getAmount(),
                 $request->getDuration() ?? $orderContainer->getOrderFinancialDetails()->getDuration(),
@@ -132,8 +133,5 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface, LoggingInterface
 
             throw new ShipOrderException("Configuration isn't properly set");
         }
-
-        $this->logInfo('Ship order v2 with butler');
-        $this->shipOrderService->ship($orderContainer, $invoice);
     }
 }

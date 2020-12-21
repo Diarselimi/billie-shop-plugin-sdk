@@ -4,7 +4,7 @@ namespace App\Http\Controller\PublicApi;
 
 use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\ShipOrderWithInvoice\ShipOrderWithInvoiceRequestV1;
-use App\Application\UseCase\ShipOrderWithInvoice\ShipOrderWithInvoiceUseCase;
+use App\Application\UseCase\ShipOrderWithInvoice\ShipOrderWithInvoiceUseCaseV1;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\OrderResponse\OrderResponseV1;
 use App\DomainModel\ShipOrder\ShipOrderException;
@@ -43,9 +43,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class ShipOrderWithInvoiceController
 {
-    private ShipOrderWithInvoiceUseCase $useCase;
+    private ShipOrderWithInvoiceUseCaseV1 $useCase;
 
-    public function __construct(ShipOrderWithInvoiceUseCase $useCase)
+    public function __construct(ShipOrderWithInvoiceUseCaseV1 $useCase)
     {
         $this->useCase = $useCase;
     }

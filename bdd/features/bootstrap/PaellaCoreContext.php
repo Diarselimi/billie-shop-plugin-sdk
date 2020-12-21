@@ -200,7 +200,7 @@ class PaellaCoreContext extends MinkContext
                 ->setUseExperimentalDebtorIdentification(false)
                 ->setDebtorForgivenessThreshold(1.0)
                 ->setInvoiceHandlingStrategy('http')
-                ->setFeeRates([new Percent(20)])
+                ->setFeeRates([120 => new Percent(20)])
                 ->setCreatedAt($now)
                 ->setUpdatedAt($now)
         );

@@ -6,28 +6,32 @@ use App\DomainModel\ArrayableInterface;
 
 class HttpInvoiceUploadRequest implements ArrayableInterface
 {
-    private $merchantId;
+    private int $merchantId;
 
-    private $orderExternalCode;
+    private string $orderExternalCode;
 
-    private $invoiceUrl;
+    private string $invoiceUuid;
 
-    private $invoiceNumber;
+    private string $invoiceUrl;
 
-    private $event;
+    private string $invoiceNumber;
+
+    private string $eventSource;
 
     public function __construct(
         int $merchantId,
         string $orderExternalCode,
+        string $invoiceUuid,
         string $invoiceUrl,
         string $invoiceNumber,
-        string $event
+        string $eventSource
     ) {
         $this->merchantId = $merchantId;
         $this->orderExternalCode = $orderExternalCode;
+        $this->invoiceUuid = $invoiceUuid;
         $this->invoiceUrl = $invoiceUrl;
         $this->invoiceNumber = $invoiceNumber;
-        $this->event = $event;
+        $this->eventSource = $eventSource;
     }
 
     public function getMerchantId(): int
@@ -40,6 +44,11 @@ class HttpInvoiceUploadRequest implements ArrayableInterface
         return $this->orderExternalCode;
     }
 
+    public function getInvoiceUuid(): string
+    {
+        return $this->invoiceUuid;
+    }
+
     public function getInvoiceUrl(): string
     {
         return $this->invoiceUrl;
@@ -50,9 +59,9 @@ class HttpInvoiceUploadRequest implements ArrayableInterface
         return $this->invoiceNumber;
     }
 
-    public function getEvent(): string
+    public function getEventSource(): string
     {
-        return $this->event;
+        return $this->eventSource;
     }
 
     public function toArray(): array
@@ -60,9 +69,10 @@ class HttpInvoiceUploadRequest implements ArrayableInterface
         return [
             'merchant_id' => $this->merchantId,
             'order_external_code' => $this->orderExternalCode,
+            'invoice_uuid' => $this->invoiceUuid,
             'invoice_url' => $this->invoiceUrl,
             'invoice_number' => $this->getInvoiceNumber(),
-            'event' => $this->event,
+            'event_source' => $this->eventSource,
         ];
     }
 }

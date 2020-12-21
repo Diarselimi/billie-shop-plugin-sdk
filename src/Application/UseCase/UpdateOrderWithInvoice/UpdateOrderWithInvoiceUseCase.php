@@ -12,7 +12,7 @@ use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\SalesforceInterface;
-use App\DomainModel\OrderInvoice\OrderInvoiceManager;
+use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentCreator;
 use App\DomainModel\OrderUpdateWithInvoice\UpdateOrderWithInvoicePersistenceService;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -25,19 +25,19 @@ class UpdateOrderWithInvoiceUseCase implements LoggingInterface, ValidatedUseCas
 
     private UpdateOrderWithInvoicePersistenceService $updateOrderWithInvoicePersistenceService;
 
-    private OrderInvoiceManager $invoiceManager;
+    private InvoiceDocumentCreator $invoiceDocumentCreator;
 
     private SalesforceInterface $salesforce;
 
     public function __construct(
         OrderContainerFactory $orderContainerFactory,
         UpdateOrderWithInvoicePersistenceService $updateOrderWithInvoicePersistenceService,
-        OrderInvoiceManager $invoiceManager,
+        InvoiceDocumentCreator $orderinvoiceDocumentCreator,
         SalesforceInterface $salesforce
     ) {
         $this->orderContainerFactory = $orderContainerFactory;
         $this->updateOrderWithInvoicePersistenceService = $updateOrderWithInvoicePersistenceService;
-        $this->invoiceManager = $invoiceManager;
+        $this->invoiceDocumentCreator = $orderinvoiceDocumentCreator;
         $this->salesforce = $salesforce;
     }
 
@@ -74,8 +74,9 @@ class UpdateOrderWithInvoiceUseCase implements LoggingInterface, ValidatedUseCas
         );
 
         if ($request->getInvoiceFile() !== null && $orderContainer->getOrder()->wasShipped()) {
-            $this->invoiceManager->uploadInvoiceFile(
-                $order,
+            $this->invoiceDocumentCreator->createFromUpload(
+                $order->getId(),
+                $order->getInvoiceNumber(),
                 $request->getInvoiceFile()
             );
         }

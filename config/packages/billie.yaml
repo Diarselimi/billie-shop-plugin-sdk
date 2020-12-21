@@ -23,12 +23,15 @@ ozean12_amqp_pack:
     customer.customer_fee_rates_updated:
       class: Ozean12\Transfer\Message\Customer\CustomerFeeRatesUpdated
       delay: 15000
+    invoice.create_invoice: Ozean12\Transfer\Message\Invoice\CreateInvoice
+    document.document_uploaded:
+      class: Ozean12\Transfer\Message\Document\DocumentUploaded
+      delay: 5000
   subscribe:
     identity.identity_verification_succeeded: Ozean12\Transfer\Message\Identity\IdentityVerificationSucceeded
     order.order_dunning_step_changed: Ozean12\Transfer\Message\Order\OrderDunningStepChanged
     company_information_change_request.company_information_change_request_decision_issued: Ozean12\Transfer\Message\CompanyInformationChangeRequest\CompanyInformationChangeRequestDecisionIssued
     customer.customer_created: Ozean12\Transfer\Message\Customer\CustomerCreated
-    invoice.create_invoice: Ozean12\Transfer\Message\Invoice\CreateInvoice
 
 billie_monitoring:
   strict_logging: true

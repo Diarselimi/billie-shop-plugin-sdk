@@ -14,4 +14,11 @@ interface FileServiceInterface
     public function download(string $fileUuid): StreamInterface;
 
     public function uploadFromFile(UploadedFile $uploadedFile, string $filename, string $type): FileServiceResponseDTO;
+
+    public function uploadFromUrl(
+        string $url,
+        string $filename,
+        string $type,
+        int $fileSizeLimit
+    ): FileServiceResponseDTO;
 }

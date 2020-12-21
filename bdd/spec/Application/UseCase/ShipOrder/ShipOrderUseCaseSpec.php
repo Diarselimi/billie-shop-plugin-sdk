@@ -6,7 +6,6 @@ use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\ShipOrder\ShipOrderRequest;
 use App\Application\UseCase\ShipOrder\ShipOrderRequestV1;
 use App\Application\UseCase\ShipOrder\ShipOrderUseCase;
-use App\DomainModel\FeatureFlag\FeatureFlagManager;
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceFactory;
 use App\DomainModel\Order\Lifecycle\ShipOrder\ShipOrderInterface;
@@ -15,10 +14,9 @@ use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
-use App\DomainModel\OrderInvoice\OrderInvoiceManager;
+use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerAggregator;
 use App\DomainModel\OrderResponse\OrderResponse;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
-use App\Infrastructure\Repository\OrderRepository;
 use Ozean12\Money\Money;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
 use PhpSpec\ObjectBehavior;
@@ -46,12 +44,11 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
     private const PAYMENT_DETAILS_ID = '4d5w45d4';
 
     public function let(
-        OrderInvoiceManager $invoiceManager,
+        InvoiceDocumentUploadHandlerAggregator $invoiceManager,
         OrderContainerFactory $orderContainerFactory,
         Registry $workflowRegistry,
         ShipOrderService $shipOrderService,
         OrderResponseFactory $orderResponseFactory,
-        FeatureFlagManager $featureFlagManager,
         InvoiceFactory $invoiceFactory,
         OrderContainer $orderContainer,
         OrderEntity $order,
@@ -62,7 +59,6 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
         LoggerInterface $logger
     ) {
         $order->isWorkflowV1()->willReturn(false);
-        $featureFlagManager->isEnabled(FeatureFlagManager::FEATURE_INVOICE_BUTLER)->willReturn(true);
         $orderContainer->getOrder()->willReturn($order);
 
         $request->getOrderId()->willReturn(self::ID);
@@ -124,9 +120,12 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
             self::PROOF_OF_DELIVERY_URL
         )->willReturn($invoice);
 
+        $order->getUuid()->willReturn('1768ab4c-8cab-4166-a892-6bd3efe9ec13');
         $order->getState()->willReturn(OrderEntity::STATE_CREATED);
         $order->getExternalCode()->willReturn(self::EXTERNAL_CODE);
         $order->getPaymentId()->willReturn(self::PAYMENT_DETAILS_ID);
+
+        $invoice->getUuid()->willReturn('3c5593cb-04a6-41e6-b57b-1d65dd98e252');
 
         $workflow->can($order, OrderEntity::TRANSITION_SHIP_FULLY)->shouldBeCalled()->willReturn(true);
         $shipOrderService->ship($orderContainer, $invoice)->shouldBeCalled();

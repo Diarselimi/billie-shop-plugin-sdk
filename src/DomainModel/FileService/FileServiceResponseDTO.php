@@ -20,6 +20,9 @@ class FileServiceResponseDTO
         $this->filePath = $filePath;
     }
 
+    /**
+     * @deprecated
+     */
     public function getFileId(): int
     {
         return $this->id;

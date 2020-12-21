@@ -44,7 +44,9 @@ class OrderResponseFactory
         $response = $this->addData($orderContainer, new OrderResponseV1());
         $response->setReasons([$response->getDeclineReason()]);
 
-        if (!$this->featureFlagManager->isEnabled(FeatureFlagManager::FEATURE_INVOICE_BUTLER) && !empty($orderContainer->getOrder()->getPaymentId())) {
+        if (!$this->featureFlagManager->isButlerFullyEnabled()
+            && !empty($orderContainer->getOrder()->getPaymentId())
+        ) {
             $this->addInvoiceDataV1($orderContainer, $response);
         } elseif (count($orderContainer->getInvoices()) === 1) {
             $invoices = $orderContainer->getInvoices();
@@ -58,7 +60,7 @@ class OrderResponseFactory
                 ->setFeeRate($invoice->getFeeRate()->toFloat())
                 ->setFeeAmount($invoice->getFeeAmount()->getGross()->toFloat())
                 ->setDueDate($invoice->getDueDate())
-                // fields are used only for dashboard, let's fix it later
+                // TODO: fields are used only for dashboard, let's fix it later
 //                ->setPendingCancellationAmount($orderPaymentDetails->getOutstandingAmountInvoiceCancellation())
 //                ->setPendingMerchantPaymentAmount($orderPaymentDetails->getOutstandingAmountMerchantPayment())
             ;

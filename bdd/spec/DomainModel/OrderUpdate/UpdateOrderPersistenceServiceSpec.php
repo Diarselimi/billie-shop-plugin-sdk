@@ -2,6 +2,7 @@
 
 namespace spec\App\DomainModel\OrderUpdate;
 
+use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\UpdateOrder\UpdateOrderRequest;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
@@ -10,9 +11,9 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsPersistenceService;
-use App\DomainModel\OrderInvoice\InvoiceUploadHandlerInterface;
-use App\DomainModel\OrderInvoice\OrderInvoiceManager;
-use App\DomainModel\OrderInvoice\OrderInvoiceUploadException;
+use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentUploadException;
+use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerAggregator;
+use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerInterface;
 use App\DomainModel\OrderUpdate\UpdateOrderException;
 use App\DomainModel\OrderUpdate\UpdateOrderLimitsService;
 use App\DomainModel\OrderUpdate\UpdateOrderPersistenceService;
@@ -27,6 +28,8 @@ use Prophecy\Argument;
 
 class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
 {
+    private const ORDER_UUID = '4ea7ca9a-876f-478f-9fce-441effaac58d';
+
     public function it_is_initializable()
     {
         $this->shouldHaveType(UpdateOrderPersistenceService::class);
@@ -36,7 +39,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         PaymentsServiceInterface $paymentsService,
         OrderRepositoryInterface $orderRepository,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
-        OrderInvoiceManager $invoiceManager,
+        InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
         PaymentRequestFactory $paymentRequestFactory,
         UpdateOrderLimitsService $updateOrderLimitsService,
         UpdateOrderRequestValidator $updateOrderRequestValidator,
@@ -46,6 +49,9 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         $this->beConstructedWith(...func_get_args());
 
         $orderContainer->getOrder()->willReturn($order);
+        $order->getUuid()->willReturn(self::ORDER_UUID);
+        $order->isWorkflowV1()->willReturn(true);
+        $order->isWorkflowV2()->willReturn(false);
         $order->setInvoiceNumber(Argument::any())->willReturn($order);
         $order->setInvoiceUrl(Argument::any())->willReturn($order);
         $order->setExternalCode(Argument::any())->willReturn($order);
@@ -61,7 +67,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         MerchantRepositoryInterface $merchantRepository,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
-        OrderInvoiceManager $invoiceManager,
+        InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
         PaymentRequestFactory $paymentRequestFactory,
         PaymentsServiceInterface $paymentsService
     ) {
@@ -98,7 +104,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         $orderContainer->getMerchant()->shouldNotBeCalled();
 
         // should NOT unlock merchant debtor limit
-        $updateOrderLimitsService->unlockLimits($orderContainer, $grossDiff)->shouldNotBeCalled();
+        $updateOrderLimitsService->unlockLimits($orderContainer, Argument::any())->shouldNotBeCalled();
 
         // should NOT unlock merchant limit
         $merchant->increaseFinancingLimit($grossDiff)->shouldNotBeCalled();
@@ -113,7 +119,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
 
         // should NOT update order nor invoice
         $orderRepository->update(Argument::any())->shouldNotBeCalled();
-        $invoiceManager->upload(Argument::cetera())->shouldNotBeCalled();
+        $invoiceUrlHandler->handle(Argument::cetera())->shouldNotBeCalled();
 
         // calls payments service
         $order->wasShipped()->shouldBeCalled()->willReturn(true);
@@ -133,7 +139,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         UpdateOrderLimitsService $updateOrderLimitsService,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
-        OrderInvoiceManager $invoiceManager,
+        InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
         PaymentRequestFactory $paymentRequestFactory,
         PaymentsServiceInterface $paymentsService
     ) {
@@ -171,7 +177,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
 
         // should NOT update order nor invoice
         $orderRepository->update(Argument::any())->shouldNotBeCalled();
-        $invoiceManager->upload(Argument::cetera())->shouldNotBeCalled();
+        $invoiceUrlHandler->handle(Argument::cetera())->shouldNotBeCalled();
 
         // should NOT call payments service
         $order->wasShipped()->shouldBeCalled()->willReturn(false);
@@ -190,7 +196,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         UpdateOrderLimitsService $updateOrderLimitsService,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
-        OrderInvoiceManager $invoiceManager,
+        InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
         PaymentRequestFactory $paymentRequestFactory,
         PaymentsServiceInterface $paymentsService
     ) {
@@ -219,7 +225,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
 
         // should NOT update order nor invoice
         $orderRepository->update(Argument::any())->shouldNotBeCalled();
-        $invoiceManager->upload(Argument::cetera())->shouldNotBeCalled();
+        $invoiceUrlHandler->handle(Argument::cetera())->shouldNotBeCalled();
 
         // calls payments service
         $order->wasShipped()->shouldBeCalled()->willReturn(true);
@@ -239,7 +245,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         UpdateOrderLimitsService $updateOrderLimitsService,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
-        OrderInvoiceManager $invoiceManager,
+        InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
         PaymentRequestFactory $paymentRequestFactory,
         PaymentsServiceInterface $paymentsService
     ) {
@@ -261,7 +267,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
 
         // update order and invoice
         $orderRepository->update($order)->shouldBeCalled();
-        $invoiceManager->upload($order, 'some_url', '123', 'order.update')->shouldBeCalled();
+        $invoiceUrlHandler->handle($order, self::ORDER_UUID, 'some_url', '123', 'order.update')->shouldBeCalled();
 
         // calls payments service
         $order->wasShipped()->shouldBeCalled()->willReturn(true);
@@ -281,7 +287,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         UpdateOrderLimitsService $updateOrderLimitsService,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
-        OrderInvoiceManager $invoiceManager,
+        InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
         PaymentRequestFactory $paymentRequestFactory,
         PaymentsServiceInterface $paymentsService
     ) {
@@ -304,7 +310,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         $orderRepository->update($order)->shouldBeCalled();
 
         // it does NOT update invoice
-        $invoiceManager->upload(Argument::cetera())->shouldNotBeCalled();
+        $invoiceUrlHandler->handle(Argument::cetera())->shouldNotBeCalled();
 
         // it does not call payments service
         $order->wasShipped()->shouldNotBeCalled();
@@ -322,7 +328,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         UpdateOrderLimitsService $updateOrderLimitsService,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
-        OrderInvoiceManager $invoiceManager,
+        InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
         OrderEntity $order,
         PaymentRequestFactory $paymentRequestFactory,
         PaymentsServiceInterface $paymentsService
@@ -345,7 +351,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         $orderRepository->update(Argument::any())->shouldNotBeCalled();
 
         // it does NOT update invoice
-        $invoiceManager->upload(Argument::cetera())->shouldNotBeCalled();
+        $invoiceUrlHandler->handle(Argument::cetera())->shouldNotBeCalled();
 
         // it does not call payments service
         $order->wasShipped(Argument::any())->shouldNotBeCalled();
@@ -364,7 +370,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         UpdateOrderLimitsService $updateOrderLimitsService,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
-        OrderInvoiceManager $invoiceManager,
+        InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
         PaymentRequestFactory $paymentRequestFactory,
         PaymentsServiceInterface $paymentsService
     ) {
@@ -402,7 +408,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
 
         // should NOT update order nor invoice
         $orderRepository->update(Argument::any())->shouldNotBeCalled();
-        $invoiceManager->upload(Argument::cetera())->shouldNotBeCalled();
+        $invoiceUrlHandler->handle(Argument::cetera())->shouldNotBeCalled();
 
         // it does NOT call payments service
         $order->wasShipped()->shouldBeCalled()->willReturn(false);
@@ -421,7 +427,7 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         UpdateOrderLimitsService $updateOrderLimitsService,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
-        OrderInvoiceManager $invoiceManager,
+        InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
         PaymentRequestFactory $paymentRequestFactory,
         PaymentsServiceInterface $paymentsService
     ) {
@@ -439,13 +445,13 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
         // it does NOT update financial details
         $financialDetailsPersistenceService->updateFinancialDetails(
             Argument::any(),
-            InvoiceUploadHandlerInterface::EVENT_UPDATE
+            InvoiceDocumentUploadHandlerInterface::EVENT_SOURCE_UPDATE
         )->shouldNotBeCalled();
 
         // update order and invoice
         $orderRepository->update($order)->shouldBeCalled();
-        $invoiceManager->upload(Argument::cetera())
-            ->shouldBeCalled()->willThrow(OrderInvoiceUploadException::class);
+        $invoiceUrlHandler->handle(Argument::cetera())
+            ->shouldBeCalled()->willThrow(InvoiceDocumentUploadException::class);
 
         // it does NOT call payments service
         $order->wasShipped()->shouldNotBeCalled();
@@ -454,5 +460,15 @@ class UpdateOrderPersistenceServiceSpec extends ObjectBehavior
 
         // run
         $this->shouldThrow(UpdateOrderException::class)->during('update', [$orderContainer, $request]);
+    }
+
+    public function it_fails_on_workflow_v2(
+        OrderContainer $orderContainer,
+        OrderEntity $order,
+        UpdateOrderRequest $request
+    ) {
+        $order->isWorkflowV1()->willReturn(false);
+        $order->isWorkflowV2()->willReturn(true);
+        $this->shouldThrow(WorkflowException::class)->during('update', [$orderContainer, $request]);
     }
 }

@@ -4,76 +4,60 @@ namespace App\Application\UseCase\HttpInvoiceUpload;
 
 use App\DomainModel\FileService\FileServiceInterface;
 use App\DomainModel\FileService\FileServiceRequestException;
+use App\DomainModel\Order\OrderNotFoundException;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\OrderInvoice\LegacyOrderInvoiceFactory;
-use App\DomainModel\OrderInvoice\LegacyOrderInvoiceRepositoryInterface;
+use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentCreator;
+use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentUpload;
 use App\Infrastructure\ClientResponseDecodeException;
-use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
-use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\TransferException;
 
-class HttpInvoiceUploadUseCase implements LoggingInterface
+class HttpInvoiceUploadUseCase
 {
-    use LoggingTrait;
-
     private const FILE_SIZE_LIMIT = 2097152; // 2 MBs
 
-    private $client;
+    private FileServiceInterface $fileService;
 
-    private $fileService;
+    private OrderRepositoryInterface $orderRepository;
 
-    private $orderRepository;
-
-    private $orderInvoiceRepository;
-
-    private $orderInvoiceFactory;
+    private InvoiceDocumentCreator $invoiceDocumentCreator;
 
     public function __construct(
-        Client $invoiceDownloadClient,
         FileServiceInterface $fileService,
         OrderRepositoryInterface $orderRepository,
-        LegacyOrderInvoiceRepositoryInterface $orderInvoiceRepository,
-        LegacyOrderInvoiceFactory $orderInvoiceFactory
+        InvoiceDocumentCreator $invoiceDocumentCreator
     ) {
-        $this->client = $invoiceDownloadClient;
         $this->fileService = $fileService;
         $this->orderRepository = $orderRepository;
-        $this->orderInvoiceRepository = $orderInvoiceRepository;
-        $this->orderInvoiceFactory = $orderInvoiceFactory;
+        $this->invoiceDocumentCreator = $invoiceDocumentCreator;
     }
 
     public function execute(HttpInvoiceUploadRequest $request)
     {
-        $fileUrl = $request->getInvoiceUrl();
+        $order = $this->orderRepository->getOneByMerchantIdAndExternalCodeOrUUID(
+            $request->getOrderExternalCode(),
+            $request->getMerchantId()
+        );
 
-        try {
-            $response = $this->client->head($fileUrl);
-
-            $size = $response->getHeader('Content-Length');
-            if (!isset($size[0]) || $size[0] > self::FILE_SIZE_LIMIT) {
-                throw new HttpInvoiceUploadException('Invoice file size limit exceeded');
-            }
-
-            $response = $this->client->get($fileUrl);
-        } catch (TransferException $exception) {
-            throw new HttpInvoiceUploadException('Invoice download transfer exception', null, $exception);
+        if ($order === null) {
+            throw new OrderNotFoundException();
         }
 
         try {
-            $file = $this->fileService->upload((string) $response->getBody(), $fileUrl, FileServiceInterface::TYPE_ORDER_INVOICE);
+            $file = $this->fileService->uploadFromUrl(
+                $request->getInvoiceUrl(),
+                $request->getInvoiceUrl(),
+                FileServiceInterface::TYPE_ORDER_INVOICE,
+                self::FILE_SIZE_LIMIT
+            );
         } catch (FileServiceRequestException | ClientResponseDecodeException $exception) {
-            throw new HttpInvoiceUploadException('Exception wile uploading invoice to file service', null, $exception);
+            throw new HttpInvoiceUploadException('Exception while uploading invoice to file service', null, $exception);
         }
 
-        $order = $this->orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($request->getOrderExternalCode(), $request->getMerchantId());
-        $orderInvoice = $this->orderInvoiceFactory->create($order->getId(), $file->getFileId(), $request->getInvoiceNumber());
-        $this->orderInvoiceRepository->insert($orderInvoice);
-
-        $this->logInfo('Invoice {number} for order {id} uploaded with file id {count}', [
-           LoggingInterface::KEY_NUMBER => $request->getInvoiceNumber(),
-           LoggingInterface::KEY_ID => $order->getId(),
-           LoggingInterface::KEY_COUNT => $file->getFileId(),
-        ]);
+        $this->invoiceDocumentCreator->create(new InvoiceDocumentUpload(
+            $order->getId(),
+            $request->getInvoiceUuid(),
+            $request->getInvoiceNumber(),
+            $file->getUuid(),
+            $file->getFileId()
+        ));
     }
 }

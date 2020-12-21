@@ -1,39 +1,42 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Application\UseCase\CreateOrderInvoice;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\OrderInvoice\LegacyOrderInvoiceFactory;
-use App\DomainModel\OrderInvoice\LegacyOrderInvoiceRepositoryInterface;
+use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentCreator;
+use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentUpload;
 
 class CreateOrderInvoiceUseCase
 {
-    private $orderRepository;
+    private OrderRepositoryInterface $orderRepository;
 
-    private $orderInvoiceRepository;
-
-    private $orderInvoiceFactory;
+    private InvoiceDocumentCreator $invoiceDocumentCreator;
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
-        LegacyOrderInvoiceRepositoryInterface $orderInvoiceRepository,
-        LegacyOrderInvoiceFactory $orderInvoiceFactory
+        InvoiceDocumentCreator $invoiceDocumentCreator
     ) {
         $this->orderRepository = $orderRepository;
-        $this->orderInvoiceRepository = $orderInvoiceRepository;
-        $this->orderInvoiceFactory = $orderInvoiceFactory;
+        $this->invoiceDocumentCreator = $invoiceDocumentCreator;
     }
 
     public function execute(CreateOrderInvoiceRequest $request): void
     {
         $order = $this->orderRepository->getOneByUuid($request->getOrderUuid());
 
-        if (!$order) {
+        if ($order === null) {
             throw new OrderNotFoundException();
         }
 
-        $orderInvoice = $this->orderInvoiceFactory->create($order->getId(), $request->getFileId(), $request->getInvoiceNumber());
-        $this->orderInvoiceRepository->insert($orderInvoice);
+        $this->invoiceDocumentCreator->create(new InvoiceDocumentUpload(
+            $order->getId(),
+            $request->getInvoiceUuid(),
+            $request->getInvoiceNumber(),
+            $request->getFileUuid(),
+            $request->getFileId(),
+        ));
     }
 }

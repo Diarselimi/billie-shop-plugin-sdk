@@ -11,8 +11,6 @@ class FeatureFlagManager
 {
     public const FEATURE_DUMMY_RISK_CHECKS = 'dummy_risk_checks';
 
-    public const FEATURE_INVOICE_BUTLER = 'invoice_butler';
-
     private FeatureManagerInterface $featureManager;
 
     private array $overrides = [];
@@ -36,8 +34,14 @@ class FeatureFlagManager
         return $this->featureManager->isActive($featureName, $context);
     }
 
-    public function overrideIsEnabled(string $featureName, bool $enabled)
+    public function overrideIsEnabled(string $featureName, bool $enabled): void
     {
         $this->overrides[$featureName] = $enabled;
+    }
+
+    public function isButlerFullyEnabled(): bool
+    {
+        return false;
+//        return $this->isEnabled(self::FEATURE_INVOICE_BUTLER);
     }
 }

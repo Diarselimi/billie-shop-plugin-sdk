@@ -23,7 +23,7 @@ pre-commit-hook:
 	docker-compose up -d app
 	docker-compose exec -T app make openapi
 	docker-compose exec -T app make openapi-validation
-	docker-compose exec -T app vendor/bin/cs-fix-staged-files
+	docker-compose exec -T app vendor/bin/cs-fix-staged-files || echo "cs-fix: No changes in code."
 cache:
 	echo " > Cleaning and warming up caches... "
 	composer dumpautoload

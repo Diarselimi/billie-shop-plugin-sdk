@@ -24,6 +24,8 @@ class MerchantSettingsRepository extends AbstractPdoRepository implements Mercha
 
     public function insert(MerchantSettingsEntity $merchantSettingsEntity): void
     {
+        $feeRates = array_map(fn (Percent $rate) => $rate->toFloat(), $merchantSettingsEntity->getFeeRates());
+
         $id = $this->doInsert('
             INSERT INTO '. self::TABLE_NAME .'
             (
@@ -62,7 +64,7 @@ class MerchantSettingsRepository extends AbstractPdoRepository implements Mercha
             'use_experimental_identification' => (int) $merchantSettingsEntity->useExperimentalDebtorIdentification(),
             'invoice_handling_strategy' => $merchantSettingsEntity->getInvoiceHandlingStrategy(),
             'debtor_forgiveness_threshold' => $merchantSettingsEntity->getDebtorForgivenessThreshold(),
-            'fee_rates' => json_encode(array_map(fn (Percent $rate) => $rate->toFloat(), $merchantSettingsEntity->getFeeRates())),
+            'fee_rates' => json_encode($feeRates),
             'created_at' => $merchantSettingsEntity->getCreatedAt()->format(self::DATE_FORMAT),
             'updated_at' => $merchantSettingsEntity->getUpdatedAt()->format(self::DATE_FORMAT),
         ]);

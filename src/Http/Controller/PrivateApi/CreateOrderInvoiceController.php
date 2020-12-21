@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controller\PrivateApi;
 
 use App\Application\Exception\OrderNotFoundException;
@@ -15,12 +17,13 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     path="/order/{uuid}/add-invoice",
  *     operationId="order_create_invoice",
  *     summary="Create Order Invoice",
- *     description="(Automated) Creates a new invoice, linking an order with a file. Called automatically by the invoice uploader Lambda service.",
+ *     description="(Automated) Creates a new invoice, linking an order with a file. Called automatically by the
+ *     invoice uploader Lambda service.",
  *
  *     tags={"Support"},
  *     x={"groups":{"private"}},
  *
- *     @OA\Parameter(
+ * @OA\Parameter(
  *          in="path",
  *          name="uuid",
  *          @OA\Schema(ref="#/components/schemas/UUID"),
@@ -28,25 +31,28 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *          required=true
  *     ),
  *
- *     @OA\RequestBody(
+ * @OA\RequestBody(
  *          required=true,
  *          @OA\MediaType(mediaType="application/json",
  *          @OA\Schema(type="object", required={"file_id", "invoice_number"}, properties={
+ *              @OA\Property(property="invoice_uuid", @OA\Schema(ref="#/components/schemas/UUID")),
+ *              @OA\Property(property="file_uuid", @OA\Schema(ref="#/components/schemas/UUID")),
  *              @OA\Property(property="file_id", type="integer", description="File ID in the Nachos file service."),
- *              @OA\Property(property="invoice_number", ref="#/components/schemas/TinyText", description="Invoice number provided by the merchant.")
+ *              @OA\Property(property="invoice_number", ref="#/components/schemas/TinyText",
+ *                  description="Invoice number provided by the merchant.")
  *          }))
  *     ),
  *
- *     @OA\Response(response=201, description="Order invoice successfully created"),
- *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),
- *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
- *     @OA\Response(response=404, ref="#/components/responses/NotFound"),
- *     @OA\Response(response=500, ref="#/components/responses/ServerError")
+ * @OA\Response(response=201, description="Order invoice successfully created"),
+ * @OA\Response(response=400, ref="#/components/responses/BadRequest"),
+ * @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+ * @OA\Response(response=404, ref="#/components/responses/NotFound"),
+ * @OA\Response(response=500, ref="#/components/responses/ServerError")
  * )
  */
 class CreateOrderInvoiceController
 {
-    private $createOrderInvoiceUseCase;
+    private CreateOrderInvoiceUseCase $createOrderInvoiceUseCase;
 
     public function __construct(CreateOrderInvoiceUseCase $createOrderInvoiceUseCase)
     {
@@ -58,8 +64,10 @@ class CreateOrderInvoiceController
         try {
             $useCaseRequest = new CreateOrderInvoiceRequest(
                 $uuid,
+                $request->request->get('invoice_uuid', ''),
+                $request->request->get('invoice_number', ''),
+                $request->request->get('file_uuid', ''),
                 $request->request->getInt('file_id'),
-                $request->request->get('invoice_number')
             );
 
             $this->createOrderInvoiceUseCase->execute($useCaseRequest);

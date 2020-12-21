@@ -66,15 +66,14 @@ class ShipOrderService implements ShipOrderInterface, LoggingInterface
 
         $this->orderFinancialDetailsRepository->insert($financialDetails);
 
+        $this->announcer->announce($invoice, $orderContainer->getDebtorCompany()->getName());
+
         if ($order->isWorkflowV2()) {
             $isFullyShipped = $unshippedAmountGross->isZero() && $unshippedAmountNet->isZero() && $unshippedAmountTax->isZero();
             $transition = $isFullyShipped ? OrderEntity::TRANSITION_SHIP_FULLY : OrderEntity::TRANSITION_SHIP_PARTIALLY;
-        } else {
-            $transition = OrderEntity::TRANSITION_SHIP;
-        }
 
-        $this->announcer->announce($invoice, $orderContainer->getDebtorCompany()->getName());
-        $workflow->apply($order, $transition);
+            $workflow->apply($order, $transition);
+        }
 
         $this->logInfo('Order shipped with {name} workflow', [LoggingInterface::KEY_NAME => $workflow->getName()]);
     }

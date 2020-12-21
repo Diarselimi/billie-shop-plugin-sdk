@@ -441,7 +441,9 @@ paths:
       tags:
         - Support
       summary: 'Create Order Invoice'
-      description: '(Automated) Creates a new invoice, linking an order with a file. Called automatically by the invoice uploader Lambda service.'
+      description: |
+        (Automated) Creates a new invoice, linking an order with a file. Called automatically by the
+         *     invoice uploader Lambda service.
       operationId: order_create_invoice
       parameters:
         -
@@ -460,6 +462,8 @@ paths:
                 - file_id
                 - invoice_number
               properties:
+                invoice_uuid: {  }
+                file_uuid: {  }
                 file_id:
                   description: 'File ID in the Nachos file service.'
                   type: integer

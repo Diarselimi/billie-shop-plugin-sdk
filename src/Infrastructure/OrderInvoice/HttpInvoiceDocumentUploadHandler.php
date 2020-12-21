@@ -6,12 +6,12 @@ use App\Application\UseCase\HttpInvoiceUpload\HttpInvoiceUploadRequest;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\OrderInvoice\AbstractSettingsAwareInvoiceUploadHandler;
+use App\DomainModel\OrderInvoiceDocument\UploadHandler\AbstractInvoiceDocumentUploadHandler;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 
-class HttpInvoiceUploadHandler extends AbstractSettingsAwareInvoiceUploadHandler implements LoggingInterface
+class HttpInvoiceDocumentUploadHandler extends AbstractInvoiceDocumentUploadHandler implements LoggingInterface
 {
     use LoggingTrait;
 
@@ -28,14 +28,20 @@ class HttpInvoiceUploadHandler extends AbstractSettingsAwareInvoiceUploadHandler
         parent::__construct($merchantSettingsRepository);
     }
 
-    public function handleInvoice(OrderEntity $order, string $invoiceUrl, string $invoiceNumber, string $event): void
-    {
+    public function handle(
+        OrderEntity $order,
+        string $invoiceUuid,
+        string $invoiceUrl,
+        string $invoiceNumber,
+        string $eventSource
+    ): void {
         $message = new HttpInvoiceUploadRequest(
             $order->getMerchantId(),
             $order->getExternalCode(),
+            $invoiceUuid,
             $invoiceUrl,
             $invoiceNumber,
-            $event
+            $eventSource
         );
 
         $data = json_encode($message->toArray());

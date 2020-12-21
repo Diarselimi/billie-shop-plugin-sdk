@@ -13,7 +13,7 @@ class HttpInvoiceUploadConsumer implements ConsumerInterface, LoggingInterface
 {
     use LoggingTrait;
 
-    private $useCase;
+    private HttpInvoiceUploadUseCase $useCase;
 
     public function __construct(HttpInvoiceUploadUseCase $useCase)
     {
@@ -28,14 +28,16 @@ class HttpInvoiceUploadConsumer implements ConsumerInterface, LoggingInterface
         $request = new HttpInvoiceUploadRequest(
             $data['merchant_id'],
             $data['order_external_code'],
+            $data['invoice_uuid'] ?? '',
             $data['invoice_url'],
             $data['invoice_number'],
-            $data['event']
+            $data['event_source'] ?? $data['event']
         );
 
         try {
             $this->useCase->execute($request);
         } catch (\Throwable $exception) {
+            $this->logError('Http upload exception', [LoggingInterface::KEY_EXCEPTION => $exception]);
             $this->logSuppressedException($exception, 'HTTP Invoice Upload Failed', $data);
         }
     }

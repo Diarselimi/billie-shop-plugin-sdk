@@ -16,11 +16,11 @@ services:
       $producer: '@old_sound_rabbit_mq.paella_events_producer'
       $delayedProducer: '@old_sound_rabbit_mq.paella_delayed_events_producer'
       $invoiceUploadHandlers:
-        ftp: '@App\Infrastructure\Sns\SnsInvoiceUploadHandler'
-        http: '@App\Infrastructure\OrderInvoice\HttpInvoiceUploadHandler'
-        none: '@App\DomainModel\OrderInvoice\UselessInvoiceUploadHandler'
+        ftp: '@App\Infrastructure\OrderInvoice\SnsInvoiceDocumentUploadHandler'
+        http: '@App\Infrastructure\OrderInvoice\HttpInvoiceDocumentUploadHandler'
+        none: '@App\DomainModel\OrderInvoiceDocument\UploadHandler\NullInvoiceDocumentUploadHandler'
       $snsInvoiceUploadTopicArn: '%receive_invoices_sns_topic_arn%'
-      $invoiceDownloadClient: '@eight_points_guzzle.client.invoice_download'
+      $urlDownloaderClient: '@eight_points_guzzle.client.url_downloader'
       $alfredClient: '@eight_points_guzzle.client.alfred'
       $jarvisClient: '@eight_points_guzzle.client.jarvis'
       $borschtClient: '@eight_points_guzzle.client.borscht'
@@ -50,7 +50,6 @@ services:
       $paellaSandboxUrl: '%env(string:PAELLA_SANDBOX_URL)%'
       $vatRatesYamlPath: "%kernel.root_dir%/Resources/vat_rate/matrix.yaml"
       $isDummyRiskChecksFeatureEnabled: '%env(bool:DUMMY_CHECKS_ENABLED)%'
-      $isInvoiceButlerFeatureEnabled: '%env(bool:INVOICE_BUTLER_ENABLED)%'
 
   _instanceof:
     App\Application\UseCase\ValidatedUseCaseInterface:
@@ -149,7 +148,6 @@ services:
             debtor_is_trusted: '@App\DomainModel\OrderRiskCheck\Checker\DebtorIsTrustedCheck'
             delivery_address: '@App\DomainModel\OrderRiskCheck\Checker\DeliveryAddressCheck'
             fraud_score: '@App\DomainModel\OrderRiskCheck\Checker\FraudScoreCheck'
-
             debtor_score_available_dummy: '@App\DomainModel\OrderRiskCheck\DummyChecker\DebtorScoreAvailableDummyCheck'
 
   App\DomainModel\OrderRiskCheck\Flagception\DummyRiskCheckStrategyManager:

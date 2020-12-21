@@ -10,6 +10,7 @@ Feature: Attach invoice file to an order.
       """
       {
           "file_id": "1299",
+          "file_uuid": "7680ea0f-9d22-4041-afaf-a3ac1a979db3",
           "invoice_number": "BI1515"
       }
       """
@@ -24,6 +25,7 @@ Feature: Attach invoice file to an order.
       """
       {
           "file_id": "1299",
+          "file_uuid": "7680ea0f-9d22-4041-afaf-a3ac1a979db3",
           "invoice_number": "BI1515"
       }
       """

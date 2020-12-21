@@ -9,15 +9,12 @@ use App\DomainModel\FileService\FileServiceInterface;
 use App\DomainModel\FileService\FileServiceRequestException;
 use App\DomainModel\FileService\FileServiceResponseDTO;
 use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\Order\OrderNotFoundException;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\OrderInvoice\LegacyOrderInvoiceEntity;
-use App\DomainModel\OrderInvoice\LegacyOrderInvoiceFactory;
-use App\DomainModel\OrderInvoice\LegacyOrderInvoiceRepositoryInterface;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\TransferException;
-use GuzzleHttp\Psr7\Response;
+use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentCreator;
+use App\Infrastructure\ClientResponseDecodeException;
 use PhpSpec\ObjectBehavior;
-use Psr\Log\LoggerInterface;
+use Prophecy\Argument;
 
 class HttpInvoiceUploadUseCaseSpec extends ObjectBehavior
 {
@@ -31,27 +28,22 @@ class HttpInvoiceUploadUseCaseSpec extends ObjectBehavior
 
     private const FILE_ID = 888;
 
+    private const FILE_UUID = '8c1ba170-a36b-4498-a266-551e5f8d054b';
+
     private const ORDER_ID = 90;
 
     private const ORDER_EXTERNAL_CODE = 'ext_code';
 
     public function let(
-        Client $invoiceUploadClient,
         FileServiceInterface $fileService,
         OrderRepositoryInterface $orderRepository,
-        LegacyOrderInvoiceRepositoryInterface $orderInvoiceRepository,
-        LegacyOrderInvoiceFactory $orderInvoiceFactory,
-        LoggerInterface $logger
+        InvoiceDocumentCreator $invoiceDocumentCreator
     ) {
         $this->beConstructedWith(
-            $invoiceUploadClient,
             $fileService,
             $orderRepository,
-            $orderInvoiceRepository,
-            $orderInvoiceFactory
+            $invoiceDocumentCreator,
         );
-
-        $this->setLogger($logger);
     }
 
     public function it_is_initializable()
@@ -59,88 +51,67 @@ class HttpInvoiceUploadUseCaseSpec extends ObjectBehavior
         $this->shouldHaveType(HttpInvoiceUploadUseCase::class);
     }
 
-    public function it_throws_exception_on_invoice_download_exception(
-        Client $invoiceUploadClient,
-        FileServiceInterface $fileService,
-        HttpInvoiceUploadRequest $request
+    public function it_throws_exception_on_order_not_found(
+        OrderRepositoryInterface $orderRepository
     ) {
-        $request->getInvoiceUrl()->shouldBeCalledOnce()->willReturn(self::INVOICE_URL);
+        $request = new HttpInvoiceUploadRequest(1, 'ext-code', 'uuid', 'url', 'num', 'event-src');
+        $orderRepository->getOneByMerchantIdAndExternalCodeOrUUID(
+            $request->getOrderExternalCode(),
+            $request->getMerchantId()
+        )->willReturn(null);
 
-        $invoiceUploadClient->head(self::INVOICE_URL)->shouldBeCalledOnce()->willThrow(new TransferException());
-        $invoiceUploadClient->get(self::INVOICE_URL)->shouldNotBeCalled();
-        $fileService->upload()->shouldNotBeCalled();
-
-        $this->shouldThrow(new HttpInvoiceUploadException('Invoice download transfer exception'))->during('execute', [$request]);
+        $this->shouldThrow(OrderNotFoundException::class)->during('execute', [$request]);
     }
 
-    public function it_throws_exception_if_file_is_too_big(
-        Client $invoiceUploadClient,
-        FileServiceInterface $fileService,
-        HttpInvoiceUploadRequest $request,
-        Response $response
+    public function it_throws_upload_exception_on_file_service_exception(
+        OrderRepositoryInterface $orderRepository,
+        FileServiceInterface $fileService
     ) {
-        $request->getInvoiceUrl()->shouldBeCalledOnce()->willReturn(self::INVOICE_URL);
+        $request = new HttpInvoiceUploadRequest(1, 'ext-code', 'uuid', 'url', 'num', 'event-src');
+        $orderRepository->getOneByMerchantIdAndExternalCodeOrUUID(
+            $request->getOrderExternalCode(),
+            $request->getMerchantId()
+        )->willReturn(new OrderEntity());
 
-        $response->getHeader('Content-Length')->shouldBeCalledOnce()->willReturn([2097153]); // 2MBs + 1 byte
+        $fileService->uploadFromUrl(Argument::cetera())->willThrow(FileServiceRequestException::class);
 
-        $invoiceUploadClient->head(self::INVOICE_URL)->shouldBeCalledOnce()->willReturn($response);
-        $invoiceUploadClient->get(self::INVOICE_URL)->shouldNotBeCalled();
-        $fileService->upload()->shouldNotBeCalled();
-
-        $this->shouldThrow(new HttpInvoiceUploadException('Invoice file size limit exceeded'))->during('execute', [$request]);
+        $this->shouldThrow(HttpInvoiceUploadException::class)->during('execute', [$request]);
     }
 
-    public function it_throws_exception_on_file_service_error(
-        Client $invoiceUploadClient,
-        FileServiceInterface $fileService,
-        HttpInvoiceUploadRequest $request,
-        Response $headResponse,
-        Response $getResponse
+    public function it_throws_upload_exception_on_file_service_decode_exception(
+        OrderRepositoryInterface $orderRepository,
+        FileServiceInterface $fileService
     ) {
-        $request->getInvoiceUrl()->shouldBeCalledOnce()->willReturn(self::INVOICE_URL);
+        $request = new HttpInvoiceUploadRequest(1, 'ext-code', 'uuid', 'url', 'num', 'event-src');
+        $orderRepository->getOneByMerchantIdAndExternalCodeOrUUID(
+            $request->getOrderExternalCode(),
+            $request->getMerchantId()
+        )->willReturn(new OrderEntity());
 
-        $headResponse->getHeader('Content-Length')->shouldBeCalledOnce()->willReturn([2097152]); // 2MBs
-        $getResponse->getBody()->shouldBeCalledOnce()->willReturn(self::INVOICE);
+        $fileService->uploadFromUrl(Argument::cetera())->willThrow(ClientResponseDecodeException::class);
 
-        $invoiceUploadClient->head(self::INVOICE_URL)->shouldBeCalledOnce()->willReturn($headResponse);
-        $invoiceUploadClient->get(self::INVOICE_URL)->shouldBeCalledOnce()->willReturn($getResponse);
-        $fileService->upload(self::INVOICE, self::INVOICE_URL, 'order_invoice')->shouldBeCalledOnce()->willThrow(new FileServiceRequestException());
-
-        $this->shouldThrow(new HttpInvoiceUploadException('Exception wile uploading invoice to file service'))->during('execute', [$request]);
+        $this->shouldThrow(HttpInvoiceUploadException::class)->during('execute', [$request]);
     }
 
     public function it_does_everything_amazingly(
-        Client $invoiceUploadClient,
-        FileServiceInterface $fileService,
         OrderRepositoryInterface $orderRepository,
-        LegacyOrderInvoiceRepositoryInterface $orderInvoiceRepository,
-        LegacyOrderInvoiceFactory $orderInvoiceFactory,
-        HttpInvoiceUploadRequest $request,
-        OrderEntity $order,
-        LegacyOrderInvoiceEntity $orderInvoice,
-        Response $headResponse,
-        Response $getResponse,
-        FileServiceResponseDTO $file
+        FileServiceInterface $fileService
     ) {
-        $request->getInvoiceUrl()->shouldBeCalledOnce()->willReturn(self::INVOICE_URL);
-        $request->getInvoiceNumber()->shouldBeCalledTimes(2)->willReturn(self::INVOICE_NUMBER);
-        $request->getMerchantId()->shouldBeCalledOnce()->willReturn(self::MERCHANT_ID);
-        $request->getOrderExternalCode()->shouldBeCalledOnce()->willReturn(self::ORDER_EXTERNAL_CODE);
+        $orderId = 100;
+        $request = new HttpInvoiceUploadRequest(1, 'ext-code', 'invoice-uuid', 'url', 'invoice-num', 'event-src');
+        $orderRepository->getOneByMerchantIdAndExternalCodeOrUUID(
+            $request->getOrderExternalCode(),
+            $request->getMerchantId()
+        )->willReturn((new OrderEntity())->setId($orderId));
 
-        $headResponse->getHeader('Content-Length')->shouldBeCalledOnce()->willReturn([2097152]); // 2MBs
-        $getResponse->getBody()->shouldBeCalledOnce()->willReturn(self::INVOICE);
+        $file = new FileServiceResponseDTO(1, 'uuid', 'filename', 'filepath');
 
-        $file->getFileId()->shouldBeCalledTimes(2)->willReturn(self::FILE_ID);
-        $order->getId()->shouldBeCalledTimes(2)->willReturn(self::ORDER_ID);
-
-        $invoiceUploadClient->head(self::INVOICE_URL)->shouldBeCalledOnce()->willReturn($headResponse);
-        $invoiceUploadClient->get(self::INVOICE_URL)->shouldBeCalledOnce()->willReturn($getResponse);
-
-        $fileService->upload(self::INVOICE, self::INVOICE_URL, 'order_invoice')->shouldBeCalledOnce()->willReturn($file);
-
-        $orderRepository->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_EXTERNAL_CODE, self::MERCHANT_ID)->willReturn($order);
-        $orderInvoiceFactory->create(self::ORDER_ID, self::FILE_ID, self::INVOICE_NUMBER)->shouldBeCalledOnce()->willReturn($orderInvoice);
-        $orderInvoiceRepository->insert($orderInvoice)->shouldBeCalledOnce();
+        $fileService->uploadFromUrl(
+            $request->getInvoiceUrl(),
+            $request->getInvoiceUrl(),
+            FileServiceInterface::TYPE_ORDER_INVOICE,
+            Argument::type('int')
+        )->willReturn($file);
 
         $this->execute($request);
     }

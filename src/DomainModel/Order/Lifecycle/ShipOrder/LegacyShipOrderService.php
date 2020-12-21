@@ -58,7 +58,9 @@ class LegacyShipOrderService implements ShipOrderInterface, LoggingInterface
             }
         }
 
-        $workflow->apply($order, OrderEntity::TRANSITION_SHIP);
+        if ($order->isWorkflowV1()) {
+            $workflow->apply($order, OrderEntity::TRANSITION_SHIP);
+        }
 
         $this->logInfo('Order shipped with {name} workflow', [LoggingInterface::KEY_NAME => $workflow->getName()]);
     }

@@ -1,18 +1,18 @@
 <?php
 
-namespace spec\App\Infrastructure\Sns;
+namespace spec\App\Infrastructure\OrderInvoice;
 
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
-use App\Infrastructure\Sns\SnsInvoiceUploadHandler;
+use App\Infrastructure\OrderInvoice\SnsInvoiceDocumentUploadHandler;
 use Aws\Sns\Exception\SnsException;
 use Aws\Sns\SnsClient;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
 
-class SnsInvoiceUploadHandlerSpec extends ObjectBehavior
+class SnsInvoiceDocumentUploadHandlerSpec extends ObjectBehavior
 {
     private const ORDER_UUID = 'test-order-uuid';
 
@@ -30,7 +30,7 @@ class SnsInvoiceUploadHandlerSpec extends ObjectBehavior
 
     public function it_is_initializable()
     {
-        $this->shouldHaveType(SnsInvoiceUploadHandler::class);
+        $this->shouldHaveType(SnsInvoiceDocumentUploadHandler::class);
     }
 
     public function let(
@@ -64,7 +64,7 @@ class SnsInvoiceUploadHandlerSpec extends ObjectBehavior
     {
         $snsClient->publish(Argument::any())->shouldBeCalledOnce();
 
-        $this->handleInvoice($order, 'test', 'test', self::EVENT_NAME);
+        $this->handle($order, 'test', self::PATH, self::INVOICE_NUMBER, self::EVENT_NAME);
     }
 
     public function it_should_log_error_if_sns_exception_is_thrown(
@@ -77,7 +77,7 @@ class SnsInvoiceUploadHandlerSpec extends ObjectBehavior
 
         $snsClient->publish(Argument::any())->willThrow(SnsException::class);
 
-        $this->handleInvoice($order, 'test', 'test', self::EVENT_NAME);
+        $this->handle($order, 'test', self::PATH, self::INVOICE_NUMBER, self::EVENT_NAME);
     }
 
     private function getExpectedEventPayload(): array
