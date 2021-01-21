@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\DomainModel\Invoice;
 
+use App\Helper\Uuid\UuidGeneratorInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Ozean12\Transfer\Message\Invoice\CreateInvoice;
@@ -17,9 +18,12 @@ class InvoiceAnnouncer implements LoggingInterface
 
     private MessageBusInterface $bus;
 
-    public function __construct(MessageBusInterface $bus)
+    private UuidGeneratorInterface $uuidGenerator;
+
+    public function __construct(MessageBusInterface $bus, UuidGeneratorInterface $uuidGenerator)
     {
         $this->bus = $bus;
+        $this->uuidGenerator = $uuidGenerator;
     }
 
     public function announce(Invoice $invoice, string $debtorCompanyName): void
@@ -30,6 +34,7 @@ class InvoiceAnnouncer implements LoggingInterface
             ->setDebtorCompanyUuid($invoice->getDebtorCompanyUuid())
             ->setDebtorCompanyName($debtorCompanyName)
             ->setPaymentDebtorUuid($invoice->getPaymentDebtorUuid())
+            ->setPaymentUuid($invoice->getPaymentUuid())
             ->setGrossAmount($invoice->getAmount()->getGross()->shift(2)->toInt())
             ->setNetAmount($invoice->getAmount()->getNet()->shift(2)->toInt())
             ->setGrossFeeAmount($invoice->getFeeAmount()->getGross()->shift(2)->toInt())
@@ -40,8 +45,7 @@ class InvoiceAnnouncer implements LoggingInterface
             ->setBillingDate($invoice->getBillingDate()->format('Y-m-d'))
             ->setProofOfDeliveryUrl($invoice->getProofOfDeliveryUrl())
             ->setServices(self::SERVICES)
-            ->setExternalCode($invoice->getExternalCode())
-        ;
+            ->setExternalCode($invoice->getExternalCode());
 
         $this->bus->dispatch($message);
         $this->logInfo('CreateInvoice event announced');

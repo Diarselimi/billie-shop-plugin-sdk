@@ -43,7 +43,7 @@ class LegacyShipOrderService implements ShipOrderInterface, LoggingInterface
         $order = $orderContainer->getOrder();
         $workflow = $this->workflowRegistry->get($order);
 
-        if (!$order->getPaymentId()) {
+        if ($order->getPaymentId() === null) {
             $order->setPaymentId($this->uuidGenerator->uuid4())
                 ->setShippedAt(new \DateTime())
             ;

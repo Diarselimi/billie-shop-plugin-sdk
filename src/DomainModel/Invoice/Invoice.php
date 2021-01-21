@@ -24,6 +24,8 @@ class Invoice
 
     private string $paymentDebtorUuid;
 
+    private string $paymentUuid;
+
     private Percent $feeRate;
 
     private int $duration;
@@ -200,6 +202,18 @@ class Invoice
     public function setExternalCode(string $externalCode): Invoice
     {
         $this->externalCode = $externalCode;
+
+        return $this;
+    }
+
+    public function getPaymentUuid(): string
+    {
+        return $this->paymentUuid;
+    }
+
+    public function setPaymentUuid(string $paymentUuid): self
+    {
+        $this->paymentUuid = $paymentUuid;
 
         return $this;
     }

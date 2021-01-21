@@ -35,6 +35,7 @@ class InvoiceFactory extends AbstractFactory
             ->setCustomerUuid($orderContainer->getMerchant()->getPaymentUuid())
             ->setDebtorCompanyUuid($orderContainer->getMerchantDebtor()->getCompanyUuid())
             ->setPaymentDebtorUuid($orderContainer->getMerchantDebtor()->getPaymentDebtorId())
+            ->setPaymentUuid($orderContainer->getOrder()->getPaymentId() ?? $this->uuidGenerator->uuid4())
             ->setAmount(clone $amount)
             ->setOutstandingAmount($amount->getGross())
             ->setPayoutAmount($amount->getGross()->subtract($fee->getGrossFeeAmount()))
