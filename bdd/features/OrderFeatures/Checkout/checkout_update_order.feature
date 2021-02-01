@@ -71,6 +71,22 @@ Feature: As a merchant debtor, I want to use my initially provided address (whic
     And the order with code "CO123" should have company_billing_address set to "4b2228d3-1fa7-401c-8a92-5e8c4827caa3"
     And the debtor external data for order with code "CO123" should have a billing address
 
+  Scenario Template: The duration and duration extension are properly updated
+    Examples:
+      | state       |
+      | pre_waiting |
+      | authorized  |
+    Given I have a <state> order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123"
+    When I send a POST request to "/checkout-session/123123/update" with body:
+    """
+      {
+        "duration": 45
+      }
+    """
+    Then the response status code should be 204
+    And the order with code "CO123" at "duration" equals 45
+    And the order with code "CO123" at "durationExtension" equals 15
+
   Scenario: The billing address is properly updated, even with an already used checkout session UUID
     Given I have a "authorized" order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123-inactive"
     When I send a POST request to "/checkout-session/123123-inactive/update" with body:

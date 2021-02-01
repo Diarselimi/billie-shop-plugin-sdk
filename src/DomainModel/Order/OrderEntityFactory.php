@@ -55,6 +55,7 @@ class OrderEntityFactory
             ->setCreationSource($row['creation_source'])
             ->setCompanyBillingAddressUuid($row['company_billing_address_uuid'])
             ->setWorkflowName($row['workflow_name'])
+            ->setDurationExtension($row['duration_extension'])
         ;
     }
 }

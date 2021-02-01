@@ -598,11 +598,12 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
-     * @Given the order :orderId :key is :expectedValue
+     * @Given the order :externalCode :key is :expectedValue
+     * @Given the order with code :externalCode at :key equals :expectedValue
      */
-    public function orderDurationIs($orderId, $key, $expectedValue)
+    public function orderPropertyEquals($externalCode, $key, $expectedValue)
     {
-        $order = $this->getOrderRepository()->getOneByExternalCodeAndMerchantId($orderId, 1);
+        $order = $this->getOrderRepository()->getOneByExternalCodeAndMerchantId($externalCode, 1);
 
         Assert::notNull($order);
 

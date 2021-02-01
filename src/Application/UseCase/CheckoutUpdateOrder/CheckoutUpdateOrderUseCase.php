@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\UseCase\CheckoutUpdateOrder;
 
 use App\Application\Exception\OrderNotFoundException;
+use App\Application\Exception\RequestValidationException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Address\AddressEntity;
@@ -16,10 +17,14 @@ use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\Infrastructure\Repository\OrderFinancialDetailsRepository;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationList;
 
-class CheckoutUpdateOrderUseCase implements ValidatedUseCaseInterface
+class CheckoutUpdateOrderUseCase implements ValidatedUseCaseInterface, LoggingInterface
 {
-    use ValidatedUseCaseTrait;
+    use ValidatedUseCaseTrait, LoggingTrait;
 
     private OrderContainerFactory $orderContainerFactory;
 
@@ -96,16 +101,39 @@ class CheckoutUpdateOrderUseCase implements ValidatedUseCaseInterface
         $this->debtorExternalDataRepository->update($externalData);
     }
 
-    private function updateDurationForOrder(OrderContainer $orderContainer, int $duration): void
+    private function updateDurationForOrder(OrderContainer $orderContainer, int $newDuration): void
     {
         $orderFinancialDetailsEntity = clone $orderContainer->getOrderFinancialDetails();
+        $currentDuration = $orderFinancialDetailsEntity->getDuration();
+
+        if ($newDuration === $currentDuration) {
+            return;
+        }
+
+        if ($newDuration < $currentDuration) {
+            $errorMsg = 'New duration cannot be lower than the original one';
+
+            throw new RequestValidationException(
+                new ConstraintViolationList(
+                    [new ConstraintViolation($errorMsg, $errorMsg, [], '', 'duration', $newDuration)]
+                )
+            );
+        }
+
         $orderFinancialDetailsEntity
-            ->setDuration($duration)
+            ->setDuration($newDuration)
             ->setCreatedAt(new \DateTime())
             ->setUpdatedAt(new \DateTime());
 
         $this->financialDetailsRepository->insert($orderFinancialDetailsEntity);
         $orderContainer->setOrderFinancialDetails($orderFinancialDetailsEntity);
+
+        $durationExtension = $newDuration - $currentDuration;
+
+        $this->orderRepository->updateDurationExtension(
+            $orderContainer->getOrder()->getId(),
+            $durationExtension
+        );
     }
 
     private function saveAndAssociateBillingAddressToOrder(

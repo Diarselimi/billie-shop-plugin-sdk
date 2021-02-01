@@ -14,7 +14,9 @@ use Billie\PdoBundle\Infrastructure\Pdo\PdoConnection;
 use Generator;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class OrderRepository extends AbstractPdoRepository implements OrderRepositoryInterface, StatefulEntityRepositoryInterface
+class OrderRepository extends AbstractPdoRepository implements
+    OrderRepositoryInterface,
+    StatefulEntityRepositoryInterface
 {
     use StatefulEntityRepositoryTrait;
 
@@ -44,6 +46,7 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
         'checkout_session_id',
         'company_billing_address_uuid',
         'creation_source',
+        'duration_extension',
     ];
 
     private OrderEntityFactory $orderFactory;
@@ -58,7 +61,8 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
 
     public function insert(OrderEntity $order): void
     {
-        $id = $this->doInsert('
+        $id = $this->doInsert(
+            '
             INSERT INTO ' . self::TABLE_NAME . '
             (
               amount_forgiven, 
@@ -107,30 +111,32 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
               :created_at, 
               :updated_at
             )
-        ', [
-            'amount_forgiven' => $order->getAmountForgiven(),
-            'external_code' => $order->getExternalCode(),
-            'state' => $order->getState(),
-            'external_comment' => $order->getExternalComment(),
-            'internal_comment' => $order->getInternalComment(),
-            'invoice_number' => $order->getInvoiceNumber(),
-            'invoice_url' => $order->getInvoiceUrl(),
-            'proof_of_delivery_url' => $order->getProofOfDeliveryUrl(),
-            'delivery_address_id' => $order->getDeliveryAddressId(),
-            'merchant_id' => $order->getMerchantId(),
-            'debtor_person_id' => $order->getDebtorPersonId(),
-            'debtor_external_data_id' => $order->getDebtorExternalDataId(),
-            'payment_id' => $order->getPaymentId(),
-            'uuid' => $order->getUuid(),
-            'rid' => $this->ridProvider->getRid(),
-            'checkout_session_id' => $order->getCheckoutSessionId(),
-            'workflow_name' => $order->getWorkflowName(),
-            'created_at' => $order->getCreatedAt()->format(self::DATE_FORMAT),
-            'updated_at' => $order->getUpdatedAt()->format(self::DATE_FORMAT),
-            'merchant_debtor_id' => $order->getMerchantDebtorId(),
-            'company_billing_address_uuid' => $order->getCompanyBillingAddressUuid(),
-            'creation_source' => $order->getCreationSource(),
-        ]);
+        ',
+            [
+                'amount_forgiven' => $order->getAmountForgiven(),
+                'external_code' => $order->getExternalCode(),
+                'state' => $order->getState(),
+                'external_comment' => $order->getExternalComment(),
+                'internal_comment' => $order->getInternalComment(),
+                'invoice_number' => $order->getInvoiceNumber(),
+                'invoice_url' => $order->getInvoiceUrl(),
+                'proof_of_delivery_url' => $order->getProofOfDeliveryUrl(),
+                'delivery_address_id' => $order->getDeliveryAddressId(),
+                'merchant_id' => $order->getMerchantId(),
+                'debtor_person_id' => $order->getDebtorPersonId(),
+                'debtor_external_data_id' => $order->getDebtorExternalDataId(),
+                'payment_id' => $order->getPaymentId(),
+                'uuid' => $order->getUuid(),
+                'rid' => $this->ridProvider->getRid(),
+                'checkout_session_id' => $order->getCheckoutSessionId(),
+                'workflow_name' => $order->getWorkflowName(),
+                'created_at' => $order->getCreatedAt()->format(self::DATE_FORMAT),
+                'updated_at' => $order->getUpdatedAt()->format(self::DATE_FORMAT),
+                'merchant_debtor_id' => $order->getMerchantDebtorId(),
+                'company_billing_address_uuid' => $order->getCompanyBillingAddressUuid(),
+                'creation_source' => $order->getCreationSource(),
+            ]
+        );
 
         $order->setId($id);
         $this->dispatchCreatedEvent($order);
@@ -138,91 +144,122 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
 
     public function getOneByExternalCodeAndMerchantId(string $externalCode, int $merchantId): ?OrderEntity
     {
-        $order = $this->doFetchOne('
+        $order = $this->doFetchOne(
+            '
           SELECT ' . implode(', ', self::SELECT_FIELDS) . '
           FROM ' . self::TABLE_NAME . '
           WHERE external_code = :external_code AND merchant_id = :merchant_id
-        ', [
-            'external_code' => $externalCode,
-            'merchant_id' => $merchantId,
-        ]);
+        ',
+            [
+                'external_code' => $externalCode,
+                'merchant_id' => $merchantId,
+            ]
+        );
 
         return $order ? $this->orderFactory->createFromDatabaseRow($order) : null;
     }
 
     public function getOneByMerchantIdAndExternalCodeOrUUID(string $id, int $merchantId): ?OrderEntity
     {
-        $order = $this->doFetchOne('
+        $order = $this->doFetchOne(
+            '
           SELECT ' . implode(', ', self::SELECT_FIELDS) . '
           FROM ' . self::TABLE_NAME . '
           WHERE merchant_id = :merchant_id AND (external_code = :external_code OR uuid = :uuid)
-        ', [
-            'merchant_id' => $merchantId,
-            'external_code' => $id,
-            'uuid' => $id,
-        ]);
+        ',
+            [
+                'merchant_id' => $merchantId,
+                'external_code' => $id,
+                'uuid' => $id,
+            ]
+        );
 
         return $order ? $this->orderFactory->createFromDatabaseRow($order) : null;
     }
 
     public function getOneByMerchantIdAndUUID(string $uuid, int $merchantId): ?OrderEntity
     {
-        $order = $this->doFetchOne('
+        $order = $this->doFetchOne(
+            '
           SELECT ' . implode(', ', self::SELECT_FIELDS) . '
           FROM ' . self::TABLE_NAME . '
           WHERE merchant_id = :merchant_id AND uuid = :uuid
-        ', [
-            'merchant_id' => $merchantId,
-            'uuid' => $uuid,
-        ]);
+        ',
+            [
+                'merchant_id' => $merchantId,
+                'uuid' => $uuid,
+            ]
+        );
 
         return $order ? $this->orderFactory->createFromDatabaseRow($order) : null;
     }
 
     public function getOneByPaymentId(string $paymentId): ?OrderEntity
     {
-        $order = $this->doFetchOne('
+        $order = $this->doFetchOne(
+            '
           SELECT ' . implode(', ', self::SELECT_FIELDS) . '
           FROM orders
           WHERE payment_id = :payment_id
-        ', [
-            'payment_id' => $paymentId,
-        ]);
+        ',
+            [
+                'payment_id' => $paymentId,
+            ]
+        );
 
         return $order ? $this->orderFactory->createFromDatabaseRow($order) : null;
     }
 
     public function getOneById(int $id): ?OrderEntity
     {
-        $order = $this->doFetchOne('
+        $order = $this->doFetchOne(
+            '
           SELECT ' . implode(', ', self::SELECT_FIELDS) . '
           FROM ' . self::TABLE_NAME . ' 
           WHERE id = :id
-        ', [
-            'id' => $id,
-        ]);
+        ',
+            [
+                'id' => $id,
+            ]
+        );
 
         return $order ? $this->orderFactory->createFromDatabaseRow($order) : null;
     }
 
     public function getOneByUuid(string $uuid): ?OrderEntity
     {
-        $order = $this->doFetchOne('
+        $order = $this->doFetchOne(
+            '
           SELECT ' . implode(', ', self::SELECT_FIELDS) . '
           FROM ' . self::TABLE_NAME . '
           WHERE uuid = :uuid
-        ', [
-            'uuid' => $uuid,
-        ]);
+        ',
+            [
+                'uuid' => $uuid,
+            ]
+        );
 
         return $order ? $this->orderFactory->createFromDatabaseRow($order) : null;
+    }
+
+    public function updateDurationExtension(int $orderId, int $durationExtension): void
+    {
+        $this->doUpdate(
+            'UPDATE ' . self::TABLE_NAME .
+            ' SET duration_extension = :duration_extension ' .
+            ' WHERE id = :id ',
+            [
+                'duration_extension' => $durationExtension,
+                'id' => $orderId,
+            ]
+        );
     }
 
     public function updateOrderExternalCode(OrderEntity $orderEntity): void
     {
         $this->doUpdate(
-            'UPDATE '. self::TABLE_NAME .
-            ' SET external_code = :external_code '.
+            'UPDATE ' . self::TABLE_NAME .
+            ' SET external_code = :external_code ' .
             ' WHERE id = :id ',
             [
                 'external_code' => $orderEntity->getExternalCode(),
@@ -233,7 +270,8 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
 
     public function update(OrderEntity $order): void
     {
-        $this->doUpdate('
+        $this->doUpdate(
+            '
             UPDATE ' . self::TABLE_NAME . '
             SET
               external_code = :external_code,
@@ -249,51 +287,59 @@ class OrderRepository extends AbstractPdoRepository implements OrderRepositoryIn
               company_billing_address_uuid = :company_billing_address_uuid,
               creation_source = :creation_source
             WHERE id = :id
-        ', [
-            'external_code' => $order->getExternalCode(),
-            'state' => $order->getState(),
-            'merchant_debtor_id' => $order->getMerchantDebtorId(),
-            'amount_forgiven' => $order->getAmountForgiven(),
-            'shipped_at' => $order->getShippedAt() ? $order->getShippedAt()->format(self::DATE_FORMAT) : null,
-            'updated_at' => (new \DateTime())->format(self::DATE_FORMAT),
-            'payment_id' => $order->getPaymentId(),
-            'invoice_number' => $order->getInvoiceNumber(),
-            'invoice_url' => $order->getInvoiceUrl(),
-            'proof_of_delivery_url' => $order->getProofOfDeliveryUrl(),
-            'company_billing_address_uuid' => $order->getCompanyBillingAddressUuid(),
-            'creation_source' => $order->getCreationSource(),
-            'id' => $order->getId(),
-        ]);
+        ',
+            [
+                'external_code' => $order->getExternalCode(),
+                'state' => $order->getState(),
+                'merchant_debtor_id' => $order->getMerchantDebtorId(),
+                'amount_forgiven' => $order->getAmountForgiven(),
+                'shipped_at' => $order->getShippedAt() ? $order->getShippedAt()->format(self::DATE_FORMAT) : null,
+                'updated_at' => (new \DateTime())->format(self::DATE_FORMAT),
+                'payment_id' => $order->getPaymentId(),
+                'invoice_number' => $order->getInvoiceNumber(),
+                'invoice_url' => $order->getInvoiceUrl(),
+                'proof_of_delivery_url' => $order->getProofOfDeliveryUrl(),
+                'company_billing_address_uuid' => $order->getCompanyBillingAddressUuid(),
+                'creation_source' => $order->getCreationSource(),
+                'id' => $order->getId(),
+            ]
+        );
     }
 
     public function updateMerchantDebtor(int $orderId, int $merchantDebtorId): void
     {
-        $this->doUpdate('
+        $this->doUpdate(
+            '
             UPDATE ' . self::TABLE_NAME . '
             SET
               merchant_debtor_id = :merchant_debtor_id,
               updated_at = :updated_at
             WHERE id = :id
-        ', [
-            'merchant_debtor_id' => $merchantDebtorId,
-            'updated_at' => (new \DateTime())->format(self::DATE_FORMAT),
-            'id' => $orderId,
-        ]);
+        ',
+            [
+                'merchant_debtor_id' => $merchantDebtorId,
+                'updated_at' => (new \DateTime())->format(self::DATE_FORMAT),
+                'id' => $orderId,
+            ]
+        );
     }
 
     public function updateIdentificationBillingAddress(int $orderId, string $billingAddressUuid): void
     {
-        $this->doUpdate('
+        $this->doUpdate(
+            '
             UPDATE ' . self::TABLE_NAME . '
             SET
               company_billing_address_uuid = :company_billing_address_uuid,
               updated_at = :updated_at
             WHERE id = :id
-        ', [
-            'company_billing_address_uuid' => $billingAddressUuid,
-            'updated_at' => (new \DateTime())->format(self::DATE_FORMAT),
-            'id' => $orderId,
-        ]);
+        ',
+            [
+                'company_billing_address_uuid' => $billingAddressUuid,
+                'updated_at' => (new \DateTime())->format(self::DATE_FORMAT),
+                'id' => $orderId,
+            ]
+        );
     }
 
     public function getDebtorMaximumOverdue(string $companyUuid): int
@@ -395,7 +441,8 @@ SQL;
 
     public function getOrdersByInvoiceHandlingStrategy(string $strategy): Generator
     {
-        $stmt = $this->doExecute('
+        $stmt = $this->doExecute(
+            '
             SELECT ' . implode(', ', self::SELECT_FIELDS) . '
             FROM orders
             WHERE invoice_url IS NOT NULL
@@ -403,9 +450,11 @@ SQL;
                 SELECT merchant_id FROM merchant_settings
                 WHERE invoice_handling_strategy = :strategy
             );
-        ', [
-            'strategy' => $strategy,
-        ]);
+        ',
+            [
+                'strategy' => $strategy,
+            ]
+        );
 
         while ($row = $stmt->fetch(PdoConnection::FETCH_ASSOC)) {
             yield $this->orderFactory->createFromDatabaseRow($row);
@@ -414,9 +463,12 @@ SQL;
 
     public function getNotYetConfirmedByCheckoutSessionUuid(string $checkoutSessionUuid): ?OrderEntity
     {
-        $states = array_map(function ($state) {
-            return "'{$state}'";
-        }, [OrderEntity::STATE_PRE_WAITING, OrderEntity::STATE_AUTHORIZED]);
+        $states = array_map(
+            function ($state) {
+                return "'{$state}'";
+            },
+            [OrderEntity::STATE_PRE_WAITING, OrderEntity::STATE_AUTHORIZED]
+        );
 
         $sql = 'SELECT orders.' . implode(', orders.', self::SELECT_FIELDS) . ' FROM orders
             INNER JOIN checkout_sessions ch ON ch.id = orders.checkout_session_id
@@ -450,10 +502,13 @@ SQL;
         return (int) $result['total'];
     }
 
-    public function getOrdersCountByCompanyBillingAddressAndState(string $companyUuid, string $addressUuid, string $state): int
-    {
+    public function getOrdersCountByCompanyBillingAddressAndState(
+        string $companyUuid,
+        string $addressUuid,
+        string $state
+    ): int {
         $result = $this->doFetchOne(
-            'SELECT COUNT(*) as total FROM ' . self::TABLE_NAME .' o
+            'SELECT COUNT(*) as total FROM ' . self::TABLE_NAME . ' o
             JOIN merchants_debtors md ON o.merchant_debtor_id = md.id 
             WHERE state = :state AND o.company_billing_address_uuid = :address_uuid AND md.company_uuid = :company_uuid',
             [
@@ -503,9 +558,12 @@ SQL;
         }
 
         if ($filters->has('state') && is_array($filters->get('state')) && !empty($filters->get('state'))) {
-            $states = array_map(function ($state) {
-                return "'{$state}'";
-            }, $filters->get('state'));
+            $states = array_map(
+                function ($state) {
+                    return "'{$state}'";
+                },
+                $filters->get('state')
+            );
 
             $query .= ' AND orders.state IN (' . implode(',', $states) . ')';
         }

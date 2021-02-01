@@ -68,4 +68,6 @@ interface OrderRepositoryInterface
         string $addressUuid,
         string $state
     ): int;
+
+    public function updateDurationExtension(int $orderId, int $durationExtension): void;
 }

@@ -148,6 +148,8 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
 
     private string $workflowName;
 
+    private ?int $durationExtension;
+
     public function getUuid(): string
     {
         return $this->uuid;
@@ -435,5 +437,17 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
     public function isWorkflowV2(): bool
     {
         return $this->workflowName === self::WORKFLOW_NAME_V2;
+    }
+
+    public function getDurationExtension(): ?int
+    {
+        return $this->durationExtension;
+    }
+
+    public function setDurationExtension(?int $durationExtension): self
+    {
+        $this->durationExtension = $durationExtension;
+
+        return $this;
     }
 }
