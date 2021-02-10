@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\UseCase\UpdateOrder;
+namespace App\Application\UseCase\LegacyUpdateOrder;
 
 use App\Application\Exception\OrderBeingCollectedException;
 use App\Application\Exception\OrderNotFoundException;
@@ -10,31 +10,29 @@ use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\SalesforceInterface;
-use App\DomainModel\OrderUpdate\UpdateOrderPersistenceService;
-use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
-use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
+use App\DomainModel\OrderUpdate\LegacyUpdateOrderService;
 
-class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
+class LegacyUpdateOrderUseCase implements ValidatedUseCaseInterface
 {
-    use LoggingTrait, ValidatedUseCaseTrait;
+    use ValidatedUseCaseTrait;
 
     private OrderContainerFactory $orderContainerFactory;
 
-    private UpdateOrderPersistenceService $updateOrderPersistenceService;
+    private LegacyUpdateOrderService $legacyUpdateOrderService;
 
     private SalesforceInterface $salesforce;
 
     public function __construct(
         OrderContainerFactory $orderContainerFactory,
-        UpdateOrderPersistenceService $updateOrderPersistenceService,
+        LegacyUpdateOrderService $legacyUpdateOrderService,
         SalesforceInterface $salesforce
     ) {
         $this->orderContainerFactory = $orderContainerFactory;
-        $this->updateOrderPersistenceService = $updateOrderPersistenceService;
+        $this->legacyUpdateOrderService = $legacyUpdateOrderService;
         $this->salesforce = $salesforce;
     }
 
-    public function execute(UpdateOrderRequest $request): void
+    public function execute(LegacyUpdateOrderRequest $request): void
     {
         $this->validateRequest($request);
 
@@ -53,17 +51,7 @@ class UpdateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
             throw new OrderBeingCollectedException();
         }
 
-        $changes = $this->updateOrderPersistenceService->update($orderContainer, $request);
-
-        $this->logInfo('Start order update, state {name}.', [
-            LoggingInterface::KEY_NAME => $order->getState(),
-            LoggingInterface::KEY_SOBAKA => [
-                'duration_changed' => (int) $changes->getDuration() !== null,
-                'invoice_changed' => (int) ($changes->getInvoiceNumber() !== null) || ($changes->getInvoiceUrl() !== null),
-                'amount_changed' => (int) $changes->getAmount() !== null,
-                'external_code_changed' => (int) $changes->getExternalCode() !== null,
-            ],
-        ]);
+        $this->legacyUpdateOrderService->update($orderContainer, $request);
     }
 
     private function isOrderLateAndInCollections(OrderEntity $order): bool

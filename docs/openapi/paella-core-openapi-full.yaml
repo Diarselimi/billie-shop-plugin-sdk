@@ -1969,7 +1969,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateOrderRequest'
+              $ref: '#/components/schemas/LegacyUpdateOrderRequest'
       responses:
         '204':
           description: 'Order successfully updated'
@@ -3656,6 +3656,22 @@ components:
           example: 'false'
           nullable: true
       type: object
+    LegacyUpdateOrderRequest:
+      title: 'Order Update Object'
+      properties:
+        duration:
+          $ref: '#/components/schemas/OrderDuration'
+        amount:
+          $ref: '#/components/schemas/AmountDTO'
+        invoice_number:
+          $ref: '#/components/schemas/TinyText'
+        invoice_url:
+          $ref: '#/components/schemas/TinyText'
+        order_id:
+          description: 'Order external code'
+          example: DE123456-1
+          $ref: '#/components/schemas/TinyText'
+      type: object
     MarkDuplicateDebtorItem:
       required:
         - debtor_id
@@ -4005,22 +4021,6 @@ components:
           $ref: '#/components/schemas/TinyText'
         address_postal_code:
           example: '10969'
-          $ref: '#/components/schemas/TinyText'
-      type: object
-    UpdateOrderRequest:
-      title: 'Order Update Object'
-      properties:
-        duration:
-          $ref: '#/components/schemas/OrderDuration'
-        amount:
-          $ref: '#/components/schemas/AmountDTO'
-        invoice_number:
-          $ref: '#/components/schemas/TinyText'
-        invoice_url:
-          $ref: '#/components/schemas/TinyText'
-        order_id:
-          description: 'Order external code'
-          example: DE123456-1
           $ref: '#/components/schemas/TinyText'
       type: object
     UpdateOrderWithInvoiceRequest:

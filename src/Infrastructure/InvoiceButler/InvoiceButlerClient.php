@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\InvoiceButler;
 
-use App\DomainModel\Fraud\FraudServiceException;
 use App\DomainModel\Invoice\InvoiceFactory;
 use App\DomainModel\Invoice\InvoiceServiceException;
 use App\DomainModel\Invoice\InvoiceServiceInterface;
@@ -33,12 +32,15 @@ class InvoiceButlerClient implements InvoiceServiceInterface, LoggingInterface
     public function findByUuids(array $uuids): array
     {
         try {
-            $response = $this->client->get('/invoices', [
-                'query' => ['uuids' => $uuids],
-                'on_stats' => function (TransferStats $stats) {
-                    $this->logServiceRequestStats($stats, 'get_invoices');
-                },
-            ]);
+            $response = $this->client->get(
+                '/invoices',
+                [
+                    'query' => ['uuids' => $uuids],
+                    'on_stats' => function (TransferStats $stats) {
+                        $this->logServiceRequestStats($stats, 'get_invoices');
+                    },
+                ]
+            );
 
             return $this->factory->createFromArrayCollection(
                 $this->decodeResponse($response)

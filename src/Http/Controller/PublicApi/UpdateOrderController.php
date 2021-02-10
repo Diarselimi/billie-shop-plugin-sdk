@@ -4,8 +4,8 @@ namespace App\Http\Controller\PublicApi;
 
 use App\Application\Exception\OrderBeingCollectedException;
 use App\Application\Exception\OrderNotFoundException;
-use App\Application\UseCase\UpdateOrder\UpdateOrderRequest;
-use App\Application\UseCase\UpdateOrder\UpdateOrderUseCase;
+use App\Application\UseCase\LegacyUpdateOrder\LegacyUpdateOrderRequest;
+use App\Application\UseCase\LegacyUpdateOrder\LegacyUpdateOrderUseCase;
 use App\DomainModel\OrderUpdate\UpdateOrderException;
 use App\Http\HttpConstantsInterface;
 use App\Http\RequestTransformer\UpdateOrder\UpdateOrderAmountRequestFactory;
@@ -36,7 +36,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     @OA\RequestBody(
  *          required=true,
  *          @OA\MediaType(mediaType="application/json",
- *          @OA\Schema(ref="#/components/schemas/UpdateOrderRequest"))
+ *          @OA\Schema(ref="#/components/schemas/LegacyUpdateOrderRequest"))
  *     ),
  *
  *     @OA\Response(response=204, description="Order successfully updated"),
@@ -48,12 +48,12 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class UpdateOrderController
 {
-    private UpdateOrderUseCase $useCase;
+    private LegacyUpdateOrderUseCase $useCase;
 
     private UpdateOrderAmountRequestFactory $updateOrderAmountRequestFactory;
 
     public function __construct(
-        UpdateOrderUseCase $useCase,
+        LegacyUpdateOrderUseCase $useCase,
         UpdateOrderAmountRequestFactory $updateOrderAmountRequestFactory
     ) {
         $this->useCase = $useCase;
@@ -64,7 +64,7 @@ class UpdateOrderController
     {
         try {
             $merchantId = $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID);
-            $orderRequest = (new UpdateOrderRequest($id, $merchantId))
+            $orderRequest = (new LegacyUpdateOrderRequest($id, $merchantId))
                 ->setAmount($this->updateOrderAmountRequestFactory->create($request))
                 ->setDuration($request->request->get('duration'))
                 ->setInvoiceNumber($request->request->get('invoice_number'))

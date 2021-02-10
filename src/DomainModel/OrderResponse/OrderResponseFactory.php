@@ -65,7 +65,10 @@ class OrderResponseFactory
 //                ->setPendingMerchantPaymentAmount($orderPaymentDetails->getOutstandingAmountMerchantPayment())
             ;
         } elseif (count($orderContainer->getInvoices()) > 1) {
-            throw new \RuntimeException('Unexpected order-invoice relationship');
+            throw new \RuntimeException(
+                'Unexpected invoices count. Order has more than one invoice: ' .
+                $orderContainer->getOrder()->getUuid()
+            );
         }
 
         return $response;
@@ -242,7 +245,7 @@ class OrderResponseFactory
         ;
     }
 
-    private function addInvoiceDataV1(OrderContainer $orderContainer, AbstractOrderResponse $response): void
+    private function addInvoiceDataV1(OrderContainer $orderContainer, OrderResponseV1 $response): void
     {
         $orderPaymentDetails = $orderContainer->getPaymentDetails();
         $response

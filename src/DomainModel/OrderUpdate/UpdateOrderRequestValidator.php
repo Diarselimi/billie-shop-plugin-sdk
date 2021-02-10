@@ -2,7 +2,7 @@
 
 namespace App\DomainModel\OrderUpdate;
 
-use App\Application\UseCase\UpdateOrder\UpdateOrderRequest;
+use App\Application\UseCase\LegacyUpdateOrder\LegacyUpdateOrderRequest;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
 
@@ -43,9 +43,9 @@ class UpdateOrderRequestValidator
         $this->invoiceUrlValidator = $invoiceUrlValidator;
     }
 
-    public function getValidatedRequest(OrderContainer $orderContainer, UpdateOrderRequest $request): UpdateOrderRequest
+    public function getValidatedRequest(OrderContainer $orderContainer, LegacyUpdateOrderRequest $request): LegacyUpdateOrderRequest
     {
-        return (new UpdateOrderRequest($request->getOrderId(), $request->getMerchantId()))
+        return (new LegacyUpdateOrderRequest($request->getOrderId(), $request->getMerchantId()))
             ->setAmount($this->amountValidator->getValidatedValue(
                 $orderContainer,
                 $request->getAmount(),

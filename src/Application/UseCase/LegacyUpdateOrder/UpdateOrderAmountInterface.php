@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\UseCase\UpdateOrder;
+namespace App\Application\UseCase\LegacyUpdateOrder;
 
 use Ozean12\Money\TaxedMoney\TaxedMoney;
 

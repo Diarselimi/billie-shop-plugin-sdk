@@ -423,7 +423,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateOrderRequest'
+              $ref: '#/components/schemas/LegacyUpdateOrderRequest'
       responses:
         '204':
           description: 'Order successfully updated'
@@ -911,6 +911,22 @@ components:
         amount:
           $ref: '#/components/schemas/AmountDTO'
       type: object
+    LegacyUpdateOrderRequest:
+      title: 'Order Update Object'
+      properties:
+        duration:
+          $ref: '#/components/schemas/OrderDuration'
+        amount:
+          $ref: '#/components/schemas/AmountDTO'
+        invoice_number:
+          $ref: '#/components/schemas/TinyText'
+        invoice_url:
+          $ref: '#/components/schemas/TinyText'
+        order_id:
+          description: 'Order external code'
+          example: DE123456-1
+          $ref: '#/components/schemas/TinyText'
+      type: object
     PauseOrderDunningRequest:
       title: 'Pause Order Dunning'
       properties:
@@ -945,22 +961,6 @@ components:
       allOf:
         -
           $ref: '#/components/schemas/AbstractShipOrderRequestV1'
-    UpdateOrderRequest:
-      title: 'Order Update Object'
-      properties:
-        duration:
-          $ref: '#/components/schemas/OrderDuration'
-        amount:
-          $ref: '#/components/schemas/AmountDTO'
-        invoice_number:
-          $ref: '#/components/schemas/TinyText'
-        invoice_url:
-          $ref: '#/components/schemas/TinyText'
-        order_id:
-          description: 'Order external code'
-          example: DE123456-1
-          $ref: '#/components/schemas/TinyText'
-      type: object
     DebtorCompanyRequest:
       title: 'Debtor Company Request'
       required:

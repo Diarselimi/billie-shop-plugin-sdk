@@ -3,7 +3,7 @@
 namespace App\Application\UseCase\UpdateOrderWithInvoice;
 
 use App\Application\UseCase\AbstractOrderRequest;
-use App\Application\UseCase\UpdateOrder\UpdateOrderAmountInterface;
+use App\Application\UseCase\LegacyUpdateOrder\UpdateOrderAmountInterface;
 use App\Application\UseCase\ValidatedRequestInterface;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\File\UploadedFile;

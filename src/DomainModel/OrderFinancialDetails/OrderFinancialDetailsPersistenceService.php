@@ -2,7 +2,7 @@
 
 namespace App\DomainModel\OrderFinancialDetails;
 
-use App\Application\UseCase\UpdateOrder\UpdateOrderAmountInterface;
+use App\Application\UseCase\LegacyUpdateOrder\UpdateOrderAmountInterface;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
 use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;

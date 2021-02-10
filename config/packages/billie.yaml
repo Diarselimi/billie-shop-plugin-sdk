@@ -24,6 +24,7 @@ ozean12_amqp_pack:
       class: Ozean12\Transfer\Message\Customer\CustomerFeeRatesUpdated
       delay: 15000
     invoice.create_invoice: Ozean12\Transfer\Message\Invoice\CreateInvoice
+    invoice.extend_invoice: Ozean12\Transfer\Message\Invoice\ExtendInvoice
     document.document_uploaded:
       class: Ozean12\Transfer\Message\Document\DocumentUploaded
       delay: 5000

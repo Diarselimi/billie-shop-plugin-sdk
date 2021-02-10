@@ -2,7 +2,7 @@
 
 namespace App\DomainModel\OrderUpdate;
 
-use App\Application\UseCase\UpdateOrder\UpdateOrderAmountInterface;
+use App\Application\UseCase\LegacyUpdateOrder\UpdateOrderAmountInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;

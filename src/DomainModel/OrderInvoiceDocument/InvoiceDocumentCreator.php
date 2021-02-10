@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\DomainModel\OrderInvoiceDocument;
 
 use App\Application\UseCase\HttpInvoiceUpload\HttpInvoiceUploadException;
-use App\DomainModel\FeatureFlag\FeatureFlagManager;
 use App\DomainModel\FileService\FileServiceInterface;
 use App\DomainModel\FileService\FileServiceRequestException;
 use App\DomainModel\OrderInvoice\LegacyOrderInvoiceFactory;
@@ -28,21 +27,17 @@ class InvoiceDocumentCreator implements LoggingInterface
 
     private FileServiceInterface $fileService;
 
-    private FeatureFlagManager $featureFlagManager;
-
     private MessageBusInterface $messageBus;
 
     public function __construct(
         LegacyOrderInvoiceRepositoryInterface $orderInvoiceRepository,
         LegacyOrderInvoiceFactory $orderInvoiceFactory,
         FileServiceInterface $fileService,
-        FeatureFlagManager $featureFlagManager,
         MessageBusInterface $messageBus
     ) {
         $this->orderInvoiceRepository = $orderInvoiceRepository;
         $this->orderInvoiceFactory = $orderInvoiceFactory;
         $this->fileService = $fileService;
-        $this->featureFlagManager = $featureFlagManager;
         $this->messageBus = $messageBus;
     }
 
@@ -55,9 +50,9 @@ class InvoiceDocumentCreator implements LoggingInterface
             $documentUpload->getInvoiceNumber()
         );
         $this->orderInvoiceRepository->insert($invoice);
-        $this->logInfo('Legacy Invoice created (invoice-butler disabled).');
 
-        // TODO: re-enable when ready
+        // TODO (partial-shipments): re-enable after migrating invoices to butler #CORE-556
+        $this->logInfo('Legacy Invoice created (DocumentUploaded dispatching is disabled).');
         // $this->dispatchDocumentUploaded($documentUpload);
     }
 

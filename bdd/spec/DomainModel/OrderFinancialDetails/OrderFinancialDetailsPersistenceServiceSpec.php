@@ -2,7 +2,7 @@
 
 namespace spec\App\DomainModel\OrderFinancialDetails;
 
-use App\Application\UseCase\UpdateOrder\UpdateOrderRequest;
+use App\Application\UseCase\LegacyUpdateOrder\LegacyUpdateOrderRequest;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsFactory;
@@ -31,7 +31,7 @@ class OrderFinancialDetailsPersistenceServiceSpec extends ObjectBehavior
         $orderContainer->setOrderFinancialDetails(Argument::any())->willReturn($orderContainer);
         // Arrange
         $newFinancialDetails = new OrderFinancialDetailsEntity();
-        $changeSet = new UpdateOrderRequest('', 1);
+        $changeSet = new LegacyUpdateOrderRequest('', 1);
         $orderId = 1;
         $duration = 100;
         $factory->create(

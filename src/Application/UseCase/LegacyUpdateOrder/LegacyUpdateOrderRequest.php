@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Application\UseCase\UpdateOrder;
+namespace App\Application\UseCase\LegacyUpdateOrder;
 
 use App\Application\UseCase\AbstractOrderRequest;
 use App\Application\UseCase\ValidatedRequestInterface;
 use App\Application\Validator\Constraint as PaellaAssert;
-use Ozean12\Money\TaxedMoney\TaxedMoney;
 use OpenApi\Annotations as OA;
+use Ozean12\Money\TaxedMoney\TaxedMoney;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @OA\Schema(schema="UpdateOrderRequest", title="Order Update Object", type="object", properties={
+ * @OA\Schema(schema="LegacyUpdateOrderRequest", title="Order Update Object", type="object", properties={
  *      @OA\Property(property="duration", ref="#/components/schemas/OrderDuration"),
  *      @OA\Property(property="amount", ref="#/components/schemas/AmountDTO"),
  *      @OA\Property(property="invoice_number", ref="#/components/schemas/TinyText"),
@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      @OA\Property(property="order_id", ref="#/components/schemas/TinyText", description="Order external code", example="DE123456-1")
  * })
  */
-class UpdateOrderRequest extends AbstractOrderRequest implements
+class LegacyUpdateOrderRequest extends AbstractOrderRequest implements
     ValidatedRequestInterface,
     UpdateOrderAmountInterface
 {
@@ -81,14 +81,14 @@ class UpdateOrderRequest extends AbstractOrderRequest implements
         return $this->duration;
     }
 
-    public function setDuration(?int $duration): UpdateOrderRequest
+    public function setDuration(?int $duration): LegacyUpdateOrderRequest
     {
         $this->duration = $duration;
 
         return $this;
     }
 
-    public function setAmount(?TaxedMoney $amountRequest): UpdateOrderRequest
+    public function setAmount(?TaxedMoney $amountRequest): LegacyUpdateOrderRequest
     {
         $this->amount = $amountRequest;
 
@@ -105,10 +105,35 @@ class UpdateOrderRequest extends AbstractOrderRequest implements
         return $this->orderId;
     }
 
-    public function setExternalCode($externalCode): UpdateOrderRequest
+    public function setExternalCode($externalCode): LegacyUpdateOrderRequest
     {
         $this->orderId = $externalCode;
 
         return $this;
+    }
+
+    public function isAmountChanged(): bool
+    {
+        return $this->amount !== null;
+    }
+
+    public function isDurationChanged(): bool
+    {
+        return $this->duration !== null;
+    }
+
+    public function isExternalCodeChanged(): bool
+    {
+        return $this->orderId !== null;
+    }
+
+    public function isInvoiceUrlChanged(): bool
+    {
+        return $this->invoiceUrl !== null;
+    }
+
+    public function isInvoiceNumberChanged(): bool
+    {
+        return $this->invoiceNumber !== null;
     }
 }
