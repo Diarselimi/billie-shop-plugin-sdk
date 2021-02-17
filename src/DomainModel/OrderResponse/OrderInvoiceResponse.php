@@ -9,18 +9,26 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Schema(schema="OrderInvoiceResponse", title="Order Entity", type="object", properties={
+ *      @OA\Property(property="uuid", ref="#/components/schemas/UUID", nullable=true),
  *      @OA\Property(property="invoice_number", ref="#/components/schemas/TinyText", nullable=true),
+ *      @OA\Property(property="state", ref="#/components/schemas/TinyText", nullable=true),
  *      @OA\Property(property="payout_amount", type="number", format="float", nullable=true),
+ *      @OA\Property(property="amount", type="number", format="float"),
+ *      @OA\Property(property="amount_net", type="number", format="float"),
+ *      @OA\Property(property="amount_tax", type="number", format="float"),
  *      @OA\Property(property="outstanding_amount", type="number", format="float", nullable=true),
  *      @OA\Property(property="pending_merchant_payment_amount", type="number", format="float", nullable=true),
  *      @OA\Property(property="pending_cancellation_amount", type="number", format="float", nullable=true),
  *      @OA\Property(property="fee_amount", type="number", format="float", nullable=true),
  *      @OA\Property(property="fee_rate", type="number", format="float", nullable=true),
- *      @OA\Property(property="due_date", type="string", format="date", nullable=true, example="2019-03-20"),
+ *      @OA\Property(property="due_date", type="string", format="date", example="2019-03-20"),
+ *      @OA\Property(property="created_at", type="string", format="date", example="2019-03-20"),
  * })
  */
 class OrderInvoiceResponse implements ArrayableInterface
 {
+    private $uuid;
+
     private $invoiceNumber;
 
     private $payoutAmount;
@@ -35,11 +43,15 @@ class OrderInvoiceResponse implements ArrayableInterface
 
     private $dueDate;
 
+    private $createdAt;
+
     private $duration;
 
     private $pendingMerchantPaymentAmount;
 
     private $pendingCancellationAmount;
+
+    private $state;
 
     public function getInvoiceNumber(): ? string
     {
@@ -161,16 +173,58 @@ class OrderInvoiceResponse implements ArrayableInterface
         return $this;
     }
 
+    public function getCreatedAt(): ?\DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTime $createdAt): OrderInvoiceResponse
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getState(): ?string
+    {
+        return $this->state;
+    }
+
+    public function setState(?string $state): OrderInvoiceResponse
+    {
+        $this->state = $state;
+
+        return $this;
+    }
+
+    public function getUuid(): string
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid(string $uuid): OrderInvoiceResponse
+    {
+        $this->uuid = $uuid;
+
+        return $this;
+    }
+
     public function toArray(): array
     {
         return [
+            'uuid' => $this->getUuid(),
             'invoice_number' => $this->getInvoiceNumber(),
             'payout_amount' => $this->getPayoutAmount(),
             'outstanding_amount' => $this->getOutstandingAmount(),
+            'amount' => $this->getAmount()->getGross()->toFloat(),
+            'amount_net' => $this->getAmount()->getNet()->toFloat(),
+            'amount_tax' => $this->getAmount()->getTax()->toFloat(),
             'fee_amount' => $this->getFeeAmount(),
             'fee_rate' => $this->getFeeRate(),
             'due_date' => $this->getDueDate() ? $this->getDueDate()->format(DateFormat::FORMAT_YMD) : null,
+            'created_at' => $this->getDueDate() ? $this->getCreatedAt()->format(DateFormat::FORMAT_YMD) : null,
             'duration' => $this->getDuration(),
+            'state' => $this->getState(),
             'pending_merchant_payment_amount' => $this->getPendingMerchantPaymentAmount(),
             'pending_cancellation_amount' => $this->getPendingCancellationAmount(),
         ];

@@ -89,69 +89,7 @@ Feature:
     """
     Then the order A1 is in state created
     And the response status code should be 200
-    And the JSON response should be:
-    """
-    {
-       "order_id":"A1",
-       "state":"created",
-       "reasons":null,
-       "decline_reason":null,
-       "amount":1000,
-       "amount_net":900,
-       "amount_tax":100,
-       "duration":30,
-       "dunning_status":null,
-       "debtor_company":{
-          "name":"Test User Company",
-          "address_house_number":"10",
-          "address_street":"Heinrich-Heine-Platz",
-          "address_postal_code":"10179",
-          "address_city":"Berlin",
-          "address_country":"DE"
-       },
-       "bank_account":{
-          "iban":"DE1234",
-          "bic":"BICISHERE"
-       },
-       "invoice":{
-          "invoice_number":null,
-          "payout_amount":null,
-          "outstanding_amount":null,
-          "fee_amount":null,
-          "fee_rate":null,
-          "due_date":null,
-          "pending_merchant_payment_amount":null,
-          "pending_cancellation_amount":null
-       },
-       "debtor_external_data":{
-          "merchant_customer_id":"12",
-          "name":"Test User Company",
-          "address_country":"DE",
-          "address_city":"Berlin",
-          "address_postal_code":"10179",
-          "address_street":"Heinrich-Heine-Platz",
-          "address_house":"10",
-          "industry_sector":"SOME SECTOR"
-       },
-       "delivery_address":{
-          "house_number":"10",
-          "street":"Heinrich-Heine-Platz",
-          "city":"Berlin",
-          "postal_code":"10179",
-          "country":"DE"
-       },
-       "billing_address":{
-          "house_number":"10",
-          "street":"Heinrich-Heine-Platz",
-          "city":"Berlin",
-          "postal_code":"10179",
-          "country":"DE"
-       },
-       "created_at":"2020-02-18T12:13:14+0100",
-       "shipped_at":null,
-       "debtor_uuid":null
-    }
-    """
+    And the JSON response should be file "create_order_response.json"
 
   Scenario: Successful order creation by adding the billing address
     Given I get from companies service identify match response
@@ -214,7 +152,6 @@ Feature:
     """
     Then the order A1 is in state created
     And the response status code should be 200
-    And the JSON response should be:
     """
     {
        "order_id":"A1",
@@ -226,6 +163,12 @@ Feature:
        "amount_tax":100,
        "duration":30,
        "dunning_status":null,
+       "unshipped_amount":1000,
+       "unshipped_amount_net":900,
+       "unshipped_amount_tax":100,
+       "workflow_name":"order_v1",
+       "due_date":"2021-01-13",
+       "invoices":[],
        "debtor_company":{
           "name":"Test User Company",
           "address_house_number":"10",
@@ -333,69 +276,7 @@ Feature:
     """
     Then the order A1 is in state created
     And the response status code should be 200
-    And the JSON response should be:
-    """
-    {
-       "order_id":"A1",
-       "state":"created",
-       "reasons":null,
-       "decline_reason":null,
-       "amount":1000,
-       "amount_net":900,
-       "amount_tax":100,
-       "duration":30,
-       "dunning_status":null,
-       "debtor_company":{
-          "name":"Test User Company",
-          "address_house_number":"10",
-          "address_street":"Heinrich-Heine-Platz",
-          "address_postal_code":"10179",
-          "address_city":"Berlin",
-          "address_country":"DE"
-       },
-       "bank_account":{
-          "iban":"DE1234",
-          "bic":"BICISHERE"
-       },
-       "invoice":{
-          "invoice_number":null,
-          "payout_amount":null,
-          "outstanding_amount":null,
-          "fee_amount":null,
-          "fee_rate":null,
-          "due_date":null,
-          "pending_merchant_payment_amount":null,
-          "pending_cancellation_amount":null
-       },
-       "debtor_external_data":{
-          "merchant_customer_id":"12",
-          "name":"Test User Company",
-          "address_country":"DE",
-          "address_city":"Berlin",
-          "address_postal_code":"10179",
-          "address_street":"Heinrich-Heine-Platz",
-          "address_house":"10",
-          "industry_sector":"SOME SECTOR"
-       },
-       "delivery_address":{
-          "house_number":"10",
-          "street":"Heinrich-Heine-Platz",
-          "city":"Berlin",
-          "postal_code":"10179",
-          "country":"DE"
-       },
-       "billing_address":{
-          "house_number":"10",
-          "street":"Heinrich-Heine-Platz",
-          "city":"Berlin",
-          "postal_code":"10179",
-          "country":"DE"
-       },
-       "created_at":"2020-02-18T12:16:07+0100",
-       "shipped_at":null,
-       "debtor_uuid":null
-    }
-    """
+    And the JSON response should be file "create_order_response.json"
     And the order "A1" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz 10 de"
 
   Scenario: Successful order creation by not providing billing address nor the delivery address, as a delivery and billing address I will have the same as debtor address
@@ -445,7 +326,6 @@ Feature:
     """
     Then the order A1 is in state created
     And the response status code should be 200
-    And the JSON response should be:
     """
     {
        "order_id":"A1",
@@ -456,6 +336,12 @@ Feature:
        "amount_net":900,
        "amount_tax":100,
        "duration":30,
+       "unshipped_amount":1000,
+       "unshipped_amount_net":900,
+       "unshipped_amount_tax":100,
+       "workflow_name":"order_v1",
+       "due_date":"2021-01-13",
+       "invoices":[],
        "dunning_status":null,
        "debtor_company":{
           "name":"Test User Company",
@@ -565,69 +451,7 @@ Feature:
     """
     Then the order A1 is in state created
     And the response status code should be 200
-    And the JSON response should be:
-    """
-    {
-       "order_id":"A1",
-       "state":"created",
-       "reasons":null,
-       "decline_reason":null,
-       "amount":1000,
-       "amount_net":900,
-       "amount_tax":100,
-       "duration":30,
-       "dunning_status":null,
-       "debtor_company":{
-          "name":"Test User Company",
-          "address_house_number":"10",
-          "address_street":"Heinrich-Heine-Platz",
-          "address_postal_code":"10179",
-          "address_city":"Berlin",
-          "address_country":"DE"
-       },
-       "bank_account":{
-          "iban":"DE1234",
-          "bic":"BICISHERE"
-       },
-       "invoice":{
-          "invoice_number":null,
-          "payout_amount":null,
-          "outstanding_amount":null,
-          "fee_amount":null,
-          "fee_rate":null,
-          "due_date":null,
-          "pending_merchant_payment_amount":null,
-          "pending_cancellation_amount":null
-       },
-       "debtor_external_data":{
-          "merchant_customer_id":"12",
-          "name":"Test User Company",
-          "address_country":"DE",
-          "address_city":"Berlin",
-          "address_postal_code":"10179",
-          "address_street":"Heinrich-Heine-Platz",
-          "address_house":"10",
-          "industry_sector":"SOME SECTOR"
-       },
-       "delivery_address":{
-          "house_number":"10",
-          "street":"Heinrich-Heine-Platz",
-          "city":"Berlin",
-          "postal_code":"10179",
-          "country":"DE"
-       },
-       "billing_address":{
-          "house_number":"10",
-          "street":"Heinrich-Heine-Platz",
-          "city":"Berlin",
-          "postal_code":"10179",
-          "country":"DE"
-       },
-       "created_at":"2020-02-18T12:19:53+0100",
-       "shipped_at":null,
-       "debtor_uuid":null
-    }
-    """
+    And the JSON response should be file "create_order_response.json"
     And the order "A1" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz 10 de"
 
   Scenario: Successful order creation by not providing the delivery address, we should get the delivery from the billing address.
@@ -696,6 +520,12 @@ Feature:
        "amount_tax":100,
        "duration":30,
        "dunning_status":null,
+       "unshipped_amount":1000,
+       "unshipped_amount_net":900,
+       "unshipped_amount_tax":100,
+       "workflow_name":"order_v1",
+       "due_date":"2021-01-13",
+       "invoices":[],
        "debtor_company":{
           "name":"Test User Company",
           "address_house_number":"10",

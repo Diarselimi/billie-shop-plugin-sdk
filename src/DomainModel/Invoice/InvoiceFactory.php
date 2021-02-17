@@ -22,8 +22,13 @@ class InvoiceFactory extends AbstractFactory
         $this->feeCalculator = $feeCalculator;
     }
 
-    public function create(OrderContainer $orderContainer, TaxedMoney $amount, int $duration, string $invoiceNumber, string $proofOfDeliveryUrl = null): Invoice
-    {
+    public function create(
+        OrderContainer $orderContainer,
+        TaxedMoney $amount,
+        int $duration,
+        string $invoiceNumber,
+        string $proofOfDeliveryUrl = null
+    ): Invoice {
         $fee = $this->feeCalculator->calculate(
             $amount->getGross(),
             $duration,
@@ -42,22 +47,26 @@ class InvoiceFactory extends AbstractFactory
             ->setFeeAmount(new TaxedMoney($fee->getGrossFeeAmount(), $fee->getNetFeeAmount(), $fee->getTaxFeeAmount()))
             ->setFeeRate($fee->getFeeRate())
             ->setDuration($duration)
+            ->setState('')
             ->setBillingDate(new \DateTime('today'))
             ->setDueDate(new \DateTime("today + {$duration} days"))
+            ->setCreatedAt(new \DateTime())
             ->setProofOfDeliveryUrl($proofOfDeliveryUrl)
             ->setExternalCode($invoiceNumber)
+            ->setInvoicePendingCancellationAmount(new Money(0))
+            ->setMerchantPendingPaymentAmount(new Money(0))
         ;
     }
 
     public function createFromArray(array $data): Invoice
     {
-        $grossAmount = new Money($data['gross_amount']);
-        $netAmount = new Money($data['net_amount']);
-        $taxAmount = $grossAmount->add($netAmount);
+        $grossAmount = new Money($data['amount']);
+        $netAmount = new Money($data['amount_net']);
+        $taxAmount = new Money($data['amount_tax']);
 
         $grossFeeAmount = new Money($data['fee_amount']);
-        $netFeeAmount = new Money($data['fee_net_amount']);
-        $taxFeeAmount = new Money($data['fee_vat_amount']);
+        $netFeeAmount = new Money($data['fee_amount_net']);
+        $taxFeeAmount = new Money($data['fee_amount_vat']);
 
         return (new Invoice())
             ->setUuid($data['uuid'])
@@ -67,9 +76,15 @@ class InvoiceFactory extends AbstractFactory
             ->setFeeAmount(new TaxedMoney($grossFeeAmount, $netFeeAmount, $taxFeeAmount))
             ->setFeeRate(new Percent($data['factoring_fee_rate']))
             ->setDuration($data['duration'])
+            ->setCreatedAt(new \DateTime($data['created_at']))
+            ->setDueDate(new \DateTime($data['due_date']))
+            ->setDuration($data['duration'])
             ->setBillingDate(new \DateTime($data['billing_date']))
             ->setProofOfDeliveryUrl('proof_of_delivery_url')
             ->setExternalCode($data['external_code'])
-        ;
+            ->setState($data['state'])
+            ->setCreatedAt(new \DateTime($data['created_at']))
+            ->setMerchantPendingPaymentAmount(new Money($data['merchant_pending_payment_amount']))
+            ->setInvoicePendingCancellationAmount(new Money($data['invoice_pending_cancellation_amount']));
     }
 }

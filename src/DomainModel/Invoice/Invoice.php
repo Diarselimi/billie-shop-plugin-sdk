@@ -34,9 +34,17 @@ class Invoice
 
     private \DateTime $billingDate;
 
+    private \DateTime $createdAt;
+
     private ?string $proofOfDeliveryUrl = null;
 
     private string $externalCode;
+
+    private string $state;
+
+    private Money $invoicePendingCancellationAmount;
+
+    private Money $merchantPendingPaymentAmount;
 
     public function getUuid(): string
     {
@@ -214,6 +222,54 @@ class Invoice
     public function setPaymentUuid(string $paymentUuid): self
     {
         $this->paymentUuid = $paymentUuid;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): \DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTime $createdAt): Invoice
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getState(): string
+    {
+        return $this->state;
+    }
+
+    public function setState(string $state): Invoice
+    {
+        $this->state = $state;
+
+        return $this;
+    }
+
+    public function getInvoicePendingCancellationAmount(): Money
+    {
+        return $this->invoicePendingCancellationAmount;
+    }
+
+    public function setInvoicePendingCancellationAmount(Money $invoicePendingCancellationAmount): Invoice
+    {
+        $this->invoicePendingCancellationAmount = $invoicePendingCancellationAmount;
+
+        return $this;
+    }
+
+    public function getMerchantPendingPaymentAmount(): Money
+    {
+        return $this->merchantPendingPaymentAmount;
+    }
+
+    public function setMerchantPendingPaymentAmount(Money $merchantPendingPaymentAmount): Invoice
+    {
+        $this->merchantPendingPaymentAmount = $merchantPendingPaymentAmount;
 
         return $this;
     }

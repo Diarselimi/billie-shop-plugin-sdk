@@ -47,6 +47,8 @@ use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface;
 use App\DomainModel\OrderIdentification\OrderIdentificationRepositoryInterface;
+use App\DomainModel\OrderInvoice\OrderInvoiceEntity;
+use App\DomainModel\OrderInvoice\OrderInvoiceRepositoryInterface;
 use App\DomainModel\OrderNotification\OrderNotificationRepositoryInterface;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntity;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
@@ -389,9 +391,9 @@ class PaellaCoreContext extends MinkContext
                 ->setAmountGross(new Money($gross))
                 ->setAmountNet(new Money($net))
                 ->setAmountTax(new Money($tax))
-                ->setUnshippedAmountGross(new Money())
-                ->setUnshippedAmountNet(new Money())
-                ->setUnshippedAmountTax(new Money())
+                ->setUnshippedAmountGross(new Money($gross))
+                ->setUnshippedAmountNet(new Money($net))
+                ->setUnshippedAmountTax(new Money($tax))
                 ->setDuration($duration)
                 ->setCreatedAt(new \DateTime())
                 ->setUpdatedAt(new \DateTime())
@@ -511,6 +513,22 @@ class PaellaCoreContext extends MinkContext
                 'Order %s should have invoice data',
                 $order->getId()
             ));
+        }
+    }
+
+    /**
+     * @Given /^the following invoice data exists:$/
+     */
+    public function orderHasTheFollowingInvoiceData(TableNode $node)
+    {
+        $invoiceV2Repo = $this->getOrderInvoiceV2Repository();
+        foreach ($node as $row) {
+            $orderInvoice = (new OrderInvoiceEntity())
+                ->setOrderId($row['order_id'])
+                ->setInvoiceUuid($row['invoice_uuid'])
+                ->setCreatedAt(new \DateTime());
+
+            $invoiceV2Repo->insert($orderInvoice);
         }
     }
 
@@ -1168,6 +1186,11 @@ class PaellaCoreContext extends MinkContext
     private function getMerchantOnboardingRepository(): MerchantOnboardingRepositoryInterface
     {
         return $this->get(MerchantOnboardingRepositoryInterface::class);
+    }
+
+    private function getOrderInvoiceV2Repository(): OrderInvoiceRepositoryInterface
+    {
+        return $this->get(OrderInvoiceRepositoryInterface::class);
     }
 
     private function getMerchantOnboardingTransitionRepository(): MerchantOnboardingTransitionRepositoryInterface

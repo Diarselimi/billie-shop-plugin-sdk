@@ -4,8 +4,9 @@ namespace App\DomainModel\Order;
 
 use App\Application\UseCase\CreateOrder\CreateOrderRequest;
 use App\Helper\Uuid\UuidGeneratorInterface;
+use App\Support\AbstractFactory;
 
-class OrderEntityFactory
+class OrderEntityFactory extends AbstractFactory
 {
     private UuidGeneratorInterface $uuidGenerator;
 
@@ -29,7 +30,7 @@ class OrderEntityFactory
         ;
     }
 
-    public function createFromDatabaseRow(array $row): OrderEntity
+    public function createFromArray(array $row): OrderEntity
     {
         return (new OrderEntity())
             ->setId($row['id'])

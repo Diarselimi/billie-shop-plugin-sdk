@@ -12,9 +12,9 @@ use App\DomainModel\Order\Lifecycle\ShipOrder\LegacyShipOrderService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\OrderResponse\OrderResponse;
 use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentCreator;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
-use App\DomainModel\OrderResponse\OrderResponseV1;
 use Symfony\Component\Workflow\Registry;
 
 class ShipOrderWithInvoiceUseCaseV1 implements ValidatedUseCaseInterface
@@ -45,7 +45,7 @@ class ShipOrderWithInvoiceUseCaseV1 implements ValidatedUseCaseInterface
         $this->orderResponseFactory = $orderResponseFactory;
     }
 
-    public function execute(ShipOrderWithInvoiceRequestV1 $request): OrderResponseV1
+    public function execute(ShipOrderWithInvoiceRequestV1 $request): OrderResponse
     {
         $orderContainer = $this->orderContainerFactory->loadByMerchantIdAndUuid(
             $request->getMerchantId(),
@@ -66,7 +66,7 @@ class ShipOrderWithInvoiceUseCaseV1 implements ValidatedUseCaseInterface
             $request->getInvoiceFile()
         );
 
-        return $this->orderResponseFactory->createV1($orderContainer);
+        return $this->orderResponseFactory->create($orderContainer);
     }
 
     private function validate(ShipOrderWithInvoiceRequestV1 $request, OrderContainer $orderContainer): void

@@ -14,6 +14,7 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderRiskCheck\CheckResultCollection;
 use App\DomainModel\Payment\OrderPaymentDetailsDTO;
 use App\DomainModel\Payment\PaymentsServiceInterface;
+use Ozean12\Money\TaxedMoney\TaxedMoney;
 use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
 
 class OrderResponseFactory
@@ -38,102 +39,22 @@ class OrderResponseFactory
         $this->featureFlagManager = $featureFlagManager;
     }
 
-    public function createV1(OrderContainer $orderContainer): OrderResponseV1
-    {
-        /** @var OrderResponseV1 $response */
-        $response = $this->addData($orderContainer, new OrderResponseV1());
-        $response->setReasons([$response->getDeclineReason()]);
-
-        if (!$this->featureFlagManager->isButlerFullyEnabled()
-            && !empty($orderContainer->getOrder()->getPaymentId())
-        ) {
-            $this->addInvoiceDataV1($orderContainer, $response);
-        } elseif (count($orderContainer->getInvoices()) === 1) {
-            $invoices = $orderContainer->getInvoices();
-            /** @var Invoice $invoice */
-            $invoice = array_pop($invoices);
-            $amount = $invoice->getAmount()->getGross()->toFloat();
-            $response
-                ->setInvoiceNumber($invoice->getExternalCode())
-                ->setPayoutAmount($amount)
-                ->setOutstandingAmount($invoice->getOutstandingAmount()->toFloat())
-                ->setFeeRate($invoice->getFeeRate()->toFloat())
-                ->setFeeAmount($invoice->getFeeAmount()->getGross()->toFloat())
-                ->setDueDate($invoice->getDueDate())
-                // TODO: fields are used only for dashboard, let's fix it later
-//                ->setPendingCancellationAmount($orderPaymentDetails->getOutstandingAmountInvoiceCancellation())
-//                ->setPendingMerchantPaymentAmount($orderPaymentDetails->getOutstandingAmountMerchantPayment())
-            ;
-        } elseif (count($orderContainer->getInvoices()) > 1) {
-            throw new \RuntimeException(
-                'Unexpected invoices count. Order has more than one invoice: ' .
-                $orderContainer->getOrder()->getUuid()
-            );
-        }
-
-        return $response;
-    }
-
     public function create(OrderContainer $orderContainer): OrderResponse
     {
-        /** @var OrderResponse $response */
-        $response = $this->addData($orderContainer, new OrderResponse());
+        $response = new OrderResponse();
 
-        foreach ($orderContainer->getInvoices() as $invoice) {
-            $dueDate = clone $invoice->getBillingDate();
-            $dueDate->add(
-                new \DateInterval(
-                    sprintf('P%dD', $invoice->getDuration())
-                )
-            );
+        $this->addData($orderContainer, $response);
+        $this->addInvoiceData($orderContainer, $response);
+        $this->addLegacyInvoiceData($orderContainer, $response);
 
-            $response->addInvoice(
-                (new OrderInvoiceResponse())
-                ->setAmount($invoice->getAmount())
-                ->setDuration($invoice->getDuration())
-                ->setFeeAmount($invoice->getFeeAmount()->getGross()->toBase100())
-                ->setFeeRate($invoice->getFeeRate()->toBase100())
-                ->setInvoiceNumber($invoice->getExternalCode())
-                ->setDueDate($dueDate)
-                ->setPayoutAmount($invoice->getPayoutAmount()->toBase100())
-                ->setOutstandingAmount($invoice->getAmount()->getGross()->toBase100())
-            );
-        }
-
-        return $response;
-    }
-
-    private function addData(OrderContainer $orderContainer, AbstractOrderResponse $response): AbstractOrderResponse
-    {
-        $order = $orderContainer->getOrder();
-
-        $this->addFinancialDetails($orderContainer, $response);
-        $this->addOrderData($order, $response);
-        $this->addExternalData($orderContainer, $response);
-        $this->addDeliveryData($orderContainer, $response);
-        $this->addBillingAddressData($orderContainer->getBillingAddress(), $response);
-
-        if ($order->getMerchantDebtorId()) {
-            $this->addCompanyData(
-                $orderContainer->getDebtorCompany()->getAddress(),
-                $orderContainer->getDebtorCompany()->getName(),
-                $response
-            );
-            $this->addPaymentData($orderContainer, $response);
-        }
-
-        if ($order->isLate()) {
-            $response->setDunningStatus($orderContainer->getDunningStatus());
-        }
-
-        $response = $this->addReasons($orderContainer->getRiskCheckResultCollection(), $response);
+        $response->setReasons([$response->getDeclineReason()]);
 
         return $response;
     }
 
     /**
-     * @param  OrderContainer[]  $orderContainers
-     * @return OrderResponseV1[]
+     * @param  OrderContainer[] $orderContainers
+     * @return OrderResponse[]
      */
     public function createFromOrderContainers(array $orderContainers): array
     {
@@ -155,109 +76,10 @@ class OrderResponseFactory
                 $orderContainer->setPaymentDetails($orderPaymentsDetails[$orderContainer->getOrder()->getPaymentId()]);
             }
 
-            $orderResponses[] = $this->createV1($orderContainer);
+            $orderResponses[] = $this->create($orderContainer);
         }
 
         return $orderResponses;
-    }
-
-    /**
-     * @param OrderContainer[]
-     * @return OrderPaymentDetailsDTO[]
-     */
-    public function getOrderPaymentsDetails(array $orderContainers): array
-    {
-        $paymentIds = array_map(static function (OrderContainer $orderContainer) {
-            if ($orderContainer->getOrder()->getPaymentId() !== null) {
-                return $orderContainer->getOrder()->getPaymentId();
-            }
-
-            return null;
-        }, $orderContainers);
-
-        return $this->paymentsService->getBatchOrderPaymentDetails($paymentIds);
-    }
-
-    /**
-     * @param OrderContainer[]
-     * @return DebtorCompany[]
-     */
-    private function getDebtorCompanies(array $orderContainers): array
-    {
-        $debtorIds = array_map(static function (OrderContainer $orderContainer) {
-            if ($orderContainer->getOrder()->getMerchantDebtorId() !== null) {
-                return $orderContainer->getMerchantDebtor()->getDebtorId();
-            }
-
-            return null;
-        }, $orderContainers);
-        $debtorIds = array_filter($debtorIds);
-
-        return $this->companiesService->getDebtors($debtorIds);
-    }
-
-    private function addFinancialDetails(OrderContainer $orderContainer, AbstractOrderResponse $response): void
-    {
-        $response
-            ->setAmount(TaxedMoneyFactory::create(
-                $orderContainer->getOrderFinancialDetails()->getAmountGross(),
-                $orderContainer->getOrderFinancialDetails()->getAmountNet(),
-                $orderContainer->getOrderFinancialDetails()->getAmountTax()
-            ))
-            ->setDuration($orderContainer->getOrderFinancialDetails()->getDuration());
-    }
-
-    private function addOrderData(OrderEntity $order, AbstractOrderResponse $response): void
-    {
-        $response
-            ->setExternalCode($order->getExternalCode())
-            ->setUuid($order->getUuid())
-            ->setState($order->getState())
-            ->setCreatedAt($order->getCreatedAt())
-            ->setShippedAt($order->getShippedAt());
-    }
-
-    /**
-     * @param AbstractOrderResponse|CheckoutAuthorizeOrderResponse $response
-     */
-    private function addCompanyData(AddressEntity $address, string $companyName, $response): void
-    {
-        $response
-            ->setCompanyName($companyName)
-            ->setCompanyAddressHouseNumber($address->getHouseNumber())
-            ->setCompanyAddressStreet($address->getStreet())
-            ->setCompanyAddressPostalCode($address->getPostalCode())
-            ->setCompanyAddressCity($address->getCity())
-            ->setCompanyAddressCountry($address->getCountry());
-    }
-
-    private function addPaymentData(OrderContainer $orderContainer, AbstractOrderResponse $response): void
-    {
-        if ($orderContainer->getOrder()->isDeclined() || $orderContainer->getOrder()->isWaiting()) {
-            return;
-        }
-
-        $paymentDetails = $orderContainer->getDebtorPaymentDetails();
-
-        $response
-            ->setBankAccountIban($paymentDetails->getBankAccountIban())
-            ->setBankAccountBic($paymentDetails->getBankAccountBic())
-        ;
-    }
-
-    private function addInvoiceDataV1(OrderContainer $orderContainer, OrderResponseV1 $response): void
-    {
-        $orderPaymentDetails = $orderContainer->getPaymentDetails();
-        $response
-            ->setInvoiceNumber($orderContainer->getOrder()->getInvoiceNumber())
-            ->setPayoutAmount($orderPaymentDetails->getPayoutAmount())
-            ->setOutstandingAmount($orderPaymentDetails->getOutstandingAmount())
-            ->setFeeRate($orderPaymentDetails->getFeeRate())
-            ->setFeeAmount($orderPaymentDetails->getFeeAmount())
-            ->setDueDate($orderPaymentDetails->getDueDate())
-            ->setPendingCancellationAmount($orderPaymentDetails->getOutstandingAmountInvoiceCancellation())
-            ->setPendingMerchantPaymentAmount($orderPaymentDetails->getOutstandingAmountMerchantPayment())
-        ;
     }
 
     public function createAuthorizeResponse(OrderContainer $orderContainer): CheckoutAuthorizeOrderResponse
@@ -299,9 +121,187 @@ class OrderResponseFactory
         return $response;
     }
 
+    private function addLegacyInvoiceData(OrderContainer $orderContainer, OrderResponse $response): void
+    {
+        if (!$this->featureFlagManager->isButlerFullyEnabled()
+            && !empty($orderContainer->getOrder()->getPaymentId())
+        ) {
+            $orderPaymentDetails = $orderContainer->getPaymentDetails();
+            $response
+                ->setInvoiceNumber($orderContainer->getOrder()->getInvoiceNumber())
+                ->setPayoutAmount($orderPaymentDetails->getPayoutAmount())
+                ->setOutstandingAmount($orderPaymentDetails->getOutstandingAmount())
+                ->setFeeRate($orderPaymentDetails->getFeeRate())
+                ->setFeeAmount($orderPaymentDetails->getFeeAmount())
+                ->setPendingCancellationAmount($orderPaymentDetails->getOutstandingAmountInvoiceCancellation())
+                ->setPendingMerchantPaymentAmount($orderPaymentDetails->getOutstandingAmountMerchantPayment());
+        } elseif (count($orderContainer->getInvoices()) >= 1) {
+            $invoices = $orderContainer->getInvoices();
+            /** @var Invoice $invoice */
+            $invoice = array_pop($invoices);
+            $amount = $invoice->getAmount()->getGross()->toFloat();
+            $response
+                ->setInvoiceNumber($invoice->getExternalCode())
+                ->setPayoutAmount($amount)
+                ->setOutstandingAmount($invoice->getOutstandingAmount()->toFloat())
+                ->setFeeRate($invoice->getFeeRate()->toFloat())
+                ->setFeeAmount($invoice->getFeeAmount()->getGross()->toFloat())
+                ->setInvoiceNumber($invoice->getExternalCode())
+                ->setPendingCancellationAmount($invoice->getInvoicePendingCancellationAmount()->getMoneyValue())
+                ->setPendingMerchantPaymentAmount($invoice->getMerchantPendingPaymentAmount()->getMoneyValue());
+        }
+    }
+
+    private function addInvoiceData(OrderContainer $orderContainer, OrderResponse $response): void
+    {
+        foreach ($orderContainer->getInvoices() as $invoice) {
+            $dueDate = clone $invoice->getBillingDate();
+            $dueDate->add(
+                new \DateInterval(
+                    sprintf('P%dD', $invoice->getDuration())
+                )
+            );
+
+            $response->addInvoice(
+                (new OrderInvoiceResponse())
+                    ->setUuid($invoice->getUuid())
+                    ->setDuration($invoice->getDuration())
+                    ->setAmount($invoice->getAmount())
+                    ->setDuration($invoice->getDuration())
+                    ->setFeeAmount($invoice->getFeeAmount()->getGross()->toBase100())
+                    ->setFeeRate($invoice->getFeeRate()->toBase100())
+                    ->setInvoiceNumber($invoice->getExternalCode())
+                    ->setDueDate($dueDate)
+                    ->setCreatedAt($invoice->getCreatedAt())
+                    ->setPayoutAmount($invoice->getPayoutAmount()->toBase100())
+                    ->setState($invoice->getState())
+                    ->setOutstandingAmount($invoice->getAmount()->getGross()->toBase100())
+                    ->setPendingMerchantPaymentAmount($invoice->getMerchantPendingPaymentAmount()->getMoneyValue())
+                    ->setPendingCancellationAmount($invoice->getInvoicePendingCancellationAmount()->getMoneyValue())
+            );
+        }
+    }
+
+    private function addData(OrderContainer $orderContainer, OrderResponse $response): void
+    {
+        $order = $orderContainer->getOrder();
+
+        $this->addFinancialDetails($orderContainer, $response);
+        $this->addOrderData($order, $response);
+        $this->addExternalData($orderContainer, $response);
+        $this->addDeliveryData($orderContainer, $response);
+        $this->addBillingAddressData($orderContainer->getBillingAddress(), $response);
+
+        if ($order->getMerchantDebtorId()) {
+            $this->addCompanyData(
+                $orderContainer->getDebtorCompany()->getAddress(),
+                $orderContainer->getDebtorCompany()->getName(),
+                $response
+            );
+            $this->addPaymentData($orderContainer, $response);
+        }
+
+        if ($order->isLate()) {
+            $response->setDunningStatus($orderContainer->getDunningStatus());
+        }
+
+        $this->addReasons($orderContainer->getRiskCheckResultCollection(), $response);
+    }
+
     /**
-     * @param  AbstractOrderResponse|CheckoutAuthorizeOrderResponse $response
-     * @return AbstractOrderResponse|CheckoutAuthorizeOrderResponse $response
+     * @param OrderContainer[]
+     * @return OrderPaymentDetailsDTO[]
+     */
+    private function getOrderPaymentsDetails(array $orderContainers): array
+    {
+        $paymentIds = array_map(static function (OrderContainer $orderContainer) {
+            if ($orderContainer->getOrder()->getPaymentId() !== null) {
+                return $orderContainer->getOrder()->getPaymentId();
+            }
+
+            return null;
+        }, $orderContainers);
+
+        return $this->paymentsService->getBatchOrderPaymentDetails($paymentIds);
+    }
+
+    /**
+     * @param OrderContainer[]
+     * @return DebtorCompany[]
+     */
+    private function getDebtorCompanies(array $orderContainers): array
+    {
+        $debtorIds = array_map(static function (OrderContainer $orderContainer) {
+            if ($orderContainer->getOrder()->getMerchantDebtorId() !== null) {
+                return $orderContainer->getMerchantDebtor()->getDebtorId();
+            }
+
+            return null;
+        }, $orderContainers);
+        $debtorIds = array_filter($debtorIds);
+
+        return $this->companiesService->getDebtors($debtorIds);
+    }
+
+    private function addFinancialDetails(OrderContainer $orderContainer, OrderResponse $response): void
+    {
+        $financialDetails = $orderContainer->getOrderFinancialDetails();
+        $response
+            ->setAmount(TaxedMoneyFactory::create(
+                $financialDetails->getAmountGross(),
+                $financialDetails->getAmountNet(),
+                $financialDetails->getAmountTax()
+            ))
+            ->setDuration($orderContainer->getOrderFinancialDetails()->getDuration())
+            ->setDueDate($orderContainer->getOrder()->getCreatedAt()->modify("+ {$financialDetails->getDuration()} days"))
+            ->setUnshippedAmount(new TaxedMoney(
+                $financialDetails->getUnshippedAmountGross(),
+                $financialDetails->getUnshippedAmountNet(),
+                $financialDetails->getUnshippedAmountTax()
+            ));
+    }
+
+    private function addOrderData(OrderEntity $order, OrderResponse $response): void
+    {
+        $response
+            ->setExternalCode($order->getExternalCode())
+            ->setWorkflowName($order->getWorkflowName())
+            ->setUuid($order->getUuid())
+            ->setState($order->getState())
+            ->setCreatedAt($order->getCreatedAt())
+            ->setShippedAt($order->getShippedAt());
+    }
+
+    /**
+     * @param OrderResponse|CheckoutAuthorizeOrderResponse $response
+     */
+    private function addCompanyData(AddressEntity $address, string $companyName, $response): void
+    {
+        $response
+            ->setCompanyName($companyName)
+            ->setCompanyAddressHouseNumber($address->getHouseNumber())
+            ->setCompanyAddressStreet($address->getStreet())
+            ->setCompanyAddressPostalCode($address->getPostalCode())
+            ->setCompanyAddressCity($address->getCity())
+            ->setCompanyAddressCountry($address->getCountry());
+    }
+
+    private function addPaymentData(OrderContainer $orderContainer, OrderResponse $response): void
+    {
+        if ($orderContainer->getOrder()->isDeclined() || $orderContainer->getOrder()->isWaiting()) {
+            return;
+        }
+
+        $paymentDetails = $orderContainer->getDebtorPaymentDetails();
+
+        $response
+            ->setBankAccountIban($paymentDetails->getBankAccountIban())
+            ->setBankAccountBic($paymentDetails->getBankAccountBic());
+    }
+
+    /**
+     * @param  OrderResponse|CheckoutAuthorizeOrderResponse $response
+     * @return OrderResponse|CheckoutAuthorizeOrderResponse $response
      */
     private function addReasons(CheckResultCollection $checkResultCollection, $response)
     {
@@ -316,7 +316,7 @@ class OrderResponseFactory
         return $response;
     }
 
-    private function addDeliveryData(OrderContainer $orderContainer, AbstractOrderResponse $response): void
+    private function addDeliveryData(OrderContainer $orderContainer, OrderResponse $response): void
     {
         $response->setDeliveryAddressStreet($orderContainer->getDeliveryAddress()->getStreet())
             ->setDeliveryAddressHouseNumber($orderContainer->getDeliveryAddress()->getHouseNumber())
@@ -325,7 +325,7 @@ class OrderResponseFactory
             ->setDeliveryAddressCountry($orderContainer->getDeliveryAddress()->getCountry());
     }
 
-    private function addBillingAddressData(AddressEntity $billingAddress, AbstractOrderResponse $response): void
+    private function addBillingAddressData(AddressEntity $billingAddress, OrderResponse $response): void
     {
         $response->setBillingAddressStreet($billingAddress->getStreet())
             ->setBillingAddressHouseNumber($billingAddress->getHouseNumber())
@@ -334,7 +334,7 @@ class OrderResponseFactory
             ->setBillingAddressCountry($billingAddress->getCountry());
     }
 
-    private function addExternalData(OrderContainer $orderContainer, AbstractOrderResponse $response): void
+    private function addExternalData(OrderContainer $orderContainer, OrderResponse $response): void
     {
         $response
             ->setDebtorExternalDataAddressCountry($orderContainer->getDebtorExternalDataAddress()->getCountry())

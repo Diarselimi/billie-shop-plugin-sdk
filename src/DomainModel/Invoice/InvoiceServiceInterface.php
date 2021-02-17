@@ -10,5 +10,7 @@ interface InvoiceServiceInterface
      * @param  array|string[] $uuids
      * @return Invoice[]
      */
-    public function findByUuids(array $uuids): array;
+    public function getByUuids(array $uuids): array;
+
+    public function getOneByUuid(string $uuid): ?Invoice;
 }

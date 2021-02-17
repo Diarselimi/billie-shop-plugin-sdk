@@ -107,6 +107,9 @@ services:
   App\DomainModel\DebtorSettings\DebtorSettingsRepositoryInterface:
     alias: 'App\Infrastructure\Repository\DebtorSettingsRepository'
     public: true
+  App\DomainModel\OrderInvoice\OrderInvoiceRepositoryInterface:
+    alias: 'App\Infrastructure\Repository\OrderInvoiceRepository'
+    public: true
   App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestRepositoryInterface:
     alias: 'App\Infrastructure\Repository\DebtorInformationChangeRequestRepository'
     public: true

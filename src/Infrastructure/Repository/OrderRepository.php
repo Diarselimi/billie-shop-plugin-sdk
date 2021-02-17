@@ -156,7 +156,7 @@ class OrderRepository extends AbstractPdoRepository implements
             ]
         );
 
-        return $order ? $this->orderFactory->createFromDatabaseRow($order) : null;
+        return $order ? $this->orderFactory->createFromArray($order) : null;
     }
 
     public function getOneByMerchantIdAndExternalCodeOrUUID(string $id, int $merchantId): ?OrderEntity
@@ -174,7 +174,7 @@ class OrderRepository extends AbstractPdoRepository implements
             ]
         );
 
-        return $order ? $this->orderFactory->createFromDatabaseRow($order) : null;
+        return $order ? $this->orderFactory->createFromArray($order) : null;
     }
 
     public function getOneByMerchantIdAndUUID(string $uuid, int $merchantId): ?OrderEntity
@@ -191,7 +191,7 @@ class OrderRepository extends AbstractPdoRepository implements
             ]
         );
 
-        return $order ? $this->orderFactory->createFromDatabaseRow($order) : null;
+        return $order ? $this->orderFactory->createFromArray($order) : null;
     }
 
     public function getOneByPaymentId(string $paymentId): ?OrderEntity
@@ -207,7 +207,7 @@ class OrderRepository extends AbstractPdoRepository implements
             ]
         );
 
-        return $order ? $this->orderFactory->createFromDatabaseRow($order) : null;
+        return $order ? $this->orderFactory->createFromArray($order) : null;
     }
 
     public function getOneById(int $id): ?OrderEntity
@@ -223,7 +223,7 @@ class OrderRepository extends AbstractPdoRepository implements
             ]
         );
 
-        return $order ? $this->orderFactory->createFromDatabaseRow($order) : null;
+        return $order ? $this->orderFactory->createFromArray($order) : null;
     }
 
     public function getOneByUuid(string $uuid): ?OrderEntity
@@ -239,7 +239,33 @@ class OrderRepository extends AbstractPdoRepository implements
             ]
         );
 
-        return $order ? $this->orderFactory->createFromDatabaseRow($order) : null;
+        return $order ? $this->orderFactory->createFromArray($order) : null;
+    }
+
+    public function getByInvoice(string $invoiceUuid): array
+    {
+        $orders = $this->doFetchAll(
+            'SELECT ' . implode(', ', array_map(fn ($f) => 'o.' . $f, self::SELECT_FIELDS)) .
+            ' FROM ' . self::TABLE_NAME . ' o ' .
+            ' LEFT JOIN order_invoices_v2 inv ON inv.order_id = o.id ' .
+            ' WHERE inv.invoice_uuid = :uuid',
+            ['uuid' => $invoiceUuid]
+        );
+
+        return $this->orderFactory->createFromArrayCollection($orders);
+    }
+
+    public function getByInvoiceAndMerchant(string $invoiceUuid, int $merchantId): ?OrderEntity
+    {
+        $order = $this->doFetchOne(
+            'SELECT ' . implode(', ', array_map(fn ($f) => 'o.' . $f, self::SELECT_FIELDS)) .
+            ' FROM ' . self::TABLE_NAME . ' o ' .
+            ' LEFT JOIN order_invoices_v2 inv ON inv.order_id = o.id ' .
+            ' WHERE inv.invoice_uuid = :uuid AND o.merchant_id = :merchant_id',
+            ['uuid' => $invoiceUuid, 'merchant_id' => $merchantId]
+        );
+
+        return $order ? $this->orderFactory->createFromArray($order) : null;
     }
 
     public function updateDurationExtension(int $orderId, int $durationExtension): void
@@ -457,7 +483,7 @@ SQL;
         );
 
         while ($row = $stmt->fetch(PdoConnection::FETCH_ASSOC)) {
-            yield $this->orderFactory->createFromDatabaseRow($row);
+            yield $this->orderFactory->createFromArray($row);
         }
     }
 
@@ -482,7 +508,7 @@ SQL;
             ]
         );
 
-        return $row ? $this->orderFactory->createFromDatabaseRow($row) : null;
+        return $row ? $this->orderFactory->createFromArray($row) : null;
     }
 
     public function getOrdersCountByMerchantDebtorAndState(int $merchantDebtorId, string $state): int
@@ -579,7 +605,7 @@ SQL;
 
         return [
             'total' => $totalCount['total_count'] ?? 0,
-            'orders' => array_map([$this->orderFactory, 'createFromDatabaseRow'], $rows),
+            'orders' => array_map([$this->orderFactory, 'createFromArray'], $rows),
         ];
     }
 }

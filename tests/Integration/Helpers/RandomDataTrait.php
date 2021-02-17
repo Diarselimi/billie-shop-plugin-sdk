@@ -152,6 +152,7 @@ trait RandomDataTrait
     {
         $order = new OrderEntity();
         $this->fillObject($order);
+        $order->setInvoiceNumber(random_bytes(8));
         $merchantDebtor = new MerchantDebtorEntity();
         $this->fillObject($merchantDebtor);
 

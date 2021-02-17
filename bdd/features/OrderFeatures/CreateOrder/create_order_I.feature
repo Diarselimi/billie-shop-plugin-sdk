@@ -104,8 +104,13 @@ Feature:
        "amount":1000,
        "amount_net":900,
        "amount_tax":100,
+       "unshipped_amount":1000,
+       "unshipped_amount_net":900,
+       "unshipped_amount_tax":100,
        "duration":30,
        "dunning_status":null,
+       "workflow_name":"order_v1",
+       "due_date":"2021-01-13",
        "debtor_company":{
           "name":null,
           "address_house_number":null,
@@ -118,6 +123,7 @@ Feature:
           "iban":null,
           "bic":null
        },
+       "invoices":[],
        "invoice":{
           "invoice_number":null,
           "payout_amount":null,
@@ -214,69 +220,7 @@ Feature:
     And the order A1 workflow name is order_v1
     And the order A1 has creation source "api"
     And the response status code should be 200
-    And the JSON response should be:
-    """
-    {
-       "order_id":"A1",
-       "state":"created",
-       "reasons":null,
-       "decline_reason":null,
-       "amount":1000,
-       "amount_net":900,
-       "amount_tax":100,
-       "duration":30,
-       "dunning_status":null,
-       "debtor_company":{
-          "name":"Test User Company",
-          "address_house_number":"10",
-          "address_street":"Heinrich-Heine-Platz",
-          "address_postal_code":"10179",
-          "address_city":"Berlin",
-          "address_country":"DE"
-       },
-       "bank_account":{
-          "iban":"DE1234",
-          "bic":"BICISHERE"
-       },
-       "invoice":{
-          "invoice_number":null,
-          "payout_amount":null,
-          "outstanding_amount":null,
-          "fee_amount":null,
-          "fee_rate":null,
-          "due_date":null,
-          "pending_merchant_payment_amount":null,
-          "pending_cancellation_amount":null
-       },
-       "debtor_external_data":{
-          "merchant_customer_id":"12",
-          "name":"Test User Company",
-          "address_country":"DE",
-          "address_city":"Berlin",
-          "address_postal_code":"10179",
-          "address_street":"Heinrich-Heine-Platz",
-          "address_house":"10",
-          "industry_sector":"SOME SECTOR"
-       },
-       "delivery_address":{
-          "house_number":"10",
-          "street":"Heinrich-Heine-Platz",
-          "city":"Berlin",
-          "postal_code":"10179",
-          "country":"DE"
-       },
-       "billing_address":{
-          "house_number":"10",
-          "street":"Heinrich-Heine-Platz",
-          "city":"Berlin",
-          "postal_code":"10179",
-          "country":"DE"
-       },
-       "created_at":"2020-02-18T12:28:46+0100",
-       "shipped_at":null,
-       "debtor_uuid":null
-    }
-    """
+    And the JSON response should be file "create_order_response.json"
     And the order "A1" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz 10 de"
 
   Scenario: Successful order creation without house and workflow v2
@@ -344,6 +288,12 @@ Feature:
        "amount":1000,
        "amount_net":900,
        "amount_tax":100,
+       "unshipped_amount":1000,
+       "unshipped_amount_net":900,
+       "unshipped_amount_tax":100,
+       "workflow_name":"order_v2",
+       "due_date":"2021-01-13",
+       "invoices":[],
        "duration":30,
        "dunning_status":null,
        "debtor_company":{
@@ -398,243 +348,6 @@ Feature:
     }
     """
     And the order "A1" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz de"
-
-  Scenario: Successful order creation without delivery_address.house_number
-    Given I get from companies service identify match response
-    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
-    And I get from payments service register debtor positive response
-    And Debtor has sufficient limit
-    And Debtor lock limit call succeeded
-    When I send a POST request to "/order" with body:
-    """
-    {
-       "debtor_person":{
-          "salutation":"m",
-          "first_name":"someone",
-          "last_name":"else",
-          "phone_number":"+491234567",
-          "email":"someone@billie.io"
-       },
-       "debtor_company":{
-          "merchant_customer_id":"12",
-          "name":"Test User Company",
-          "address_addition":"left door",
-          "address_house_number":"10",
-          "address_street":"Heinrich-Heine-Platz",
-          "address_city":"Berlin",
-          "address_postal_code":"10179",
-          "address_country":"DE",
-          "tax_id":"VA222",
-          "tax_number":"3333",
-          "registration_court":"",
-          "registration_number":" some number",
-          "industry_sector":"some sector",
-          "subindustry_sector":"some sub",
-          "employees_number":"33",
-          "legal_form":"some legal",
-          "established_customer":1
-       },
-       "delivery_address":{
-          "house_number":"10",
-          "street":"Heinrich-Heine-Platz",
-          "city": "Berlin",
-          "postal_code":"10179",
-          "country":"DE"
-       },
-       "amount":{
-          "net":33.2,
-          "gross":43.30,
-          "tax":10.10
-       },
-       "comment":"Some comment",
-       "duration":30,
-       "order_id":"A123"
-    }
-    """
-    Then the order A123 is in state created
-    And the response status code should be 200
-    And the JSON response should be:
-    """
-    {
-       "order_id":"A123",
-       "state":"created",
-       "reasons":null,
-       "decline_reason":null,
-       "amount":43.3,
-       "amount_net":33.2,
-       "amount_tax":10.1,
-       "duration":30,
-       "dunning_status":null,
-       "debtor_company":{
-          "name":"Test User Company",
-          "address_house_number":"10",
-          "address_street":"Heinrich-Heine-Platz",
-          "address_postal_code":"10179",
-          "address_city":"Berlin",
-          "address_country":"DE"
-       },
-       "bank_account":{
-          "iban":"DE1234",
-          "bic":"BICISHERE"
-       },
-       "invoice":{
-          "invoice_number":null,
-          "payout_amount":null,
-          "outstanding_amount":null,
-          "fee_amount":null,
-          "fee_rate":null,
-          "due_date":null,
-          "pending_merchant_payment_amount":null,
-          "pending_cancellation_amount":null
-       },
-       "debtor_external_data":{
-          "merchant_customer_id":"12",
-          "name":"Test User Company",
-          "address_country":"DE",
-          "address_city":"Berlin",
-          "address_postal_code":"10179",
-          "address_street":"Heinrich-Heine-Platz",
-          "address_house":"10",
-          "industry_sector":"SOME SECTOR"
-       },
-       "delivery_address":{
-          "house_number":"10",
-          "street":"Heinrich-Heine-Platz",
-          "city":"Berlin",
-          "postal_code":"10179",
-          "country":"DE"
-       },
-       "billing_address":{
-          "house_number":"10",
-          "street":"Heinrich-Heine-Platz",
-          "city":"Berlin",
-          "postal_code":"10179",
-          "country":"DE"
-       },
-       "created_at":"2020-02-18T12:31:54+0100",
-       "shipped_at":null,
-       "debtor_uuid":null
-    }
-    """
-    And the order "A123" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz 10 de"
-
-  Scenario: Successful order creation using lowercase country
-    Given I get from companies service identify match response
-    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
-    And Debtor has sufficient limit
-    And Debtor lock limit call succeeded
-    And I get from payments service register debtor positive response
-    When I send a POST request to "/order" with body:
-    """
-    {
-       "debtor_person":{
-          "salutation":"m",
-          "first_name":"something",
-          "last_name":"else",
-          "phone_number":"+491234567",
-          "email":"someone@billie.io"
-       },
-       "debtor_company":{
-          "merchant_customer_id":"12",
-          "name":"Test User Company",
-          "address_addition":"left door",
-          "address_house_number":"10",
-          "address_street":"Heinrich-Heine-Platz",
-          "address_city":"Berlin",
-          "address_postal_code":"10179",
-          "address_country":"de",
-          "tax_id":"VA222",
-          "tax_number":"3333",
-          "registration_court":"",
-          "registration_number":" some number",
-          "industry_sector":"some sector",
-          "subindustry_sector":"some sub",
-          "employees_number":"33",
-          "legal_form":"some legal",
-          "established_customer":1
-       },
-       "delivery_address":{
-          "house_number":"10",
-          "street":"Heinrich-Heine-Platz",
-          "city":"Berlin",
-          "postal_code":"10179",
-          "country":"DE"
-       },
-       "amount":{
-          "net":900.00,
-          "gross":1000.00,
-          "tax":100.00
-       },
-       "comment":"Some comment",
-       "duration":30,
-       "order_id":"A1"
-    }
-    """
-    Then the order A1 is in state created
-    And the response status code should be 200
-    And the JSON response should be:
-    """
-    {
-       "order_id":"A1",
-       "state":"created",
-       "reasons":null,
-       "decline_reason":null,
-       "amount":1000,
-       "amount_net":900,
-       "amount_tax":100,
-       "duration":30,
-       "dunning_status":null,
-       "debtor_company":{
-          "name":"Test User Company",
-          "address_house_number":"10",
-          "address_street":"Heinrich-Heine-Platz",
-          "address_postal_code":"10179",
-          "address_city":"Berlin",
-          "address_country":"DE"
-       },
-       "bank_account":{
-          "iban":"DE1234",
-          "bic":"BICISHERE"
-       },
-       "invoice":{
-          "invoice_number":null,
-          "payout_amount":null,
-          "outstanding_amount":null,
-          "fee_amount":null,
-          "fee_rate":null,
-          "due_date":null,
-          "pending_merchant_payment_amount":null,
-          "pending_cancellation_amount":null
-       },
-       "debtor_external_data":{
-          "merchant_customer_id":"12",
-          "name":"Test User Company",
-          "address_country":"DE",
-          "address_city":"Berlin",
-          "address_postal_code":"10179",
-          "address_street":"Heinrich-Heine-Platz",
-          "address_house":"10",
-          "industry_sector":"SOME SECTOR"
-       },
-       "delivery_address":{
-          "house_number":"10",
-          "street":"Heinrich-Heine-Platz",
-          "city":"Berlin",
-          "postal_code":"10179",
-          "country":"DE"
-       },
-       "billing_address":{
-          "house_number":"10",
-          "street":"Heinrich-Heine-Platz",
-          "city":"Berlin",
-          "postal_code":"10179",
-          "country":"DE"
-       },
-       "created_at":"2020-02-18T12:33:35+0100",
-       "shipped_at":null,
-       "debtor_uuid":null
-    }
-    """
 
   Scenario: Debtor is not eligible for Point Of Sale
     Given I get from companies service identify match response
@@ -712,6 +425,12 @@ Feature:
           "iban":null,
           "bic":null
        },
+       "unshipped_amount":1000,
+       "unshipped_amount_net":900,
+       "unshipped_amount_tax":100,
+       "workflow_name":"order_v1",
+       "due_date":"2021-01-13",
+       "invoices":[],
        "invoice":{
           "invoice_number":null,
           "payout_amount":null,

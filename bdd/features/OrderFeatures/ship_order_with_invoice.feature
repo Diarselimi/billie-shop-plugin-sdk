@@ -34,6 +34,12 @@ Feature:
       "amount": 1000,
       "amount_net": 900.00,
       "amount_tax": 100.00,
+      "unshipped_amount":1000,
+      "unshipped_amount_net":900,
+      "unshipped_amount_tax":100,
+      "workflow_name":"order_v1",
+      "due_date":"2021-01-13",
+      "invoices":[],
       "debtor_company": {
         "name": "Test User Company",
         "address_house_number": "10",

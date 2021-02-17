@@ -72,4 +72,10 @@ eight_points_guzzle:
         debug: false
         query:
           app: watson
+    invoice_butler:
+      base_url: "%behat_mock_server_url%/butler/"
+      options:
+        debug: false
+        query:
+          app: butler
 

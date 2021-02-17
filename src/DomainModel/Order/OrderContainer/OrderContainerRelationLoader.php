@@ -142,7 +142,7 @@ class OrderContainerRelationLoader
 
         $uuids = array_map(fn (OrderInvoiceEntity $orderInvoice) => $orderInvoice->getInvoiceUuid(), $orderInvoices);
 
-        $invoices = $this->invoiceRepository->findByUuids($uuids);
+        $invoices = $this->invoiceRepository->getByUuids($uuids);
 
         return array_combine(
             array_map(fn (Invoice $invoice) => $invoice->getUuid(), $invoices),

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\InvoiceButler;
 
+use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceFactory;
 use App\DomainModel\Invoice\InvoiceServiceException;
 use App\DomainModel\Invoice\InvoiceServiceInterface;
@@ -29,11 +30,11 @@ class InvoiceButlerClient implements InvoiceServiceInterface, LoggingInterface
         $this->factory = $factory;
     }
 
-    public function findByUuids(array $uuids): array
+    public function getByUuids(array $uuids): array
     {
         try {
             $response = $this->client->get(
-                '/invoices',
+                'invoices',
                 [
                     'query' => ['uuids' => $uuids],
                     'on_stats' => function (TransferStats $stats) {
@@ -48,5 +49,16 @@ class InvoiceButlerClient implements InvoiceServiceInterface, LoggingInterface
         } catch (ClientException | TransferException $exception) {
             throw new InvoiceServiceException($exception);
         }
+    }
+
+    public function getOneByUuid(string $uuid): ?Invoice
+    {
+        $invoices = $this->getByUuids([$uuid]);
+
+        if (empty($invoices)) {
+            return null;
+        }
+
+        return array_shift($invoices);
     }
 }

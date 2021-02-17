@@ -2,6 +2,7 @@
 
 namespace App\DomainModel\Order;
 
+use App\DomainModel\Invoice\Invoice;
 use Generator;
 
 interface OrderRepositoryInterface
@@ -35,6 +36,13 @@ interface OrderRepositoryInterface
     public function debtorHasAtLeastOneFullyPaidOrder(string $companyUuid): bool;
 
     public function countOrdersByState(int $merchantDebtorId): OrderStateCounterDTO;
+
+    /**
+     * @return OrderEntity[]
+     */
+    public function getByInvoice(string $invoiceUuid): array;
+
+    public function getByInvoiceAndMerchant(string $invoiceUuid, int $merchantId): ?OrderEntity;
 
     /**
      * @return Generator|array|OrderEntity[]

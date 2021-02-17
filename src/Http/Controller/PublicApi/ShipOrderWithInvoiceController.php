@@ -6,7 +6,7 @@ use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\ShipOrderWithInvoice\ShipOrderWithInvoiceRequestV1;
 use App\Application\UseCase\ShipOrderWithInvoice\ShipOrderWithInvoiceUseCaseV1;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
-use App\DomainModel\OrderResponse\OrderResponseV1;
+use App\DomainModel\OrderResponse\OrderResponse;
 use App\DomainModel\ShipOrder\ShipOrderException;
 use App\Http\HttpConstantsInterface;
 use OpenApi\Annotations as OA;
@@ -50,7 +50,7 @@ class ShipOrderWithInvoiceController
         $this->useCase = $useCase;
     }
 
-    public function execute(string $uuid, Request $request): OrderResponseV1
+    public function execute(string $uuid, Request $request): OrderResponse
     {
         $merchantId = $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID);
         $orderRequest = (new ShipOrderWithInvoiceRequestV1($uuid, $merchantId))

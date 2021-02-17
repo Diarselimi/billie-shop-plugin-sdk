@@ -354,6 +354,7 @@ Feature: As a merchant, I should be able to create an order by providing a valid
     Then the order CO123 is in state created
     And the response status code should be 202
     And the JSON at "amount" should be 100.3
+    And the JSON at "unshipped_amount" should be 100.3
     And the JSON at "amount_net" should be 99.1
     And the JSON at "amount_tax" should be 1.2
 

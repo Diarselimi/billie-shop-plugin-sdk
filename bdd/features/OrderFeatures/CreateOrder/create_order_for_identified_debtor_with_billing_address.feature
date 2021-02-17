@@ -112,8 +112,13 @@ Feature:
       "amount":1000,
       "amount_net":900,
       "amount_tax":100,
+      "unshipped_amount":1000,
+      "unshipped_amount_net":900,
+      "unshipped_amount_tax":100,
       "duration":30,
       "dunning_status":null,
+      "workflow_name":"order_v1",
+      "due_date":"2021-01-13",
       "debtor_company":{
         "name":"Test User Company",
         "address_house_number":"10",
@@ -126,6 +131,7 @@ Feature:
         "iban":"DE1234",
         "bic":"BICISHERE"
       },
+      "invoices":[],
       "invoice":{
         "invoice_number":null,
         "payout_amount":null,
@@ -234,8 +240,13 @@ Feature:
       "amount":1000,
       "amount_net":900,
       "amount_tax":100,
+      "unshipped_amount":1000,
+      "unshipped_amount_net":900,
+      "unshipped_amount_tax":100,
       "duration":30,
       "dunning_status":null,
+      "workflow_name":"order_v1",
+      "due_date":"2021-01-13",
       "debtor_company":{
         "name":"Test User Company",
         "address_house_number":"10",
@@ -248,6 +259,7 @@ Feature:
         "iban":null,
         "bic":null
       },
+      "invoices":[],
       "invoice":{
         "invoice_number":null,
         "payout_amount":null,

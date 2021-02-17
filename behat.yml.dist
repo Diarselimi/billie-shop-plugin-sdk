@@ -4,7 +4,7 @@ default:
 
   suites:
     default:
-      paths: [ '%paths.base%/bdd/features/' ]
+      paths: [ '%paths.base%/bdd/features' ]
       contexts:
         - Behatch\Context\RestContext
         - json_spec
@@ -25,6 +25,7 @@ default:
         - App\Tests\Functional\Context\NachosContext
         - App\Tests\Functional\Context\ScoringServiceContext
         - App\Tests\Functional\Context\FraudServiceContext
+        - App\Tests\Functional\Context\InvoiceButlerServiceContext
         - App\Tests\Functional\Context\MessengerContext:
             kernel: '@kernel'
             amqpMapper: '@Ozean12\AmqpPackBundle\Mapping\AmqpMapperInterface'
@@ -36,7 +37,8 @@ default:
   extensions:
     Behatch\Extension: ~
     JsonSpec\Behat\Extension:
-      excluded_keys: [id, uuid, created_at, updated_at, shipped_at, invitation_token, api_key, payment_merchant_id, investor_uuid, company_uuid]
+      excluded_keys: [id, uuid, created_at, updated_at, shipped_at, due_date, invitation_token, api_key, payment_merchant_id, investor_uuid, company_uuid]
+      json_directory: '%paths.base%/bdd/features/resources'
     Behat\MinkExtension:
       base_url: 'http://paella-behat' # Fake URL (see HttpKernelBrowser usage in PaellaCoreContext)
       goutte: ~

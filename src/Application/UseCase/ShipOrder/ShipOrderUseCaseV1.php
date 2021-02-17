@@ -15,10 +15,10 @@ use App\DomainModel\Order\Lifecycle\ShipOrder\ShipOrderService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\OrderResponse\OrderResponse;
 use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentUploadException;
 use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerAggregator;
 use App\DomainModel\OrderResponse\OrderResponseFactory;
-use App\DomainModel\OrderResponse\OrderResponseV1;
 use App\DomainModel\ShipOrder\ShipOrderException;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -62,7 +62,7 @@ class ShipOrderUseCaseV1 implements ValidatedUseCaseInterface, LoggingInterface
         $this->invoiceFactory = $invoiceFactory;
     }
 
-    public function execute(ShipOrderRequestV1 $request): OrderResponseV1
+    public function execute(ShipOrderRequestV1 $request): OrderResponse
     {
         $orderContainer = $this->orderContainerFactory->loadByMerchantIdAndExternalIdOrUuid(
             $request->getMerchantId(),
@@ -78,7 +78,7 @@ class ShipOrderUseCaseV1 implements ValidatedUseCaseInterface, LoggingInterface
 
         $this->uploadInvoice($order, $request, $invoice->getUuid());
 
-        return $this->orderResponseFactory->createV1($orderContainer);
+        return $this->orderResponseFactory->create($orderContainer);
     }
 
     private function uploadInvoice(OrderEntity $order, ShipOrderRequestV1 $request, string $invoiceUuid): void
