@@ -800,7 +800,6 @@ class OrderResponse implements ArrayableInterface
             'shipped_at' => ($this->getShippedAt() ? $this->getShippedAt()->format(\DateTime::ISO8601) : null),
             'debtor_uuid' => $this->getDebtorUuid(),
             'workflow_name' => $this->workflowName,
-            'due_date' => $this->dueDate->format(DateFormat::FORMAT_YMD),
             'invoices' => array_map(fn (OrderInvoiceResponse $invoice) => $invoice->toArray(), $this->invoices),
             'invoice' => [
                 'invoice_number' => $this->getInvoiceNumber(),
@@ -808,6 +807,7 @@ class OrderResponse implements ArrayableInterface
                 'outstanding_amount' => $this->getOutstandingAmount(),
                 'fee_amount' => $this->getFeeAmount(),
                 'fee_rate' => $this->getFeeRate(),
+                'due_date' => $this->dueDate->format(DateFormat::FORMAT_YMD),
                 'pending_merchant_payment_amount' => $this->getPendingMerchantPaymentAmount(),
                 'pending_cancellation_amount' => $this->getPendingCancellationAmount(),
             ],

@@ -96,7 +96,6 @@ class OrderContainerFactory
             ->setOrderFinancialDetails($newOrder->getFinancialDetails())
             ->setLineItems($newOrder->getLineItems())
             ->setBillingAddress($newOrder->getBillingAddress())
-            ->setRiskCheckResultCollection(new CheckResultCollection())
-        ;
+            ->setRiskCheckResultCollection(new CheckResultCollection());
     }
 }

@@ -185,7 +185,6 @@ class OrderResponseFactory
     private function addData(OrderContainer $orderContainer, OrderResponse $response): void
     {
         $order = $orderContainer->getOrder();
-
         $this->addFinancialDetails($orderContainer, $response);
         $this->addOrderData($order, $response);
         $this->addExternalData($orderContainer, $response);
@@ -246,6 +245,7 @@ class OrderResponseFactory
     private function addFinancialDetails(OrderContainer $orderContainer, OrderResponse $response): void
     {
         $financialDetails = $orderContainer->getOrderFinancialDetails();
+        $createdAt = clone $orderContainer->getOrder()->getCreatedAt();
         $response
             ->setAmount(TaxedMoneyFactory::create(
                 $financialDetails->getAmountGross(),
@@ -253,7 +253,7 @@ class OrderResponseFactory
                 $financialDetails->getAmountTax()
             ))
             ->setDuration($orderContainer->getOrderFinancialDetails()->getDuration())
-            ->setDueDate($orderContainer->getOrder()->getCreatedAt()->modify("+ {$financialDetails->getDuration()} days"))
+            ->setDueDate($createdAt->modify("+ {$financialDetails->getDuration()} days"))
             ->setUnshippedAmount(new TaxedMoney(
                 $financialDetails->getUnshippedAmountGross(),
                 $financialDetails->getUnshippedAmountNet(),
