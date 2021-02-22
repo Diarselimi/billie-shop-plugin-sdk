@@ -51,9 +51,8 @@ class InvoiceDocumentCreator implements LoggingInterface
         );
         $this->orderInvoiceRepository->insert($invoice);
 
-        // TODO (partial-shipments): re-enable after migrating invoices to butler #CORE-556
-        $this->logInfo('Legacy Invoice created (DocumentUploaded dispatching is disabled).');
-        // $this->dispatchDocumentUploaded($documentUpload);
+        $this->dispatchDocumentUploaded($documentUpload);
+        $this->logInfo('DocumentUpload message Dispatched.');
     }
 
     private function dispatchDocumentUploaded(InvoiceDocumentUpload $documentUpload)
