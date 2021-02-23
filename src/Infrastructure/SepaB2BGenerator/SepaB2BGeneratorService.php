@@ -7,7 +7,7 @@ namespace App\Infrastructure\SepaB2BGenerator;
 use App\DomainModel\BankAccount\BankAccountDTO;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\FileService\FileServiceInterface;
-use App\DomainModel\FileService\FileServiceResponseDTO;
+use App\DomainModel\FileService\FileServiceUploadResponse;
 use App\DomainModel\SepaB2BGenerator\DocumentGeneratorClientInterface;
 use App\DomainModel\SepaB2BGenerator\SepaB2BDocumentGenerationRequestDTO;
 use App\Infrastructure\FinTechToolbox\FinTechToolboxResponseDTO;
@@ -34,7 +34,7 @@ class SepaB2BGeneratorService implements LoggingInterface
         $this->fileService = $fileService;
     }
 
-    public function generate(string $companyUuid, BankAccountDTO $bankAccountDTO, FinTechToolboxResponseDTO $bankInfo, string $mandateReference): FileServiceResponseDTO
+    public function generate(string $companyUuid, BankAccountDTO $bankAccountDTO, FinTechToolboxResponseDTO $bankInfo, string $mandateReference): FileServiceUploadResponse
     {
         $debtorCompany = $this->companiesService->getDebtorByUuid($companyUuid);
 

@@ -1,23 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Application\UseCase\GetMerchantSepaMandate;
 
+use App\DomainModel\FileService\FileServiceDownloadResponse;
 use App\DomainModel\FileService\FileServiceInterface;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class GetMerchantSepaMandateUseCase
 {
-    private $fileService;
+    private FileServiceInterface $fileService;
 
     public function __construct(FileServiceInterface $fileService)
     {
         $this->fileService = $fileService;
     }
 
-    public function execute(GetMerchantSepaMandateRequest $request): StreamedResponse
+    public function execute(GetMerchantSepaMandateRequest $request): FileServiceDownloadResponse
     {
-        $response = $this->fileService->download($request->getFileUuid());
-
-        return (new GetMerchantSepaMandateResponse())->stream($response);
+        return $this->fileService->download($request->getFileUuid());
     }
 }

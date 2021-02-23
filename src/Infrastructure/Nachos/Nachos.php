@@ -2,10 +2,11 @@
 
 namespace App\Infrastructure\Nachos;
 
+use App\DomainModel\FileService\FileServiceDownloadResponse;
 use App\DomainModel\FileService\FileServiceInterface;
 use App\DomainModel\FileService\FileServiceRequestException;
-use App\DomainModel\FileService\FileServiceResponseDTO;
-use App\DomainModel\FileService\FileServiceResponseFactory;
+use App\DomainModel\FileService\FileServiceUploadResponse;
+use App\DomainModel\FileService\FileServiceUploadResponseFactory;
 use App\DomainModel\FileService\FileSizeExceededException;
 use App\Infrastructure\DecodeResponseTrait;
 use GuzzleHttp\Client;
@@ -26,14 +27,14 @@ class Nachos implements FileServiceInterface
     public function __construct(
         Client $urlDownloaderClient,
         Client $nachosClient,
-        FileServiceResponseFactory $factory
+        FileServiceUploadResponseFactory $factory
     ) {
         $this->client = $nachosClient;
         $this->factory = $factory;
         $this->urlDownloaderClient = $urlDownloaderClient;
     }
 
-    public function upload(string $contents, string $filename, string $type): FileServiceResponseDTO
+    public function upload(string $contents, string $filename, string $type): FileServiceUploadResponse
     {
         try {
             $response = $this->client->post(
@@ -58,18 +59,24 @@ class Nachos implements FileServiceInterface
         return $this->factory->createFromArray($this->decodeResponse($response));
     }
 
-    public function download(string $fileUuid): StreamInterface
+    public function download(string $fileUuid): FileServiceDownloadResponse
     {
         try {
-            $response = $this->client->get("files/{$fileUuid}/raw", ['stream' => true]);
+            $response = $this->client->get("files/{$fileUuid}/raw");
         } catch (TransferException $exception) {
             throw new FileServiceRequestException($exception);
         }
 
-        return $response->getBody();
+        $body = $response->getBody();
+        $body->rewind();
+
+        return new FileServiceDownloadResponse(
+            $body,
+            $response->getHeader('Content-type')[0]
+        );
     }
 
-    public function uploadFromFile(UploadedFile $uploadedFile, string $filename, string $type): FileServiceResponseDTO
+    public function uploadFromFile(UploadedFile $uploadedFile, string $filename, string $type): FileServiceUploadResponse
     {
         try {
             $response = $this->client->post(
@@ -99,7 +106,7 @@ class Nachos implements FileServiceInterface
         string $filename,
         string $type,
         int $fileSizeLimit
-    ): FileServiceResponseDTO {
+    ): FileServiceUploadResponse {
         $response = $this->urlDownloaderClient->head($url);
 
         $size = $response->getHeader('Content-Length');

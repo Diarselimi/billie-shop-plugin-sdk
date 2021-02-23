@@ -2,7 +2,7 @@
 
 namespace App\DomainModel\FileService;
 
-class FileServiceResponseDTO
+class FileServiceUploadResponse
 {
     private $id;
 

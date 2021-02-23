@@ -7,7 +7,7 @@ use App\Application\UseCase\HttpInvoiceUpload\HttpInvoiceUploadRequest;
 use App\Application\UseCase\HttpInvoiceUpload\HttpInvoiceUploadUseCase;
 use App\DomainModel\FileService\FileServiceInterface;
 use App\DomainModel\FileService\FileServiceRequestException;
-use App\DomainModel\FileService\FileServiceResponseDTO;
+use App\DomainModel\FileService\FileServiceUploadResponse;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderNotFoundException;
 use App\DomainModel\Order\OrderRepositoryInterface;
@@ -104,7 +104,7 @@ class HttpInvoiceUploadUseCaseSpec extends ObjectBehavior
             $request->getMerchantId()
         )->willReturn((new OrderEntity())->setId($orderId));
 
-        $file = new FileServiceResponseDTO(1, 'uuid', 'filename', 'filepath');
+        $file = new FileServiceUploadResponse(1, 'uuid', 'filename', 'filepath');
 
         $fileService->uploadFromUrl(
             $request->getInvoiceUrl(),
