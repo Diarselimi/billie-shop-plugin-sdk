@@ -72,7 +72,7 @@ class InvoiceDocumentCreator implements LoggingInterface
 
     public function createFromUpload(
         int $orderId,
-        string $invoiceUuid,
+        ?string $invoiceUuid,
         string $invoiceNumber,
         UploadedFile $uploadedFile
     ): void {
@@ -84,6 +84,10 @@ class InvoiceDocumentCreator implements LoggingInterface
             );
         } catch (FileServiceRequestException | ClientResponseDecodeException $exception) {
             throw new HttpInvoiceUploadException($exception->getMessage(), null, $exception);
+        }
+
+        if ($invoiceUuid === null) {
+            return;
         }
 
         $this->create(

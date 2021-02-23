@@ -74,8 +74,12 @@ class UpdateOrderWithInvoiceUseCase implements LoggingInterface, ValidatedUseCas
         );
 
         if ($request->getInvoiceFile() !== null && $orderContainer->getOrder()->wasShipped()) {
+            $invoices = $orderContainer->getInvoices();
+            $invoice = empty($invoices) ? null : array_pop($invoices);
+
             $this->invoiceDocumentCreator->createFromUpload(
                 $order->getId(),
+                $invoice ? $invoice->getUuid() : null,
                 $order->getInvoiceNumber(),
                 $request->getInvoiceFile()
             );
