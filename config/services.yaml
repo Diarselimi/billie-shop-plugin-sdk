@@ -50,11 +50,12 @@ services:
       $paellaSandboxUrl: '%env(string:PAELLA_SANDBOX_URL)%'
       $vatRatesYamlPath: "%kernel.root_dir%/Resources/vat_rate/matrix.yaml"
       $isDummyRiskChecksFeatureEnabled: '%env(bool:DUMMY_CHECKS_ENABLED)%'
+      $blacklistedAddresses: '%blacklisted_addresses%'
 
   _instanceof:
     App\Application\UseCase\ValidatedUseCaseInterface:
       calls:
-        - [setValidator, ['@Symfony\Component\Validator\Validator\ValidatorInterface']]
+        - [ setValidator, [ '@Symfony\Component\Validator\Validator\ValidatorInterface' ] ]
 
   App\:
     resource: '../src/*'
@@ -62,7 +63,7 @@ services:
 
   App\Http\Controller\:
     resource: '../src/Http/Controller'
-    tags: ['controller.service_arguments']
+    tags: [ 'controller.service_arguments' ]
 
   Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter: '@serializer.name_converter.camel_case_to_snake_case'
 
@@ -86,16 +87,16 @@ services:
         - '%kernel.root_dir%/..'
 
   App\Infrastructure\OpenApi\Routing\OpenApiClassLoader:
-    tags: [routing.loader]
+    tags: [ routing.loader ]
 
   App\Infrastructure\OpenApi\Routing\OpenApiFileLoader:
-    tags: [routing.loader]
+    tags: [ routing.loader ]
     arguments:
       - '@openapi_file_locator'
       - '@App\Infrastructure\OpenApi\Routing\OpenApiClassLoader'
 
   App\Infrastructure\OpenApi\Routing\OpenApiDirectoryLoader:
-    tags: [routing.loader]
+    tags: [ routing.loader ]
     arguments:
       - '@openapi_file_locator'
       - '@App\Infrastructure\OpenApi\Routing\OpenApiClassLoader'
@@ -113,6 +114,7 @@ services:
         - 'line_items'
         - 'debtor_country'
         - 'debtor_industry_sector'
+        - 'black_listed_address'
       $postIdentificationChecks:
         - 'debtor_identified'
         - 'debtor_identified_strict'
@@ -149,6 +151,7 @@ services:
             delivery_address: '@App\DomainModel\OrderRiskCheck\Checker\DeliveryAddressCheck'
             fraud_score: '@App\DomainModel\OrderRiskCheck\Checker\FraudScoreCheck'
             debtor_score_available_dummy: '@App\DomainModel\OrderRiskCheck\DummyChecker\DebtorScoreAvailableDummyCheck'
+            black_listed_address: '@App\DomainModel\OrderRiskCheck\Checker\BlackListAddressCheck'
 
   App\DomainModel\OrderRiskCheck\Flagception\DummyRiskCheckStrategyManager:
     class: App\DomainModel\OrderRiskCheck\Flagception\DummyRiskCheckStrategyManager

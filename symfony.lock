@@ -72,6 +72,9 @@
     "ozean12/amqp-transfers": {
         "version": "0.3.55"
     },
+    "ozean12/company-strict-match-bundle": {
+        "version": "1.0.2"
+    },
     "ozean12/php-cs-fixer": {
         "version": "1.2.0"
     },

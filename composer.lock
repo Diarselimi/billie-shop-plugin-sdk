@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3be0d865e902bea596fa6676d456874d",
+    "content-hash": "5a8016d56edc8ab715103aa2641db504",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -3064,6 +3064,71 @@
                 "issues": "https://github.com/ozean12/amqp-transfers-serializer/issues"
             },
             "time": "2019-03-12T17:12:20+00:00"
+        },
+        {
+            "name": "ozean12/company-strict-match-bundle",
+            "version": "1.0.2",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:ozean12/CompanyStrictMatchBundle.git",
+                "reference": "be1d9e24f0cadc16efb81a58e3ee8bda3f217b95"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ozean12/CompanyStrictMatchBundle/zipball/be1d9e24f0cadc16efb81a58e3ee8bda3f217b95",
+                "reference": "be1d9e24f0cadc16efb81a58e3ee8bda3f217b95",
+                "shasum": ""
+            },
+            "require": {
+                "billie/monitoring-bundle": "^3.0",
+                "ext-mbstring": "*",
+                "illuminate/support": "^6.18 || ^7.25",
+                "php": ">=7.3",
+                "symfony/config": "^3.4 || ^4.4 || ^5.0",
+                "symfony/dependency-injection": "^3.4 || ^4.4 || ^5.0",
+                "symfony/finder": "^3.4 || ^4.4 || ^5.0",
+                "symfony/http-kernel": "^3.4 || ^4.4 || ^5.0"
+            },
+            "require-dev": {
+                "league/csv": "^9.6",
+                "matthiasnoback/symfony-config-test": "^4.2",
+                "matthiasnoback/symfony-dependency-injection-test": "^4.1",
+                "ozean12/php-cs-fixer": "^1.2",
+                "phpspec/prophecy": "^1.11",
+                "phpspec/prophecy-phpunit": "^2.0",
+                "phpunit/phpunit": "^9.3"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Ozean12\\CompanyStrictMatcher\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Ozean12\\CompanyStrictMatcher\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "./vendor/bin/phpunit --testdox --colors=always --coverage-text"
+                ],
+                "test-functional": [
+                    "./vendor/bin/phpunit ./tests/Functional/* --testdox --colors=always --coverage-text"
+                ],
+                "test-non-functional": [
+                    "./vendor/bin/phpunit ./tests/Unit/* --testdox --colors=always --coverage-text",
+                    "./vendor/bin/phpunit ./tests/Integration/* --testdox --colors=always --coverage-text"
+                ]
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Company Strict Match Bundle",
+            "support": {
+                "source": "https://github.com/ozean12/CompanyStrictMatchBundle/tree/1.0.2"
+            },
+            "time": "2021-02-05T19:02:28+00:00"
         },
         {
             "name": "ozean12/graphql-repository-client",
