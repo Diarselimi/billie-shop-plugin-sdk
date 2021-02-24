@@ -17,5 +17,5 @@ return [
     Farmatholin\SegmentIoBundle\SegmentIoBundle::class => ['all' => true],
     Flagception\Bundle\FlagceptionBundle\FlagceptionBundle::class => ['all' => true],
     League\FlysystemBundle\FlysystemBundle::class => ['all' => true],
-    Ozean12\CompanyStrictMatcher\CompanyStrictMatcherBundle::class => ['dev' => true, 'test' => true],
+    Ozean12\CompanyStrictMatcher\CompanyStrictMatcherBundle::class => ['all' => true],
 ];
