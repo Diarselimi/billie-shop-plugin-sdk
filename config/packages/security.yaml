@@ -1,111 +1,122 @@
 security:
-    providers:
-        in_memory: { memory: ~ }
-    firewalls:
-        dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
+  providers:
+    in_memory: { memory: ~ }
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
 
-        healthcheck:
-            pattern: ^/(public/)?healthcheck
-            security: false
+    healthcheck:
+      pattern: ^/(public/)?healthcheck
+      security: false
 
-        private_api:
-            pattern: ^/private/*
-            security: false
+    private_api:
+      pattern: ^/private/*
+      security: false # handled via AWS
 
-        api_docs:
-            pattern: ^/(docs|internal-docs)(/.*)?
-            security: false
+    api_docs:
+      pattern: ^/(docs|internal-docs)(/.*)?
+      security: false
 
-        merchant_user_login:
-            pattern: ^/(public/)?merchant/user/login
-            security: false
+    legal_forms:
+      pattern: ^/(public/)?(api/)?(v[1-2]/)?legal-forms
+      security: false
 
-        merchant_user_logout:
-            pattern: ^/(public/)?merchant/user/logout
-            anonymous: false
-            stateless: true
-            guard:
-                authenticators:
-                    - App\Http\Authentication\Authenticator\OAuthTokenAuthenticator
+    # ---------------------------------------- #
+    # DASHBOARD
+    # ---------------------------------------- #
 
-        merchant_user_request_new_password:
-          pattern: ^/(public/)?merchant/user/request-new-password
-          security: false
+    merchant_user_login:
+      pattern: ^/(public/)?(api/)?(v[1-2]/)?merchant/user/login
+      security: false
 
-        merchant_user_confirm_password_reset:
-          pattern: ^/(public/)?merchant/user/confirm-password-reset
-          security: false
+    merchant_user_logout:
+      pattern: ^/(public/)?(api/)?(v[1-2]/)?merchant/user/logout
+      anonymous: false
+      stateless: true
+      guard:
+        authenticators:
+          - App\Http\Authentication\Authenticator\OAuthTokenAuthenticator
 
-        merchant_user_reset_password:
-          pattern: ^/(public/)?merchant/user/reset-password
-          security: false
+    merchant_user_request_new_password:
+      pattern: ^/(public/)?(api/)?(v[1-2]/)?merchant/user/request-new-password
+      security: false
 
-        legal_forms:
-            pattern: ^/(public/)?legal-forms
-            security: false
+    merchant_user_confirm_password_reset:
+      pattern: ^/(public/)?(api/)?(v[1-2]/)?merchant/user/confirm-password-reset
+      security: false
 
-        checkout_authorize:
-            pattern: ^/(public/)?(api/)?(v[1-2]/)?checkout-session/.*/authorize
-            anonymous: false
-            stateless: true
-            guard:
-                authenticators:
-                    - App\Http\Authentication\Authenticator\ActiveCheckoutSessionAuthenticator
+    merchant_user_reset_password:
+      pattern: ^/(public/)?(api/)?(v[1-2]/)?merchant/user/reset-password
+      security: false
 
-        checkout_update:
-          pattern: ^/(public/)?(api/)?(v1/)?checkout-session/.*/update
-          anonymous: false
-          stateless: true
-          guard:
-            authenticators:
-              - App\Http\Authentication\Authenticator\ExistingCheckoutSessionAuthenticator
+    merchant_user_invitations:
+      pattern: ^/(public/)?(api/)?(v[1-2]/)?merchant/users/invitations/([a-z0-9])+/(signup|details)$
+      methods: [ GET, POST, OPTIONS ]
+      anonymous: false
+      stateless: true
+      guard:
+        authenticators:
+          - App\Http\Authentication\Authenticator\InvitedUserTokenAuthenticator
 
-        get_external_debtors:
-          pattern: ^/(public/)?(api/)?(v1/)?external-debtors
-          anonymous: false
-          stateless: true
-          guard:
-            authenticators:
-              - App\Http\Authentication\Authenticator\ActiveCheckoutSessionAuthenticator
-              - App\Http\Authentication\Authenticator\SandboxAuthenticator
-            entry_point: App\Http\Authentication\Authenticator\ActiveCheckoutSessionAuthenticator
+    merchant_signatory_powers:
+      pattern: ^/(public/)?(api/)?(v[1-2]/)?merchant/signatory-powers/.*(/(start-identity-verification))?
+      methods: [ GET, POST, OPTIONS ]
+      anonymous: false
+      stateless: true
+      guard:
+        authenticators:
+          - App\Http\Authentication\Authenticator\SignatoryPowerTokenAuthenticator
 
-        invited_user:
-            pattern: ^/(public/)?merchant/users/invitations/([a-z0-9])+/(signup|details)$
-            methods: [GET, POST, OPTIONS]
-            anonymous: false
-            stateless: true
-            guard:
-                authenticators:
-                    - App\Http\Authentication\Authenticator\InvitedUserTokenAuthenticator
+    # ---------------------------------------- #
+    # CHECKOUT
+    # ---------------------------------------- #
 
-        signatory_power_token:
-            pattern: ^/(public/)?merchant/signatory-powers/.*(/(start-identity-verification))?
-            methods: [GET, POST, OPTIONS]
-            anonymous: false
-            stateless: true
-            guard:
-                authenticators:
-                    - App\Http\Authentication\Authenticator\SignatoryPowerTokenAuthenticator
+    checkout_authorize:
+      pattern: ^/(public/)?(api/)?(v[1-2]/)?checkout-session/.*/authorize
+      anonymous: false
+      stateless: true
+      guard:
+        authenticators:
+          - App\Http\Authentication\Authenticator\ActiveCheckoutSessionAuthenticator
 
-        sandbox_security:
-            anonymous: false
-            stateless: true
-            request_matcher: sandbox_request_matcher
-            guard:
-                authenticators:
-                    - App\Http\Authentication\Authenticator\SandboxAuthenticator
-                    - App\Http\Authentication\Authenticator\ApiKeyAuthenticator
-                entry_point: App\Http\Authentication\Authenticator\SandboxAuthenticator
+    checkout_update:
+      pattern: ^/(public/)?(api/)?(v[1-2]/)?checkout-session/.*/update
+      anonymous: false
+      stateless: true
+      guard:
+        authenticators:
+          - App\Http\Authentication\Authenticator\ExistingCheckoutSessionAuthenticator
 
-        default_security:
-            anonymous: false
-            stateless: true
-            guard:
-                authenticators:
-                    - App\Http\Authentication\Authenticator\OAuthTokenAuthenticator
-                    - App\Http\Authentication\Authenticator\ApiKeyAuthenticator
-                entry_point: App\Http\Authentication\Authenticator\OAuthTokenAuthenticator
+    get_external_debtors:
+      pattern: ^/(public/)?(api/)?(v[1-2]/)?external-debtors
+      anonymous: false
+      stateless: true
+      guard:
+        authenticators:
+          - App\Http\Authentication\Authenticator\ActiveCheckoutSessionAuthenticator
+          - App\Http\Authentication\Authenticator\SandboxAuthenticator
+        entry_point: App\Http\Authentication\Authenticator\ActiveCheckoutSessionAuthenticator
 
+    # ---------------------------------------- #
+    # DEFAULTS
+    # ---------------------------------------- #
+
+    sandbox_security:
+      anonymous: false
+      stateless: true
+      request_matcher: sandbox_request_matcher
+      guard:
+        authenticators:
+          - App\Http\Authentication\Authenticator\SandboxAuthenticator
+          - App\Http\Authentication\Authenticator\ApiKeyAuthenticator
+        entry_point: App\Http\Authentication\Authenticator\SandboxAuthenticator
+
+    default_security:
+      anonymous: false
+      stateless: true
+      guard:
+        authenticators:
+          - App\Http\Authentication\Authenticator\OAuthTokenAuthenticator
+          - App\Http\Authentication\Authenticator\ApiKeyAuthenticator
+        entry_point: App\Http\Authentication\Authenticator\OAuthTokenAuthenticator

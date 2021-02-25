@@ -116,3 +116,11 @@ Feature: An endpoint to return list of supported legal forms
 	  ]
 	}
 	"""
+
+  Scenario: Successfully retrieve legal forms with v1 api
+    When I send a GET request to "/public/api/v1/legal-forms"
+    Then the response status code should be 200
+
+  Scenario: Successfully retrieve legal forms with v2 api
+    When I send a GET request to "/public/api/v2/legal-forms"
+    Then the response status code should be 200
