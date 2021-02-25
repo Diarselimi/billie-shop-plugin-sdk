@@ -71,6 +71,7 @@ test-integration: test-seed
 test-unit:
 	echo " > Running unit tests... "
 	./vendor/bin/phpspec run --stop-on-failure -vvv
+	./vendor/bin/phpunit tests/Unit --stop-on-failure
 
 ######################## Docker-wrapped targets #################################
 local-start:

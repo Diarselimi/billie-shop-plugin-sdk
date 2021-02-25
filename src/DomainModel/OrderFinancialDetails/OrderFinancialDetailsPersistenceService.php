@@ -30,26 +30,35 @@ class OrderFinancialDetailsPersistenceService
 
         if ($changeSet->getAmount() !== null) {
             $amount = $changeSet->getAmount();
+            $unshippedAmount = $this->calculateUnshippedAmount($financialDetails, $changeSet->getAmount());
         } else {
             $amount = TaxedMoneyFactory::create(
                 $financialDetails->getAmountGross(),
                 $financialDetails->getAmountNet(),
                 $financialDetails->getAmountTax()
             );
-        }
 
-        $unshippedAmount = new TaxedMoney(
-            $financialDetails->getUnshippedAmountGross(),
-            $financialDetails->getUnshippedAmountNet(),
-            $financialDetails->getUnshippedAmountTax()
-        );
+            $unshippedAmount = new TaxedMoney(
+                $financialDetails->getUnshippedAmountGross(),
+                $financialDetails->getUnshippedAmountNet(),
+                $financialDetails->getUnshippedAmountTax()
+            );
+        }
 
         $newFinancialDetails = $this
             ->factory
-            ->create($financialDetails->getOrderId(), $amount, $duration, $unshippedAmount)
-        ;
+            ->create($financialDetails->getOrderId(), $amount, $duration, $unshippedAmount);
 
         $this->repository->insert($newFinancialDetails);
         $orderContainer->setOrderFinancialDetails($newFinancialDetails);
+    }
+
+    private function calculateUnshippedAmount(OrderFinancialDetailsEntity $financialDetails, TaxedMoney $newAmount): TaxedMoney
+    {
+        return new TaxedMoney(
+            $financialDetails->getUnshippedAmountGross()->subtract($financialDetails->getAmountGross()->subtract($newAmount->getGross())),
+            $financialDetails->getUnshippedAmountNet()->subtract($financialDetails->getAmountNet()->subtract($newAmount->getNet())),
+            $financialDetails->getUnshippedAmountTax()->subtract($financialDetails->getAmountTax()->subtract($newAmount->getTax()))
+        );
     }
 }
