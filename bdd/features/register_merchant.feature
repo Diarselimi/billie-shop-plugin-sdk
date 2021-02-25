@@ -209,6 +209,15 @@ Feature: Register a new merchant with an invitation for the initial admin user.
     And the default notification settings should be created for merchant with company ID 1
     And all the default roles should be created for merchant with company ID 1
     And a user invitation with role "admin" and email "test@billie.dev" should have been created for merchant with company ID 1
+    And queue should contain message with routing key merchant_user_invitation.merchant_user_invitation_created with below data:
+    """
+    {
+      "merchantPaymentUuid":"@string@",
+      "token":"@string@",
+      "email":"test@billie.dev",
+      "userRoleName":"admin"
+    }
+    """
 
   Scenario: Identify company via Firmenwissen when not found
     Given I get from companies service "/debtor/crefo/123" endpoint response with status 404 and body

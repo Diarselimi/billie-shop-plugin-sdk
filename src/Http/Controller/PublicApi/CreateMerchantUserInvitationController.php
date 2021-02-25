@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controller\PublicApi;
 
 use App\Application\UseCase\CreateMerchantUserInvitation\CreateMerchantUserInvitationRequest;
 use App\Application\UseCase\CreateMerchantUserInvitation\CreateMerchantUserInvitationResponse;
 use App\Application\UseCase\CreateMerchantUserInvitation\CreateMerchantUserInvitationUseCase;
+use App\DomainModel\Merchant\MerchantNotFoundException;
 use App\DomainModel\MerchantUser\RoleNotFoundException;
 use App\DomainModel\MerchantUserInvitation\MerchantUserInvitationAlreadyExistsException;
 use App\Http\HttpConstantsInterface;
@@ -49,7 +52,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class CreateMerchantUserInvitationController
 {
-    private $useCase;
+    private CreateMerchantUserInvitationUseCase $useCase;
 
     public function __construct(CreateMerchantUserInvitationUseCase $useCase)
     {
@@ -68,6 +71,8 @@ class CreateMerchantUserInvitationController
             return $this->useCase->execute($useCaseRequest);
         } catch (RoleNotFoundException $e) {
             throw new NotFoundHttpException('Role not found', $e);
+        } catch (MerchantNotFoundException $e) {
+            throw new NotFoundHttpException('Merchant not found', $e);
         } catch (MerchantUserInvitationAlreadyExistsException $e) {
             throw new ConflictHttpException('Invitation for the same email already exists', $e);
         }

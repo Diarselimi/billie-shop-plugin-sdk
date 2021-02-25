@@ -1,6 +1,15 @@
 {
+    "aeon-php/calendar": {
+        "version": "0.15.0"
+    },
     "billie/monitoring-bundle": {
         "version": "v2.10.3"
+    },
+    "coduo/php-matcher": {
+        "version": "6.0.1"
+    },
+    "coduo/php-to-string": {
+        "version": "3.1.0"
     },
     "composer/semver": {
         "version": "1.7.0"
@@ -151,6 +160,12 @@
     },
     "symfony/http-client-contracts": {
         "version": "v2.3.1"
+    },
+    "symfony/intl": {
+        "version": "v4.4.19"
+    },
+    "symfony/polyfill-intl-icu": {
+        "version": "v1.22.1"
     },
     "symfony/polyfill-intl-normalizer": {
         "version": "v1.18.1"

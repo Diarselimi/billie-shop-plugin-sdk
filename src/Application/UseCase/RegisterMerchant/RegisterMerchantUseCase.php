@@ -87,7 +87,7 @@ class RegisterMerchantUseCase implements ValidatedUseCaseInterface
 
         $invitation = $this->invitationPersistenceService->createInvitationByRoleName(
             MerchantUserDefaultRoles::ROLE_ADMIN['name'],
-            $creationDTO->getMerchant()->getId(),
+            $creationDTO->getMerchant(),
             $request->getEmail(),
             (new \DateTime())->modify(self::INVITATION_EXPIRES_AT)
         );

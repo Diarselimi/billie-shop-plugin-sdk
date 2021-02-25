@@ -28,6 +28,7 @@ ozean12_amqp_pack:
     document.document_uploaded:
       class: Ozean12\Transfer\Message\Document\DocumentUploaded
       delay: 5000
+    merchant_user_invitation.merchant_user_invitation_created: Ozean12\Transfer\Message\MerchantUserInvitation\MerchantUserInvitationCreated
   subscribe:
     identity.identity_verification_succeeded: Ozean12\Transfer\Message\Identity\IdentityVerificationSucceeded
     order.order_dunning_step_changed: Ozean12\Transfer\Message\Order\OrderDunningStepChanged

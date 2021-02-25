@@ -75,6 +75,15 @@ Feature: APIS-1443 - Invite user by email and role
     """
     Then the response status code should be 200
     And the JSON response should have "invitation_uuid"
+    And queue should contain message with routing key merchant_user_invitation.merchant_user_invitation_created with below data:
+    """
+    {
+      "merchantPaymentUuid":"f2ec4d5e-79f4-40d6-b411-31174b6519ac",
+      "token":"@...@",
+      "email":"dev@billie.dev",
+      "userRoleName":"human-cookie"
+    }
+    """
 
   Scenario: Create invitation succeeds if already exists for same email but is not valid anymore
     Given a merchant user exists with permission MANAGE_USERS
@@ -91,6 +100,15 @@ Feature: APIS-1443 - Invite user by email and role
     """
     Then the response status code should be 200
     And the JSON response should have "invitation_uuid"
+    And queue should contain message with routing key merchant_user_invitation.merchant_user_invitation_created with below data:
+    """
+    {
+      "merchantPaymentUuid":"f2ec4d5e-79f4-40d6-b411-31174b6519ac",
+      "token":"@string@",
+      "email":"dev@billie.dev",
+      "userRoleName":"human-cookie"
+    }
+    """
 
 
   Scenario: Create invitation fails if already exists for same email and is still valid

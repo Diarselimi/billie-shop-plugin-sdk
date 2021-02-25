@@ -1,9 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Application\UseCase\CreateMerchantUserInvitation;
 
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
+use App\DomainModel\Merchant\MerchantNotFoundException;
+use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantUser\MerchantUserDefaultRoles;
 use App\DomainModel\MerchantUser\MerchantUserRoleRepositoryInterface;
 use App\DomainModel\MerchantUser\RoleNotFoundException;
@@ -19,15 +23,19 @@ class CreateMerchantUserInvitationUseCase implements ValidatedUseCaseInterface
         MerchantUserDefaultRoles::ROLE_BILLIE_ADMIN['name'],
     ];
 
-    private $merchantUserRoleRepository;
+    private MerchantUserRoleRepositoryInterface $merchantUserRoleRepository;
 
-    private $invitationPersistenceService;
+    private MerchantRepositoryInterface $merchantRepository;
+
+    private MerchantUserInvitationPersistenceService $invitationPersistenceService;
 
     public function __construct(
         MerchantUserRoleRepositoryInterface $merchantUserRoleRepository,
+        MerchantRepositoryInterface $merchantRepository,
         MerchantUserInvitationPersistenceService $invitationPersistenceService
     ) {
         $this->merchantUserRoleRepository = $merchantUserRoleRepository;
+        $this->merchantRepository = $merchantRepository;
         $this->invitationPersistenceService = $invitationPersistenceService;
     }
 
@@ -41,9 +49,14 @@ class CreateMerchantUserInvitationUseCase implements ValidatedUseCaseInterface
             throw new RoleNotFoundException();
         }
 
+        $merchant = $this->merchantRepository->getOneById($request->getMerchantId());
+        if ($merchant === null) {
+            throw new MerchantNotFoundException();
+        }
+
         $invitation = $this->invitationPersistenceService->createInvitation(
             $role,
-            $request->getMerchantId(),
+            $merchant,
             $request->getEmail()
         );
 

@@ -31,6 +31,7 @@ default:
             amqpMapper: '@Ozean12\AmqpPackBundle\Mapping\AmqpMapperInterface'
             changeRequestDecisionIssuesHandler: '@App\Amqp\Handler\CompanyInformationChangeRequestDecisionIssuedHandler'
             identityVerificationSucceededHandler: '@App\Amqp\Handler\IdentityVerificationSucceededHandler'
+            traceableMessageBus: '@Symfony\Component\Messenger\MessageBusInterface'
         - App\Tests\Functional\Context\RepositoryIntegrationContext:
             kernel: '@kernel'
 

@@ -9,7 +9,6 @@ services:
     public: true
 
   # override sentry calls:
-  App\Test\TestMessageBus: ~
   App\Test\TestSentryClient: ~
   App\Test\TestSentrySubscriber: ~
   Psr\Log\NullLogger: ~
@@ -21,8 +20,12 @@ services:
   Psr\Log\LoggerInterface: '@Psr\Log\NullLogger'
 
   App\Http\ApiError\VerboseApiErrorResponseFactory: ~
-  Symfony\Component\Messenger\MessageBusInterface: '@App\Test\TestMessageBus'
   App\Http\ApiError\ApiErrorResponseFactory: '@App\Http\ApiError\VerboseApiErrorResponseFactory'
+
+  Symfony\Component\Messenger\MessageBus: ~
+  Symfony\Component\Messenger\TraceableMessageBus:
+    arguments: [ '@Symfony\Component\Messenger\MessageBus' ]
+  Symfony\Component\Messenger\MessageBusInterface: '@Symfony\Component\Messenger\TraceableMessageBus'
 
   App\DomainModel\Merchant\MerchantCreationService: ~
 
