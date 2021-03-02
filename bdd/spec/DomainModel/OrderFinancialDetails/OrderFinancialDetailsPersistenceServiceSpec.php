@@ -4,6 +4,7 @@ namespace spec\App\DomainModel\OrderFinancialDetails;
 
 use App\Application\UseCase\LegacyUpdateOrder\LegacyUpdateOrderRequest;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
+use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsFactory;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface;
@@ -26,9 +27,13 @@ class OrderFinancialDetailsPersistenceServiceSpec extends ObjectBehavior
     public function it_updates_financial_details(
         OrderFinancialDetailsRepositoryInterface $repository,
         OrderFinancialDetailsFactory $factory,
-        OrderContainer $orderContainer
+        OrderContainer $orderContainer,
+        OrderEntity $order
     ) {
         $orderContainer->setOrderFinancialDetails(Argument::any())->willReturn($orderContainer);
+        $orderContainer->getOrder()->willReturn($order);
+        $order->wasShipped()->willReturn(false);
+
         // Arrange
         $newFinancialDetails = new OrderFinancialDetailsEntity();
         $changeSet = new LegacyUpdateOrderRequest('', 1);

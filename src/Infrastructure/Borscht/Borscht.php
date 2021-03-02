@@ -11,7 +11,6 @@ use App\DomainModel\Payment\OrderPaymentDetailsFactory;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Payment\PaymentsServiceRequestException;
 use App\DomainModel\Payment\RequestDTO\ConfirmRequestDTO;
-use App\DomainModel\Payment\RequestDTO\CreateRequestDTO;
 use App\DomainModel\Payment\RequestDTO\ModifyRequestDTO;
 use App\Infrastructure\ClientResponseDecodeException;
 use App\Infrastructure\DecodeResponseTrait;
@@ -140,31 +139,6 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
             ]);
         } catch (TransferException $exception) {
             throw new PaymentsServiceRequestException($exception);
-        }
-    }
-
-    public function createOrder(CreateRequestDTO $requestDTO): OrderPaymentDetailsDTO
-    {
-        $json = $requestDTO->toArray();
-
-        $this->logInfo('Create borscht ticket', [LoggingInterface::KEY_SOBAKA => $json]);
-
-        try {
-            $response = $this->client->post('order.json', [
-                'json' => $json,
-                'timeout' => self::EXTENDED_REQUEST_TIMEOUT,
-                'on_stats' => function (TransferStats $stats) {
-                    $this->logServiceRequestStats($stats, 'create_borscht_ticket');
-                },
-            ]);
-
-            $decodedResponse = $this->decodeResponse($response);
-
-            return $this->paymentDetailsFactory->createFromBorschtResponse($decodedResponse);
-        } catch (TransferException $exception) {
-            throw new PaymentsServiceRequestException($exception);
-        } catch (ClientResponseDecodeException $exception) {
-            throw new PaymentsServiceRequestException($exception, self::ERR_BODY_DECODE_MESSAGE);
         }
     }
 

@@ -25,8 +25,9 @@ class FeeCalculator implements LoggingInterface
     public function calculate(Money $amount, int $duration, array $feeRates): Fee
     {
         $feeRate = $this->getFeeRate($duration, $feeRates);
-        $netFeeAmount = $amount->percent($feeRate)->round();
+        $netFeeAmount = $amount->percent($feeRate);
         $taxFeeAmount = $netFeeAmount->percent($this->vatRateRepository->getForDateTime(new \DateTime()))->round();
+        $netFeeAmount = $netFeeAmount->round();
         $grossFeeAmount = $netFeeAmount->add($taxFeeAmount);
 
         return new Fee($feeRate, $grossFeeAmount, $netFeeAmount, $taxFeeAmount);

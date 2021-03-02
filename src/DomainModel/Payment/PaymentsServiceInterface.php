@@ -5,7 +5,6 @@ namespace App\DomainModel\Payment;
 use App\DomainModel\MerchantDebtor\RegisterDebtorDTO;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Payment\RequestDTO\ConfirmRequestDTO;
-use App\DomainModel\Payment\RequestDTO\CreateRequestDTO;
 use App\DomainModel\Payment\RequestDTO\ModifyRequestDTO;
 
 interface PaymentsServiceInterface
@@ -23,8 +22,6 @@ interface PaymentsServiceInterface
     public function modifyOrder(ModifyRequestDTO $requestDTO): void;
 
     public function confirmPayment(ConfirmRequestDTO $requestDTO): void;
-
-    public function createOrder(CreateRequestDTO $requestDTO): OrderPaymentDetailsDTO;
 
     public function createFraudReclaim(string $orderPaymentId): void;
 }

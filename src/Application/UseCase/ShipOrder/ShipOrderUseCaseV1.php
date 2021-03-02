@@ -152,7 +152,7 @@ class ShipOrderUseCaseV1 implements ValidatedUseCaseInterface, LoggingInterface
     private function ship(OrderContainer $orderContainer, Invoice $invoice): void
     {
         $this->logInfo('Ship order v1 in paella'); // PRE-BUTLER HACK TODO (partial-activation) remove on migration
-        $this->legacyShipOrderService->ship($orderContainer, new Invoice());
+        $this->legacyShipOrderService->ship($orderContainer, $invoice);
 
         $this->logInfo('Ship order v1 in core');
         $this->shipOrderService->ship($orderContainer, $invoice);

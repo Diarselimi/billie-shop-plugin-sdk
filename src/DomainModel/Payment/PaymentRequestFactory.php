@@ -3,7 +3,6 @@
 namespace App\DomainModel\Payment;
 
 use App\DomainModel\Payment\RequestDTO\ConfirmRequestDTO;
-use App\DomainModel\Payment\RequestDTO\CreateRequestDTO;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Payment\RequestDTO\ModifyRequestDTO;
@@ -27,15 +26,7 @@ class PaymentRequestFactory
             ->setInvoiceNumber($orderEntity->getInvoiceNumber())
             ->setExternalCode($orderEntity->getExternalCode())
             ->setShippedAt($orderEntity->getShippedAt())
-            ;
-    }
-
-    public function createCreateRequestDTO(OrderContainer $orderContainer): CreateRequestDTO
-    {
-        $requestDTO = new CreateRequestDTO();
-        $this->createFromOrderContainer($orderContainer, $requestDTO);
-
-        return $requestDTO;
+        ;
     }
 
     public function createConfirmRequestDTO(OrderEntity $order, float $outstandingAmount): ConfirmRequestDTO

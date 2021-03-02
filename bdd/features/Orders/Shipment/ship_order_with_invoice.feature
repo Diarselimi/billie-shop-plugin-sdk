@@ -10,8 +10,6 @@ Feature:
 
   Scenario: Successful invoice upload and order shipment
     Given I have a created order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-    And I get from payments service get order details not found response
-    And I get from payments service create ticket response
     And I get from companies service identify match response
     And GraphQL will respond to getMerchantDebtorDetails query
     And I get from files service a good response
@@ -26,69 +24,86 @@ Feature:
     Then the JSON response should be:
     """
     {
-      "order_id": "CO123",
-      "uuid": "test-order-uuidCO123",
-      "state": "shipped",
-      "reasons": null,
-      "decline_reason": null,
-      "amount": 1000,
-      "amount_net": 900.00,
-      "amount_tax": 100.00,
-      "unshipped_amount":1000,
-      "unshipped_amount_net":900,
-      "unshipped_amount_tax":100,
-      "workflow_name":"order_v1",
-      "due_date":"2021-01-13",
-      "invoices":[],
-      "debtor_company": {
-        "name": "Test User Company",
-        "address_house_number": "10",
-        "address_street": "Heinrich-Heine-Platz",
-        "address_postal_code": "10179",
-        "address_city": "Berlin",
-        "address_country": "DE"
-      },
-      "bank_account": {
-        "iban": "DE1234",
-        "bic": "BICISHERE"
-      },
-      "invoice": {
-        "invoice_number": "123456A",
-        "payout_amount": 1000,
-        "outstanding_amount": 1000,
-        "fee_amount": 10,
-        "fee_rate": 1,
-        "due_date": "1978-11-20",
-        "pending_merchant_payment_amount": null,
-        "pending_cancellation_amount": null
-      },
-      "debtor_external_data": {
-        "name": "test",
-        "address_country": "TE",
-        "address_city": "testCity",
-        "address_postal_code": "test",
-        "address_street": "test",
-        "address_house": "test",
-        "industry_sector": "test",
-        "merchant_customer_id":"ext_id"
-      },
-      "duration":30,
-      "dunning_status": null,
-      "delivery_address":{
-        "house_number":"test",
-        "street":"test",
-        "city": "test",
-        "postal_code":"test",
-        "country":"TE"
-      },
-      "billing_address":{
-        "house_number":"test",
-        "street":"test",
-        "city":"test",
-        "postal_code":"test",
-        "country":"TE"
-      },
-      "debtor_uuid":null
+        "order_id": "CO123",
+        "uuid": "test-order-uuidCO123",
+        "state": "shipped",
+        "decline_reason": null,
+        "reasons": null,
+        "amount": 1000,
+        "amount_net": 900,
+        "amount_tax": 100,
+        "unshipped_amount": 0,
+        "unshipped_amount_net": 0,
+        "unshipped_amount_tax": 0,
+        "duration": 30,
+        "dunning_status": null,
+        "debtor_company": {
+            "name": "Test User Company",
+            "address_house_number": "10",
+            "address_street": "Heinrich-Heine-Platz",
+            "address_postal_code": "10179",
+            "address_city": "Berlin",
+            "address_country": "DE"
+        },
+        "bank_account": {
+            "iban": "DE1234",
+            "bic": "BICISHERE"
+        },
+        "debtor_external_data": {
+            "merchant_customer_id": "ext_id",
+            "name": "test",
+            "address_country": "TE",
+            "address_city": "testCity",
+            "address_postal_code": "test",
+            "address_street": "test",
+            "address_house": "test",
+            "industry_sector": "test"
+        },
+        "delivery_address": {
+            "house_number": "test",
+            "street": "test",
+            "city": "test",
+            "postal_code": "test",
+            "country": "TE"
+        },
+        "billing_address": {
+            "house_number": "test",
+            "street": "test",
+            "city": "test",
+            "postal_code": "test",
+            "country": "TE"
+        },
+        "created_at": "2019-05-20T13:00:00+0200",
+        "shipped_at": null,
+        "debtor_uuid": null,
+        "workflow_name": "order_v1",
+        "invoices": [{
+            "uuid": "57ecaca2-aaf5-4c36-b41c-cea57330cb45",
+            "invoice_number": "123456A",
+            "payout_amount": 762,
+            "outstanding_amount": 1000,
+            "amount": 1000,
+            "amount_net": 900,
+            "amount_tax": 100,
+            "fee_amount": 238,
+            "fee_rate": 20,
+            "due_date": "2021-03-21",
+            "created_at": "2021-02-19",
+            "duration": 30,
+            "state": "new",
+            "pending_merchant_payment_amount": 0,
+            "pending_cancellation_amount": 0
+        }],
+        "invoice": {
+            "invoice_number": "123456A",
+            "payout_amount": 1000,
+            "outstanding_amount": 1000,
+            "fee_amount": 238,
+            "fee_rate": 20,
+            "due_date": "2019-06-19",
+            "pending_merchant_payment_amount": 0,
+            "pending_cancellation_amount": 0
+        }
     }
     """
     And the response status code should be 200

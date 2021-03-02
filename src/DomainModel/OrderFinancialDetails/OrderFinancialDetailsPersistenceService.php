@@ -27,21 +27,23 @@ class OrderFinancialDetailsPersistenceService
         int $duration
     ): void {
         $financialDetails = $orderContainer->getOrderFinancialDetails();
+        $unshippedAmount = new TaxedMoney(
+            $financialDetails->getUnshippedAmountGross(),
+            $financialDetails->getUnshippedAmountNet(),
+            $financialDetails->getUnshippedAmountTax()
+        );
 
         if ($changeSet->getAmount() !== null) {
             $amount = $changeSet->getAmount();
-            $unshippedAmount = $this->calculateUnshippedAmount($financialDetails, $changeSet->getAmount());
+
+            if (!$orderContainer->getOrder()->wasShipped()) {
+                $unshippedAmount = $this->calculateUnshippedAmount($financialDetails, $changeSet->getAmount());
+            }
         } else {
             $amount = TaxedMoneyFactory::create(
                 $financialDetails->getAmountGross(),
                 $financialDetails->getAmountNet(),
                 $financialDetails->getAmountTax()
-            );
-
-            $unshippedAmount = new TaxedMoney(
-                $financialDetails->getUnshippedAmountGross(),
-                $financialDetails->getUnshippedAmountNet(),
-                $financialDetails->getUnshippedAmountTax()
             );
         }
 
