@@ -12,8 +12,9 @@ services:
     depends_on:
       - mysql
     environment:
-      - PHP_MEMORY_LIMIT=256M
       - APP_ENV=test
+      - PHP_XDEBUG_ENABLED=false
+      - PHP_MEMORY_LIMIT=256M
       - APP_NAME=paella-core
       - APP_SECRET=abcdef0123456789abcdef0123456789
       - INSTANCE_SUFFIX=_test

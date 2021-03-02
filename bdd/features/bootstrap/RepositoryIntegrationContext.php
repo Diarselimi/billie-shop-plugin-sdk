@@ -7,7 +7,7 @@ namespace App\Tests\Functional\Context;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
-use App\Tests\Integration\Helpers\RandomDataTrait;
+use App\Tests\Helpers\RandomDataTrait;
 use Behat\Behat\Context\Context;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Symfony\Component\HttpKernel\KernelInterface;

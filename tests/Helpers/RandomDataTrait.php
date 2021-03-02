@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Integration\Helpers;
+namespace App\Tests\Helpers;
 
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\Address\AddressRepositoryInterface;
@@ -107,7 +107,7 @@ trait RandomDataTrait
 
     private function getRandomLegalForm(): array
     {
-        $json = json_decode(file_get_contents(__DIR__ . '/../../../src/Resources/legal_forms.json'), true);
+        $json = json_decode(file_get_contents(__DIR__ . '/../../src/Resources/legal_forms.json'), true);
 
         return $json['items'][array_rand($json['items'])];
     }

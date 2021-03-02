@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Tests\Integration\Tests\Infrastructure\Repository;
+namespace App\Tests\Integration\Infrastructure\Repository;
 
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingRepositoryInterface;
+use App\Tests\Helpers\RandomDataTrait;
 use App\Tests\Integration\DatabaseTestCase;
-use App\Tests\Integration\Helpers\RandomDataTrait;
 
 class MerchantRepositoryTest extends DatabaseTestCase
 {

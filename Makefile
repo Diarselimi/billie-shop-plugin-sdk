@@ -66,12 +66,17 @@ test-functional:
 
 test-integration: test-seed
 	echo " > Running integration tests... "
-	./vendor/bin/phpunit --stop-on-failure -vvv
+	./vendor/bin/phpunit --stop-on-failure -vvv tests/Integration
 
 test-unit:
 	echo " > Running unit tests... "
 	./vendor/bin/phpspec run --stop-on-failure -vvv
-	./vendor/bin/phpunit tests/Unit --stop-on-failure
+	./vendor/bin/phpunit tests/Unit --stop-on-failure -vvv
+
+test-coverage:
+	echo " > Running tests with code coverage..."
+	./vendor/bin/phpunit --stop-on-failure --testdox --colors=always -v --do-not-cache-result --coverage-html=var/tests/_output/ --coverage-clover=var/tests/_output/clover.xml --log-junit=var/tests/_output/junit.xml
+
 
 ######################## Docker-wrapped targets #################################
 local-start:
@@ -106,6 +111,11 @@ local-test-functional:
 	bin/docker/app make test-functional
 
 local-test: local-test-unit local-test-integration local-test-functional
+
+local-test-coverage:
+	bin/docker/app make test-coverage
+	open var/tests/_output/index.html
+
 ###################################################################################
 
 $(V).SILENT:

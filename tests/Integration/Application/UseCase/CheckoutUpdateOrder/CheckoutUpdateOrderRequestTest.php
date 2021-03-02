@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Integration\Tests\Application\UseCase\CheckoutUpdateOrder;
+namespace App\Tests\Integration\Application\UseCase\CheckoutUpdateOrder;
 
 use App\Application\Exception\RequestValidationException;
 use App\Application\UseCase\CheckoutUpdateOrder\CheckoutUpdateOrderRequest;
 use App\Application\UseCase\ValidatedUseCaseTrait;
-use App\Tests\Integration\Helpers\FakeDataFiller;
+use App\Tests\Helpers\FakeDataFiller;
 use App\Tests\Integration\IntegrationTestCase;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 

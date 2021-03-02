@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Integration\Tests\Application\UseCase\ResetPassword;
+namespace App\Tests\Integration\Application\UseCase\ResetPassword;
 
 use App\Application\Exception\RequestValidationException;
 use App\Application\UseCase\ResetPassword\ResetPasswordRequest;

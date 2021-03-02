@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Integration\Tests\Infrastructure\Repository;
+namespace App\Tests\Integration\Infrastructure\Repository;
 
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderInvoice\OrderInvoiceEntity;
 use App\DomainModel\OrderInvoice\OrderInvoiceRepositoryInterface;
+use App\Tests\Helpers\FakeDataFiller;
+use App\Tests\Helpers\RandomDataTrait;
 use App\Tests\Integration\DatabaseTestCase;
-use App\Tests\Integration\Helpers\FakeDataFiller;
-use App\Tests\Integration\Helpers\RandomDataTrait;
 
 class OrderRepositoryTest extends DatabaseTestCase
 {

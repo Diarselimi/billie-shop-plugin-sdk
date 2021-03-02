@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 use App\DomainModel\MerchantUser\MerchantUserDefaultRoles;
 use App\Infrastructure\Repository\MerchantRepository;
 use App\Infrastructure\Repository\MerchantUserRoleRepository;
 use Phinx\Seed\AbstractSeed;
 use Ramsey\Uuid\Uuid;
 
-class Seed002AddMerchantRoles extends AbstractSeed
+class Seed003AddMerchantRoles extends AbstractSeed
 {
     private const FIRST_ADMIN_ROLE_UUID = '4c3fbc94-79bc-48ca-be55-b93d6cd833bd';
 
@@ -29,21 +31,25 @@ class Seed002AddMerchantRoles extends AbstractSeed
                     $uuid = Uuid::uuid4();
                 }
 
-                $table->insert([
-                    'uuid' => $uuid,
-                    'merchant_id' => $merchant['id'],
-                    'name' => $role['name'],
-                    'permissions' => json_encode($role['permissions']),
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ])->save();
+                $table->insert(
+                    [
+                        'uuid' => $uuid,
+                        'merchant_id' => $merchant['id'],
+                        'name' => $role['name'],
+                        'permissions' => json_encode($role['permissions']),
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ]
+                )->save();
             }
         }
     }
 
     private function merchantHasRoles($merchantId): bool
     {
-        $stmt = $this->query("SELECT id FROM " . MerchantUserRoleRepository::TABLE_NAME . " WHERE merchant_id='{$merchantId}'");
+        $stmt = $this->query(
+            "SELECT id FROM " . MerchantUserRoleRepository::TABLE_NAME . " WHERE merchant_id='{$merchantId}'"
+        );
 
         return $stmt ? (bool) $stmt->fetch() : false;
     }

@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Integration\Tests\Application\UseCase\CheckoutConfirmOrder;
+namespace App\Tests\Integration\Application\UseCase\CheckoutConfirmOrder;
 
 use App\Application\Exception\RequestValidationException;
 use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmOrderRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\DebtorCompany\DebtorCompanyRequest;
-use App\Tests\Integration\Helpers\FakeDataFiller;
-use App\Tests\Integration\Helpers\RandomDataTrait;
+use App\Tests\Helpers\FakeDataFiller;
+use App\Tests\Helpers\RandomDataTrait;
 use App\Tests\Integration\IntegrationTestCase;
 use Ozean12\Money\Money;
 use Ozean12\Money\TaxedMoney\TaxedMoney;

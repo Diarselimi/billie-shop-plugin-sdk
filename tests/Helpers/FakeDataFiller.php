@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Integration\Helpers;
+namespace App\Tests\Helpers;
 
 use Faker\Factory;
 use Ozean12\Money\Money;
@@ -20,7 +20,7 @@ trait FakeDataFiller
             if (str_contains($method, 'set')) {
                 try {
                     $methodReflection = $objectReflection->getMethod($method);
-                    list($firstParam) = $methodReflection->getParameters();
+                    [$firstParam] = $methodReflection->getParameters();
                 } catch (\Exception $e) {
                     continue;
                 }
