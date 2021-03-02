@@ -11,11 +11,11 @@ use App\DomainModel\DebtorCompany\DebtorCreationDTO;
 use App\DomainModel\DebtorCompany\IdentifyDebtorRequestDTO;
 use App\DomainModel\DebtorCompany\IdentifyDebtorResponseDTO;
 use App\DomainModel\DebtorCompany\IdentifyDebtorResponseDTOFactory;
-use App\DomainModel\DebtorCompany\NullMostSimilarCandidateDTO;
 use App\DomainModel\ExternalDebtorResponse\ExternalDebtorFactory;
 use App\DomainModel\IdentityVerification\IdentityVerificationCaseDTO;
 use App\DomainModel\IdentityVerification\IdentityVerificationCaseDTOFactory;
 use App\DomainModel\MerchantDebtor\MerchantDebtorDuplicateDTO;
+use App\DomainModel\SignatoryPower\SignatoryPowerAlreadySignedException;
 use App\DomainModel\SignatoryPower\SignatoryPowerDTO;
 use App\DomainModel\SignatoryPower\SignatoryPowerDTOFactory;
 use App\DomainModel\SignatoryPower\SignatoryPowerSelectionDTO;
@@ -319,6 +319,10 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
     {
         try {
             $this->client->post("signatory-powers/{$signatoryPowerUuid}/accept-tc");
+        } catch (ClientException $exception) {
+            if ($exception->getCode() === Response::HTTP_CONFLICT) {
+                throw new SignatoryPowerAlreadySignedException();
+            }
         } catch (TransferException $exception) {
             throw new CompaniesServiceRequestException($exception);
         }

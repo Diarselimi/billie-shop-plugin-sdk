@@ -13,10 +13,13 @@ use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepNotFoundException;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepTransitionEntity;
 use App\DomainModel\MerchantOnboarding\MerchantStepTransitionService;
 use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
+use App\DomainModel\SignatoryPower\SignatoryPowerAlreadySignedException;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
-class SignatoryPowersSelectionUseCase implements ValidatedUseCaseInterface
+class SignatoryPowersSelectionUseCase implements ValidatedUseCaseInterface, LoggingInterface
 {
-    use ValidatedUseCaseTrait;
+    use ValidatedUseCaseTrait, LoggingTrait;
 
     private $companiesService;
 
@@ -64,7 +67,14 @@ class SignatoryPowersSelectionUseCase implements ValidatedUseCaseInterface
                 $loggedInSignatory->getUuid()
             );
 
-            $this->companiesService->acceptSignatoryPowerTc($loggedInSignatory->getUuid());
+            try {
+                $this->companiesService->acceptSignatoryPowerTc($loggedInSignatory->getUuid());
+            } catch (SignatoryPowerAlreadySignedException $exception) {
+                $this->logWarning(
+                    'Signatory already signed',
+                    [LoggingInterface::KEY_UUID => $loggedInSignatory->getUuid()]
+                );
+            }
 
             if ($selectionsRequest->getMerchantUser()->getIdentityVerificationCaseUuid()) {
                 $this->companiesService->assignIdentityVerificationCase(
