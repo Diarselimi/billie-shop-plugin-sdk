@@ -3,6 +3,7 @@
 namespace App\Http\Controller\PublicApi;
 
 use App\Application\Exception\OrderNotFoundException;
+use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\CancelOrder\CancelOrderException;
 use App\Application\UseCase\CancelOrder\CancelOrderRequest;
 use App\Application\UseCase\CancelOrder\CancelOrderUseCase;
@@ -35,7 +36,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class CancelOrderController
 {
-    private $useCase;
+    private CancelOrderUseCase $useCase;
 
     public function __construct(CancelOrderUseCase $useCase)
     {
@@ -50,7 +51,7 @@ class CancelOrderController
                 $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID)
             );
             $this->useCase->execute($orderRequest);
-        } catch (CancelOrderException $e) {
+        } catch (CancelOrderException | WorkflowException $e) {
             throw new AccessDeniedHttpException($e->getMessage());
         } catch (OrderNotFoundException $e) {
             throw new NotFoundHttpException($e->getMessage());

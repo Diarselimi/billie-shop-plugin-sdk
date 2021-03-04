@@ -6,13 +6,17 @@ use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\CancelOrder\CancelOrderException;
 use App\Application\UseCase\CancelOrder\CancelOrderRequest;
 use App\Application\UseCase\CancelOrder\CancelOrderUseCase;
+use App\DomainModel\Invoice\CreditNote\InvoiceCreditNoteAnnouncer;
+use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\Payment\PaymentsServiceInterface;
+use Ozean12\Money\Money;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
@@ -36,6 +40,7 @@ class CancelOrderUseCaseSpec extends ObjectBehavior
         OrderContainerFactory $orderContainerFactory,
         MerchantRepositoryInterface $merchantRepository,
         Registry $workflowRegistry,
+        InvoiceCreditNoteAnnouncer $invoiceCreditNoteAnnouncer,
         Workflow $workflow,
         LoggerInterface $logger,
         CancelOrderRequest $request,
@@ -45,6 +50,7 @@ class CancelOrderUseCaseSpec extends ObjectBehavior
         $this->beConstructedWith(...func_get_args());
         $this->setLogger($logger);
 
+        $order->isWorkflowV2()->willReturn(false);
         $request->getOrderId()->willReturn(self::ORDER_UUID);
         $request->getMerchantId()->willReturn(self::MERCHANT_ID);
 
@@ -105,6 +111,7 @@ class CancelOrderUseCaseSpec extends ObjectBehavior
         OrderContainerFactory $orderContainerFactory,
         CancelOrderRequest $request,
         Workflow $workflow,
+        InvoiceCreditNoteAnnouncer $invoiceCreditNoteAnnouncer,
         OrderEntity $order,
         OrderContainer $orderContainer
     ) {
@@ -134,7 +141,53 @@ class CancelOrderUseCaseSpec extends ObjectBehavior
 
         $limitsService->unlock($orderContainer)->shouldNotBeCalled();
         $paymentsService->cancelOrder($order)->shouldNotBeCalled();
+        $invoiceCreditNoteAnnouncer->create(Argument::cetera())->shouldNotBeCalled();
         $workflow->apply($order, OrderEntity::TRANSITION_CANCEL_WAITING)->shouldBeCalledOnce();
+
+        $this->execute($request);
+    }
+
+    public function it_cancels_shipped_order_state(
+        MerchantDebtorLimitsService $limitsService,
+        PaymentsServiceInterface $paymentsService,
+        OrderContainerFactory $orderContainerFactory,
+        CancelOrderRequest $request,
+        Workflow $workflow,
+        InvoiceCreditNoteAnnouncer $invoiceCreditNoteAnnouncer,
+        OrderEntity $order,
+        OrderContainer $orderContainer,
+        Invoice $invoice,
+        OrderFinancialDetailsEntity $orderFinancialDetails
+    ) {
+        $orderContainerFactory
+            ->loadByMerchantIdAndExternalIdOrUuid(self::MERCHANT_ID, self::ORDER_UUID)
+            ->shouldBeCalled()
+            ->willReturn($orderContainer)
+        ;
+
+        $workflow
+            ->can($order, 'cancel')
+            ->shouldBeCalledOnce()
+            ->willReturn(false)
+        ;
+
+        $workflow
+            ->can($order, 'cancel_shipped')
+            ->shouldBeCalledOnce()
+            ->willReturn(true)
+        ;
+
+        $orderFinancialDetails->getAmountGross()->willReturn(new Money());
+        $orderFinancialDetails->getAmountNet()->willReturn(new Money());
+        $orderFinancialDetails->getAmountTax()->willReturn(new Money());
+
+        $invoice->getExternalCode()->willReturn('CORE');
+        $limitsService->unlock($orderContainer)->shouldNotBeCalled();
+        $paymentsService->cancelOrder($order)->shouldBeCalled();
+        $orderContainer->getInvoices()->willReturn([$invoice]);
+        $orderContainer->getOrderFinancialDetails()->willReturn($orderFinancialDetails);
+        $invoiceCreditNoteAnnouncer->create(Argument::cetera())->shouldBeCalled();
+        $workflow->apply($order, OrderEntity::TRANSITION_CANCEL_SHIPPED)->shouldBeCalledOnce();
 
         $this->execute($request);
     }

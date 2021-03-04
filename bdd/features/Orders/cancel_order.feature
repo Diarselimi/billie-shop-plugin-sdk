@@ -26,6 +26,7 @@ Feature:
     And I get from payments service get order details not found response
     And I get from payments service create ticket response
     And I get from companies service identify match response
+    And I get from invoice-butler service good response
     When I send a POST request to "/order/CO123/ship" with body:
     """
     {
@@ -68,6 +69,7 @@ Feature:
     Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
     And I get from payments service get order details response
     And I get from payments service modify ticket response
+    And I get from invoice-butler service good response
     When I send a POST request to "/order/CO123/cancel"
     Then the response status code should be 204
     And the response should be empty

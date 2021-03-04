@@ -25,6 +25,7 @@ ozean12_amqp_pack:
       delay: 15000
     invoice.create_invoice: Ozean12\Transfer\Message\Invoice\CreateInvoice
     invoice.extend_invoice: Ozean12\Transfer\Message\Invoice\ExtendInvoice
+    credit_note.create_credit_note: Ozean12\Transfer\Message\CreditNote\CreateCreditNote
     document.document_uploaded:
       class: Ozean12\Transfer\Message\Document\DocumentUploaded
       delay: 5000
