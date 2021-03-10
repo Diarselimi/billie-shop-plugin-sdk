@@ -4,6 +4,9 @@ namespace App\DomainModel\OrderPayments;
 
 use App\Support\PaginationFilterInterface;
 
+/**
+ * @deprecated we won't filter them anymore by type, in invoice payments response
+ */
 class OrderPaymentsResponseFilter implements PaginationFilterInterface
 {
     public function check(array $item): bool

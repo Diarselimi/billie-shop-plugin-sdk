@@ -2,6 +2,7 @@
 
 namespace App\DomainModel\OrderPayments;
 
+use App\DomainModel\Payment\BankTransaction;
 use App\Support\DateFormat;
 use OpenApi\Annotations as OA;
 
@@ -14,14 +15,16 @@ use OpenApi\Annotations as OA;
  *      @OA\Property(property="transaction_uuid", ref="#/components/schemas/UUID"),
  *      @OA\Property(property="debtor_name", type="string")
  * })
+ * @deprecated use BankTransaction
+ * @see BankTransaction
  */
 class OrderPaymentDTO
 {
-    public const PAYMENT_TYPE_INVOICE_PAYBACK = 'invoice_payback';
+    public const PAYMENT_TYPE_INVOICE_PAYBACK = BankTransaction::TYPE_INVOICE_PAYBACK;
 
-    public const PAYMENT_STATE_NEW = 'new';
+    public const PAYMENT_STATE_NEW = BankTransaction::STATE_NEW;
 
-    public const PAYMENT_STATE_COMPLETE = 'complete';
+    public const PAYMENT_STATE_COMPLETE = BankTransaction::STATE_COMPLETE;
 
     private $createdAt;
 

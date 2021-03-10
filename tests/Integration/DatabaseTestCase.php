@@ -9,7 +9,7 @@ use Billie\PdoBundle\Infrastructure\Pdo\PdoConnection;
 
 abstract class DatabaseTestCase extends IntegrationTestCase
 {
-    private $connection;
+    private PdoConnection $connection;
 
     protected function getConnection(): PdoConnection
     {

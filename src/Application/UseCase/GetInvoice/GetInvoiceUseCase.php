@@ -7,6 +7,8 @@ namespace App\Application\UseCase\GetInvoice;
 use App\Application\Exception\InvoiceNotFoundException;
 use App\Application\UseCase\GetInvoice\Factory\GetInvoiceResponseFactory;
 use App\DomainModel\Invoice\InvoiceServiceInterface;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
+use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 
 class GetInvoiceUseCase
@@ -17,14 +19,21 @@ class GetInvoiceUseCase
 
     private OrderRepositoryInterface $orderRepository;
 
+    /**
+     * @var OrderContainerFactory
+     */
+    private OrderContainerFactory $orderContainerFactory;
+
     public function __construct(
         InvoiceServiceInterface $invoiceButler,
         GetInvoiceResponseFactory $responseFactory,
-        OrderRepositoryInterface $orderRepository
+        OrderRepositoryInterface $orderRepository,
+        OrderContainerFactory $orderContainerFactory
     ) {
         $this->invoiceButler = $invoiceButler;
         $this->responseFactory = $responseFactory;
         $this->orderRepository = $orderRepository;
+        $this->orderContainerFactory = $orderContainerFactory;
     }
 
     public function execute(GetInvoiceRequest $request): GetInvoiceResponse
@@ -40,7 +49,11 @@ class GetInvoiceUseCase
         }
 
         $orders = $this->orderRepository->getByInvoice($invoice->getUuid());
+        $orderContainers = array_map(
+            fn (OrderEntity $order) => $this->orderContainerFactory->createFromOrderEntity($order),
+            $orders
+        );
 
-        return $this->responseFactory->create($invoice, $orders);
+        return $this->responseFactory->create($invoice, $orderContainers);
     }
 }

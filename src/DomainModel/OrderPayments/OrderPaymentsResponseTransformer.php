@@ -2,8 +2,13 @@
 
 namespace App\DomainModel\OrderPayments;
 
+use App\DomainModel\Payment\BankTransactionFactory;
 use App\Support\PaginatedCollection;
 
+/**
+ * @deprecated use BankTransactionFactory
+ * @see BankTransactionFactory
+ */
 class OrderPaymentsResponseTransformer
 {
     private $filter;

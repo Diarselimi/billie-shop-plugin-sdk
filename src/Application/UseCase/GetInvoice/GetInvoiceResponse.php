@@ -10,28 +10,34 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Schema(schema="GetInvoiceResponse", title="Get Invoice Response", type="object", properties={
+ *      @OA\Property(property="uuid", ref="#/components/schemas/UUID"),
  *      @OA\Property(property="invoice_number", ref="#/components/schemas/TinyText", nullable=true),
- *      @OA\Property(property="payout_amount", type="number", format="float", nullable=false),
  *      @OA\Property(property="duration", type="number", nullable=false),
+ *      @OA\Property(property="payout_amount", type="number", format="float", nullable=false),
  *      @OA\Property(property="amount", type="number", format="float", nullable=false),
  *      @OA\Property(property="amount_net", type="number", format="float", nullable=false),
  *      @OA\Property(property="amount_tax", type="number", format="float", nullable=false),
  *      @OA\Property(property="outstanding_amount", type="number", format="float", nullable=false),
- *      @OA\Property(property="pending_merchant_payment_amount", type="number", format="float", nullable=false),
- *      @OA\Property(property="pending_cancellation_amount", type="number", format="float", nullable=false),
  *      @OA\Property(property="fee_amount", type="number", format="float", nullable=false),
  *      @OA\Property(property="fee_rate", type="number", format="float", nullable=false),
  *      @OA\Property(property="created_at", type="string", format="date", nullable=false, example="2019-03-20"),
  *      @OA\Property(property="due_date", type="string", format="date", nullable=false, example="2019-03-20"),
+ *      @OA\Property(property="pending_merchant_payment_amount", type="number", format="float", nullable=false),
+ *      @OA\Property(property="pending_cancellation_amount", type="number", format="float", nullable=false),
  *      @OA\Property(property="state", type="string", nullable=true, example="created"),
  *      @OA\Property(property="orders", type="array", @OA\Items(type="object", properties={
  *          @OA\Property(property="uuid", ref="#/components/schemas/UUID"),
  *          @OA\Property(property="external_code", type="string", nullable=true, example="C-10123456789-0001"),
+ *          @OA\Property(property="amount", type="number", format="float", nullable=false),
+ *          @OA\Property(property="amount_net", type="number", format="float", nullable=false),
+ *          @OA\Property(property="amount_tax", type="number", format="float", nullable=false),
  *     }))
  * })
  */
 class GetInvoiceResponse implements ArrayableInterface
 {
+    private string $uuid;
+
     private string $invoiceNumber;
 
     private int $duration;
@@ -94,6 +100,18 @@ class GetInvoiceResponse implements ArrayableInterface
         $this->dueDate = $dueDate;
         $this->state = $state;
         $this->ordersResponse = $ordersResponse;
+    }
+
+    public function getUuid(): string
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid(string $uuid): self
+    {
+        $this->uuid = $uuid;
+
+        return $this;
     }
 
     public function getInvoiceNumber(): string
@@ -169,6 +187,7 @@ class GetInvoiceResponse implements ArrayableInterface
     public function toArray(): array
     {
         return [
+            'uuid' => $this->getUuid(),
             'invoice_number' => $this->getInvoiceNumber(),
             'duration' => $this->getDuration(),
             'payout_amount' => $this->getPayoutAmount(),

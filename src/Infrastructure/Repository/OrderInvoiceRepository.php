@@ -27,16 +27,19 @@ class OrderInvoiceRepository extends AbstractPdoRepository implements OrderInvoi
 
     public function insert(OrderInvoiceEntity $orderInvoiceEntity): OrderInvoiceEntity
     {
-        $id = $this->doInsert('
+        $id = $this->doInsert(
+            '
             INSERT INTO ' . self::TABLE_NAME . '
             (order_id, invoice_uuid, created_at)
             VALUES
             (:order_id, :invoice_uuid, :created_at)
-        ', [
-            'order_id' => $orderInvoiceEntity->getOrderId(),
-            'invoice_uuid' => $orderInvoiceEntity->getInvoiceUuid(),
-            'created_at' => $orderInvoiceEntity->getCreatedAt()->format(self::DATE_FORMAT),
-        ]);
+        ',
+            [
+                'order_id' => $orderInvoiceEntity->getOrderId(),
+                'invoice_uuid' => $orderInvoiceEntity->getInvoiceUuid(),
+                'created_at' => $orderInvoiceEntity->getCreatedAt()->format(self::DATE_FORMAT),
+            ]
+        );
 
         $orderInvoiceEntity->setId($id);
 

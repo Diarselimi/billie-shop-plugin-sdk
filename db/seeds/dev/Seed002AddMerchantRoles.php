@@ -29,21 +29,25 @@ class Seed002AddMerchantRoles extends AbstractSeed
                     $uuid = Uuid::uuid4();
                 }
 
-                $table->insert([
-                    'uuid' => $uuid,
-                    'merchant_id' => $merchant['id'],
-                    'name' => $role['name'],
-                    'permissions' => json_encode($role['permissions']),
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ])->save();
+                $table->insert(
+                    [
+                        'uuid' => $uuid,
+                        'merchant_id' => $merchant['id'],
+                        'name' => $role['name'],
+                        'permissions' => json_encode($role['permissions']),
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ]
+                )->save();
             }
         }
     }
 
     private function merchantHasRoles($merchantId): bool
     {
-        $stmt = $this->query("SELECT id FROM " . MerchantUserRoleRepository::TABLE_NAME . " WHERE merchant_id='{$merchantId}'");
+        $stmt = $this->query(
+            "SELECT id FROM " . MerchantUserRoleRepository::TABLE_NAME . " WHERE merchant_id='{$merchantId}'"
+        );
 
         return $stmt ? (bool) $stmt->fetch() : false;
     }

@@ -193,6 +193,9 @@ trait RandomDataTrait
     private function generateSomeFailingOrderRiskChecks(int $orderId): array
     {
         $riskChecks = $this->getRiskChecksDefinitionsFromSeed();
+        if (empty($riskChecks)) {
+            throw new \RuntimeException('Risk check generation failed: The risk_check_definitions table is empty.');
+        }
         $uniqueFailedRiskChecks = [];
 
         foreach ($riskChecks as $check) {

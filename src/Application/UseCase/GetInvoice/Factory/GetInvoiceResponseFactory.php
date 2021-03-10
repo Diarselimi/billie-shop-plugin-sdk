@@ -6,13 +6,13 @@ namespace App\Application\UseCase\GetInvoice\Factory;
 
 use App\Application\UseCase\GetInvoice\GetInvoiceResponse;
 use App\DomainModel\Invoice\Invoice;
-use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
 
 class GetInvoiceResponseFactory
 {
-    public function create(Invoice $invoice, array $orders): GetInvoiceResponse
+    public function create(Invoice $invoice, array $orderContainers): GetInvoiceResponse
     {
-        return new GetInvoiceResponse(
+        return (new GetInvoiceResponse(
             $invoice->getExternalCode(),
             $invoice->getDuration(),
             $invoice->getPayoutAmount()->toFloat(),
@@ -27,17 +27,29 @@ class GetInvoiceResponseFactory
             $invoice->getCreatedAt(),
             $invoice->getDueDate(),
             $invoice->getState(),
-            $this->createOrdersResponse($orders)
-        );
+            $this->createOrdersResponse($orderContainers)
+        ))->setUuid($invoice->getUuid());
     }
 
-    private function createOrdersResponse(array $orders): array
+    /**
+     * @param  OrderContainer[] $orderContainers
+     * @return array[]
+     */
+    private function createOrdersResponse(array $orderContainers): array
     {
-        return array_map(function (OrderEntity $order) {
-            return [
-                'uuid' => $order->getUuid(),
-                'external_code' => $order->getExternalCode(),
-            ];
-        }, $orders);
+        return array_map(
+            function (OrderContainer $orderContainer) {
+                $financialDetails = $orderContainer->getOrderFinancialDetails();
+
+                return [
+                    'uuid' => $orderContainer->getOrder()->getUuid(),
+                    'external_code' => $orderContainer->getOrder()->getExternalCode(),
+                    'amount' => $financialDetails->getAmountGross()->getMoneyValue(),
+                    'amount_net' => $financialDetails->getAmountNet()->getMoneyValue(),
+                    'amount_tax' => $financialDetails->getAmountTax()->getMoneyValue(),
+                ];
+            },
+            $orderContainers
+        );
     }
 }

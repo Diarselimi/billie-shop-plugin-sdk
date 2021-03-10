@@ -31,15 +31,29 @@ cd paella-core && \
 make
 ```
 
-## Order State Workflow
+## State Workflows
 
-![orders_workflow](src/Resources/docs/orders-workflow.png)
+> To update the diagrams, run the following (requires PHP and `graphviz`):
+> ```bash
+> bin/generate-workflow-diagram
+> ```
 
-To update the diagram, run the following (requires `graphviz`): 
+### Orders Workflow (v1)
 
-```bash
-bin/generate-workflow-diagram
-```
+![orders_workflow](src/Resources/docs/orders-workflow-v1.png)
+
+### Orders Workflow (v2)
+
+![orders_workflow_v2](src/Resources/docs/orders-workflow-v2.png)
+
+### Merchant Onboarding Workflow
+
+![orders_workflow_v2](src/Resources/docs/merchant_onboarding-workflow.png)
+
+### Merchant Onboarding Step Workflow
+
+![orders_workflow_v2](src/Resources/docs/merchant_onboarding_step-workflow.png)
+
 
 ## Usage
 

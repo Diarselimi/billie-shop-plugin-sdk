@@ -38,7 +38,18 @@ default:
   extensions:
     Behatch\Extension: ~
     JsonSpec\Behat\Extension:
-      excluded_keys: [id, uuid, created_at, updated_at, shipped_at, due_date, invitation_token, api_key, payment_merchant_id, investor_uuid, company_uuid]
+      excluded_keys:
+        - id
+        - uuid
+        - created_at
+        - updated_at
+        - shipped_at
+        - due_date
+        - invitation_token
+        - api_key
+        - payment_merchant_id
+        - investor_uuid
+        - company_uuid
       json_directory: '%paths.base%/bdd/features/resources'
     Behat\MinkExtension:
       base_url: 'http://paella-behat' # Fake URL (see HttpKernelBrowser usage in PaellaCoreContext)

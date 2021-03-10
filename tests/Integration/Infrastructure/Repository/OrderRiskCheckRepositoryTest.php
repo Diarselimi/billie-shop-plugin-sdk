@@ -22,12 +22,6 @@ class OrderRiskCheckRepositoryTest extends DatabaseTestCase
         $failedChecks = $this->generateSomeFailingOrderRiskChecks($order->getId());
         $this->passRiskChecksForOrder($failedChecks);
 
-        $this->assertNotEmpty(
-            $failedChecks,
-            "Unexpected: \$failedChecks is empty.
-            risk_check_definitions table is possibly empty too. Was the table truncated after migrations?"
-        );
-
         $riskCheckToFail = array_shift($failedChecks);
 
         $this->failRiskChecksForOrder([$riskCheckToFail]);

@@ -11,5 +11,5 @@ interface PaymentsRepositoryInterface
 
     public function searchMerchantPayments(SearchPaymentsDTO $paymentsDTO): PaginatedCollection;
 
-    public function getOrderPayments(string $orderPaymentUuid): PaginatedCollection;
+    public function getTicketPayments(string $paymentTicketUuid): PaginatedCollection;
 }

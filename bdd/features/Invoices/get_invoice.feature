@@ -15,7 +15,6 @@ Feature: Get invoice from invoice-butler
       | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
     When I send a GET request to "/invoices/208cfe7d-046f-4162-b175-748942d6cff4"
     Then the response status code should be 200
-    And print last JSON response
     And the JSON response should be:
     """
     {
@@ -34,7 +33,10 @@ Feature: Get invoice from invoice-butler
         "orders": [
             {
                 "uuid": "test-order-uuidABCDE",
-                "external_code": "ABCDE"
+                "external_code": "ABCDE",
+                "amount": 1000,
+                "amount_net": 900,
+                "amount_tax": 100
             }
         ],
         "invoice_number": "some_code",

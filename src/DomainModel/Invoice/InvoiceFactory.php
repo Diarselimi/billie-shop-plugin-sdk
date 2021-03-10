@@ -74,6 +74,7 @@ class InvoiceFactory extends AbstractFactory
 
         return (new Invoice())
             ->setUuid($data['uuid'])
+            ->setPaymentUuid($data['payment_uuid'])
             ->setAmount((new TaxedMoney($grossAmount, $netAmount, $taxAmount)))
             ->setOutstandingAmount(new Money($data['outstanding_amount'], 0))
             ->setPayoutAmount(new Money($data['payout_amount'], 0))

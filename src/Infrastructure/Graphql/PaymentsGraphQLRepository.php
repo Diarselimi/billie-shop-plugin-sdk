@@ -16,7 +16,7 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
 
     private const GET_PAYMENT_DETAILS_QUERY = 'get_merchant_payment_details';
 
-    private const GET_ORDER_PAYMENTS_QUERY = 'get_order_payments';
+    private const GET_TICKET_PAYMENTS_QUERY = 'get_ticket_payments';
 
     public function searchMerchantPayments(SearchPaymentsDTO $paymentsDTO): PaginatedCollection
     {
@@ -62,10 +62,10 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
         return empty($response) ? [] : $response[0];
     }
 
-    public function getOrderPayments(string $orderPaymentUuid): PaginatedCollection
+    public function getTicketPayments(string $paymentTicketUuid): PaginatedCollection
     {
         $params = [
-            'ticketUuid' => $orderPaymentUuid,
+            'ticketUuid' => $paymentTicketUuid,
             'offset' => '0',
             'limit' => '100',
             'sortBy' => 'transaction_date',
@@ -73,7 +73,7 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
             'searchString' => null,
         ];
 
-        $result = $this->query(self::GET_ORDER_PAYMENTS_QUERY, $params);
+        $result = $this->query(self::GET_TICKET_PAYMENTS_QUERY, $params);
 
         return new PaginatedCollection($result, count($result));
     }

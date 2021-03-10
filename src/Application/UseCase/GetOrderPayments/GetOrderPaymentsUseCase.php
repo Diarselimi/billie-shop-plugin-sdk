@@ -8,6 +8,9 @@ use App\DomainModel\Payment\PaymentsRepositoryInterface;
 use App\Infrastructure\Repository\OrderRepository;
 use App\Support\PaginatedCollection;
 
+/**
+ * @deprecated replaced by GetInvoicePaymentsUseCase
+ */
 class GetOrderPaymentsUseCase
 {
     private $orderRepository;
@@ -36,7 +39,7 @@ class GetOrderPaymentsUseCase
 
         $result = new PaginatedCollection([], 0);
         if ($order->getPaymentId()) {
-            $result = $this->paymentsRepository->getOrderPayments($order->getPaymentId());
+            $result = $this->paymentsRepository->getTicketPayments($order->getPaymentId());
         }
 
         return $this->orderPaymentsTransformer->transformPaymentsCollection($result);

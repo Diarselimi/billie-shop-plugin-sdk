@@ -16,13 +16,14 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="items", type="array", description="Order payment item",
  *      @OA\Items(ref="#/components/schemas/OrderPaymentDTO")),
  *     @OA\Property(property="total", type="integer", description="Total number of results"),
- * })
+ * }, deprecated=true)
  *
  * @OA\Get(
  *     path="/order/{uuid}/payments",
  *     operationId="get_order_payments",
  *     summary="Get Order Payments",
  *     security={{"oauth2"={}}},
+ *     deprecated=true,
  *
  *     tags={"Order Management"},
  *     x={"groups":{"private"}},
@@ -43,6 +44,8 @@ use OpenApi\Annotations as OA;
  *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
  *     @OA\Response(response=500, ref="#/components/responses/ServerError")
  * )
+ *
+ * @deprecated replaced by GetInvoicePaymentsUseCase
  */
 class GetOrderPaymentsController
 {

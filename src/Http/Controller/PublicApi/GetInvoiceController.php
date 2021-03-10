@@ -9,8 +9,10 @@ use App\Application\UseCase\GetInvoice\GetInvoiceRequest;
 use App\Application\UseCase\GetInvoice\GetInvoiceResponse;
 use App\Application\UseCase\GetInvoice\GetInvoiceUseCase;
 use App\Http\Authentication\UserProvider;
+use App\Http\HttpConstantsInterface;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -37,15 +39,17 @@ class GetInvoiceController
 
     private UserProvider $userProvider;
 
-    public function __construct(GetInvoiceUseCase $useCase, UserProvider $userProvider)
+    public function __construct(GetInvoiceUseCase $useCase)
     {
         $this->useCase = $useCase;
-        $this->userProvider = $userProvider;
     }
 
-    public function execute(string $uuid): GetInvoiceResponse
+    public function execute(string $uuid, Request $request): GetInvoiceResponse
     {
-        $useCaseRequest = new GetInvoiceRequest($uuid, $this->userProvider->getUser()->getMerchant()->getId());
+        $useCaseRequest = new GetInvoiceRequest(
+            $uuid,
+            $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID)
+        );
 
         try {
             return $this->useCase->execute($useCaseRequest);

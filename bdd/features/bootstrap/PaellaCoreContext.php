@@ -853,6 +853,19 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
+     * @Given a merchant user exists with permissions:
+     */
+    public function aMerchantUserExistsWithPermissions(TableNode $table)
+    {
+        $permissions = [];
+        foreach ($table as $row) {
+            $permissions[] = $row['permission'];
+        }
+        $role = $this->createRole('test', 'test_uuid', $permissions);
+        $this->createUser($role->getId());
+    }
+
+    /**
      * @Given a merchant user exists with permission :permission and identity verification case uuid :invitationCaseUuid
      */
     public function aMerchantUserExistsWithPermissionAndIdentifcationCase(string $permission, string $identityVerificationCaseUuid)
