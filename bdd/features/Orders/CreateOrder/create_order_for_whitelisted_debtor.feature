@@ -37,7 +37,6 @@ Feature:
       | debtor_blacklisted        | 1       | 1                  |
       | debtor_overdue            | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
-    And GraphQL will respond to getMerchantDebtorDetails query
 
   Scenario: Successful order creation for whitelisted debtor
     Given I get from companies service get debtor response

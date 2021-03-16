@@ -269,8 +269,7 @@ class OrderResponseFactory
             ->setUuid($order->getUuid())
             ->setState($order->getState())
             ->setCreatedAt($order->getCreatedAt())
-            ->setShippedAt($order->getShippedAt())
-            ->setWorkflowName($order->getWorkflowName());
+            ->setShippedAt($order->getShippedAt());
     }
 
     /**

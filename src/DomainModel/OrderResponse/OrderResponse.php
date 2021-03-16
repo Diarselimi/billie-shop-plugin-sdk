@@ -49,7 +49,6 @@ use Ozean12\Money\TaxedMoney\TaxedMoney;
  *      @OA\Property(property="created_at", ref="#/components/schemas/DateTime"),
  *      @OA\Property(property="shipped_at", ref="#/components/schemas/DateTime"),
  *      @OA\Property(property="debtor_uuid", ref="#/components/schemas/UUID"),
- *      @OA\Property(property="workflow_name", type="string", example="order_v1"),
  * })
  *
  */

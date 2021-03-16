@@ -1220,9 +1220,6 @@ components:
           $ref: '#/components/schemas/DateTime'
         debtor_uuid:
           $ref: '#/components/schemas/UUID'
-        workflow_name:
-          type: string
-          example: order_v1
       type: object
     ErrorsObject:
       title: 'API Errors'
