@@ -14,6 +14,12 @@ eight_points_guzzle:
         timeout: 1
         headers:
           Content-Type: "application/json"
+      plugin:
+        retry:
+          retry_enabled: true
+          max_retry_attempts: 3
+          retry_on_status: [ 404 ]
+          default_retry_multiplier: 0.25 #250ms, 500ms, 750ms
     smaug:
       base_url: "%env(string:SMAUG_URL)%"
       options:

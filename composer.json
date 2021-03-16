@@ -12,6 +12,7 @@
         "aws/aws-sdk-php-symfony": "^2.2",
         "billie/monitoring-bundle": "^3.0",
         "billie/pdo-bundle": "^2.1",
+        "caseyamcl/guzzle_retry_middleware": "^2.6",
         "doctrine/annotations": "^1.10",
         "egulias/email-validator": "^2.1",
         "eightpoints/guzzle-bundle": "^8.1",

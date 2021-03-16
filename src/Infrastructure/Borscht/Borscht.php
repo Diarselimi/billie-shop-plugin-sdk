@@ -41,7 +41,7 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
     public function getDebtorPaymentDetails(string $debtorPaymentId): DebtorPaymentDetailsDTO
     {
         try {
-            $response = $this->client->get("debtor/{$debtorPaymentId}.json");
+            $response = $this->client->get("debtor/{$debtorPaymentId}.json", ['retry_enabled' => false]);
 
             $decodedResponse = $this->decodeResponse($response);
 
@@ -105,6 +105,7 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
         try {
             $this->client->delete('order.json', [
                 'json' => $json,
+                'retry_enabled' => false,
             ]);
         } catch (TransferException $exception) {
             throw new PaymentsServiceRequestException($exception);
@@ -121,7 +122,7 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
         ]);
 
         try {
-            $this->client->put('order.json', ['json' => $requestDTO->toArray()]);
+            $this->client->put('order.json', ['json' => $requestDTO->toArray(), 'retry_enabled' => false]);
         } catch (TransferException $exception) {
             throw new PaymentsServiceRequestException($exception);
         }
@@ -136,6 +137,7 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
         try {
             $this->client->post('merchant/payment.json', [
                 'json' => $requestDTO->toArray(),
+                'retry_enabled' => false,
             ]);
         } catch (TransferException $exception) {
             throw new PaymentsServiceRequestException($exception);
@@ -155,6 +157,7 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
                 'on_stats' => function (TransferStats $stats) {
                     $this->logServiceRequestStats($stats, 'create_borscht_debtor');
                 },
+                'retry_enabled' => false,
             ]);
 
             $decodedResponse = $this->decodeResponse($response);
@@ -170,7 +173,7 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
     public function createFraudReclaim(string $orderPaymentId): void
     {
         try {
-            $this->client->post("order/$orderPaymentId/fraud-reclaim.json");
+            $this->client->post("order/$orderPaymentId/fraud-reclaim.json", ['retry_enabled' => false]);
         } catch (TransferException $exception) {
             throw new PaymentsServiceRequestException($exception, 'Fraud reclaim request to Payment failed');
         }

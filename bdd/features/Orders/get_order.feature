@@ -132,7 +132,7 @@ Feature:
 
   Scenario: Successful late order retrieval
     Given I have a late order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
-    And I get from payments service get order details response
+    And I get from payments service get order details response with first try fail
     And GraphQL will respond to getMerchantDebtorDetails query
     And I get from salesforce dunning status endpoint "Created" status for order "test-order-uuidXF43Y"
     When I send a GET request to "/order/XF43Y"

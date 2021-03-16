@@ -45,6 +45,18 @@ class PaymentsServiceContext implements Context
     }
 
     /**
+     * @Given /^I get from payments service get order details response with first try fail$/
+     */
+    public function iGetFromPaymentsServiceGetOrderDetailsFirstTryFailResponse()
+    {
+        //This will test the retry mechanism.
+        $this->mockRequest('/order/' . PaellaCoreContext::DUMMY_UUID4 . '.json', new ResponseStack(
+            new MockResponse('', [], 404),
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/payments_service_order_details.json'))
+        ));
+    }
+
+    /**
      * @Given /^I get from payments service get order details response$/
      */
     public function iGetFromPaymentsServiceGetOrderDetailsResponse()
