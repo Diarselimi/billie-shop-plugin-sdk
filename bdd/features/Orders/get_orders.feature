@@ -7,11 +7,12 @@ Feature: Retrieve and search all orders of a merchant
     And I get from Oauth service a valid user token
     And a merchant user exists with permission VIEW_ORDERS
     And I get from payments service get orders details response
+    And I get from companies service get debtors response
+    And I get from payments service get debtor response
+    And GraphQL will respond to getMerchantDebtorDetails query
 
   Scenario: Successfully retrieve orders that are not in state new
     Given I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
-    And I get from companies service get debtors response
-    And I get from payments service get debtor response
     When I send a GET request to "/public/orders"
     Then the response status code should be 200
     And the JSON response should be:
@@ -27,10 +28,8 @@ Feature: Retrieve and search all orders of a merchant
       | external_id | state   | gross | net | tax | duration | comment        | payment_uuid |
       | XF123       | created | 1000  | 900 | 100 | 30       | "test comment" | 123456a      |
       | XF125       | created | 1000  | 900 | 100 | 30       | "test comment" | 123456b      |
-    And I get from companies service get debtors response
     And I get from payments service get orders details response
     And I get from payments service get order details response
-    And I get from payments service get debtor response
     When I send a GET request to "/public/orders"
     Then the response status code should be 200
     Then the JSON response should be:
@@ -180,8 +179,6 @@ Feature: Retrieve and search all orders of a merchant
     Given I have orders with the following data
       | external_id | state   | gross | net | tax | duration | comment        | payment_uuid |
       | XF43Y       | created | 1000  | 900 | 100 | 30       | "test comment" | 123456a      |
-    And I get from companies service get debtors response
-    And I get from payments service get debtor response
     When I send a GET request to "/orders?search=XF43Y"
     Then the response status code should be 200
     And the JSON response should be:
@@ -264,8 +261,6 @@ Feature: Retrieve and search all orders of a merchant
     Given I have orders with the following data
       | external_id | state      | gross | net | tax | duration | comment        | payment_uuid |
       | XF43Y       | authorized | 1000  | 900 | 100 | 30       | "test comment" | 123456a      |
-    And I get from companies service get debtors response
-    And I get from payments service get debtor response
     When I send a GET request to "/orders?filters[state][]=authorized&filters[state][]=created"
     Then the response status code should be 200
     And the JSON response should be:
@@ -346,8 +341,6 @@ Feature: Retrieve and search all orders of a merchant
 
   Scenario: Search orders filtering by state gives no results
     Given I have a created order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
-    And I get from companies service get debtors response
-    And I get from payments service get debtor response
     When I send a GET request to "/orders?filters[state][0]=shipped"
     Then the response status code should be 200
     And the JSON response should be:
@@ -362,8 +355,6 @@ Feature: Retrieve and search all orders of a merchant
     Given I have orders with the following data
       | external_id | state   | gross | net | tax | duration | comment        | payment_uuid |
       | XF43Y       | created | 1000  | 900 | 100 | 30       | "test comment" | 123456a      |
-    And I get from companies service get debtors response
-    And I get from payments service get debtor response
     When I send a GET request to "/orders?search=test-order-uuid"
     Then the response status code should be 200
     And the JSON response should be:
@@ -468,15 +459,13 @@ Feature: Retrieve and search all orders of a merchant
       }
     """
 
-    Scenario: Filter by merchant debtor UUID
-      Given I have orders with the following data
-        | external_id | state   | gross | net | tax | duration | comment        | payment_uuid |
-        | XF43Y       | created | 1000  | 900 | 100 | 30       | "test comment" | 123456a      |
-      And I get from companies service get debtors response
-      And I get from payments service get debtor response
-      When I send a GET request to "/orders?filters[merchant_debtor_id]=ad74bbc4-509e-47d5-9b50-a0320ce3d715"
-      Then the response status code should be 200
-      And the JSON response should be:
+  Scenario: Filter by merchant debtor UUID
+    Given I have orders with the following data
+      | external_id | state   | gross | net | tax | duration | comment        | payment_uuid |
+      | XF43Y       | created | 1000  | 900 | 100 | 30       | "test comment" | 123456a      |
+    When I send a GET request to "/orders?filters[merchant_debtor_id]=ad74bbc4-509e-47d5-9b50-a0320ce3d715"
+    Then the response status code should be 200
+    And the JSON response should be:
       """
         {
         "total": 1,

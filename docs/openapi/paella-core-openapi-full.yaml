@@ -2590,7 +2590,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/ShipOrderWithInvoiceRequestV1'
+              $ref: '#/components/schemas/ShipOrderWithInvoiceRequest'
       responses:
         '200':
           description: 'Order successfully shipped. Order details.'
@@ -4130,13 +4130,16 @@ components:
       allOf:
         -
           $ref: '#/components/schemas/AbstractShipOrderRequestV1'
-    ShipOrderWithInvoiceRequestV1:
+    ShipOrderWithInvoiceRequest:
       title: 'Order Shipping With Invoice Object'
       properties:
         invoice_file:
           description: 'Invoice file'
           type: string
           format: binary
+        amount:
+          nullable: true
+          $ref: '#/components/schemas/AmountDTO'
       type: object
       allOf:
         -
@@ -4769,6 +4772,9 @@ components:
           $ref: '#/components/schemas/DateTime'
         debtor_uuid:
           $ref: '#/components/schemas/UUID'
+        workflow_name:
+          type: string
+          example: order_v1
       type: object
     BankTransactionDTO:
       properties:

@@ -24,6 +24,7 @@ Feature:
     And The following notification settings exist for merchant 1:
       | notification_type | enabled |
       | order_waiting     | 1       |
+    And GraphQL will respond to getMerchantDebtorDetails query
 
   Scenario: Soft decline is enabled for limit check - all risk checks passed - order created successfully
     Given The following merchant risk check settings exist for merchant 1:

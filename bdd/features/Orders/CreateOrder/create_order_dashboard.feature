@@ -7,6 +7,7 @@ Feature:
     And I add "X-Api-Key" header equal to test
     And I get from payments service get debtor response
     And I get from Fraud service a non fraud response
+    And GraphQL will respond to getMerchantDebtorDetails query
 
   Scenario: Successful order creation
     Given I get from companies service identify match response

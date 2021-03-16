@@ -39,6 +39,7 @@ Feature:
       | debtor_blacklisted        | 1       | 1                  |
       | debtor_overdue            | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
+    And GraphQL will respond to getMerchantDebtorDetails query
 
   Scenario: Duplicate order with same external ID
     Given I have a new order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"

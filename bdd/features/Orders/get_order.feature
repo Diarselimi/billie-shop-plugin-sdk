@@ -126,7 +126,8 @@ Feature:
           "postal_code":"test",
           "country":"TE"
         },
-        "debtor_uuid": "ad74bbc4-509e-47d5-9b50-a0320ce3d715"
+        "debtor_uuid": "ad74bbc4-509e-47d5-9b50-a0320ce3d715",
+        "workflow_name": "order_v1"
     }
     """
 
@@ -203,7 +204,8 @@ Feature:
        },
        "created_at":"2019-05-20T13:00:00+0200",
        "shipped_at":null,
-       "debtor_uuid": "ad74bbc4-509e-47d5-9b50-a0320ce3d715"
+       "debtor_uuid": "ad74bbc4-509e-47d5-9b50-a0320ce3d715",
+       "workflow_name": "order_v1"
     }
     """
 
@@ -280,6 +282,7 @@ Feature:
         },
         "created_at": "2019-05-20T13:00:00+0200",
         "shipped_at": null,
-        "debtor_uuid": "ad74bbc4-509e-47d5-9b50-a0320ce3d715"
+        "debtor_uuid": "ad74bbc4-509e-47d5-9b50-a0320ce3d715",
+        "workflow_name": "order_v1"
     }
     """

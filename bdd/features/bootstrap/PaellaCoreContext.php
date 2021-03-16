@@ -517,6 +517,18 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
+     * @Then the order :orderId has no invoice data
+     */
+    public function orderHasNoInvoiceData($orderId)
+    {
+        $order = $this->getOrderRepository()->getOneByMerchantIdAndExternalCodeOrUUID($orderId, 1);
+        if ($order === null) {
+            throw new \RuntimeException('Order not found');
+        }
+        Assert::null($order->getInvoiceNumber());
+    }
+
+    /**
      * @Given /^the following invoice data exists:$/
      */
     public function orderHasTheFollowingInvoiceData(TableNode $node)
@@ -1106,6 +1118,11 @@ class PaellaCoreContext extends MinkContext
         return $this->get(OrderRepositoryInterface::class);
     }
 
+    private function getOrderInvoiceRepository(): OrderInvoiceRepositoryInterface
+    {
+        return $this->get(OrderInvoiceRepositoryInterface::class);
+    }
+
     private function getMerchantRepository(): MerchantRepositoryInterface
     {
         return $this->get(MerchantRepositoryInterface::class);
@@ -1452,7 +1469,10 @@ class PaellaCoreContext extends MinkContext
                 $row['tax'],
                 $row['duration'],
                 $row['comment'],
-                $row['payment_uuid']
+                $row['payment_uuid'],
+                null,
+                OrderEntity::CREATION_SOURCE_API,
+                $row['workflow_name'] ?? OrderEntity::WORKFLOW_NAME_V1
             );
         }
     }
@@ -1619,6 +1639,20 @@ class PaellaCoreContext extends MinkContext
     {
         $order = $this->getOrderRepository()->getOneByUuid($uuid);
         Assert::eq($order->getInvoiceNumber(), $invoiceNumber);
+    }
+
+    /**
+     * @Then the order :orderId has an invoice
+     */
+    public function theOrderHasAnInvoice(string $orderId): void
+    {
+        $order = $this->getOrderRepository()->getOneByMerchantIdAndExternalCodeOrUUID($orderId, 1);
+        if ($order === null) {
+            throw new \RuntimeException('Order not found');
+        }
+
+        $invoices = $this->getOrderInvoiceRepository()->findByOrderId($order->getId());
+        Assert::count($invoices, 1);
     }
 
     /**
