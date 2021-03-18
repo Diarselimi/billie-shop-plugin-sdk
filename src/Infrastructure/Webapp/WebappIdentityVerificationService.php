@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Infrastructure\Webapp;
 
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
-use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
 use App\DomainModel\IdentityVerification\IdentityVerificationServiceException;
 use App\DomainModel\IdentityVerification\IdentityVerificationServiceInterface;
 use App\DomainModel\IdentityVerification\IdentityVerificationStartRequestDTO;
 use App\DomainModel\IdentityVerification\IdentityVerificationStartResponseDTO;
 use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
+use App\DomainModel\SignatoryPower\SignatoryPowerAlreadySignedException;
 use App\Infrastructure\DecodeResponseTrait;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -96,13 +96,8 @@ class WebappIdentityVerificationService implements IdentityVerificationServiceIn
 
         try {
             $this->companiesService->acceptSignatoryPowerTc($requestDTO->getSignatoryPowerUuid());
-        } catch (CompaniesServiceRequestException $e) {
-            if ($e->getResponse() && $e->getResponse()->getStatusCode() === 400) {
-                // If TC already accepted, is ok, ignore it.
-                return;
-            }
-
-            throw $e;
+        } catch (SignatoryPowerAlreadySignedException $exception) {
+            // If TC already accepted, is ok, ignore it.
         }
     }
 }
