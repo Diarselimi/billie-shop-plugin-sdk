@@ -245,6 +245,8 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
+     * @deprecated use iHaveOrdersWithTheFollowingData() instead
+     *
      * @Given I have a(n) :state order with amounts :gross/:net/:tax, duration :duration and comment :comment
      */
     public function iHaveAnOrderWithoutExternalCode($state, $gross, $net, $tax, $duration, $comment)
@@ -313,6 +315,8 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
+     * @deprecated use iHaveOrdersWithTheFollowingData() instead
+     *
      * @Given I have a(n) :state order :externalCode with amounts :gross/:net/:tax, duration :duration and comment :comment
      */
     public function iHaveAnOrder(
@@ -328,6 +332,8 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
+     * @deprecated use iHaveOrdersWithTheFollowingData() instead
+     *
      * @Given I have a(n) :state order :externalCode with amounts :gross/:net/:tax, duration :duration and checkout session :checkoutSession
      */
     public function iHaveAnOrderWithCheckoutSession(
@@ -340,6 +346,28 @@ class PaellaCoreContext extends MinkContext
         $checkoutSession
     ) {
         $this->createOrder($state, $externalCode, $gross, $net, $tax, $duration, 'test', null, $checkoutSession);
+    }
+
+    /**
+     * @Given /^I have orders with the following data$/
+     */
+    public function iHaveOrdersWithTheFollowingData(TableNode $table)
+    {
+        foreach ($table as $row) {
+            $this->createOrder(
+                $row['state'],
+                $row['external_id'],
+                $row['gross'],
+                $row['net'],
+                $row['tax'],
+                $row['duration'],
+                $row['comment'],
+                $row['payment_uuid'],
+                $row['checkout_session'],
+                OrderEntity::CREATION_SOURCE_API,
+                $row['workflow_name'] ?? OrderEntity::WORKFLOW_NAME_V1
+            );
+        }
     }
 
     public function createOrder(
@@ -367,7 +395,7 @@ class PaellaCoreContext extends MinkContext
             ->setExternalComment($comment)
             ->setMerchantDebtorId($merchantDebtor->getId())
             ->setMerchantId($this->merchant->getId())
-            ->setPaymentId($paymentUuid ?? self::DUMMY_UUID4)
+            ->setPaymentId($paymentUuid)
             ->setCreatedAt(new \DateTime('2019-05-20 13:00:00'))
             ->setUuid('test-order-uuid' . $externalCode)
             ->setCompanyBillingAddressUuid('c7be46c0-e049-4312-b274-258ec5aeeb71')
@@ -514,6 +542,18 @@ class PaellaCoreContext extends MinkContext
                 $order->getId()
             ));
         }
+    }
+
+    /**
+     * @Then the order :orderId has no invoice data
+     */
+    public function orderHasNoInvoiceData($orderId)
+    {
+        $order = $this->getOrderRepository()->getOneByMerchantIdAndExternalCodeOrUUID($orderId, 1);
+        if ($order === null) {
+            throw new \RuntimeException('Order not found');
+        }
+        Assert::null($order->getInvoiceNumber());
     }
 
     /**
@@ -1106,6 +1146,11 @@ class PaellaCoreContext extends MinkContext
         return $this->get(OrderRepositoryInterface::class);
     }
 
+    private function getOrderInvoiceRepository(): OrderInvoiceRepositoryInterface
+    {
+        return $this->get(OrderInvoiceRepositoryInterface::class);
+    }
+
     private function getMerchantRepository(): MerchantRepositoryInterface
     {
         return $this->get(MerchantRepositoryInterface::class);
@@ -1439,25 +1484,6 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
-     * @Given /^I have orders with the following data$/
-     */
-    public function iHaveOrdersWithTheFollowingData(TableNode $table)
-    {
-        foreach ($table as $row) {
-            $this->createOrder(
-                $row['state'],
-                $row['external_id'],
-                $row['gross'],
-                $row['net'],
-                $row['tax'],
-                $row['duration'],
-                $row['comment'],
-                $row['payment_uuid']
-            );
-        }
-    }
-
-    /**
      * @Given a merchant :merchantId is complete at :date
      */
     public function aMerchantIsCompleteAt(string $merchantId, string $date)
@@ -1619,6 +1645,46 @@ class PaellaCoreContext extends MinkContext
     {
         $order = $this->getOrderRepository()->getOneByUuid($uuid);
         Assert::eq($order->getInvoiceNumber(), $invoiceNumber);
+    }
+
+    /**
+     * @Then the order :orderId has an invoice
+     */
+    public function theOrderHasAnInvoice(string $orderId): void
+    {
+        $order = $this->getOrderRepository()->getOneByMerchantIdAndExternalCodeOrUUID($orderId, 1);
+        if ($order === null) {
+            throw new \RuntimeException('Order not found');
+        }
+
+        $invoices = $this->getOrderInvoiceRepository()->findByOrderId($order->getId());
+        Assert::count($invoices, 1);
+    }
+
+    /**
+     * @Then the order :orderId has a payment id
+     */
+    public function theOrderHasAPaymentId(string $orderId): void
+    {
+        $order = $this->getOrderRepository()->getOneByMerchantIdAndExternalCodeOrUUID($orderId, 1);
+        if ($order === null) {
+            throw new \RuntimeException('Order not found');
+        }
+
+        Assert::notEmpty($order->getPaymentId());
+    }
+
+    /**
+     * @Then the order :orderId does not have a payment id
+     */
+    public function theOrderHasDoesNotHaveAPaymentId(string $orderId): void
+    {
+        $order = $this->getOrderRepository()->getOneByMerchantIdAndExternalCodeOrUUID($orderId, 1);
+        if ($order === null) {
+            throw new \RuntimeException('Order not found');
+        }
+
+        Assert::isEmpty($order->getPaymentId());
     }
 
     /**

@@ -3,12 +3,13 @@
 namespace App\Http\Controller\PublicApi;
 
 use App\Application\Exception\WorkflowException;
-use App\Application\UseCase\ShipOrderWithInvoice\ShipOrderWithInvoiceRequestV1;
-use App\Application\UseCase\ShipOrderWithInvoice\ShipOrderWithInvoiceUseCaseV1;
+use App\Application\UseCase\ShipOrderWithInvoice\ShipOrderWithInvoiceRequest;
+use App\Application\UseCase\ShipOrderWithInvoice\ShipOrderWithInvoiceUseCase;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\OrderResponse\OrderResponse;
 use App\DomainModel\ShipOrder\ShipOrderException;
 use App\Http\HttpConstantsInterface;
+use App\Http\RequestTransformer\UpdateOrder\UpdateOrderAmountRequestFactory;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,7 +32,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     @OA\RequestBody(
  *          required=true,
  *          @OA\MediaType(mediaType="multipart/form-data",
- *          @OA\Schema(ref="#/components/schemas/ShipOrderWithInvoiceRequestV1"))
+ *          @OA\Schema(ref="#/components/schemas/ShipOrderWithInvoiceRequest"))
  *     ),
  *
  *     @OA\Response(response=200, @OA\JsonContent(ref="#/components/schemas/OrderResponse"), description="Order successfully shipped. Order details."),
@@ -43,20 +44,34 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class ShipOrderWithInvoiceController
 {
-    private ShipOrderWithInvoiceUseCaseV1 $useCase;
+    private ShipOrderWithInvoiceUseCase $useCase;
 
-    public function __construct(ShipOrderWithInvoiceUseCaseV1 $useCase)
-    {
+    private UpdateOrderAmountRequestFactory $updateOrderAmountRequestFactory;
+
+    public function __construct(
+        ShipOrderWithInvoiceUseCase $useCase,
+        UpdateOrderAmountRequestFactory $updateOrderAmountRequestFactory
+    ) {
         $this->useCase = $useCase;
+        $this->updateOrderAmountRequestFactory = $updateOrderAmountRequestFactory;
     }
 
     public function execute(string $uuid, Request $request): OrderResponse
     {
         $merchantId = $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID);
-        $orderRequest = (new ShipOrderWithInvoiceRequestV1($uuid, $merchantId))
+        $orderRequest = (new ShipOrderWithInvoiceRequest($uuid, $merchantId))
             ->setExternalCode($request->request->get('external_order_id'))
             ->setInvoiceNumber($request->request->get('invoice_number'))
             ->setInvoiceFile($request->files->get('invoice_file'));
+
+        if ($request->request->has('amount')) {
+            $amount = $this->updateOrderAmountRequestFactory->create($request);
+            if ($amount === null) {
+                throw new BadRequestHttpException('Invalid amount value supplied');
+            }
+
+            $orderRequest->setAmount($amount);
+        }
 
         try {
             return $this->useCase->execute($orderRequest);

@@ -33,10 +33,11 @@ class LegacyShipOrderService implements ShipOrderInterface, LoggingInterface
         $workflow = $this->workflowRegistry->get($order);
 
         if ($order->getPaymentId() === null) {
-            $order
-                ->setPaymentId($invoice->getPaymentUuid())
-                ->setShippedAt(new \DateTime())
-            ;
+            if (!$this->isPartialShipment($orderContainer, $invoice)) {
+                $order
+                    ->setPaymentId($invoice->getPaymentUuid())
+                    ->setShippedAt(new \DateTime());
+            }
             $this->orderRepository->update($order);
         }
 
@@ -57,5 +58,12 @@ class LegacyShipOrderService implements ShipOrderInterface, LoggingInterface
         $orderContainer->setPaymentDetails($orderPaymentDetails);
 
         $this->logInfo('Order shipped with {name} workflow', [LoggingInterface::KEY_NAME => $workflow->getName()]);
+    }
+
+    private function isPartialShipment(OrderContainer $orderContainer, Invoice $invoice): bool
+    {
+        return !$orderContainer->getOrderFinancialDetails()->getAmountGross()->equals(
+            $invoice->getAmount()->getGross()
+        );
     }
 }

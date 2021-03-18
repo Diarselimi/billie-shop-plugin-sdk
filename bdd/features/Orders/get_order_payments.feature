@@ -10,7 +10,9 @@ Feature:
     And a merchant user exists with permission VIEW_ORDERS
 
   Scenario: Successful order payments retrieve
-    Given I have a new order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
+    Given I have orders with the following data
+      | external_id | state      | gross | net | tax | duration | comment    | payment_uuid                         |
+      | XF43Y       | new        | 1000  | 900 | 100 | 30       | test order | 6d6b4222-be8c-11e9-9cb5-2a2ae2dbcce4 |
     And GraphQL will respond to getPadOrderPayments with 200 and response:
     """
     {

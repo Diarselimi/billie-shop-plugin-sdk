@@ -4,8 +4,7 @@ namespace App\Tests\Functional\Context;
 
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
-use Coduo\PHPMatcher\Backtrace\InMemoryBacktrace;
-use Coduo\PHPMatcher\Factory\MatcherFactory;
+use Coduo\PHPMatcher\PHPMatcher;
 use Google\Protobuf\Internal\Message;
 use Ozean12\AmqpPackBundle\Mapping\AmqpMapperInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -89,15 +88,14 @@ class MessengerContext implements Context
 
         $error = null;
         $atLeastOneMatched = false;
-        $factory = new MatcherFactory();
-        $matcher = $factory->createMatcher(new InMemoryBacktrace());
+        $matcher = new PHPMatcher();
         foreach ($dispatchedMessages as $dispatchedMessage) {
             $dispatchedMessage = $dispatchedMessage['message'];
             if (!$matcher->match(
                 (string) $dispatchedMessage->serializeToJsonString(),
                 $expectedMessage->serializeToJsonString()
             )) {
-                $error = (string) $matcher->getError();
+                $error = (string) $matcher->error();
             } else {
                 $atLeastOneMatched = true;
             }

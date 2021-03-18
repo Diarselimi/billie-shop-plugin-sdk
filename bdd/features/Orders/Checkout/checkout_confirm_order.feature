@@ -326,7 +326,9 @@ Feature: As a merchant, I should be able to create an order by providing a valid
     And the response status code should be 400
 
   Scenario: Successfully order confirmation returns exactly the same decimal numbers for amounts
-    Given I have a authorized order "CO123" with amounts 100.3/99.1/1.2, duration 30 and checkout session "123123CO123"
+    Given I have orders with the following data
+      | external_id | state      | gross | net  | tax | duration | checkout_session |
+      | CO123       | authorized | 100.3 | 99.1 | 1.2 | 30       | 123123CO123      |
     And I get from companies service a good debtor strict match response
     And I get from payments service get order details response
     And Debtor lock limit call succeeded

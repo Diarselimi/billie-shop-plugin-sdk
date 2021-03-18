@@ -50,7 +50,9 @@ Feature:
     """
 
   Scenario: Successful declined order retrieval
-    Given I have a declined order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
+    Given I have orders with the following data
+      | external_id | state    | gross | net | tax | duration | comment    | payment_uuid                         |
+      | XF43Y       | declined | 1000  | 900 | 100 | 30       | test order | 6d6b4222-be8c-11e9-9cb5-2a2ae2dbcce4 |
     And The following risk check results exist for order "XF43Y":
     | check_name | is_passed |
     | fraud_score| 0         |
@@ -126,12 +128,15 @@ Feature:
           "postal_code":"test",
           "country":"TE"
         },
-        "debtor_uuid": "ad74bbc4-509e-47d5-9b50-a0320ce3d715"
+        "debtor_uuid": "ad74bbc4-509e-47d5-9b50-a0320ce3d715",
+        "workflow_name": "order_v1"
     }
     """
 
   Scenario: Successful late order retrieval
-    Given I have a late order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
+    Given I have orders with the following data
+      | external_id | state    | gross | net | tax | duration | comment    | payment_uuid                         |
+      | XF43Y       | late     | 1000  | 900 | 100 | 30       | test order | 6d6b4222-be8c-11e9-9cb5-2a2ae2dbcce4 |
     And I get from payments service get order details response with first try fail
     And GraphQL will respond to getMerchantDebtorDetails query
     And I get from salesforce dunning status endpoint "Created" status for order "test-order-uuidXF43Y"
@@ -203,12 +208,15 @@ Feature:
        },
        "created_at":"2019-05-20T13:00:00+0200",
        "shipped_at":null,
-       "debtor_uuid": "ad74bbc4-509e-47d5-9b50-a0320ce3d715"
+       "debtor_uuid": "ad74bbc4-509e-47d5-9b50-a0320ce3d715",
+       "workflow_name": "order_v1"
     }
     """
 
   Scenario: Successful complete order retrieval
-    Given I have a complete order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"
+    Given I have orders with the following data
+      | external_id | state    | gross | net | tax | duration | comment    | payment_uuid                         |
+      | XF43Y       | complete | 1000  | 900 | 100 | 30       | test order | 6d6b4222-be8c-11e9-9cb5-2a2ae2dbcce4 |
     And I get from payments service get order details response
     And GraphQL will respond to getMerchantDebtorDetails query
     When I send a GET request to "/order/XF43Y"
@@ -280,6 +288,7 @@ Feature:
         },
         "created_at": "2019-05-20T13:00:00+0200",
         "shipped_at": null,
-        "debtor_uuid": "ad74bbc4-509e-47d5-9b50-a0320ce3d715"
+        "debtor_uuid": "ad74bbc4-509e-47d5-9b50-a0320ce3d715",
+        "workflow_name": "order_v1"
     }
     """
