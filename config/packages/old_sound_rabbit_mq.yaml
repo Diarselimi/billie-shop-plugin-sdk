@@ -13,12 +13,6 @@ old_sound_rabbit_mq:
       heartbeat: 0
       use_socket: false
   consumers:
-    order_payment_state_change:
-      connection:       default
-      exchange_options: { name: 'borscht_events%env(INSTANCE_SUFFIX)%', type: direct }
-      queue_options:    { name: 'order_payment_state_change%env(INSTANCE_SUFFIX)%', routing_keys: ['state_change'] }
-      callback:         App\Amqp\Consumer\OrderPaymentStateChangeConsumer
-      qos_options:      {prefetch_size: 0, prefetch_count: 1, global: false}
     order_payment_amount_change:
       connection:       default
       exchange_options: { name: 'borscht_events%env(INSTANCE_SUFFIX)%', type: direct }

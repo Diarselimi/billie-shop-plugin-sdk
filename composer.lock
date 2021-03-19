@@ -183,6 +183,9 @@
                     "email": "alex.lahtarin@gmail.com"
                 }
             ],
+            "support": {
+                "source": "https://github.com/ozean12/MonitoringBundle/tree/3.0.6"
+            },
             "time": "2020-12-03T11:15:42+00:00"
         },
         {
@@ -1070,20 +1073,6 @@
                 "uppercase",
                 "words"
             ],
-            "funding": [
-                {
-                    "url": "https://www.doctrine-project.org/sponsorship.html",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://www.patreon.com/phpdoctrine",
-                    "type": "patreon"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/doctrine%2Finflector",
-                    "type": "tidelift"
-                }
-            ],
             "time": "2020-05-29T15:13:26+00:00"
         },
         {
@@ -1145,20 +1134,6 @@
                 "lexer",
                 "parser",
                 "php"
-            ],
-            "funding": [
-                {
-                    "url": "https://www.doctrine-project.org/sponsorship.html",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://www.patreon.com/phpdoctrine",
-                    "type": "patreon"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/doctrine%2Flexer",
-                    "type": "tidelift"
-                }
             ],
             "time": "2020-05-25T17:44:05+00:00"
         },
@@ -2022,10 +1997,6 @@
                 "LGPL-3.0-only"
             ],
             "description": "php-iban is a library for parsing and validating IBAN (and IIBAN) bank account information.",
-            "support": {
-                "issues": "https://github.com/globalcitizen/php-iban/issues",
-                "source": "https://github.com/globalcitizen/php-iban/tree/master"
-            },
             "time": "2020-08-22T21:06:00+00:00"
         },
         {
@@ -3076,16 +3047,16 @@
         },
         {
             "name": "ozean12/amqp-transfers",
-            "version": "0.4.23",
+            "version": "0.4.25",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/amqp-transfers.git",
-                "reference": "42089500d2443519a6cae42c8720ae273e0487cd"
+                "reference": "7e054e78c23735b203aaf2093a854b187d58e33f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/amqp-transfers/zipball/42089500d2443519a6cae42c8720ae273e0487cd",
-                "reference": "42089500d2443519a6cae42c8720ae273e0487cd",
+                "url": "https://api.github.com/repos/ozean12/amqp-transfers/zipball/7e054e78c23735b203aaf2093a854b187d58e33f",
+                "reference": "7e054e78c23735b203aaf2093a854b187d58e33f",
                 "shasum": ""
             },
             "require": {
@@ -3105,10 +3076,10 @@
             ],
             "description": "Transfer objects across Billie universe",
             "support": {
-                "source": "https://github.com/ozean12/amqp-transfers/tree/0.4.23",
+                "source": "https://github.com/ozean12/amqp-transfers/tree/0.4.25",
                 "issues": "https://github.com/ozean12/amqp-transfers/issues"
             },
-            "time": "2021-03-11T13:33:43+00:00"
+            "time": "2021-03-17T16:29:30+00:00"
         },
         {
             "name": "ozean12/amqp-transfers-serializer",
@@ -3212,6 +3183,9 @@
                 "proprietary"
             ],
             "description": "Company Strict Match Bundle",
+            "support": {
+                "source": "https://github.com/ozean12/CompanyStrictMatchBundle/tree/1.0.2"
+            },
             "time": "2021-02-05T19:02:28+00:00"
         },
         {
