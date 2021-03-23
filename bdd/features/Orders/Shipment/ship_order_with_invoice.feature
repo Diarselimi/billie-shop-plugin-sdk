@@ -116,6 +116,7 @@ Feature:
     {
       "uuid":"@string@",
       "externalCode":"123456A",
+      "orderExternalCode":"CO123",
       "customerUuid":"f2ec4d5e-79f4-40d6-b411-31174b6519ac",
       "debtorCompanyUuid":"c7be46c0-e049-4312-b274-258ec5aeeb70",
       "debtorCompanyName":"Test User Company",
@@ -240,6 +241,7 @@ Feature:
     {
       "uuid":"@string@",
       "externalCode":"123456A",
+      "orderExternalCode":"CO123",
       "customerUuid":"f2ec4d5e-79f4-40d6-b411-31174b6519ac",
       "debtorCompanyUuid":"c7be46c0-e049-4312-b274-258ec5aeeb70",
       "debtorCompanyName":"Test User Company",

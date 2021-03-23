@@ -65,7 +65,7 @@ class ShipOrderService implements ShipOrderInterface, LoggingInterface
 
         $this->orderFinancialDetailsRepository->insert($financialDetails);
 
-        $this->announcer->announce($invoice, $orderContainer->getDebtorCompany()->getName());
+        $this->announcer->announce($invoice, $orderContainer->getDebtorCompany()->getName(), $orderContainer->getOrder()->getExternalCode());
 
         if ($order->isWorkflowV2()) {
             $isFullyShipped = $unshippedAmountGross->isZero() && $unshippedAmountNet->isZero() && $unshippedAmountTax->isZero();

@@ -18,15 +18,12 @@ class InvoiceAnnouncer implements LoggingInterface
 
     private MessageBusInterface $bus;
 
-    private UuidGeneratorInterface $uuidGenerator;
-
     public function __construct(MessageBusInterface $bus, UuidGeneratorInterface $uuidGenerator)
     {
         $this->bus = $bus;
-        $this->uuidGenerator = $uuidGenerator;
     }
 
-    public function announce(Invoice $invoice, string $debtorCompanyName): void
+    public function announce(Invoice $invoice, string $debtorCompanyName, string $orderExternalCode): void
     {
         $message = (new CreateInvoice())
             ->setUuid($invoice->getUuid())
@@ -45,7 +42,9 @@ class InvoiceAnnouncer implements LoggingInterface
             ->setBillingDate($invoice->getBillingDate()->format('Y-m-d'))
             ->setProofOfDeliveryUrl($invoice->getProofOfDeliveryUrl())
             ->setServices(self::SERVICES)
-            ->setExternalCode($invoice->getExternalCode());
+            ->setExternalCode($invoice->getExternalCode())
+            ->setOrderExternalCode($orderExternalCode)
+        ;
 
         $this->bus->dispatch($message);
         $this->logInfo('CreateInvoice event announced');
