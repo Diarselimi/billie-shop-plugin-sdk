@@ -223,7 +223,7 @@ Feature:
       "invoice":{
         "due_date":"2019-06-19",
         "invoice_number":"123456A",
-        "payout_amount":500,
+        "payout_amount":381,
         "outstanding_amount":500,
         "fee_amount":119,
         "fee_rate":20,

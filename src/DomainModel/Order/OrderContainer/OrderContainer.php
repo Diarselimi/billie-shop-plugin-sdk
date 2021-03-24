@@ -11,6 +11,7 @@ use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorScoring\DebtorScoringResponseDTO;
 use App\DomainModel\DebtorSettings\DebtorSettingsEntity;
 use App\DomainModel\Invoice\Invoice;
+use App\DomainModel\Invoice\InvoiceCollection;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
@@ -135,10 +136,7 @@ class OrderContainer
         return $this;
     }
 
-    /**
-     * @return array|Invoice[]
-     */
-    public function getInvoices(): array
+    public function getInvoices(): InvoiceCollection
     {
         return $this->invoices
             ?? $this->invoices = $this->relationLoader->loadInvoices($this);
@@ -146,11 +144,7 @@ class OrderContainer
 
     public function addInvoice(Invoice $invoice): OrderContainer
     {
-        if (empty($this->invoices)) {
-            $this->invoices = $this->relationLoader->loadInvoices($this);
-        }
-
-        $this->invoices[$invoice->getUuid()] = $invoice;
+        $this->getInvoices()->add($invoice);
 
         return $this;
     }

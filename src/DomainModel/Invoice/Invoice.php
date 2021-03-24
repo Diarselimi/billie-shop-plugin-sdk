@@ -2,6 +2,7 @@
 
 namespace App\DomainModel\Invoice;
 
+use App\DomainModel\Invoice\CreditNote\CreditNoteCollection;
 use Ozean12\Money\Money;
 use Ozean12\Money\Percent;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
@@ -45,6 +46,13 @@ class Invoice
     private Money $invoicePendingCancellationAmount;
 
     private Money $merchantPendingPaymentAmount;
+
+    private CreditNoteCollection $creditNoteCollection;
+
+    public function __construct()
+    {
+        $this->creditNoteCollection = new CreditNoteCollection([]);
+    }
 
     public function getUuid(): string
     {
@@ -270,6 +278,18 @@ class Invoice
     public function setMerchantPendingPaymentAmount(Money $merchantPendingPaymentAmount): Invoice
     {
         $this->merchantPendingPaymentAmount = $merchantPendingPaymentAmount;
+
+        return $this;
+    }
+
+    public function getCreditNotes(): CreditNoteCollection
+    {
+        return $this->creditNoteCollection;
+    }
+
+    public function setCreditNotes(CreditNoteCollection $creditNoteCollection): Invoice
+    {
+        $this->creditNoteCollection = $creditNoteCollection;
 
         return $this;
     }

@@ -4,8 +4,12 @@ namespace spec\App\DomainModel\OrderUpdate;
 
 use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\LegacyUpdateOrder\LegacyUpdateOrderRequest;
+use App\DomainModel\Invoice\CreditNote\CreditNote;
+use App\DomainModel\Invoice\CreditNote\CreditNoteFactory;
+use App\DomainModel\Invoice\CreditNote\InvoiceCreditNoteMessageFactory;
 use App\DomainModel\Invoice\ExtendInvoiceService;
 use App\DomainModel\Invoice\Invoice;
+use App\DomainModel\Invoice\InvoiceCollection;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
@@ -25,9 +29,13 @@ use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Payment\RequestDTO\ModifyRequestDTO;
 use Ozean12\Money\Money;
 use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
+use Ozean12\Transfer\Message\CreditNote\CreateCreditNote;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
+use Ramsey\Uuid\Uuid;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class LegacyUpdateOrderServiceSpec extends ObjectBehavior
 {
@@ -47,6 +55,9 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         UpdateOrderLimitsService $updateOrderLimitsService,
         UpdateOrderRequestValidator $updateOrderRequestValidator,
         ExtendInvoiceService $extendInvoiceService,
+        InvoiceCreditNoteMessageFactory $creditNoteAnnouncer,
+        CreditNoteFactory $creditNoteFactory,
+        MessageBusInterface $bus,
         LoggerInterface $logger,
         OrderContainer $orderContainer,
         OrderEntity $order
@@ -62,6 +73,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         $order->setInvoiceNumber(Argument::any())->willReturn($order);
         $order->setInvoiceUrl(Argument::any())->willReturn($order);
         $order->setExternalCode(Argument::any())->willReturn($order);
+        $bus->dispatch(Argument::cetera())->willReturn(new Envelope(new CreateCreditNote()));
     }
 
     public function it_updates_amount_but_not_limits_if_order_was_shipped(
@@ -83,7 +95,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         $changeSet = (new LegacyUpdateOrderRequest('order123', 1))->setAmount(
             TaxedMoneyFactory::create(150, 150, 0)
         );
-        $orderContainer->getInvoices()->willReturn([]);
+        $orderContainer->getInvoices()->willReturn(new InvoiceCollection([]));
         $orderFinancialDetails = (new OrderFinancialDetailsEntity())
             ->setAmountGross(new Money(200))
             ->setAmountNet(new Money(200))
@@ -192,7 +204,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         $paymentRequestFactory->createModifyRequestDTO(Argument::any())->shouldNotBeCalled();
         $paymentsService->modifyOrder(Argument::any())->shouldNotBeCalled();
 
-        $orderContainer->getInvoices()->willReturn([]);
+        $orderContainer->getInvoices()->willReturn(new InvoiceCollection([]));
 
         $this->update($orderContainer, $request);
     }
@@ -210,7 +222,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         PaymentsServiceInterface $paymentsService
     ) {
         $changeSet = (new LegacyUpdateOrderRequest('order123', 1))->setDuration(60);
-        $orderContainer->getInvoices()->willReturn([]);
+        $orderContainer->getInvoices()->willReturn(new InvoiceCollection([]));
         $newOrderFinancialDetails = (new OrderFinancialDetailsEntity())
             ->setAmountGross(new Money(200))
             ->setAmountNet(new Money(200))
@@ -260,7 +272,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
     ) {
         $order->getInvoiceNumber()->willReturn('123');
         $order->getInvoiceUrl()->willReturn('some_url');
-        $orderContainer->getInvoices()->willReturn([]);
+        $orderContainer->getInvoices()->willReturn(new InvoiceCollection([]));
         $changeSet = (new LegacyUpdateOrderRequest('order123', 1))->setInvoiceNumber('foobar')->setInvoiceUrl('foobar.pdf');
         $updateOrderRequestValidator->getValidatedRequest(
             $orderContainer,
@@ -397,6 +409,8 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
             ->setDuration(30)
             ->setOrderId(1);
 
+        $orderContainer->getInvoices()->willReturn(new InvoiceCollection([]));
+
         $updateOrderRequestValidator->getValidatedRequest(
             $orderContainer,
             $request
@@ -477,7 +491,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         $this->shouldThrow(WorkflowException::class)->during('update', [$orderContainer, $request]);
     }
 
-    public function it_uses_extend_invpice_service_if_butler_invoice_is_found(
+    public function it_uses_extend_invoice_service_if_butler_invoice_is_found(
         OrderContainer $orderContainer,
         OrderEntity $order,
         LegacyUpdateOrderRequest $request,
@@ -487,12 +501,22 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         OrderRepositoryInterface $orderRepository,
         InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
         ExtendInvoiceService $extendInvoiceService,
+        InvoiceCreditNoteMessageFactory $creditNoteAnnouncer,
+        LegacyUpdateOrderRequest $changeSet,
         PaymentRequestFactory $paymentRequestFactory,
-        PaymentsServiceInterface $paymentsService
+        PaymentsServiceInterface $paymentsService,
+        CreditNoteFactory $creditNoteFactory
     ) {
-        $changeSet = (new LegacyUpdateOrderRequest('order123', 1))->setAmount(
-            TaxedMoneyFactory::create(150, 150, 0)
-        )->setDuration(30);
+        $creditNoteFactory->create(Argument::cetera())->willReturn($this->prepareCreditNote());
+        $changeSet->getAmount()->willReturn(TaxedMoneyFactory::create(150, 150, 0));
+        $changeSet->getDuration()->willReturn(30);
+        $changeSet->isDurationChanged()->willReturn(true);
+        $changeSet->isAmountChanged()->willReturn(true);
+        $changeSet->isInvoiceNumberChanged()->willReturn(false);
+        $changeSet->isExternalCodeChanged()->willReturn(false);
+        $changeSet->isInvoiceUrlChanged()->willReturn(false);
+        $changeSet->setAmount(Argument::any())->willReturn($changeSet);
+
         $orderFinancialDetails = (new OrderFinancialDetailsEntity())
             ->setAmountGross(new Money(200))
             ->setAmountNet(new Money(200))
@@ -528,14 +552,29 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
 
         // it does NOT call payments service
         $invoice = new Invoice();
-        $orderContainer->getInvoices()->shouldBeCalled()->willReturn([$invoice]);
+        $invoice
+            ->setUuid(Uuid::uuid4()->toString())
+            ->setAmount(TaxedMoneyFactory::create(100, 50, 10))
+            ->setExternalCode('some_code');
+        $orderContainer->getInvoices()->shouldBeCalled()->willReturn(new InvoiceCollection([$invoice]));
         $order->wasShipped()->shouldBeCalled()->willReturn(true);
-        $extendInvoiceService->extend($orderContainer, $invoice, 30)->shouldBeCalled();
+        $extendInvoiceService->extend(Argument::cetera())->shouldBeCalled();
+
+        $creditNoteAnnouncer->create(Argument::cetera())->shouldBeCalledOnce();
+
         $paymentsModifyRequest = new ModifyRequestDTO();
-        $paymentRequestFactory->createModifyRequestDTO($orderContainer)
-            ->shouldBeCalled()->willReturn($paymentsModifyRequest);
+        $paymentRequestFactory->createModifyRequestDTO($orderContainer)->shouldBeCalled()->willReturn($paymentsModifyRequest);
         $paymentsService->modifyOrder($paymentsModifyRequest)->shouldBeCalled();
 
         $this->update($orderContainer, $request);
+    }
+
+    private function prepareCreditNote(): CreditNote
+    {
+        return (new CreditNote())
+            ->setUuid(self::ORDER_UUID)
+            ->setExternalCode('CORE')
+            ->setCreatedAt(new \DateTime())
+            ->setAmount(TaxedMoneyFactory::create(123, 22, 1));
     }
 }

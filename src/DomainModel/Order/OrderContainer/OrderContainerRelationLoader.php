@@ -10,7 +10,7 @@ use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\DebtorSettings\DebtorSettingsEntity;
 use App\DomainModel\DebtorSettings\DebtorSettingsRepositoryInterface;
-use App\DomainModel\Invoice\Invoice;
+use App\DomainModel\Invoice\InvoiceCollection;
 use App\DomainModel\Invoice\InvoiceServiceInterface;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
@@ -133,21 +133,16 @@ class OrderContainerRelationLoader
         return $this->addressRepository->getOneById($orderContainer->getDebtorExternalData()->getBillingAddressId());
     }
 
-    public function loadInvoices(OrderContainer $orderContainer): array
+    public function loadInvoices(OrderContainer $orderContainer): InvoiceCollection
     {
         $orderInvoices = $this->orderInvoiceRepository->findByOrderId($orderContainer->getOrder()->getId());
         if (empty($orderInvoices)) {
-            return [];
+            return new InvoiceCollection([]);
         }
 
         $uuids = array_map(fn (OrderInvoiceEntity $orderInvoice) => $orderInvoice->getInvoiceUuid(), $orderInvoices);
 
-        $invoices = $this->invoiceRepository->getByUuids($uuids);
-
-        return array_combine(
-            array_map(fn (Invoice $invoice) => $invoice->getUuid(), $invoices),
-            $invoices
-        );
+        return $this->invoiceRepository->getByUuids($uuids);
     }
 
     public function loadMerchant(OrderContainer $orderContainer): MerchantEntity

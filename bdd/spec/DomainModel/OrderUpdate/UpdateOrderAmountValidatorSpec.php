@@ -2,6 +2,7 @@
 
 namespace spec\App\DomainModel\OrderUpdate;
 
+use App\DomainModel\Invoice\InvoiceCollection;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
@@ -17,6 +18,8 @@ class UpdateOrderAmountValidatorSpec extends ObjectBehavior
     public function it_should_decrease_the_amount(
         OrderContainer $orderContainer
     ) {
+        $invoiceCollection = new InvoiceCollection([]);
+        $orderContainer->getInvoices()->willReturn($invoiceCollection);
         $newAmount = TaxedMoneyFactory::create(100.0, 81.0, 19.0);
 
         $financialDetails = (new OrderFinancialDetailsEntity())
@@ -38,6 +41,7 @@ class UpdateOrderAmountValidatorSpec extends ObjectBehavior
     public function it_should_not_increase_the_amount(
         OrderContainer $orderContainer
     ) {
+        $invoiceCollection = new InvoiceCollection([]);
         $newAmount = TaxedMoneyFactory::create(100.0, 81.0, 19.0);
 
         $financialDetails = (new OrderFinancialDetailsEntity())
@@ -48,6 +52,7 @@ class UpdateOrderAmountValidatorSpec extends ObjectBehavior
             ->setUnshippedAmountNet(new Money())
             ->setUnshippedAmountTax(new Money());
         $orderContainer->getOrderFinancialDetails()->willReturn($financialDetails);
+        $orderContainer->getInvoices()->willReturn($invoiceCollection);
 
         $order = (new OrderEntity())
             ->setState(self::STATE);

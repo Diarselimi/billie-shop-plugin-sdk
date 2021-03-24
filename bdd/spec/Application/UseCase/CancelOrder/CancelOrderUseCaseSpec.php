@@ -6,8 +6,12 @@ use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\CancelOrder\CancelOrderException;
 use App\Application\UseCase\CancelOrder\CancelOrderRequest;
 use App\Application\UseCase\CancelOrder\CancelOrderUseCase;
-use App\DomainModel\Invoice\CreditNote\InvoiceCreditNoteAnnouncer;
+use App\DomainModel\Invoice\CreditNote\CreditNote;
+use App\DomainModel\Invoice\CreditNote\CreditNoteCollection;
+use App\DomainModel\Invoice\CreditNote\CreditNoteFactory;
+use App\DomainModel\Invoice\CreditNote\InvoiceCreditNoteMessageFactory;
 use App\DomainModel\Invoice\Invoice;
+use App\DomainModel\Invoice\InvoiceCollection;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
@@ -17,9 +21,14 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use Ozean12\Money\Money;
+use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
+use Ozean12\Transfer\Message\CreditNote\CreateCreditNote;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
+use Ramsey\Uuid\Uuid;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\Workflow;
 
@@ -40,12 +49,15 @@ class CancelOrderUseCaseSpec extends ObjectBehavior
         OrderContainerFactory $orderContainerFactory,
         MerchantRepositoryInterface $merchantRepository,
         Registry $workflowRegistry,
-        InvoiceCreditNoteAnnouncer $invoiceCreditNoteAnnouncer,
+        InvoiceCreditNoteMessageFactory $creditNoteMessageFactory,
+        CreditNoteFactory $creditNoteFactory,
+        MessageBusInterface $bus,
         Workflow $workflow,
         LoggerInterface $logger,
         CancelOrderRequest $request,
         OrderContainer $orderContainer,
-        OrderEntity $order
+        OrderEntity $order,
+        CreateCreditNote $creditNoteMessage
     ) {
         $this->beConstructedWith(...func_get_args());
         $this->setLogger($logger);
@@ -55,6 +67,9 @@ class CancelOrderUseCaseSpec extends ObjectBehavior
         $request->getMerchantId()->willReturn(self::MERCHANT_ID);
 
         $workflowRegistry->get($order)->willReturn($workflow);
+
+        $creditNoteFactory->create(Argument::cetera())->willReturn($this->createCreditNote());
+        $creditNoteMessageFactory->create(Argument::cetera())->willReturn($creditNoteMessage);
 
         $orderContainer->getOrder()->willReturn($order);
         $order->getId()->willReturn(self::ORDER_ID);
@@ -72,8 +87,7 @@ class CancelOrderUseCaseSpec extends ObjectBehavior
         $orderContainerFactory
             ->loadByMerchantIdAndExternalIdOrUuid(self::MERCHANT_ID, self::ORDER_UUID)
             ->shouldBeCalled()
-            ->willThrow(OrderContainerFactoryException::class)
-        ;
+            ->willThrow(OrderContainerFactoryException::class);
 
         $this->shouldThrow(OrderNotFoundException::class)->during('execute', [$request]);
     }
@@ -90,14 +104,12 @@ class CancelOrderUseCaseSpec extends ObjectBehavior
         $orderContainerFactory
             ->loadByMerchantIdAndExternalIdOrUuid(self::MERCHANT_ID, self::ORDER_UUID)
             ->shouldBeCalled()
-            ->willReturn($orderContainer)
-        ;
+            ->willReturn($orderContainer);
 
         $workflow
             ->can($order, Argument::any())
             ->shouldBeCalled()
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
         $limitsService->unlock($orderContainer)->shouldNotBeCalled();
         $paymentsService->cancelOrder($order)->shouldNotBeCalled();
@@ -111,37 +123,33 @@ class CancelOrderUseCaseSpec extends ObjectBehavior
         OrderContainerFactory $orderContainerFactory,
         CancelOrderRequest $request,
         Workflow $workflow,
-        InvoiceCreditNoteAnnouncer $invoiceCreditNoteAnnouncer,
+        InvoiceCreditNoteMessageFactory $creditNoteMessageFactory,
         OrderEntity $order,
         OrderContainer $orderContainer
     ) {
         $orderContainerFactory
             ->loadByMerchantIdAndExternalIdOrUuid(self::MERCHANT_ID, self::ORDER_UUID)
             ->shouldBeCalled()
-            ->willReturn($orderContainer)
-        ;
+            ->willReturn($orderContainer);
 
         $workflow
             ->can($order, 'cancel')
             ->shouldBeCalledOnce()
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
         $workflow
             ->can($order, 'cancel_shipped')
             ->shouldBeCalledOnce()
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
         $workflow
             ->can($order, 'cancel_waiting')
             ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
 
         $limitsService->unlock($orderContainer)->shouldNotBeCalled();
         $paymentsService->cancelOrder($order)->shouldNotBeCalled();
-        $invoiceCreditNoteAnnouncer->create(Argument::cetera())->shouldNotBeCalled();
+        $creditNoteMessageFactory->create(Argument::cetera())->shouldNotBeCalled();
         $workflow->apply($order, OrderEntity::TRANSITION_CANCEL_WAITING)->shouldBeCalledOnce();
 
         $this->execute($request);
@@ -153,42 +161,59 @@ class CancelOrderUseCaseSpec extends ObjectBehavior
         OrderContainerFactory $orderContainerFactory,
         CancelOrderRequest $request,
         Workflow $workflow,
-        InvoiceCreditNoteAnnouncer $invoiceCreditNoteAnnouncer,
+        InvoiceCreditNoteMessageFactory $creditNoteMessageFactory,
         OrderEntity $order,
         OrderContainer $orderContainer,
         Invoice $invoice,
-        OrderFinancialDetailsEntity $orderFinancialDetails
+        OrderFinancialDetailsEntity $orderFinancialDetails,
+        InvoiceCollection $invoiceCollection,
+        MessageBusInterface $bus
     ) {
+        $invoiceCollection->getInvoicesCreditNotesGrossSum()->willReturn(new Money(200));
+        $invoiceCollection->getInvoicesCreditNotesNetSum()->willReturn(new Money(150));
+        $orderContainer->getOrder()->willReturn($order);
+        $invoiceCollection->getLastInvoice()->willReturn($invoice);
         $orderContainerFactory
             ->loadByMerchantIdAndExternalIdOrUuid(self::MERCHANT_ID, self::ORDER_UUID)
             ->shouldBeCalled()
-            ->willReturn($orderContainer)
-        ;
+            ->willReturn($orderContainer);
 
         $workflow
             ->can($order, 'cancel')
             ->shouldBeCalledOnce()
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
         $workflow
             ->can($order, 'cancel_shipped')
             ->shouldBeCalledOnce()
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
 
         $orderFinancialDetails->getAmountGross()->willReturn(new Money());
         $orderFinancialDetails->getAmountNet()->willReturn(new Money());
         $orderFinancialDetails->getAmountTax()->willReturn(new Money());
 
         $invoice->getExternalCode()->willReturn('CORE');
+        $invoice->getCreditNotes()->willReturn(new CreditNoteCollection([]));
+        $invoiceCollection->isEmpty()->willReturn(false);
+        $orderContainer->getInvoices()->willReturn($invoiceCollection);
+
         $limitsService->unlock($orderContainer)->shouldNotBeCalled();
         $paymentsService->cancelOrder($order)->shouldBeCalled();
-        $orderContainer->getInvoices()->willReturn([$invoice]);
         $orderContainer->getOrderFinancialDetails()->willReturn($orderFinancialDetails);
-        $invoiceCreditNoteAnnouncer->create(Argument::cetera())->shouldBeCalled();
+        $creditNoteMessageFactory->create(Argument::cetera())->shouldBeCalled();
         $workflow->apply($order, OrderEntity::TRANSITION_CANCEL_SHIPPED)->shouldBeCalledOnce();
 
+        $bus->dispatch(Argument::any())->shouldBeCalled()->willReturn(new Envelope(new CreateCreditNote()));
+
         $this->execute($request);
+    }
+
+    private function createCreditNote(): CreditNote
+    {
+        return (new CreditNote())
+            ->setUuid(Uuid::uuid4()->toString())
+            ->setAmount(TaxedMoneyFactory::create(123, 22, 11))
+            ->setExternalCode('CORE-CN')
+            ->setInvoiceUuid(self::ORDER_UUID);
     }
 }

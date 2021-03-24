@@ -3,6 +3,8 @@
 namespace App\DomainModel\Invoice;
 
 use App\DomainModel\Fee\FeeCalculator;
+use App\DomainModel\Invoice\CreditNote\CreditNoteCollection;
+use App\DomainModel\Invoice\CreditNote\CreditNoteFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\Helper\Uuid\UuidGeneratorInterface;
 use App\Support\AbstractFactory;
@@ -18,10 +20,16 @@ class InvoiceFactory extends AbstractFactory
 
     private FeeCalculator $feeCalculator;
 
-    public function __construct(UuidGeneratorInterface $uuidGenerator, FeeCalculator $feeCalculator)
-    {
+    private CreditNoteFactory $creditNoteFactory;
+
+    public function __construct(
+        UuidGeneratorInterface $uuidGenerator,
+        FeeCalculator $feeCalculator,
+        CreditNoteFactory $creditNoteFactory
+    ) {
         $this->uuidGenerator = $uuidGenerator;
         $this->feeCalculator = $feeCalculator;
+        $this->creditNoteFactory = $creditNoteFactory;
     }
 
     public function create(
@@ -58,8 +66,7 @@ class InvoiceFactory extends AbstractFactory
             ->setProofOfDeliveryUrl($proofOfDeliveryUrl)
             ->setExternalCode($invoiceNumber)
             ->setInvoicePendingCancellationAmount(new Money(0))
-            ->setMerchantPendingPaymentAmount(new Money(0))
-        ;
+            ->setMerchantPendingPaymentAmount(new Money(0));
     }
 
     public function createFromArray(array $data): Invoice
@@ -71,6 +78,9 @@ class InvoiceFactory extends AbstractFactory
         $grossFeeAmount = new Money($data['fee_amount'], 0);
         $netFeeAmount = new Money($data['fee_amount_net'], 0);
         $taxFeeAmount = new Money($data['fee_amount_vat'], 0);
+
+        $creditNotesData = $data['credit_notes'] ?? [];
+        $creditNoteCollection = new CreditNoteCollection($this->creditNoteFactory->createFromArrayCollection($creditNotesData));
 
         return (new Invoice())
             ->setUuid($data['uuid'])
@@ -90,6 +100,7 @@ class InvoiceFactory extends AbstractFactory
             ->setState($data['state'])
             ->setCreatedAt(new \DateTime($data['created_at']))
             ->setMerchantPendingPaymentAmount(new Money($data['merchant_pending_payment_amount'], 0))
-            ->setInvoicePendingCancellationAmount(new Money($data['invoice_pending_cancellation_amount'], 0));
+            ->setInvoicePendingCancellationAmount(new Money($data['invoice_pending_cancellation_amount'], 0))
+            ->setCreditNotes($creditNoteCollection);
     }
 }

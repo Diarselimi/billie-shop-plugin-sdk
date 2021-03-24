@@ -31,20 +31,26 @@ class UpdateOrderAmountValidator
     private function isAmountChanged(OrderContainer $orderContainer, TaxedMoney $newAmount): bool
     {
         $financialDetails = $orderContainer->getOrderFinancialDetails();
+        $invoicesGrossAmountSum = $orderContainer->getInvoices()->getInvoicesCreditNotesGrossSum();
+        $invoicesNetAmountSum = $orderContainer->getInvoices()->getInvoicesCreditNotesNetSum();
+        $invoicesTaxAmountSum = $invoicesGrossAmountSum->subtract($invoicesNetAmountSum);
 
         return
-            !$financialDetails->getAmountGross()->equals($newAmount->getGross()) ||
-            !$financialDetails->getAmountNet()->equals($newAmount->getNet()) ||
-            !$financialDetails->getAmountTax()->equals($newAmount->getTax());
+            !$financialDetails->getAmountGross()->subtract($invoicesGrossAmountSum)->equals($newAmount->getGross()) ||
+            !$financialDetails->getAmountNet()->subtract($invoicesNetAmountSum)->equals($newAmount->getNet()) ||
+            !$financialDetails->getAmountTax()->subtract($invoicesTaxAmountSum)->equals($newAmount->getTax());
     }
 
     private function isAmountAllowed(OrderContainer $orderContainer, TaxedMoney $newAmount): bool
     {
         $financialDetails = $orderContainer->getOrderFinancialDetails();
+        $invoicesGrossAmountSum = $orderContainer->getInvoices()->getInvoicesCreditNotesGrossSum();
+        $invoicesNetAmountSum = $orderContainer->getInvoices()->getInvoicesCreditNotesNetSum();
+        $invoicesTaxAmountSum = $invoicesGrossAmountSum->subtract($invoicesNetAmountSum);
 
         return
-            $financialDetails->getAmountGross()->greaterThanOrEqual($newAmount->getGross()) &&
-            $financialDetails->getAmountNet()->greaterThanOrEqual($newAmount->getNet()) &&
-            $financialDetails->getAmountTax()->greaterThanOrEqual($newAmount->getTax());
+            $financialDetails->getAmountGross()->subtract($invoicesGrossAmountSum)->greaterThanOrEqual($newAmount->getGross()) &&
+            $financialDetails->getAmountNet()->subtract($invoicesNetAmountSum)->greaterThanOrEqual($newAmount->getNet()) &&
+            $financialDetails->getAmountTax()->subtract($invoicesTaxAmountSum)->greaterThanOrEqual($newAmount->getTax());
     }
 }

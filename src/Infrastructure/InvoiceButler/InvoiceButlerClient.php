@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Infrastructure\InvoiceButler;
 
 use App\DomainModel\Invoice\Invoice;
+use App\DomainModel\Invoice\InvoiceCollection;
 use App\DomainModel\Invoice\InvoiceFactory;
 use App\DomainModel\Invoice\InvoiceServiceException;
 use App\DomainModel\Invoice\InvoiceServiceInterface;
@@ -30,7 +31,7 @@ class InvoiceButlerClient implements InvoiceServiceInterface, LoggingInterface
         $this->factory = $factory;
     }
 
-    public function getByUuids(array $uuids): array
+    public function getByUuids(array $uuids): InvoiceCollection
     {
         try {
             $response = $this->client->get(
@@ -43,9 +44,11 @@ class InvoiceButlerClient implements InvoiceServiceInterface, LoggingInterface
                 ]
             );
 
-            return $this->factory->createFromArrayCollection(
+            $invoices = $this->factory->createFromArrayCollection(
                 $this->decodeResponse($response)
             );
+
+            return new InvoiceCollection($invoices);
         } catch (ClientException | TransferException $exception) {
             throw new InvoiceServiceException($exception);
         }
@@ -55,10 +58,10 @@ class InvoiceButlerClient implements InvoiceServiceInterface, LoggingInterface
     {
         $invoices = $this->getByUuids([$uuid]);
 
-        if (empty($invoices)) {
+        if ($invoices->isEmpty()) {
             return null;
         }
 
-        return array_shift($invoices);
+        return $invoices->getFirst();
     }
 }

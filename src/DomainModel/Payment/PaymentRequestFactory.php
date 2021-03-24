@@ -2,9 +2,9 @@
 
 namespace App\DomainModel\Payment;
 
-use App\DomainModel\Payment\RequestDTO\ConfirmRequestDTO;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\Payment\RequestDTO\ConfirmRequestDTO;
 use App\DomainModel\Payment\RequestDTO\ModifyRequestDTO;
 
 class PaymentRequestFactory
@@ -13,9 +13,14 @@ class PaymentRequestFactory
     {
         $requestDTO
             ->setDuration($orderContainer->getOrderFinancialDetails()->getDuration())
-            ->setAmountGross($orderContainer->getOrderFinancialDetails()->getAmountGross()->toFloat())
             ->setDebtorPaymentId($orderContainer->getMerchantDebtor()->getPaymentDebtorId())
-            ;
+            ->setAmountGross(
+                $orderContainer
+                    ->getOrderFinancialDetails()->getAmountGross()
+                    ->subtract($orderContainer->getInvoices()->getInvoicesCreditNotesGrossSum())
+                    ->toFloat()
+            )
+            ->setDebtorPaymentId($orderContainer->getMerchantDebtor()->getPaymentDebtorId());
         $this->createFromOrder($orderContainer->getOrder(), $requestDTO);
     }
 
@@ -25,8 +30,7 @@ class PaymentRequestFactory
             ->setPaymentId($orderEntity->getPaymentId())
             ->setInvoiceNumber($orderEntity->getInvoiceNumber())
             ->setExternalCode($orderEntity->getExternalCode())
-            ->setShippedAt($orderEntity->getShippedAt())
-        ;
+            ->setShippedAt($orderEntity->getShippedAt());
     }
 
     public function createConfirmRequestDTO(OrderEntity $order, float $outstandingAmount): ConfirmRequestDTO

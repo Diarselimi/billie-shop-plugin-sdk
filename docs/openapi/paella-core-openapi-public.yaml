@@ -3,26 +3,26 @@ info:
   title: 'Billie Boost API Documentation'
   description: |
     # Introduction
-    
+
     With PayAfterDelivery (PAD) / "Rechnungskauf" Billie offers a convenient, secure and simple way to allow your B2B-customers
     to pay on invoice. Our solution enables merchants to accept invoice payments from other business customers without waiting for their money,
     reminding customers about the payment, or assuming credit risk.
-    
+
     The following documentation describes our RESTFul API, which allows easy integration into your web-shop,
     eCommerce platform or invoicing back-end.
-    
+
     Based upon your Billie contract, your customers will have between 7 and 120 days (payment term) to pay your invoices, while Billie will 
     transfer the money to you immediately after shipment of goods or fulfilment of service obligation. For outstanding payments, 
     Billie takes over reminding customers on your behalf (white-label solution). Additionally, Billie protects you from credit risks 
     by absorbing any potential debtor defaults.
-    
+
     ---
     ## Order State Transitions
-    
+
     ![img](src/Resources/docs/orders-workflow-public.png)
-    
+
     ## Order States
-    
+
     | State         | Description                                                                                   |
     |---------------|-----------------------------------------------------------------------------------------------|
     | waiting       | The order creation failed and needs a manual operation in order to be approved or declined    |
@@ -34,12 +34,12 @@ info:
     | late          | The payment of the outstanding amount is overdue                                              |
     | complete      | The outstanding amount was successfully paid back by the customer                             |
     | canceled      | The order was canceled by the merchant       
-    
-    
+
+
     ## Order Decline Reasons
-    
+
     An order could be declined by any of these reasons:
-    
+
     | Reason                | Description                                               |
     |-----------------------|-----------------------------------------------------------|
     | debtor_address        | Debtor address or name mismatch                           |
@@ -47,15 +47,14 @@ info:
     | risk_policy           | Risk decline                                              |
     | risk_scoring_failed   | Not enough data available to make a decision              |
     | debtor_limit_exceeded | Financing limit of debtor currently exceeded              |
-    
-    
+
+
     ## Usage of Virtual IBANs
-    
+
     Since payouts by Billie to the merchant are made immediately after shipment of goods or delivery of the agreed service, customers need to 
     pay back their invoices directly to Billie upon due date. Therefore, Billie is using so-called virtual IBANs (VIBANs).
     VIBANs are delivered back to the merchant as response to an (accepted) order creation request. VIBANs are unique for each of your 
     debtor / customer. The VIBAN needs to be put on the invoice which the customer receives for the purchase.
-    
   termsOfService: 'https://www.billie.io/agb/'
   license:
     name: '© Billie GmbH, 2020'
@@ -77,25 +76,25 @@ paths:
       tags:
         - Authentication
       summary: 'Request OAuth Token'
-      description: |
+      description: |-
         <!-- Grants documentation taken from: https://oauth2.thephpleague.com/ -->
-        
+
         ### Flow
-        
+
         The client sends a POST request with following body parameters to the authorization server:
-        
+
         * `grant_type` with the value `client_credentials`
         * `client_id` with the client's ID
         * `client_secret` with the client's secret
-        
+
         The authorization server will respond with a JSON object containing the following properties:
-        
+
         * `token_type` with the value `Bearer`
         * `expires_in` with an integer representing the TTL (in seconds) of the access token (Default is 8 hours)
         * `access_token` a JWT signed with the authorization server's private key
-        
+
         The `access_token` should be used in the `Authorization` header together with the `Bearer` challenge to authenticate all the requests.
-        
+
         > Example: `Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c`.
       operationId: oauth_token_create
       requestBody:
@@ -116,7 +115,7 @@ paths:
       tags:
         - Authentication
       summary: 'Validate OAuth Token'
-      description: |
+      description: |-
         Validates the `Authorization: Bearer XXXX` OAuth 2.0 token header and returns a successful response
         with `client_id` and `user_id` or fails if it's invalid.
       operationId: oauth_token_validate
@@ -248,10 +247,10 @@ paths:
       tags:
         - 'Order Management'
       summary: 'Confirm Order Payment'
-      description: |
+      description: |-
         This endpoint needs to be called if a customer is accidentally paying the purchase amount 
         directly to the merchant. (See usage of virtual IBANs).
-        
+
         As a consequence of sending this call, Billie will make a direct debit from the merchant 
         or net it against the potential outstanding payout amount of the very day. 
         Please mind that the order state will only be updated after Billie actually receives 
@@ -296,12 +295,12 @@ paths:
       tags:
         - 'Back-end Order Creation'
       summary: 'Create Order'
-      description: |
+      description: |-
         Authorization of order financing requests.
-        
+
         Provide with this endpoint relevant information about the customer and the respective purchase to understand if
         Billie can offer financing for this transaction.
-        
+
         The decision whether or not Billie can accept a specific order is made on a single transaction basis.
         Therefore, orders need to be created to represent a specific transaction for the merchant.
       operationId: order_create
@@ -375,9 +374,9 @@ paths:
       tags:
         - 'Order Management'
       summary: 'Get Order Details'
-      description: |
+      description: |-
         Retrieves information about an order.
-        
+
         Get relevant information about an order (e.g. in order to understand, if a specific order was already repaid 
         by your customer).
       operationId: order_get_details
@@ -415,19 +414,19 @@ paths:
       tags:
         - 'Order Management'
       summary: 'Update Order'
-      description: |
+      description: |-
         Updates an order if changes are necessary. 
         The following information can be updated until the order reached state complete:
-        
+
         - order amount: decrease the order amount (mostly due to partial cancellations of a purchase), always possible 
           unless the order is already fully paid.
         - duration: extend timeframe for a payment. This changes the due date (§1).
         - invoice details like invoice number and document URL.
-        
-        
+
+
         §1 This call can also be used to move the due date into the future. This is possible from the moment the shipment is 
         confirmed until the last day before reaching the current due date.
-        
+
         The new duration is to be set (i.e. initial request for 30 days, shipment on the 01.01., due date = 31.01., 
         update duration on 45 days, new due date = 15.02.).
       operationId: order_update
@@ -512,9 +511,9 @@ paths:
       tags:
         - 'Order Management'
       summary: 'Ship Order'
-      description: |
+      description: |-
         Confirm that an order was shipped.
-        
+
         Confirm the shipment of the product or delivery of the agreed service to receive the payout of the purchase amount.
       operationId: order_ship
       parameters:
@@ -1281,13 +1280,13 @@ components:
   securitySchemes:
     oauth2:
       type: oauth2
-      description: |
+      description: |-
         This authentication mechanism is based on the OAuth 2.0 prototocol and requires a Client ID, a Client Secret Key and
         in some cases also a user and password.
-        
+
         With these credentials, the client should request a token using the `POST /api/v1/oauth/token` endpoint,
         which should be used in the `Authorization` header together with the `Bearer` challenge to authenticate all the requests.
-        
+
         > Example: `Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c`.
       flows:
         password:
@@ -1297,47 +1296,47 @@ components:
 tags:
   -
     name: Authentication
-    description: |
+    description: |-
       This API uses OAuth 2.0 for secure authentication. 
-      
+
       Different keys are used for the `sandbox` and `production` environments. Both systems operate completely independent, however both show largely 
       the same response behaviour. The major difference is that sandbox does not trigger any payment events (payout to merchant, repayment 
       by debtors, etc.). To obtain your credentials for both environments please contact Billie's merchant integration support 
       via telephone ( [+49-30-120872485](tel:+4930120872485) ) or email ( pad@billie.io ).
-      
+
       This authentication mechanism is based on the OAuth 2.0 protocol and requires a Client ID and a Client Secret Key (client credentials).
-      
+
       Before triggering any API call, a so called JSON web token (JWT) must be requested through the `oauth/token` endpoint described below
       by using your client credentials.
       In all following requests / API calls, this JWT token is used for authorization and must be passed as type "Bearer" token 
       in the Authorization header. Example: `Authorization: Bearer eyJhbGciOiJIUzI...`
-      
+
       Renewal of the bearer token / JWT:
-      
+
       Every token expires automatically after 8 hours. After expiration of an existing token a new token must be requested through the 
       `POST oauth/token` endpoint. Implementation best practice is to always try sending API calls first with the previously stored token. 
       Sending API calls with an expired token will be answered with an `HTTP 401` (Unauthorized request or invalid credentials) response.
-      
+
       After receiving the `401` error you will simply need to request a new token by triggering again the `oauth/token` endpoint. 
       After receiving the new valid token, resend the previously failed API call. This procedure allows for optimal API interaction, 
       ensures reduced system load on both ends, and is easy to implement as you don't need to keep track of token expiration times.
-      
+
       There is another endpoint available for checking if a token is still valid or not: `GET oauth/token`.
   -
     name: 'Checkout Client'
-    description: |
+    description: |-
       To integrate the Billie checkout widget, the following steps are required:
-      
+
       1. Add the Billie checkout widget bundle to your checkout page
       2. Provide config data _(with the `session_id` from the server-side integration)_
       3. Provide order details and call the mount method
       4. Handle the widget responses
       5. Apply customized styling _[optional]_
-      
+
       This section provides a step-by-step guide of the setup process.
-      
+
       ### 1. Include Billie Checkout Widget Bundle into your Checkout Page
-      
+
       On the checkout page, the following code snippet must be included:
       ```html
       <script>
@@ -1349,19 +1348,19 @@ tags:
         }(window,document,'script','bcw', bcwSrc));
       </script>
       ```
-      
+
       The URL contained in `bcwSrc` specifies whether you are using the Sandbox or Production environment:
-      
+
       Sandbox: https://static-paella-sandbox.billie.io/checkout/billie-checkout.js
-      
+
       Production: https://static.billie.io/checkout/billie-checkout.js
-      
+
       The code snippet above injects our checkout script into the `head` of the webshop. This will download our widget bundle code and enable function calls to interact with the widget.
-      
+
       It is **strongly recommended** to add this code snippet as high as possible in the document head to ensure that the widget download completes as soon as possible, providing a smooth user experience.
-      
+
       ### 2. Provide Config Data
-      
+
       During initialization of the widget, the `session_id` is required. This can be obtained by calling [Checkout Session Create](#operation/checkout_session_create) from your backend and exposing it to the frontend. The `session_id` will be unique per order.
       ```html
       <script>
@@ -1372,11 +1371,11 @@ tags:
       </script>
       ```
       The `session_id` is needed to approve the order and should be known before mounting the widget.
-      
+
       Ideally, if you are using server side rendering, this piece of code should be inserted into the document head with prefilled values. Otherwise please ensure there is an [XHR request](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest) as early as possible to your backend to retrieve the `session_id`.
-      
+
       ### 3. Provide Order Details and Call Mount Method
-      
+
       Once the user reviews his checkout basket and is ready to pay, he can click on the **Pay with Billie** button. When this happens, Billie expects the `mount` method to be called. The easiest integration option is to inline the function call directly on the button, for example:
       ```html
       <script>
@@ -1398,25 +1397,25 @@ tags:
       </script>
       <button onclick="payWithBillie()"> Pay with Billie </button>
       ```
-      
+
       `BillieCheckoutWidget` is a JavaScript promise which can accept optional `then` and `catch` methods. They can be added if the webshop needs to perform an action based on the outcome of the order authorization. 
-      
+
       The `then` block will receive as parameter the object with the authorised order details.
-      
+
       The `catch` block will receive the error object with reasons why the order creation was rejected.
-      
-      
+
+
       #### 3.a Mount Method Parameters
-      
+
       `BillieCheckoutWidget.mount` expects two parameters:
       - `billie_config_data` is the object received in step two which includes the `session_id` and `merchant_name`
       - `billie_order_data`  is a collection of order data from the user
-      
-      
+
+
       #### 3.b Order Data Object
-      
+
       The order data object must contain all information about an order, in the following format (required values are **bolded**):
-      
+
       - `amount` **[object]**
          - `gross` **[float]** `> 0`
          - `tax` **[float]** `>= 0`
@@ -1457,7 +1456,7 @@ tags:
           - `gross` **[float]** `> 0`
           - `tax` **[float]** `>= 0`
           - `net` **[float]** `> 0`
-      
+
       Below you can find an example of `orderData` object in javascript
       ```javascript
       const billie_order_data = {
@@ -1505,17 +1504,17 @@ tags:
         ]
       };
       ```
-      
+
       ### 4. Handle Widget Responses
-      
+
       When submitted, the checkout widget will evaluate if an order with the given data can be accepted. 
       - If an order cannot be accepted, the widget will return the state `declined` with a specified `decline_reason`
       - If an order can be accepted immediately the widget will return the state `authorized`. 
       - It is also possible that some additional checks need to be conducted by Billie in order to accept the order. In this case the widget will return the state `pre_waiting`. 
-      
+
       In both `authorized` and `pre_waiting` states the `checkout-session-confirm` call must be used to confirm the order creation. 
-      
-      
+
+
       #### Response
       After submitting the widget, following data will be returned to either `then` or `catch` block:
       - `state` **[string]** `<= 255 characters`   
@@ -1530,15 +1529,15 @@ tags:
         - `address_city` **[string]** `<= 255 characters`
         - `address_postal_code` **[string]** `<= 5 characters`
         - `address_country` **[string]** `2 characters` `^[A-Za-z]{2}$`
-      
+
       _**Special note**_  
       * `decline_reason` will be set only when `state` value is `declined`
       * `validation_error_source` will be set only when `decline_reason` value is `validation_error`. We will fill this property with information to help you find which fields are failing validation checks. 
-      
+
       #### 5. Apply Customized Styling
-      
+
       It is possible to set some CSS rules to be applied over widget in a simple format. Simply use this snippet:
-      
+
       ```html
       <style>
         .billie-checkout-modal {
@@ -1546,7 +1545,7 @@ tags:
         }
       </style>
       ```
-      
+
       Other available options are:
       - `c-primary` -  color of submit button
       - `s-font` - font size inside the widget 
@@ -1559,23 +1558,23 @@ tags:
     name: 'Order Management'
   -
     name: Webhooks
-    description: |
+    description: |-
       To send updates on relevant events, Billie PaD sends POST requests to the incoming webhook URL provided by the merchant.
       See "Event Names" section for the list of events that can be communicated via webhooks
-      
+
       ### Webhook Authentication
-      
+
       The authentication for webhooks sent from Billie to the merchants incoming webhook URL depends on the merchant specifications 
       and needs, but one possibility is sending the Billie API Key via headers:
       Examples:
        - `Authorization: Basic THE_API_KEY`
        - `X-Api-Key: THE_API_KEY`
        - `X-Another-Custom-Header: THE_API_KEY`
-      
+
       The merchants will need to verify on their server side the authentication mechanism and credentials.
-      
+
       ### Webhook Requests
-      
+
       A `POST` request is sent to the configured merchant Webhook URL with one of the API Key headers mentioned above,
       the `application/json` Content-Type and the following body format:
       ```
@@ -1588,10 +1587,10 @@ tags:
           open_amount: (string) (optional) (contains sum of outstanding amount)
       }
       ```
-      
+
       ## Event Names
       ### State Transitions
-      
+
       | Event Name    | Description |
       |---------------|-------------|
       |order_waiting  | Order is moved to waiting state. |
@@ -1599,16 +1598,16 @@ tags:
       |order_paid_out | When the order is paid_out  |
       |order_late     | When the order goes in state late. |
       |order_canceled | When the order is canceled. |
-      
+
       ### Waiting State
-      
+
       | Event Name      | Description                                                                                                                |
       |-----------------|----------------------------------------------------------------------------------------------------------------------------|
       | order\_approved | An order that is in waiting state and moves to order_approved.                                                             |
       | order\_declined | An order that is in waiting state and moves to order_declined.                                                             |
-      
+
       ### Webhooks for Dunning & Collections
-      
+
       | Event Name       | Description                              |
       |------------------|------------------------------------------|
       | reminder_email_1 | 1st Reminder mail was sent               |
@@ -1620,9 +1619,9 @@ tags:
       | dunning_email_2  | 2nd Dunning email was sent               |
       | reminder_email_4 | 4th Reminder email was sent              |
       | dca_email        | Handover to collections email was sent   |
-      
+
       ### Payments 
-      
+
       | Event Name |  Description |
       |------------|--------------|
       | payment    |The outstanding amount for an order changed. This message is sent for full as well as partial payments for orders|

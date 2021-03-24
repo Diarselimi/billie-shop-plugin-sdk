@@ -4,8 +4,10 @@ namespace App\DomainModel\OrderUpdate;
 
 use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\LegacyUpdateOrder\LegacyUpdateOrderRequest;
+use App\DomainModel\Invoice\CreditNote\CreditNote;
+use App\DomainModel\Invoice\CreditNote\CreditNoteFactory;
+use App\DomainModel\Invoice\CreditNote\InvoiceCreditNoteMessageFactory;
 use App\DomainModel\Invoice\ExtendInvoiceService;
-use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
@@ -17,6 +19,8 @@ use App\DomainModel\Payment\PaymentRequestFactory;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
+use Ozean12\Money\TaxedMoney\TaxedMoney;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class LegacyUpdateOrderService implements LoggingInterface
 {
@@ -38,6 +42,12 @@ class LegacyUpdateOrderService implements LoggingInterface
 
     private ExtendInvoiceService $extendInvoiceService;
 
+    private InvoiceCreditNoteMessageFactory $creditNoteMessageFactory;
+
+    private CreditNoteFactory $creditNoteFactory;
+
+    private MessageBusInterface $bus;
+
     public function __construct(
         PaymentsServiceInterface $paymentsService,
         OrderRepositoryInterface $orderRepository,
@@ -46,7 +56,10 @@ class LegacyUpdateOrderService implements LoggingInterface
         PaymentRequestFactory $paymentRequestFactory,
         UpdateOrderLimitsService $updateOrderLimitsService,
         UpdateOrderRequestValidator $updateOrderRequestValidator,
-        ExtendInvoiceService $extendInvoiceService
+        ExtendInvoiceService $extendInvoiceService,
+        InvoiceCreditNoteMessageFactory $creditNoteAnnouncer,
+        CreditNoteFactory $creditNoteFactory,
+        MessageBusInterface $bus
     ) {
         $this->paymentsService = $paymentsService;
         $this->orderRepository = $orderRepository;
@@ -56,6 +69,9 @@ class LegacyUpdateOrderService implements LoggingInterface
         $this->updateOrderLimitsService = $updateOrderLimitsService;
         $this->updateOrderRequestValidator = $updateOrderRequestValidator;
         $this->extendInvoiceService = $extendInvoiceService;
+        $this->creditNoteMessageFactory = $creditNoteAnnouncer;
+        $this->creditNoteFactory = $creditNoteFactory;
+        $this->bus = $bus;
     }
 
     public function update(OrderContainer $orderContainer, LegacyUpdateOrderRequest $request): void
@@ -93,31 +109,26 @@ class LegacyUpdateOrderService implements LoggingInterface
         );
     }
 
-    private function retrieveSingleInvoice(OrderContainer $orderContainer): ?Invoice
-    {
-        $invoices = $orderContainer->getInvoices();
-        if (count($invoices) === 1) {
-            return array_pop($invoices);
-        }
-
-        return null;
-    }
-
     private function doUpdate(OrderContainer $orderContainer, LegacyUpdateOrderRequest $changeSet): void
     {
-        if (
-            $changeSet->isAmountChanged()
-            || $changeSet->isDurationChanged()
-        ) {
+        if ($changeSet->isAmountChanged() || $changeSet->isDurationChanged()) {
+            $changedAmount = $changeSet->getAmount();
             $duration = $changeSet->isDurationChanged()
                 ? $changeSet->getDuration()
                 : $orderContainer->getOrderFinancialDetails()->getDuration();
+
+            if (!$orderContainer->getInvoices()->isEmpty()) {
+                $this->onAmountChangeDispatchCreditNoteMessage($changeSet, $orderContainer);
+                $changeSet->setAmount(null);
+            }
 
             $this->financialDetailsPersistenceService->updateFinancialDetails(
                 $orderContainer,
                 $changeSet,
                 $duration
             );
+
+            $changeSet->setAmount($changedAmount);
         }
 
         if (
@@ -152,7 +163,7 @@ class LegacyUpdateOrderService implements LoggingInterface
             return;
         }
 
-        $invoice = $this->retrieveSingleInvoice($orderContainer);
+        $invoice = $orderContainer->getInvoices()->getLastInvoice();
         if (($invoice !== null) && ($changeSet->isDurationChanged() || $changeSet->isInvoiceNumberChanged())) {
             if ($changeSet->isInvoiceNumberChanged()) {
                 $invoice->setExternalCode($changeSet->getInvoiceNumber());
@@ -162,7 +173,6 @@ class LegacyUpdateOrderService implements LoggingInterface
             $this->extendInvoiceService->extend($orderContainer, $invoice, $duration);
         }
 
-        // TODO (partial-shipments): replace borscht modify ticket call with CreateCreditNote msg
         $this->paymentsService->modifyOrder(
             $this->paymentRequestFactory->createModifyRequestDTO($orderContainer)
         );
@@ -197,5 +207,44 @@ class LegacyUpdateOrderService implements LoggingInterface
         } catch (InvoiceDocumentUploadException $exception) {
             throw new UpdateOrderException("Order invoice cannot be updated: upload failed.", 0, $exception);
         }
+    }
+
+    private function calculateReducedAmount(
+        OrderContainer $orderContainer,
+        LegacyUpdateOrderRequest $changeSet
+    ): TaxedMoney {
+        $initialAmountGross = $orderContainer->getOrderFinancialDetails()->getAmountGross();
+        $initialAmountNet = $orderContainer->getOrderFinancialDetails()->getAmountNet();
+
+        $reducedAmountGross = $initialAmountGross
+            ->subtract($orderContainer->getInvoices()->getInvoicesCreditNotesGrossSum())
+            ->subtract($changeSet->getAmount()->getGross());
+        $reducedAmountNet = $initialAmountNet
+            ->subtract($orderContainer->getInvoices()->getInvoicesCreditNotesNetSum())
+            ->subtract($changeSet->getAmount()->getNet());
+
+        return new TaxedMoney($reducedAmountGross, $reducedAmountNet, $reducedAmountGross->subtract($reducedAmountNet));
+    }
+
+    private function onAmountChangeDispatchCreditNoteMessage(
+        LegacyUpdateOrderRequest $changeSet,
+        OrderContainer $orderContainer
+    ): void {
+        if (!$changeSet->isAmountChanged()) {
+            return;
+        }
+
+        $invoice = $orderContainer->getInvoices()->getLastInvoice();
+
+        $differenceAmount = $this->calculateReducedAmount($orderContainer, $changeSet);
+        $creditNote = $this->creditNoteFactory->create(
+            $invoice,
+            $differenceAmount,
+            $invoice->getExternalCode() . CreditNote::EXTERNAL_CODE_SUFFIX,
+            null
+        );
+
+        $this->bus->dispatch($this->creditNoteMessageFactory->create($creditNote));
+        $invoice->getCreditNotes()->add($creditNote);
     }
 }

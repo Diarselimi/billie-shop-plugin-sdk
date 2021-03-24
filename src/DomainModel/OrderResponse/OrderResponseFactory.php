@@ -124,7 +124,7 @@ class OrderResponseFactory
     private function addLegacyInvoiceData(OrderContainer $orderContainer, OrderResponse $response): void
     {
         if (!$this->featureFlagManager->isButlerFullyEnabled()
-            && !empty($orderContainer->getOrder()->getPaymentId())
+            && $orderContainer->getOrder()->getPaymentId() !== null
         ) {
             $orderPaymentDetails = $orderContainer->getPaymentDetails();
             $response
@@ -135,14 +135,11 @@ class OrderResponseFactory
                 ->setFeeAmount($orderPaymentDetails->getFeeAmount())
                 ->setPendingCancellationAmount($orderPaymentDetails->getOutstandingAmountInvoiceCancellation())
                 ->setPendingMerchantPaymentAmount($orderPaymentDetails->getOutstandingAmountMerchantPayment());
-        } elseif (count($orderContainer->getInvoices()) >= 1) {
-            $invoices = $orderContainer->getInvoices();
-            /** @var Invoice $invoice */
-            $invoice = array_pop($invoices);
-            $amount = $invoice->getAmount()->getGross()->toFloat();
+        } elseif (!$orderContainer->getInvoices()->isEmpty()) {
+            $invoice = $orderContainer->getInvoices()->getFirst();
             $response
                 ->setInvoiceNumber($invoice->getExternalCode())
-                ->setPayoutAmount($amount)
+                ->setPayoutAmount($invoice->getPayoutAmount()->getMoneyValue())
                 ->setOutstandingAmount($invoice->getOutstandingAmount()->toFloat())
                 ->setFeeRate($invoice->getFeeRate()->toFloat())
                 ->setFeeAmount($invoice->getFeeAmount()->getGross()->toFloat())
@@ -154,6 +151,7 @@ class OrderResponseFactory
 
     private function addInvoiceData(OrderContainer $orderContainer, OrderResponse $response): void
     {
+        /** @var Invoice $invoice */
         foreach ($orderContainer->getInvoices() as $invoice) {
             $dueDate = clone $invoice->getBillingDate();
             $dueDate->add(
@@ -168,14 +166,14 @@ class OrderResponseFactory
                     ->setDuration($invoice->getDuration())
                     ->setAmount($invoice->getAmount())
                     ->setDuration($invoice->getDuration())
-                    ->setFeeAmount($invoice->getFeeAmount()->getGross()->toBase100())
+                    ->setFeeAmount($invoice->getFeeAmount()->getGross()->getMoneyValue())
                     ->setFeeRate($invoice->getFeeRate()->toBase100())
                     ->setInvoiceNumber($invoice->getExternalCode())
                     ->setDueDate($dueDate)
                     ->setCreatedAt($invoice->getCreatedAt())
-                    ->setPayoutAmount($invoice->getPayoutAmount()->toBase100())
+                    ->setPayoutAmount($invoice->getPayoutAmount()->getMoneyValue())
                     ->setState($invoice->getState())
-                    ->setOutstandingAmount($invoice->getAmount()->getGross()->toBase100())
+                    ->setOutstandingAmount($invoice->getOutstandingAmount()->getMoneyValue())
                     ->setPendingMerchantPaymentAmount($invoice->getMerchantPendingPaymentAmount()->getMoneyValue())
                     ->setPendingCancellationAmount($invoice->getInvoicePendingCancellationAmount()->getMoneyValue())
             );
@@ -245,13 +243,21 @@ class OrderResponseFactory
     private function addFinancialDetails(OrderContainer $orderContainer, OrderResponse $response): void
     {
         $financialDetails = $orderContainer->getOrderFinancialDetails();
+
+        $clonedInvoiceCollection = clone $orderContainer->getInvoices();
+        if (!$orderContainer->getInvoices()->isEmpty() && $orderContainer->getOrder()->isCanceled()) {
+            $clonedInvoiceCollection->getLastInvoice()->getCreditNotes()->pop();
+        }
+
+        $calculatedTaxedAmount = TaxedMoneyFactory::create(
+            $financialDetails->getAmountGross()->subtract($gross = $clonedInvoiceCollection->getInvoicesCreditNotesGrossSum()),
+            $financialDetails->getAmountNet()->subtract($net = $clonedInvoiceCollection->getInvoicesCreditNotesNetSum()),
+            $financialDetails->getAmountTax()->subtract($gross->subtract($net))
+        );
+
         $createdAt = clone $orderContainer->getOrder()->getCreatedAt();
         $response
-            ->setAmount(TaxedMoneyFactory::create(
-                $financialDetails->getAmountGross(),
-                $financialDetails->getAmountNet(),
-                $financialDetails->getAmountTax()
-            ))
+            ->setAmount($calculatedTaxedAmount)
             ->setDuration($orderContainer->getOrderFinancialDetails()->getDuration())
             ->setDueDate($createdAt->modify("+ {$financialDetails->getDuration()} days"))
             ->setUnshippedAmount(new TaxedMoney(
@@ -259,6 +265,12 @@ class OrderResponseFactory
                 $financialDetails->getUnshippedAmountNet(),
                 $financialDetails->getUnshippedAmountTax()
             ));
+
+        if (!$orderContainer->getInvoices()->isEmpty()) {
+            $outstandingAmount = $orderContainer->getInvoices()->getLastInvoice()->getOutstandingAmount()->getMoneyValue();
+            $response
+                ->setOutstandingAmount($outstandingAmount);
+        }
     }
 
     private function addOrderData(OrderEntity $order, OrderResponse $response): void

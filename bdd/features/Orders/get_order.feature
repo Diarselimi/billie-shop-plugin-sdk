@@ -140,6 +140,10 @@ Feature:
     And I get from payments service get order details response with first try fail
     And GraphQL will respond to getMerchantDebtorDetails query
     And I get from salesforce dunning status endpoint "Created" status for order "test-order-uuidXF43Y"
+    And I get from invoice-butler service good response
+    And the following invoice data exists:
+      | order_id | invoice_uuid                         |
+      | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
     When I send a GET request to "/order/XF43Y"
     Then the response status code should be 200
     And the JSON response should be:
@@ -149,9 +153,9 @@ Feature:
        "state":"late",
        "reasons":null,
        "decline_reason":null,
-       "amount":1000,
-       "amount_net":900,
-       "amount_tax":100,
+       "amount":945,
+       "amount_net":850,
+       "amount_tax":95,
        "duration":30,
        "dunning_status":"active",
        "unshipped_amount":1000,
@@ -159,7 +163,7 @@ Feature:
        "unshipped_amount_tax":100,
        "workflow_name":"order_v1",
        "due_date":"2021-01-13",
-       "invoices":[],
+       "invoices":[{"uuid":"208cfe7d-046f-4162-b175-748942d6cff4","invoice_number":"some_code","payout_amount":123.33,"outstanding_amount":500,"amount":123.33,"amount_net":123.33,"amount_tax":0,"fee_amount":123.33,"fee_rate":20,"due_date":"2020-12-31","created_at":"2020-10-12","duration":30,"state":"new","pending_merchant_payment_amount":0,"pending_cancellation_amount":0}],
        "debtor_company":{
           "name":"Test User Company",
           "address_house_number":"10",

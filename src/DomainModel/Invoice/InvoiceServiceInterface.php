@@ -6,11 +6,7 @@ namespace App\DomainModel\Invoice;
 
 interface InvoiceServiceInterface
 {
-    /**
-     * @param  array|string[] $uuids
-     * @return Invoice[]
-     */
-    public function getByUuids(array $uuids): array;
+    public function getByUuids(array $uuids): InvoiceCollection;
 
     public function getOneByUuid(string $uuid): ?Invoice;
 }

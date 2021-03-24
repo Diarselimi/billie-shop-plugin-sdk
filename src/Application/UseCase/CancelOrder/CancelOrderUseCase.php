@@ -4,7 +4,9 @@ namespace App\Application\UseCase\CancelOrder;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\WorkflowException;
-use App\DomainModel\Invoice\CreditNote\InvoiceCreditNoteAnnouncer;
+use App\DomainModel\Invoice\CreditNote\CreditNote;
+use App\DomainModel\Invoice\CreditNote\CreditNoteFactory;
+use App\DomainModel\Invoice\CreditNote\InvoiceCreditNoteMessageFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Payment\PaymentsServiceInterface;
@@ -16,13 +18,14 @@ use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Workflow\Registry;
 
 class CancelOrderUseCase implements LoggingInterface
 {
     use LoggingTrait;
 
-    private const CREDIT_NOTE_SUFFIX = '-CN';
+    private const CREDIT_NOTE_COMMENT = 'cancelation';
 
     private MerchantDebtorLimitsService $limitsService;
 
@@ -34,7 +37,11 @@ class CancelOrderUseCase implements LoggingInterface
 
     private Registry $workflowRegistry;
 
-    private InvoiceCreditNoteAnnouncer $invoiceCreditNoteAnnouncer;
+    private InvoiceCreditNoteMessageFactory $creditNoteMessageFactory;
+
+    private CreditNoteFactory $creditNoteFactory;
+
+    private MessageBusInterface $bus;
 
     public function __construct(
         MerchantDebtorLimitsService $limitsService,
@@ -42,14 +49,18 @@ class CancelOrderUseCase implements LoggingInterface
         OrderContainerFactory $orderContainerFactory,
         MerchantRepositoryInterface $merchantRepository,
         Registry $workflowRegistry,
-        InvoiceCreditNoteAnnouncer $invoiceCreditNoteAnnouncer
+        InvoiceCreditNoteMessageFactory $creditNoteMessageFactory,
+        CreditNoteFactory $creditNoteFactory,
+        MessageBusInterface $bus
     ) {
         $this->limitsService = $limitsService;
         $this->paymentsService = $paymentsService;
         $this->orderContainerFactory = $orderContainerFactory;
         $this->merchantRepository = $merchantRepository;
         $this->workflowRegistry = $workflowRegistry;
-        $this->invoiceCreditNoteAnnouncer = $invoiceCreditNoteAnnouncer;
+        $this->creditNoteMessageFactory = $creditNoteMessageFactory;
+        $this->creditNoteFactory = $creditNoteFactory;
+        $this->bus = $bus;
     }
 
     public function execute(CancelOrderRequest $request): void
@@ -104,14 +115,26 @@ class CancelOrderUseCase implements LoggingInterface
     private function createCreditNote(OrderContainer $orderContainer): void
     {
         $invoices = $orderContainer->getInvoices();
-        if (empty($invoices)) { // pre-butler order
+        if ($invoices->isEmpty()) { // pre-butler order
             return;
         }
 
-        $invoice = array_pop($invoices);
+        $invoice = $invoices->getLastInvoice();
         $financialDetails = $orderContainer->getOrderFinancialDetails();
-        $amount = new TaxedMoney($financialDetails->getAmountGross(), $financialDetails->getAmountNet(), $financialDetails->getAmountTax());
+        $amount = new TaxedMoney(
+            $financialDetails->getAmountGross()->subtract($grossSum = $invoices->getInvoicesCreditNotesGrossSum()),
+            $financialDetails->getAmountNet()->subtract($netSum = $invoices->getInvoicesCreditNotesNetSum()),
+            $financialDetails->getAmountTax()->subtract($grossSum->subtract($netSum))
+        );
 
-        $this->invoiceCreditNoteAnnouncer->create($invoice, $amount, $invoice->getExternalCode().self::CREDIT_NOTE_SUFFIX);
+        $creditNote = $this->creditNoteFactory->create(
+            $invoice,
+            $amount,
+            $invoice->getExternalCode().CreditNote::EXTERNAL_CODE_SUFFIX,
+            self::CREDIT_NOTE_COMMENT
+        );
+
+        $this->bus->dispatch($this->creditNoteMessageFactory->create($creditNote));
+        $invoice->getCreditNotes()->add($creditNote);
     }
 }
