@@ -143,6 +143,16 @@ Feature: Register merchant user to access dashboard
     """
     And the response status code should be 200
     And merchant user with merchant id 1 and user id "oauthUserId" should be created
+    And queue should contain message with routing key merchant_user_invitation.merchant_user_registered with below data:
+    """
+    {
+      "merchantPaymentUuid":"f2ec4d5e-79f4-40d6-b411-31174b6519ac",
+      "merchantUserUuid":"oauthUserId",
+      "token":"4b4e2b8b859a45bebfe0ae88b58c333b",
+      "firstName":"Cool",
+      "lastName":"Alex"
+    }
+    """
 
   Scenario: Successfully register admin merchant user via invitation
     Given I successfully create OAuth client with email "dev@billie.dev" and user id "oauthUserId"
@@ -195,3 +205,13 @@ Feature: Register merchant user to access dashboard
     """
     And the response status code should be 200
     And merchant user with merchant id 1 and user id "oauthUserId" should be created
+    And queue should contain message with routing key merchant_user_invitation.merchant_user_registered with below data:
+    """
+    {
+      "merchantPaymentUuid":"f2ec4d5e-79f4-40d6-b411-31174b6519ac",
+      "merchantUserUuid":"oauthUserId",
+      "token":"4b4e2b8b859a45bebfe0ae88b58c333b",
+      "firstName":"Cool",
+      "lastName":"Alex"
+    }
+    """

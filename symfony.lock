@@ -423,9 +423,6 @@
     "symfony/http-client-contracts": {
         "version": "v2.3.1"
     },
-    "symfony/intl": {
-        "version": "v4.4.19"
-    },
     "symfony/messenger": {
         "version": "4.3",
         "recipe": {
@@ -458,9 +455,6 @@
     },
     "symfony/options-resolver": {
         "version": "v4.4.20"
-    },
-    "symfony/polyfill-intl-icu": {
-        "version": "v1.22.1"
     },
     "symfony/polyfill-intl-normalizer": {
         "version": "v1.18.1"
@@ -547,9 +541,6 @@
     },
     "voku/portable-ascii": {
         "version": "1.5.2"
-    },
-    "webimpress/safe-writer": {
-        "version": "2.1.0"
     },
     "webmozart/assert": {
         "version": "1.10.0"
