@@ -12,7 +12,7 @@ abstract class IntegrationTestCase extends KernelTestCase
         return parent::$container;
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         self::bootKernel();
     }

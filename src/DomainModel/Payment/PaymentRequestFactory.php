@@ -2,10 +2,12 @@
 
 namespace App\DomainModel\Payment;
 
+use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Payment\RequestDTO\ConfirmRequestDTO;
 use App\DomainModel\Payment\RequestDTO\ModifyRequestDTO;
+use Ozean12\Money\Money;
 
 class PaymentRequestFactory
 {
@@ -19,24 +21,38 @@ class PaymentRequestFactory
                     ->getOrderFinancialDetails()->getAmountGross()
                     ->subtract($orderContainer->getInvoices()->getInvoicesCreditNotesGrossSum())
                     ->toFloat()
-            )
-            ->setDebtorPaymentId($orderContainer->getMerchantDebtor()->getPaymentDebtorId());
+            );
         $this->createFromOrder($orderContainer->getOrder(), $requestDTO);
     }
 
     private function createFromOrder(OrderEntity $orderEntity, AbstractPaymentRequestDTO $requestDTO)
     {
         $requestDTO
-            ->setPaymentId($orderEntity->getPaymentId())
+            ->setPaymentUuid($orderEntity->getPaymentId())
             ->setInvoiceNumber($orderEntity->getInvoiceNumber())
             ->setExternalCode($orderEntity->getExternalCode())
             ->setShippedAt($orderEntity->getShippedAt());
     }
 
-    public function createConfirmRequestDTO(OrderEntity $order, float $outstandingAmount): ConfirmRequestDTO
+    public function createConfirmRequestDTO(OrderEntity $order, float $paidAmount): ConfirmRequestDTO
     {
-        $requestDTO = new ConfirmRequestDTO($outstandingAmount);
+        $requestDTO = new ConfirmRequestDTO($paidAmount);
         $this->createFromOrder($order, $requestDTO);
+
+        return $requestDTO;
+    }
+
+    public function createConfirmRequestDTOFromInvoice(
+        Invoice $invoice,
+        Money $paidAmount,
+        string $orderExternalCode
+    ): ConfirmRequestDTO {
+        $requestDTO = new ConfirmRequestDTO($paidAmount->getMoneyValue());
+        $requestDTO
+            ->setPaymentUuid($invoice->getPaymentUuid())
+            ->setInvoiceNumber($invoice->getExternalCode())
+            ->setExternalCode($orderExternalCode)
+            ->setShippedAt($invoice->getCreatedAt());
 
         return $requestDTO;
     }

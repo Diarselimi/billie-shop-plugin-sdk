@@ -2,13 +2,13 @@ public_api_non_prefixed:
   resource: ../src/Http/Controller/PublicApi
   type: openapi_annotation
 
-public_api_prefixed:
+public_api_prefixed_public:
   resource: ../src/Http/Controller/PublicApi
   type: openapi_annotation
   prefix: /public
   name_prefix: public_
 
-public_api_prefixed_v1:
+public_api_prefixed_full:
   resource: ../src/Http/Controller/PublicApi
   type: openapi_annotation
   prefix: /public/api/v1

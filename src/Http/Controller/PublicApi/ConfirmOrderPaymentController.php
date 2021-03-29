@@ -42,6 +42,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     @OA\Response(response=404, ref="#/components/responses/NotFound"),
  *     @OA\Response(response=500, ref="#/components/responses/ServerError")
  * )
+ * @deprecated Use ConfirmInvoicePayment* classes
  */
 class ConfirmOrderPaymentController
 {

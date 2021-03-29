@@ -2812,6 +2812,47 @@ paths:
       security:
         -
           oauth2: []
+  '/invoices/{uuid}/confirm-payment':
+    post:
+      tags:
+        - 'Invoice Management'
+      summary: 'Confirm Invoice Payment'
+      description: 'Confirms that the debtor paid the given amount of this invoice directly to the merchant.'
+      operationId: invoice_payment_confirm
+      parameters:
+        -
+          name: uuid
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                paid_amount:
+                  type: number
+                  format: float
+                  minimum: 0.1
+              type: object
+      responses:
+        '204':
+          description: 'Invoice payment successfully confirmed'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
 components:
   schemas:
     UUID:
@@ -5245,6 +5286,8 @@ tags:
     name: 'Back-end Order Creation'
   -
     name: 'Order Management'
+  -
+    name: 'Invoice Management'
   -
     name: Webhooks
     description: |-

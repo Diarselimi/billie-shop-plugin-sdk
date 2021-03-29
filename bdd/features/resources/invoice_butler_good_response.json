@@ -1,7 +1,7 @@
 [
   {
     "uuid": "208cfe7d-046f-4162-b175-748942d6cff4",
-    "payment_uuid": "b0a709cf-4bba-476b-ab74-17bf6b693126",
+    "payment_uuid": "8e6a9efa-3a76-44f1-ad98-24f0ef15d7ad",
     "external_code": "some_code",
     "invoice_number": "123",
     "offered_amount": 123.33,

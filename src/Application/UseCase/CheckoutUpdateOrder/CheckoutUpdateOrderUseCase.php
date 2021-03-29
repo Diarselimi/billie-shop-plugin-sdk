@@ -111,12 +111,10 @@ class CheckoutUpdateOrderUseCase implements ValidatedUseCaseInterface, LoggingIn
         }
 
         if ($newDuration < $currentDuration) {
-            $errorMsg = 'New duration cannot be lower than the original one';
-
-            throw new RequestValidationException(
-                new ConstraintViolationList(
-                    [new ConstraintViolation($errorMsg, $errorMsg, [], '', 'duration', $newDuration)]
-                )
+            throw RequestValidationException::createForInvalidValue(
+                'New duration cannot be lower than the original one',
+                'duration',
+                $newDuration
             );
         }
 

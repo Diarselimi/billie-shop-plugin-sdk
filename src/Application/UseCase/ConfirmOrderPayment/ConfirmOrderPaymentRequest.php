@@ -5,6 +5,9 @@ namespace App\Application\UseCase\ConfirmOrderPayment;
 use App\Application\UseCase\ValidatedRequestInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * @deprecated Use ConfirmInvoicePayment* classes
+ */
 class ConfirmOrderPaymentRequest implements ValidatedRequestInterface
 {
     private $orderId;

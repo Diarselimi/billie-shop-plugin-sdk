@@ -12,14 +12,14 @@ trait ValidatedUseCaseTrait
     /**
      * @var ValidatorInterface
      */
-    private $validator;
+    private ValidatorInterface $validator;
 
     public function setValidator(ValidatorInterface $validator)
     {
         $this->validator = $validator;
     }
 
-    public function validateRequest(ValidatedRequestInterface $request, $constrains = null, $groups = null): void
+    public function validateRequest($request, $constrains = null, $groups = null): void
     {
         $validationErrors = $this->validator->validate($request, $constrains, $groups);
 

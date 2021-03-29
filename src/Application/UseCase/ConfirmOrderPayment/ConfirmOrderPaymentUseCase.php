@@ -10,6 +10,9 @@ use App\DomainModel\Payment\PaymentRequestFactory;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Order\OrderRepositoryInterface;
 
+/**
+ * @deprecated Use ConfirmInvoicePayment* classes
+ */
 class ConfirmOrderPaymentUseCase implements ValidatedUseCaseInterface
 {
     use ValidatedUseCaseTrait;

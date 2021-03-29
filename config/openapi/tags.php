@@ -10,6 +10,7 @@ use OpenApi\Annotations as OA;
  *          @OA\Tag(name="Checkout Server", x={"groups":{"public", "private"}}),
  *          @OA\Tag(name="Back-end Order Creation", x={"groups":{"public", "private"}}),
  *          @OA\Tag(name="Order Management", x={"groups":{"public", "private"}}),
+ *          @OA\Tag(name="Invoice Management", x={"groups":{"private"}}),
  *          @OA\Tag(name="Webhooks", x={"groups":{"public", "private"}}),
  *
  *          @OA\Tag(name="Dashboard Orders", x={"groups":{"private"}}),

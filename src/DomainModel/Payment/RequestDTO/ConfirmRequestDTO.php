@@ -28,7 +28,7 @@ class ConfirmRequestDTO extends AbstractPaymentRequestDTO
     public function toArray(): array
     {
         return [
-            'ticket_id' => $this->getPaymentId(),
+            'ticket_id' => $this->getPaymentUuid(),
             'amount' => $this->getAmount(),
         ];
     }

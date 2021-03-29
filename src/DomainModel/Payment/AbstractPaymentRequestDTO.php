@@ -16,7 +16,7 @@ abstract class AbstractPaymentRequestDTO
 
     private $externalCode;
 
-    private $paymentId;
+    private $paymentUuid;
 
     public function getDebtorPaymentId(): ?string
     {
@@ -114,18 +114,18 @@ abstract class AbstractPaymentRequestDTO
         return $this;
     }
 
-    public function getPaymentId(): ?string
+    public function getPaymentUuid(): ?string
     {
-        return $this->paymentId;
+        return $this->paymentUuid;
     }
 
     /**
-     * @param  string|null $paymentId
+     * @param  string|null $paymentUuid
      * @return $this
      */
-    public function setPaymentId(?string $paymentId): AbstractPaymentRequestDTO
+    public function setPaymentUuid(?string $paymentUuid): AbstractPaymentRequestDTO
     {
-        $this->paymentId = $paymentId;
+        $this->paymentUuid = $paymentUuid;
 
         return $this;
     }

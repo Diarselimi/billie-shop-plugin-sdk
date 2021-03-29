@@ -9,7 +9,7 @@ class ModifyRequestDTO extends AbstractPaymentRequestDTO
     public function toArray(): array
     {
         return [
-            'ticket_id' => $this->getPaymentId(),
+            'ticket_id' => $this->getPaymentUuid(),
             'invoice_number' => $this->getInvoiceNumber(),
             'duration' => $this->getDuration(),
             'amount' => $this->getAmountGross(),

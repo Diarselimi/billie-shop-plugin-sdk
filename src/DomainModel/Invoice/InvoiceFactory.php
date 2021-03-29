@@ -97,6 +97,7 @@ class InvoiceFactory extends AbstractFactory
             ->setBillingDate(new \DateTime($data['billing_date']))
             ->setProofOfDeliveryUrl('proof_of_delivery_url')
             ->setExternalCode($data['external_code'])
+            ->setPaymentUuid($data['payment_uuid'])
             ->setState($data['state'])
             ->setCreatedAt(new \DateTime($data['created_at']))
             ->setMerchantPendingPaymentAmount(new Money($data['merchant_pending_payment_amount'], 0))

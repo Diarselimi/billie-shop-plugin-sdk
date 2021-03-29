@@ -9,6 +9,14 @@ use Ozean12\Money\TaxedMoney\TaxedMoney;
 
 class Invoice
 {
+    public const STATE_NEW = 'new';
+
+    public const STATE_PAID_OUT = 'paid_out';
+
+    public const STATE_CANCELED = 'canceled';
+
+    public const STATE_COMPLETE = 'complete';
+
     private string $uuid;
 
     private TaxedMoney $amount;
@@ -256,6 +264,26 @@ class Invoice
         $this->state = $state;
 
         return $this;
+    }
+
+    public function isNew(): bool
+    {
+        return $this->getState() === self::STATE_NEW;
+    }
+
+    public function isPaidOut(): bool
+    {
+        return $this->getState() === self::STATE_PAID_OUT;
+    }
+
+    public function isComplete(): bool
+    {
+        return $this->getState() === self::STATE_COMPLETE;
+    }
+
+    public function isCanceled(): bool
+    {
+        return $this->getState() === self::STATE_CANCELED;
     }
 
     public function getInvoicePendingCancellationAmount(): Money

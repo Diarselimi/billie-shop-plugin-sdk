@@ -1,7 +1,4 @@
-Feature:
-    In order to cancel an order
-    I want to have an end point to cancel my orders
-    And expect empty response
+Feature: Confirm order payments
 
     Background:
         Given I add "Content-type" header equal to "application/json"
