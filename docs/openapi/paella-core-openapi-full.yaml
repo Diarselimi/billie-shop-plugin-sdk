@@ -958,6 +958,33 @@ paths:
       security:
         -
           oauth2: []
+  '/invoices/{uuid}/check-owner':
+    get:
+      tags:
+        - 'Dashboard Merchants'
+      summary: 'Check invoice owner'
+      operationId: check_invoice_owner
+      parameters:
+        -
+          name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'Invoice is owned by merchant'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
   '/checkout-session/{sessionUuid}/authorize':
     put:
       tags:

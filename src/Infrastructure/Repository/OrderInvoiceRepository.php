@@ -56,4 +56,17 @@ class OrderInvoiceRepository extends AbstractPdoRepository implements OrderInvoi
 
         return $rows ? $this->factory->createFromArrayCollection($rows) : [];
     }
+
+    public function getByUuidAndMerchant(string $invoiceUuid, int $merchantId): ?OrderInvoiceEntity
+    {
+        $invoice = $this->doFetchOne(
+            'SELECT ' . implode(', ', array_map(fn ($f) => 'inv.' . $f, self::SELECT_FIELDS)) .
+            ' FROM ' . self::TABLE_NAME . ' inv ' .
+            ' LEFT JOIN orders o ON inv.order_id = o.id ' .
+            ' WHERE inv.invoice_uuid = :uuid AND o.merchant_id = :merchant_id',
+            ['uuid' => $invoiceUuid, 'merchant_id' => $merchantId]
+        );
+
+        return $invoice ? $this->factory->createFromArray($invoice) : null;
+    }
 }

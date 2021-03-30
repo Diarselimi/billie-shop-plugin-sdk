@@ -11,4 +11,6 @@ interface OrderInvoiceRepositoryInterface
      * @return array|OrderInvoiceEntity[]
      */
     public function findByOrderId(int $orderId): array;
+
+    public function getByUuidAndMerchant(string $invoiceUuid, int $merchantId): ?OrderInvoiceEntity;
 }
