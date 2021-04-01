@@ -78,4 +78,9 @@ interface OrderRepositoryInterface
     ): int;
 
     public function updateDurationExtension(int $orderId, int $durationExtension): void;
+
+    /**
+     * @return OrderEntity[]
+     */
+    public function geOrdersByMerchantId(int $merchantId, \DateTime $shippedFrom, int $limit): array;
 }

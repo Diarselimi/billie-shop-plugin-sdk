@@ -608,4 +608,34 @@ SQL;
             'orders' => array_map([$this->orderFactory, 'createFromArray'], $rows),
         ];
     }
+
+    public function geOrdersByMerchantId(int $merchantId, \DateTime $shippedFrom, int $limit): array
+    {
+        $tableOrders = self::TABLE_NAME;
+        $tableInvoicesV1 = LegacyOrderInvoiceRepository::TABLE_NAME;
+
+        $sql = <<<SQL
+SELECT
+	o.id
+FROM
+	{$tableOrders} o
+	INNER JOIN {$tableInvoicesV1} i on o.id = i.order_id
+WHERE
+	o.shipped_at >= :shipped_from
+LIMIT $limit
+;
+SQL;
+
+        $rows = $this->doFetchAll(
+            $sql,
+            [
+                'shipped_from' => $shippedFrom->format('c'),
+            ]
+        );
+
+        return [
+            'total' => $totalCount['total_count'] ?? 0,
+            'orders' => array_map([$this->orderFactory, 'createFromArray'], $rows),
+        ];
+    }
 }
