@@ -95,7 +95,7 @@ class UploadShippedInvoicesCommand extends Command implements LoggingInterface
                 $this->uploadInvoice(
                     $order,
                     $invoice->getUuid(),
-                    $invoice->getProofOfDeliveryUrl(),
+                    $order->getInvoiceUrl(),
                     $invoice->getExternalCode()
                 );
             }
@@ -107,9 +107,20 @@ class UploadShippedInvoicesCommand extends Command implements LoggingInterface
     private function uploadInvoice(
         OrderEntity $order,
         string $invoiceUuid,
-        string $invoiceUrl,
+        ?string $invoiceUrl,
         string $invoiceNumber
     ): void {
+        if ($invoiceUrl === null) {
+            $this->logInfo(
+                sprintf(
+                    'Uploading order #%d. Skip. Invoice URL is null',
+                    $order->getId()
+                )
+            );
+
+            return;
+        }
+
         $this->logInfo(
             sprintf(
                 'Uploading order #%d',
