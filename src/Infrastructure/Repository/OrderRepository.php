@@ -613,10 +613,11 @@ SQL;
     {
         $tableOrders = self::TABLE_NAME;
         $tableInvoicesV1 = LegacyOrderInvoiceRepository::TABLE_NAME;
+        $allFields = 'orders.' . implode(', orders.', self::SELECT_FIELDS);
 
         $sql = <<<SQL
 SELECT
-	o.id
+	$allFields
 FROM
 	{$tableOrders} o
 	LEFT JOIN {$tableInvoicesV1} i on o.id = i.order_id
@@ -636,9 +637,6 @@ SQL;
             ]
         );
 
-        return [
-            'total' => $totalCount['total_count'] ?? 0,
-            'orders' => array_map([$this->orderFactory, 'createFromArray'], $rows),
-        ];
+        return array_map([$this->orderFactory, 'createFromArray'], $rows);
     }
 }
