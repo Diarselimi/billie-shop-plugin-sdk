@@ -123,8 +123,9 @@ class UploadShippedInvoicesCommand extends Command implements LoggingInterface
 
         $this->logInfo(
             sprintf(
-                'Uploading order #%d',
-                $order->getId()
+                'Uploading order #%d. Invoice url "%s"',
+                $order->getId(),
+                $invoiceUrl
             )
         );
 
