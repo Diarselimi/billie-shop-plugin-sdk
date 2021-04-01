@@ -619,9 +619,11 @@ SELECT
 	o.id
 FROM
 	{$tableOrders} o
-	INNER JOIN {$tableInvoicesV1} i on o.id = i.order_id
+	LEFT JOIN {$tableInvoicesV1} i on o.id = i.order_id
 WHERE
 	o.shipped_at >= :shipped_from
+	AND o.merchant_id = :merchant_id
+	AND i.id IS NULL
 LIMIT $limit
 ;
 SQL;
@@ -630,6 +632,7 @@ SQL;
             $sql,
             [
                 'shipped_from' => $shippedFrom->format('c'),
+                'merchant_id' => $merchantId,
             ]
         );
 
