@@ -55,7 +55,7 @@ class UploadShippedInvoicesCommand extends Command implements LoggingInterface
     {
         $this
             ->addOption(self::OPTION_LIMIT, 'l', InputOption::VALUE_OPTIONAL, '', self::DEFAULT_LIMIT)
-            ->addOption(self::OPTION_SHIPPED_FROM, 'f', InputOption::VALUE_OPTIONAL, '', (new \DateTime())->sub(new \DateInterval('P3D')))
+            ->addOption(self::OPTION_SHIPPED_FROM, 'f', InputOption::VALUE_OPTIONAL, '', (new \DateTime())->sub(new \DateInterval('P3D'))->format('c'))
             ->addArgument(self::ARGUMENT_MERCHANT_ID, InputArgument::REQUIRED)
         ;
     }
@@ -65,7 +65,7 @@ class UploadShippedInvoicesCommand extends Command implements LoggingInterface
         $merchantId = $input->getArgument(self::ARGUMENT_MERCHANT_ID);
         $shippedFrom = new \DateTime($input->getOption(self::OPTION_SHIPPED_FROM));
 
-        $this->logger->info(
+        $this->logInfo(
             sprintf(
                 'Starting the invoices upload for the merchant "%d" shipped from "%s"',
                 $merchantId,
@@ -79,7 +79,7 @@ class UploadShippedInvoicesCommand extends Command implements LoggingInterface
             (int) $input->getOption(self::OPTION_LIMIT)
         );
 
-        $this->logger->info(
+        $this->logInfo(
             sprintf(
                 'Found "%d" orders',
                 count($orders)
@@ -110,7 +110,7 @@ class UploadShippedInvoicesCommand extends Command implements LoggingInterface
         string $invoiceUrl,
         string $invoiceNumber
     ): void {
-        $this->logger->info(
+        $this->logInfo(
             sprintf(
                 'Uploading order #%d',
                 $order->getId()
