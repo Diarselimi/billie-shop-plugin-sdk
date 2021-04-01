@@ -613,7 +613,7 @@ SQL;
     {
         $tableOrders = self::TABLE_NAME;
         $tableInvoicesV1 = LegacyOrderInvoiceRepository::TABLE_NAME;
-        $allFields = 'orders.' . implode(', orders.', self::SELECT_FIELDS);
+        $allFields = 'o.' . implode(', o.', self::SELECT_FIELDS);
 
         $sql = <<<SQL
 SELECT
