@@ -10,7 +10,7 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Get(
- *     path="/v2/docs",
+ *     path="/docs/v2",
  *     operationId="docs_v2_get_default",
  *     summary="Public API Docs (default)",
  *

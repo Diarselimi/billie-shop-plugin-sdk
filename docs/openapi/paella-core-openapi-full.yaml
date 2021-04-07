@@ -326,7 +326,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-  /v2/docs:
+  /docs/v2:
     get:
       tags:
         - 'API Docs'
@@ -356,7 +356,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-  /v2/docs/billie-pad-openapi.yaml:
+  /docs/v2/billie-pad-openapi.yaml:
     get:
       tags:
         - 'API Docs'

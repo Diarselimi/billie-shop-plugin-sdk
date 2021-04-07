@@ -15,7 +15,7 @@ security:
       security: false # handled via AWS
 
     api_docs:
-      pattern: ^/(v[1-2]/)?(docs|internal-docs)(/.*)?
+      pattern: ^/(docs|internal-docs)(/.*)?
       security: false
 
     legal_forms:

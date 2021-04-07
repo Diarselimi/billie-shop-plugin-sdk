@@ -172,7 +172,7 @@ if (url.toLowerCase().includes('v2')) {
 }
 
 document.querySelector('.api-v1').setAttribute('href', base_url+'/docs');
-document.querySelector('.api-v2').setAttribute('href', base_url+'/v2/docs');
+document.querySelector('.api-v2').setAttribute('href', base_url+'/docs/v2');
 
 function switchLeft(){
 	document.querySelector('.api-v2').classList.remove('active-case');
