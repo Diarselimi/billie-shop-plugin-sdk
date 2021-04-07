@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\OpenApi\Command;
 
+use App\Http\Controller\ApiDocs\AbstractApiDocsController;
 use App\Infrastructure\OpenApi\Annotations\Processors as CustomProcessors;
 use App\Infrastructure\OpenApi\RelativeFileReader;
 use OpenApi\Analyser;
@@ -46,7 +47,7 @@ class GenerateOpenApiSpec extends Command
                 null,
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
                 'White list of groups to include in the generated spec.',
-                ['public', 'private']
+                [AbstractApiDocsController::API_VERSION_1, 'private']
             )
             ->addOption(
                 'with-extra-config',
@@ -62,9 +63,13 @@ class GenerateOpenApiSpec extends Command
             mkdir($this->projectDocsDir, 0755, true);
         }
 
-        $outputFile = $input->getOption('output-file') ?:
-            ($this->projectDocsDir . '/paella-' . $input->getArgument('version') . '-openapi.yaml');
+        $filename = '-openapi.yaml';
+        if (in_array(AbstractApiDocsController::API_VERSION_2, $input->getOption('groups'), true)) {
+            $filename = '-openapi-publicV2.yaml';
+        }
 
+        $outputFile = $input->getOption('output-file') ?:
+            ($this->projectDocsDir . '/paella-' . $input->getArgument('version') . $filename);
         file_put_contents($outputFile, $this->buildYaml($input));
 
         return 0;
@@ -93,11 +98,17 @@ class GenerateOpenApiSpec extends Command
 
     protected function buildProcessorsData(InputInterface $input)
     {
+        if (in_array(AbstractApiDocsController::API_VERSION_2, $input->getOption('groups'), true)) {
+            $mdFile = 'docs/markdown/indexV2.md';
+        } else {
+            $mdFile = 'docs/markdown/index.md';
+        }
+
         return [
             'title' => $input->getOption('title'),
             'version' => $input->getArgument('version'),
             'logo' => 'data:image/svg+xml;base64,' . base64_encode($this->fileReader->read('docs/billie-logo.svg')),
-            'info_description' => $this->fileReader->read('docs/markdown/index.md'),
+            'info_description' => $this->fileReader->read($mdFile),
         ];
     }
 

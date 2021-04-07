@@ -17,7 +17,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @IsGranted("ROLE_AUTHENTICATED_AS_MERCHANT")
- *
  * @OA\Patch(
  *     path="/order/{id}",
  *     operationId="order_update",

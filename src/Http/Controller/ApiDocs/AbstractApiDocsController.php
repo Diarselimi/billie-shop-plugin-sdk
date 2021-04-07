@@ -18,6 +18,12 @@ abstract class AbstractApiDocsController
 
     public const CACHE_MAX_DAYS_URL_SPEC = (30 * 24 * 60 * 60);
 
+    public const API_VERSION_PRIVATE = 'private';
+
+    public const API_VERSION_1 = 'publicV1';
+
+    public const API_VERSION_2 = 'publicV2';
+
     public function __construct(ApiDocsRenderUseCase $docsRenderUseCase, ApiSpecLoadUseCase $specLoadUseCase)
     {
         $this->docsRenderUseCase = $docsRenderUseCase;
@@ -28,7 +34,7 @@ abstract class AbstractApiDocsController
 
     public function createResponse(Request $request, string $apiGroup): Response
     {
-        $isInlineSpec = $request->query->has('embed');
+        $isInlineSpec = $request->query->has('1');
         $inlineSpec = $isInlineSpec ? $this->getInlineSpec($apiGroup) : "''";
 
         $headers = ['Content-Type' => 'text/html'];

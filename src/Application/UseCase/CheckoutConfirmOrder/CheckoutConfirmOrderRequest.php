@@ -6,7 +6,6 @@ namespace App\Application\UseCase\CheckoutConfirmOrder;
 
 use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
 use App\Application\UseCase\ValidatedRequestInterface;
-use App\Application\Validator\Constraint as CustomConstrains;
 use App\Application\Validator\Constraint as PaellaAssert;
 use App\DomainModel\DebtorCompany\DebtorCompanyRequest;
 use OpenApi\Annotations as OA;
@@ -17,9 +16,10 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @OA\Schema(schema="CheckoutConfirmOrderRequest", required={"amount", "duration", "debtor_company"}, properties={
  *      @OA\Property(property="amount", ref="#/components/schemas/AmountDTO"),
  *      @OA\Property(property="duration", ref="#/components/schemas/OrderDuration"),
- *      @OA\Property(property="debtor_company", ref="#/components/schemas/DebtorCompanyRequest"),
- *      @OA\Property(property="delivery_address", ref="#/components/schemas/CreateOrderAddressRequest", nullable=true),
- *      @OA\Property(property="order_id", ref="#/components/schemas/TinyText", description="Order external code", example="DE123456-1")
+ *      @OA\Property(property="debtor_company_name", ref="#/components/schemas/TinyText", description="Company name"),
+ *      @OA\Property(property="debtor_company_address", ref="#/components/schemas/Address"),
+ *      @OA\Property(property="delivery_address", ref="#/components/schemas/Address", nullable=true),
+ *      @OA\Property(property="external_code", ref="#/components/schemas/TinyText", description="Order external code", example="DE123456-1")
  * })
  */
 class CheckoutConfirmOrderRequest implements ValidatedRequestInterface

@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
  *     security={{"oauth2"={}}},
  *
  *     tags={"Back-end Order Creation"},
- *     x={"groups":{"public"}},
+ *     x={"groups":{"publicV1"}},
  *
  *     @OA\RequestBody(
  *          required=true,

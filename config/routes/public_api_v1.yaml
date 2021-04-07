@@ -1,6 +1,7 @@
 public_api_non_prefixed:
   resource: ../src/Http/Controller/PublicApi
   type: openapi_annotation
+  name_prefix: api_v1_
 
 public_api_prefixed_public:
   resource: ../src/Http/Controller/PublicApi

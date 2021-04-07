@@ -250,3 +250,16 @@ use OpenApi\Annotations as OA;
  *     }
  * )
  */
+
+/**
+ * @OA\Schema(schema="Address", title="Address data are all required except house number.",
+ *     required={"street", "postal_code", "city", "country"},
+ *     properties={
+ *          @OA\Property(property="house_number", ref="#/components/schemas/TinyText"),
+ *          @OA\Property(property="street", ref="#/components/schemas/TinyText"),
+ *          @OA\Property(property="postal_code", ref="#/components/schemas/TinyText"),
+ *          @OA\Property(property="city", ref="#/components/schemas/TinyText"),
+ *          @OA\Property(property="country", ref="#/components/schemas/TinyText")
+ *     }
+ * )
+ */

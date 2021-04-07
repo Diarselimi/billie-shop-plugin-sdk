@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
  *     security={{"oauth2"={}}},
  *
  *     tags={"Checkout Server"},
- *     x={"groups":{"public", "private"}},
+ *     x={"groups":{"publicV1", "publicV2", "private"}},
  *
  *     @OA\RequestBody(
  *          required=true,

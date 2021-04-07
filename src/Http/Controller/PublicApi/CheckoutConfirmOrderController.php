@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     security={{"oauth2"={}}},
  *
  *     tags={"Checkout Server"},
- *     x={"groups":{"public", "private"}},
+ *     x={"groups":{"publicV1", "private"}},
  *
  *     @OA\Parameter(in="path", name="sessionUuid", @OA\Schema(ref="#/components/schemas/UUID"), required=true),
  *

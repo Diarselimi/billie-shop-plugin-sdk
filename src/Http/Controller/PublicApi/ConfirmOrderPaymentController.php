@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     security={{"oauth2"={}}},
  *
  *     tags={"Order Management"},
- *     x={"groups":{"public", "private"}},
+ *     x={"groups":{"publicV1", "private"}},
  *
  *     @OA\Parameter(in="path", name="id", @OA\Schema(ref="#/components/schemas/TinyText"), required=true),
  *

@@ -138,278 +138,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
         default:
           $ref: '#/components/responses/ServerError'
-  '/order/{id}/cancel':
-    post:
-      tags:
-        - 'Order Management'
-      summary: 'Cancel Order'
-      description: 'This call initiates a full order cancellation.'
-      operationId: order_cancel
-      parameters:
-        -
-          name: id
-          in: path
-          description: 'Order ID or UUID'
-          required: true
-          schema:
-            type: integer
-      responses:
-        '204':
-          description: 'Order successfully cancelled'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-  '/checkout-session/{sessionUuid}/confirm':
-    put:
-      tags:
-        - 'Checkout Server'
-      summary: 'Checkout Session Confirm'
-      description: 'Confirms the creation of an existing checkout session.'
-      operationId: checkout_session_confirm
-      parameters:
-        -
-          name: sessionUuid
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/UUID'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CheckoutConfirmOrderRequest'
-      responses:
-        '202':
-          description: 'Order data successfully confirmed'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-  /checkout-session:
-    post:
-      tags:
-        - 'Checkout Server'
-      summary: 'Checkout Session Create'
-      description: 'Initializes a new Billie Checkout session for the given customer.'
-      operationId: checkout_session_create
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              properties:
-                merchant_customer_id:
-                  description: 'Debtor ID in the merchant system.'
-                  $ref: '#/components/schemas/TinyText'
-              type: object
-      responses:
-        '200':
-          description: 'Checkout session created.'
-          content:
-            application/json:
-              schema:
-                required:
-                  - id
-                properties:
-                  id: { description: 'Checkout Session Token', $ref: '#/components/schemas/UUID' }
-                type: object
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-  '/order/{id}/confirm-payment':
-    post:
-      tags:
-        - 'Order Management'
-      summary: 'Confirm Order Payment'
-      description: |-
-        This endpoint needs to be called if a customer is accidentally paying the purchase amount 
-        directly to the merchant. (See usage of virtual IBANs).
-
-        As a consequence of sending this call, Billie will make a direct debit from the merchant 
-        or net it against the potential outstanding payout amount of the very day. 
-        Please mind that the order state will only be updated after Billie actually receives 
-        the money of the confirmed payment.
-      operationId: order_payment_confirm
-      parameters:
-        -
-          name: id
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/TinyText'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              properties:
-                paid_amount:
-                  type: number
-                  format: float
-                  minimum: 0.1
-              type: object
-      responses:
-        '204':
-          description: 'Order payment successfully confirmed'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-  /order:
-    post:
-      tags:
-        - 'Back-end Order Creation'
-      summary: 'Create Order'
-      description: |-
-        Authorization of order financing requests.
-
-        Provide with this endpoint relevant information about the customer and the respective purchase to understand if
-        Billie can offer financing for this transaction.
-
-        The decision whether or not Billie can accept a specific order is made on a single transaction basis.
-        Therefore, orders need to be created to represent a specific transaction for the merchant.
-      operationId: order_create
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateOrderRequest'
-      responses:
-        '200':
-          description: 'Order successfully created'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-  '/invoices/{uuid}':
-    get:
-      tags:
-        - 'Dashboard Orders'
-      summary: 'Get Invoice'
-      operationId: get_invoice
-      parameters:
-        -
-          name: uuid
-          in: path
-          description: 'Get Invoice with Uuid'
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: 'Invoice Response'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetInvoiceResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
-  /legal-forms:
-    get:
-      tags:
-        - 'Back-end Order Creation'
-      summary: 'Get Legal Forms'
-      operationId: get_legal_forms
-      responses:
-        '200':
-          description: 'List of supported legal forms'
-          content:
-            application/json:
-              schema:
-                properties:
-                  items: { type: array, items: { properties: { code: { description: 'Legal form code', type: integer, example: '90101' }, name: { description: 'Legal form name', type: string, example: 'AG & Co. KG', nullable: true }, required_input: { description: 'Required input (HR-NR => Registration Number, Ust-ID => Registration ID)', type: string, example: HR-NR }, required: { description: Required, type: boolean } }, type: object } }
-                type: object
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security: []
   '/order/{id}':
-    get:
-      tags:
-        - 'Order Management'
-      summary: 'Get Order Details'
-      description: |-
-        Retrieves information about an order.
-
-        Get relevant information about an order (e.g. in order to understand, if a specific order was already repaid 
-        by your customer).
-      operationId: order_get_details
-      parameters:
-        -
-          name: id
-          in: path
-          description: 'Order external code or UUID'
-          required: true
-          schema:
-            oneOf:
-              -
-                $ref: '#/components/schemas/UUID'
-              -
-                type: string
-      responses:
-        '200':
-          description: 'Order details'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
     patch:
       tags:
         - 'Order Management'
@@ -462,54 +191,8 @@ paths:
       security:
         -
           oauth2: []
-  '/order/{id}/pause-dunning':
+  '/orders/{id}/ship':
     post:
-      tags:
-        - 'Order Management'
-      summary: 'Pause Order Dunning Process'
-      operationId: order_pause_dunning
-      parameters:
-        -
-          name: id
-          in: path
-          description: 'Order external code or UUID'
-          required: true
-          schema:
-            oneOf:
-              -
-                $ref: '#/components/schemas/UUID'
-              -
-                type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PauseOrderDunningRequest'
-      responses:
-        '204':
-          description: 'Successfully paused order dunning'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          description: 'Pause order dunning is not allowed'
-          content:
-            application/json:
-              schema:
-                properties:
-                  errors: { type: array, items: { required: [title, code], properties: { title: { type: string, enum: ['maximum pausing attempts reached', 'requested number of days exceeds maximum duration allowed', 'maximum dunning stage reached', 'other orders exceed maximum dunning stage', 'Cannot pause dunning. Order is not in state late'], example: 'maximum pausing attempts reached', nullable: false }, code: { type: string, example: forbidden, nullable: true } }, type: object } }
-                type: object
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-  '/order/{id}/ship':
-    post:
-      tags:
-        - 'Order Management'
       summary: 'Ship Order'
       description: |-
         Confirm that an order was shipped.
@@ -520,33 +203,43 @@ paths:
         -
           name: id
           in: path
-          description: 'Order external code or UUID'
+          description: 'Order ID or UUID'
           required: true
           schema:
-            oneOf:
-              -
-                $ref: '#/components/schemas/UUID'
-              -
-                type: string
+            type: integer
+      responses:
+        '204':
+          description: 'Order successfully shipped.'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+  '/invoices/{uuid}/update-details':
+    post:
+      tags:
+        - 'Back-end Invoice Update'
+      summary: 'Update Invoice'
+      operationId: invoice_update
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ShipOrderRequestV1'
+              $ref: '#/components/schemas/UpdateInvoiceRequest'
       responses:
-        '200':
-          description: 'Order successfully shipped. Order details.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderResponse'
+        '204':
+          description: 'Invoice successfully updated'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
       security:
@@ -560,87 +253,16 @@ components:
       maxLength: 36
       minLength: 36
       example: 12345667-890a-bcde-f123-34567890abcd
-    OrderState:
-      title: 'Order State'
-      type: string
-      enum:
-        - new
-        - pre_waiting
-        - authorized
-        - waiting
-        - created
-        - declined
-        - shipped
-        - paid_out
-        - late
-        - complete
-        - canceled
-      example: created
-    OrderDeclineReason:
-      title: 'Order Decline Reason'
-      type: string
-      enum:
-        - risk_policy
-        - risk_scoring_failed
-        - debtor_not_identified
-        - debtor_address
-        - risk_scoring_failed
-        - debtor_limit_exceeded
-      example: debtor_not_identified
-    OrderDunningStatus:
-      title: 'Order Dunning Status'
-      type: string
-      enum:
-        - not_started
-        - active
-        - paused
-        - inactive
-      example: active
-      nullable: true
     OrderDuration:
       title: 'Order Duration'
       type: integer
       maximum: 120
       minimum: 1
       example: 30
-    PostalCode:
-      title: 'Postal Code'
-      type: string
-      maxLength: 5
-      example: '10969'
-    CountryCode:
-      title: 'Country Code'
-      type: string
-      maxLength: 2
-      pattern: '^[A-Za-z]{2}$'
-      example: DE
-    PhoneNumber:
-      title: 'Phone Number'
-      type: string
-      maxLength: 21
-      minLength: 5
-      pattern: '^(\+|\d|\()[ \-\/0-9()]{5,20}$'
-      example: '030 31199251'
-    Date:
-      title: Date
-      type: string
-      format: date
-      example: '2019-01-20'
-    DateTime:
-      title: Date-Time
-      type: string
-      format: date-time
-      example: '2019-01-20 14:00:00'
     TinyText:
       title: string
       type: string
       maxLength: 255
-    URL:
-      title: URL
-      type: string
-      format: url
-      maxLength: 255
-      example: 'https://example.com'
     AmountDTO:
       title: 'Amount with split values for net, gross and tax.'
       required:
@@ -722,304 +344,6 @@ components:
         invoice_number:
           $ref: '#/components/schemas/TinyText'
       type: object
-    CheckoutConfirmOrderRequest:
-      required:
-        - amount
-        - duration
-        - debtor_company
-      properties:
-        amount:
-          $ref: '#/components/schemas/AmountDTO'
-        duration:
-          $ref: '#/components/schemas/OrderDuration'
-        debtor_company:
-          $ref: '#/components/schemas/DebtorCompanyRequest'
-        delivery_address:
-          nullable: true
-          $ref: '#/components/schemas/CreateOrderAddressRequest'
-        order_id:
-          description: 'Order external code'
-          example: DE123456-1
-          $ref: '#/components/schemas/TinyText'
-      type: object
-    CreateOrderRequest:
-      title: 'Order Creation Request'
-      required:
-        - amount
-        - duration
-        - debtor_company
-        - debtor_person
-      properties:
-        amount:
-          $ref: '#/components/schemas/AmountDTO'
-        comment:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        duration:
-          $ref: '#/components/schemas/OrderDuration'
-        order_id:
-          description: 'Order external code'
-          example: DE123456-1
-          $ref: '#/components/schemas/TinyText'
-        delivery_address:
-          nullable: true
-          $ref: '#/components/schemas/CreateOrderAddressRequest'
-        billing_address:
-          nullable: true
-          $ref: '#/components/schemas/CreateOrderAddressRequest'
-        debtor_company:
-          $ref: '#/components/schemas/CreateOrderDebtorCompanyRequest'
-        debtor_person:
-          $ref: '#/components/schemas/CreateOrderDebtorPersonRequest'
-        line_items:
-          type: array
-          items:
-            $ref: '#/components/schemas/CreateOrderLineItemRequest'
-          nullable: true
-      type: object
-    CreateOrderAddressRequest:
-      title: Address
-      required:
-        - street
-        - city
-        - postal_code
-        - country
-      properties:
-        addition:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        house_number:
-          example: '4'
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        street:
-          example: 'Charlotten Str.'
-          $ref: '#/components/schemas/TinyText'
-        city:
-          example: Berlin
-          $ref: '#/components/schemas/TinyText'
-        postal_code:
-          $ref: '#/components/schemas/PostalCode'
-        country:
-          $ref: '#/components/schemas/CountryCode'
-      type: object
-    CreateOrderDebtorCompanyRequest:
-      title: 'Debtor Company'
-      required:
-        - merchant_customer_id
-        - name
-        - legal_form
-        - address_street
-        - address_city
-        - address_postal_code
-        - address_country
-      properties:
-        merchant_customer_id:
-          description: 'Unique identifier of the customer provided by the merchant side.'
-          example: '128483'
-          $ref: '#/components/schemas/TinyText'
-        name:
-          example: 'Billie GmbH'
-          $ref: '#/components/schemas/TinyText'
-        tax_id:
-          example: DE1234556
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        tax_number:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        registration_court:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        registration_number:
-          example: 'HRB 1234556'
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        industry_sector:
-          example: C
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        subindustry_sector:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        employees_number:
-          example: 1-5
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        legal_form:
-          description: 'One of the legal form codes available in the `GET /legal-forms` API endpoint.'
-          example: '10001'
-          $ref: '#/components/schemas/TinyText'
-        established_customer:
-          type: boolean
-          nullable: true
-        address_addition:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        address_house_number:
-          example: '4'
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        address_street:
-          example: Charlottenstr.
-          $ref: '#/components/schemas/TinyText'
-        address_city:
-          example: Berlin
-          $ref: '#/components/schemas/TinyText'
-        address_postal_code:
-          example: '10969'
-          $ref: '#/components/schemas/PostalCode'
-        address_country:
-          example: DE
-          $ref: '#/components/schemas/CountryCode'
-      type: object
-    CreateOrderDebtorPersonRequest:
-      title: 'Debtor Person'
-      required:
-        - email
-      properties:
-        salutation:
-          type: string
-          maxLength: 1
-          enum:
-            - m
-            - f
-          nullable: true
-        first_name:
-          example: James
-          $ref: '#/components/schemas/TinyText'
-        last_name:
-          example: Smith
-          $ref: '#/components/schemas/TinyText'
-        phone_number:
-          $ref: '#/components/schemas/PhoneNumber'
-        email:
-          type: string
-          format: email
-          example: james.smith@example.com
-      type: object
-    CreateOrderLineItemRequest:
-      title: 'Order Line Item'
-      required:
-        - external_id
-        - title
-        - quantity
-        - amount_gross
-        - amount_tax
-        - amount_net
-      properties:
-        external_id:
-          $ref: '#/components/schemas/TinyText'
-        title:
-          $ref: '#/components/schemas/TinyText'
-        description:
-          type: string
-          nullable: true
-        quantity:
-          type: number
-          minimum: 1
-        category:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        brand:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        gtin:
-          description: 'Global Trade Item Number'
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        mpn:
-          description: 'Manufacturer Part Numbers'
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        amount:
-          $ref: '#/components/schemas/AmountDTO'
-      type: object
-    GetInvoiceResponse:
-      title: 'Get Invoice Response'
-      properties:
-        uuid:
-          $ref: '#/components/schemas/UUID'
-        invoice_number:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        duration:
-          type: number
-          nullable: false
-        payout_amount:
-          type: number
-          format: float
-          nullable: false
-        amount:
-          type: number
-          format: float
-          nullable: false
-        amount_net:
-          type: number
-          format: float
-          nullable: false
-        amount_tax:
-          type: number
-          format: float
-          nullable: false
-        outstanding_amount:
-          type: number
-          format: float
-          nullable: false
-        fee_amount:
-          type: number
-          format: float
-          nullable: false
-        fee_rate:
-          type: number
-          format: float
-          nullable: false
-        created_at:
-          type: string
-          format: date
-          example: '2019-03-20'
-          nullable: false
-        due_date:
-          type: string
-          format: date
-          example: '2019-03-20'
-          nullable: false
-        pending_merchant_payment_amount:
-          type: number
-          format: float
-          nullable: false
-        pending_cancellation_amount:
-          type: number
-          format: float
-          nullable: false
-        state:
-          type: string
-          example: created
-          nullable: true
-        orders:
-          type: array
-          items:
-            properties:
-              uuid:
-                $ref: '#/components/schemas/UUID'
-              external_code:
-                type: string
-                example: C-10123456789-0001
-                nullable: true
-              amount:
-                type: number
-                format: float
-                nullable: false
-              amount_net:
-                type: number
-                format: float
-                nullable: false
-              amount_tax:
-                type: number
-                format: float
-                nullable: false
-            type: object
-      type: object
     LegacyUpdateOrderRequest:
       title: 'Order Update Object'
       properties:
@@ -1036,192 +360,18 @@ components:
           example: DE123456-1
           $ref: '#/components/schemas/TinyText'
       type: object
-    PauseOrderDunningRequest:
-      title: 'Pause Order Dunning'
-      properties:
-        number_of_days:
-          type: integer
-          minimum: 1
-          nullable: false
-      type: object
-    ShipOrderRequest:
-      title: 'Order Shipping Object'
+    UpdateInvoiceRequest:
+      title: 'Invoice Update Request'
       required:
+        - external_code
         - invoice_url
       properties:
+        external_code:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
         invoice_url:
-          $ref: '#/components/schemas/URL'
-        shipping_document_url:
-          $ref: '#/components/schemas/URL'
-      type: object
-      allOf:
-        -
-          $ref: '#/components/schemas/AbstractShipOrderRequest'
-    ShipOrderRequestV1:
-      title: 'Order Shipping Object'
-      required:
-        - invoice_url
-      properties:
-        invoice_url:
-          $ref: '#/components/schemas/URL'
-        shipping_document_url:
-          $ref: '#/components/schemas/URL'
-      type: object
-      allOf:
-        -
-          $ref: '#/components/schemas/AbstractShipOrderRequestV1'
-    DebtorCompanyRequest:
-      title: 'Debtor Company Request'
-      required:
-        - name
-        - address_street
-        - address_city
-        - address_postal_code
-        - address_country
-      properties:
-        name:
-          example: 'Billie GmbH'
-          $ref: '#/components/schemas/TinyText'
-        address_addition:
           nullable: true
           $ref: '#/components/schemas/TinyText'
-        address_house_number:
-          example: '4'
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        address_street:
-          example: Charlottenstr.
-          $ref: '#/components/schemas/TinyText'
-        address_city:
-          example: Berlin
-          $ref: '#/components/schemas/TinyText'
-        address_postal_code:
-          example: '10969'
-          $ref: '#/components/schemas/PostalCode'
-        address_country:
-          example: DE
-          $ref: '#/components/schemas/CountryCode'
-      type: object
-    OrderResponse:
-      title: 'Order Entity'
-      properties:
-        order_id:
-          type: string
-          example: C-10123456789-0001
-          nullable: true
-        uuid:
-          $ref: '#/components/schemas/UUID'
-        state:
-          example: created
-          $ref: '#/components/schemas/OrderState'
-        decline_reason:
-          nullable: true
-          $ref: '#/components/schemas/OrderDeclineReason'
-        amount:
-          description: 'Gross amount'
-          type: number
-          format: float
-          example: 123.57
-          nullable: false
-        amount_net:
-          type: number
-          format: float
-          example: 100.12
-          nullable: false
-        amount_tax:
-          type: number
-          format: float
-          example: 23.45
-          nullable: false
-        duration:
-          example: 30
-          $ref: '#/components/schemas/OrderDuration'
-        dunning_status:
-          $ref: '#/components/schemas/OrderDunningStatus'
-        debtor_company:
-          description: 'Identified company'
-          properties:
-            name:
-              example: 'Billie GmbH'
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            address_house_number:
-              example: '4'
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            address_street:
-              example: Charlottenstr.
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            address_postal_code:
-              type: string
-              maxLength: 5
-              example: '10969'
-              nullable: true
-            address_city:
-              example: Berlin
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            address_country:
-              type: string
-              maxLength: 2
-              nullable: true
-          type: object
-        bank_account:
-          properties:
-            iban:
-              description: 'Virtual IBAN provided by Billie'
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-            bic:
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-          type: object
-        debtor_external_data:
-          description: 'Data provided in the order creation'
-          properties:
-            merchant_customer_id:
-              example: C-10123456789
-              $ref: '#/components/schemas/TinyText'
-            name:
-              example: 'Billie G.m.b.H.'
-              $ref: '#/components/schemas/TinyText'
-            address_country:
-              type: string
-              maxLength: 2
-              example: DE
-            address_city:
-              example: Berlin
-              $ref: '#/components/schemas/TinyText'
-            address_postal_code:
-              type: string
-              maxLength: 5
-              example: '10969'
-            address_street:
-              example: 'Charlotten Straße'
-              $ref: '#/components/schemas/TinyText'
-            address_house:
-              example: '4'
-              $ref: '#/components/schemas/TinyText'
-            industry_sector:
-              nullable: true
-              $ref: '#/components/schemas/TinyText'
-          type: object
-        delivery_address:
-          type: object
-          $ref: '#/components/schemas/CreateOrderAddressRequest'
-        billing_address:
-          type: object
-          $ref: '#/components/schemas/CreateOrderAddressRequest'
-        created_at:
-          $ref: '#/components/schemas/DateTime'
-        shipped_at:
-          $ref: '#/components/schemas/DateTime'
-        debtor_uuid:
-          $ref: '#/components/schemas/UUID'
-        workflow_name:
-          type: string
-          example: order_v1
       type: object
     ErrorsObject:
       title: 'API Errors'

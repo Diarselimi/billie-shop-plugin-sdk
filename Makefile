@@ -41,7 +41,8 @@ openapi:
 	# full (no x-group filtering)
 	bin/openapi-generate full
 	# public (the one in developers.billie.io)
-	bin/openapi-generate public
+	bin/openapi-generate publicV1
+	bin/openapi-generate publicV2
 	# checkout-client (internal)
 	bin/openapi-generate checkout-client --with-extra-config
 

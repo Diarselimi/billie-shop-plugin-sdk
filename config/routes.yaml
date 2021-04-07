@@ -9,6 +9,7 @@ public_health_check:
 api_docs:
   resource: ../src/Http/Controller/ApiDocs
   type: openapi_annotation
+  name_prefix: docs_
 
 api_v1:
   resource: 'routes/public_api_v1.yaml'

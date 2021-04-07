@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controller\PublicApi;
+namespace App\Http\Controller\PublicApiV2;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\WorkflowException;
@@ -16,25 +16,25 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @IsGranted({"ROLE_AUTHENTICATED_AS_MERCHANT", "ROLE_CANCEL_ORDERS"})
- * @OA\Post(
- *     path="/order/{id}/cancel",
- *     operationId="order_cancel",
- *     summary="Cancel Order",
+ * @OA\Delete(
+ *     path="/invoices/{uuid}",
+ *     operationId="invoice_cancel_v2",
+ *     summary="Cancel Invoice",
  *     security={{"oauth2"={}}},
  *
- *     tags={"Order Management"},
- *     x={"groups":{"publicV1", "publicV2", "private"}},
+ *     tags={"Invoices"},
+ *     x={"groups":{"publicV2"}},
  *
- *     @OA\Parameter(in="path", name="id", @OA\Schema(type="integer"), required=true, description="Order ID or UUID"),
+ *     @OA\Parameter(in="path", name="uuid", @OA\Schema(ref="#/components/schemas/UUID"), required=true, description="Invoice UUID"),
  *
- *     @OA\Response(response=204, description="Order successfully cancelled"),
+ *     @OA\Response(response=204, description="Invoice successfully cancelled"),
  *     @OA\Response(response=404, ref="#/components/responses/NotFound"),
  *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
  *     @OA\Response(response=403, ref="#/components/responses/Forbidden"),
  *     @OA\Response(response=500, ref="#/components/responses/ServerError")
  * )
  */
-class CancelOrderController
+class CancelInvoiceController
 {
     private CancelOrderUseCase $useCase;
 

@@ -25,7 +25,7 @@ public_api_prefixed_v2_from_v1:
   resource: ../src/Http/Controller/PublicApi
   type: openapi_annotation
   prefix: /public/api/v2
-  name_prefix: public_api_v2_
+  name_prefix: public_api_v2_v1_
 
 ## Any other new routes (V2-only):
 
@@ -37,7 +37,7 @@ public_api_prefixed_public_v2:
   resource: ../src/Http/Controller/PublicApiV2
   type: openapi_annotation
   prefix: /public
-  name_prefix: public_
+  name_prefix: public_v2_
 
 public_api_prefixed_full_v2:
   resource: ../src/Http/Controller/PublicApiV2

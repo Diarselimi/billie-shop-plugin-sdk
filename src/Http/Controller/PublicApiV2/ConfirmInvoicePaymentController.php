@@ -28,7 +28,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     description="Confirms that the debtor paid the given amount of this invoice directly to the merchant.",
  *     security={{"oauth2"={}}},
  *
- *     tags={"Invoice Management"},
+ *     tags={"Invoices"},
  *     x={"groups":{"private"}},
  *
  *     @OA\Parameter(in="path", name="uuid", @OA\Schema(ref="#/components/schemas/UUID"), required=true),
