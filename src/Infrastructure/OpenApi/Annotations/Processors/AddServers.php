@@ -2,13 +2,26 @@
 
 namespace App\Infrastructure\OpenApi\Annotations\Processors;
 
+use App\Http\Controller\ApiDocs\AbstractApiDocsController;
 use OpenApi\Analysis;
 use OpenApi\Annotations as OA;
 
 class AddServers implements ProcessorInterface
 {
+    private array $groups;
+
+    public function __construct(array $groups)
+    {
+        $this->groups = $groups;
+    }
+
     private function getServers(): array
     {
+        $apiVersion = '/v1';
+        if (in_array(AbstractApiDocsController::API_VERSION_2, $this->groups, true)) {
+            $apiVersion = '/v2';
+        }
+
         $testInstances = range(1, 19);
         $serverNumVar = new OA\ServerVariable(
             [
@@ -41,9 +54,8 @@ class AddServers implements ProcessorInterface
                 'description' => 'Production Private API (AWS Gateway)',
                 'x' => ['groups' => ['support', 'salesforce']],
             ]),
-            new OA\Server(['url' => 'https://paella-sandbox.billie.io/api/v1', 'description' => 'Test Sandbox API']),
-            new OA\Server(['url' => 'https://paella.billie.io/api/v1', 'description' => 'Production API']),
-
+            new OA\Server(['url' => 'https://paella-sandbox.billie.io/api'.$apiVersion, 'description' => 'Test Sandbox API']),
+            new OA\Server(['url' => 'https://paella.billie.io/api'.$apiVersion, 'description' => 'Production API']),
         ];
     }
 

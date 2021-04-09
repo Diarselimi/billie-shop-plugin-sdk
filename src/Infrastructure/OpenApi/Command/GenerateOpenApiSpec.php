@@ -126,7 +126,7 @@ class GenerateOpenApiSpec extends Command
             new Processors\MergeIntoComponents(),
             new Processors\AugmentSchemas(),
             new Processors\AugmentProperties(),
-            new CustomProcessors\AddServers(),
+            new CustomProcessors\AddServers($groups),
             new CustomProcessors\AugmentMainInfo($data),
             new CustomProcessors\AugmentDescriptions($this->fileReader),
             new Processors\BuildPaths(),

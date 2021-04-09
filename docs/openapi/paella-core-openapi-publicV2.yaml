@@ -74,10 +74,10 @@ info:
     href: '#'
 servers:
   -
-    url: 'https://paella-sandbox.billie.io/api/v1'
+    url: 'https://paella-sandbox.billie.io/api/v2'
     description: 'Test Sandbox API'
   -
-    url: 'https://paella.billie.io/api/v1'
+    url: 'https://paella.billie.io/api/v2'
     description: 'Production API'
 paths:
   '/order/{id}/cancel':
