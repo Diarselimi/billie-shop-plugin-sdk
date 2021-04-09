@@ -24,7 +24,7 @@ class OrderContainerFactory
     public function loadById(int $orderId): OrderContainer
     {
         $order = $this->orderRepository->getOneById($orderId);
-        if (!$order) {
+        if ($order === null) {
             throw new OrderContainerFactoryException("Order not found");
         }
 

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Application\UseCase\GetInvoice\Factory;
 
 use App\Application\UseCase\GetInvoice\GetInvoiceResponse;
+use App\DomainModel\Invoice\CreditNote\CreditNote;
+use App\DomainModel\Invoice\CreditNote\CreditNoteCollection;
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 
@@ -13,21 +15,9 @@ class GetInvoiceResponseFactory
     public function create(Invoice $invoice, array $orderContainers): GetInvoiceResponse
     {
         return (new GetInvoiceResponse(
-            $invoice->getExternalCode(),
-            $invoice->getDuration(),
-            $invoice->getPayoutAmount()->toFloat(),
-            $invoice->getAmount()->getGross()->toFloat(),
-            $invoice->getAmount()->getNet()->toFloat(),
-            $invoice->getAmount()->getTax()->toFloat(),
-            $invoice->getOutstandingAmount()->toFloat(),
-            $invoice->getMerchantPendingPaymentAmount()->toFloat(),
-            $invoice->getInvoicePendingCancellationAmount()->toFloat(),
-            $invoice->getFeeAmount()->getGross()->toFloat(),
-            $invoice->getFeeRate()->toFloat(),
-            $invoice->getCreatedAt(),
-            $invoice->getDueDate(),
-            $invoice->getState(),
-            $this->createOrdersResponse($orderContainers)
+            $invoice,
+            $this->createOrdersResponse($orderContainers),
+            $this->createCreditNotesResponse($invoice->getCreditNotes())
         ))->setUuid($invoice->getUuid());
     }
 
@@ -51,5 +41,10 @@ class GetInvoiceResponseFactory
             },
             $orderContainers
         );
+    }
+
+    private function createCreditNotesResponse(CreditNoteCollection $creditNotes): array
+    {
+        return array_map(fn (CreditNote $creditNote) => $creditNote->toArray(), array_values($creditNotes->toArray()));
     }
 }

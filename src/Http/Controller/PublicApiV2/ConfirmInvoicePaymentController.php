@@ -9,7 +9,7 @@ use App\Application\Exception\RequestValidationException;
 use App\Application\UseCase\ConfirmInvoicePayment\ConfirmInvoicePaymentNotAllowedException;
 use App\Application\UseCase\ConfirmInvoicePayment\ConfirmInvoicePaymentRequest;
 use App\Application\UseCase\ConfirmInvoicePayment\ConfirmInvoicePaymentUseCase;
-use App\Application\UseCase\ConfirmInvoicePayment\PaidAmountExceededException;
+use App\Application\UseCase\ConfirmInvoicePayment\AmountExceededException;
 use App\Http\Controller\MerchantIdTrait;
 use OpenApi\Annotations as OA;
 use Ozean12\Money\Money;
@@ -29,7 +29,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     security={{"oauth2"={}}},
  *
  *     tags={"Invoices"},
- *     x={"groups":{"private"}},
+ *     x={"groups":{"publicV2"}},
  *
  *     @OA\Parameter(in="path", name="uuid", @OA\Schema(ref="#/components/schemas/UUID"), required=true),
  *
@@ -74,7 +74,7 @@ class ConfirmInvoicePaymentController
             throw new NotFoundHttpException($exception->getMessage(), $exception);
         } catch (ConfirmInvoicePaymentNotAllowedException $exception) {
             throw new AccessDeniedHttpException($exception->getMessage(), $exception, JsonResponse::HTTP_FORBIDDEN);
-        } catch (PaidAmountExceededException $exception) {
+        } catch (AmountExceededException $exception) {
             throw RequestValidationException::createForInvalidValue(
                 $exception->getMessage(),
                 'paid_amount',

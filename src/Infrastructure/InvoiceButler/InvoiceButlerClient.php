@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\InvoiceButler;
 
+use App\DomainModel\Invoice\CreditNote\CreditNote;
+use App\DomainModel\Invoice\CreditNote\InvoiceCreditNoteMessageFactory;
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceCollection;
 use App\DomainModel\Invoice\InvoiceFactory;
 use App\DomainModel\Invoice\InvoiceServiceException;
 use App\DomainModel\Invoice\InvoiceServiceInterface;
+use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\Payment\PaymentRequestFactory;
+use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\Infrastructure\DecodeResponseTrait;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -16,6 +21,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\TransferStats;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class InvoiceButlerClient implements InvoiceServiceInterface, LoggingInterface
 {
@@ -23,12 +29,30 @@ class InvoiceButlerClient implements InvoiceServiceInterface, LoggingInterface
 
     private Client $client;
 
-    private InvoiceFactory $factory;
+    private InvoiceFactory $invoiceFactory;
 
-    public function __construct(Client $invoiceButlerClient, InvoiceFactory $factory)
-    {
+    private InvoiceCreditNoteMessageFactory $creditNoteMessageFactory;
+
+    private MessageBusInterface $messageBus;
+
+    private PaymentRequestFactory $paymentRequestFactory;
+
+    private PaymentsServiceInterface $paymentsService;
+
+    public function __construct(
+        Client $invoiceButlerClient,
+        InvoiceFactory $invoiceFactory,
+        InvoiceCreditNoteMessageFactory $creditNoteMessageFactory,
+        MessageBusInterface $messageBus,
+        PaymentRequestFactory $paymentRequestFactory,
+        PaymentsServiceInterface $paymentsService
+    ) {
         $this->client = $invoiceButlerClient;
-        $this->factory = $factory;
+        $this->invoiceFactory = $invoiceFactory;
+        $this->creditNoteMessageFactory = $creditNoteMessageFactory;
+        $this->messageBus = $messageBus;
+        $this->paymentRequestFactory = $paymentRequestFactory;
+        $this->paymentsService = $paymentsService;
     }
 
     public function getByUuids(array $uuids): InvoiceCollection
@@ -44,7 +68,7 @@ class InvoiceButlerClient implements InvoiceServiceInterface, LoggingInterface
                 ]
             );
 
-            $invoices = $this->factory->createFromArrayCollection(
+            $invoices = $this->invoiceFactory->createFromArrayCollection(
                 $this->decodeResponse($response)
             );
 
@@ -63,5 +87,54 @@ class InvoiceButlerClient implements InvoiceServiceInterface, LoggingInterface
         }
 
         return $invoices->getFirst();
+    }
+
+    public function createCreditNote(Invoice $invoice, CreditNote $creditNote): void
+    {
+        // TODO remove next line & dependencies when invoice-butler CreditNote use case is ready:
+        $this->handleCreditNoteWithBorscht($invoice, $creditNote);
+
+        $creditNoteMessage = $this->creditNoteMessageFactory->create($creditNote);
+        $this->messageBus->dispatch($creditNoteMessage);
+    }
+
+    private function handleCreditNoteWithBorscht(Invoice $invoice, CreditNote $creditNote): void
+    {
+        $creditNotesSum = $invoice->getCreditNotes()->getGrossSum();
+        $isFullCancellation = $creditNotesSum->add($creditNote->getAmount()->getGross())
+            ->equals($invoice->getAmount()->getGross());
+
+        $logData = [
+            LoggingInterface::KEY_SOBAKA => [
+                'invoice_uuid' => $invoice->getUuid(),
+                'invoice_outstanding_amount' => $invoice->getOutstandingAmount()->getMoneyValue(),
+                'invoice_amount' => $invoice->getAmount()->getGross(),
+                'credit_notes_sum' => $creditNotesSum->getMoneyValue(),
+                'credit_note_amount' => $creditNote->getAmount()->getGross()->getMoneyValue(),
+            ],
+        ];
+
+        if ($isFullCancellation) {
+            $this->logInfo(
+                'The invoice will be FULLY cancelled (invoice_cancellation obligation should be created)',
+                $logData
+            );
+            $order = new OrderEntity();
+            $order->setPaymentId($invoice->getPaymentUuid());
+            // this just cancels the borscht ticket for this invoice, not the boost order!
+            $this->paymentsService->cancelOrder($order);
+
+            return;
+        }
+
+        $this->logInfo(
+            'The invoice will be PARTIALLY cancelled (invoice_payback obligation amount should be reduced)',
+            $logData
+        );
+        $modifyTicketRequest = $this->paymentRequestFactory->createModifyRequestFromInvoice(
+            $invoice,
+            $creditNote->getAmount()->getGross()
+        );
+        $this->paymentsService->modifyOrder($modifyTicketRequest);
     }
 }

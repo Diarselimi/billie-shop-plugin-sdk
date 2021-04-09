@@ -40,6 +40,30 @@ Feature: Get invoice from invoice-butler
             }
         ],
         "invoice_number": "some_code",
-        "payout_amount": 123.33
+        "payout_amount": 123.33,
+        "credit_notes": [
+          {
+            "uuid": "208cfe7d-046f-4162-b175-748942d6cff5",
+            "amount": {
+              "gross": 22.0,
+              "net": 20.0,
+              "tax": 2.0
+            },
+            "external_code":  "some-code-CN",
+            "comment": null,
+            "created_at": "2021-03-01 12:12:12"
+          },
+          {
+            "uuid": "208cfe7d-046f-4162-b175-748942d6cff6",
+            "amount": {
+              "gross": 33.0,
+              "net": 30.0,
+              "tax": 3.0
+            },
+            "external_code":  "another-code-CN",
+            "comment": null,
+            "created_at": "2021-03-01 12:12:12"
+          }
+        ]
     }
     """

@@ -69,4 +69,15 @@ class OrderInvoiceRepository extends AbstractPdoRepository implements OrderInvoi
 
         return $invoice ? $this->factory->createFromArray($invoice) : null;
     }
+
+    public function getByUuid(string $invoiceUuid): ?OrderInvoiceEntity
+    {
+        $invoice = $this->doFetchOne(
+            'SELECT ' . implode(', ', self::SELECT_FIELDS) . ' FROM ' . self::TABLE_NAME .
+            ' WHERE invoice_uuid = :uuid',
+            ['uuid' => $invoiceUuid]
+        );
+
+        return $invoice ? $this->factory->createFromArray($invoice) : null;
+    }
 }

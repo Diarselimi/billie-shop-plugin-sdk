@@ -9,7 +9,7 @@ use App\Application\Exception\RequestValidationException;
 use App\Application\UseCase\ConfirmInvoicePayment\ConfirmInvoicePaymentNotAllowedException;
 use App\Application\UseCase\ConfirmInvoicePayment\ConfirmInvoicePaymentRequest;
 use App\Application\UseCase\ConfirmInvoicePayment\ConfirmInvoicePaymentUseCase;
-use App\Application\UseCase\ConfirmInvoicePayment\PaidAmountExceededException;
+use App\Application\UseCase\ConfirmInvoicePayment\AmountExceededException;
 use App\Http\Controller\PublicApiV2\ConfirmInvoicePaymentController;
 use App\Http\HttpConstantsInterface;
 use App\Tests\Unit\UnitTestCase;
@@ -52,9 +52,9 @@ class ConfirmInvoicePaymentControllerTest extends UnitTestCase
 
     /**
      * @test
-     * @param  string                      $useCaseException
-     * @param  string                      $expectedException
-     * @throws PaidAmountExceededException
+     * @param  string                  $useCaseException
+     * @param  string                  $expectedException
+     * @throws AmountExceededException
      * @dataProvider shouldCatchUseCaseExceptionDataProvider
      */
     public function shouldCatchUseCaseException(string $useCaseException, string $expectedException): void
@@ -78,7 +78,7 @@ class ConfirmInvoicePaymentControllerTest extends UnitTestCase
         return [
             [InvoiceNotFoundException::class, NotFoundHttpException::class],
             [ConfirmInvoicePaymentNotAllowedException::class, AccessDeniedHttpException::class],
-            [PaidAmountExceededException::class, RequestValidationException::class],
+            [AmountExceededException::class, RequestValidationException::class],
         ];
     }
 

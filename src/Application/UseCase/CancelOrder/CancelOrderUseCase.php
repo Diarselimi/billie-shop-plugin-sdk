@@ -25,8 +25,6 @@ class CancelOrderUseCase implements LoggingInterface
 {
     use LoggingTrait;
 
-    private const CREDIT_NOTE_COMMENT = 'cancelation';
-
     private MerchantDebtorLimitsService $limitsService;
 
     private PaymentsServiceInterface $paymentsService;
@@ -131,7 +129,7 @@ class CancelOrderUseCase implements LoggingInterface
             $invoice,
             $amount,
             $invoice->getExternalCode().CreditNote::EXTERNAL_CODE_SUFFIX,
-            self::CREDIT_NOTE_COMMENT
+            CreditNote::INTERNAL_COMMENT_CANCELATION
         );
 
         $this->bus->dispatch($this->creditNoteMessageFactory->create($creditNote));

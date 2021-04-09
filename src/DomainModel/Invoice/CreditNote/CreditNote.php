@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace App\DomainModel\Invoice\CreditNote;
 
+use App\DomainModel\ArrayableInterface;
+use App\Support\DateFormat;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
 
-final class CreditNote
+final class CreditNote implements ArrayableInterface
 {
     public const EXTERNAL_CODE_SUFFIX = '-CN';
+
+    public const INTERNAL_COMMENT_CANCELATION = 'cancelation';
 
     private string $uuid;
 
@@ -106,5 +110,20 @@ final class CreditNote
         $this->invoiceUuid = $invoiceUuid;
 
         return $this;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'uuid' => $this->getUuid(),
+            'amount' => [
+                'gross' => $this->getAmount()->getGross()->getMoneyValue(),
+                'net' => $this->getAmount()->getNet()->getMoneyValue(),
+                'tax' => $this->getAmount()->getTax()->getMoneyValue(),
+            ],
+            'external_code' => $this->getExternalCode(),
+            'comment' => $this->getExternalComment(),
+            'created_at' => $this->getCreatedAt()->format(DateFormat::FORMAT_YMD_HIS),
+        ];
     }
 }

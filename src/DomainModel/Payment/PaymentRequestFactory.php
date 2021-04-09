@@ -11,8 +11,10 @@ use Ozean12\Money\Money;
 
 class PaymentRequestFactory
 {
-    private function createFromOrderContainer(OrderContainer $orderContainer, AbstractPaymentRequestDTO $requestDTO)
-    {
+    private function createModifyRequestFromOrderContainer(
+        OrderContainer $orderContainer,
+        AbstractPaymentRequestDTO $requestDTO
+    ) {
         $requestDTO
             ->setDuration($orderContainer->getOrderFinancialDetails()->getDuration())
             ->setDebtorPaymentId($orderContainer->getMerchantDebtor()->getPaymentDebtorId())
@@ -60,8 +62,20 @@ class PaymentRequestFactory
     public function createModifyRequestDTO(OrderContainer $orderContainer): ModifyRequestDTO
     {
         $requestDTO = new ModifyRequestDTO();
-        $this->createFromOrderContainer($orderContainer, $requestDTO);
+        $this->createModifyRequestFromOrderContainer($orderContainer, $requestDTO);
 
         return $requestDTO;
+    }
+
+    public function createModifyRequestFromInvoice(Invoice $invoice, Money $amountReduction): ModifyRequestDTO
+    {
+        return (new ModifyRequestDTO())
+            ->setDuration($invoice->getDuration())
+            ->setDebtorPaymentId($invoice->getPaymentDebtorUuid())
+            ->setAmountGross($invoice->getAmount()->getGross()->subtract($amountReduction)->toFloat())
+            ->setPaymentUuid($invoice->getPaymentUuid())
+            ->setInvoiceNumber($invoice->getExternalCode())
+            ->setExternalCode($invoice->getExternalCode())
+            ->setShippedAt($invoice->getCreatedAt());
     }
 }

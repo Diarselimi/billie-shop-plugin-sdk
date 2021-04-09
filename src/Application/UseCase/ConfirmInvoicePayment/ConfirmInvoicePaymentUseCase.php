@@ -60,7 +60,7 @@ class ConfirmInvoicePaymentUseCase implements ValidatedUseCaseInterface
         }
 
         if ($request->getPaidAmount()->greaterThan($invoice->getOutstandingAmount())) {
-            throw new PaidAmountExceededException();
+            throw new AmountExceededException();
         }
 
         $this->confirmPayment($request, $invoice, $order);

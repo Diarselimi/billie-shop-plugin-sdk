@@ -85,7 +85,7 @@ class PaymentsServiceContext implements Context
     }
 
     /**
-     * @Given /^I get from payments service modify ticket response$/
+     * @Given /^I get from payments service (a )?(modify|cancel) ticket response$/
      */
     public function iGetFromPaymentsServiceModifyTicketResponse()
     {

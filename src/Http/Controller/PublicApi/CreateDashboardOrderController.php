@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controller\PublicApi;
 
+use App\Application\UseCase\CreateOrder\CreateOrderRequest;
 use App\Application\UseCase\CreateOrder\CreateOrderUseCase;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderResponse\OrderResponse;
@@ -54,16 +55,28 @@ class CreateDashboardOrderController
 
     public function execute(Request $request): OrderResponse
     {
+        return $this->createOrderUseCase->execute($this->buildUseCaseRequest($request));
+    }
+
+    private function buildUseCaseRequest(Request $request): CreateOrderRequest
+    {
         $request->attributes->set(
             HttpConstantsInterface::REQUEST_ATTRIBUTE_CREATION_SOURCE,
             OrderEntity::CREATION_SOURCE_DASHBOARD
         );
-        $debtorCompany = $request->request->get('debtor_company', []);
-        $debtorCompany['legal_form'] = $debtorCompany['legal_form'] ? $debtorCompany['legal_form'] : self::DEFAULT_LEGAL_FORM;
+
+        $debtorCompany = $request->request->get('debtor_company', ['legal_form' => null]);
+        $debtorCompany['legal_form'] = $debtorCompany['legal_form'] ?: self::DEFAULT_LEGAL_FORM;
         $request->request->set('debtor_company', $debtorCompany);
 
         $useCaseRequest = $this->orderRequestFactory->createForCreateOrder($request);
 
-        return $this->createOrderUseCase->execute($useCaseRequest);
+        $workflowName = $request->request->get('workflow_name');
+
+        if (in_array($workflowName, [OrderEntity::WORKFLOW_NAME_V1, OrderEntity::WORKFLOW_NAME_V2], true)) {
+            $useCaseRequest->setWorkflowName($workflowName);
+        }
+
+        return $useCaseRequest;
     }
 }

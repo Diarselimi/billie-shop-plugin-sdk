@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\UseCase\GetInvoice;
 
 use App\DomainModel\ArrayableInterface;
+use App\DomainModel\Invoice\Invoice;
 use App\Support\DateFormat;
 use OpenApi\Annotations as OA;
 
@@ -68,38 +69,26 @@ class GetInvoiceResponse implements ArrayableInterface
 
     private array $ordersResponse;
 
-    public function __construct(
-        string $invoiceNumber,
-        int $duration,
-        float $payoutAmount,
-        float $amount,
-        float $amountNet,
-        float $amountTax,
-        float $outstandingAmount,
-        float $pendingMerchantPaymentAmount,
-        float $pendingCancellationAmount,
-        float $feeAmount,
-        float $feeRate,
-        \DateTime $createdAt,
-        \DateTime $dueDate,
-        ?string $state,
-        array $ordersResponse
-    ) {
-        $this->invoiceNumber = $invoiceNumber;
-        $this->duration = $duration;
-        $this->payoutAmount = $payoutAmount;
-        $this->amount = $amount;
-        $this->amountNet = $amountNet;
-        $this->amountTax = $amountTax;
-        $this->outstandingAmount = $outstandingAmount;
-        $this->pendingMerchantPaymentAmount = $pendingMerchantPaymentAmount;
-        $this->pendingCancellationAmount = $pendingCancellationAmount;
-        $this->feeAmount = $feeAmount;
-        $this->feeRate = $feeRate;
-        $this->createdAt = $createdAt;
-        $this->dueDate = $dueDate;
-        $this->state = $state;
+    private array $creditNotesResponse;
+
+    public function __construct(Invoice $invoice, array $ordersResponse, array $creditNotesResponse)
+    {
+        $this->invoiceNumber = $invoice->getExternalCode();
+        $this->duration = $invoice->getDuration();
+        $this->payoutAmount = $invoice->getPayoutAmount()->getMoneyValue();
+        $this->amount = $invoice->getAmount()->getGross()->getMoneyValue();
+        $this->amountNet = $invoice->getAmount()->getNet()->getMoneyValue();
+        $this->amountTax = $invoice->getAmount()->getTax()->getMoneyValue();
+        $this->outstandingAmount = $invoice->getOutstandingAmount()->getMoneyValue();
+        $this->pendingMerchantPaymentAmount = $invoice->getMerchantPendingPaymentAmount()->getMoneyValue();
+        $this->pendingCancellationAmount = $invoice->getInvoicePendingCancellationAmount()->getMoneyValue();
+        $this->feeAmount = $invoice->getFeeAmount()->getGross()->getMoneyValue();
+        $this->feeRate = $invoice->getFeeRate()->toBase100();
+        $this->createdAt = $invoice->getCreatedAt();
+        $this->dueDate = $invoice->getDueDate();
+        $this->state = $invoice->getState();
         $this->ordersResponse = $ordersResponse;
+        $this->creditNotesResponse = $creditNotesResponse;
     }
 
     public function getUuid(): string
@@ -203,6 +192,7 @@ class GetInvoiceResponse implements ArrayableInterface
             'pending_cancellation_amount' => $this->getPendingCancellationAmount(),
             'state' => $this->getState(),
             'orders' => $this->ordersResponse,
+            'credit_notes' => $this->creditNotesResponse,
         ];
     }
 }

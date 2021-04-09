@@ -24,20 +24,22 @@ class CreditNoteFactory extends AbstractFactory
             ->setExternalComment($data['external_comment'])
             ->setInternalComment($data['internal_comment'])
             ->setCreatedAt(new \DateTime($data['created_at']))
-            ->setUuid($data['uuid'])
-        ;
+            ->setUuid($data['uuid']);
     }
 
-    public function create(Invoice $invoice, TaxedMoney $amount, ?string $externalCode, ?string $internalCode): CreditNote
-    {
+    public function create(
+        Invoice $invoice,
+        TaxedMoney $amount,
+        ?string $externalCode,
+        ?string $internalComment
+    ): CreditNote {
         return (new CreditNote())
             ->setAmount($amount)
             ->setCreatedAt(new \DateTime())
             ->setExternalCode($externalCode)
             ->setExternalComment(null)
-            ->setInternalComment($internalCode)
+            ->setInternalComment($internalComment)
             ->setUuid(Uuid::uuid4()->toString())
-            ->setInvoiceUuid($invoice->getUuid())
-        ;
+            ->setInvoiceUuid($invoice->getUuid());
     }
 }

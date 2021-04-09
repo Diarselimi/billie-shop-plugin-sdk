@@ -8,7 +8,8 @@ use App\Application\Exception\InvoiceNotFoundException;
 use App\Application\UseCase\ConfirmInvoicePayment\ConfirmInvoicePaymentNotAllowedException;
 use App\Application\UseCase\ConfirmInvoicePayment\ConfirmInvoicePaymentRequest;
 use App\Application\UseCase\ConfirmInvoicePayment\ConfirmInvoicePaymentUseCase;
-use App\Application\UseCase\ConfirmInvoicePayment\PaidAmountExceededException;
+use App\Application\UseCase\ConfirmInvoicePayment\AmountExceededException;
+use App\Application\UseCase\GetInvoicePayments\GetInvoicePaymentsUseCase;
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceServiceInterface;
 use App\DomainModel\Order\OrderEntity;
@@ -159,7 +160,7 @@ class ConfirmInvoicePaymentUseCaseTest extends UnitTestCase
             ->setOutstandingAmount(new Money(10));
         $this->invoiceService->getOneByUuid(self::INVOICE_UUID)->shouldBeCalledOnce()->willReturn($invoice);
 
-        $this->expectException(PaidAmountExceededException::class);
+        $this->expectException(AmountExceededException::class);
 
         $this->useCase->execute(
             new ConfirmInvoicePaymentRequest(self::INVOICE_UUID, self::MERCHANT_ID, new Money(200))
