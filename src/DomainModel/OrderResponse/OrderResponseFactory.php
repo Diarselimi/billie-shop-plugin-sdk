@@ -93,19 +93,14 @@ class OrderResponseFactory
 
         $statesAccepted = [OrderEntity::STATE_AUTHORIZED, OrderEntity::STATE_PRE_WAITING];
         if (in_array($order->getState(), $statesAccepted, true)) {
-            if ($orderContainer->getIdentifiedDebtorCompany()->getIdentificationType() === IdentifiedDebtorCompany::IDENTIFIED_BY_COMPANY_ADDRESS) {
-                $identifiedAddress = $orderContainer->getIdentifiedDebtorCompany()->getAddress();
-            } else {
-                $identifiedAddress = $orderContainer->getIdentifiedDebtorCompany()->getDebtorBillingAddressByUuid(
-                    $orderContainer->getIdentifiedDebtorCompany()->getIdentifiedAddressUuid()
+            $identifiedAddress = $this->getIdentifiedAddress($orderContainer);
+            if ($identifiedAddress instanceof AddressEntity) {
+                $this->addCompanyData(
+                    $identifiedAddress,
+                    $orderContainer->getDebtorCompany()->getName(),
+                    $response
                 );
             }
-
-            $this->addCompanyData(
-                $identifiedAddress,
-                $orderContainer->getDebtorCompany()->getName(),
-                $response
-            );
 
             return $response;
         }
@@ -119,6 +114,27 @@ class OrderResponseFactory
         }
 
         return $response;
+    }
+
+    private function getIdentifiedAddress(OrderContainer $orderContainer): ?AddressEntity
+    {
+        $identifiedCompany = $orderContainer->getIdentifiedDebtorCompany();
+
+        if (!($identifiedCompany instanceof IdentifiedDebtorCompany)) {
+            return null;
+        }
+
+        $identifiedAddress = null;
+
+        if ($identifiedCompany->getIdentificationType() === IdentifiedDebtorCompany::IDENTIFIED_BY_COMPANY_ADDRESS) {
+            $identifiedAddress = $identifiedCompany->getAddress();
+        } elseif ($identifiedCompany->getIdentifiedAddressUuid() !== null) {
+            $identifiedAddress = $identifiedCompany->getDebtorBillingAddressByUuid(
+                $identifiedCompany->getIdentifiedAddressUuid()
+            );
+        }
+
+        return $identifiedAddress;
     }
 
     private function addLegacyInvoiceData(OrderContainer $orderContainer, OrderResponse $response): void
@@ -211,13 +227,16 @@ class OrderResponseFactory
      */
     private function getOrderPaymentsDetails(array $orderContainers): array
     {
-        $paymentIds = array_map(static function (OrderContainer $orderContainer) {
-            if ($orderContainer->getOrder()->getPaymentId() !== null) {
-                return $orderContainer->getOrder()->getPaymentId();
-            }
+        $paymentIds = array_map(
+            static function (OrderContainer $orderContainer) {
+                if ($orderContainer->getOrder()->getPaymentId() !== null) {
+                    return $orderContainer->getOrder()->getPaymentId();
+                }
 
-            return null;
-        }, $orderContainers);
+                return null;
+            },
+            $orderContainers
+        );
 
         return $this->paymentsService->getBatchOrderPaymentDetails($paymentIds);
     }
@@ -228,13 +247,16 @@ class OrderResponseFactory
      */
     private function getDebtorCompanies(array $orderContainers): array
     {
-        $debtorIds = array_map(static function (OrderContainer $orderContainer) {
-            if ($orderContainer->getOrder()->getMerchantDebtorId() !== null) {
-                return $orderContainer->getMerchantDebtor()->getDebtorId();
-            }
+        $debtorIds = array_map(
+            static function (OrderContainer $orderContainer) {
+                if ($orderContainer->getOrder()->getMerchantDebtorId() !== null) {
+                    return $orderContainer->getMerchantDebtor()->getDebtorId();
+                }
 
-            return null;
-        }, $orderContainers);
+                return null;
+            },
+            $orderContainers
+        );
         $debtorIds = array_filter($debtorIds);
 
         return $this->companiesService->getDebtors($debtorIds);
@@ -250,8 +272,12 @@ class OrderResponseFactory
         }
 
         $calculatedTaxedAmount = TaxedMoneyFactory::create(
-            $financialDetails->getAmountGross()->subtract($gross = $clonedInvoiceCollection->getInvoicesCreditNotesGrossSum()),
-            $financialDetails->getAmountNet()->subtract($net = $clonedInvoiceCollection->getInvoicesCreditNotesNetSum()),
+            $financialDetails->getAmountGross()->subtract(
+                $gross = $clonedInvoiceCollection->getInvoicesCreditNotesGrossSum()
+            ),
+            $financialDetails->getAmountNet()->subtract(
+                $net = $clonedInvoiceCollection->getInvoicesCreditNotesNetSum()
+            ),
             $financialDetails->getAmountTax()->subtract($gross->subtract($net))
         );
 
@@ -260,14 +286,20 @@ class OrderResponseFactory
             ->setAmount($calculatedTaxedAmount)
             ->setDuration($orderContainer->getOrderFinancialDetails()->getDuration())
             ->setDueDate($createdAt->modify("+ {$financialDetails->getDuration()} days"))
-            ->setUnshippedAmount(new TaxedMoney(
-                $financialDetails->getUnshippedAmountGross(),
-                $financialDetails->getUnshippedAmountNet(),
-                $financialDetails->getUnshippedAmountTax()
-            ));
+            ->setUnshippedAmount(
+                new TaxedMoney(
+                    $financialDetails->getUnshippedAmountGross(),
+                    $financialDetails->getUnshippedAmountNet(),
+                    $financialDetails->getUnshippedAmountTax()
+                )
+            );
 
         if (!$orderContainer->getInvoices()->isEmpty()) {
-            $outstandingAmount = $orderContainer->getInvoices()->getLastInvoice()->getOutstandingAmount()->getMoneyValue();
+            $outstandingAmount = $orderContainer
+                ->getInvoices()
+                ->getLastInvoice()
+                ->getOutstandingAmount()
+                ->getMoneyValue();
             $response
                 ->setOutstandingAmount($outstandingAmount);
         }
@@ -318,7 +350,8 @@ class OrderResponseFactory
      */
     private function addReasons(CheckResultCollection $checkResultCollection, $response)
     {
-        $failedRiskCheckResult = $checkResultCollection->getFirstHardDeclined() ?? $checkResultCollection->getFirstSoftDeclined();
+        $failedRiskCheckResult = $checkResultCollection->getFirstHardDeclined(
+            ) ?? $checkResultCollection->getFirstSoftDeclined();
         if ($failedRiskCheckResult === null) {
             return $response;
         }
