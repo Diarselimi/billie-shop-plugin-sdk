@@ -32,6 +32,6 @@ class PublicApiDocsController extends AbstractApiDocsController
 {
     public function execute(Request $request): Response
     {
-        return $this->createResponse($request, 'public');
+        return $this->createResponse($request, 'publicV1');
     }
 }

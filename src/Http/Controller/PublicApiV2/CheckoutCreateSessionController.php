@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controller\PublicApi;
+namespace App\Http\Controller\PublicApiV2;
 
 use App\Application\UseCase\CheckoutCreateSession\CheckoutCreateSessionResponse;
 use App\Application\UseCase\CheckoutCreateSession\CheckoutCreateSessionRequest;
@@ -13,13 +13,13 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * @IsGranted("ROLE_AUTHENTICATED_AS_MERCHANT")
  * @OA\Post(
- *     path="/checkout-session",
- *     operationId="checkout_session_create",
+ *     path="/checkout-sessions",
+ *     operationId="checkout_session_create_v2",
  *     summary="Checkout Session Create",
  *     security={{"oauth2"={}}},
  *
  *     tags={"Checkout Server"},
- *     x={"groups":{"publicV1", "private"}},
+ *     x={"groups":{"publicV2"}},
  *
  *     @OA\RequestBody(
  *          required=true,

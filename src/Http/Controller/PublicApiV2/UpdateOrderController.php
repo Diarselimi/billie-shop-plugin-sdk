@@ -9,7 +9,7 @@ use OpenApi\Annotations as OA;
 /**
  * @OA\Patch(
  *     path="/orders/{uuid}",
- *     operationId="order_update",
+ *     operationId="order_update_v2",
  *     summary="Update Order",
  *     security={{"oauth2"={}}},
  *

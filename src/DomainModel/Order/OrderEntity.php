@@ -24,6 +24,8 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
 
     public const STATE_SHIPPED = 'shipped';
 
+    public const STATE_PARTIALLY_SHIPPED = 'partially_shipped';
+
     public const STATE_PAID_OUT = 'paid_out';
 
     public const STATE_LATE = 'late';
@@ -72,6 +74,18 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
         self::STATE_LATE,
         self::STATE_COMPLETE,
         self::STATE_CANCELED,
+    ];
+
+    public const ALL_STATES_V2 = [
+        self::STATE_WAITING,
+        self::STATE_CREATED,
+        self::STATE_DECLINED,
+        self::STATE_PARTIALLY_SHIPPED,
+        self::STATE_SHIPPED,
+        self::STATE_COMPLETE,
+        self::STATE_CANCELED,
+        self::STATE_PRE_WAITING,
+        self::STATE_AUTHORIZED,
     ];
 
     public const MAX_DURATION_IN_PRE_WAITING_STATE = '1 days';

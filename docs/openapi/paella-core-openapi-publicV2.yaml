@@ -80,72 +80,73 @@ servers:
     url: 'https://paella.billie.io/api/v2'
     description: 'Production API'
 paths:
-  '/order/{id}/cancel':
+  /oauth/token:
     post:
       tags:
-        - 'Order Management'
-      summary: 'Cancel Order'
-      description: 'This call initiates a full order cancellation.'
-      operationId: order_cancel
-      parameters:
-        -
-          name: id
-          in: path
-          description: 'Order ID or UUID'
-          required: true
-          schema:
-            type: integer
-      responses:
-        '204':
-          description: 'Order successfully cancelled'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-  /checkout-session:
-    post:
-      tags:
-        - 'Checkout Server'
-      summary: 'Checkout Session Create'
-      description: 'Initializes a new Billie Checkout session for the given customer.'
-      operationId: checkout_session_create
+        - Authentication
+      summary: 'Request OAuth Token'
+      description: |-
+        <!-- Grants documentation taken from: https://oauth2.thephpleague.com/ -->
+
+        ### Flow
+
+        The client sends a POST request with following body parameters to the authorization server:
+
+        * `grant_type` with the value `client_credentials`
+        * `client_id` with the client's ID
+        * `client_secret` with the client's secret
+
+        The authorization server will respond with a JSON object containing the following properties:
+
+        * `token_type` with the value `Bearer`
+        * `expires_in` with an integer representing the TTL (in seconds) of the access token (Default is 8 hours)
+        * `access_token` a JWT signed with the authorization server's private key
+
+        The `access_token` should be used in the `Authorization` header together with the `Bearer` challenge to authenticate all the requests.
+
+        > Example: `Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c`.
+      operationId: oauth_token_create
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              properties:
-                merchant_customer_id:
-                  description: 'Debtor ID in the merchant system.'
-                  $ref: '#/components/schemas/TinyText'
-              type: object
+              $ref: '#/components/schemas/OauthClientCredentialsGrantRequestBodyParams'
       responses:
         '200':
-          description: 'Checkout session created.'
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OauthTokenResponseBody'
+  /oauth/authorization:
+    get:
+      tags:
+        - Authentication
+      summary: 'Validate OAuth Token'
+      description: |-
+        Validates the `Authorization: Bearer XXXX` OAuth 2.0 token header and returns a successful response
+        with `client_id` and `user_id` or fails if it's invalid.
+      operationId: oauth_token_validate
+      responses:
+        '200':
+          description: Successful
           content:
             application/json:
               schema:
                 required:
-                  - id
+                  - client_id
+                  - scopes
                 properties:
-                  id: { description: 'Checkout Session Token', $ref: '#/components/schemas/UUID' }
+                  client_id: { $ref: '#/components/schemas/UUID' }
+                  scopes: { type: array, items: { type: string }, default: [] }
                 type: object
-        '400':
-          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
-        '500':
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        default:
           $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
   '/invoices/{uuid}':
     get:
       tags:
@@ -219,7 +220,7 @@ paths:
   /orders:
     post:
       tags:
-        - 'Order Management'
+        - 'Back-end Order Creation'
       summary: 'Create Order'
       operationId: order_create_V2
       requestBody:
@@ -244,6 +245,34 @@ paths:
       security:
         -
           oauth2: []
+  '/orders/{id}/cancel':
+    post:
+      tags:
+        - 'Order Management'
+      summary: 'Cancel Order'
+      operationId: order_cancel_v2
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'Order ID or UUID'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: 'Order successfully cancelled'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
   '/checkout-sessions/{sessionUuid}/confirm':
     put:
       tags:
@@ -263,7 +292,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CheckoutConfirmOrderRequest'
+              $ref: '#/components/schemas/CheckoutConfirmOrderRequestV2'
       responses:
         '202':
           description: 'Order data successfully confirmed'
@@ -277,6 +306,42 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+  /checkout-sessions:
+    post:
+      tags:
+        - 'Checkout Server'
+      summary: 'Checkout Session Create'
+      operationId: checkout_session_create_v2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                merchant_customer_id:
+                  description: 'Debtor ID in the merchant system.'
+                  $ref: '#/components/schemas/TinyText'
+              type: object
+      responses:
+        '200':
+          description: 'Checkout session created.'
+          content:
+            application/json:
+              schema:
+                required:
+                  - id
+                properties:
+                  id: { description: 'Checkout Session Token', $ref: '#/components/schemas/UUID' }
+                type: object
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/ServerError'
       security:
@@ -463,27 +528,36 @@ paths:
       security:
         -
           oauth2: []
+  '/invoices/{uuid}/update-details':
+    post:
+      tags:
+        - Invoices
+      summary: 'Update Invoice'
+      operationId: invoice_update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInvoiceRequest'
+      responses:
+        '204':
+          description: 'Invoice successfully updated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
   '/orders/{uuid}':
     patch:
       tags:
         - 'Order Management'
       summary: 'Update Order'
-      description: |-
-        Updates an order if changes are necessary. 
-        The following information can be updated until the order reached state complete:
-
-        - order amount: decrease the order amount (mostly due to partial cancellations of a purchase), always possible 
-          unless the order is already fully paid.
-        - duration: extend timeframe for a payment. This changes the due date (§1).
-        - invoice details like invoice number and document URL.
-
-
-        §1 This call can also be used to move the due date into the future. This is possible from the moment the shipment is 
-        confirmed until the last day before reaching the current due date.
-
-        The new duration is to be set (i.e. initial request for 30 days, shipment on the 01.01., due date = 31.01., 
-        update duration on 45 days, new due date = 15.02.).
-      operationId: order_update
+      operationId: order_update_v2
       parameters:
         -
           name: uuid
@@ -532,6 +606,20 @@ components:
         - late
         - complete
         - canceled
+      example: created
+    OrderStateV2:
+      title: 'Order State'
+      type: string
+      enum:
+        - waiting
+        - created
+        - declined
+        - partially_shipped
+        - shipped
+        - complete
+        - canceled
+        - pre_waiting
+        - authorized
       example: created
     OrderDeclineReason:
       title: 'Order Decline Reason'
@@ -637,6 +725,37 @@ components:
         country:
           $ref: '#/components/schemas/TinyText'
       type: object
+    OauthClientCredentialsGrantRequestBodyParams:
+      title: 'Request OAuth Token'
+      required:
+        - grant_type
+        - client_id
+        - client_secret
+      properties:
+        grant_type:
+          type: string
+          example: client_credentials
+        client_id:
+          $ref: '#/components/schemas/UUID'
+        client_secret:
+          type: string
+      type: object
+    OauthTokenResponseBody:
+      title: 'Request Oauth Token Response'
+      properties:
+        token_type:
+          type: string
+          example: Bearer
+          nullable: false
+        expires_in:
+          description: 'TTL of the access token in seconds (Default is 8 hours)'
+          type: integer
+          nullable: false
+        access_token:
+          description: 'JWT signed with the authorization server''s private key'
+          type: string
+          nullable: false
+      type: object
     AbstractShipOrderRequest:
       allOf:
         -
@@ -662,6 +781,26 @@ components:
           $ref: '#/components/schemas/TinyText'
       type: object
     CheckoutConfirmOrderRequest:
+      required:
+        - amount
+        - duration
+        - debtor_company
+      properties:
+        amount:
+          $ref: '#/components/schemas/AmountDTO'
+        duration:
+          $ref: '#/components/schemas/OrderDuration'
+        debtor_company:
+          $ref: '#/components/schemas/DebtorCompanyRequest'
+        delivery_address:
+          nullable: true
+          $ref: '#/components/schemas/CreateOrderAddressRequest'
+        order_id:
+          description: 'Order external code'
+          example: DE123456-1
+          $ref: '#/components/schemas/TinyText'
+      type: object
+    CheckoutConfirmOrderRequestV2:
       required:
         - amount
         - duration
@@ -702,28 +841,29 @@ components:
           nullable: true
       type: object
     CreateInvoiceRequest:
-      title: 'Order Creation Request'
+      title: 'Create Invoice Request'
       required:
+        - orders
+        - external_code
+        - invoice_url
         - amount
-        - duration
-        - debtor_company
-        - debtor_person
       properties:
         orders:
           type: array
           items:
             $ref: '#/components/schemas/TinyText'
-          nullable: true
+          nullable: false
         external_code:
-          nullable: true
+          nullable: false
           $ref: '#/components/schemas/TinyText'
         invoice_url:
-          nullable: true
+          nullable: false
           $ref: '#/components/schemas/TinyText'
         shipping_document_url:
           nullable: true
           $ref: '#/components/schemas/TinyText'
         amount:
+          nullable: false
           $ref: '#/components/schemas/AmountDTO'
         line_items:
           type: array
@@ -903,10 +1043,7 @@ components:
         - merchant_customer_id
         - name
         - legal_form
-        - address_street
-        - address_city
-        - address_postal_code
-        - address_country
+        - address
       properties:
         merchant_customer_id:
           description: 'Unique identifier of the customer provided by the merchant side.'
@@ -916,6 +1053,7 @@ components:
           example: 'Billie GmbH'
           $ref: '#/components/schemas/TinyText'
         address:
+          nullable: false
           $ref: '#/components/schemas/Address'
         tax_id:
           example: DE1234556
@@ -1109,6 +1247,19 @@ components:
           type: number
           minimum: 1
       type: object
+    UpdateInvoiceRequest:
+      title: 'Invoice Update Request'
+      required:
+        - external_code
+        - invoice_url
+      properties:
+        external_code:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        invoice_url:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+      type: object
     UpdateOrderRequest:
       title: 'Order Update with invoice Object'
       properties:
@@ -1117,6 +1268,38 @@ components:
         external_code:
           description: 'Update order request'
           $ref: '#/components/schemas/TinyText'
+      type: object
+    DebtorCompanyRequest:
+      title: 'Debtor Company Request'
+      required:
+        - name
+        - address_street
+        - address_city
+        - address_postal_code
+        - address_country
+      properties:
+        name:
+          example: 'Billie GmbH'
+          $ref: '#/components/schemas/TinyText'
+        address_addition:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        address_house_number:
+          example: '4'
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        address_street:
+          example: Charlottenstr.
+          $ref: '#/components/schemas/TinyText'
+        address_city:
+          example: Berlin
+          $ref: '#/components/schemas/TinyText'
+        address_postal_code:
+          example: '10969'
+          $ref: '#/components/schemas/PostalCode'
+        address_country:
+          example: DE
+          $ref: '#/components/schemas/CountryCode'
       type: object
     OrderInvoiceResponse:
       title: 'Order Entity'
@@ -1304,7 +1487,7 @@ components:
           $ref: '#/components/schemas/UUID'
         state:
           example: created
-          $ref: '#/components/schemas/OrderState'
+          $ref: '#/components/schemas/OrderStateV2'
         decline_reason:
           nullable: true
           $ref: '#/components/schemas/OrderDeclineReason'
@@ -1427,4 +1610,266 @@ components:
           tokenUrl: /oauth/token
           scopes:
             default: default
-tags: []
+tags:
+  -
+    name: Authentication
+    description: |-
+      This API uses OAuth 2.0 for secure authentication. 
+
+      Different keys are used for the `sandbox` and `production` environments. Both systems operate completely independent, however both show largely 
+      the same response behaviour. The major difference is that sandbox does not trigger any payment events (payout to merchant, repayment 
+      by debtors, etc.). To obtain your credentials for both environments please contact Billie's merchant integration support 
+      via telephone ( [+49-30-120872485](tel:+4930120872485) ) or email ( pad@billie.io ).
+
+      This authentication mechanism is based on the OAuth 2.0 protocol and requires a Client ID and a Client Secret Key (client credentials).
+
+      Before triggering any API call, a so called JSON web token (JWT) must be requested through the `oauth/token` endpoint described below
+      by using your client credentials.
+      In all following requests / API calls, this JWT token is used for authorization and must be passed as type "Bearer" token 
+      in the Authorization header. Example: `Authorization: Bearer eyJhbGciOiJIUzI...`
+
+      Renewal of the bearer token / JWT:
+
+      Every token expires automatically after 8 hours. After expiration of an existing token a new token must be requested through the 
+      `POST oauth/token` endpoint. Implementation best practice is to always try sending API calls first with the previously stored token. 
+      Sending API calls with an expired token will be answered with an `HTTP 401` (Unauthorized request or invalid credentials) response.
+
+      After receiving the `401` error you will simply need to request a new token by triggering again the `oauth/token` endpoint. 
+      After receiving the new valid token, resend the previously failed API call. This procedure allows for optimal API interaction, 
+      ensures reduced system load on both ends, and is easy to implement as you don't need to keep track of token expiration times.
+
+      There is another endpoint available for checking if a token is still valid or not: `GET oauth/token`.
+  -
+    name: 'Checkout Client'
+    description: |-
+      To integrate the Billie checkout widget, the following steps are required:
+
+      1. Add the Billie checkout widget bundle to your checkout page
+      2. Provide config data _(with the `session_id` from the server-side integration)_
+      3. Provide order details and call the mount method
+      4. Handle the widget responses
+      5. Apply customized styling _[optional]_
+
+      This section provides a step-by-step guide of the setup process.
+
+      ### 1. Include Billie Checkout Widget Bundle into your Checkout Page
+
+      On the checkout page, the following code snippet must be included:
+      ```html
+      <script>
+        var bcwSrc = 'https://static-paella-sandbox.billie.io/checkout/billie-checkout.js';
+        (function(w,d,s,o,f,js,fjs){
+          w['BillieCheckoutWidget']=o;w[o]=w[o]||function(){(w[o].q=w[o].q||[]).push(arguments)};
+          w.billieSrc=f;js=d.createElement(s);fjs=d.getElementsByTagName(s)[0];js.id=o;
+          js.src=f;js.charset='utf-8';js.async=1;fjs.parentNode.insertBefore(js,fjs);bcw('init');
+        }(window,document,'script','bcw', bcwSrc));
+      </script>
+      ```
+
+      The URL contained in `bcwSrc` specifies whether you are using the Sandbox or Production environment:
+
+      Sandbox: https://static-paella-sandbox.billie.io/checkout/billie-checkout.js
+
+      Production: https://static.billie.io/checkout/billie-checkout.js
+
+      The code snippet above injects our checkout script into the `head` of the webshop. This will download our widget bundle code and enable function calls to interact with the widget.
+
+      It is **strongly recommended** to add this code snippet as high as possible in the document head to ensure that the widget download completes as soon as possible, providing a smooth user experience.
+
+      ### 2. Provide Config Data
+
+      During initialization of the widget, the `session_id` is required. This can be obtained by calling [Checkout Session Create](#operation/checkout_session_create) from your backend and exposing it to the frontend. The `session_id` will be unique per order.
+      ```html
+      <script>
+        const billie_config_data = {
+          'session_id': ':YOUR_SESSION_ID',
+          'merchant_name': ':YOUR_NAME'
+        }
+      </script>
+      ```
+      The `session_id` is needed to approve the order and should be known before mounting the widget.
+
+      Ideally, if you are using server side rendering, this piece of code should be inserted into the document head with prefilled values. Otherwise please ensure there is an [XHR request](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest) as early as possible to your backend to retrieve the `session_id`.
+
+      ### 3. Provide Order Details and Call Mount Method
+
+      Once the user reviews his checkout basket and is ready to pay, he can click on the **Pay with Billie** button. When this happens, Billie expects the `mount` method to be called. The easiest integration option is to inline the function call directly on the button, for example:
+      ```html
+      <script>
+        function payWithBillie() {
+          // prepare / get all the data and assign it to billie_order_data, please refer to 3a section
+          BillieCheckoutWidget.mount({
+            billie_config_data: billie_config_data, 
+            billie_order_data: billie_order_data
+          })
+          .then(function success(ao) {
+            // code to execute when approved order
+            // console.log('Approved order', ao);
+          })
+          .catch(function failure(err) {
+            // code to execute when there is an error or when order is rejected
+            // console.log('Error occurred', err);
+          });
+        }
+      </script>
+      <button onclick="payWithBillie()"> Pay with Billie </button>
+      ```
+
+      `BillieCheckoutWidget` is a JavaScript promise which can accept optional `then` and `catch` methods. They can be added if the webshop needs to perform an action based on the outcome of the order authorization. 
+
+      The `then` block will receive as parameter the object with the authorised order details.
+
+      The `catch` block will receive the error object with reasons why the order creation was rejected.
+
+
+      #### 3.a Mount Method Parameters
+
+      `BillieCheckoutWidget.mount` expects two parameters:
+      - `billie_config_data` is the object received in step two which includes the `session_id` and `merchant_name`
+      - `billie_order_data`  is a collection of order data from the user
+
+
+      #### 3.b Order Data Object
+
+      The order data object must contain all information about an order, in the following format (required values are **bolded**):
+
+      - `amount` **[object]**
+         - `gross` **[float]** `> 0`
+         - `tax` **[float]** `>= 0`
+         - `net` **[float]** `> 0`
+      - `duration` **[integer]** `[7...120]`
+      - `delivery_address` **[object]**
+        - `street` **[string]** `<= 255 characters`
+        - `house_number`  _[string]_ `<= 255 characters`
+        - `addition` _[string]_ `<= 255 characters`
+        - `city` **[string]** `<= 255 characters`
+        - `postal_code` **[string]** `<= 5 characters`
+        - `country` **[string]** `2 characters` `^[A-Za-z]{2}$`
+      - `debtor_company` **[object]**
+        - `name` **[string]** `<= 255 characters`
+        - `established_customer` _[boolean]_ 
+        - `address_street` **[string]** `<= 255 characters`
+        - `address_house_number` **[string]** `<= 255 characters`
+        - `address_addition` _[string]_  `<= 255 characters`
+        - `address_city` **[string]** `<= 255 characters`
+        - `address_postal_code` **[string]** `<= 5 characters`
+        - `address_country` **[string]** `2 characters` `^[A-Za-z]{2}$`
+      - `debtor_person`  **[object]**
+        - `salutation` **[string]** `1 character` `["m" / "f"]`
+        - `first_name` _[string]_ `<= 255 characters`
+        - `last_name` _[string]_ `<= 255 characters`
+        - `phone_number` _[string]_ `>= 5 characters`, `<= 20 characters` `^(\+|\d|\()[ \-\/0-9()]{5,20}$`
+        - `email` **[string]** `<= 255 characters` `valid email`
+      - `line_items` **[array of objects]**
+        - `external_id` **[string]** `<= 255 characters`
+        - `title` **[string]** `<= 255 characters`
+        - `description` _[string]_ `<= 255 characters`
+        - `quantity` **[string]** `>= 1`
+        - `category` _[string]_ `<= 255 characters`
+        - `brand` _[string]_ `<= 255 characters`
+        - `gtin` _[string]_ `<= 255 characters`
+        - `mpn` _[string]_ `<= 255 characters`
+        - `amount` **[object]**
+          - `gross` **[float]** `> 0`
+          - `tax` **[float]** `>= 0`
+          - `net` **[float]** `> 0`
+
+      Below you can find an example of `orderData` object in javascript
+      ```javascript
+      const billie_order_data = {
+        "amount": { "net": 100, "gross": 100, "tax": 0 },
+        "comment": "string",
+        "duration": 30,
+        "delivery_address": {
+          "house_number": "string",
+          "street": "string",
+          "city": "string",
+          "postal_code": "10000",
+          "country": "DE",
+          "addition": "string"
+        },
+        "debtor_company": {
+          "name": "string",
+          "established_customer": false,
+          "address_house_number": "string",
+          "address_street": "string",
+          "address_city": "string",
+          "address_postal_code": "10000",
+          "address_country": "DE",
+          "address_addition": "string"
+        },
+        "debtor_person": {
+          "salutation": "m",
+          "first_name": "string",
+          "last_name": "string",
+          "phone_number": "030 31199251",
+          "email": "james.smith@example.com"
+        },
+        "line_items": [
+          {
+            "external_id": "string",
+            "title": "string",
+            "description": "string",
+            "quantity": 1,
+            "category": "string",
+            "brand": "string",
+            "gtin": "string",
+            "mpn": "string",
+            "amount": { "net": 100, "gross": 100, "tax": 0 },
+          }
+          // , ...
+        ]
+      };
+      ```
+
+      ### 4. Handle Widget Responses
+
+      When submitted, the checkout widget will evaluate if an order with the given data can be accepted. 
+      - If an order cannot be accepted, the widget will return the state `declined` with a specified `decline_reason`
+      - If an order can be accepted immediately the widget will return the state `authorized`. 
+      - It is also possible that some additional checks need to be conducted by Billie in order to accept the order. In this case the widget will return the state `pre_waiting`. 
+
+      In both `authorized` and `pre_waiting` states the `checkout-session-confirm` call must be used to confirm the order creation. 
+
+
+      #### Response
+      After submitting the widget, following data will be returned to either `then` or `catch` block:
+      - `state` **[string]** `<= 255 characters`   
+      &nbsp;&nbsp;&nbsp;&nbsp;Enum: `authorized` `declined` `pre_waiting`
+      - `decline_reason` **[string]** `<= 255 characters`   
+      &nbsp;&nbsp;&nbsp;&nbsp;Enum: `validation_error` `risk_policy` `debtor_not_identified` `debtor_address` `risk_scoring_failed` `debtor_limit_exceeded` `unknown_error`
+      - `validation_error_source` **[string]**  `<= 255 characters`
+      - `debtor_company` **[object]**  
+        - `name` **[string]** `<= 255 characters`
+        - `address_street` **[string]** `<= 255 characters`
+        - `address_house_number` **[string]** `<= 255 characters`
+        - `address_city` **[string]** `<= 255 characters`
+        - `address_postal_code` **[string]** `<= 5 characters`
+        - `address_country` **[string]** `2 characters` `^[A-Za-z]{2}$`
+
+      _**Special note**_  
+      * `decline_reason` will be set only when `state` value is `declined`
+      * `validation_error_source` will be set only when `decline_reason` value is `validation_error`. We will fill this property with information to help you find which fields are failing validation checks. 
+
+      #### 5. Apply Customized Styling
+
+      It is possible to set some CSS rules to be applied over widget in a simple format. Simply use this snippet:
+
+      ```html
+      <style>
+        .billie-checkout-modal {
+          --c-primary: #FF4338;
+        }
+      </style>
+      ```
+
+      Other available options are:
+      - `c-primary` -  color of submit button
+      - `s-font` - font size inside the widget 
+      - `s-font-small` - font size of small text inside the widget
+  -
+    name: 'Checkout Server'
+  -
+    name: 'Back-end Order Creation'
+  -
+    name: 'Order Management'

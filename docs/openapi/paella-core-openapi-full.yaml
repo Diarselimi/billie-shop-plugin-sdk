@@ -2261,7 +2261,7 @@ paths:
           oauth2: []
     post:
       tags:
-        - 'Order Management'
+        - 'Back-end Order Creation'
       summary: 'Create Order'
       operationId: order_create_V2
       requestBody:
@@ -2945,6 +2945,34 @@ paths:
       security:
         -
           oauth2: []
+  '/orders/{id}/cancel':
+    post:
+      tags:
+        - 'Order Management'
+      summary: 'Cancel Order'
+      operationId: order_cancel_v2
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'Order ID or UUID'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: 'Order successfully cancelled'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
   '/checkout-sessions/{sessionUuid}/confirm':
     put:
       tags:
@@ -2964,7 +2992,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CheckoutConfirmOrderRequest'
+              $ref: '#/components/schemas/CheckoutConfirmOrderRequestV2'
       responses:
         '202':
           description: 'Order data successfully confirmed'
@@ -2978,6 +3006,42 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+  /checkout-sessions:
+    post:
+      tags:
+        - 'Checkout Server'
+      summary: 'Checkout Session Create'
+      operationId: checkout_session_create_v2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                merchant_customer_id:
+                  description: 'Debtor ID in the merchant system.'
+                  $ref: '#/components/schemas/TinyText'
+              type: object
+      responses:
+        '200':
+          description: 'Checkout session created.'
+          content:
+            application/json:
+              schema:
+                required:
+                  - id
+                properties:
+                  id: { description: 'Checkout Session Token', $ref: '#/components/schemas/UUID' }
+                type: object
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/ServerError'
       security:
@@ -3193,22 +3257,7 @@ paths:
       tags:
         - 'Order Management'
       summary: 'Update Order'
-      description: |-
-        Updates an order if changes are necessary. 
-        The following information can be updated until the order reached state complete:
-
-        - order amount: decrease the order amount (mostly due to partial cancellations of a purchase), always possible 
-          unless the order is already fully paid.
-        - duration: extend timeframe for a payment. This changes the due date (§1).
-        - invoice details like invoice number and document URL.
-
-
-        §1 This call can also be used to move the due date into the future. This is possible from the moment the shipment is 
-        confirmed until the last day before reaching the current due date.
-
-        The new duration is to be set (i.e. initial request for 30 days, shipment on the 01.01., due date = 31.01., 
-        update duration on 45 days, new due date = 15.02.).
-      operationId: order_update
+      operationId: order_update_v2
       parameters:
         -
           name: uuid
@@ -3257,6 +3306,20 @@ components:
         - late
         - complete
         - canceled
+      example: created
+    OrderStateV2:
+      title: 'Order State'
+      type: string
+      enum:
+        - waiting
+        - created
+        - declined
+        - partially_shipped
+        - shipped
+        - complete
+        - canceled
+        - pre_waiting
+        - authorized
       example: created
     OnboardingState:
       title: 'Onboarding State'
@@ -3543,6 +3606,26 @@ components:
           $ref: '#/components/schemas/AmountDTO'
         duration:
           $ref: '#/components/schemas/OrderDuration'
+        debtor_company:
+          $ref: '#/components/schemas/DebtorCompanyRequest'
+        delivery_address:
+          nullable: true
+          $ref: '#/components/schemas/CreateOrderAddressRequest'
+        order_id:
+          description: 'Order external code'
+          example: DE123456-1
+          $ref: '#/components/schemas/TinyText'
+      type: object
+    CheckoutConfirmOrderRequestV2:
+      required:
+        - amount
+        - duration
+        - debtor_company
+      properties:
+        amount:
+          $ref: '#/components/schemas/AmountDTO'
+        duration:
+          $ref: '#/components/schemas/OrderDuration'
         debtor_company_name:
           description: 'Company name'
           $ref: '#/components/schemas/TinyText'
@@ -3583,28 +3666,29 @@ components:
           nullable: true
       type: object
     CreateInvoiceRequest:
-      title: 'Order Creation Request'
+      title: 'Create Invoice Request'
       required:
+        - orders
+        - external_code
+        - invoice_url
         - amount
-        - duration
-        - debtor_company
-        - debtor_person
       properties:
         orders:
           type: array
           items:
             $ref: '#/components/schemas/TinyText'
-          nullable: true
+          nullable: false
         external_code:
-          nullable: true
+          nullable: false
           $ref: '#/components/schemas/TinyText'
         invoice_url:
-          nullable: true
+          nullable: false
           $ref: '#/components/schemas/TinyText'
         shipping_document_url:
           nullable: true
           $ref: '#/components/schemas/TinyText'
         amount:
+          nullable: false
           $ref: '#/components/schemas/AmountDTO'
         line_items:
           type: array
@@ -3908,10 +3992,7 @@ components:
         - merchant_customer_id
         - name
         - legal_form
-        - address_street
-        - address_city
-        - address_postal_code
-        - address_country
+        - address
       properties:
         merchant_customer_id:
           description: 'Unique identifier of the customer provided by the merchant side.'
@@ -3921,6 +4002,7 @@ components:
           example: 'Billie GmbH'
           $ref: '#/components/schemas/TinyText'
         address:
+          nullable: false
           $ref: '#/components/schemas/Address'
         tax_id:
           example: DE1234556
@@ -4841,6 +4923,38 @@ components:
         role_uuid:
           $ref: '#/components/schemas/UUID'
       type: object
+    DebtorCompanyRequest:
+      title: 'Debtor Company Request'
+      required:
+        - name
+        - address_street
+        - address_city
+        - address_postal_code
+        - address_country
+      properties:
+        name:
+          example: 'Billie GmbH'
+          $ref: '#/components/schemas/TinyText'
+        address_addition:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        address_house_number:
+          example: '4'
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        address_street:
+          example: Charlottenstr.
+          $ref: '#/components/schemas/TinyText'
+        address_city:
+          example: Berlin
+          $ref: '#/components/schemas/TinyText'
+        address_postal_code:
+          example: '10969'
+          $ref: '#/components/schemas/PostalCode'
+        address_country:
+          example: DE
+          $ref: '#/components/schemas/CountryCode'
+      type: object
     MerchantUserIdentityVerificationResponse:
       title: 'Merchant User Identity Verification Response'
       properties:
@@ -5421,7 +5535,7 @@ components:
           $ref: '#/components/schemas/UUID'
         state:
           example: created
-          $ref: '#/components/schemas/OrderState'
+          $ref: '#/components/schemas/OrderStateV2'
         decline_reason:
           nullable: true
           $ref: '#/components/schemas/OrderDeclineReason'

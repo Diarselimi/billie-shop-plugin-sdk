@@ -5,13 +5,13 @@ use OpenApi\Annotations as OA;
 /**
  * @OA\OpenApi(
  *     tags={
- *          @OA\Tag(name="Authentication", x={"groups":{"public", "private"}}),
- *          @OA\Tag(name="Checkout Client", x={"groups":{"public", "private"}}),
- *          @OA\Tag(name="Checkout Server", x={"groups":{"public", "private"}}),
- *          @OA\Tag(name="Back-end Order Creation", x={"groups":{"public", "private"}}),
- *          @OA\Tag(name="Order Management", x={"groups":{"public", "private"}}),
+ *          @OA\Tag(name="Authentication", x={"groups":{"publicV1", "publicV2", "private"}}),
+ *          @OA\Tag(name="Checkout Client", x={"groups":{"publicV1", "publicV2", "private"}}),
+ *          @OA\Tag(name="Checkout Server", x={"groups":{"publicV1", "publicV2", "private"}}),
+ *          @OA\Tag(name="Back-end Order Creation", x={"groups":{"publicV1", "publicV2", "private"}}),
+ *          @OA\Tag(name="Order Management", x={"groups":{"publicV1", "publicV2", "private"}}),
  *          @OA\Tag(name="Invoice Management", x={"groups":{"private"}}),
- *          @OA\Tag(name="Webhooks", x={"groups":{"public", "private"}}),
+ *          @OA\Tag(name="Webhooks", x={"groups":{"publicV1", "private"}}),
  *
  *          @OA\Tag(name="Dashboard Orders", x={"groups":{"private"}}),
  *          @OA\Tag(name="Dashboard Debtors", x={"groups":{"private"}}),

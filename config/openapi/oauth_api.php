@@ -7,7 +7,7 @@ use OpenApi\Annotations as OA;
  *     path="/oauth/token",
  *     operationId="oauth_token_create",
  *     tags={"Authentication"},
- *     x={"groups":{"public", "private"}},
+ *     x={"groups":{"publicV1", "publicV2", "private"}},
  *     summary="Request OAuth Token",
  *
  *     @OA\RequestBody(
@@ -29,7 +29,7 @@ use OpenApi\Annotations as OA;
  *     path="/oauth/authorization",
  *     operationId="oauth_token_validate",
  *     tags={"Authentication"},
- *     x={"groups":{"public", "private"}},
+ *     x={"groups":{"publicV1", "publicV2", "private"}},
  *     summary="Validate OAuth Token",
  *
  *     @OA\Response(

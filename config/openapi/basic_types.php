@@ -25,6 +25,16 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Schema(
+ *     schema="OrderStateV2",
+ *     title="Order State",
+ *     type="string",
+ *     enum=\App\DomainModel\Order\OrderEntity::ALL_STATES_V2,
+ *     example="created"
+ * )
+ */
+
+/**
+ * @OA\Schema(
  *     schema="OnboardingState",
  *     title="Onboarding State",
  *     type="string",

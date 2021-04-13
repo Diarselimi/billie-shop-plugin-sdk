@@ -14,7 +14,7 @@ use OpenApi\Annotations as OA;
  *     security={{"oauth2"={}}},
  *
  *     tags={"Invoices"},
- *     x={"groups":{"public"}},
+ *     x={"groups":{"publicV2"}},
  *
  *     @OA\RequestBody(
  *          required=true,

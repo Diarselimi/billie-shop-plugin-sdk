@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controller\PublicApi;
+namespace App\Http\Controller\PublicApiV2;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\WorkflowException;
@@ -17,13 +17,13 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 /**
  * @IsGranted({"ROLE_AUTHENTICATED_AS_MERCHANT", "ROLE_CANCEL_ORDERS"})
  * @OA\Post(
- *     path="/order/{id}/cancel",
- *     operationId="order_cancel",
+ *     path="/orders/{id}/cancel",
+ *     operationId="order_cancel_v2",
  *     summary="Cancel Order",
  *     security={{"oauth2"={}}},
  *
  *     tags={"Order Management"},
- *     x={"groups":{"publicV1", "private"}},
+ *     x={"groups":{"publicV2"}},
  *
  *     @OA\Parameter(in="path", name="id", @OA\Schema(type="integer"), required=true, description="Order ID or UUID"),
  *

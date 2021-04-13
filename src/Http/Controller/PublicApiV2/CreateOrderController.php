@@ -13,7 +13,7 @@ use OpenApi\Annotations as OA;
  *     summary="Create Order",
  *     security={{"oauth2"={}}},
  *
- *     tags={"Order Management"},
+ *     tags={"Back-end Order Creation"},
  *     x={"groups":{"publicV2"}},
  *
  *     @OA\RequestBody(

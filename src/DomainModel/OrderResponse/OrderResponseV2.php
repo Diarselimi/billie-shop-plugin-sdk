@@ -10,7 +10,7 @@ use Ozean12\Money\TaxedMoney\TaxedMoney;
  * @OA\Schema(schema="OrderResponseV2", title="Order Entity", type="object", properties={
  *      @OA\Property(property="external_code", type="string", nullable=true, example="C-10123456789-0001"),
  *      @OA\Property(property="uuid", ref="#/components/schemas/UUID"),
- *      @OA\Property(property="state", ref="#/components/schemas/OrderState", example="created"),
+ *      @OA\Property(property="state", ref="#/components/schemas/OrderStateV2", example="created"),
  *      @OA\Property(property="decline_reason", ref="#/components/schemas/OrderDeclineReason", nullable=true),
  *      @OA\Property(property="amount", ref="#/components/schemas/AmountDTO"),
  *      @OA\Property(property="unshipped_amount", ref="#/components/schemas/AmountDTO"),

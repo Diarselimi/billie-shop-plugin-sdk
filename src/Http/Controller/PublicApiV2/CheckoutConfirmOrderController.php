@@ -19,7 +19,7 @@ use OpenApi\Annotations as OA;
  *     @OA\RequestBody(
  *          required=true,
  *          @OA\MediaType(mediaType="application/json",
- *          @OA\Schema(ref="#/components/schemas/CheckoutConfirmOrderRequest"))
+ *          @OA\Schema(ref="#/components/schemas/CheckoutConfirmOrderRequestV2"))
  *     ),
  *
  *     @OA\Response(response=202, description="Order data successfully confirmed", @OA\JsonContent(ref="#/components/schemas/OrderResponseV2")),

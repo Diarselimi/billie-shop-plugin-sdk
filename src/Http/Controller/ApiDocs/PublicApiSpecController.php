@@ -27,7 +27,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class PublicApiSpecController extends AbstractApiSpecController
 {
-    private const API_GROUP_WHITELIST = ['public'];
+    private const API_GROUP_WHITELIST = ['publicV1'];
 
     public function __construct(ApiSpecLoadUseCase $useCase)
     {
@@ -36,6 +36,6 @@ class PublicApiSpecController extends AbstractApiSpecController
 
     public function execute(Request $request): Response
     {
-        return $this->createResponse($request, 'public');
+        return $this->createResponse($request, 'publicV1');
     }
 }
