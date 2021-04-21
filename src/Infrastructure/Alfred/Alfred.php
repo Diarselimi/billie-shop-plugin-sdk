@@ -93,8 +93,14 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
                 'query' => [
                     'ids' => $debtorIds,
                 ],
+                'on_stats' => function (TransferStats $stats) {
+                    $this->logServiceRequestStats($stats, 'get_debtors');
+                },
             ]);
         } catch (TransferException $exception) {
+            // Temporary log exception for BH-2392:
+            $this->logSuppressedException($exception, $exception->getMessage());
+
             throw new CompaniesServiceRequestException();
         }
 
