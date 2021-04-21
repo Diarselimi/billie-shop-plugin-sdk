@@ -90,3 +90,9 @@ eight_points_guzzle:
         timeout: 1
         headers:
           Content-Type: "application/json"
+    cosimi:
+      base_url: "%env(string:COMPANIES_SIMILARITY_URL)%"
+      options:
+        timeout: 2
+        headers:
+          Content-Type: "application/json"

@@ -78,4 +78,10 @@ eight_points_guzzle:
         debug: false
         query:
           app: butler
+    cosimi:
+      base_url: "%behat_mock_server_url%/cosimi/"
+      options:
+        debug: false
+        query:
+          app: cosimi
 
