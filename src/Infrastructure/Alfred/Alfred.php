@@ -96,7 +96,6 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
                 'on_stats' => function (TransferStats $stats) {
                     $this->logServiceRequestStats($stats, 'get_debtors');
                 },
-                'timeout' => self::EXTENDED_TIMEOUT,
             ]);
         } catch (TransferException $exception) {
             throw new CompaniesServiceRequestException();
