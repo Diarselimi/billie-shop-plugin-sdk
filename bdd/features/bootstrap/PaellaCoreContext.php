@@ -334,6 +334,23 @@ class PaellaCoreContext extends MinkContext
     /**
      * @deprecated use iHaveOrdersWithTheFollowingData() instead
      *
+     * @Given I have a(n) :state v2 order :externalCode with amounts :gross/:net/:tax, duration :duration and comment :comment
+     */
+    public function iHaveAnOrderV2(
+        $state,
+        $externalCode,
+        $gross,
+        $net,
+        $tax,
+        $duration,
+        $comment
+    ) {
+        $this->createOrder($state, $externalCode, $gross, $net, $tax, $duration, $comment, null, null, OrderEntity::CREATION_SOURCE_API, OrderEntity::WORKFLOW_NAME_V2);
+    }
+
+    /**
+     * @deprecated use iHaveOrdersWithTheFollowingData() instead
+     *
      * @Given I have a(n) :state order :externalCode with amounts :gross/:net/:tax, duration :duration and checkout session :checkoutSession
      */
     public function iHaveAnOrderWithCheckoutSession(

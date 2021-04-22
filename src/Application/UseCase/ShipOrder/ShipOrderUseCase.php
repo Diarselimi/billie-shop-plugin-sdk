@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\UseCase\ShipOrder;
 
 use App\Application\Exception\WorkflowException;
+use App\Application\UseCase\CreateInvoice\CreateInvoiceRequest;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Fee\FeeCalculationException;
@@ -56,11 +57,14 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface, LoggingInterface
         $this->invoiceFactory = $invoiceFactory;
     }
 
-    public function execute(ShipOrderRequest $request): OrderResponse
+    public function execute(CreateInvoiceRequest $request): OrderResponse
     {
+        $orders = $request->getOrders();
+        $orderId = reset($orders);
+
         $orderContainer = $this->orderContainerFactory->loadByMerchantIdAndExternalIdOrUuid(
             $request->getMerchantId(),
-            $request->getOrderId()
+            $orderId
         );
         $order = $orderContainer->getOrder();
 
@@ -75,14 +79,14 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface, LoggingInterface
         return $this->orderResponseFactory->create($orderContainer);
     }
 
-    private function uploadInvoice(OrderEntity $order, ShipOrderRequest $request, string $invoiceUuid): void
+    private function uploadInvoice(OrderEntity $order, CreateInvoiceRequest $request, string $invoiceUuid): void
     {
         try {
             $this->invoiceManager->handle(
                 $order,
                 $invoiceUuid,
                 $request->getInvoiceUrl(),
-                $request->getInvoiceNumber(),
+                $request->getExternalCode(),
                 InvoiceDocumentUploadHandlerAggregator::EVENT_SOURCE_SHIPMENT
             );
         } catch (InvoiceDocumentUploadException $exception) {
@@ -90,17 +94,13 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface, LoggingInterface
         }
     }
 
-    private function validate(ShipOrderRequest $request, OrderContainer $orderContainer): void
+    private function validate(CreateInvoiceRequest $request, OrderContainer $orderContainer): void
     {
         $order = $orderContainer->getOrder();
         $this->validateRequest($request, null, ['Default']);
 
         if (empty($order->getExternalCode())) {
             throw new ShipOrderException('Order id is not set');
-        }
-
-        if ($order->isWorkflowV1()) {
-            throw new WorkflowException('Order workflow is not supported by api v2');
         }
 
         $workflow = $this->workflowRegistry->get($order);
@@ -118,14 +118,14 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface, LoggingInterface
         }
     }
 
-    private function makeInvoice(OrderContainer $orderContainer, ShipOrderRequest $request): Invoice
+    private function makeInvoice(OrderContainer $orderContainer, CreateInvoiceRequest $request): Invoice
     {
         try {
             return $this->invoiceFactory->create(
                 $orderContainer,
                 $request->getAmount(),
-                $request->getDuration() ?? $orderContainer->getOrderFinancialDetails()->getDuration(),
-                $request->getInvoiceNumber(),
+                $orderContainer->getOrderFinancialDetails()->getDuration(),
+                $request->getExternalCode(),
                 $request->getShippingDocumentUrl()
             );
         } catch (FeeCalculationException $exception) {

@@ -67,9 +67,13 @@ class GetInvoiceResponse implements ArrayableInterface
 
     private ?string $state;
 
-    private array $ordersResponse;
+    private array
 
-    private array $creditNotesResponse;
+ $ordersResponse;
+
+    private array
+
+ $creditNotesResponse;
 
     public function __construct(Invoice $invoice, array $ordersResponse, array $creditNotesResponse)
     {

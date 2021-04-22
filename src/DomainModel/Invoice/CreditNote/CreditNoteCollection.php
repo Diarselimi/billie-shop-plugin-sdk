@@ -12,7 +12,9 @@ class CreditNoteCollection implements CollectionInterface
     /**
      * @var CreditNote[]
      */
-    private array $elements;
+    private array
+
+ $elements;
 
     public function __construct(array $elements)
     {

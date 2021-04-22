@@ -3,6 +3,7 @@
 namespace spec\App\Application\UseCase\ShipOrder;
 
 use App\Application\Exception\WorkflowException;
+use App\Application\UseCase\CreateInvoice\CreateInvoiceRequest;
 use App\Application\UseCase\ShipOrder\ShipOrderRequest;
 use App\Application\UseCase\ShipOrder\ShipOrderRequestV1;
 use App\Application\UseCase\ShipOrder\ShipOrderUseCase;
@@ -53,7 +54,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
         OrderContainer $orderContainer,
         OrderEntity $order,
         OrderResponse $orderResponse,
-        ShipOrderRequestV1 $request,
+        CreateInvoiceRequest $request,
         ValidatorInterface $validator,
         Workflow $workflow,
         LoggerInterface $logger
@@ -61,10 +62,10 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
         $order->isWorkflowV1()->willReturn(false);
         $orderContainer->getOrder()->willReturn($order);
 
-        $request->getOrderId()->willReturn(self::ID);
+        $request->getOrders()->willReturn([self::ID]);
         $request->getMerchantId()->willReturn(self::MERCHANT_ID);
         $request->getExternalCode()->willReturn(self::EXTERNAL_CODE);
-        $request->getInvoiceNumber()->willReturn(self::INVOICE_NUMBER);
+        $request->getExternalCode()->willReturn(self::INVOICE_NUMBER);
         $request->getInvoiceUrl()->willReturn(self::INVOICE_URL);
         $request->getShippingDocumentUrl()->willReturn(self::PROOF_OF_DELIVERY_URL);
 
@@ -88,7 +89,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
 
     public function it_ships_order_if_already_has_payment_details_and_can_ship(
         OrderContainerFactory $orderContainerFactory,
-        ShipOrderRequest $request,
+        CreateInvoiceRequest $request,
         OrderContainer $orderContainer,
         OrderEntity $order,
         ShipOrderInterface $shipOrderService,
@@ -98,6 +99,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
         TaxedMoney $shipAmount,
         Invoice $invoice
     ) {
+        $financialDetailsEntity->getDuration()->willReturn(30);
         $orderContainerFactory->loadByMerchantIdAndUuid(Argument::cetera())->willReturn($orderContainer);
         $orderContainer->getOrderFinancialDetails()->willReturn($financialDetailsEntity);
 
@@ -106,7 +108,6 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
         $shipAmount->getTax()->willReturn(new Money(50));
 
         $request->getAmount()->willReturn($shipAmount);
-        $request->getDuration()->willReturn(30);
 
         $financialDetailsEntity->getUnshippedAmountGross()->willReturn(new Money(1000));
         $financialDetailsEntity->getUnshippedAmountNet()->willReturn(new Money(1100));
@@ -135,7 +136,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
 
     public function it_fails_if_order_cannot_transition_to_shipped(
         OrderContainerFactory $orderContainerFactory,
-        ShipOrderRequest $request,
+        CreateInvoiceRequest $request,
         OrderContainer $orderContainer,
         OrderEntity $order,
         ShipOrderInterface $shipOrderService,
