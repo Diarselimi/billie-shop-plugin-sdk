@@ -37,7 +37,8 @@ class InvoiceFactory extends AbstractFactory
         TaxedMoney $amount,
         int $duration,
         string $invoiceNumber,
-        string $proofOfDeliveryUrl = null
+        string $proofOfDeliveryUrl = null,
+        string $invoiceAndPaymentUuid = null
     ): Invoice {
         $fee = $this->feeCalculator->calculate(
             $amount->getGross(),
@@ -45,7 +46,9 @@ class InvoiceFactory extends AbstractFactory
             $orderContainer->getMerchantSettings()->getFeeRates()
         );
 
-        $invoiceAndPaymentUuid = $this->uuidGenerator->uuid4();
+        if ($invoiceAndPaymentUuid === null) {
+            $invoiceAndPaymentUuid = $this->uuidGenerator->uuid4();
+        }
 
         return (new Invoice())
             ->setUuid($invoiceAndPaymentUuid)
