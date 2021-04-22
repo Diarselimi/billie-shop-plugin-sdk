@@ -26,6 +26,8 @@ interface MerchantUserPermissions
 
     public const CANCEL_ORDERS = 'CANCEL_ORDERS';
 
+    public const CANCEL_INVOICES = 'CANCEL_INVOICES';
+
     public const MANAGE_ONBOARDING = 'MANAGE_ONBOARDING';
 
     public const CHANGE_DEBTOR_INFORMATION = 'CHANGE_DEBTOR_INFORMATION';
@@ -52,6 +54,7 @@ interface MerchantUserPermissions
         self::PAUSE_DUNNING,
         self::MANAGE_USERS,
         self::CANCEL_ORDERS,
+        self::CANCEL_INVOICES,
         self::MANAGE_ONBOARDING,
         self::CHANGE_DEBTOR_INFORMATION,
         self::UPDATE_ORDERS,
@@ -76,6 +79,7 @@ interface MerchantUserPermissions
         self::PAUSE_DUNNING,
         self::MANAGE_USERS,
         self::CANCEL_ORDERS,
+        self::CANCEL_INVOICES,
         self::MANAGE_ONBOARDING,
         self::CHANGE_DEBTOR_INFORMATION,
         self::UPDATE_ORDERS,

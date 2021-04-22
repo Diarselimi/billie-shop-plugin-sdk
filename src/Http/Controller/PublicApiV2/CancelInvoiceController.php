@@ -2,20 +2,18 @@
 
 namespace App\Http\Controller\PublicApiV2;
 
-use App\Application\Exception\OrderNotFoundException;
-use App\Application\Exception\WorkflowException;
-use App\Application\UseCase\CancelOrder\CancelOrderException;
-use App\Application\UseCase\CancelOrder\CancelOrderRequest;
-use App\Application\UseCase\CancelOrder\CancelOrderUseCase;
-use App\Http\HttpConstantsInterface;
+use App\Application\Exception\InvoiceNotFoundException;
+use App\Application\UseCase\CancelInvoice\CancelInvoiceRequest;
+use App\Application\UseCase\CancelInvoice\CancelInvoiceUseCase;
+use App\DomainModel\Invoice\CreditNote\CreditNoteNotAllowedException;
+use App\Http\Authentication\UserProvider;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * @IsGranted({"ROLE_AUTHENTICATED_AS_MERCHANT", "ROLE_CANCEL_ORDERS"})
+ * @IsGranted({"ROLE_AUTHENTICATED_AS_MERCHANT", "ROLE_CANCEL_INVOICES"})
  * @OA\Delete(
  *     path="/invoices/{uuid}",
  *     operationId="invoice_cancel_v2",
@@ -29,32 +27,36 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *
  *     @OA\Response(response=204, description="Invoice successfully cancelled"),
  *     @OA\Response(response=404, ref="#/components/responses/NotFound"),
+ *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),
  *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
- *     @OA\Response(response=403, ref="#/components/responses/Forbidden"),
  *     @OA\Response(response=500, ref="#/components/responses/ServerError")
  * )
  */
 class CancelInvoiceController
 {
-    private CancelOrderUseCase $useCase;
+    private CancelInvoiceUseCase $useCase;
 
-    public function __construct(CancelOrderUseCase $useCase)
+    private UserProvider $userProvider;
+
+    public function __construct(CancelInvoiceUseCase $useCase, UserProvider $userProvider)
     {
         $this->useCase = $useCase;
+        $this->userProvider = $userProvider;
     }
 
-    public function execute(string $id, Request $request): void
+    public function execute(string $uuid): void
     {
+        $merchant = $this->userProvider->getMerchantUser() ?? $this->userProvider->getMerchantApiUser();
+
         try {
-            $orderRequest = new CancelOrderRequest(
-                $id,
-                $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID)
-            );
-            $this->useCase->execute($orderRequest);
-        } catch (CancelOrderException | WorkflowException $e) {
-            throw new AccessDeniedHttpException($e->getMessage());
-        } catch (OrderNotFoundException $e) {
+            $this->useCase->execute(new CancelInvoiceRequest(
+                $uuid,
+                $merchant->getMerchant()->getId()
+            ));
+        } catch (InvoiceNotFoundException $e) {
             throw new NotFoundHttpException($e->getMessage());
+        } catch (CreditNoteNotAllowedException $e) {
+            throw new BadRequestHttpException($e->getMessage());
         }
     }
 }

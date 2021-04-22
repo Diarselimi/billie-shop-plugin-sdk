@@ -50,6 +50,7 @@ interface MerchantUserDefaultRoles
             MerchantUserPermissions::CONFIRM_ORDER_PAYMENT,
             MerchantUserPermissions::PAUSE_DUNNING,
             MerchantUserPermissions::CANCEL_ORDERS,
+            MerchantUserPermissions::CANCEL_INVOICES,
             MerchantUserPermissions::CHANGE_DEBTOR_INFORMATION,
             MerchantUserPermissions::UPDATE_ORDERS,
             MerchantUserPermissions::SHIP_ORDERS,

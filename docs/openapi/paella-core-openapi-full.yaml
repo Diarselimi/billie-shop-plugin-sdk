@@ -1485,10 +1485,10 @@ paths:
           description: 'Invoice successfully cancelled'
         '404':
           $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/ServerError'
       security:
@@ -3455,6 +3455,7 @@ components:
         - PAUSE_DUNNING
         - MANAGE_USERS
         - CANCEL_ORDERS
+        - CANCEL_INVOICES
         - MANAGE_ONBOARDING
         - CHANGE_DEBTOR_INFORMATION
         - UPDATE_ORDERS
@@ -3472,6 +3473,7 @@ components:
         - PAUSE_DUNNING
         - MANAGE_USERS
         - CANCEL_ORDERS
+        - CANCEL_INVOICES
         - MANAGE_ONBOARDING
         - CHANGE_DEBTOR_INFORMATION
         - UPDATE_ORDERS
