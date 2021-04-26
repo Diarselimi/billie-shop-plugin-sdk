@@ -6,6 +6,7 @@ namespace App\DomainModel\Fraud;
 
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\ArrayableInterface;
+use App\DomainModel\OrderLineItem\OrderLineItemEntity;
 use App\DomainModel\Person\PersonEntity;
 use Ozean12\Money\Money;
 
@@ -31,6 +32,8 @@ class FraudRequestDTO implements ArrayableInterface
 
     private $invoiceCreatedAt;
 
+    private $lineItems;
+
     private $debtorCompanySchufaId;
 
     public function __construct(
@@ -44,6 +47,7 @@ class FraudRequestDTO implements ArrayableInterface
         AddressEntity $billingAddress,
         AddressEntity $shippingAddress,
         \DateTime $invoiceCreatedAt,
+        array $lineItems,
         ?string $debtorCompanySchufaId = null
     ) {
         $this->invoiceUuid = $invoiceUuid;
@@ -56,6 +60,7 @@ class FraudRequestDTO implements ArrayableInterface
         $this->billingAddress = $billingAddress;
         $this->shippingAddress = $shippingAddress;
         $this->invoiceCreatedAt = $invoiceCreatedAt;
+        $this->lineItems = $lineItems;
         $this->debtorCompanySchufaId = $debtorCompanySchufaId;
     }
 
@@ -88,6 +93,11 @@ class FraudRequestDTO implements ArrayableInterface
                 'city' => $this->shippingAddress->getCity(),
                 'country' => $this->shippingAddress->getCountry(),
             ],
+            'line_items' => array_map(fn (OrderLineItemEntity $lineItem) => [
+                'title' => $lineItem->getTitle(),
+                'description' => $lineItem->getDescription(),
+                'brand' => $lineItem->getBrand(),
+            ], $this->lineItems),
         ];
     }
 }
