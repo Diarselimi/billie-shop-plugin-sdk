@@ -33,7 +33,9 @@ class UpdateUserRoleControllerSpec extends ObjectBehavior
         $request->request->set('role_uuid', $roleUuid);
 
         $useCase->execute(Argument::that(function (UpdateUserRoleRequest $updateUserRoleRequest) use (
-            $merchantId, $userUuid, $roleUuid
+            $merchantId,
+            $userUuid,
+            $roleUuid
         ) {
             return $updateUserRoleRequest->getMerchantId() === $merchantId
                 && $updateUserRoleRequest->getUserUuid() === $userUuid

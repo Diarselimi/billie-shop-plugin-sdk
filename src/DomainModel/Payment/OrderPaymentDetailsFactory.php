@@ -2,6 +2,8 @@
 
 namespace App\DomainModel\Payment;
 
+use DateTime;
+
 class OrderPaymentDetailsFactory
 {
     public function createFromBorschtResponse(array $response): OrderPaymentDetailsDTO
@@ -13,7 +15,7 @@ class OrderPaymentDetailsFactory
             ->setOutstandingAmount($response['outstanding_amount'])
             ->setFeeAmount($response['fee_amount'])
             ->setFeeRate($response['fee_rate'])
-            ->setDueDate(new \DateTime($response['due_date']))
+            ->setDueDate(new DateTime($response['due_date']))
             ->setOutstandingAmountInvoiceCancellation($response['outstanding_amount_invoice_cancellation'])
             ->setOutstandingAmountMerchantPayment($response['outstanding_amount_merchant_payment'])
         ;

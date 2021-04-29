@@ -3,6 +3,7 @@
 namespace App\DomainModel\Invoice;
 
 use App\DomainModel\Invoice\CreditNote\CreditNoteCollection;
+use DateTime;
 use Ozean12\Money\Money;
 use Ozean12\Money\Percent;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
@@ -16,6 +17,8 @@ class Invoice
     public const STATE_CANCELED = 'canceled';
 
     public const STATE_COMPLETE = 'complete';
+
+    public const STATE_LATE = 'late';
 
     private string $uuid;
 
@@ -39,11 +42,11 @@ class Invoice
 
     private int $duration;
 
-    private \DateTime $dueDate;
+    private DateTime $dueDate;
 
-    private \DateTime $billingDate;
+    private DateTime $billingDate;
 
-    private \DateTime $createdAt;
+    private DateTime $createdAt;
 
     private ?string $proofOfDeliveryUrl = null;
 
@@ -182,24 +185,24 @@ class Invoice
         return $this;
     }
 
-    public function getDueDate(): \DateTime
+    public function getDueDate(): DateTime
     {
         return $this->dueDate;
     }
 
-    public function setDueDate(\DateTime $dueDate): Invoice
+    public function setDueDate(DateTime $dueDate): Invoice
     {
         $this->dueDate = $dueDate;
 
         return $this;
     }
 
-    public function getBillingDate(): \DateTime
+    public function getBillingDate(): DateTime
     {
         return $this->billingDate;
     }
 
-    public function setBillingDate(\DateTime $billingDate): Invoice
+    public function setBillingDate(DateTime $billingDate): Invoice
     {
         $this->billingDate = $billingDate;
 
@@ -242,12 +245,12 @@ class Invoice
         return $this;
     }
 
-    public function getCreatedAt(): \DateTime
+    public function getCreatedAt(): DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTime $createdAt): Invoice
+    public function setCreatedAt(DateTime $createdAt): Invoice
     {
         $this->createdAt = $createdAt;
 
@@ -320,5 +323,32 @@ class Invoice
         $this->creditNoteCollection = $creditNoteCollection;
 
         return $this;
+    }
+
+    public function getGrossAmount(): Money
+    {
+        return $this->amount->getGross();
+    }
+
+    public function canBeExtendedWith(Duration $newDuration): bool
+    {
+        if ($this->isCanceled() || $this->isComplete()) {
+            return false;
+        }
+        if ($this->duration >= $newDuration->days()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function isLate(): bool
+    {
+        if ($this->state === self::STATE_LATE) {
+            return true;
+        }
+        $now = time();
+
+        return $this->dueDate->getTimestamp() < $now;
     }
 }

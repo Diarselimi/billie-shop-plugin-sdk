@@ -38,4 +38,9 @@ class VatRateRepository implements VatRateRepositoryInterface
 
         throw new \LogicException('Vat Rate cannot be found for the given date.');
     }
+
+    public function getCurrentRate(): Percent
+    {
+        return $this->getForDateTime(new \DateTime());
+    }
 }

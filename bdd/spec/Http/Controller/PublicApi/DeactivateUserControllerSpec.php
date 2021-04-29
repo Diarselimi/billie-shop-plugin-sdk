@@ -37,7 +37,9 @@ class DeactivateUserControllerSpec extends ObjectBehavior
         $userProvider->getMerchantUser()->willReturn($merchantUser);
 
         $useCase->execute(Argument::that(function (DeactivateUserRequest $deactivateUserRequest) use (
-            $merchantId, $userUuid, $currentUserUuid
+            $merchantId,
+            $userUuid,
+            $currentUserUuid
         ) {
             return $deactivateUserRequest->getMerchantId() === $merchantId
                 && $deactivateUserRequest->getUserUuid() === $userUuid

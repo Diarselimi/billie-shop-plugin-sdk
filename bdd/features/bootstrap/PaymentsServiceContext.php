@@ -75,6 +75,16 @@ class PaymentsServiceContext implements Context
     }
 
     /**
+     * @Given /^I get from payments service get order detail response$/
+     */
+    public function iGetFromPaymentsServiceGetOrderDetailResponse()
+    {
+        $this->mockRequest('/order/8e6a9efa-3a76-44f1-ad98-24f0ef15d7ad.json', new MockResponse(
+            file_get_contents(__DIR__ . '/../resources/payments_service_order_details.json')
+        ));
+    }
+
+    /**
      * @Given /^I get from payments service create ticket response$/
      */
     public function iGetFromPaymentsServiceCreateTicketResponse()

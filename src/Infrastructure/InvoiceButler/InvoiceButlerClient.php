@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\InvoiceButler;
 
+use App\DomainModel\Fee\Fee;
 use App\DomainModel\Invoice\CreditNote\CreditNote;
 use App\DomainModel\Invoice\CreditNote\InvoiceCreditNoteMessageFactory;
+use App\DomainModel\Invoice\Duration;
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceCollection;
 use App\DomainModel\Invoice\InvoiceFactory;
@@ -21,6 +23,8 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\TransferStats;
+use Ozean12\Transfer\Message\Invoice\ExtendInvoice;
+use Ozean12\Transfer\Shared\Invoice as InvoiceMessage;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class InvoiceButlerClient implements InvoiceServiceInterface, LoggingInterface
@@ -136,5 +140,25 @@ class InvoiceButlerClient implements InvoiceServiceInterface, LoggingInterface
             $creditNote->getAmount()->getGross()
         );
         $this->paymentsService->modifyOrder($modifyTicketRequest);
+    }
+
+    public function extendInvoiceDuration(Invoice $invoice, Fee $fee, Duration $duration): void
+    {
+        $newBillingDate = $duration->addToDate($invoice->getBillingDate());
+        $invoiceMessage = (new InvoiceMessage())
+            ->setUuid($invoice->getUuid())
+            ->setDueDate($newBillingDate->format('Y-m-d'))
+            ->setFeeRate($fee->getFeeRate()->shift(2)->toInt())
+            ->setNetFeeAmount($fee->getNetFeeAmount()->shift(2)->toInt())
+            ->setVatOnFeeAmount($fee->getTaxFeeAmount()->shift(2)->toInt())
+            ->setDuration($duration->days())
+            ->setInvoiceReferences(
+                ['external_code' => $invoice->getExternalCode()]
+            );
+
+        $extendInvoiceMessage = (new ExtendInvoice())
+            ->setInvoice($invoiceMessage);
+
+        $this->messageBus->dispatch($extendInvoiceMessage);
     }
 }

@@ -96,6 +96,9 @@ local-openapi:
 local-openapi-validation:
 	bin/docker/app make openapi-validation
 
+local-cs-fix:
+	bin/docker/app vendor/bin/cs-fix
+
 local-test-migrations:
 	bin/docker/app make test-migrations
 

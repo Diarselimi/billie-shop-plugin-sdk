@@ -2,6 +2,8 @@
 
 namespace App\Infrastructure\Salesforce;
 
+use App\DomainModel\Invoice\Invoice;
+use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\SalesforceInterface;
 use App\Infrastructure\ClientResponseDecodeException;
 use App\Infrastructure\DecodeResponseTrait;
@@ -19,9 +21,12 @@ class Salesforce implements SalesforceInterface
 
     private $client;
 
-    public function __construct(Client $salesforceClient)
+    private OrderRepositoryInterface $orderRepository;
+
+    public function __construct(Client $salesforceClient, OrderRepositoryInterface $orderRepository)
     {
         $this->client = $salesforceClient;
+        $this->orderRepository = $orderRepository;
     }
 
     public function pauseOrderDunning(string $orderUuid, int $numberOfDays): void
@@ -70,6 +75,19 @@ class Salesforce implements SalesforceInterface
         } catch (RequestException $exception) {
             $this->handleException($exception);
         }
+    }
+
+    public function isDunningInProgress(Invoice $invoice): bool
+    {
+        $orders = $this->orderRepository->getByInvoice($invoice->getUuid());
+
+        foreach ($orders as $order) {
+            if ($this->getOrderCollectionsStatus($order->getUuid()) !== null) {
+                return true;
+            }
+        }
+
+        return  false;
     }
 
     private function handleException(RequestException $exception): void

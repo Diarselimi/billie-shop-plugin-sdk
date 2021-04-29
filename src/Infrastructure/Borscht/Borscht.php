@@ -2,6 +2,8 @@
 
 namespace App\Infrastructure\Borscht;
 
+use App\DomainModel\Invoice\Duration;
+use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\MerchantDebtor\RegisterDebtorDTO;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Payment\DebtorPaymentDetailsDTO;
@@ -177,5 +179,15 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
         } catch (TransferException $exception) {
             throw new PaymentsServiceRequestException($exception, 'Fraud reclaim request to Payment failed');
         }
+    }
+
+    public function extendInvoiceDuration(Invoice $invoice, Duration $duration): void
+    {
+        $request = (new ModifyRequestDTO())
+            ->setInvoiceNumber($invoice->getExternalCode())
+            ->setPaymentUuid($invoice->getPaymentUuid())
+            ->setAmountGross($invoice->getGrossAmount()->getMoneyValue())
+            ->setDuration($duration->days());
+        $this->modifyOrder($request);
     }
 }
