@@ -38,9 +38,14 @@ interface MerchantUserPermissions
 
     public const CREATE_ORDERS = 'CREATE_ORDERS';
 
+    public const VIEW_INVOICES = 'VIEW_INVOICES';
+
+    public const UPDATE_INVOICES = 'UPDATE_INVOICES';
+
     public const ALL_PERMISSIONS = [
         // read:
         self::VIEW_ORDERS,
+        self::VIEW_INVOICES,
         self::VIEW_DEBTORS,
         self::VIEW_PAYMENTS,
         self::VIEW_USERS,
@@ -58,6 +63,7 @@ interface MerchantUserPermissions
         self::MANAGE_ONBOARDING,
         self::CHANGE_DEBTOR_INFORMATION,
         self::UPDATE_ORDERS,
+        self::UPDATE_INVOICES,
         self::SHIP_ORDERS,
         self::CREATE_ORDERS,
     ];
@@ -68,6 +74,7 @@ interface MerchantUserPermissions
      */
     public const ALL_READ_PERMISSIONS = [
         self::VIEW_ORDERS,
+        self::VIEW_INVOICES,
         self::VIEW_DEBTORS,
         self::VIEW_PAYMENTS,
         self::VIEW_USERS,

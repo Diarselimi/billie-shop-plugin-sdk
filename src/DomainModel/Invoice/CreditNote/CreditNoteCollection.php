@@ -16,7 +16,7 @@ class CreditNoteCollection implements CollectionInterface
 
  $elements;
 
-    public function __construct(array $elements)
+    public function __construct(array $elements = [])
     {
         $this->elements = [];
         foreach ($elements as $creditNote) {

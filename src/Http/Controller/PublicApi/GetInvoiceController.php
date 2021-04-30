@@ -9,14 +9,13 @@ use App\Application\UseCase\GetInvoice\GetInvoiceRequest;
 use App\Application\UseCase\GetInvoice\GetInvoiceResponse;
 use App\Application\UseCase\GetInvoice\GetInvoiceUseCase;
 use App\Http\Authentication\UserProvider;
-use App\Http\HttpConstantsInterface;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * @IsGranted("ROLE_VIEW_ORDERS")
+ * @IsGranted({"ROLE_AUTHENTICATED_AS_MERCHANT", "ROLE_VIEW_INVOICES"})
  *
  * @OA\Get(
  *     path="/invoices/{uuid}",
@@ -39,16 +38,19 @@ class GetInvoiceController
 
     private UserProvider $userProvider;
 
-    public function __construct(GetInvoiceUseCase $useCase)
+    public function __construct(GetInvoiceUseCase $useCase, UserProvider $userProvider)
     {
         $this->useCase = $useCase;
+        $this->userProvider = $userProvider;
     }
 
     public function execute(string $uuid, Request $request): GetInvoiceResponse
     {
+        $merchantUser = $this->userProvider->getMerchantApiUser() ?? $this->userProvider->getMerchantUser();
+
         $useCaseRequest = new GetInvoiceRequest(
             $uuid,
-            $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID)
+            $merchantUser->getMerchant()->getId()
         );
 
         try {

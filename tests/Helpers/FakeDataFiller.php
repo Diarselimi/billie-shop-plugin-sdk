@@ -4,6 +4,9 @@ namespace App\Tests\Helpers;
 
 use Faker\Factory;
 use Ozean12\Money\Money;
+use Ozean12\Money\Percent;
+use Ozean12\Money\TaxedMoney\TaxedMoney;
+use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
 
 trait FakeDataFiller
 {
@@ -57,6 +60,14 @@ trait FakeDataFiller
                         break;
                     case Money::class:
                         $val = new Money($faker->randomFloat(2));
+
+                        break;
+                    case TaxedMoney::class:
+                        $val = TaxedMoneyFactory::create($gross = $faker->randomFloat(2, 200, 500), $gross - 10, 10);
+
+                        break;
+                    case Percent::class:
+                        $val = new Percent($faker->randomFloat(2, 10, 90));
 
                         break;
                     case 'int':

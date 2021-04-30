@@ -551,6 +551,8 @@ paths:
           description: 'Invoice successfully updated'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '500':
@@ -1255,9 +1257,6 @@ components:
       type: object
     UpdateInvoiceRequest:
       title: 'Invoice Update Request'
-      required:
-        - external_code
-        - invoice_url
       properties:
         external_code:
           nullable: true

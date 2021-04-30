@@ -65,6 +65,23 @@ class MessengerContext implements Context
     }
 
     /**
+     * @Then queue should contain message with routing key :routingKey
+     */
+    public function queueDispatchedMessages(string $routingKey): void
+    {
+        $dispatchedMessages = $this->traceableMessageBus->getDispatchedMessages();
+
+        $dispatchedMessages = array_filter(
+            $dispatchedMessages,
+            function (array $messageContext) use ($routingKey) {
+                return $routingKey === $this->amqpMapper->mapToKey(get_class($messageContext['message']));
+            }
+        );
+
+        Assert::greaterThan($dispatchedMessages, 0, 'There is no dispatched message with name '.$routingKey);
+    }
+
+    /**
      * @Then queue should contain message with routing key :routingKey with below data:
      */
     public function queueDispatchedMessagesContains(string $routingKey, PyStringNode $string): void

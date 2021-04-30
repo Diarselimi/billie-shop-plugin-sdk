@@ -5,7 +5,7 @@ Feature: Get invoice from invoice-butler
     And I add "X-Test" header equal to 1
     And I add "Authorization" header equal to "Bearer someToken"
     And I get from Oauth service a valid user token
-    And a merchant user exists with permission VIEW_ORDERS
+    And a merchant user exists with permission VIEW_INVOICES
 
   Scenario: Get an invoice successfully
     Given I have a new order "ABCDE" with amounts 1000/900/100, duration 30 and checkout session "208cfe7d-046f-4162-b175-748942d6cff2"

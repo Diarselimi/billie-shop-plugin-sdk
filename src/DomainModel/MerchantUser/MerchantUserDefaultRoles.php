@@ -42,6 +42,7 @@ interface MerchantUserDefaultRoles
         'permissions' => [
             // read:
             MerchantUserPermissions::VIEW_ORDERS,
+            MerchantUserPermissions::VIEW_INVOICES,
             MerchantUserPermissions::VIEW_DEBTORS,
             MerchantUserPermissions::VIEW_PAYMENTS,
             MerchantUserPermissions::VIEW_USERS,
@@ -53,6 +54,7 @@ interface MerchantUserDefaultRoles
             MerchantUserPermissions::CANCEL_INVOICES,
             MerchantUserPermissions::CHANGE_DEBTOR_INFORMATION,
             MerchantUserPermissions::UPDATE_ORDERS,
+            MerchantUserPermissions::UPDATE_INVOICES,
             MerchantUserPermissions::SHIP_ORDERS,
             MerchantUserPermissions::CREATE_ORDERS,
         ],
@@ -63,6 +65,7 @@ interface MerchantUserDefaultRoles
         'permissions' => [
             // read:
             MerchantUserPermissions::VIEW_ORDERS,
+            MerchantUserPermissions::VIEW_INVOICES,
             MerchantUserPermissions::VIEW_DEBTORS,
             MerchantUserPermissions::VIEW_PAYMENTS,
             MerchantUserPermissions::VIEW_USERS,
@@ -77,6 +80,7 @@ interface MerchantUserDefaultRoles
         'permissions' => [
             // read:
             MerchantUserPermissions::VIEW_ORDERS,
+            MerchantUserPermissions::VIEW_INVOICES,
             MerchantUserPermissions::VIEW_DEBTORS,
             MerchantUserPermissions::VIEW_PAYMENTS,
             MerchantUserPermissions::VIEW_USERS,
