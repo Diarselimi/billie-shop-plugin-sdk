@@ -49,7 +49,6 @@ class InsertInvoiceService implements LoggingInterface
     private function createInvoice(OrderSynchronizeWrapper $order): void
     {
         $sql = "INSERT INTO webapp.invoices (
-            customer_debtor_uuid, 
             invoice_external_nr, 
             invoice_code, 
             offered_amount, 
@@ -75,7 +74,6 @@ class InsertInvoiceService implements LoggingInterface
             customer_debtor_uuid,
             debtor_company_uuid
         ) VALUES (
-	        :merchant_debtor_uuid,
 	        :invoice_number,
 	        :invoice_code,
 	        :amount_gross,
