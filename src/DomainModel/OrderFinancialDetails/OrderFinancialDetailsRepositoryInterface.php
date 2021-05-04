@@ -7,4 +7,6 @@ interface OrderFinancialDetailsRepositoryInterface
     public function insert(OrderFinancialDetailsEntity $orderFinancialDetailsEntity): void;
 
     public function getCurrentByOrderId(int $orderId): ? OrderFinancialDetailsEntity;
+
+    public function findOneByOrderUuid(string $orderUuid): ?OrderFinancialDetailsEntity;
 }

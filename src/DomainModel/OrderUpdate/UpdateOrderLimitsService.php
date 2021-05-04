@@ -2,10 +2,10 @@
 
 namespace App\DomainModel\OrderUpdate;
 
-use App\Application\UseCase\LegacyUpdateOrder\UpdateOrderAmountInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
+use Ozean12\Money\TaxedMoney\TaxedMoney;
 
 class UpdateOrderLimitsService
 {
@@ -21,14 +21,12 @@ class UpdateOrderLimitsService
         $this->merchantDebtorLimitsService = $merchantDebtorLimitsService;
     }
 
-    public function unlockLimits(
-        OrderContainer $orderContainer,
-        UpdateOrderAmountInterface $changeSet
-    ) {
+    public function updateLimitAmounts(OrderContainer $orderContainer, TaxedMoney $amount): void
+    {
         $amountGrossDiff = $orderContainer
             ->getOrderFinancialDetails()
             ->getAmountGross()
-            ->subtract($changeSet->getAmount()->getGross());
+            ->subtract($amount->getGross());
 
         // unlock merchant-debtor limit
         $this->merchantDebtorLimitsService->unlock($orderContainer, $amountGrossDiff);

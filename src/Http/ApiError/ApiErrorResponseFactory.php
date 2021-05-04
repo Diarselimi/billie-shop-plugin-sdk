@@ -30,6 +30,8 @@ class ApiErrorResponseFactory
                 return $this->createFromRequestValidationException($exception);
             case $exception instanceof HttpException:
                 return $this->createFromHttpException($exception);
+            case $exception instanceof \TypeError:
+                return $this->createFromTypeError($exception);
             default:
                 return $this->createResponse(
                     [$this->createGenericError($exception)],
@@ -115,5 +117,15 @@ class ApiErrorResponseFactory
     private function createResponse(array $errors, int $statusCode, array $headers = []): ApiErrorResponse
     {
         return new ApiErrorResponse($errors, $statusCode, $headers);
+    }
+
+    private function createFromTypeError(\TypeError $exception): ApiErrorResponse
+    {
+        $argumentValues = implode(', ', $exception->getTrace()[0]['args']);
+
+        return $this->createResponse(
+            [new ApiError(sprintf('Please check if the value(s) %s have correct type.', $argumentValues), ApiError::CODE_REQUEST_INVALID)],
+            ApiErrorResponse::HTTP_BAD_REQUEST
+        );
     }
 }

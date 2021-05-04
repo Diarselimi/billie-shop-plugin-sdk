@@ -4,10 +4,21 @@ declare(strict_types=1);
 
 namespace App\Http\Controller\PublicApiV2;
 
+use App\Application\Exception\OrderNotFoundException;
+use App\Application\UseCase\UpdateOrder\UpdateOrderRequest;
+use App\Application\UseCase\UpdateOrder\UpdateOrderUseCase;
+use App\DomainModel\OrderUpdate\UpdateOrderException;
+use App\Http\Authentication\UserProvider;
+use App\Support\TaxedMoneyFactoryDecorator;
 use OpenApi\Annotations as OA;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * @OA\Patch(
+ * @IsGranted("ROLE_AUTHENTICATED_AS_MERCHANT", "ROLE_UPDATE_ORDERS")
+ * @OA\Post(
  *     path="/orders/{uuid}",
  *     operationId="order_update_v2",
  *     summary="Update Order",
@@ -32,8 +43,32 @@ use OpenApi\Annotations as OA;
  */
 class UpdateOrderController
 {
-    public function execute(): void
+    private UserProvider $userProvider;
+
+    private UpdateOrderUseCase $useCase;
+
+    public function __construct(UpdateOrderUseCase $useCase, UserProvider $userProvider)
     {
-        return;
+        $this->useCase = $useCase;
+        $this->userProvider = $userProvider;
+    }
+
+    public function execute(string $uuid, Request $request): void
+    {
+        $userMerchant = $this->userProvider->getMerchantApiUser() ?? $this->userProvider->getMerchantUser();
+        $useCaseInput = new UpdateOrderRequest(
+            $uuid,
+            $userMerchant->getMerchant()->getId(),
+            $request->request->get('external_code'),
+            TaxedMoneyFactoryDecorator::createFromRequest($request)
+        );
+
+        try {
+            $this->useCase->execute($useCaseInput);
+        } catch (UpdateOrderException $e) {
+            throw new BadRequestHttpException($e->getMessage());
+        } catch (OrderNotFoundException $e) {
+            throw new NotFoundHttpException($e->getMessage());
+        }
     }
 }

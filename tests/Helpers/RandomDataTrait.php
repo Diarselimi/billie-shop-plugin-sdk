@@ -15,10 +15,13 @@ use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
+use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntity;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
 use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonRepositoryInterface;
+use Ozean12\Money\Money;
 use Ramsey\Uuid\Uuid;
 use Webmozart\Assert\Assert;
 
@@ -87,6 +90,30 @@ trait RandomDataTrait
             ->setCountry('DE');
     }
 
+    private function getRandomFinantialDetails(float $gross = null): OrderFinancialDetailsEntity
+    {
+        $fnd = new OrderFinancialDetailsEntity();
+        $this->fillObject($fnd, true);
+
+        if ($gross !== null) {
+            $fnd
+                ->setAmountGross(new Money($gross))
+                ->setAmountNet(new Money($gross - 10))
+                ->setAmountTax(new Money(10))
+                ->setUnshippedAmountGross(new Money($gross))
+                ->setUnshippedAmountNet(new Money($gross - 10))
+                ->setUnshippedAmountTax(new Money(10));
+        }
+
+        $order = $this->data['last_order'];
+        if ($order instanceof OrderEntity) {
+            $fnd->setOrderId($order->getId());
+            $this->createFinancialDetails($fnd);
+        }
+
+        return $fnd;
+    }
+
     private function getRandomDebtorExternalData(
         string $externalId,
         int $addressId,
@@ -148,10 +175,13 @@ trait RandomDataTrait
         return $merchant;
     }
 
-    private function getRandomOrderEntity(): OrderEntity
+    private function getRandomOrderEntity(?string $externalCode = null): OrderEntity
     {
         $order = new OrderEntity();
         $this->fillObject($order);
+        if ($externalCode !== null) {
+            $order->setExternalCode($externalCode);
+        }
         $order->setInvoiceNumber(random_bytes(8));
         $merchantDebtor = new MerchantDebtorEntity();
         $this->fillObject($merchantDebtor);
@@ -225,6 +255,14 @@ trait RandomDataTrait
     {
         $this->getContainer()->get(OrderRepositoryInterface::class)->insert($entity);
         $this->data['last_order'] = $entity;
+
+        return $entity;
+    }
+
+    private function createFinancialDetails(OrderFinancialDetailsEntity $entity): OrderFinancialDetailsEntity
+    {
+        $this->getContainer()->get(OrderFinancialDetailsRepositoryInterface::class)->insert($entity);
+        $this->data['last_financial_details'] = $entity;
 
         return $entity;
     }

@@ -75,13 +75,25 @@ class OrderFinancialDetailsRepository extends AbstractPdoRepository implements O
         $orderFinancialDetailsEntity->setId($id);
     }
 
-    public function getCurrentByOrderId(int $orderId): ? OrderFinancialDetailsEntity
+    public function getCurrentByOrderId(int $orderId): ?OrderFinancialDetailsEntity
     {
         $row = $this->doFetchOne(
             'SELECT ' . implode(', ', self::SELECT_FIELDS) . ' FROM ' . self::TABLE_NAME . ' 
             WHERE order_id = :order_id ORDER BY id DESC LIMIT 1',
             ['order_id' => $orderId]
         );
+
+        return $row ? $this->factory->createFromDatabaseRow($row) : null;
+    }
+
+    public function findOneByOrderUuid(string $orderUuid): ?OrderFinancialDetailsEntity
+    {
+        $selectFields = array_map(fn ($field) => self::TABLE_NAME . '.' . $field, self::SELECT_FIELDS);
+        $sql = $this->generateSelectQuery(self::TABLE_NAME, $selectFields);
+        $sql .= ' INNER JOIN orders o ON o.id = ' . self::TABLE_NAME . '.order_id';
+        $sql .= ' WHERE o.uuid = :order_uuid ORDER BY ' . self::TABLE_NAME . '.id DESC LIMIT 1';
+
+        $row = $this->doFetchOne($sql, ['order_uuid' => $orderUuid]);
 
         return $row ? $this->factory->createFromDatabaseRow($row) : null;
     }

@@ -51,6 +51,6 @@ class UpdateOrderLimitsServiceSpec extends ObjectBehavior
             ->shouldBeCalledOnce();
 
         // Act
-        $this->unlockLimits($orderContainer, $changeSet);
+        $this->updateLimitAmounts($orderContainer, $changeSet->getAmount());
     }
 }

@@ -29,6 +29,8 @@ services:
 
   App\DomainModel\Merchant\MerchantCreationService: ~
 
+  App\Application\Validator\Constraint\UpdateAmountValidator: ~
+
   App\DomainModel\Order\OrderRepositoryInterface:
     alias: 'App\Infrastructure\Repository\OrderRepository'
     public: true

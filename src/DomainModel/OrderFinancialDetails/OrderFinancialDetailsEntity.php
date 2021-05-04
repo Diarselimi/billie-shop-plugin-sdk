@@ -120,6 +120,24 @@ class OrderFinancialDetailsEntity extends AbstractTimestampableEntity
         return $this;
     }
 
+    public function setUnshippedAmount(TaxedMoney $money): self
+    {
+        $this->unshippedAmountGross = $money->getGross();
+        $this->unshippedAmountNet = $money->getNet();
+        $this->unshippedAmountTax = $money->getTax();
+
+        return $this;
+    }
+
+    public function setAmount(TaxedMoney $money): self
+    {
+        $this->amountGross = $money->getGross();
+        $this->amountNet = $money->getNet();
+        $this->amountTax = $money->getTax();
+
+        return $this;
+    }
+
     public function getAmountTaxedMoney(): TaxedMoney
     {
         return new TaxedMoney($this->amountGross, $this->amountNet, $this->amountTax);

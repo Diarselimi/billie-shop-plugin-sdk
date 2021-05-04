@@ -58,6 +58,10 @@ trait FakeDataFiller
                         $val = $faker->randomFloat(2);
 
                         break;
+                    case TaxedMoney::class:
+                        $val = TaxedMoneyFactory::create($gross = $faker->randomFloat(2), $gross - 10, 10);
+
+                        break;
                     case Money::class:
                         $val = new Money($faker->randomFloat(2));
 

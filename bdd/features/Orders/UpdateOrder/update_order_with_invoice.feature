@@ -9,6 +9,7 @@ Feature: Update order with invoice to reduce the order amount
 		Given I have a "created" order with amounts 1000/900/100, duration 30 and comment "test order"
 		And a merchant user exists with permission UPDATE_ORDERS
 		And I get from Oauth service a valid user token
+		And Debtor release limit call succeeded
 		And I add "Authorization" header equal to "Bearer someToken"
 		When I send a POST request to "/order-with-invoice/test-order-uuid" with body:
 		  """
@@ -28,6 +29,7 @@ Feature: Update order with invoice to reduce the order amount
 		Given I have a "created" order with amounts 1000/900/100, duration 30 and comment "test order"
 		And a merchant user exists with permission UPDATE_ORDERS
 		And I get from Oauth service a valid user token
+		And Debtor release limit call succeeded
 		And I add "Authorization" header equal to "Bearer someToken"
 		When I send a POST request to "/order-with-invoice/test-order-uuid" with body:
     """
@@ -49,6 +51,7 @@ Feature: Update order with invoice to reduce the order amount
 		And I get from Oauth service a valid user token
 		And I add "Authorization" header equal to "Bearer someToken"
 		And I get from files service a good response
+		And Debtor release limit call succeeded
 		When I send a POST request to "/order-with-invoice/test-order-uuid" with parameters:
 			| key               | value                             |
 			| invoice_number    | 555                               |

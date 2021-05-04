@@ -56,7 +56,7 @@ class UpdateOrderWithInvoicePersistenceService
         $invoiceNumberChanged = $changeSet->getInvoiceNumber() !== null;
 
         if ($amountChanged && !$order->wasShipped()) {
-            $this->updateOrderLimitsService->unlockLimits($orderContainer, $changeSet);
+            $this->updateOrderLimitsService->updateLimitAmounts($orderContainer, $changeSet->getAmount());
         }
 
         if ($amountChanged) {
