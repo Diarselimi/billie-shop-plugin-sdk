@@ -16,14 +16,20 @@ class IdentifyAndRemoveWrongIdentificationsCommand extends Command
 
     private const OPTION_DRYRUN = 'dryrun';
 
+    const OPTION_SINCE = 'since';
+
     private const OUTPUT_REPORT_FILE_HEADERS = [
         'external_id',
         'company_name',
+        'address',
+        'extracted_legal_form',
         'identified_company_id',
         'identified_name',
+        'identified_address',
         'found',
         'matches',
         'unlinked',
+        'score',
     ];
 
     protected static $defaultName = 'paella:debtors:remove-wrong-identifications';
@@ -44,15 +50,20 @@ class IdentifyAndRemoveWrongIdentificationsCommand extends Command
             ->addOption(self::OPTION_FILE, 'f', InputOption::VALUE_REQUIRED, 'Merchant ID')
             ->addOption(self::OPTION_MERCHANT_ID, 'm', InputOption::VALUE_REQUIRED, 'Path to the the csv file')
             ->addOption(self::OPTION_DRYRUN, 'd', InputOption::VALUE_OPTIONAL, 'Should be a dry run?', true)
+            ->addOption(self::OPTION_SINCE, 's', InputOption::VALUE_OPTIONAL, 'Since what line to run?', 0)
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $stdout = fopen('php://stdout', 'r+');
+        $stderr = fopen('php://stderr', 'r+');
+
         $isDryRun = $input->getOption(self::OPTION_DRYRUN) !== 'false';
-        $output->writeln(
+        fwrite(
+            $stderr,
             sprintf(
-                '<info>Running the command as a dry_run = "%s" in 5 seconds...</info>',
+                'Running the command as a dry_run = "%s" in 5 seconds...' . "\n\n",
                 $isDryRun ? 'true' : 'false'
             )
         );
@@ -65,15 +76,35 @@ class IdentifyAndRemoveWrongIdentificationsCommand extends Command
         }
 
         $merchantId = (int) $input->getOption(self::OPTION_MERCHANT_ID);
-        $results = [];
         $headers = [];
+
         $i = -1; // start with header row
+        $j = $input->getOption(self::OPTION_SINCE); // since what iterator to begin with
+        $totalLines = $this->calculateFileLines($input->getOption(self::OPTION_FILE));
 
         while (($data = fgetcsv($handle, 0, ';')) !== false) {
+            $rawData = $data;
             $data = array_map('trim', $data);
+
+            fwrite(
+                $stderr,
+                sprintf(
+                    "\rProcessing the line %d [%.10f%%] [Debtor external id \"%s\"]",
+                    $i,
+                    max($i, 0) / $totalLines * 100,
+                    $data[0]
+                )
+            );
 
             if ($i === -1) {
                 $headers = array_values($data);
+                $this->csvCreateHeader($stdout);
+                $i++;
+
+                continue;
+            }
+
+            if ($i + 2 < $j) { // start from 10th __LINE__ in the original csv file.
                 $i++;
 
                 continue;
@@ -81,48 +112,59 @@ class IdentifyAndRemoveWrongIdentificationsCommand extends Command
 
             $debtorExternalData = array_combine($headers, $data);
 
+            if ($debtorExternalData === false) {
+                $output->writeln(
+                    sprintf('<info>Failed to parse/combine row "%s"</info>', $rawData),
+                    OutputInterface::VERBOSITY_VERBOSE
+                );
+
+                continue;
+            }
+
             $output->writeln(
                 sprintf('<info>Identifying debtor: %s</info>', $debtorExternalData['external_id']),
                 OutputInterface::VERBOSITY_VERBOSE
             );
 
-            try {
-                $result = $this->service->process(
-                    $debtorExternalData,
-                    $merchantId,
-                    $isDryRun
-                );
-                $results[] = $result;
-            } catch (\Exception  $exception) {
-//                $output->writeln('<error>Merchant was not found.</error>');
-                throw $exception;
-            }
+            $result = $this->service->process(
+                $debtorExternalData,
+                $merchantId,
+                $isDryRun
+            );
+
+            $this->csvWriteLine($stdout, $result);
 
             $i++;
         }
 
+        fclose($stdout);
+        fclose($stderr);
         fclose($handle);
-        $output->writeln($this->createCSVReport($results));
 
         return 0;
     }
 
-    private function createCSVReport(array $data): string
+    private function csvCreateHeader($resource)
     {
-        $output = fopen('php://temp', 'r+');
+        fputcsv($resource, self::OUTPUT_REPORT_FILE_HEADERS);
+    }
 
-        fputcsv($output, self::OUTPUT_REPORT_FILE_HEADERS);
+    private function csvWriteLine($resource, array $row)
+    {
+        fputcsv($resource, array_intersect_key($row, array_flip(self::OUTPUT_REPORT_FILE_HEADERS)));
+    }
 
-        foreach ($data as $row) {
-            fputcsv($output, array_intersect_key($row, array_flip(self::OUTPUT_REPORT_FILE_HEADERS)));
+    private function calculateFileLines(string $filePath): int
+    {
+        $lines = 0;
+
+        $handle = fopen($filePath, "r");
+        while (!feof($handle)) {
+            fgets($handle);
+            $lines++;
         }
+        fclose($handle);
 
-        rewind($output);
-
-        $csv = stream_get_contents($output);
-
-        fclose($output);
-
-        return $csv;
+        return $lines;
     }
 }
