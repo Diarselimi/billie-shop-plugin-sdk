@@ -6,7 +6,7 @@ use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\ShipOrder\ShipOrderRequestV1;
 use App\Application\UseCase\ShipOrder\ShipOrderUseCaseV1;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
-use App\DomainModel\OrderResponse\OrderResponse;
+use App\DomainModel\OrderResponse\LegacyOrderResponse;
 use App\DomainModel\ShipOrder\ShipOrderException;
 use App\Http\HttpConstantsInterface;
 use OpenApi\Annotations as OA;
@@ -54,7 +54,7 @@ class ShipOrderController
         $this->useCase = $useCase;
     }
 
-    public function execute(string $id, Request $request): OrderResponse
+    public function execute(string $id, Request $request): LegacyOrderResponse
     {
         $orderRequest = (new ShipOrderRequestV1(
             $id,

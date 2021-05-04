@@ -17,7 +17,7 @@ use App\DomainModel\Payment\PaymentsServiceInterface;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
 use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
 
-class OrderResponseFactory
+class LegacyOrderResponseFactory
 {
     private CompaniesServiceInterface $companiesService;
 
@@ -39,9 +39,9 @@ class OrderResponseFactory
         $this->featureFlagManager = $featureFlagManager;
     }
 
-    public function create(OrderContainer $orderContainer): OrderResponse
+    public function create(OrderContainer $orderContainer): LegacyOrderResponse
     {
-        $response = new OrderResponse();
+        $response = new LegacyOrderResponse();
 
         $this->addData($orderContainer, $response);
         $this->addInvoiceData($orderContainer, $response);
@@ -54,7 +54,7 @@ class OrderResponseFactory
 
     /**
      * @param  OrderContainer[] $orderContainers
-     * @return OrderResponse[]
+     * @return LegacyOrderResponse[]
      */
     public function createFromOrderContainers(array $orderContainers): array
     {
@@ -137,7 +137,7 @@ class OrderResponseFactory
         return $identifiedAddress;
     }
 
-    private function addLegacyInvoiceData(OrderContainer $orderContainer, OrderResponse $response): void
+    private function addLegacyInvoiceData(OrderContainer $orderContainer, LegacyOrderResponse $response): void
     {
         if (!$this->featureFlagManager->isButlerFullyEnabled()
             && $orderContainer->getOrder()->getPaymentId() !== null
@@ -165,7 +165,7 @@ class OrderResponseFactory
         }
     }
 
-    private function addInvoiceData(OrderContainer $orderContainer, OrderResponse $response): void
+    private function addInvoiceData(OrderContainer $orderContainer, LegacyOrderResponse $response): void
     {
         /** @var Invoice $invoice */
         foreach ($orderContainer->getInvoices() as $invoice) {
@@ -177,7 +177,7 @@ class OrderResponseFactory
             );
 
             $response->addInvoice(
-                (new OrderInvoiceResponse())
+                (new LegacyOrderInvoiceResponse())
                     ->setUuid($invoice->getUuid())
                     ->setDuration($invoice->getDuration())
                     ->setAmount($invoice->getAmount())
@@ -196,7 +196,7 @@ class OrderResponseFactory
         }
     }
 
-    private function addData(OrderContainer $orderContainer, OrderResponse $response): void
+    private function addData(OrderContainer $orderContainer, LegacyOrderResponse $response): void
     {
         $order = $orderContainer->getOrder();
         $this->addFinancialDetails($orderContainer, $response);
@@ -262,7 +262,7 @@ class OrderResponseFactory
         return $this->companiesService->getDebtors($debtorIds);
     }
 
-    private function addFinancialDetails(OrderContainer $orderContainer, OrderResponse $response): void
+    private function addFinancialDetails(OrderContainer $orderContainer, LegacyOrderResponse $response): void
     {
         $financialDetails = $orderContainer->getOrderFinancialDetails();
 
@@ -305,7 +305,7 @@ class OrderResponseFactory
         }
     }
 
-    private function addOrderData(OrderEntity $order, OrderResponse $response): void
+    private function addOrderData(OrderEntity $order, LegacyOrderResponse $response): void
     {
         $response
             ->setExternalCode($order->getExternalCode())
@@ -318,7 +318,7 @@ class OrderResponseFactory
     }
 
     /**
-     * @param OrderResponse|CheckoutAuthorizeOrderResponse $response
+     * @param LegacyOrderResponse|CheckoutAuthorizeOrderResponse $response
      */
     private function addCompanyData(AddressEntity $address, string $companyName, $response): void
     {
@@ -331,7 +331,7 @@ class OrderResponseFactory
             ->setCompanyAddressCountry($address->getCountry());
     }
 
-    private function addPaymentData(OrderContainer $orderContainer, OrderResponse $response): void
+    private function addPaymentData(OrderContainer $orderContainer, LegacyOrderResponse $response): void
     {
         if ($orderContainer->getOrder()->isDeclined() || $orderContainer->getOrder()->isWaiting()) {
             return;
@@ -345,8 +345,8 @@ class OrderResponseFactory
     }
 
     /**
-     * @param  OrderResponse|CheckoutAuthorizeOrderResponse $response
-     * @return OrderResponse|CheckoutAuthorizeOrderResponse $response
+     * @param  LegacyOrderResponse|CheckoutAuthorizeOrderResponse $response
+     * @return LegacyOrderResponse|CheckoutAuthorizeOrderResponse $response
      */
     private function addReasons(CheckResultCollection $checkResultCollection, $response)
     {
@@ -362,7 +362,7 @@ class OrderResponseFactory
         return $response;
     }
 
-    private function addDeliveryData(OrderContainer $orderContainer, OrderResponse $response): void
+    private function addDeliveryData(OrderContainer $orderContainer, LegacyOrderResponse $response): void
     {
         $response->setDeliveryAddressStreet($orderContainer->getDeliveryAddress()->getStreet())
             ->setDeliveryAddressHouseNumber($orderContainer->getDeliveryAddress()->getHouseNumber())
@@ -371,7 +371,7 @@ class OrderResponseFactory
             ->setDeliveryAddressCountry($orderContainer->getDeliveryAddress()->getCountry());
     }
 
-    private function addBillingAddressData(AddressEntity $billingAddress, OrderResponse $response): void
+    private function addBillingAddressData(AddressEntity $billingAddress, LegacyOrderResponse $response): void
     {
         $response->setBillingAddressStreet($billingAddress->getStreet())
             ->setBillingAddressHouseNumber($billingAddress->getHouseNumber())
@@ -380,7 +380,7 @@ class OrderResponseFactory
             ->setBillingAddressCountry($billingAddress->getCountry());
     }
 
-    private function addExternalData(OrderContainer $orderContainer, OrderResponse $response): void
+    private function addExternalData(OrderContainer $orderContainer, LegacyOrderResponse $response): void
     {
         $response
             ->setDebtorExternalDataAddressCountry($orderContainer->getDebtorExternalDataAddress()->getCountry())

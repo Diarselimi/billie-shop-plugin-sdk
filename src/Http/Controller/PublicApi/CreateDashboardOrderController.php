@@ -7,7 +7,7 @@ namespace App\Http\Controller\PublicApi;
 use App\Application\UseCase\CreateOrder\CreateOrderRequest;
 use App\Application\UseCase\CreateOrder\CreateOrderUseCase;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\OrderResponse\OrderResponse;
+use App\DomainModel\OrderResponse\LegacyOrderResponse;
 use App\Http\HttpConstantsInterface;
 use App\Http\RequestTransformer\CreateOrder\CreateOrderRequestFactory;
 use OpenApi\Annotations as OA;
@@ -53,7 +53,7 @@ class CreateDashboardOrderController
         $this->orderRequestFactory = $orderRequestFactory;
     }
 
-    public function execute(Request $request): OrderResponse
+    public function execute(Request $request): LegacyOrderResponse
     {
         return $this->createOrderUseCase->execute($this->buildUseCaseRequest($request));
     }

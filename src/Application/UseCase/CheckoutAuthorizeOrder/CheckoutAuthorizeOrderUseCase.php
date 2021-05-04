@@ -16,7 +16,7 @@ use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderResponse\CheckoutAuthorizeOrderResponse;
-use App\DomainModel\OrderResponse\OrderResponseFactory;
+use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\Workflow\Registry;
@@ -37,7 +37,7 @@ class CheckoutAuthorizeOrderUseCase implements LoggingInterface, ValidatedUseCas
         DeclineOrderService $declineOrderService,
         CheckoutSessionRepositoryInterface $checkoutSessionRepository,
         IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification,
-        OrderResponseFactory $orderResponseFactory
+        LegacyOrderResponseFactory $orderResponseFactory
     ) {
         $this->orderPersistenceService = $orderPersistenceService;
         $this->orderContainerFactory = $orderContainerFactory;

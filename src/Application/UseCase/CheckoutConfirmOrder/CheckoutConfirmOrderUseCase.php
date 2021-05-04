@@ -16,14 +16,14 @@ use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\OrderResponse\OrderResponse;
-use App\DomainModel\OrderResponse\OrderResponseFactory;
+use App\DomainModel\OrderResponse\LegacyOrderResponse;
+use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
 
 class CheckoutConfirmOrderUseCase implements ValidatedUseCaseInterface
 {
     use ValidatedUseCaseTrait;
 
-    private OrderResponseFactory $orderResponseFactory;
+    private LegacyOrderResponseFactory $orderResponseFactory;
 
     private OrderContainerFactory $orderContainerFactory;
 
@@ -36,7 +36,7 @@ class CheckoutConfirmOrderUseCase implements ValidatedUseCaseInterface
     private OrderRepositoryInterface $orderRepository;
 
     public function __construct(
-        OrderResponseFactory $orderResponseFactory,
+        LegacyOrderResponseFactory $orderResponseFactory,
         OrderContainerFactory $orderContainerFactory,
         ApproveOrderService $approveOrderService,
         WaitingOrderService $waitingOrderService,
@@ -51,7 +51,7 @@ class CheckoutConfirmOrderUseCase implements ValidatedUseCaseInterface
         $this->orderRepository = $orderRepository;
     }
 
-    public function execute(CheckoutConfirmOrderRequest $request): OrderResponse
+    public function execute(CheckoutConfirmOrderRequest $request): LegacyOrderResponse
     {
         $this->validateRequest($request);
 

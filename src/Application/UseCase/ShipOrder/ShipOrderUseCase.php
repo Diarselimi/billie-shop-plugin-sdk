@@ -17,8 +17,8 @@ use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentUploadException;
 use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerAggregator;
-use App\DomainModel\OrderResponse\OrderResponse;
-use App\DomainModel\OrderResponse\OrderResponseFactory;
+use App\DomainModel\OrderResponse\LegacyOrderResponse;
+use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
 use App\DomainModel\ShipOrder\ShipOrderException;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -37,7 +37,7 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface, LoggingInterface
 
     private ShipOrderService $shipOrderService;
 
-    private OrderResponseFactory $orderResponseFactory;
+    private LegacyOrderResponseFactory $orderResponseFactory;
 
     private InvoiceFactory $invoiceFactory;
 
@@ -46,7 +46,7 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface, LoggingInterface
         OrderContainerFactory $orderContainerFactory,
         Registry $workflowRegistry,
         ShipOrderService $shipOrderService,
-        OrderResponseFactory $orderResponseFactory,
+        LegacyOrderResponseFactory $orderResponseFactory,
         InvoiceFactory $invoiceFactory
     ) {
         $this->invoiceManager = $invoiceManager;
@@ -57,7 +57,7 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface, LoggingInterface
         $this->invoiceFactory = $invoiceFactory;
     }
 
-    public function execute(CreateInvoiceRequest $request): OrderResponse
+    public function execute(CreateInvoiceRequest $request): LegacyOrderResponse
     {
         $orders = $request->getOrders();
         $orderId = reset($orders);

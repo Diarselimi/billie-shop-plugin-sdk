@@ -12,7 +12,7 @@ use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentCreator;
-use App\DomainModel\OrderResponse\OrderResponseFactory;
+use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
 use Ozean12\Money\Money;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
 use PhpSpec\ObjectBehavior;
@@ -34,7 +34,7 @@ class ShipOrderWithInvoiceUseCaseSpec extends ObjectBehavior
         LegacyShipOrderService $legacyShipOrderService,
         ShipOrderService $shipOrderService,
         Registry $workflowRegistry,
-        OrderResponseFactory $orderResponseFactory,
+        LegacyOrderResponseFactory $orderResponseFactory,
         InvoiceFactory $invoiceFactory,
         ValidatorInterface $validator
     ) {
@@ -59,7 +59,7 @@ class ShipOrderWithInvoiceUseCaseSpec extends ObjectBehavior
         InvoiceFactory $invoiceFactory,
         ShipOrderService $shipOrderService,
         InvoiceDocumentCreator $invoiceManager,
-        OrderResponseFactory $orderResponseFactory
+        LegacyOrderResponseFactory $orderResponseFactory
     ): void {
         $orderId = 1;
         $merchantId = 1;

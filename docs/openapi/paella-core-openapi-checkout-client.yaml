@@ -162,6 +162,20 @@ components:
         - complete
         - canceled
       example: created
+    OrderStateV2:
+      title: 'Order State'
+      type: string
+      enum:
+        - waiting
+        - created
+        - declined
+        - partially_shipped
+        - shipped
+        - complete
+        - canceled
+        - pre_waiting
+        - authorized
+      example: created
     OrderDeclineReason:
       title: 'Order Decline Reason'
       type: string
@@ -197,6 +211,16 @@ components:
       minLength: 5
       pattern: '^(\+|\d|\()[ \-\/0-9()]{5,20}$'
       example: '030 31199251'
+    Date:
+      title: Date
+      type: string
+      format: date
+      example: '2019-01-20'
+    DateTime:
+      title: Date-Time
+      type: string
+      format: date-time
+      example: '2019-01-20 14:00:00'
     TinyText:
       title: string
       type: string
@@ -226,6 +250,25 @@ components:
           format: float
           minimum: 0
           example: 60.15
+      type: object
+    Address:
+      title: 'Address data are all required except house number.'
+      required:
+        - street
+        - postal_code
+        - city
+        - country
+      properties:
+        house_number:
+          $ref: '#/components/schemas/TinyText'
+        street:
+          $ref: '#/components/schemas/TinyText'
+        postal_code:
+          $ref: '#/components/schemas/TinyText'
+        city:
+          $ref: '#/components/schemas/TinyText'
+        country:
+          $ref: '#/components/schemas/TinyText'
       type: object
     AbstractShipOrderRequest:
       allOf:
@@ -512,6 +555,60 @@ components:
               nullable: true
           type: object
       type: object
+    OrderInvoiceResponse:
+      title: 'Order Entity'
+      properties:
+        uuid:
+          nullable: true
+          $ref: '#/components/schemas/UUID'
+        invoice_number:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        state:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        payout_amount:
+          type: number
+          format: float
+          nullable: true
+        amount:
+          type: number
+          format: float
+        amount_net:
+          type: number
+          format: float
+        amount_tax:
+          type: number
+          format: float
+        outstanding_amount:
+          type: number
+          format: float
+          nullable: true
+        pending_merchant_payment_amount:
+          type: number
+          format: float
+          nullable: true
+        pending_cancellation_amount:
+          type: number
+          format: float
+          nullable: true
+        fee_amount:
+          type: number
+          format: float
+          nullable: true
+        fee_rate:
+          type: number
+          format: float
+          nullable: true
+        due_date:
+          type: string
+          format: date
+          example: '2019-03-20'
+        created_at:
+          type: string
+          format: date
+          example: '2019-03-20'
+      type: object
     ErrorsObject:
       title: 'API Errors'
       properties:
@@ -534,6 +631,109 @@ components:
                 type: string
                 nullable: true
             type: object
+      type: object
+    BankAccount:
+      title: 'Simple representation of a bank account'
+      properties:
+        iban:
+          description: 'Virtual IBAN provided by Billie'
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        bic:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+      type: object
+    Debtor:
+      title: 'Order Debtor'
+      properties:
+        name:
+          type: string
+          example: C-10123456789-0001
+        company_address:
+          $ref: '#/components/schemas/Address'
+        billing_address:
+          $ref: '#/components/schemas/Address'
+        bank_account:
+          $ref: '#/components/schemas/BankAccount'
+        external_data:
+          $ref: '#/components/schemas/DebtorExternalData'
+      type: object
+    DebtorExternalData:
+      title: 'Debtor External Data'
+      properties:
+        merchant_customer_id:
+          example: C-10123456789
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        name:
+          example: 'Billie G.m.b.H.'
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        industry_sector:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        address:
+          $ref: '#/components/schemas/Address'
+      type: object
+    Order:
+      title: 'Order Entity'
+      properties:
+        external_code:
+          type: string
+          example: C-10123456789-0001
+          nullable: true
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        state:
+          example: created
+          $ref: '#/components/schemas/OrderStateV2'
+        decline_reason:
+          nullable: true
+          $ref: '#/components/schemas/OrderDeclineReason'
+        amount:
+          $ref: '#/components/schemas/TaxedMoney'
+        unshipped_amount:
+          $ref: '#/components/schemas/TaxedMoney'
+        duration:
+          example: 30
+          $ref: '#/components/schemas/OrderDuration'
+        created_at:
+          $ref: '#/components/schemas/DateTime'
+        delivery_address:
+          $ref: '#/components/schemas/Address'
+        debtor:
+          $ref: '#/components/schemas/Debtor'
+        invoices:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderInvoiceResponse'
+          nullable: true
+      type: object
+    TaxedMoney:
+      title: 'Amount with split values for net, gross and tax.'
+      required:
+        - net
+        - gross
+        - tax
+      properties:
+        gross:
+          description: 'Value greater than 0, with max. 2 decimals. It should equal to net + tax.'
+          type: number
+          format: float
+          minimum: 1
+          example: 260.27
+        net:
+          description: 'Value greater than 0, with max. 2 decimals.'
+          type: number
+          format: float
+          minimum: 1
+          example: 200.12
+        tax:
+          description: 'Value greater than or equal to 0, with max. 2 decimals.'
+          type: number
+          format: float
+          minimum: 0
+          example: 60.15
       type: object
   responses:
     ServerError:

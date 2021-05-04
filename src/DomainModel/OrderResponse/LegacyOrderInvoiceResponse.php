@@ -25,7 +25,7 @@ use OpenApi\Annotations as OA;
  *      @OA\Property(property="created_at", type="string", format="date", example="2019-03-20"),
  * })
  */
-class OrderInvoiceResponse implements ArrayableInterface
+class LegacyOrderInvoiceResponse implements ArrayableInterface
 {
     private $uuid;
 
@@ -178,7 +178,7 @@ class OrderInvoiceResponse implements ArrayableInterface
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTime $createdAt): OrderInvoiceResponse
+    public function setCreatedAt(\DateTime $createdAt): LegacyOrderInvoiceResponse
     {
         $this->createdAt = $createdAt;
 
@@ -190,7 +190,7 @@ class OrderInvoiceResponse implements ArrayableInterface
         return $this->state;
     }
 
-    public function setState(?string $state): OrderInvoiceResponse
+    public function setState(?string $state): LegacyOrderInvoiceResponse
     {
         $this->state = $state;
 
@@ -202,7 +202,7 @@ class OrderInvoiceResponse implements ArrayableInterface
         return $this->uuid;
     }
 
-    public function setUuid(string $uuid): OrderInvoiceResponse
+    public function setUuid(string $uuid): LegacyOrderInvoiceResponse
     {
         $this->uuid = $uuid;
 

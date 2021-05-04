@@ -9,9 +9,7 @@ use Ozean12\Money\Money;
 
 class InvoiceCollection implements CollectionInterface
 {
-    private array
-
- $elements;
+    private array $elements;
 
     public function __construct(array $elements)
     {

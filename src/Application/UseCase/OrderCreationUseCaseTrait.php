@@ -14,7 +14,7 @@ use App\DomainModel\Order\OrderChecksRunnerService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\OrderResponse\OrderResponseFactory;
+use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
 use Symfony\Component\Workflow\Registry;
 
 trait OrderCreationUseCaseTrait
@@ -37,7 +37,7 @@ trait OrderCreationUseCaseTrait
 
     private IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification;
 
-    private OrderResponseFactory $orderResponseFactory;
+    private LegacyOrderResponseFactory $orderResponseFactory;
 
     private function createIdentifiedOrder(CreateOrderRequest $request): OrderContainer
     {

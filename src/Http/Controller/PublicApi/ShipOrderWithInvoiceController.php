@@ -6,7 +6,7 @@ use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\ShipOrderWithInvoice\ShipOrderWithInvoiceRequest;
 use App\Application\UseCase\ShipOrderWithInvoice\ShipOrderWithInvoiceUseCase;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
-use App\DomainModel\OrderResponse\OrderResponse;
+use App\DomainModel\OrderResponse\LegacyOrderResponse;
 use App\DomainModel\ShipOrder\ShipOrderException;
 use App\Http\HttpConstantsInterface;
 use App\Http\RequestTransformer\UpdateOrder\UpdateOrderAmountRequestFactory;
@@ -56,7 +56,7 @@ class ShipOrderWithInvoiceController
         $this->updateOrderAmountRequestFactory = $updateOrderAmountRequestFactory;
     }
 
-    public function execute(string $uuid, Request $request): OrderResponse
+    public function execute(string $uuid, Request $request): LegacyOrderResponse
     {
         $merchantId = $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID);
         $orderRequest = (new ShipOrderWithInvoiceRequest($uuid, $merchantId))

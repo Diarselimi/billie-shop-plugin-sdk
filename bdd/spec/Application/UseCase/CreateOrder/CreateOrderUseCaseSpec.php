@@ -18,8 +18,8 @@ use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\OrderResponse\OrderResponse;
-use App\DomainModel\OrderResponse\OrderResponseFactory;
+use App\DomainModel\OrderResponse\LegacyOrderResponse;
+use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -32,7 +32,7 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
         OrderContainerFactory $orderContainerFactory,
         OrderChecksRunnerService $orderChecksRunnerService,
         OrderRepositoryInterface $orderRepository,
-        OrderResponseFactory $orderResponseFactory,
+        LegacyOrderResponseFactory $orderResponseFactory,
         ApproveOrderService $approveOrderService,
         WaitingOrderService $waitingOrderService,
         DeclineOrderService $declineOrderService,
@@ -75,14 +75,14 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
         OrderContainer $orderContainer,
         CreateOrderRequest $request,
         OrderEntity $order,
-        OrderResponseFactory $orderResponseFactory
+        LegacyOrderResponseFactory $orderResponseFactory
     ) {
         $orderChecksRunnerService->passesPreIdentificationChecks($orderContainer)->shouldBeCalledOnce()->willReturn(false);
         $order->isDeclined()->shouldBeCalledOnce()->willReturn(true);
 
         $approveOrderService->approve($orderContainer)->shouldNotBeCalled();
         $declineOrderService->decline($orderContainer)->shouldBeCalledOnce();
-        $orderResponseFactory->create($orderContainer)->shouldBeCalledOnce()->willReturn(new OrderResponse());
+        $orderResponseFactory->create($orderContainer)->shouldBeCalledOnce()->willReturn(new LegacyOrderResponse());
 
         $this->execute($request);
     }
@@ -94,7 +94,7 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
         OrderContainer $orderContainer,
         CreateOrderRequest $request,
         OrderEntity $order,
-        OrderResponseFactory $orderResponseFactory,
+        LegacyOrderResponseFactory $orderResponseFactory,
         IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification
     ) {
         $merchantDebtor = (new MerchantDebtorEntity())->setId(1);
@@ -108,7 +108,7 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
 
         $approveOrderService->approve($orderContainer)->shouldNotBeCalled();
         $declineOrderService->decline($orderContainer)->shouldBeCalledOnce();
-        $orderResponseFactory->create($orderContainer)->shouldBeCalledOnce()->willReturn(new OrderResponse());
+        $orderResponseFactory->create($orderContainer)->shouldBeCalledOnce()->willReturn(new LegacyOrderResponse());
 
         $this->execute($request);
     }
@@ -119,7 +119,7 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
         CreateOrderRequest $request,
         WaitingOrderService $waitingOrderService,
         OrderEntity $order,
-        OrderResponseFactory $orderResponseFactory,
+        LegacyOrderResponseFactory $orderResponseFactory,
         IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification
     ) {
         $merchantDebtor = (new MerchantDebtorEntity())->setId(1);
@@ -132,7 +132,7 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
 
         $order->isDeclined()->shouldBeCalledOnce()->willReturn(false);
         $waitingOrderService->wait($orderContainer)->shouldBeCalledOnce();
-        $orderResponseFactory->create($orderContainer)->shouldBeCalledOnce()->willReturn(new OrderResponse());
+        $orderResponseFactory->create($orderContainer)->shouldBeCalledOnce()->willReturn(new LegacyOrderResponse());
 
         $this->execute($request);
     }
@@ -144,7 +144,7 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
         OrderContainer $orderContainer,
         CreateOrderRequest $request,
         OrderEntity $order,
-        OrderResponseFactory $orderResponseFactory,
+        LegacyOrderResponseFactory $orderResponseFactory,
         IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification
     ) {
         $merchantDebtor = (new MerchantDebtorEntity())->setId(1);
@@ -158,7 +158,7 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
         $order->isDeclined()->shouldBeCalledOnce()->willReturn(false);
         $approveOrderService->approve($orderContainer)->shouldBeCalledOnce();
         $declineOrderService->decline($orderContainer)->shouldNotBeCalled();
-        $orderResponseFactory->create($orderContainer)->shouldBeCalledOnce()->willReturn(new OrderResponse());
+        $orderResponseFactory->create($orderContainer)->shouldBeCalledOnce()->willReturn(new LegacyOrderResponse());
 
         $this->execute($request);
     }

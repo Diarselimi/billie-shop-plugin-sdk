@@ -9,6 +9,10 @@ use App\DomainModel\OrderRiskCheck\Checker\DebtorScoreAvailableCheck;
 use App\DomainModel\OrderRiskCheck\Checker\LimitCheck;
 use App\DomainModel\OrderRiskCheck\CheckResult;
 
+/**
+ * @deprecated
+ * @see src/DomainModel/Order/OrderContainer/OrderContainer.php:33
+ */
 class OrderDeclinedReasonsMapper
 {
     public const REASONS = [ // used by the Open API documentation

@@ -4,24 +4,25 @@ namespace App\DomainModel\OrderFinancialDetails;
 
 use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 use Ozean12\Money\Money;
+use Ozean12\Money\TaxedMoney\TaxedMoney;
 
 class OrderFinancialDetailsEntity extends AbstractTimestampableEntity
 {
-    private $orderId;
+    private int $orderId;
 
-    private $amountGross;
+    private Money $amountGross;
 
-    private $amountNet;
+    private Money $amountNet;
 
-    private $amountTax;
+    private Money $amountTax;
 
-    private $duration;
+    private int $duration;
 
-    private ?Money $unshippedAmountGross;
+    private Money $unshippedAmountGross;
 
-    private ?Money $unshippedAmountNet;
+    private Money $unshippedAmountNet;
 
-    private ?Money $unshippedAmountTax;
+    private Money $unshippedAmountTax;
 
     public function getOrderId(): int
     {
@@ -117,5 +118,19 @@ class OrderFinancialDetailsEntity extends AbstractTimestampableEntity
         $this->unshippedAmountTax = $unshippedAmountTax;
 
         return $this;
+    }
+
+    public function getAmountTaxedMoney(): TaxedMoney
+    {
+        return new TaxedMoney($this->amountGross, $this->amountNet, $this->amountTax);
+    }
+
+    public function getUnshippedAmountTaxedMoney(): ?TaxedMoney
+    {
+        return new TaxedMoney(
+            $this->unshippedAmountGross,
+            $this->unshippedAmountNet,
+            $this->unshippedAmountTax
+        );
     }
 }

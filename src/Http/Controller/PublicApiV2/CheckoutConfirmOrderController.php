@@ -22,7 +22,7 @@ use OpenApi\Annotations as OA;
  *          @OA\Schema(ref="#/components/schemas/CheckoutConfirmOrderRequestV2"))
  *     ),
  *
- *     @OA\Response(response=202, description="Order data successfully confirmed", @OA\JsonContent(ref="#/components/schemas/OrderResponseV2")),
+ *     @OA\Response(response=202, description="Order data successfully confirmed", @OA\JsonContent(ref="#/components/schemas/Order")),
  *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),
  *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
  *     @OA\Response(response=404, ref="#/components/responses/NotFound"),

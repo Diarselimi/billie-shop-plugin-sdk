@@ -4,8 +4,8 @@ namespace App\Http\Controller\PublicApi;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\GetOrder\GetOrderRequest;
-use App\Application\UseCase\GetOrder\GetOrderUseCase;
-use App\DomainModel\OrderResponse\OrderResponse;
+use App\Application\UseCase\GetOrder\LegacyGetOrderUseCase;
+use App\DomainModel\OrderResponse\LegacyOrderResponse;
 use App\Http\HttpConstantsInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,14 +38,14 @@ use OpenApi\Annotations as OA;
  */
 class GetOrderController
 {
-    private GetOrderUseCase $useCase;
+    private LegacyGetOrderUseCase $useCase;
 
-    public function __construct(GetOrderUseCase $useCase)
+    public function __construct(LegacyGetOrderUseCase $useCase)
     {
         $this->useCase = $useCase;
     }
 
-    public function execute(string $id, Request $request): OrderResponse
+    public function execute(string $id, Request $request): LegacyOrderResponse
     {
         try {
             $response = $this->useCase->execute(

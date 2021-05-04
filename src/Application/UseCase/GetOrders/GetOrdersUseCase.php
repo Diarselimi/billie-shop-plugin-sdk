@@ -7,7 +7,7 @@ use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\OrderResponse\OrderResponseFactory;
+use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
 
 class GetOrdersUseCase implements ValidatedUseCaseInterface
 {
@@ -22,7 +22,7 @@ class GetOrdersUseCase implements ValidatedUseCaseInterface
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         OrderContainerFactory $orderContainerFactory,
-        OrderResponseFactory $orderResponseFactory
+        LegacyOrderResponseFactory $orderResponseFactory
     ) {
         $this->orderRepository = $orderRepository;
         $this->orderContainerFactory = $orderContainerFactory;

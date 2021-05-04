@@ -53,7 +53,7 @@ use Ozean12\Money\TaxedMoney\TaxedMoney;
  * })
  *
  */
-class OrderResponse implements ArrayableInterface
+class LegacyOrderResponse implements ArrayableInterface
 {
     private $externalCode;
 
@@ -611,7 +611,7 @@ class OrderResponse implements ArrayableInterface
     /**
      * @deprecated
      */
-    public function setReasons(array $reasons): OrderResponse
+    public function setReasons(array $reasons): LegacyOrderResponse
     {
         $this->reasons = $reasons;
 
@@ -623,7 +623,7 @@ class OrderResponse implements ArrayableInterface
         return $this->invoiceNumber;
     }
 
-    public function setInvoiceNumber(?string $invoiceNumber): OrderResponse
+    public function setInvoiceNumber(?string $invoiceNumber): LegacyOrderResponse
     {
         $this->invoiceNumber = $invoiceNumber;
 
@@ -635,7 +635,7 @@ class OrderResponse implements ArrayableInterface
         return $this->payoutAmount;
     }
 
-    public function setPayoutAmount(float $payoutAmount): OrderResponse
+    public function setPayoutAmount(float $payoutAmount): LegacyOrderResponse
     {
         $this->payoutAmount = $payoutAmount;
 
@@ -647,7 +647,7 @@ class OrderResponse implements ArrayableInterface
         return $this->outstandingAmount;
     }
 
-    public function setOutstandingAmount(float $outstandingAmount): OrderResponse
+    public function setOutstandingAmount(float $outstandingAmount): LegacyOrderResponse
     {
         $this->outstandingAmount = $outstandingAmount;
 
@@ -659,7 +659,7 @@ class OrderResponse implements ArrayableInterface
         return $this->feeAmount;
     }
 
-    public function setFeeAmount(float $feeAmount): OrderResponse
+    public function setFeeAmount(float $feeAmount): LegacyOrderResponse
     {
         $this->feeAmount = $feeAmount;
 
@@ -671,7 +671,7 @@ class OrderResponse implements ArrayableInterface
         return $this->feeRate;
     }
 
-    public function setFeeRate(float $feeRate): OrderResponse
+    public function setFeeRate(float $feeRate): LegacyOrderResponse
     {
         $this->feeRate = $feeRate;
 
@@ -683,7 +683,7 @@ class OrderResponse implements ArrayableInterface
         return $this->dueDate;
     }
 
-    public function setDueDate(\DateTime $dueDate): OrderResponse
+    public function setDueDate(\DateTime $dueDate): LegacyOrderResponse
     {
         $this->dueDate = $dueDate;
 
@@ -695,7 +695,7 @@ class OrderResponse implements ArrayableInterface
         return $this->pendingMerchantPaymentAmount;
     }
 
-    public function setPendingMerchantPaymentAmount(?float $pendingMerchantPaymentAmount): OrderResponse
+    public function setPendingMerchantPaymentAmount(?float $pendingMerchantPaymentAmount): LegacyOrderResponse
     {
         $this->pendingMerchantPaymentAmount = $pendingMerchantPaymentAmount;
 
@@ -707,7 +707,7 @@ class OrderResponse implements ArrayableInterface
         return $this->pendingCancellationAmount;
     }
 
-    public function setPendingCancellationAmount(?float $pendingCancellationAmount): OrderResponse
+    public function setPendingCancellationAmount(?float $pendingCancellationAmount): LegacyOrderResponse
     {
         $this->pendingCancellationAmount = $pendingCancellationAmount;
 
@@ -738,7 +738,7 @@ class OrderResponse implements ArrayableInterface
         return $this;
     }
 
-    public function addInvoice(OrderInvoiceResponse $invoices): self
+    public function addInvoice(LegacyOrderInvoiceResponse $invoices): self
     {
         $this->invoices[] = $invoices;
 
@@ -801,7 +801,7 @@ class OrderResponse implements ArrayableInterface
             'shipped_at' => ($this->getShippedAt() ? $this->getShippedAt()->format(\DateTime::ISO8601) : null),
             'debtor_uuid' => $this->getDebtorUuid(),
             'workflow_name' => $this->workflowName,
-            'invoices' => array_map(fn (OrderInvoiceResponse $invoice) => $invoice->toArray(), $this->invoices),
+            'invoices' => array_map(fn (LegacyOrderInvoiceResponse $invoice) => $invoice->toArray(), $this->invoices),
             'invoice' => [
                 'invoice_number' => $this->getInvoiceNumber(),
                 'payout_amount' => $this->getPayoutAmount(),

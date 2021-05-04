@@ -16,8 +16,8 @@ use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentCreator;
-use App\DomainModel\OrderResponse\OrderResponse;
-use App\DomainModel\OrderResponse\OrderResponseFactory;
+use App\DomainModel\OrderResponse\LegacyOrderResponse;
+use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
 use App\DomainModel\ShipOrder\ShipOrderException;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
@@ -38,7 +38,7 @@ class ShipOrderWithInvoiceUseCase implements ValidatedUseCaseInterface
 
     private ShipOrderService $shipOrderService;
 
-    private OrderResponseFactory $orderResponseFactory;
+    private LegacyOrderResponseFactory $orderResponseFactory;
 
     private InvoiceFactory $invoiceFactory;
 
@@ -48,7 +48,7 @@ class ShipOrderWithInvoiceUseCase implements ValidatedUseCaseInterface
         LegacyShipOrderService $legacyShipOrderService,
         ShipOrderService $shipOrderService,
         Registry $workflowRegistry,
-        OrderResponseFactory $orderResponseFactory,
+        LegacyOrderResponseFactory $orderResponseFactory,
         InvoiceFactory $invoiceFactory
     ) {
         $this->invoiceManager = $invoiceManager;
@@ -60,7 +60,7 @@ class ShipOrderWithInvoiceUseCase implements ValidatedUseCaseInterface
         $this->invoiceFactory = $invoiceFactory;
     }
 
-    public function execute(ShipOrderWithInvoiceRequest $request): OrderResponse
+    public function execute(ShipOrderWithInvoiceRequest $request): LegacyOrderResponse
     {
         $orderContainer = $this->orderContainerFactory->loadByMerchantIdAndUuid(
             $request->getMerchantId(),

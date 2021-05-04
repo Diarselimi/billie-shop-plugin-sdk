@@ -22,7 +22,7 @@ use OpenApi\Annotations as OA;
  *          @OA\Schema(ref="#/components/schemas/CreateOrderRequestV2"))
  *     ),
  *
- *     @OA\Response(response=200, description="Order successfully created", @OA\JsonContent(ref="#/components/schemas/OrderResponseV2")),
+ *     @OA\Response(response=200, description="Order successfully created", @OA\JsonContent(ref="#/components/schemas/Order")),
  *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),
  *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
  *     @OA\Response(response=500, ref="#/components/responses/ServerError")

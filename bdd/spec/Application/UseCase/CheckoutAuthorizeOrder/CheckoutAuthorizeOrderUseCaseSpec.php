@@ -13,7 +13,7 @@ use App\DomainModel\Order\OrderChecksRunnerService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\OrderResponse\OrderResponseFactory;
+use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -32,7 +32,7 @@ class CheckoutAuthorizeOrderUseCaseSpec extends ObjectBehavior
         DeclineOrderService $declineOrderService,
         CheckoutSessionRepositoryInterface $checkoutSessionRepository,
         IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification,
-        OrderResponseFactory $orderResponseFactory,
+        LegacyOrderResponseFactory $orderResponseFactory,
         ValidatorInterface $validator,
         OrderCreationDTO $creationDTO,
         OrderContainer $orderContainer

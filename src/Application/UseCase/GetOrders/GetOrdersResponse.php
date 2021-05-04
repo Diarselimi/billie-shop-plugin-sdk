@@ -3,7 +3,7 @@
 namespace App\Application\UseCase\GetOrders;
 
 use App\DomainModel\ArrayableInterface;
-use App\DomainModel\OrderResponse\OrderResponse;
+use App\DomainModel\OrderResponse\LegacyOrderResponse;
 
 class GetOrdersResponse implements ArrayableInterface
 {
@@ -11,7 +11,7 @@ class GetOrdersResponse implements ArrayableInterface
 
     private $totalCount;
 
-    public function __construct(int $totalCount, OrderResponse ...$orders)
+    public function __construct(int $totalCount, LegacyOrderResponse ...$orders)
     {
         $this->totalCount = $totalCount;
         $this->orders = $orders;
@@ -31,7 +31,7 @@ class GetOrdersResponse implements ArrayableInterface
     {
         return [
             'total' => $this->getTotalCount(),
-            'items' => array_map(function (OrderResponse $orderResponse) {
+            'items' => array_map(function (LegacyOrderResponse $orderResponse) {
                 return $orderResponse->toArray();
             }, $this->getOrders()),
         ];

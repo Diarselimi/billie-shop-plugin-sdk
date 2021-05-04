@@ -18,6 +18,11 @@ use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderLineItem\OrderLineItemEntity;
+use App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedBillingAddressCheck;
+use App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedCheck;
+use App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedStrictCheck;
+use App\DomainModel\OrderRiskCheck\Checker\DebtorScoreAvailableCheck;
+use App\DomainModel\OrderRiskCheck\Checker\LimitCheck;
 use App\DomainModel\OrderRiskCheck\CheckResultCollection;
 use App\DomainModel\Payment\DebtorPaymentDetailsDTO;
 use App\DomainModel\Payment\OrderPaymentDetailsDTO;
@@ -25,6 +30,35 @@ use App\DomainModel\Person\PersonEntity;
 
 class OrderContainer
 {
+    public const DECLINE_REASONS = [
+        self::DECLINE_REASON_RISK_POLICY,
+        self::DECLINE_REASON_RISK_SCORING_FAILED,
+        self::DECLINE_REASON_DEBTOR_NOT_IDENTIFIED,
+        self::DECLINE_REASON_ADDRESS_MISMATCH,
+        self::DECLINE_REASON_RISK_SCORING_FAILED,
+        self::DECLINE_REASON_DEBTOR_LIMIT_EXCEEDED,
+    ];
+
+    private const DEFAULT_DECLINE_REASON = self::DECLINE_REASON_RISK_POLICY;
+
+    private const DECLINE_REASON_RISK_POLICY = 'risk_policy';
+
+    private const DECLINE_REASON_RISK_SCORING_FAILED = 'risk_scoring_failed';
+
+    private const DECLINE_REASON_DEBTOR_NOT_IDENTIFIED = 'debtor_not_identified';
+
+    private const DECLINE_REASON_ADDRESS_MISMATCH = 'debtor_address';
+
+    private const DECLINE_REASON_DEBTOR_LIMIT_EXCEEDED = 'debtor_limit_exceeded';
+
+    private const RISK_CHECK_MAPPING = [
+        DebtorIdentifiedCheck::NAME => self::DECLINE_REASON_DEBTOR_NOT_IDENTIFIED,
+        DebtorIdentifiedStrictCheck::NAME => self::DECLINE_REASON_ADDRESS_MISMATCH,
+        LimitCheck::NAME => self::DECLINE_REASON_DEBTOR_LIMIT_EXCEEDED,
+        DebtorIdentifiedBillingAddressCheck::NAME => self::DECLINE_REASON_ADDRESS_MISMATCH,
+        DebtorScoreAvailableCheck::NAME => self::DECLINE_REASON_RISK_SCORING_FAILED,
+    ];
+
     private $order;
 
     private $orderFinancialDetails;
@@ -329,6 +363,20 @@ class OrderContainer
         $this->mostSimilarCandidateDTO = $mostSimilarCandidateDTO;
 
         return $this;
+    }
+
+    public function getDeclineReason(): ?string
+    {
+        $checkResultCollection = $this->getRiskCheckResultCollection();
+
+        $failedRiskCheckResult = $checkResultCollection->getFirstHardDeclined()
+            ?? $checkResultCollection->getFirstSoftDeclined();
+
+        if ($failedRiskCheckResult === null) {
+            return null;
+        }
+
+        return self::RISK_CHECK_MAPPING[$failedRiskCheckResult->getName()] ?? self::DEFAULT_DECLINE_REASON;
     }
 
     private function loadDebtorCompanyAndPaymentDetails(): void

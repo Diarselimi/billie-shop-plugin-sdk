@@ -3,12 +3,12 @@
 namespace App\Application\UseCase\GetOrder;
 
 use App\Application\Exception\OrderNotFoundException;
-use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
+use App\DomainModel\OrderResponse\LegacyOrderResponse;
 use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
 
-class GetOrderUseCase
+class LegacyGetOrderUseCase
 {
     private OrderContainerFactory $orderContainerFactory;
 
@@ -22,7 +22,7 @@ class GetOrderUseCase
         $this->orderResponseFactory = $orderResponseFactory;
     }
 
-    public function execute(GetOrderRequest $request): OrderContainer
+    public function execute(GetOrderRequest $request): LegacyOrderResponse
     {
         try {
             $orderContainer = $this->orderContainerFactory->loadByMerchantIdAndExternalIdOrUuid(
@@ -33,6 +33,12 @@ class GetOrderUseCase
             throw new OrderNotFoundException($exception);
         }
 
-        return $orderContainer;
+        $response = $this->orderResponseFactory->create($orderContainer);
+
+        if ($orderContainer->getOrder()->getMerchantDebtorId() !== null) {
+            $response->setDebtorUuid($orderContainer->getMerchantDebtor()->getUuid());
+        }
+
+        return $response;
     }
 }

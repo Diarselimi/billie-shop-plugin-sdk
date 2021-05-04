@@ -15,8 +15,8 @@ use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\OrderResponse\OrderResponse;
-use App\DomainModel\OrderResponse\OrderResponseFactory;
+use App\DomainModel\OrderResponse\LegacyOrderResponse;
+use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
 use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -26,7 +26,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class CheckoutConfirmOrderUseCaseSpec extends ObjectBehavior
 {
     public function let(
-        OrderResponseFactory $orderResponseFactory,
+        LegacyOrderResponseFactory $orderResponseFactory,
         OrderContainerFactory $orderContainerFactory,
         ApproveOrderService $approveOrderService,
         WaitingOrderService $waitingOrderService,
@@ -75,7 +75,7 @@ class CheckoutConfirmOrderUseCaseSpec extends ObjectBehavior
 
     public function it_should_approve_order_if_data_is_valid_and_not_in_pre_waiting(
         OrderContainer $orderContainer,
-        OrderResponseFactory $orderResponseFactory,
+        LegacyOrderResponseFactory $orderResponseFactory,
         ApproveOrderService $approveOrderService,
         WaitingOrderService $waitingOrderService,
         OrderEntity $order,
@@ -98,13 +98,13 @@ class CheckoutConfirmOrderUseCaseSpec extends ObjectBehavior
         $waitingOrderService->wait($orderContainer)->shouldNotBeCalled();
         $approveOrderService->approve($orderContainer)->shouldBeCalled();
 
-        $orderResponseFactory->create($orderContainer)->shouldBeCalled()->willReturn(new OrderResponse());
+        $orderResponseFactory->create($orderContainer)->shouldBeCalled()->willReturn(new LegacyOrderResponse());
         $this->execute($request);
     }
 
     public function it_should_move_order_to_waiting_if_data_is_valid_and_in_pre_waiting(
         OrderContainer $orderContainer,
-        OrderResponseFactory $orderResponseFactory,
+        LegacyOrderResponseFactory $orderResponseFactory,
         ApproveOrderService $approveOrderService,
         WaitingOrderService $waitingOrderService,
         OrderEntity $order,
@@ -127,7 +127,7 @@ class CheckoutConfirmOrderUseCaseSpec extends ObjectBehavior
         $waitingOrderService->wait($orderContainer)->shouldBeCalled();
         $approveOrderService->approve($orderContainer)->shouldNotBeCalled();
 
-        $orderResponseFactory->create($orderContainer)->shouldBeCalled()->willReturn(new OrderResponse());
+        $orderResponseFactory->create($orderContainer)->shouldBeCalled()->willReturn(new LegacyOrderResponse());
         $this->execute($request);
     }
 

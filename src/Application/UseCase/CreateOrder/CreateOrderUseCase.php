@@ -13,8 +13,8 @@ use App\DomainModel\Order\NewOrder\OrderPersistenceService;
 use App\DomainModel\Order\OrderChecksRunnerService;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\OrderResponse\OrderResponse;
-use App\DomainModel\OrderResponse\OrderResponseFactory;
+use App\DomainModel\OrderResponse\LegacyOrderResponse;
+use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
@@ -27,7 +27,7 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         OrderContainerFactory $orderContainerFactory,
         OrderChecksRunnerService $orderChecksRunnerService,
         OrderRepositoryInterface $orderRepository,
-        OrderResponseFactory $orderResponseFactory,
+        LegacyOrderResponseFactory $orderResponseFactory,
         ApproveOrderService $approveOrderService,
         WaitingOrderService $waitingOrderService,
         DeclineOrderService $declineOrderService,
@@ -44,7 +44,7 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         $this->identifyAndTriggerAsyncIdentification = $identifyAndTriggerAsyncIdentification;
     }
 
-    public function execute(CreateOrderRequest $request): OrderResponse
+    public function execute(CreateOrderRequest $request): LegacyOrderResponse
     {
         $this->validateRequest($request);
 
