@@ -95,7 +95,7 @@ class MessengerContext implements Context
             }
         );
 
-        Assert::greaterThan($dispatchedMessages, 0, 'There is no dispatched message with name '.$routingKey);
+        Assert::greaterThan(count($dispatchedMessages), 0, 'There is no dispatched message with name '.$routingKey);
 
         $className = $this->amqpMapper->mapToClassName($routingKey);
 

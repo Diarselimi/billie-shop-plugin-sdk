@@ -6,12 +6,15 @@ use App\Application\UseCase\CreateMerchantUserInvitation\CreateMerchantUserInvit
 use App\Application\UseCase\ResendMerchantUserInvitation\ResendMerchantUserInvitationRequest;
 use App\Application\UseCase\ResendMerchantUserInvitation\ResendMerchantUserInvitationUseCase;
 use App\Application\UseCase\ResendMerchantUserInvitation\ResendNotAllowedException;
+use App\DomainModel\Merchant\MerchantNotFoundException;
+use App\DomainModel\MerchantUser\RoleNotFoundException;
 use App\DomainModel\MerchantUserInvitation\MerchantUserInvitationNotFoundException;
 use App\Http\HttpConstantsInterface;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -64,6 +67,8 @@ class ResendMerchantUserInvitationController
             throw new NotFoundHttpException($e->getMessage(), $e);
         } catch (ResendNotAllowedException $e) {
             throw new AccessDeniedHttpException(null, $e);
+        } catch (MerchantNotFoundException | RoleNotFoundException $exception) {
+            throw new HttpException(500, $exception->getMessage());
         }
     }
 }
