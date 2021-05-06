@@ -16,7 +16,7 @@ The heart of Billie Pay-After-Delivery (PaD).
   * [Contributing](#contributing)
 
 
-## Installation
+## Installation 
 
 In order to install this application for local development, 
 first you need to make sure that you have access to the ozean12's 

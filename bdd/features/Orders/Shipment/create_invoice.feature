@@ -13,6 +13,7 @@ Feature:
 
   Scenario: I successfully partially ship an order
     Given I have a created v2 order "CO124" with amounts 1000/900/100, duration 30 and comment "test order"
+    And I get from invoice-butler service good response
     When I send a POST request to "/invoices" with body:
     """
     {
@@ -35,6 +36,7 @@ Feature:
 
   Scenario: I successfully fully ship an order
     Given I have a created v2 order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+    And I get from invoice-butler service good response
     When I send a POST request to "/invoices" with body:
     """
     {

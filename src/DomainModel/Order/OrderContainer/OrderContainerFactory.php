@@ -46,6 +46,16 @@ class OrderContainerFactory
         return new OrderContainer($order, $this->relationLoader);
     }
 
+    public function createFromInvoiceId(string $paymentId): OrderContainer
+    {
+        $order = $this->orderRepository->getByInvoice($paymentId)[0];
+        if (!$order) {
+            throw new OrderContainerFactoryException("Order not found");
+        }
+
+        return new OrderContainer($order, $this->relationLoader);
+    }
+
     public function loadByUuid(string $uuid): OrderContainer
     {
         $order = $this->orderRepository->getOneByUuid($uuid);

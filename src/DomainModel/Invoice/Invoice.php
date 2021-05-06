@@ -7,6 +7,7 @@ use DateTime;
 use Ozean12\Money\Money;
 use Ozean12\Money\Percent;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
+use Ramsey\Uuid\Uuid;
 
 class Invoice
 {
@@ -63,6 +64,7 @@ class Invoice
     public function __construct()
     {
         $this->creditNoteCollection = new CreditNoteCollection([]);
+        $this->uuid = Uuid::uuid4();
     }
 
     public function getUuid(): string

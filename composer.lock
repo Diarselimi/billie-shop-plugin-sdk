@@ -568,10 +568,6 @@
                 "retry",
                 "retry-after"
             ],
-            "support": {
-                "issues": "https://github.com/caseyamcl/guzzle_retry_middleware/issues",
-                "source": "https://github.com/caseyamcl/guzzle_retry_middleware/tree/v2.6.1"
-            },
             "time": "2020-11-27T19:10:19+00:00"
         },
         {
@@ -1077,20 +1073,6 @@
                 "uppercase",
                 "words"
             ],
-            "funding": [
-                {
-                    "url": "https://www.doctrine-project.org/sponsorship.html",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://www.patreon.com/phpdoctrine",
-                    "type": "patreon"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/doctrine%2Finflector",
-                    "type": "tidelift"
-                }
-            ],
             "time": "2020-05-29T15:13:26+00:00"
         },
         {
@@ -1152,20 +1134,6 @@
                 "lexer",
                 "parser",
                 "php"
-            ],
-            "funding": [
-                {
-                    "url": "https://www.doctrine-project.org/sponsorship.html",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://www.patreon.com/phpdoctrine",
-                    "type": "patreon"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/doctrine%2Flexer",
-                    "type": "tidelift"
-                }
             ],
             "time": "2020-05-25T17:44:05+00:00"
         },
@@ -3080,16 +3048,16 @@
         },
         {
             "name": "ozean12/amqp-transfers",
-            "version": "0.4.29",
+            "version": "0.4.41",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/amqp-transfers.git",
-                "reference": "2504230ac6aa5aba6632673186377986ae03695e"
+                "reference": "29e502cadba4852461e5767eaea45f44221ebdd0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/amqp-transfers/zipball/2504230ac6aa5aba6632673186377986ae03695e",
-                "reference": "2504230ac6aa5aba6632673186377986ae03695e",
+                "url": "https://api.github.com/repos/ozean12/amqp-transfers/zipball/29e502cadba4852461e5767eaea45f44221ebdd0",
+                "reference": "29e502cadba4852461e5767eaea45f44221ebdd0",
                 "shasum": ""
             },
             "require": {
@@ -3109,10 +3077,10 @@
             ],
             "description": "Transfer objects across Billie universe",
             "support": {
-                "source": "https://github.com/ozean12/amqp-transfers/tree/0.4.29",
+                "source": "https://github.com/ozean12/amqp-transfers/tree/0.4.41",
                 "issues": "https://github.com/ozean12/amqp-transfers/issues"
             },
-            "time": "2021-03-24T14:55:40+00:00"
+            "time": "2021-04-16T11:50:12+00:00"
         },
         {
             "name": "ozean12/amqp-transfers-serializer",
@@ -3325,7 +3293,8 @@
             ],
             "description": "PHP package for dealing with decimals, percents and money",
             "support": {
-                "source": "https://github.com/ozean12/money-php/tree/3.1.0"
+                "source": "https://github.com/ozean12/money-php/tree/3.1.0",
+                "issues": "https://github.com/ozean12/money-php/issues"
             },
             "time": "2020-10-19T08:33:36+00:00"
         },

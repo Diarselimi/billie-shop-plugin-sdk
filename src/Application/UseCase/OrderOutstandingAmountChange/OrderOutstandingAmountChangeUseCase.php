@@ -6,7 +6,6 @@ use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\WorkflowException;
 use App\DomainModel\OrderNotification\OrderNotificationEntity;
 use App\DomainModel\OrderNotification\OrderNotificationPayloadFactory;
-use App\DomainModel\Payment\OrderAmountChangeDTO;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsException;
@@ -16,7 +15,6 @@ use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\OrderNotification\NotificationScheduler;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
-use Ozean12\Money\Money;
 use Symfony\Component\Workflow\Registry;
 
 class OrderOutstandingAmountChangeUseCase implements LoggingInterface
@@ -53,15 +51,13 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 
     public function execute(OrderOutstandingAmountChangeRequest $request): void
     {
-        $amountChange = $request->getOrderAmountChangeDetails();
-
         try {
-            $orderContainer = $this->orderContainerFactory->createFromPaymentId($amountChange->getId());
+            $orderContainer = $this->orderContainerFactory->createFromInvoiceId($request->getId());
         } catch (OrderContainerFactoryException $exception) {
             $this->logSuppressedException(
                 new OrderNotFoundException(),
                 '[suppressed] Trying to change state for non-existing order',
-                ['payment_id' => $amountChange->getId()]
+                ['payment_id' => $request->getId()]
             );
 
             return;
@@ -84,30 +80,28 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 
         $merchant = $orderContainer->getMerchant();
 
-        if ($amountChange->getAmountChange() > 0) {
+        if ($request->getAmountChange()->greaterThan(0)) {
             try {
-                $this->limitsService->unlock($orderContainer, new Money($amountChange->getAmountChange()));
+                $this->limitsService->unlock($orderContainer, $request->getAmountChange());
             } catch (MerchantDebtorLimitsException $exception) {
                 $this->logSuppressedException($exception, 'Limes call failed', ['exception' => $exception]);
             }
         }
 
-        $merchant->increaseFinancingLimit(new Money($amountChange->getAmountChange()));
+        $merchant->increaseFinancingLimit($request->getAmountChange());
         $this->merchantRepository->update($merchant);
 
-        if (!$amountChange->isPayment()) {
+        if ($request->getType() !== OrderOutstandingAmountChangeRequest::TYPE_PAYMENT) {
             return;
         }
 
-        $this->scheduleMerchantNotification($order, $amountChange);
-
-        if ($amountChange->getOutstandingAmount() <= 0 && !$order->isCanceled()) {
-            $this->workflowRegistry->get($order)->apply($order, OrderEntity::TRANSITION_COMPLETE);
-        }
+        $this->scheduleMerchantNotification($order, $request);
     }
 
-    private function scheduleMerchantNotification(OrderEntity $order, OrderAmountChangeDTO $amountChange): void
-    {
+    private function scheduleMerchantNotification(
+        OrderEntity $order,
+        OrderOutstandingAmountChangeRequest $request
+    ): void {
         $this->notificationScheduler->createAndSchedule(
             $order,
             OrderNotificationEntity::NOTIFICATION_TYPE_PAYMENT,
@@ -115,10 +109,10 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
                 $order,
                 OrderNotificationEntity::NOTIFICATION_TYPE_PAYMENT,
                 [
-                    'amount' => $amountChange->getPaidAmount(),
-                    'open_amount' => $amountChange->getOutstandingAmount(),
-                    'iban' => $amountChange->getIban(),
-                    'account_holder' => $amountChange->getAccountHolder(),
+                    'amount' => $request->getPaidAmount()->toFloat(),
+                    'open_amount' => $request->getOutstandingAmount()->toFloat(),
+                    'iban' => $request->getIban(),
+                    'account_holder' => $request->getAccountHolder(),
                 ]
             )
         );

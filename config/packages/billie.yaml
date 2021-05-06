@@ -38,6 +38,8 @@ ozean12_amqp_pack:
     customer.customer_created: Ozean12\Transfer\Message\Customer\CustomerCreated
     invoice.invoice_financing_workflow_paid_out: Ozean12\Transfer\Message\Invoice\InvoiceFinancingWorkflowPaidOut
     invoice.invoice_marked_as_late: Ozean12\Transfer\Message\Invoice\InvoiceMarkedAsLate
+    invoice.invoice_completed: Ozean12\Transfer\Message\Invoice\InvoiceCompleted
+    ticket.ticket_outstanding_amount_changed : Ozean12\Transfer\Message\Ticket\TicketOutstandingAmountChanged
 
 billie_monitoring:
   strict_logging: true
