@@ -55,7 +55,7 @@ class UploadShippedInvoicesCommand extends Command implements LoggingInterface
     {
         $this
             ->addOption(self::OPTION_LIMIT, 'l', InputOption::VALUE_OPTIONAL, '', self::DEFAULT_LIMIT)
-            ->addOption(self::OPTION_SHIPPED_FROM, 'f', InputOption::VALUE_OPTIONAL, '', (new \DateTime())->sub(new \DateInterval('P3D'))->format('c'))
+            ->addOption(self::OPTION_SHIPPED_FROM, 'f', InputOption::VALUE_OPTIONAL, '', (new \DateTime())->sub(new \DateInterval('P50D'))->format('c'))
             ->addArgument(self::ARGUMENT_MERCHANT_ID, InputArgument::REQUIRED)
         ;
     }
