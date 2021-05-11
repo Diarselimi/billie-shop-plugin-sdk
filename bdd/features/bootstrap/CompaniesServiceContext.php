@@ -170,7 +170,8 @@ class CompaniesServiceContext implements Context
      */
     public function iGetFromCompaniesServiceAListOfSignatoryPowersOneSignatory()
     {
-        $this->mockRequest('/debtor/10/signatory-powers', new ResponseStack(
+        $companyUuid = PaellaCoreContext::MERCHANT_COMPANY_UUID;
+        $this->mockRequest("/debtor/{$companyUuid}/signatory-powers", new ResponseStack(
             new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_signatory_powers_one_signatory.json'))
         ));
     }
@@ -180,7 +181,8 @@ class CompaniesServiceContext implements Context
      */
     public function iGetFromCompaniesServiceAListOfSignatoryPowers()
     {
-        $this->mockRequest('/debtor/10/signatory-powers', new ResponseStack(
+        $companyUuid = PaellaCoreContext::MERCHANT_COMPANY_UUID;
+        $this->mockRequest("/debtor/{$companyUuid}/signatory-powers", new ResponseStack(
             new MockResponse(file_get_contents(__DIR__ . '/../resources/companies_service_signatory_powers_list.json'))
         ));
     }
@@ -190,7 +192,8 @@ class CompaniesServiceContext implements Context
      */
     public function iGetFromCompaniesServiceAEmptyListOfSignatoryPowers()
     {
-        $this->mockRequest('/debtor/10/signatory-powers', new ResponseStack(
+        $companyUuid = PaellaCoreContext::MERCHANT_COMPANY_UUID;
+        $this->mockRequest("/debtor/{$companyUuid}/signatory-powers", new ResponseStack(
             new MockResponse("{}", [], 200)
         ));
     }
