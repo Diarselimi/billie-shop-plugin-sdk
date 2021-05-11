@@ -10,13 +10,13 @@ use App\DomainModel\SignatoryPower\UserSignatoryPowerMatcher;
 
 class GetSignatoryPowersUseCase
 {
-    private $companiesService;
+    private CompaniesServiceInterface $companiesService;
 
-    private $merchantUserRepository;
+    private MerchantUserRepositoryInterface $merchantUserRepository;
 
-    private $merchantRepository;
+    private MerchantRepositoryInterface $merchantRepository;
 
-    private $signatoryPowerMatcher;
+    private UserSignatoryPowerMatcher $signatoryPowerMatcher;
 
     public function __construct(
         CompaniesServiceInterface $companiesService,
@@ -36,7 +36,7 @@ class GetSignatoryPowersUseCase
         $merchantUser = $this->merchantUserRepository->getOneByUuid($request->getUserUuid());
 
         try {
-            $signatoryPowersDTOs = $this->companiesService->getSignatoryPowers($merchant->getCompanyId());
+            $signatoryPowersDTOs = $this->companiesService->getSignatoryPowers($merchant->getCompanyUuid());
         } catch (CompaniesServiceRequestException $exception) {
             throw new GetSignatoryPowersUseCaseException($exception->getMessage());
         }

@@ -290,10 +290,10 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
      * @return SignatoryPowerDTO[]
      * @throws CompaniesServiceRequestException
      */
-    public function getSignatoryPowers(string $companyIdentifier): array
+    public function getSignatoryPowers(string $companyUuid): array
     {
         try {
-            $response = $this->client->get("debtor/{$companyIdentifier}/signatory-powers");
+            $response = $this->client->get("debtor/{$companyUuid}/signatory-powers");
         } catch (TransferException $exception) {
             throw new CompaniesServiceRequestException($exception);
         }

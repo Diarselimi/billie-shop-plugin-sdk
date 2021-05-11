@@ -48,7 +48,7 @@ interface CompaniesServiceInterface
      * @param  string              $companyIdentifier
      * @return SignatoryPowerDTO[]
      */
-    public function getSignatoryPowers(string $companyIdentifier): array;
+    public function getSignatoryPowers(string $companyUuid): array;
 
     public function saveSelectedSignatoryPowers(string $companyIdentifier, SignatoryPowerSelectionDTO ...$signatoryPowerDTOs);
 
