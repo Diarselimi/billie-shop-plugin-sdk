@@ -30,7 +30,11 @@ class InvoiceCompletedHandler implements MessageHandlerInterface, LoggingInterfa
             $this->markOrderAsCompleteUseCase->execute(
                 new MarkOrderAsCompleteRequest($invoiceCompleted->getUuid())
             );
-        } catch (OrderNotFoundException | WorkflowException $exception) {
+        } catch (OrderNotFoundException $exception) {
+            $this->logError("Skipping the invoice {uuid}", [
+                LoggingInterface::KEY_UUID => $invoiceCompleted->getUuid(),
+            ]);
+        } catch (WorkflowException $exception) {
             $this->logSuppressedException($exception, $exception->getMessage());
         }
     }

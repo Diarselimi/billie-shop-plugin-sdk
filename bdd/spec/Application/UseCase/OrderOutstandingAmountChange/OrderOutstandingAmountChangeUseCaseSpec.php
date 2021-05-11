@@ -215,6 +215,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         $order->getState()->willReturn('complete');
 
         $order->wasShipped()->shouldBeCalledOnce()->willReturn(false);
+        $order->isComplete()->shouldBeCalledOnce()->willReturn(false);
         $order->isCanceled()->willReturn(false);
 
         $limitsService->unlock($orderContainer, new Money(0, 2))->shouldNotBeCalled();

@@ -2,7 +2,6 @@
 
 namespace App\Application\UseCase\OrderOutstandingAmountChange;
 
-use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\WorkflowException;
 use App\DomainModel\OrderNotification\OrderNotificationEntity;
 use App\DomainModel\OrderNotification\OrderNotificationPayloadFactory;
@@ -54,18 +53,16 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
         try {
             $orderContainer = $this->orderContainerFactory->createFromInvoiceId($request->getId());
         } catch (OrderContainerFactoryException $exception) {
-            $this->logSuppressedException(
-                new OrderNotFoundException(),
-                '[suppressed] Trying to change state for non-existing order',
-                ['payment_id' => $request->getId()]
-            );
+            $this->logError("Skipping the invoice {uuid}", [
+                LoggingInterface::KEY_UUID => $request->getId(),
+            ]);
 
             return;
         }
 
         $order = $orderContainer->getOrder();
 
-        if (!$order->wasShipped() && !$order->isCanceled()) {
+        if (!$order->wasShipped() && !$order->isComplete() && !$order->isCanceled()) {
             $this->logSuppressedException(
                 new WorkflowException('Order amount change not possible'),
                 '[suppressed] Outstanding amount change not possible for order {order_id}',
