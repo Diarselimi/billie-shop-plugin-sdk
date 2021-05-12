@@ -11,10 +11,9 @@ use App\DomainModel\Order\Lifecycle\DeclineOrderService;
 use App\DomainModel\Order\Lifecycle\WaitingOrderService;
 use App\DomainModel\Order\NewOrder\OrderPersistenceService;
 use App\DomainModel\Order\OrderChecksRunnerService;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\OrderResponse\LegacyOrderResponse;
-use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
@@ -27,7 +26,6 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         OrderContainerFactory $orderContainerFactory,
         OrderChecksRunnerService $orderChecksRunnerService,
         OrderRepositoryInterface $orderRepository,
-        LegacyOrderResponseFactory $orderResponseFactory,
         ApproveOrderService $approveOrderService,
         WaitingOrderService $waitingOrderService,
         DeclineOrderService $declineOrderService,
@@ -37,14 +35,13 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         $this->orderContainerFactory = $orderContainerFactory;
         $this->orderChecksRunnerService = $orderChecksRunnerService;
         $this->orderRepository = $orderRepository;
-        $this->orderResponseFactory = $orderResponseFactory;
         $this->approveOrderService = $approveOrderService;
         $this->declineOrderService = $declineOrderService;
         $this->waitingOrderService = $waitingOrderService;
         $this->identifyAndTriggerAsyncIdentification = $identifyAndTriggerAsyncIdentification;
     }
 
-    public function execute(CreateOrderRequest $request): LegacyOrderResponse
+    public function execute(CreateOrderRequest $request): OrderContainer
     {
         $this->validateRequest($request);
 
@@ -52,17 +49,17 @@ class CreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
         $order = $orderContainer->getOrder();
 
         if ($order->isDeclined()) {
-            return $this->orderResponseFactory->create($orderContainer);
+            return $orderContainer;
         }
 
         if ($this->orderChecksRunnerService->hasFailedSoftDeclinableChecks($orderContainer)) {
             $this->waitingOrderService->wait($orderContainer);
 
-            return $this->orderResponseFactory->create($orderContainer);
+            return $orderContainer;
         }
 
         $this->approveOrderService->approve($orderContainer);
 
-        return $this->orderResponseFactory->create($orderContainer);
+        return $orderContainer;
     }
 }

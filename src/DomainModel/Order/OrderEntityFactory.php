@@ -2,7 +2,7 @@
 
 namespace App\DomainModel\Order;
 
-use App\Application\UseCase\CreateOrder\CreateOrderRequest;
+use App\Application\UseCase\CreateOrder\CreateOrderRequestInterface;
 use App\Helper\Uuid\UuidGeneratorInterface;
 use App\Support\AbstractFactory;
 
@@ -15,7 +15,7 @@ class OrderEntityFactory extends AbstractFactory
         $this->uuidGenerator = $uuidGenerator;
     }
 
-    public function createFromRequest(CreateOrderRequest $request): OrderEntity
+    public function createFromRequest(CreateOrderRequestInterface $request): OrderEntity
     {
         return (new OrderEntity())
             ->setAmountForgiven(0)
@@ -26,8 +26,7 @@ class OrderEntityFactory extends AbstractFactory
             ->setUuid($this->uuidGenerator->uuid4())
             ->setCheckoutSessionId($request->getCheckoutSessionId())
             ->setCreationSource($request->getCreationSource())
-            ->setWorkflowName($request->getWorkflowName())
-        ;
+            ->setWorkflowName($request->getWorkflowName());
     }
 
     public function createFromArray(array $row): OrderEntity
@@ -56,7 +55,6 @@ class OrderEntityFactory extends AbstractFactory
             ->setCreationSource($row['creation_source'])
             ->setCompanyBillingAddressUuid($row['company_billing_address_uuid'])
             ->setWorkflowName($row['workflow_name'])
-            ->setDurationExtension($row['duration_extension'])
-        ;
+            ->setDurationExtension($row['duration_extension']);
     }
 }

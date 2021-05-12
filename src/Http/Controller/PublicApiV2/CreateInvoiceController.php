@@ -10,6 +10,7 @@ use App\Application\UseCase\ShipOrder\ShipOrderUseCase;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\ShipOrder\ShipOrderException;
 use App\Http\HttpConstantsInterface;
+use App\Http\RequestTransformer\CreateInvoice\InvoiceLineItemsFactory;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use App\Http\RequestTransformer\AmountRequestFactory;
 use OpenApi\Annotations as OA;
@@ -46,10 +47,13 @@ class CreateInvoiceController
 
     private AmountRequestFactory $requestFactory;
 
-    public function __construct(ShipOrderUseCase $shipOrderUseCase, AmountRequestFactory $requestFactory)
+    private InvoiceLineItemsFactory $lineItemsFactory;
+
+    public function __construct(ShipOrderUseCase $shipOrderUseCase, AmountRequestFactory $requestFactory, InvoiceLineItemsFactory $lineItemsFactory)
     {
         $this->shipOrderUseCase = $shipOrderUseCase;
         $this->requestFactory = $requestFactory;
+        $this->lineItemsFactory = $lineItemsFactory;
     }
 
     public function execute(Request $request): void
@@ -62,7 +66,7 @@ class CreateInvoiceController
             ->setShippingDocumentUrl($request->request->get('shipping_document_url'))
             ->setAmount($this->requestFactory->create($request))
             ->setOrders($request->request->get('orders', []))
-            ->setLineItems($request->request->get('line_items', []));
+            ->setLineItems($this->lineItemsFactory->create($request));
 
         try {
             $this->shipOrderUseCase->execute($shipRequest);

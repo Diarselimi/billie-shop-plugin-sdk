@@ -228,7 +228,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateOrderRequestV2'
+              $ref: '#/components/schemas/CreateOrderRequest'
       responses:
         '200':
           description: 'Order successfully created'
@@ -723,6 +723,57 @@ components:
         country:
           $ref: '#/components/schemas/TinyText'
       type: object
+    CreateOrderDebtorCompanyRequest:
+      title: 'Debtor Company'
+      required:
+        - merchant_customer_id
+        - name
+        - legal_form
+        - address
+      properties:
+        merchant_customer_id:
+          description: 'Unique identifier of the customer provided by the merchant side.'
+          example: '128483'
+          $ref: '#/components/schemas/TinyText'
+        name:
+          example: 'Billie GmbH'
+          $ref: '#/components/schemas/TinyText'
+        address:
+          nullable: false
+          $ref: '#/components/schemas/Address'
+        tax_id:
+          example: DE1234556
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        tax_number:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        registration_court:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        registration_number:
+          example: 'HRB 1234556'
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        industry_sector:
+          example: C
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        subindustry_sector:
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        employees_number:
+          example: 1-5
+          nullable: true
+          $ref: '#/components/schemas/TinyText'
+        legal_form:
+          description: 'One of the legal form codes available in the `GET /legal-forms` API endpoint.'
+          example: '10001'
+          $ref: '#/components/schemas/TinyText'
+        established_customer:
+          type: boolean
+          nullable: true
+      type: object
     OauthClientCredentialsGrantRequestBodyParams:
       title: 'Request OAuth Token'
       required:
@@ -876,41 +927,7 @@ components:
         - duration
         - debtor_company
         - debtor_person
-      properties:
-        amount:
-          $ref: '#/components/schemas/AmountDTO'
-        comment:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        duration:
-          $ref: '#/components/schemas/OrderDuration'
-        order_id:
-          description: 'Order external code'
-          example: DE123456-1
-          $ref: '#/components/schemas/TinyText'
-        delivery_address:
-          nullable: true
-          $ref: '#/components/schemas/CreateOrderAddressRequest'
-        billing_address:
-          nullable: true
-          $ref: '#/components/schemas/CreateOrderAddressRequest'
-        debtor_company:
-          $ref: '#/components/schemas/CreateOrderDebtorCompanyRequest'
-        debtor_person:
-          $ref: '#/components/schemas/CreateOrderDebtorPersonRequest'
-        line_items:
-          type: array
-          items:
-            $ref: '#/components/schemas/CreateOrderLineItemRequest'
-          nullable: true
-      type: object
-    CreateOrderRequestV2:
-      title: 'Order Creation Request'
-      required:
-        - amount
-        - duration
-        - debtor_company
-        - debtor_person
+        - line_items
       properties:
         amount:
           $ref: '#/components/schemas/AmountDTO'
@@ -930,14 +947,13 @@ components:
           nullable: true
           $ref: '#/components/schemas/Address'
         debtor_company:
-          $ref: '#/components/schemas/CreateOrderDebtorCompanyRequestV2'
+          $ref: '#/components/schemas/CreateOrderDebtorCompanyRequest'
         debtor_person:
           $ref: '#/components/schemas/CreateOrderDebtorPersonRequest'
         line_items:
           type: array
           items:
             $ref: '#/components/schemas/CreateOrderLineItemRequest'
-          nullable: true
       type: object
     CreateOrderAddressRequest:
       title: Address
@@ -964,127 +980,6 @@ components:
           $ref: '#/components/schemas/PostalCode'
         country:
           $ref: '#/components/schemas/CountryCode'
-      type: object
-    CreateOrderDebtorCompanyRequest:
-      title: 'Debtor Company'
-      required:
-        - merchant_customer_id
-        - name
-        - legal_form
-        - address_street
-        - address_city
-        - address_postal_code
-        - address_country
-      properties:
-        merchant_customer_id:
-          description: 'Unique identifier of the customer provided by the merchant side.'
-          example: '128483'
-          $ref: '#/components/schemas/TinyText'
-        name:
-          example: 'Billie GmbH'
-          $ref: '#/components/schemas/TinyText'
-        tax_id:
-          example: DE1234556
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        tax_number:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        registration_court:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        registration_number:
-          example: 'HRB 1234556'
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        industry_sector:
-          example: C
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        subindustry_sector:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        employees_number:
-          example: 1-5
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        legal_form:
-          description: 'One of the legal form codes available in the `GET /legal-forms` API endpoint.'
-          example: '10001'
-          $ref: '#/components/schemas/TinyText'
-        established_customer:
-          type: boolean
-          nullable: true
-        address_addition:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        address_house_number:
-          example: '4'
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        address_street:
-          example: Charlottenstr.
-          $ref: '#/components/schemas/TinyText'
-        address_city:
-          example: Berlin
-          $ref: '#/components/schemas/TinyText'
-        address_postal_code:
-          example: '10969'
-          $ref: '#/components/schemas/PostalCode'
-        address_country:
-          example: DE
-          $ref: '#/components/schemas/CountryCode'
-      type: object
-    CreateOrderDebtorCompanyRequestV2:
-      title: 'Debtor Company'
-      required:
-        - merchant_customer_id
-        - name
-        - legal_form
-        - address
-      properties:
-        merchant_customer_id:
-          description: 'Unique identifier of the customer provided by the merchant side.'
-          example: '128483'
-          $ref: '#/components/schemas/TinyText'
-        name:
-          example: 'Billie GmbH'
-          $ref: '#/components/schemas/TinyText'
-        address:
-          nullable: false
-          $ref: '#/components/schemas/Address'
-        tax_id:
-          example: DE1234556
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        tax_number:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        registration_court:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        registration_number:
-          example: 'HRB 1234556'
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        industry_sector:
-          example: C
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        subindustry_sector:
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        employees_number:
-          example: 1-5
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        legal_form:
-          description: 'One of the legal form codes available in the `GET /legal-forms` API endpoint.'
-          example: '10001'
-          $ref: '#/components/schemas/TinyText'
-        established_customer:
-          type: boolean
-          nullable: true
       type: object
     CreateOrderDebtorPersonRequest:
       title: 'Debtor Person'
@@ -1378,10 +1273,8 @@ components:
       properties:
         iban:
           description: 'Virtual IBAN provided by Billie'
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         bic:
-          nullable: true
           $ref: '#/components/schemas/TinyText'
       type: object
     Debtor:
@@ -1395,6 +1288,7 @@ components:
         billing_address:
           $ref: '#/components/schemas/Address'
         bank_account:
+          nullable: true
           $ref: '#/components/schemas/BankAccount'
         external_data:
           $ref: '#/components/schemas/DebtorExternalData'
@@ -1404,11 +1298,9 @@ components:
       properties:
         merchant_customer_id:
           example: C-10123456789
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         name:
           example: 'Billie G.m.b.H.'
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         industry_sector:
           nullable: true
@@ -1448,7 +1340,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/OrderInvoiceResponse'
-          nullable: true
+          nullable: false
       type: object
     TaxedMoney:
       title: 'Amount with split values for net, gross and tax.'

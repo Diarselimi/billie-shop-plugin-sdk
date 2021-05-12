@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controller\PublicApi;
 
-use App\Application\UseCase\CreateOrder\CreateOrderRequest;
-use App\Application\UseCase\CreateOrder\CreateOrderUseCase;
+use App\Application\UseCase\CreateOrder\LegacyCreateOrderRequest;
+use App\Application\UseCase\CreateOrder\LegacyCreateOrderUseCase;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderResponse\LegacyOrderResponse;
 use App\Http\HttpConstantsInterface;
@@ -28,7 +28,7 @@ use Symfony\Component\HttpFoundation\Request;
  *     @OA\RequestBody(
  *          required=true,
  *          @OA\MediaType(mediaType="application/json",
- *          @OA\Schema(ref="#/components/schemas/CreateOrderRequest"))
+ *          @OA\Schema(ref="#/components/schemas/LegacyCreateOrderRequest"))
  *     ),
  *
  *     @OA\Response(response=200, description="Order successfully created", @OA\JsonContent(ref="#/components/schemas/OrderResponse")),
@@ -41,12 +41,12 @@ class CreateDashboardOrderController
 {
     private const DEFAULT_LEGAL_FORM = '99999';
 
-    private CreateOrderUseCase $createOrderUseCase;
+    private LegacyCreateOrderUseCase $createOrderUseCase;
 
     private CreateOrderRequestFactory $orderRequestFactory;
 
     public function __construct(
-        CreateOrderUseCase $createOrderUseCase,
+        LegacyCreateOrderUseCase $createOrderUseCase,
         CreateOrderRequestFactory $orderRequestFactory
     ) {
         $this->createOrderUseCase = $createOrderUseCase;
@@ -58,7 +58,7 @@ class CreateDashboardOrderController
         return $this->createOrderUseCase->execute($this->buildUseCaseRequest($request));
     }
 
-    private function buildUseCaseRequest(Request $request): CreateOrderRequest
+    private function buildUseCaseRequest(Request $request): LegacyCreateOrderRequest
     {
         $request->attributes->set(
             HttpConstantsInterface::REQUEST_ATTRIBUTE_CREATION_SOURCE,
@@ -69,7 +69,7 @@ class CreateDashboardOrderController
         $debtorCompany['legal_form'] = $debtorCompany['legal_form'] ?: self::DEFAULT_LEGAL_FORM;
         $request->request->set('debtor_company', $debtorCompany);
 
-        $useCaseRequest = $this->orderRequestFactory->createForCreateOrder($request);
+        $useCaseRequest = $this->orderRequestFactory->createForLegacyCreateOrder($request);
 
         $workflowName = $request->request->get('workflow_name');
 

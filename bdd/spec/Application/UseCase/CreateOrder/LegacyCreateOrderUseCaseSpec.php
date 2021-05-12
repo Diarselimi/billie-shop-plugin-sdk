@@ -2,9 +2,8 @@
 
 namespace spec\App\Application\UseCase\CreateOrder;
 
-use App\Application\UseCase\CreateOrder\CreateOrderRequest;
-use App\Application\UseCase\CreateOrder\CreateOrderUseCase;
 use App\Application\UseCase\CreateOrder\LegacyCreateOrderRequest;
+use App\Application\UseCase\CreateOrder\LegacyCreateOrderUseCase;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\Order\IdentifyAndTriggerAsyncIdentification;
@@ -18,19 +17,22 @@ use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\OrderResponse\LegacyOrderResponse;
+use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
 use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class CreateOrderUseCaseSpec extends ObjectBehavior
+class LegacyCreateOrderUseCaseSpec extends ObjectBehavior
 {
     public function let(
         OrderPersistenceService $persistNewOrderService,
         OrderContainerFactory $orderContainerFactory,
         OrderChecksRunnerService $orderChecksRunnerService,
         OrderRepositoryInterface $orderRepository,
+        LegacyOrderResponseFactory $orderResponseFactory,
         ApproveOrderService $approveOrderService,
         WaitingOrderService $waitingOrderService,
         DeclineOrderService $declineOrderService,
@@ -40,7 +42,7 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
         OrderCreationDTO $newOrderDTO,
         OrderContainer $orderContainer,
         MerchantSettingsEntity $merchantSettings,
-        CreateOrderRequest $request
+        LegacyCreateOrderRequest $request
     ) {
         $this->beConstructedWith(...func_get_args());
 
@@ -67,7 +69,7 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
 
     public function it_is_initializable()
     {
-        $this->shouldHaveType(CreateOrderUseCase::class);
+        $this->shouldHaveType(LegacyCreateOrderUseCase::class);
     }
 
     public function it_should_be_declined_if_some_pre_identification_check_fail(
@@ -75,14 +77,16 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
         ApproveOrderService $approveOrderService,
         DeclineOrderService $declineOrderService,
         OrderContainer $orderContainer,
-        CreateOrderRequest $request,
-        OrderEntity $order
+        LegacyCreateOrderRequest $request,
+        OrderEntity $order,
+        LegacyOrderResponseFactory $orderResponseFactory
     ) {
         $orderChecksRunnerService->passesPreIdentificationChecks($orderContainer)->shouldBeCalledOnce()->willReturn(false);
         $order->isDeclined()->shouldBeCalledOnce()->willReturn(true);
 
         $approveOrderService->approve($orderContainer)->shouldNotBeCalled();
         $declineOrderService->decline($orderContainer)->shouldBeCalledOnce();
+        $orderResponseFactory->create($orderContainer)->shouldBeCalledOnce()->willReturn(new LegacyOrderResponse());
 
         $this->execute($request);
     }
@@ -92,8 +96,9 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
         ApproveOrderService $approveOrderService,
         DeclineOrderService $declineOrderService,
         OrderContainer $orderContainer,
-        CreateOrderRequest $request,
+        LegacyCreateOrderRequest $request,
         OrderEntity $order,
+        LegacyOrderResponseFactory $orderResponseFactory,
         IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification
     ) {
         $merchantDebtor = (new MerchantDebtorEntity())->setId(1);
@@ -107,6 +112,7 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
 
         $approveOrderService->approve($orderContainer)->shouldNotBeCalled();
         $declineOrderService->decline($orderContainer)->shouldBeCalledOnce();
+        $orderResponseFactory->create($orderContainer)->shouldBeCalledOnce()->willReturn(new LegacyOrderResponse());
 
         $this->execute($request);
     }
@@ -114,9 +120,10 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
     public function it_should_put_the_order_in_waiting_state_if_has_soft_declinable_checks(
         OrderChecksRunnerService $orderChecksRunnerService,
         OrderContainer $orderContainer,
-        CreateOrderRequest $request,
+        LegacyCreateOrderRequest $request,
         WaitingOrderService $waitingOrderService,
         OrderEntity $order,
+        LegacyOrderResponseFactory $orderResponseFactory,
         IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification
     ) {
         $merchantDebtor = (new MerchantDebtorEntity())->setId(1);
@@ -129,6 +136,7 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
 
         $order->isDeclined()->shouldBeCalledOnce()->willReturn(false);
         $waitingOrderService->wait($orderContainer)->shouldBeCalledOnce();
+        $orderResponseFactory->create($orderContainer)->shouldBeCalledOnce()->willReturn(new LegacyOrderResponse());
 
         $this->execute($request);
     }
@@ -138,8 +146,9 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
         ApproveOrderService $approveOrderService,
         DeclineOrderService $declineOrderService,
         OrderContainer $orderContainer,
-        CreateOrderRequest $request,
+        LegacyCreateOrderRequest $request,
         OrderEntity $order,
+        LegacyOrderResponseFactory $orderResponseFactory,
         IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification
     ) {
         $merchantDebtor = (new MerchantDebtorEntity())->setId(1);
@@ -153,6 +162,7 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
         $order->isDeclined()->shouldBeCalledOnce()->willReturn(false);
         $approveOrderService->approve($orderContainer)->shouldBeCalledOnce();
         $declineOrderService->decline($orderContainer)->shouldNotBeCalled();
+        $orderResponseFactory->create($orderContainer)->shouldBeCalledOnce()->willReturn(new LegacyOrderResponse());
 
         $this->execute($request);
     }

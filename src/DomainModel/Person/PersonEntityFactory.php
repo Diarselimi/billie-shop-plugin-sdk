@@ -2,19 +2,18 @@
 
 namespace App\DomainModel\Person;
 
-use App\Application\UseCase\CreateOrder\CreateOrderRequest;
+use App\Application\UseCase\CreateOrder\CreateOrderRequestInterface;
 
 class PersonEntityFactory
 {
-    public function createFromRequest(CreateOrderRequest $request): PersonEntity
+    public function createFromRequest(CreateOrderRequestInterface $request): PersonEntity
     {
         return (new PersonEntity())
             ->setGender($request->getDebtorPerson()->getGender())
             ->setFirstName($request->getDebtorPerson()->getFirstName())
             ->setLastName($request->getDebtorPerson()->getLastName())
             ->setPhoneNumber($request->getDebtorPerson()->getPhoneNumber())
-            ->setEmail($request->getDebtorPerson()->getEmail())
-        ;
+            ->setEmail($request->getDebtorPerson()->getEmail());
     }
 
     public function createFromDatabaseRow(array $row): PersonEntity
@@ -27,7 +26,6 @@ class PersonEntityFactory
             ->setPhoneNumber($row['phone'])
             ->setEmail($row['email'])
             ->setCreatedAt(new \DateTime($row['created_at']))
-            ->setUpdatedAt(new \DateTime($row['updated_at']))
-        ;
+            ->setUpdatedAt(new \DateTime($row['updated_at']));
     }
 }

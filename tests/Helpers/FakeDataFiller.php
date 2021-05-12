@@ -50,6 +50,10 @@ trait FakeDataFiller
                 $methodName = 'uuid';
             }
 
+            if ($methodName === 'address') {
+                $methodName = 'addressObject';
+            }
+
             try {
                 $val = $faker->$methodName;
             } catch (\Exception $e) {
@@ -64,10 +68,6 @@ trait FakeDataFiller
                         break;
                     case Money::class:
                         $val = new Money($faker->randomFloat(2));
-
-                        break;
-                    case TaxedMoney::class:
-                        $val = TaxedMoneyFactory::create($gross = $faker->randomFloat(2, 200, 500), $gross - 10, 10);
 
                         break;
                     case Percent::class:
@@ -85,6 +85,10 @@ trait FakeDataFiller
                     case 'DateTimeInterface':
                     case 'DateTime':
                         $val = new \DateTime($faker->date('Y-m-d H:i:s'));
+
+                        break;
+                    case 'array':
+                        $val = [];
 
                         break;
                     case 'string':

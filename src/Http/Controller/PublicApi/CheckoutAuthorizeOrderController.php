@@ -28,7 +28,7 @@ use Symfony\Component\HttpFoundation\Request;
  *     @OA\RequestBody(
  *          required=true,
  *          @OA\MediaType(mediaType="application/json",
- *          @OA\Schema(ref="#/components/schemas/CreateOrderRequest"))
+ *          @OA\Schema(ref="#/components/schemas/LegacyCreateOrderRequest"))
  *     ),
  *
  *     @OA\Response(response=200, @OA\JsonContent(ref="#/components/schemas/CheckoutAuthorizeOrderResponse"), description="Order created with 'authorized' state, but a merchant confirmation is needed."),

@@ -2,7 +2,7 @@
 
 namespace App\DomainModel\Order\NewOrder;
 
-use App\Application\UseCase\CreateOrder\CreateOrderRequest;
+use App\Application\UseCase\CreateOrder\CreateOrderRequestInterface;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderLineItemRequest;
 use App\DomainModel\Address\AddressEntity;
@@ -82,7 +82,7 @@ class OrderPersistenceService
         $this->orderLineItemRepository = $orderLineItemRepository;
     }
 
-    public function persistFromRequest(CreateOrderRequest $request): OrderCreationDTO
+    public function persistFromRequest(CreateOrderRequestInterface $request): OrderCreationDTO
     {
         $order = $this->orderFactory->createFromRequest($request);
 
@@ -91,13 +91,16 @@ class OrderPersistenceService
         $billingAddress = $request->getBillingAddress() ? $this->persistAddress($request->getBillingAddress()) : $debtorAddress;
         $deliveryAddress = $request->getDeliveryAddress() ? $this->persistAddress($request->getDeliveryAddress()) : $billingAddress;
 
-        $debtorExternalData = $this->persistDebtorExternalData($request, $debtorAddress->getId(), $billingAddress->getId());
+        $debtorExternalData = $this->persistDebtorExternalData(
+            $request,
+            $debtorAddress->getId(),
+            $billingAddress->getId()
+        );
 
         $order
             ->setDebtorPersonId($debtorPerson->getId())
             ->setDeliveryAddressId($deliveryAddress->getId())
-            ->setDebtorExternalDataId($debtorExternalData->getId())
-        ;
+            ->setDebtorExternalDataId($debtorExternalData->getId());
         $this->orderRepository->insert($order);
 
         $orderFinancialDetails = $this->persistOrderFinancialDetails($order->getId(), $request);
@@ -116,7 +119,7 @@ class OrderPersistenceService
         );
     }
 
-    private function persistDebtorPerson(CreateOrderRequest $request): PersonEntity
+    private function persistDebtorPerson(CreateOrderRequestInterface $request): PersonEntity
     {
         $debtorPerson = $this->personFactory->createFromRequest($request);
         $this->personRepository->insert($debtorPerson);
@@ -124,7 +127,7 @@ class OrderPersistenceService
         return $debtorPerson;
     }
 
-    private function persistDebtorAddress(CreateOrderRequest $request): AddressEntity
+    private function persistDebtorAddress(CreateOrderRequestInterface $request): AddressEntity
     {
         $debtorAddress = $this->addressFactory->createFromRequestDebtor($request);
         $this->addressRepository->insert($debtorAddress);
@@ -140,13 +143,15 @@ class OrderPersistenceService
         return $address;
     }
 
-    private function persistDebtorExternalData(CreateOrderRequest $request, int $addressId, ?int $invoiceAddressId): DebtorExternalDataEntity
-    {
+    private function persistDebtorExternalData(
+        CreateOrderRequestInterface $request,
+        int $addressId,
+        ?int $invoiceAddressId
+    ): DebtorExternalDataEntity {
         $debtorExternalData = $this->debtorExternalDataFactory
             ->createFromRequest($request)
             ->setAddressId($addressId)
-            ->setBillingAddressId($invoiceAddressId)
-        ;
+            ->setBillingAddressId($invoiceAddressId);
 
         $debtorExternalData->setDataHash($this->arrayHasher->generateHash($request));
 
@@ -155,8 +160,10 @@ class OrderPersistenceService
         return $debtorExternalData;
     }
 
-    private function persistOrderFinancialDetails(int $orderId, CreateOrderRequest $request): OrderFinancialDetailsEntity
-    {
+    private function persistOrderFinancialDetails(
+        int $orderId,
+        CreateOrderRequestInterface $request
+    ): OrderFinancialDetailsEntity {
         $orderFinancialDetails = $this->orderFinancialDetailsFactory->create(
             $orderId,
             $request->getAmount(),

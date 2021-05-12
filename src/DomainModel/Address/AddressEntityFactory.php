@@ -2,13 +2,13 @@
 
 namespace App\DomainModel\Address;
 
-use App\Application\UseCase\CreateOrder\CreateOrderRequest;
+use App\Application\UseCase\CreateOrder\CreateOrderRequestInterface;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 
 class AddressEntityFactory
 {
-    public function createFromAddressRequest(CreateOrderAddressRequest $addressRequest)
+    public function createFromAddressRequest(CreateOrderAddressRequest $addressRequest): AddressEntity
     {
         return (new AddressEntity())
             ->setAddition($addressRequest->getAddition())
@@ -20,7 +20,7 @@ class AddressEntityFactory
             ;
     }
 
-    public function createFromRequestDebtor(CreateOrderRequest $request): AddressEntity
+    public function createFromRequestDebtor(CreateOrderRequestInterface $request): AddressEntity
     {
         return (new AddressEntity())
             ->setAddition($request->getDebtorCompany()->getAddressAddition())

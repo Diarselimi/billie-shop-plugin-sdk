@@ -4,27 +4,26 @@ declare(strict_types=1);
 
 namespace App\Application\UseCase\CreateOrder;
 
+use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderDebtorCompanyRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderDebtorPersonRequest;
-use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
 use App\Application\UseCase\ValidatedRequestInterface;
 use App\Application\Validator\Constraint as CustomConstrains;
-use Ozean12\Money\TaxedMoney\TaxedMoney;
-use App\DomainModel\ArrayableInterface;
 use App\DomainModel\OrderLineItem\OrderLineItemEntity;
 use OpenApi\Annotations as OA;
+use Ozean12\Money\TaxedMoney\TaxedMoney;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @OA\Schema(schema="CreateOrderRequestV2", title="Order Creation Request", required={"amount", "duration", "debtor_company", "debtor_person"},
+ * @OA\Schema(schema="LegacyCreateOrderRequest", title="Order Creation Request", required={"amount", "duration", "debtor_company", "debtor_person"},
  *     properties={
  *          @OA\Property(property="amount", ref="#/components/schemas/AmountDTO"),
  *          @OA\Property(property="comment", ref="#/components/schemas/TinyText", nullable=true),
  *          @OA\Property(property="duration", ref="#/components/schemas/OrderDuration"),
- *          @OA\Property(property="external_code", ref="#/components/schemas/TinyText", description="Order external code", example="DE123456-1"),
- *          @OA\Property(property="delivery_address", ref="#/components/schemas/Address", nullable=true),
- *          @OA\Property(property="billing_address", ref="#/components/schemas/Address", nullable=true),
- *          @OA\Property(property="debtor_company", ref="#/components/schemas/CreateOrderDebtorCompanyRequestV2"),
+ *          @OA\Property(property="order_id", ref="#/components/schemas/TinyText", description="Order external code", example="DE123456-1"),
+ *          @OA\Property(property="delivery_address", ref="#/components/schemas/CreateOrderAddressRequest", nullable=true),
+ *          @OA\Property(property="billing_address", ref="#/components/schemas/CreateOrderAddressRequest", nullable=true),
+ *          @OA\Property(property="debtor_company", ref="#/components/schemas/LegacyCreateOrderDebtorCompanyRequest"),
  *          @OA\Property(property="debtor_person", ref="#/components/schemas/CreateOrderDebtorPersonRequest"),
  *          @OA\Property(
  *              property="line_items",
@@ -35,7 +34,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     }
  * )
  */
-class CreateOrderRequestV2 implements ValidatedRequestInterface, ArrayableInterface
+class LegacyCreateOrderRequest implements ValidatedRequestInterface, CreateOrderRequestInterface
 {
     /**
      * @Assert\NotBlank()
@@ -107,7 +106,7 @@ class CreateOrderRequestV2 implements ValidatedRequestInterface, ArrayableInterf
         return $this->amount;
     }
 
-    public function setAmount(TaxedMoney $amount): CreateOrderRequest
+    public function setAmount(TaxedMoney $amount): LegacyCreateOrderRequest
     {
         $this->amount = $amount;
 
@@ -119,7 +118,7 @@ class CreateOrderRequestV2 implements ValidatedRequestInterface, ArrayableInterf
         return $this->comment;
     }
 
-    public function setComment(?string $comment): CreateOrderRequest
+    public function setComment(?string $comment): LegacyCreateOrderRequest
     {
         $this->comment = $comment;
 
@@ -131,7 +130,7 @@ class CreateOrderRequestV2 implements ValidatedRequestInterface, ArrayableInterf
         return $this->duration;
     }
 
-    public function setDuration(int $duration): CreateOrderRequest
+    public function setDuration(int $duration): LegacyCreateOrderRequest
     {
         $this->duration = $duration;
 
@@ -143,7 +142,7 @@ class CreateOrderRequestV2 implements ValidatedRequestInterface, ArrayableInterf
         return $this->externalCode;
     }
 
-    public function setExternalCode($externalCode): CreateOrderRequest
+    public function setExternalCode($externalCode): LegacyCreateOrderRequest
     {
         $this->externalCode = $externalCode;
 
@@ -155,7 +154,7 @@ class CreateOrderRequestV2 implements ValidatedRequestInterface, ArrayableInterf
         return $this->deliveryAddress;
     }
 
-    public function setDeliveryAddress(?CreateOrderAddressRequest $deliveryAddress): CreateOrderRequest
+    public function setDeliveryAddress(?CreateOrderAddressRequest $deliveryAddress): LegacyCreateOrderRequest
     {
         $this->deliveryAddress = $deliveryAddress;
 
@@ -167,7 +166,7 @@ class CreateOrderRequestV2 implements ValidatedRequestInterface, ArrayableInterf
         return $this->debtorPerson;
     }
 
-    public function setDebtorPerson(CreateOrderDebtorPersonRequest $debtorPerson): CreateOrderRequest
+    public function setDebtorPerson(CreateOrderDebtorPersonRequest $debtorPerson): LegacyCreateOrderRequest
     {
         $this->debtorPerson = $debtorPerson;
 
@@ -179,7 +178,7 @@ class CreateOrderRequestV2 implements ValidatedRequestInterface, ArrayableInterf
         return $this->debtorCompany;
     }
 
-    public function setDebtorCompany(CreateOrderDebtorCompanyRequest $debtorCompany): CreateOrderRequest
+    public function setDebtorCompany(CreateOrderDebtorCompanyRequest $debtorCompany): LegacyCreateOrderRequest
     {
         $this->debtorCompany = $debtorCompany;
 
@@ -191,7 +190,7 @@ class CreateOrderRequestV2 implements ValidatedRequestInterface, ArrayableInterf
         return $this->merchantId;
     }
 
-    public function setMerchantId(int $merchantId): CreateOrderRequest
+    public function setMerchantId(int $merchantId): LegacyCreateOrderRequest
     {
         $this->merchantId = $merchantId;
 
@@ -203,7 +202,7 @@ class CreateOrderRequestV2 implements ValidatedRequestInterface, ArrayableInterf
         return $this->checkoutSessionId;
     }
 
-    public function setCheckoutSessionId(?int $checkoutSessionId): CreateOrderRequest
+    public function setCheckoutSessionId(?int $checkoutSessionId): LegacyCreateOrderRequest
     {
         $this->checkoutSessionId = $checkoutSessionId;
 
@@ -215,7 +214,7 @@ class CreateOrderRequestV2 implements ValidatedRequestInterface, ArrayableInterf
         return $this->creationSource;
     }
 
-    public function setCreationSource(string $creationSource): CreateOrderRequest
+    public function setCreationSource(string $creationSource): LegacyCreateOrderRequest
     {
         $this->creationSource = $creationSource;
 
@@ -227,7 +226,7 @@ class CreateOrderRequestV2 implements ValidatedRequestInterface, ArrayableInterf
         return $this->workflowName;
     }
 
-    public function setWorkflowName(string $workflowName): CreateOrderRequest
+    public function setWorkflowName(string $workflowName): LegacyCreateOrderRequest
     {
         $this->workflowName = $workflowName;
 
@@ -239,7 +238,7 @@ class CreateOrderRequestV2 implements ValidatedRequestInterface, ArrayableInterf
         return $this->billingAddress;
     }
 
-    public function setBillingAddress(?CreateOrderAddressRequest $billingAddress): CreateOrderRequest
+    public function setBillingAddress(?CreateOrderAddressRequest $billingAddress): LegacyCreateOrderRequest
     {
         $this->billingAddress = $billingAddress;
 
@@ -254,7 +253,7 @@ class CreateOrderRequestV2 implements ValidatedRequestInterface, ArrayableInterf
         return $this->lineItems;
     }
 
-    public function setLineItems(array $lineItems): CreateOrderRequest
+    public function setLineItems(array $lineItems): LegacyCreateOrderRequest
     {
         $this->lineItems = $lineItems;
 

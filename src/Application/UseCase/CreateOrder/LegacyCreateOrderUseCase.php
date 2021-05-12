@@ -1,77 +1,68 @@
 <?php
 
-namespace App\Application\UseCase\CheckoutAuthorizeOrder;
+namespace App\Application\UseCase\CreateOrder;
 
-use App\Application\UseCase\CreateOrder\LegacyCreateOrderRequest;
 use App\Application\UseCase\OrderCreationUseCaseTrait;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
-use App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface;
 use App\DomainModel\Order\IdentifyAndTriggerAsyncIdentification;
 use App\DomainModel\Order\Lifecycle\ApproveOrderService;
 use App\DomainModel\Order\Lifecycle\DeclineOrderService;
+use App\DomainModel\Order\Lifecycle\WaitingOrderService;
 use App\DomainModel\Order\NewOrder\OrderPersistenceService;
 use App\DomainModel\Order\OrderChecksRunnerService;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
-use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\OrderResponse\CheckoutAuthorizeOrderResponse;
+use App\DomainModel\OrderResponse\LegacyOrderResponse;
 use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
-use Symfony\Component\Workflow\Registry;
 
-class CheckoutAuthorizeOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
+class LegacyCreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
 {
     use LoggingTrait, ValidatedUseCaseTrait, OrderCreationUseCaseTrait;
-
-    private CheckoutSessionRepositoryInterface $checkoutSessionRepository;
 
     public function __construct(
         OrderPersistenceService $orderPersistenceService,
         OrderContainerFactory $orderContainerFactory,
         OrderChecksRunnerService $orderChecksRunnerService,
         OrderRepositoryInterface $orderRepository,
-        Registry $workflowRegistry,
+        LegacyOrderResponseFactory $orderResponseFactory,
         ApproveOrderService $approveOrderService,
+        WaitingOrderService $waitingOrderService,
         DeclineOrderService $declineOrderService,
-        CheckoutSessionRepositoryInterface $checkoutSessionRepository,
-        IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification,
-        LegacyOrderResponseFactory $orderResponseFactory
+        IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification
     ) {
         $this->orderPersistenceService = $orderPersistenceService;
         $this->orderContainerFactory = $orderContainerFactory;
         $this->orderChecksRunnerService = $orderChecksRunnerService;
         $this->orderRepository = $orderRepository;
-        $this->workflowRegistry = $workflowRegistry;
+        $this->orderResponseFactory = $orderResponseFactory;
         $this->approveOrderService = $approveOrderService;
         $this->declineOrderService = $declineOrderService;
-        $this->checkoutSessionRepository = $checkoutSessionRepository;
+        $this->waitingOrderService = $waitingOrderService;
         $this->identifyAndTriggerAsyncIdentification = $identifyAndTriggerAsyncIdentification;
-        $this->orderResponseFactory = $orderResponseFactory;
     }
 
-    public function execute(LegacyCreateOrderRequest $request): CheckoutAuthorizeOrderResponse
+    public function execute(CreateOrderRequestInterface $request): LegacyOrderResponse
     {
-        $this->validateRequest($request, null, ['Default', 'AuthorizeOrder']);
+        $this->validateRequest($request);
 
         $orderContainer = $this->createIdentifiedOrder($request);
         $order = $orderContainer->getOrder();
 
         if ($order->isDeclined()) {
-            return $this->orderResponseFactory->createAuthorizeResponse($orderContainer);
+            return $this->orderResponseFactory->create($orderContainer);
         }
 
         if ($this->orderChecksRunnerService->hasFailedSoftDeclinableChecks($orderContainer)) {
-            $this->workflowRegistry->get($order)->apply($order, OrderEntity::TRANSITION_PRE_WAITING);
-            $this->checkoutSessionRepository->invalidateById($request->getCheckoutSessionId());
+            $this->waitingOrderService->wait($orderContainer);
 
-            return $this->orderResponseFactory->createAuthorizeResponse($orderContainer);
+            return $this->orderResponseFactory->create($orderContainer);
         }
 
-        $this->workflowRegistry->get($order)->apply($order, OrderEntity::TRANSITION_AUTHORIZE);
-        $this->checkoutSessionRepository->invalidateById($request->getCheckoutSessionId());
+        $this->approveOrderService->approve($orderContainer);
 
-        return $this->orderResponseFactory->createAuthorizeResponse($orderContainer);
+        return $this->orderResponseFactory->create($orderContainer);
     }
 }

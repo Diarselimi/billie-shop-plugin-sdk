@@ -40,9 +40,7 @@ class CreateInvoiceRequest
      *     minMessage="There should be at least one order specified."
      * )
      */
-    private array
-
- $orders;
+    private array $orders;
 
     /**
      * @Assert\Length(max="255")
@@ -65,9 +63,7 @@ class CreateInvoiceRequest
      */
     private ?TaxedMoney $amount = null;
 
-    private array
-
- $lineItems;
+    private ?array $lineItems;
 
     public function __construct(int $merchantId)
     {
@@ -139,7 +135,7 @@ class CreateInvoiceRequest
         return $this->lineItems;
     }
 
-    public function setLineItems(array $lineItems): CreateInvoiceRequest
+    public function setLineItems(?array $lineItems): CreateInvoiceRequest
     {
         $this->lineItems = $lineItems;
 

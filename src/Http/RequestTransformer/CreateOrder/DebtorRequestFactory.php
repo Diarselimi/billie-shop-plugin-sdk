@@ -10,9 +10,14 @@ class DebtorRequestFactory
 {
     private $registrationNumberConverter;
 
-    public function __construct(OrderRegistrationNumberConverter $registrationNumberConverter)
-    {
+    private AddressRequestFactory $addressRequestFactory;
+
+    public function __construct(
+        OrderRegistrationNumberConverter $registrationNumberConverter,
+        AddressRequestFactory $addressRequestFactory
+    ) {
         $this->registrationNumberConverter = $registrationNumberConverter;
+        $this->addressRequestFactory = $addressRequestFactory;
     }
 
     public function create(Request $request): CreateOrderDebtorCompanyRequest
@@ -29,13 +34,14 @@ class DebtorRequestFactory
             ->setSubindustrySector($requestData['subindustry_sector'] ?? null)
             ->setEmployeesNumber($requestData['employees_number'] ?? null)
             ->setLegalForm($requestData['legal_form'] ?? null)
-            ->setEstablishedCustomer((bool) $requestData['established_customer'] ?? null)
-            ->setAddressAddition($requestData['address_addition'] ?? null)
-            ->setAddressHouseNumber($requestData['address_house_number'] ?? null)
-            ->setAddressStreet($requestData['address_street'] ?? null)
-            ->setAddressPostalCode($requestData['address_postal_code'] ?? null)
-            ->setAddressCity($requestData['address_city'] ?? null)
-            ->setAddressCountry($requestData['address_country'] ?? null);
+            ->setEstablishedCustomer((bool) $requestData['established_customer'] ?? null);
+
+        if (array_key_exists('address', $requestData)) {
+            $address = $this->addressRequestFactory->createFromArray($requestData['address']);
+        } else {
+            $address = $this->addressRequestFactory->createFromOldFormat($requestData);
+        }
+        $debtorCompany->setAddress($address);
 
         if ($requestData['registration_number'] ?? false) {
             $debtorCompany->setRegistrationNumber(

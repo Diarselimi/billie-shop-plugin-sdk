@@ -25,6 +25,22 @@ class AddressRequestFactory
             );
     }
 
+    public function createFromArray(?array $data): ?CreateOrderAddressRequest
+    {
+        if ($data === null) {
+            return null;
+        }
+
+        return (new CreateOrderAddressRequest())
+            ->setHouseNumber($data['house_number'] ?? null)
+            ->setStreet($data['street'] ?? null)
+            ->setPostalCode($data['postal_code'] ?? null)
+            ->setCity($data['city'] ?? null)
+            ->setCountry(
+                $this->normalizeCountry($data['country'] ?? null)
+            );
+    }
+
     /**
      * @deprecated don't use this for new endpoints, only existing ones
      */

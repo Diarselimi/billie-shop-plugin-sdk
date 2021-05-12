@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\UseCase;
 
-use App\Application\UseCase\CreateOrder\CreateOrderRequest;
+use App\Application\UseCase\CreateOrder\CreateOrderRequestInterface;
 use App\DomainModel\Order\IdentifyAndTriggerAsyncIdentification;
 use App\DomainModel\Order\Lifecycle\ApproveOrderService;
 use App\DomainModel\Order\Lifecycle\DeclineOrderService;
@@ -39,7 +39,7 @@ trait OrderCreationUseCaseTrait
 
     private LegacyOrderResponseFactory $orderResponseFactory;
 
-    private function createIdentifiedOrder(CreateOrderRequest $request): OrderContainer
+    private function createIdentifiedOrder(CreateOrderRequestInterface $request): OrderContainer
     {
         $orderCreationDTO = $this->orderPersistenceService->persistFromRequest($request);
         $orderContainer = $this->orderContainerFactory->createFromNewOrderDTO($orderCreationDTO);

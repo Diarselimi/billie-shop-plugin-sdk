@@ -45,7 +45,7 @@ class CreateOrderRequestFactorySpec extends ObjectBehavior
 
         $request = Request::create('/');
         $this
-            ->createForCreateOrder($request)
+            ->createForLegacyCreateOrder($request)
             ->getCreationSource()
             ->shouldBe(OrderEntity::CREATION_SOURCE_API);
     }
@@ -71,7 +71,7 @@ class CreateOrderRequestFactorySpec extends ObjectBehavior
             OrderEntity::CREATION_SOURCE_DASHBOARD
         );
         $this
-            ->createForCreateOrder($request)
+            ->createForLegacyCreateOrder($request)
             ->getCreationSource()
             ->shouldBe(OrderEntity::CREATION_SOURCE_DASHBOARD);
     }

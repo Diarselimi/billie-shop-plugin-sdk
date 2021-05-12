@@ -1,0 +1,59 @@
+{
+  "duration": 30,
+  "decline_reason": null,
+  "amount": {
+    "tax": 100,
+    "net": 900,
+    "gross": 1000
+  },
+  "state": "created",
+  "external_code": "A1",
+  "uuid": "8eeb9b34-10cb-4f81-8d0f-46c60f9fd95e",
+  "unshipped_amount": {
+    "tax": 100,
+    "net": 900,
+    "gross": 1000
+  },
+  "debtor": {
+    "name": "Test User Company",
+    "company_address": {
+      "street": "Heinrich-Heine-Platz",
+      "country": "DE",
+      "city": "Berlin",
+      "house_number": "10",
+      "postal_code": "10179"
+    },
+    "billing_address": {
+      "street": "Heinrich-Heine-Platz",
+      "country": "DE",
+      "city": "Berlin",
+      "house_number": "10",
+      "postal_code": "10179"
+    },
+    "external_data": {
+      "address": {
+        "street": "Heinrich-Heine-Platz",
+        "country": "DE",
+        "city": "Berlin",
+        "house_number": "10",
+        "postal_code": "10179"
+      },
+      "merchant_customer_id": "12",
+      "name": "Test User Company",
+      "industry_sector": "SOME SECTOR"
+    },
+    "bank_account": {
+      "bic": "BICISHERE",
+      "iban": "DE1234"
+    }
+  },
+  "delivery_address": {
+    "street": "Heinrich-Heine-Platz",
+    "country": "DE",
+    "city": "Berlin",
+    "house_number": "10",
+    "postal_code": "10179"
+  },
+  "invoices": [],
+  "created_at": "2021-05-06 11:13:43"
+}

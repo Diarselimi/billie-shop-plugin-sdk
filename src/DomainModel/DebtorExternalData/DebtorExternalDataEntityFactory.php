@@ -2,11 +2,11 @@
 
 namespace App\DomainModel\DebtorExternalData;
 
-use App\Application\UseCase\CreateOrder\CreateOrderRequest;
+use App\Application\UseCase\CreateOrder\CreateOrderRequestInterface;
 
 class DebtorExternalDataEntityFactory
 {
-    public function createFromRequest(CreateOrderRequest $request): DebtorExternalDataEntity
+    public function createFromRequest(CreateOrderRequestInterface $request): DebtorExternalDataEntity
     {
         return (new DebtorExternalDataEntity())
             ->setName($request->getDebtorCompany()->getName())
@@ -19,8 +19,7 @@ class DebtorExternalDataEntityFactory
             ->setSubindustrySector($request->getDebtorCompany()->getSubindustrySector())
             ->setEmployeesNumber($request->getDebtorCompany()->getEmployeesNumber())
             ->setEstablishedCustomer($request->getDebtorCompany()->isEstablishedCustomer())
-            ->setMerchantExternalId($request->getDebtorCompany()->getMerchantCustomerId())
-        ;
+            ->setMerchantExternalId($request->getDebtorCompany()->getMerchantCustomerId());
     }
 
     public function createFromDatabaseRow(array $row): DebtorExternalDataEntity
@@ -42,7 +41,6 @@ class DebtorExternalDataEntityFactory
             ->setMerchantExternalId($row['merchant_external_id'])
             ->setCreatedAt(new \DateTime($row['created_at']))
             ->setUpdatedAt(new \DateTime($row['updated_at']))
-            ->setDataHash($row['debtor_data_hash'])
-        ;
+            ->setDataHash($row['debtor_data_hash']);
     }
 }

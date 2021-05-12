@@ -2,7 +2,7 @@
 
 namespace App\Http\Controller\PublicApi;
 
-use App\Application\UseCase\CreateOrder\CreateOrderUseCase;
+use App\Application\UseCase\CreateOrder\LegacyCreateOrderUseCase;
 use App\Http\RequestTransformer\CreateOrder\CreateOrderRequestFactory;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Request;
  *     @OA\RequestBody(
  *          required=true,
  *          @OA\MediaType(mediaType="application/json",
- *          @OA\Schema(ref="#/components/schemas/CreateOrderRequest"))
+ *          @OA\Schema(ref="#/components/schemas/LegacyCreateOrderRequest"))
  *     ),
  *
  *     @OA\Response(response=200, description="Order successfully created", @OA\JsonContent(ref="#/components/schemas/OrderResponse")),
@@ -34,12 +34,12 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class CreateOrderController
 {
-    private CreateOrderUseCase $createOrderUseCase;
+    private LegacyCreateOrderUseCase $createOrderUseCase;
 
     private CreateOrderRequestFactory $orderRequestFactory;
 
     public function __construct(
-        CreateOrderUseCase $createOrderUseCase,
+        LegacyCreateOrderUseCase $createOrderUseCase,
         CreateOrderRequestFactory $orderRequestFactory
     ) {
         $this->createOrderUseCase = $createOrderUseCase;
@@ -48,7 +48,7 @@ class CreateOrderController
 
     public function execute(Request $request): JsonResponse
     {
-        $useCaseRequest = $this->orderRequestFactory->createForCreateOrder($request);
+        $useCaseRequest = $this->orderRequestFactory->createForLegacyCreateOrder($request);
 
         return new JsonResponse(
             $this->createOrderUseCase->execute($useCaseRequest)->toArray(),

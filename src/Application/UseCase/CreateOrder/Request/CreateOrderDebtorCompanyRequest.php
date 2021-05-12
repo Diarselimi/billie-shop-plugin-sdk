@@ -2,12 +2,12 @@
 
 namespace App\Application\UseCase\CreateOrder\Request;
 
-use Symfony\Component\Validator\Constraints as Assert;
 use OpenApi\Annotations as OA;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @OA\Schema(
- *     schema="CreateOrderDebtorCompanyRequest",
+ *     schema="LegacyCreateOrderDebtorCompanyRequest",
  *     title="Debtor Company",
  *     required={
  *          "merchant_customer_id", "name", "legal_form", "address_street",
@@ -328,6 +328,40 @@ class CreateOrderDebtorCompanyRequest
     public function setAddressCountry(?string $addressCountry): CreateOrderDebtorCompanyRequest
     {
         $this->addressCountry = $addressCountry ? strtoupper($addressCountry) : null;
+
+        return $this;
+    }
+
+    /**
+     * @return CreateOrderAddressRequest|null
+     */
+    public function getAddress(): ?CreateOrderAddressRequest
+    {
+        if ($this->addressCity === null) {
+            return null;
+        }
+
+        return (new CreateOrderAddressRequest())
+            ->setStreet($this->addressStreet)
+            ->setHouseNumber($this->addressHouseNumber)
+            ->setCity($this->addressCity)
+            ->setPostalCode($this->addressPostalCode)
+            ->setCountry($this->addressCountry)
+            ->setAddition($this->addressAddition);
+    }
+
+    public function setAddress(?CreateOrderAddressRequest $address): self
+    {
+        if ($address === null) {
+            return $this;
+        }
+
+        $this->addressStreet = $address->getStreet();
+        $this->addressHouseNumber = $address->getHouseNumber();
+        $this->addressCity = $address->getCity();
+        $this->addressPostalCode = $address->getPostalCode();
+        $this->addressCountry = $address->getCountry();
+        $this->addressAddition = $address->getAddition();
 
         return $this;
     }

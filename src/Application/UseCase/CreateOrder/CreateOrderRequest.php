@@ -4,110 +4,105 @@ declare(strict_types=1);
 
 namespace App\Application\UseCase\CreateOrder;
 
+use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderDebtorCompanyRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderDebtorPersonRequest;
-use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
 use App\Application\UseCase\ValidatedRequestInterface;
 use App\Application\Validator\Constraint as CustomConstrains;
-use Ozean12\Money\TaxedMoney\TaxedMoney;
-use App\DomainModel\ArrayableInterface;
-use App\DomainModel\OrderLineItem\OrderLineItemEntity;
 use OpenApi\Annotations as OA;
+use Ozean12\Money\TaxedMoney\TaxedMoney;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @OA\Schema(schema="CreateOrderRequest", title="Order Creation Request", required={"amount", "duration", "debtor_company", "debtor_person"},
+ * @OA\Schema(schema="CreateOrderRequest", title="Order Creation Request", required={"amount", "duration", "debtor_company", "debtor_person", "line_items"},
  *     properties={
  *          @OA\Property(property="amount", ref="#/components/schemas/AmountDTO"),
  *          @OA\Property(property="comment", ref="#/components/schemas/TinyText", nullable=true),
  *          @OA\Property(property="duration", ref="#/components/schemas/OrderDuration"),
- *          @OA\Property(property="order_id", ref="#/components/schemas/TinyText", description="Order external code", example="DE123456-1"),
- *          @OA\Property(property="delivery_address", ref="#/components/schemas/CreateOrderAddressRequest", nullable=true),
- *          @OA\Property(property="billing_address", ref="#/components/schemas/CreateOrderAddressRequest", nullable=true),
+ *          @OA\Property(property="external_code", ref="#/components/schemas/TinyText", description="Order external code", example="DE123456-1"),
+ *          @OA\Property(property="delivery_address", ref="#/components/schemas/Address", nullable=true),
+ *          @OA\Property(property="billing_address", ref="#/components/schemas/Address", nullable=true),
  *          @OA\Property(property="debtor_company", ref="#/components/schemas/CreateOrderDebtorCompanyRequest"),
  *          @OA\Property(property="debtor_person", ref="#/components/schemas/CreateOrderDebtorPersonRequest"),
  *          @OA\Property(
  *              property="line_items",
  *              type="array",
- *              nullable=true,
  *              @OA\Items(ref="#/components/schemas/CreateOrderLineItemRequest")
  *          )
  *     }
  * )
  */
-class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterface
+class CreateOrderRequest implements ValidatedRequestInterface, CreateOrderRequestInterface
 {
     /**
      * @Assert\NotBlank()
      * @Assert\Valid()
-     * @var TaxedMoney
      */
-    private $amount;
+    private ?TaxedMoney $amount;
 
     /**
      * @Assert\Length(max=255)
      */
-    private $comment;
+    private ?string $comment;
 
     /**
      * @Assert\NotBlank()
      * @Assert\Type(type="integer")
      * @CustomConstrains\OrderDuration()
      */
-    private $duration;
+    private ?int $duration;
 
     /**
      * @Assert\NotBlank(allowNull=true, message="This value should be null or non-blank string.")
      * @CustomConstrains\OrderExternalCode()
-     * @Assert\Type(type="string")
      * @Assert\Length(max=255)
      */
-    private $externalCode;
+    private ?string $externalCode;
 
     /**
      * @Assert\Valid()
      */
-    private $deliveryAddress;
+    private ?CreateOrderAddressRequest $deliveryAddress;
 
     /**
      * @Assert\Valid()
      */
-    private $debtorCompany;
+    private ?CreateOrderDebtorCompanyRequest $debtorCompany;
 
     /**
      * @Assert\Valid()
      */
-    private $debtorPerson;
+    private ?CreateOrderDebtorPersonRequest $debtorPerson;
 
     /**
      * @Assert\NotBlank()
-     * @Assert\Type(type="integer")
      */
-    private $merchantId;
+    private ?int $merchantId;
 
-    private $checkoutSessionId;
+    private ?string $checkoutSessionId;
 
-    private $creationSource;
+    private ?string $creationSource;
 
-    private $workflowName;
+    private ?string $workflowName;
 
     /**
      * @Assert\Valid()
      */
-    private $billingAddress;
+    private ?CreateOrderAddressRequest $billingAddress;
 
     /**
      * @Assert\Valid()
-     * @Assert\NotBlank(groups={"AuthorizeOrder"})
      */
-    private $lineItems;
+    private ?array
 
-    public function getAmount(): TaxedMoney
+ $lineItems;
+
+    public function getAmount(): ?TaxedMoney
     {
         return $this->amount;
     }
 
-    public function setAmount(TaxedMoney $amount): CreateOrderRequest
+    public function setAmount(?TaxedMoney $amount): CreateOrderRequest
     {
         $this->amount = $amount;
 
@@ -126,12 +121,12 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
         return $this;
     }
 
-    public function getDuration(): int
+    public function getDuration(): ?int
     {
         return $this->duration;
     }
 
-    public function setDuration(int $duration): CreateOrderRequest
+    public function setDuration(?int $duration): CreateOrderRequest
     {
         $this->duration = $duration;
 
@@ -143,7 +138,7 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
         return $this->externalCode;
     }
 
-    public function setExternalCode($externalCode): CreateOrderRequest
+    public function setExternalCode(?string $externalCode): CreateOrderRequest
     {
         $this->externalCode = $externalCode;
 
@@ -162,72 +157,72 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
         return $this;
     }
 
-    public function getDebtorPerson(): CreateOrderDebtorPersonRequest
-    {
-        return $this->debtorPerson;
-    }
-
-    public function setDebtorPerson(CreateOrderDebtorPersonRequest $debtorPerson): CreateOrderRequest
-    {
-        $this->debtorPerson = $debtorPerson;
-
-        return $this;
-    }
-
-    public function getDebtorCompany(): CreateOrderDebtorCompanyRequest
+    public function getDebtorCompany(): ?CreateOrderDebtorCompanyRequest
     {
         return $this->debtorCompany;
     }
 
-    public function setDebtorCompany(CreateOrderDebtorCompanyRequest $debtorCompany): CreateOrderRequest
+    public function setDebtorCompany(?CreateOrderDebtorCompanyRequest $debtorCompany): CreateOrderRequest
     {
         $this->debtorCompany = $debtorCompany;
 
         return $this;
     }
 
-    public function getMerchantId(): int
+    public function getDebtorPerson(): ?CreateOrderDebtorPersonRequest
+    {
+        return $this->debtorPerson;
+    }
+
+    public function setDebtorPerson(?CreateOrderDebtorPersonRequest $debtorPerson): CreateOrderRequest
+    {
+        $this->debtorPerson = $debtorPerson;
+
+        return $this;
+    }
+
+    public function getMerchantId(): ?int
     {
         return $this->merchantId;
     }
 
-    public function setMerchantId(int $merchantId): CreateOrderRequest
+    public function setMerchantId(?int $merchantId): CreateOrderRequest
     {
         $this->merchantId = $merchantId;
 
         return $this;
     }
 
-    public function getCheckoutSessionId(): ?int
+    public function getCheckoutSessionId(): ?string
     {
         return $this->checkoutSessionId;
     }
 
-    public function setCheckoutSessionId(?int $checkoutSessionId): CreateOrderRequest
+    public function setCheckoutSessionId(?string $checkoutSessionId): CreateOrderRequest
     {
         $this->checkoutSessionId = $checkoutSessionId;
 
         return $this;
     }
 
-    public function getCreationSource(): string
+    public function getCreationSource(): ?string
     {
         return $this->creationSource;
     }
 
-    public function setCreationSource(string $creationSource): CreateOrderRequest
+    public function setCreationSource(?string $creationSource): CreateOrderRequest
     {
         $this->creationSource = $creationSource;
 
         return $this;
     }
 
-    public function getWorkflowName(): string
+    public function getWorkflowName(): ?string
     {
         return $this->workflowName;
     }
 
-    public function setWorkflowName(string $workflowName): CreateOrderRequest
+    public function setWorkflowName(?string $workflowName): CreateOrderRequest
     {
         $this->workflowName = $workflowName;
 
@@ -246,15 +241,12 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
         return $this;
     }
 
-    /**
-     * @return OrderLineItemEntity[]
-     */
-    public function getLineItems(): array
+    public function getLineItems(): ?array
     {
         return $this->lineItems;
     }
 
-    public function setLineItems(array $lineItems): CreateOrderRequest
+    public function setLineItems(?array $lineItems): CreateOrderRequest
     {
         $this->lineItems = $lineItems;
 
@@ -270,11 +262,7 @@ class CreateOrderRequest implements ValidatedRequestInterface, ArrayableInterfac
             'registration_court' => $this->getDebtorCompany()->getRegistrationCourt(),
             'registration_number' => $this->getDebtorCompany()->getRegistrationNumber(),
             'legal_form' => $this->getDebtorCompany()->getLegalForm(),
-            'address_city' => $this->getDebtorCompany()->getAddressCity(),
-            'address_postal_code' => $this->getDebtorCompany()->getAddressPostalCode(),
-            'address_street' => $this->getDebtorCompany()->getAddressStreet(),
-            'address_house_number' => $this->getDebtorCompany()->getAddressHouseNumber(),
-            'address_house_country' => $this->getDebtorCompany()->getAddressCountry(),
+            'address' => $this->getDebtorCompany()->getAddress()->toArray(),
         ];
     }
 }

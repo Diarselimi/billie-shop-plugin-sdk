@@ -90,7 +90,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateOrderRequest'
+              $ref: '#/components/schemas/LegacyCreateOrderRequest'
       responses:
         '200':
           description: 'Order created with ''authorized'' state, but a merchant confirmation is needed.'
@@ -294,7 +294,7 @@ components:
         invoice_number:
           $ref: '#/components/schemas/TinyText'
       type: object
-    CreateOrderRequest:
+    LegacyCreateOrderRequest:
       title: 'Order Creation Request'
       required:
         - amount
@@ -320,7 +320,7 @@ components:
           nullable: true
           $ref: '#/components/schemas/CreateOrderAddressRequest'
         debtor_company:
-          $ref: '#/components/schemas/CreateOrderDebtorCompanyRequest'
+          $ref: '#/components/schemas/LegacyCreateOrderDebtorCompanyRequest'
         debtor_person:
           $ref: '#/components/schemas/CreateOrderDebtorPersonRequest'
         line_items:
@@ -355,7 +355,7 @@ components:
         country:
           $ref: '#/components/schemas/CountryCode'
       type: object
-    CreateOrderDebtorCompanyRequest:
+    LegacyCreateOrderDebtorCompanyRequest:
       title: 'Debtor Company'
       required:
         - merchant_customer_id
@@ -637,10 +637,8 @@ components:
       properties:
         iban:
           description: 'Virtual IBAN provided by Billie'
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         bic:
-          nullable: true
           $ref: '#/components/schemas/TinyText'
       type: object
     Debtor:
@@ -654,6 +652,7 @@ components:
         billing_address:
           $ref: '#/components/schemas/Address'
         bank_account:
+          nullable: true
           $ref: '#/components/schemas/BankAccount'
         external_data:
           $ref: '#/components/schemas/DebtorExternalData'
@@ -663,11 +662,9 @@ components:
       properties:
         merchant_customer_id:
           example: C-10123456789
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         name:
           example: 'Billie G.m.b.H.'
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         industry_sector:
           nullable: true
@@ -707,7 +704,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/OrderInvoiceResponse'
-          nullable: true
+          nullable: false
       type: object
     TaxedMoney:
       title: 'Amount with split values for net, gross and tax.'
