@@ -7,6 +7,7 @@ use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsFactory;
 use App\DomainModel\MerchantRiskCheckSettings\MerchantRiskCheckSettingsRepositoryInterface;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorScoreAvailableCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DeliveryAddressCheck;
+use App\DomainModel\OrderRiskCheck\Checker\LineItemsCheck;
 use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class MerchantRiskCheckSettingsRepository extends AbstractPdoRepository implements MerchantRiskCheckSettingsRepositoryInterface
@@ -16,6 +17,7 @@ class MerchantRiskCheckSettingsRepository extends AbstractPdoRepository implemen
     private const DISABLED_BY_DEFAULT_RISK_CHECKS = [
         DeliveryAddressCheck::NAME,
         DebtorScoreAvailableCheck::NAME,
+        LineItemsCheck::NAME,
     ];
 
     private $factory;

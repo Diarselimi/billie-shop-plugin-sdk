@@ -8,6 +8,9 @@ use App\DomainModel\PublicDomain\PublicDomainEmailRepositoryInterface;
 use App\Helper\String\StringSearch;
 use App\Infrastructure\Repository\FraudRuleRepository;
 
+/**
+ * @deprecated
+ */
 class LineItemsCheck implements CheckInterface
 {
     public const NAME = 'line_items';
