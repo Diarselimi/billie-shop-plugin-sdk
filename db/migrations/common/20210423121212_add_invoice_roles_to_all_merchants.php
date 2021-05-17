@@ -11,19 +11,17 @@ class AddInvoiceRolesToAllMerchants extends TransactionalMigration
 
     public function migrate()
     {
-        $role = MerchantUserPermissions::UPDATE_INVOICES;
-        $this->buildAppendRolePermissionSql($role, [
+        $this->execute($this->buildAppendRolePermissionSql(MerchantUserPermissions::UPDATE_INVOICES, [
             MerchantUserDefaultRoles::ROLE_ADMIN['name'],
             MerchantUserDefaultRoles::ROLE_BILLIE_ADMIN['name'],
             MerchantUserDefaultRoles::ROLE_SUPPORT['name'],
-        ]);
+        ]));
 
-        $role = MerchantUserPermissions::VIEW_INVOICES;
-        $this->buildAppendRolePermissionSql($role, [
+        $this->execute($this->buildAppendRolePermissionSql(MerchantUserPermissions::VIEW_INVOICES, [
             MerchantUserDefaultRoles::ROLE_ADMIN['name'],
             MerchantUserDefaultRoles::ROLE_BILLIE_ADMIN['name'],
             MerchantUserDefaultRoles::ROLE_SUPPORT['name'],
             MerchantUserDefaultRoles::ROLE_VIEW_ONLY['name'],
-        ]);
+        ]));
     }
 }

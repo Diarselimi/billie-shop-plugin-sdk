@@ -11,11 +11,10 @@ class AddCancelInvoiceRoleToAllMerchants extends TransactionalMigration
 
     public function migrate()
     {
-        $role = MerchantUserPermissions::CANCEL_INVOICES;
-        $this->buildAppendRolePermissionSql($role, [
+        $this->execute($this->buildAppendRolePermissionSql(MerchantUserPermissions::CANCEL_INVOICES, [
             MerchantUserDefaultRoles::ROLE_ADMIN['name'],
             MerchantUserDefaultRoles::ROLE_BILLIE_ADMIN['name'],
             MerchantUserDefaultRoles::ROLE_SUPPORT['name'],
-        ]);
+        ]));
     }
 }
