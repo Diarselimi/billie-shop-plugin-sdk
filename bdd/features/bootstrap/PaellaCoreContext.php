@@ -262,7 +262,7 @@ class PaellaCoreContext extends MinkContext
         $person = (new PersonEntity())
             ->setFirstName('test')
             ->setLastName('test')
-            ->setEmail('test')
+            ->setEmail('test@ozean12.com')
             ->setPhoneNumber('test')
             ->setGender('t');
         $this->getPersonRepository()->insert($person);

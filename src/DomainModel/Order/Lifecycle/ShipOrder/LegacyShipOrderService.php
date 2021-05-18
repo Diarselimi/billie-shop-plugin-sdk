@@ -3,12 +3,14 @@
 namespace App\DomainModel\Order\Lifecycle\ShipOrder;
 
 use App\DomainModel\Invoice\Invoice;
+use App\DomainModel\Order\Event\OrderShippedEvent;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Payment\OrderPaymentDetailsDTO;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Workflow\Registry;
 
 class LegacyShipOrderService implements ShipOrderInterface, LoggingInterface
@@ -19,12 +21,16 @@ class LegacyShipOrderService implements ShipOrderInterface, LoggingInterface
 
     private OrderRepositoryInterface $orderRepository;
 
+    private EventDispatcherInterface $eventDispatcher;
+
     public function __construct(
         Registry $workflowRegistry,
-        OrderRepositoryInterface $orderRepository
+        OrderRepositoryInterface $orderRepository,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->workflowRegistry = $workflowRegistry;
         $this->orderRepository = $orderRepository;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function ship(OrderContainer $orderContainer, Invoice $invoice): void
@@ -52,12 +58,12 @@ class LegacyShipOrderService implements ShipOrderInterface, LoggingInterface
             ->setOutstandingAmountInvoiceCancellation(0)
             ->setOutstandingAmountMerchantPayment(0)
             ->setFeeRate($invoice->getFeeRate()->toFloat())
-            ->setFeeAmount($invoice->getFeeAmount()->getGross()->toFloat())
-        ;
+            ->setFeeAmount($invoice->getFeeAmount()->getGross()->toFloat());
 
         $orderContainer->setPaymentDetails($orderPaymentDetails);
 
         $this->logInfo('Order shipped with {name} workflow', [LoggingInterface::KEY_NAME => $workflow->getName()]);
+        $this->eventDispatcher->dispatch(new OrderShippedEvent($orderContainer, $invoice));
     }
 
     private function isPartialShipment(OrderContainer $orderContainer, Invoice $invoice): bool

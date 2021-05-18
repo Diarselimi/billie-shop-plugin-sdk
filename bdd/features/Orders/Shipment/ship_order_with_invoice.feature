@@ -14,6 +14,16 @@ Feature:
     And a merchant user exists with permission SHIP_ORDERS
     And I get from Oauth service a valid user token
     And I add "Authorization" header equal to "Bearer someToken"
+    And I get from OAuth service "/resource-tokens" endpoint response with status 200 and body:
+    """
+    {
+      "company_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
+      "resource_type": "buyer_portal_ap",
+      "created_at": "2021-05-06 13:00:00",
+      "token": "sdg340vpl29kx",
+      "email": "test@ozean12.com"
+    }
+    """
 
   Scenario: Successful invoice upload and order shipment
     Given I have a created order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
@@ -134,6 +144,22 @@ Feature:
     }
     """
     And the order "CO123" has a payment id
+    And queue should contain message with routing key buyer_portal.buyer_portal_invoice_notification_requested with below data:
+    """
+    {
+      "user": {
+        "firstName":"test",
+        "lastName":"test",
+        "email":"test@ozean12.com",
+        "gender":"t"
+      },
+      "invoiceUuid": "@string@",
+      "invoiceAmount": "100000",
+      "creditorName": "Behat Merchant",
+      "debtorName":"Test User Company",
+      "token":"sdg340vpl29kx"
+    }
+    """
 
   Scenario: Ship order with invoice with amount (partial activation)
     Given I have orders with the following data

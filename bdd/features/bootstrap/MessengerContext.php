@@ -2,16 +2,16 @@
 
 namespace App\Tests\Functional\Context;
 
+use App\Amqp\Handler\CompanyInformationChangeRequestDecisionIssuedHandler;
+use App\Amqp\Handler\IdentityVerificationSucceededHandler;
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
 use Coduo\PHPMatcher\PHPMatcher;
 use Google\Protobuf\Internal\Message;
 use Ozean12\AmqpPackBundle\Mapping\AmqpMapperInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
-use App\Amqp\Handler\CompanyInformationChangeRequestDecisionIssuedHandler;
-use App\Amqp\Handler\IdentityVerificationSucceededHandler;
 use Ozean12\Transfer\Message\CompanyInformationChangeRequest\CompanyInformationChangeRequestDecisionIssued;
 use Ozean12\Transfer\Message\Identity\IdentityVerificationSucceeded;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Webmozart\Assert\Assert;
 
@@ -78,7 +78,26 @@ class MessengerContext implements Context
             }
         );
 
-        Assert::greaterThan($dispatchedMessages, 0, 'There is no dispatched message with name '.$routingKey);
+        Assert::greaterThan($dispatchedMessages, 0, 'There is no dispatched message with name ' . $routingKey);
+    }
+
+    /**
+     * @return Message[]
+     */
+    private function getQueuedMessages(?string $routingKey = null): array
+    {
+        $dispatchedMessages = $this->traceableMessageBus->getDispatchedMessages();
+
+        if ($routingKey !== null) {
+            $dispatchedMessages = array_filter(
+                $dispatchedMessages,
+                function (array $messageContext) use ($routingKey) {
+                    return $routingKey === $this->amqpMapper->mapToKey(get_class($messageContext['message']));
+                }
+            );
+        }
+
+        return $dispatchedMessages;
     }
 
     /**
@@ -86,16 +105,9 @@ class MessengerContext implements Context
      */
     public function queueDispatchedMessagesContains(string $routingKey, PyStringNode $string): void
     {
-        $dispatchedMessages = $this->traceableMessageBus->getDispatchedMessages();
+        $dispatchedMessages = $this->getQueuedMessages($routingKey);
 
-        $dispatchedMessages = array_filter(
-            $dispatchedMessages,
-            function (array $messageContext) use ($routingKey) {
-                return $routingKey === $this->amqpMapper->mapToKey(get_class($messageContext['message']));
-            }
-        );
-
-        Assert::greaterThan(count($dispatchedMessages), 0, 'There is no dispatched message with name '.$routingKey);
+        Assert::greaterThan(count($dispatchedMessages), 0, 'There is no dispatched message with name ' . $routingKey);
 
         $className = $this->amqpMapper->mapToClassName($routingKey);
 
@@ -107,9 +119,11 @@ class MessengerContext implements Context
         $atLeastOneMatched = false;
         $matcher = new PHPMatcher();
         foreach ($dispatchedMessages as $dispatchedMessage) {
+            /** @var Message $dispatchedMessage */
             $dispatchedMessage = $dispatchedMessage['message'];
+
             if (!$matcher->match(
-                (string) $dispatchedMessage->serializeToJsonString(),
+                $dispatchedMessage->serializeToJsonString(),
                 $expectedMessage->serializeToJsonString()
             )) {
                 $error = (string) $matcher->error();
@@ -120,6 +134,22 @@ class MessengerContext implements Context
 
         if (null !== $error && !$atLeastOneMatched) {
             throw new \Exception($error);
+        }
+    }
+
+    /**
+     * @Then print queued messages
+     */
+    public function printQueuedMessages(): void
+    {
+        $messages = $this->getQueuedMessages();
+        foreach ($messages as $message) {
+            /** @var Message $dispatchedMessage */
+            $dispatchedMessage = $message['message'];
+            $routingKey = $this->amqpMapper->mapToKey(get_class($dispatchedMessage));
+            print_r(
+                ['routing_key' => $routingKey, 'payload' => $dispatchedMessage->serializeToJsonString()]
+            );
         }
     }
 }

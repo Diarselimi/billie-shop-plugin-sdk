@@ -144,7 +144,7 @@ class OAuthServiceContext implements Context
     public function iGetFromOAuthServiceEndpointResponseWithStatusAndBody($url, $statusCode, PyStringNode $response)
     {
         $this->mockRequest($url, new ResponseStack(
-            new MockResponse($response, [], (int) $statusCode)
+            new MockResponse($response, ['content-type' => 'application/json'], (int) $statusCode)
         ));
     }
 

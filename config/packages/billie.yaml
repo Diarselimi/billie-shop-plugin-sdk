@@ -31,6 +31,7 @@ ozean12_amqp_pack:
       delay: 5000
     merchant_user_invitation.merchant_user_invitation_created: Ozean12\Transfer\Message\MerchantUserInvitation\MerchantUserInvitationCreated
     merchant_user_invitation.merchant_user_registered: Ozean12\Transfer\Message\MerchantUserInvitation\MerchantUserRegistered
+    buyer_portal.buyer_portal_invoice_notification_requested: Ozean12\Transfer\Message\BuyerPortal\BuyerPortalInvoiceNotificationRequested
   subscribe:
     identity.identity_verification_succeeded: Ozean12\Transfer\Message\Identity\IdentityVerificationSucceeded
     order.order_dunning_step_changed: Ozean12\Transfer\Message\Order\OrderDunningStepChanged

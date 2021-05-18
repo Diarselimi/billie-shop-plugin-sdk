@@ -24,10 +24,11 @@
         "league/flysystem-aws-s3-v3": "^1.0",
         "league/flysystem-bundle": "^1.5",
         "ozean12/amqp-pack": "^1.1",
-        "ozean12/amqp-transfers": "^0.4.15",
+        "ozean12/amqp-transfers": "^0.4",
         "ozean12/company-strict-match-bundle": "^1.0",
         "ozean12/graphql-repository-client": "^1.0",
         "ozean12/money": "^3.0",
+        "ozean12/smaug-client": "^1.0.0",
         "ramsey/uuid": "^3.9",
         "robmorgan/phinx": "^0.12.1",
         "sensio/framework-extra-bundle": "^5.5",
@@ -125,6 +126,10 @@
         "ozean12-pre-commit-hooks": {
             "type": "vcs",
             "url": "https://github.com/ozean12/php-pre-commit-hooks"
+        },
+        "ozean12-smaug-client": {
+            "type": "vcs",
+            "url": "https://github.com/ozean12/smaug-client-php"
         }
     },
     "scripts": {
