@@ -6,6 +6,7 @@ namespace App\Application\UseCase\UpdateOrderWithInvoice;
 
 use App\Application\Exception\OrderBeingCollectedException;
 use App\Application\Exception\OrderNotFoundException;
+use App\Application\UseCase\LegacyUpdateOrder\LegacyUpdateOrderRequest;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
@@ -13,7 +14,7 @@ use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\SalesforceInterface;
 use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentCreator;
-use App\DomainModel\OrderUpdateWithInvoice\UpdateOrderWithInvoicePersistenceService;
+use App\DomainModel\OrderUpdate\LegacyUpdateOrderService;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
@@ -23,22 +24,22 @@ class UpdateOrderWithInvoiceUseCase implements LoggingInterface, ValidatedUseCas
 
     private OrderContainerFactory $orderContainerFactory;
 
-    private UpdateOrderWithInvoicePersistenceService $updateOrderWithInvoicePersistenceService;
-
     private InvoiceDocumentCreator $invoiceDocumentCreator;
 
     private SalesforceInterface $salesforce;
 
+    private LegacyUpdateOrderService $legacyUpdateOrderService;
+
     public function __construct(
         OrderContainerFactory $orderContainerFactory,
-        UpdateOrderWithInvoicePersistenceService $updateOrderWithInvoicePersistenceService,
         InvoiceDocumentCreator $orderinvoiceDocumentCreator,
-        SalesforceInterface $salesforce
+        SalesforceInterface $salesforce,
+        LegacyUpdateOrderService $legacyUpdateOrderService
     ) {
         $this->orderContainerFactory = $orderContainerFactory;
-        $this->updateOrderWithInvoicePersistenceService = $updateOrderWithInvoicePersistenceService;
         $this->invoiceDocumentCreator = $orderinvoiceDocumentCreator;
         $this->salesforce = $salesforce;
+        $this->legacyUpdateOrderService = $legacyUpdateOrderService;
     }
 
     public function execute(UpdateOrderWithInvoiceRequest $request): void
@@ -68,10 +69,12 @@ class UpdateOrderWithInvoiceUseCase implements LoggingInterface, ValidatedUseCas
             throw new OrderBeingCollectedException();
         }
 
-        $changes = $this->updateOrderWithInvoicePersistenceService->update(
-            $orderContainer,
-            $request
-        );
+        $legacyUpdateOrderRequest = (new LegacyUpdateOrderRequest($request->getOrderId(), $request->getMerchantId()))
+            ->setAmount($request->getAmount())
+            ->setInvoiceNumber($request->getInvoiceNumber())
+            ->setInvoiceUrl($order->getInvoiceUrl());
+        $this->validator->validate($legacyUpdateOrderRequest);
+        $changeSet = $this->legacyUpdateOrderService->update($orderContainer, $legacyUpdateOrderRequest);
 
         if ($request->getInvoiceFile() !== null && $orderContainer->getOrder()->wasShipped()) {
             $invoice = $orderContainer->getInvoices()->getLastInvoice();
@@ -86,7 +89,7 @@ class UpdateOrderWithInvoiceUseCase implements LoggingInterface, ValidatedUseCas
 
         $this->logInfo('Order updated, state {state}.', [
             LoggingInterface::KEY_NAME => $order->getState(),
-            LoggingInterface::KEY_NUMBER => (int) $changes->getAmount() !== null,
+            LoggingInterface::KEY_NUMBER => (int) $changeSet->getAmount() !== null,
         ]);
     }
 

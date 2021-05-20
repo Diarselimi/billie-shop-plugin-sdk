@@ -143,6 +143,12 @@ class MessengerContext implements Context
     public function printQueuedMessages(): void
     {
         $messages = $this->getQueuedMessages();
+        if (empty($messages)) {
+            echo 'No messages were dispatched' . PHP_EOL;
+
+            return;
+        }
+
         foreach ($messages as $message) {
             /** @var Message $dispatchedMessage */
             $dispatchedMessage = $message['message'];

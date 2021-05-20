@@ -45,17 +45,31 @@ Feature: Update order with invoice to reduce the order amount
 		And the response should be empty
 		And the order with uuid "test-order-uuid" should have amounts 1000/900/100
 
-	Scenario: Order invoice file and invoice number can be updated after shipment
+  Scenario: Order invoice file and invoice number can be updated after shipment
 		Given I have a "shipped" order with amounts 1000/900/100, duration 30 and comment "test order"
 		And a merchant user exists with permission UPDATE_ORDERS
 		And I get from Oauth service a valid user token
 		And I add "Authorization" header equal to "Bearer someToken"
 		And I get from files service a good response
 		And Debtor release limit call succeeded
-		When I send a POST request to "/order-with-invoice/test-order-uuid" with parameters:
+    And I get from invoice-butler service good response
+    And the following invoice data exists:
+      | order_id | invoice_uuid                         |
+      | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
+    When I send a POST request to "/order-with-invoice/test-order-uuid" with parameters:
 			| key               | value                             |
-			| invoice_number    | 555                               |
+			| invoice_number    | new-invoice-number                |
 			| invoice_file      | @dummy-invoice.png                |
-			| amount												| {"gross":500,"net":400,"tax":100} |
+			| amount						| {"gross":500,"net":450,"tax":50}  |
 		Then the order "test-order-uuid" has invoice data
-  And the order with uuid "test-order-uuid" should have invoice number "555"
+    And the order with uuid "test-order-uuid" should have invoice number "new-invoice-number"
+    And queue should contain message with routing key credit_note.create_credit_note with below data:
+    """
+    {
+      "uuid":"@string@",
+      "invoiceUuid":"208cfe7d-046f-4162-b175-748942d6cff4",
+      "grossAmount":"44500",
+      "netAmount":"40000",
+      "externalCode":"new-invoice-number-CN"
+    }
+    """

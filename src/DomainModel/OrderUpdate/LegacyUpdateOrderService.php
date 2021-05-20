@@ -74,7 +74,7 @@ class LegacyUpdateOrderService implements LoggingInterface
         $this->bus = $bus;
     }
 
-    public function update(OrderContainer $orderContainer, LegacyUpdateOrderRequest $request): void
+    public function update(OrderContainer $orderContainer, LegacyUpdateOrderRequest $request): LegacyUpdateOrderRequest
     {
         $order = $orderContainer->getOrder();
         if ($order->isWorkflowV2()) {
@@ -89,6 +89,8 @@ class LegacyUpdateOrderService implements LoggingInterface
         }
 
         $this->doUpdate($orderContainer, $changeSet);
+
+        return $changeSet;
     }
 
     private function logChangeSet(OrderContainer $orderContainer, LegacyUpdateOrderRequest $changeSet): void
@@ -111,6 +113,8 @@ class LegacyUpdateOrderService implements LoggingInterface
 
     private function doUpdate(OrderContainer $orderContainer, LegacyUpdateOrderRequest $changeSet): void
     {
+        $invoice = $orderContainer->getInvoices()->getLastInvoice();
+
         if ($changeSet->isAmountChanged() || $changeSet->isDurationChanged()) {
             $changedAmount = $changeSet->getAmount();
             $duration = $changeSet->isDurationChanged()
@@ -118,6 +122,9 @@ class LegacyUpdateOrderService implements LoggingInterface
                 : $orderContainer->getOrderFinancialDetails()->getDuration();
 
             if (!$orderContainer->getInvoices()->isEmpty()) {
+                if ($invoice !== null && $changeSet->isInvoiceNumberChanged()) {
+                    $invoice->setExternalCode($changeSet->getInvoiceNumber());
+                }
                 $this->onAmountChangeDispatchCreditNoteMessage($changeSet, $orderContainer);
                 $changeSet->setAmount(null);
             }
@@ -139,10 +146,7 @@ class LegacyUpdateOrderService implements LoggingInterface
             $this->updateOrder($orderContainer, $changeSet);
         }
 
-        if (
-            $changeSet->isInvoiceUrlChanged()
-            || $changeSet->isInvoiceNumberChanged()
-        ) {
+        if ($changeSet->isInvoiceUrlChanged()) {
             $this->updateInvoiceDocument($orderContainer->getOrder());
         }
 
@@ -163,7 +167,6 @@ class LegacyUpdateOrderService implements LoggingInterface
             return;
         }
 
-        $invoice = $orderContainer->getInvoices()->getLastInvoice();
         if (($invoice !== null) && ($changeSet->isDurationChanged() || $changeSet->isInvoiceNumberChanged())) {
             if ($changeSet->isInvoiceNumberChanged()) {
                 $invoice->setExternalCode($changeSet->getInvoiceNumber());

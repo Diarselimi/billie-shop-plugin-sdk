@@ -313,6 +313,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         PaymentsServiceInterface $paymentsService
     ) {
         $changeSet = (new LegacyUpdateOrderRequest('order123', 1))->setExternalCode('foobar001');
+        $orderContainer->getInvoices()->willReturn(new InvoiceCollection([]));
 
         $updateOrderRequestValidator->getValidatedRequest(
             $orderContainer,
@@ -358,6 +359,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
             $orderContainer,
             $request
         )->shouldBeCalled()->willReturn($changeSet);
+        $orderContainer->getInvoices()->willReturn(new InvoiceCollection([]));
 
         // it does NOT unlock limits
         $updateOrderLimitsService->updateLimitAmounts($orderContainer, Argument::any())->shouldNotBeCalled();
@@ -458,6 +460,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
             $orderContainer,
             $request
         )->shouldBeCalled()->willReturn($changeSet);
+        $orderContainer->getInvoices()->willReturn(new InvoiceCollection([]));
 
         // it does NOT unlock limits
         $updateOrderLimitsService->updateLimitAmounts($orderContainer, Argument::any())->shouldNotBeCalled();
