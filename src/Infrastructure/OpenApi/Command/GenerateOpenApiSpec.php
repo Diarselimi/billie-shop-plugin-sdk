@@ -47,7 +47,7 @@ class GenerateOpenApiSpec extends Command
                 null,
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
                 'White list of groups to include in the generated spec.',
-                [AbstractApiDocsController::API_VERSION_1, 'private']
+                [AbstractApiDocsController::API_VERSION_1, 'private', AbstractApiDocsController::API_VERSION_2]
             )
             ->addOption(
                 'with-extra-config',
@@ -128,7 +128,7 @@ class GenerateOpenApiSpec extends Command
             new Processors\AugmentProperties(),
             new CustomProcessors\AddServers($groups),
             new CustomProcessors\AugmentMainInfo($data),
-            new CustomProcessors\AugmentDescriptions($this->fileReader),
+            new CustomProcessors\AugmentDescriptions($this->fileReader, $groups),
             new Processors\BuildPaths(),
             new Processors\InheritProperties(),
             new Processors\AugmentOperations(),

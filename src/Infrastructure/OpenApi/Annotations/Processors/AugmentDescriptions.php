@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\OpenApi\Annotations\Processors;
 
+use App\Http\Controller\ApiDocs\AbstractApiDocsController;
 use App\Infrastructure\OpenApi\RelativeFileReader;
 use Illuminate\Support\Str;
 use OpenApi\Analysis;
@@ -15,9 +16,20 @@ class AugmentDescriptions implements ProcessorInterface
 {
     private $fileReader;
 
-    public function __construct(RelativeFileReader $fileReader)
+    private bool $isV2Version = false;
+
+    private array
+
+ $filesExistingForV2 = [
+        'webhooks',
+    ];
+
+    public function __construct(RelativeFileReader $fileReader, array $groups = [])
     {
         $this->fileReader = $fileReader;
+        if (in_array(AbstractApiDocsController::API_VERSION_2, $groups, true)) {
+            $this->isV2Version = true;
+        }
     }
 
     public function __invoke(Analysis $analysis)
@@ -39,7 +51,11 @@ class AugmentDescriptions implements ProcessorInterface
 
     private function readMarkdown(string $folder, string $id): ?string
     {
-        $fileName = "docs/markdown/{$folder}/{$id}.md";
+        if ($this->isV2Version && in_array(strtolower($id), $this->filesExistingForV2, true)) {
+            $fileName = "docs/markdown/{$folder}/{$id}V2.md";
+        } else {
+            $fileName = "docs/markdown/{$folder}/{$id}.md";
+        }
 
         if (!$this->fileReader->exists($fileName)) {
             return null;
