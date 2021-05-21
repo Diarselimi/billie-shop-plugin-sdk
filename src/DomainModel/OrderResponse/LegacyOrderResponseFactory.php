@@ -188,7 +188,7 @@ class LegacyOrderResponseFactory
         $financialDetails = $orderContainer->getOrderFinancialDetails();
 
         $clonedInvoiceCollection = clone $orderContainer->getInvoices();
-        if ($orderContainer->getOrder()->isCanceled()) {
+        if ($orderContainer->getOrder()->isCanceled() && !$clonedInvoiceCollection->isEmpty()) {
             $clonedInvoiceCollection->getLastInvoice()->getCreditNotes()->pop();
         }
 
