@@ -4,6 +4,7 @@ namespace spec\App\Http\RequestTransformer\CreateOrder;
 
 use App\Application\UseCase\CreateOrder\Request\CreateOrderDebtorCompanyRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderDebtorPersonRequest;
+use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
 use App\Http\HttpConstantsInterface;
 use App\Http\RequestTransformer\AmountRequestFactory;
@@ -23,7 +24,8 @@ class CreateOrderRequestFactorySpec extends ObjectBehavior
         DebtorPersonRequestFactory $debtorPersonRequestFactory,
         AddressRequestFactory $addressRequestFactory,
         OrderLineItemsRequestFactory $lineItemsRequestFactory,
-        AmountRequestFactory $amountRequestFactory
+        AmountRequestFactory $amountRequestFactory,
+        MerchantSettingsRepositoryInterface $merchantSettingsRepository
     ): void {
         $this->beConstructedWith(...func_get_args());
     }

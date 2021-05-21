@@ -7,6 +7,7 @@ namespace App\Http\RequestTransformer\CreateOrder;
 use App\Application\UseCase\CreateOrder\CreateOrderRequest;
 use App\Application\UseCase\CreateOrder\LegacyCreateOrderRequest;
 use App\DomainModel\CheckoutSession\CheckoutSessionEntity;
+use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
 use App\Http\HttpConstantsInterface;
 use App\Http\RequestTransformer\AmountRequestFactory;
@@ -26,18 +27,22 @@ class CreateOrderRequestFactory
 
     private AmountRequestFactory $amountRequestFactory;
 
+    private MerchantSettingsRepositoryInterface $merchantSettingsRepository;
+
     public function __construct(
         DebtorRequestFactory $debtorRequestFactory,
         DebtorPersonRequestFactory $debtorPersonRequestFactory,
         AddressRequestFactory $addressRequestFactory,
         OrderLineItemsRequestFactory $lineItemsRequestFactory,
-        AmountRequestFactory $amountRequestFactory
+        AmountRequestFactory $amountRequestFactory,
+        MerchantSettingsRepositoryInterface $merchantSettingsRepository
     ) {
         $this->addressRequestFactory = $addressRequestFactory;
         $this->debtorRequestFactory = $debtorRequestFactory;
         $this->debtorPersonRequestFactory = $debtorPersonRequestFactory;
         $this->lineItemsRequestFactory = $lineItemsRequestFactory;
         $this->amountRequestFactory = $amountRequestFactory;
+        $this->merchantSettingsRepository = $merchantSettingsRepository;
     }
 
     public function createForLegacyCreateOrder(Request $request): LegacyCreateOrderRequest
@@ -83,7 +88,9 @@ class CreateOrderRequestFactory
                 ['merchant_customer_id' => $checkoutSessionEntity->getMerchantDebtorExternalId()]
             )
         );
+
         $request->attributes->set('checkout_session_id', $checkoutSessionEntity->getId());
+        $request->attributes->set('workflow_name', $this->getWorkflowName($checkoutSessionEntity->getMerchantId()));
 
         return $this->createForLegacyCreateOrder($request);
     }
@@ -118,5 +125,15 @@ class CreateOrderRequestFactory
         );
 
         return $useCaseRequest;
+    }
+
+    /**
+     * @TODO: a temporary way to allow v2 order creation from checkout widget
+     */
+    private function getWorkflowName(int $merchantId): string
+    {
+        return $this->merchantSettingsRepository->getOneByMerchant($merchantId)->getDebtorForgivenessThreshold() === 42.
+            ? OrderEntity::WORKFLOW_NAME_V2
+            : OrderEntity::WORKFLOW_NAME_V1;
     }
 }
