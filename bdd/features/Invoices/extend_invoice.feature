@@ -11,7 +11,6 @@ Feature: Extend invoice duration
       | 1| 30       | shipped | 1000  | 900 | 100 | 30       | test order | order_v2      |
     And I get from invoice-butler service an invoice that can be extended
     And I get from payments service modify ticket response
-    And I get from payments service get order detail response
     And Salesforce DCI API responded for the order UUID 'test-order-uuid' with no collections taking place
     And the following invoice data exists:
       | order_id | invoice_uuid                         |
@@ -30,9 +29,7 @@ Feature: Extend invoice duration
       "invoice": {
         "uuid": "208cfe7d-046f-4162-b175-748942d6cff4",
         "dueDate": "@string@",
-        "netFeeAmount": 840,
-        "vatOnFeeAmount": 159,
-        "feeRate": 100,
+        "feeRate": 2000,
         "invoiceReferences": {
           "external_code": "@string@"
         },

@@ -34,6 +34,32 @@ class InvoiceButlerServiceContext implements Context
     }
 
     /**
+     * @Given /^I get from invoice-butler service good response no CreditNotes$/
+     */
+    public function invoiceButlerNoCNApiRespondedWithSuccess()
+    {
+        $this->mockRequest(
+            '/invoices',
+            new ResponseStack(
+                new MockResponse(file_get_contents(__DIR__ . '/../resources/invoice_butler_good_response_no_CN.json'))
+            )
+        );
+    }
+
+    /**
+     * @Given /^I get from invoice-butler service empty response$/
+     */
+    public function invoiceButlerEmptyResponseApiRespondedWithSuccess()
+    {
+        $this->mockRequest(
+            '/invoices',
+            new ResponseStack(
+                new MockResponse('')
+            )
+        );
+    }
+
+    /**
      * @Given /^I get from invoice-butler service an invoice that can be extended$/
      */
     public function invoiceButlerApiRespondedWithExtendableInvoice()

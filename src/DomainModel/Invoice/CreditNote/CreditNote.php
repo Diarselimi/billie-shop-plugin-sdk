@@ -8,7 +8,7 @@ use App\DomainModel\ArrayableInterface;
 use App\Support\DateFormat;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
 
-final class CreditNote implements ArrayableInterface
+class CreditNote implements ArrayableInterface
 {
     public const EXTERNAL_CODE_SUFFIX = '-CN';
 

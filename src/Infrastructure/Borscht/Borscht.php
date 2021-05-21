@@ -8,8 +8,6 @@ use App\DomainModel\MerchantDebtor\RegisterDebtorDTO;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Payment\DebtorPaymentDetailsDTO;
 use App\DomainModel\Payment\DebtorPaymentRegistrationDTO;
-use App\DomainModel\Payment\OrderPaymentDetailsDTO;
-use App\DomainModel\Payment\OrderPaymentDetailsFactory;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Payment\PaymentsServiceRequestException;
 use App\DomainModel\Payment\RequestDTO\ConfirmRequestDTO;
@@ -32,12 +30,9 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
 
     private $client;
 
-    private $paymentDetailsFactory;
-
-    public function __construct(Client $borschtClient, OrderPaymentDetailsFactory $paymentDetailsFactory)
+    public function __construct(Client $borschtClient)
     {
         $this->client = $borschtClient;
-        $this->paymentDetailsFactory = $paymentDetailsFactory;
     }
 
     public function getDebtorPaymentDetails(string $debtorPaymentId): DebtorPaymentDetailsDTO
@@ -50,45 +45,7 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
             return (new DebtorPaymentDetailsDTO())
                 ->setBankAccountBic($decodedResponse['bic'])
                 ->setBankAccountIban($decodedResponse['iban'])
-                ->setOutstandingAmount($decodedResponse['outstanding_amount'])
-            ;
-        } catch (TransferException $exception) {
-            throw new PaymentsServiceRequestException($exception);
-        } catch (ClientResponseDecodeException $exception) {
-            throw new PaymentsServiceRequestException($exception, self::ERR_BODY_DECODE_MESSAGE);
-        }
-    }
-
-    public function getOrderPaymentDetails(string $orderPaymentId): OrderPaymentDetailsDTO
-    {
-        try {
-            $response = $this->client->get("order/{$orderPaymentId}.json");
-
-            $decodedResponse = $this->decodeResponse($response);
-
-            return $this->paymentDetailsFactory->createFromBorschtResponse($decodedResponse);
-        } catch (TransferException $exception) {
-            throw new PaymentsServiceRequestException($exception);
-        } catch (ClientResponseDecodeException $exception) {
-            throw new PaymentsServiceRequestException($exception, self::ERR_BODY_DECODE_MESSAGE);
-        }
-    }
-
-    /**
-     * @param  string[]                 $orderPaymentIds
-     * @return OrderPaymentDetailsDTO[]
-     * @throws \Exception
-     */
-    public function getBatchOrderPaymentDetails(array $orderPaymentIds): array
-    {
-        $query = ['id' => $orderPaymentIds];
-
-        try {
-            $response = $this->client->get('orders.json', ['query' => $query]);
-
-            $decodedResponse = $this->decodeResponse($response);
-
-            return $this->paymentDetailsFactory->createFromBorschtArrayResponse($decodedResponse);
+                ->setOutstandingAmount($decodedResponse['outstanding_amount']);
         } catch (TransferException $exception) {
             throw new PaymentsServiceRequestException($exception);
         } catch (ClientResponseDecodeException $exception) {
@@ -118,9 +75,9 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
     {
         $this->logInfo('Modify borscht ticket', [
             LoggingInterface::KEY_SOBAKA => [
-                    'request' => $requestDTO->toArray(),
-                    'timeout' => self::EXTENDED_REQUEST_TIMEOUT,
-                ],
+                'request' => $requestDTO->toArray(),
+                'timeout' => self::EXTENDED_REQUEST_TIMEOUT,
+            ],
         ]);
 
         try {

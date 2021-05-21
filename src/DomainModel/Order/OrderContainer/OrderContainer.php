@@ -25,7 +25,6 @@ use App\DomainModel\OrderRiskCheck\Checker\DebtorScoreAvailableCheck;
 use App\DomainModel\OrderRiskCheck\Checker\LimitCheck;
 use App\DomainModel\OrderRiskCheck\CheckResultCollection;
 use App\DomainModel\Payment\DebtorPaymentDetailsDTO;
-use App\DomainModel\Payment\OrderPaymentDetailsDTO;
 use App\DomainModel\Person\PersonEntity;
 
 class OrderContainer
@@ -118,43 +117,37 @@ class OrderContainer
     public function getOrderFinancialDetails(): OrderFinancialDetailsEntity
     {
         return $this->orderFinancialDetails
-            ?: $this->orderFinancialDetails = $this->relationLoader->loadOrderFinancialDetails($this)
-        ;
+            ?: $this->orderFinancialDetails = $this->relationLoader->loadOrderFinancialDetails($this);
     }
 
     public function getMerchantDebtor(): MerchantDebtorEntity
     {
         return $this->merchantDebtor
-            ?: $this->merchantDebtor = $this->relationLoader->loadMerchantDebtor($this)
-        ;
+            ?: $this->merchantDebtor = $this->relationLoader->loadMerchantDebtor($this);
     }
 
     public function getDebtorPerson(): PersonEntity
     {
         return $this->debtorPerson
-            ?: $this->debtorPerson = $this->relationLoader->loadDebtorPerson($this)
-        ;
+            ?: $this->debtorPerson = $this->relationLoader->loadDebtorPerson($this);
     }
 
     public function getDebtorExternalData(): DebtorExternalDataEntity
     {
         return $this->debtorExternalData
-            ?: $this->debtorExternalData = $this->relationLoader->loadDebtorExternalData($this)
-        ;
+            ?: $this->debtorExternalData = $this->relationLoader->loadDebtorExternalData($this);
     }
 
     public function getDebtorExternalDataAddress(): AddressEntity
     {
         return $this->debtorExternalDataAddress
-            ?: $this->debtorExternalDataAddress = $this->relationLoader->loadDebtorExternalDataAddress($this)
-        ;
+            ?: $this->debtorExternalDataAddress = $this->relationLoader->loadDebtorExternalDataAddress($this);
     }
 
     public function getDeliveryAddress(): AddressEntity
     {
         return $this->deliveryAddress
-            ?: $this->deliveryAddress = $this->relationLoader->loadDeliveryAddress($this)
-        ;
+            ?: $this->deliveryAddress = $this->relationLoader->loadDeliveryAddress($this);
     }
 
     public function getBillingAddress(): AddressEntity
@@ -186,15 +179,13 @@ class OrderContainer
     public function getMerchant(): MerchantEntity
     {
         return $this->merchant
-            ?: $this->merchant = $this->relationLoader->loadMerchant($this)
-        ;
+            ?: $this->merchant = $this->relationLoader->loadMerchant($this);
     }
 
     public function getMerchantSettings(): MerchantSettingsEntity
     {
         return $this->merchantSettings
-            ?: $this->merchantSettings = $this->relationLoader->loadMerchantSettings($this)
-        ;
+            ?: $this->merchantSettings = $this->relationLoader->loadMerchantSettings($this);
     }
 
     public function getDebtorCompany(): Company
@@ -282,8 +273,7 @@ class OrderContainer
     public function getDunningStatus(): ?string
     {
         return $this->dunningStatus
-            ?: $this->dunningStatus = $this->relationLoader->loadOrderDunningStatus($this)
-            ;
+            ?: $this->dunningStatus = $this->relationLoader->loadOrderDunningStatus($this);
     }
 
     public function setDunningStatus(?string $dunningStatus): OrderContainer
@@ -304,18 +294,6 @@ class OrderContainer
     public function setLineItems(array $lineItems): OrderContainer
     {
         $this->lineItems = $lineItems;
-
-        return $this;
-    }
-
-    public function getPaymentDetails(): OrderPaymentDetailsDTO
-    {
-        return $this->paymentDetails ?: $this->paymentDetails = $this->relationLoader->loadPaymentDetails($this);
-    }
-
-    public function setPaymentDetails(OrderPaymentDetailsDTO $paymentDetails): OrderContainer
-    {
-        $this->paymentDetails = $paymentDetails;
 
         return $this;
     }

@@ -54,11 +54,14 @@ Feature:
       | external_id | state    | gross | net | tax | duration | comment    | payment_uuid                         |
       | XF43Y       | declined | 1000  | 900 | 100 | 30       | test order | 6d6b4222-be8c-11e9-9cb5-2a2ae2dbcce4 |
     And The following risk check results exist for order "XF43Y":
-    | check_name | is_passed |
-    | fraud_score| 0         |
-    | limit      | 0         |
+      | check_name  | is_passed |
+      | fraud_score | 0         |
+      | limit       | 0         |
     And GraphQL will respond to getMerchantDebtorDetails query
-    And I get from payments service get order details response
+    And I get from invoice-butler service good response no CreditNotes
+    And the following invoice data exists:
+      | order_id | invoice_uuid                         |
+      | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
     When I send a GET request to "/order/XF43Y"
     Then the response status code should be 200
     And the JSON response should be:
@@ -77,8 +80,6 @@ Feature:
         "unshipped_amount_net":900,
         "unshipped_amount_tax":100,
         "workflow_name":"order_v1",
-        "due_date":"2021-01-13",
-        "invoices":[],
         "debtor_company": {
             "name": "Test User Company",
             "address_house_number": "10",
@@ -91,15 +92,16 @@ Feature:
             "iban": null,
             "bic": null
         },
+        "invoices": [],
         "invoice": {
-            "invoice_number": null,
-            "payout_amount": 1000,
-            "outstanding_amount":1000,
-            "fee_amount": 10,
-            "fee_rate": 1,
-            "due_date": "1978-11-20",
+            "outstanding_amount": 500,
             "pending_merchant_payment_amount": 0,
-            "pending_cancellation_amount": 0
+            "fee_rate": 20,
+            "fee_amount": 123.33,
+            "pending_cancellation_amount": 0,
+            "invoice_number": "some_code",
+            "payout_amount": 123.33,
+            "due_date": "2019-06-19"
         },
         "debtor_external_data": {
             "name": "test",
@@ -135,12 +137,11 @@ Feature:
 
   Scenario: Successful late order retrieval
     Given I have orders with the following data
-      | external_id | state    | gross | net | tax | duration | comment    | payment_uuid                         |
-      | XF43Y       | late     | 1000  | 900 | 100 | 30       | test order | 6d6b4222-be8c-11e9-9cb5-2a2ae2dbcce4 |
-    And I get from payments service get order details response with first try fail
+      | external_id | state | gross | net | tax | duration | comment    | payment_uuid                         |
+      | XF43Y       | late  | 1000  | 900 | 100 | 30       | test order | 6d6b4222-be8c-11e9-9cb5-2a2ae2dbcce4 |
     And GraphQL will respond to getMerchantDebtorDetails query
     And I get from salesforce dunning status endpoint "Created" status for order "test-order-uuidXF43Y"
-    And I get from invoice-butler service good response
+    And I get from invoice-butler service good response no CreditNotes
     And the following invoice data exists:
       | order_id | invoice_uuid                         |
       | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
@@ -153,9 +154,9 @@ Feature:
        "state":"late",
        "reasons":null,
        "decline_reason":null,
-       "amount":945,
-       "amount_net":850,
-       "amount_tax":95,
+       "amount":1000,
+       "amount_net":900,
+       "amount_tax":100,
        "duration":30,
        "dunning_status":"active",
        "unshipped_amount":1000,
@@ -163,7 +164,7 @@ Feature:
        "unshipped_amount_tax":100,
        "workflow_name":"order_v1",
        "due_date":"2021-01-13",
-       "invoices":[{"uuid":"208cfe7d-046f-4162-b175-748942d6cff4","invoice_number":"some_code","payout_amount":123.33,"outstanding_amount":500,"amount":123.33,"amount_net":123.33,"amount_tax":0,"fee_amount":123.33,"fee_rate":20,"due_date":"2020-12-31","created_at":"2020-10-12","duration":30,"state":"new","pending_merchant_payment_amount":0,"pending_cancellation_amount":0}],
+       "invoices": [],
        "debtor_company":{
           "name":"Test User Company",
           "address_house_number":"10",
@@ -176,15 +177,15 @@ Feature:
           "iban":"DE1234",
           "bic":"BICISHERE"
        },
-       "invoice":{
-          "invoice_number":null,
-          "payout_amount":1000,
-          "outstanding_amount":1000,
-          "fee_amount":10,
-          "fee_rate":1,
-          "due_date":"1978-11-20",
-          "pending_merchant_payment_amount":0,
-          "pending_cancellation_amount":0
+       "invoice": {
+           "outstanding_amount": 500,
+           "pending_merchant_payment_amount": 0,
+           "fee_rate": 20,
+           "fee_amount": 123.33,
+           "pending_cancellation_amount": 0,
+           "invoice_number": "some_code",
+           "payout_amount": 123.33,
+           "due_date": "2019-06-19"
        },
        "debtor_external_data":{
           "merchant_customer_id":"ext_id",
@@ -221,7 +222,10 @@ Feature:
     Given I have orders with the following data
       | external_id | state    | gross | net | tax | duration | comment    | payment_uuid                         |
       | XF43Y       | complete | 1000  | 900 | 100 | 30       | test order | 6d6b4222-be8c-11e9-9cb5-2a2ae2dbcce4 |
-    And I get from payments service get order details response
+    And I get from invoice-butler service good response no CreditNotes
+    And the following invoice data exists:
+      | order_id | invoice_uuid                         |
+      | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
     And GraphQL will respond to getMerchantDebtorDetails query
     When I send a GET request to "/order/XF43Y"
     Then the response status code should be 200
@@ -243,7 +247,6 @@ Feature:
         "unshipped_amount_tax":100,
         "workflow_name":"order_v1",
         "due_date":"2021-01-13",
-        "invoices":[],
         "debtor_company": {
             "address_city": "Berlin",
             "address_country": "DE",
@@ -256,15 +259,16 @@ Feature:
             "iban": "DE1234",
             "bic": "BICISHERE"
         },
-        "invoice": {
-            "invoice_number": null,
-            "payout_amount": 1000,
-            "outstanding_amount": 1000,
-            "fee_amount": 10,
-            "fee_rate": 1,
-            "due_date": "1978-11-20",
-            "pending_merchant_payment_amount": 0,
-            "pending_cancellation_amount": 0
+        "invoices": [],
+         "invoice": {
+           "outstanding_amount": 500,
+           "pending_merchant_payment_amount": 0,
+           "fee_rate": 20,
+           "fee_amount": 123.33,
+           "pending_cancellation_amount": 0,
+           "invoice_number": "some_code",
+           "payout_amount": 123.33,
+           "due_date": "2019-06-19"
         },
         "debtor_external_data": {
             "merchant_customer_id": "ext_id",

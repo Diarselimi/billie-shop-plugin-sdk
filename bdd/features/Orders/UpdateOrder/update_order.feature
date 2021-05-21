@@ -40,6 +40,10 @@ Feature: APIS-1077
 
   Scenario Template: Success 1: Partial provided data is OK and update is successful on any non-final state
     Given I have a "<state>" order with amounts 1000/900/100, duration 30 and comment "test order"
+    And I get from invoice-butler service good response no CreditNotes
+    And the following invoice data exists:
+      | order_id | invoice_uuid                         |
+      | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
     And Salesforce DCI API responded for the order UUID "test-order-uuid" with no collections taking place
     And Debtor release limit call succeeded
     When I send a PATCH request to "/order/test-order-uuid" with body:
@@ -63,11 +67,15 @@ Feature: APIS-1077
       | paid_out |
       | late     |
       | waiting  |
-    And the order with uuid "test-order-uuid" should have amounts 500/400/100
+    And the order with uuid "test-order-uuid" should have amounts 1000/900/100
 
 
   Scenario Template: Success 2: Full provided data is OK and update is successful only when state is or was shipped
     Given I have a "<state>" order with amounts 1000/900/100, duration 30 and comment "test order"
+    And I get from invoice-butler service good response no CreditNotes
+    And the following invoice data exists:
+      | order_id | invoice_uuid                         |
+      | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
     And Salesforce DCI API responded for the order UUID "test-order-uuid" with no collections taking place
     When I send a PATCH request to "/order/test-order-uuid" with body:
     """
@@ -90,7 +98,17 @@ Feature: APIS-1077
       | shipped  |
       | paid_out |
       | late     |
-    And the order with uuid "test-order-uuid" should have amounts 500/400/100
+    And the order with uuid "test-order-uuid" should have amounts 1000/900/100
+    And queue should contain message with routing key credit_note.create_credit_note with below data:
+    """
+    {
+        "netAmount": "50000",
+        "uuid": "@string@",
+        "externalCode": "foobar_123-CN",
+        "invoiceUuid": "208cfe7d-046f-4162-b175-748942d6cff4",
+        "grossAmount": "50000"
+    }
+    """
 
   Scenario: Order does not exist
     When I send a PATCH request to "/order/abc123" with body:

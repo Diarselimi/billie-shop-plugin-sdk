@@ -7,7 +7,6 @@ use App\DomainModel\Order\Event\OrderShippedEvent;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\Payment\OrderPaymentDetailsDTO;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -50,17 +49,6 @@ class LegacyShipOrderService implements ShipOrderInterface, LoggingInterface
         if ($order->isWorkflowV1()) {
             $workflow->apply($order, OrderEntity::TRANSITION_SHIP);
         }
-
-        $orderGrossAmount = $orderContainer->getOrderFinancialDetails()->getAmountGross()->toFloat();
-        $orderPaymentDetails = (new OrderPaymentDetailsDTO())
-            ->setPayoutAmount($orderGrossAmount)
-            ->setOutstandingAmount($orderGrossAmount)
-            ->setOutstandingAmountInvoiceCancellation(0)
-            ->setOutstandingAmountMerchantPayment(0)
-            ->setFeeRate($invoice->getFeeRate()->toFloat())
-            ->setFeeAmount($invoice->getFeeAmount()->getGross()->toFloat());
-
-        $orderContainer->setPaymentDetails($orderPaymentDetails);
 
         $this->logInfo('Order shipped with {name} workflow', [LoggingInterface::KEY_NAME => $workflow->getName()]);
         $this->eventDispatcher->dispatch(new OrderShippedEvent($orderContainer, $invoice));

@@ -28,7 +28,6 @@ use App\DomainModel\OrderLineItem\OrderLineItemEntity;
 use App\DomainModel\OrderLineItem\OrderLineItemRepositoryInterface;
 use App\DomainModel\OrderRiskCheck\CheckResultCollection;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
-use App\DomainModel\Payment\OrderPaymentDetailsDTO;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonRepositoryInterface;
@@ -173,11 +172,6 @@ class OrderContainerRelationLoader
     public function loadOrderLineItems(OrderContainer $orderContainer): array
     {
         return $this->orderLineItemRepository->getByOrderId($orderContainer->getOrder()->getId());
-    }
-
-    public function loadPaymentDetails(OrderContainer $orderContainer): OrderPaymentDetailsDTO
-    {
-        return $this->paymentsService->getOrderPaymentDetails($orderContainer->getOrder()->getPaymentId());
     }
 
     public function loadDebtorDetails(OrderContainer $orderContainer): MerchantDebtorDetailsDTO

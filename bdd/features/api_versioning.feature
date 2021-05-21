@@ -5,8 +5,11 @@ Feature: API should be able to be accessed as different versions
     And I add "X-Test" header equal to 1
     And I add "X-Api-Key" header equal to test
     And I have a new order "XF43Y2" with amounts 1000/900/100, duration 30 and comment "test order"
+    And I get from invoice-butler service good response
+    And the following invoice data exists:
+      | order_id | invoice_uuid                         |
+      | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
     And GraphQL will respond to getMerchantDebtorDetails query
-    And I get from payments service get order details response
 
   Scenario: Can access non-prefixed public endpoints
     When I send a GET request to "/order/XF43Y2"

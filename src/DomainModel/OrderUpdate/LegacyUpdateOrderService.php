@@ -167,11 +167,10 @@ class LegacyUpdateOrderService implements LoggingInterface
             return;
         }
 
-        if (($invoice !== null) && ($changeSet->isDurationChanged() || $changeSet->isInvoiceNumberChanged())) {
+        if ($changeSet->isDurationChanged() || $changeSet->isInvoiceNumberChanged()) {
             if ($changeSet->isInvoiceNumberChanged()) {
                 $invoice->setExternalCode($changeSet->getInvoiceNumber());
             }
-
             $duration = $changeSet->getDuration() ?? $invoice->getDuration();
             $this->extendInvoiceService->extend($orderContainer, $invoice, $duration);
         }

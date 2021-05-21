@@ -28,8 +28,10 @@ Feature: Retrieve and search all orders of a merchant
       | external_id | state   | gross | net | tax | duration | comment        | payment_uuid |
       | XF123       | created | 1000  | 900 | 100 | 30       | "test comment" | 123456a      |
       | XF125       | created | 1000  | 900 | 100 | 30       | "test comment" | 123456b      |
-    And I get from payments service get orders details response
-    And I get from payments service get order details response
+    And I get from invoice-butler service good response no CreditNotes
+    And the following invoice data exists:
+      | order_id | invoice_uuid                         |
+      | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
     When I send a GET request to "/public/orders"
     Then the response status code should be 200
     Then the JSON response should be:
@@ -62,14 +64,14 @@ Feature: Retrieve and search all orders of a merchant
                     "address_city": "Berlin"
                 },
                 "invoice": {
-                    "invoice_number": null,
-                    "payout_amount": 1000,
-                    "outstanding_amount":1000,
-                    "fee_amount": 10,
-                    "fee_rate": 1,
-                    "due_date": "1978-11-20",
+                    "outstanding_amount": 500,
                     "pending_merchant_payment_amount": 0,
-                    "pending_cancellation_amount": 0
+                    "fee_rate": 20,
+                    "fee_amount": 123.33,
+                    "pending_cancellation_amount": 0,
+                    "invoice_number": "some_code",
+                    "payout_amount": 123.33,
+                    "due_date": "2019-06-19"
                 },
                 "bank_account": {
                     "bic": "BICISHERE",
@@ -130,13 +132,13 @@ Feature: Retrieve and search all orders of a merchant
                 },
                 "invoice": {
                     "invoice_number": null,
-                    "payout_amount": 1000,
-                    "outstanding_amount":1000,
-                    "fee_amount": 10,
-                    "fee_rate": 1,
+                    "payout_amount": null,
+                    "outstanding_amount":null,
+                    "fee_amount": null,
+                    "fee_rate": null,
                     "due_date": "1978-11-20",
-                    "pending_merchant_payment_amount": 0,
-                    "pending_cancellation_amount": 0
+                    "pending_merchant_payment_amount": null,
+                    "pending_cancellation_amount": null
                 },
                 "bank_account": {
                     "bic": "BICISHERE",
@@ -208,15 +210,15 @@ Feature: Retrieve and search all orders of a merchant
           "iban":"DE1234",
           "bic":"BICISHERE"
          },
-         "invoice":{
-                 "invoice_number": null,
-                 "payout_amount": 1000,
-                 "outstanding_amount":1000,
-                 "fee_amount": 10,
-                 "fee_rate": 1,
-                 "due_date": "1978-11-20",
-                 "pending_merchant_payment_amount": 0,
-                 "pending_cancellation_amount": 0
+         "invoice": {
+             "invoice_number": null,
+             "payout_amount": null,
+             "outstanding_amount":null,
+             "fee_amount": null,
+             "fee_rate": null,
+             "due_date": "1978-11-20",
+             "pending_merchant_payment_amount": null,
+             "pending_cancellation_amount": null
          },
          "debtor_external_data":{
           "name":"test",
@@ -290,16 +292,16 @@ Feature: Retrieve and search all orders of a merchant
 				"iban":"DE1234",
 				"bic":"BICISHERE"
 			 },
-			 "invoice":{
-			 	 "invoice_number": null,
-			 	 "payout_amount": 1000,
-			 	 "outstanding_amount":1000,
-			 	 "fee_amount": 10,
-			 	 "fee_rate": 1,
-			 	 "due_date": "1978-11-20",
-			 	 "pending_merchant_payment_amount": 0,
-			 	 "pending_cancellation_amount": 0
-			 },
+			 "invoice": {
+                 "invoice_number": null,
+                 "payout_amount": null,
+                 "outstanding_amount":null,
+                 "fee_amount": null,
+                 "fee_rate": null,
+                 "due_date": "1978-11-20",
+                 "pending_merchant_payment_amount": null,
+                 "pending_cancellation_amount": null
+             },
 			 "debtor_external_data":{
 				"name":"test",
 				"address_country":"TE",
@@ -384,15 +386,15 @@ Feature: Retrieve and search all orders of a merchant
           "iban":"DE1234",
           "bic":"BICISHERE"
          },
-         "invoice":{
-                 "invoice_number": null,
-                 "payout_amount": 1000,
-                 "outstanding_amount":1000,
-                 "fee_amount": 10,
-                 "fee_rate": 1,
-                 "due_date": "1978-11-20",
-                 "pending_merchant_payment_amount": 0,
-                 "pending_cancellation_amount": 0
+         "invoice": {
+             "invoice_number": null,
+             "payout_amount": null,
+             "outstanding_amount":null,
+             "fee_amount": null,
+             "fee_rate": null,
+             "due_date": "1978-11-20",
+             "pending_merchant_payment_amount": null,
+             "pending_cancellation_amount": null
          },
          "debtor_external_data":{
           "name":"test",
@@ -492,15 +494,15 @@ Feature: Retrieve and search all orders of a merchant
             "iban":"DE1234",
             "bic":"BICISHERE"
            },
-           "invoice":{
-                   "invoice_number": null,
-                   "payout_amount": 1000,
-                   "outstanding_amount":1000,
-                   "fee_amount": 10,
-                   "fee_rate": 1,
-                   "due_date": "1978-11-20",
-                   "pending_merchant_payment_amount": 0,
-                   "pending_cancellation_amount": 0
+           "invoice": {
+             "invoice_number": null,
+             "payout_amount": null,
+             "outstanding_amount":null,
+             "fee_amount": null,
+             "fee_rate": null,
+             "due_date": "1978-11-20",
+             "pending_merchant_payment_amount": null,
+             "pending_cancellation_amount": null
            },
            "debtor_external_data":{
             "name":"test",

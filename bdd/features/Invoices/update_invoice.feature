@@ -22,4 +22,17 @@ Feature: Update invoices data
     """
     Then the response status code should be 204
     And the response should be empty
-    And queue should contain message with routing key invoice.extend_invoice
+    And queue should contain message with routing key invoice.extend_invoice with below data:
+    """
+    {
+        "invoice": {
+            "dueDate": "2020-12-26",
+            "duration": "30",
+            "feeRate": 2000,
+            "invoiceReferences": {
+                "external_code": "EXTERNA_CODE"
+            },
+            "uuid": "@string@"
+        }
+    }
+    """

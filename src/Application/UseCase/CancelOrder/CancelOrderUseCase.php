@@ -113,12 +113,9 @@ class CancelOrderUseCase implements LoggingInterface
     private function createCreditNote(OrderContainer $orderContainer): void
     {
         $invoices = $orderContainer->getInvoices();
-        if ($invoices->isEmpty()) { // pre-butler order
-            return;
-        }
-
         $invoice = $invoices->getLastInvoice();
         $financialDetails = $orderContainer->getOrderFinancialDetails();
+
         $amount = new TaxedMoney(
             $financialDetails->getAmountGross()->subtract($grossSum = $invoices->getInvoicesCreditNotesGrossSum()),
             $financialDetails->getAmountNet()->subtract($netSum = $invoices->getInvoicesCreditNotesNetSum()),

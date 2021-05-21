@@ -219,10 +219,14 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         OrderRepositoryInterface $orderRepository,
         InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
         PaymentRequestFactory $paymentRequestFactory,
-        PaymentsServiceInterface $paymentsService
+        PaymentsServiceInterface $paymentsService,
+        Invoice $invoice,
+        InvoiceCollection $invoiceCollection
     ) {
+        $invoiceCollection->getLastInvoice()->willReturn($invoice);
+        $invoiceCollection->isEmpty()->willReturn(false);
+        $orderContainer->getInvoices()->willReturn($invoiceCollection);
         $changeSet = (new LegacyUpdateOrderRequest('order123', 1))->setDuration(60);
-        $orderContainer->getInvoices()->willReturn(new InvoiceCollection([]));
         $newOrderFinancialDetails = (new OrderFinancialDetailsEntity())
             ->setAmountGross(new Money(200))
             ->setAmountNet(new Money(200))
@@ -268,11 +272,18 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         OrderRepositoryInterface $orderRepository,
         InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
         PaymentRequestFactory $paymentRequestFactory,
-        PaymentsServiceInterface $paymentsService
+        PaymentsServiceInterface $paymentsService,
+        Invoice $invoice,
+        InvoiceCollection $invoiceCollection
     ) {
+        $invoice->setExternalCode(Argument::any())->shouldBeCalled()->willReturn($invoice);
+        $invoice->getDuration()->willReturn(30);
+        $invoiceCollection->getLastInvoice()->willReturn($invoice);
+        $invoiceCollection->isEmpty()->willReturn(false);
+        $orderContainer->getInvoices()->willReturn($invoiceCollection);
+
         $order->getInvoiceNumber()->willReturn('123');
         $order->getInvoiceUrl()->willReturn('some_url');
-        $orderContainer->getInvoices()->willReturn(new InvoiceCollection([]));
         $changeSet = (new LegacyUpdateOrderRequest('order123', 1))->setInvoiceNumber('foobar')->setInvoiceUrl('foobar.pdf');
         $updateOrderRequestValidator->getValidatedRequest(
             $orderContainer,

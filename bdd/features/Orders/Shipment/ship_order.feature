@@ -131,34 +131,16 @@ Feature:
       "shipped_at": "2021-05-12T22:33:43+0200",
       "debtor_uuid": null,
       "workflow_name": "order_v1",
-      "invoices": [
-        {
-          "uuid": "8b5b5e9e-91da-41da-9440-d0ec1c768a16",
-          "invoice_number": "123456A",
-          "payout_amount": 762,
-          "outstanding_amount": 1000,
-          "amount": 1000,
-          "amount_net": 900,
-          "amount_tax": 100,
-          "fee_amount": 238,
-          "fee_rate": 20,
-          "due_date": "2021-06-11",
-          "created_at": "2021-05-12",
-          "duration": 30,
-          "state": "new",
-          "pending_merchant_payment_amount": 0,
-          "pending_cancellation_amount": 0
-        }
-      ],
+      "invoices": [],
       "invoice": {
-        "invoice_number": "123456A",
-        "payout_amount": 1000,
         "outstanding_amount": 1000,
-        "fee_amount": 238,
-        "fee_rate": 20,
-        "due_date": "2019-06-19",
         "pending_merchant_payment_amount": 0,
-        "pending_cancellation_amount": 0
+        "fee_rate": 20,
+        "fee_amount": 238,
+        "pending_cancellation_amount": 0,
+        "invoice_number": "123456A",
+        "payout_amount": 762,
+        "due_date": "2019-06-19"
       }
     }
     """

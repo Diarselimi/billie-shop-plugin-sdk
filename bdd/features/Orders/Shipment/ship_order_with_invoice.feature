@@ -27,6 +27,10 @@ Feature:
 
   Scenario: Successful invoice upload and order shipment
     Given I have a created order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+    And I get from invoice-butler service good response no CreditNotes
+    And the following invoice data exists:
+      | order_id | invoice_uuid                         |
+      | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
     When I send a POST request to "/order/test-order-uuidCO123/ship-with-invoice" with parameters:
       | key               | value              |
       | invoice_number    | 123456A            |
@@ -88,32 +92,16 @@ Feature:
       "shipped_at":null,
       "debtor_uuid":null,
       "workflow_name":"order_v1",
-      "invoices": [{
-        "uuid": "57ecaca2-aaf5-4c36-b41c-cea57330cb45",
-        "invoice_number": "123456A",
-        "payout_amount": 762,
-        "outstanding_amount": 1000,
-        "amount": 1000,
-        "amount_net": 900,
-        "amount_tax": 100,
-        "fee_amount": 238,
-        "fee_rate": 20,
-        "due_date": "2021-03-21",
-        "created_at": "2021-02-19",
-        "duration": 30,
-        "state": "new",
-        "pending_merchant_payment_amount": 0,
-        "pending_cancellation_amount": 0
-      }],
+      "invoices": [],
       "invoice": {
-        "invoice_number": "123456A",
-        "payout_amount": 1000,
-        "outstanding_amount": 1000,
-        "fee_amount": 238,
-        "fee_rate": 20,
-        "due_date": "2019-06-19",
+        "outstanding_amount": 500,
         "pending_merchant_payment_amount": 0,
-        "pending_cancellation_amount": 0
+        "fee_rate": 20,
+        "fee_amount": 123.33,
+        "pending_cancellation_amount": 0,
+        "invoice_number": "some_code",
+        "payout_amount": 123.33,
+        "due_date": "2019-06-19"
       }
     }
     """
@@ -165,14 +153,15 @@ Feature:
     Given I have orders with the following data
       | external_id | state   | gross | net | tax | duration | comment        | workflow_name |
       | CO123       | created | 1000  | 900 | 100 | 30       | "test order"   | order_v2      |
+    And I get from invoice-butler service good response no CreditNotes
     And the order "CO123" does not have a payment id
-    And I get from payments service get order details response
     When I send a POST request to "/order/test-order-uuidCO123/ship-with-invoice" with parameters:
       | key               | value                            |
       | invoice_number    | 123456A                          |
       | external_order_id | 1233XYZ                          |
       | invoice_file      | @dummy-invoice.png               |
       | amount            | {"gross":500,"net":450,"tax":50} |
+    And print last JSON response
     Then the JSON response should be:
     """
     {
@@ -227,34 +216,16 @@ Feature:
       },
       "debtor_uuid":null,
       "workflow_name":"order_v2",
-      "invoices":[
-        {
-          "uuid":"68ccacff-8590-4b6a-8728-57b0748a07bf",
-          "invoice_number":"123456A",
-          "payout_amount":381,
-          "outstanding_amount":500,
-          "amount":500,
-          "amount_net":450,
-          "amount_tax":50,
-          "fee_amount":119,
-          "fee_rate":20,
-          "due_date":"2021-03-19",
-          "created_at":"2021-02-17",
-          "duration":30,
-          "state":"new",
-          "pending_merchant_payment_amount":0,
-          "pending_cancellation_amount":0
-        }
-      ],
-      "invoice":{
-        "due_date":"2019-06-19",
-        "invoice_number":"123456A",
-        "payout_amount":381,
-        "outstanding_amount":500,
-        "fee_amount":119,
-        "fee_rate":20,
-        "pending_merchant_payment_amount":0,
-        "pending_cancellation_amount":0
+      "invoices": [],
+      "invoice": {
+        "outstanding_amount": 500,
+        "pending_merchant_payment_amount": 0,
+        "fee_rate": 20,
+        "fee_amount": 119,
+        "pending_cancellation_amount": 0,
+        "invoice_number": "123456A",
+        "payout_amount": 381,
+        "due_date": "2019-06-19"
       }
     }
     """

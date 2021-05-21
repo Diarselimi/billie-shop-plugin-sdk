@@ -6,14 +6,10 @@ use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorCompany\IdentifiedDebtorCompany;
-use App\DomainModel\FeatureFlag\FeatureFlagManager;
-use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderRiskCheck\CheckResultCollection;
-use App\DomainModel\Payment\OrderPaymentDetailsDTO;
-use App\DomainModel\Payment\PaymentsServiceInterface;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
 use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
 
@@ -21,22 +17,14 @@ class LegacyOrderResponseFactory
 {
     private CompaniesServiceInterface $companiesService;
 
-    private PaymentsServiceInterface $paymentsService;
-
     private OrderDeclinedReasonsMapper $declinedReasonsMapper;
-
-    private FeatureFlagManager $featureFlagManager;
 
     public function __construct(
         CompaniesServiceInterface $companiesService,
-        PaymentsServiceInterface $paymentsService,
-        OrderDeclinedReasonsMapper $declinedReasonsMapper,
-        FeatureFlagManager $featureFlagManager
+        OrderDeclinedReasonsMapper $declinedReasonsMapper
     ) {
         $this->companiesService = $companiesService;
-        $this->paymentsService = $paymentsService;
         $this->declinedReasonsMapper = $declinedReasonsMapper;
-        $this->featureFlagManager = $featureFlagManager;
     }
 
     public function create(OrderContainer $orderContainer): LegacyOrderResponse
@@ -44,7 +32,6 @@ class LegacyOrderResponseFactory
         $response = new LegacyOrderResponse();
 
         $this->addData($orderContainer, $response);
-        $this->addInvoiceData($orderContainer, $response);
         $this->addLegacyInvoiceData($orderContainer, $response);
 
         $response->setReasons([$response->getDeclineReason()]);
@@ -53,7 +40,7 @@ class LegacyOrderResponseFactory
     }
 
     /**
-     * @param  OrderContainer[] $orderContainers
+     * @param  OrderContainer[]      $orderContainers
      * @return LegacyOrderResponse[]
      */
     public function createFromOrderContainers(array $orderContainers): array
@@ -65,15 +52,10 @@ class LegacyOrderResponseFactory
         $orderResponses = [];
 
         $debtorCompanies = $this->getDebtorCompanies($orderContainers);
-        $orderPaymentsDetails = $this->getOrderPaymentsDetails($orderContainers);
         foreach ($orderContainers as $orderContainer) {
             if ($orderContainer->getOrder()->getMerchantDebtorId() !== null) {
                 $key = $orderContainer->getMerchantDebtor()->getDebtorId();
                 $orderContainer->setDebtorCompany($debtorCompanies[$key]);
-            }
-
-            if (isset($orderPaymentsDetails[$orderContainer->getOrder()->getPaymentId()])) {
-                $orderContainer->setPaymentDetails($orderPaymentsDetails[$orderContainer->getOrder()->getPaymentId()]);
             }
 
             $orderResponses[] = $this->create($orderContainer);
@@ -139,61 +121,20 @@ class LegacyOrderResponseFactory
 
     private function addLegacyInvoiceData(OrderContainer $orderContainer, LegacyOrderResponse $response): void
     {
-        if (!$this->featureFlagManager->isButlerFullyEnabled()
-            && $orderContainer->getOrder()->getPaymentId() !== null
-        ) {
-            $orderPaymentDetails = $orderContainer->getPaymentDetails();
-            $response
-                ->setInvoiceNumber($orderContainer->getOrder()->getInvoiceNumber())
-                ->setPayoutAmount($orderPaymentDetails->getPayoutAmount())
-                ->setOutstandingAmount($orderPaymentDetails->getOutstandingAmount())
-                ->setFeeRate($orderPaymentDetails->getFeeRate())
-                ->setFeeAmount($orderPaymentDetails->getFeeAmount())
-                ->setPendingCancellationAmount($orderPaymentDetails->getOutstandingAmountInvoiceCancellation())
-                ->setPendingMerchantPaymentAmount($orderPaymentDetails->getOutstandingAmountMerchantPayment());
-        } elseif (!$orderContainer->getInvoices()->isEmpty()) {
-            $invoice = $orderContainer->getInvoices()->getFirst();
-            $response
-                ->setInvoiceNumber($invoice->getExternalCode())
-                ->setPayoutAmount($invoice->getPayoutAmount()->getMoneyValue())
-                ->setOutstandingAmount($invoice->getOutstandingAmount()->toFloat())
-                ->setFeeRate($invoice->getFeeRate()->toFloat())
-                ->setFeeAmount($invoice->getFeeAmount()->getGross()->toFloat())
-                ->setInvoiceNumber($invoice->getExternalCode())
-                ->setPendingCancellationAmount($invoice->getInvoicePendingCancellationAmount()->getMoneyValue())
-                ->setPendingMerchantPaymentAmount($invoice->getMerchantPendingPaymentAmount()->getMoneyValue());
+        if ($orderContainer->getInvoices()->isEmpty()) {
+            return;
         }
-    }
 
-    private function addInvoiceData(OrderContainer $orderContainer, LegacyOrderResponse $response): void
-    {
-        /** @var Invoice $invoice */
-        foreach ($orderContainer->getInvoices() as $invoice) {
-            $dueDate = clone $invoice->getBillingDate();
-            $dueDate->add(
-                new \DateInterval(
-                    sprintf('P%dD', $invoice->getDuration())
-                )
-            );
-
-            $response->addInvoice(
-                (new LegacyOrderInvoiceResponse())
-                    ->setUuid($invoice->getUuid())
-                    ->setDuration($invoice->getDuration())
-                    ->setAmount($invoice->getAmount())
-                    ->setDuration($invoice->getDuration())
-                    ->setFeeAmount($invoice->getFeeAmount()->getGross()->getMoneyValue())
-                    ->setFeeRate($invoice->getFeeRate()->toBase100())
-                    ->setInvoiceNumber($invoice->getExternalCode())
-                    ->setDueDate($dueDate)
-                    ->setCreatedAt($invoice->getCreatedAt())
-                    ->setPayoutAmount($invoice->getPayoutAmount()->getMoneyValue())
-                    ->setState($invoice->getState())
-                    ->setOutstandingAmount($invoice->getOutstandingAmount()->getMoneyValue())
-                    ->setPendingMerchantPaymentAmount($invoice->getMerchantPendingPaymentAmount()->getMoneyValue())
-                    ->setPendingCancellationAmount($invoice->getInvoicePendingCancellationAmount()->getMoneyValue())
-            );
-        }
+        $invoice = $orderContainer->getInvoices()->getFirst();
+        $response
+            ->setInvoiceNumber($invoice->getExternalCode())
+            ->setPayoutAmount($invoice->getPayoutAmount()->getMoneyValue())
+            ->setOutstandingAmount($invoice->getOutstandingAmount()->toFloat())
+            ->setFeeRate($invoice->getFeeRate()->toFloat())
+            ->setFeeAmount($invoice->getFeeAmount()->getGross()->toFloat())
+            ->setInvoiceNumber($invoice->getExternalCode())
+            ->setPendingCancellationAmount($invoice->getInvoicePendingCancellationAmount()->getMoneyValue())
+            ->setPendingMerchantPaymentAmount($invoice->getMerchantPendingPaymentAmount()->getMoneyValue());
     }
 
     private function addData(OrderContainer $orderContainer, LegacyOrderResponse $response): void
@@ -223,26 +164,6 @@ class LegacyOrderResponseFactory
 
     /**
      * @param OrderContainer[]
-     * @return OrderPaymentDetailsDTO[]
-     */
-    private function getOrderPaymentsDetails(array $orderContainers): array
-    {
-        $paymentIds = array_map(
-            static function (OrderContainer $orderContainer) {
-                if ($orderContainer->getOrder()->getPaymentId() !== null) {
-                    return $orderContainer->getOrder()->getPaymentId();
-                }
-
-                return null;
-            },
-            $orderContainers
-        );
-
-        return $this->paymentsService->getBatchOrderPaymentDetails($paymentIds);
-    }
-
-    /**
-     * @param OrderContainer[]
      * @return DebtorCompany[]
      */
     private function getDebtorCompanies(array $orderContainers): array
@@ -267,7 +188,7 @@ class LegacyOrderResponseFactory
         $financialDetails = $orderContainer->getOrderFinancialDetails();
 
         $clonedInvoiceCollection = clone $orderContainer->getInvoices();
-        if (!$orderContainer->getInvoices()->isEmpty() && $orderContainer->getOrder()->isCanceled()) {
+        if ($orderContainer->getOrder()->isCanceled()) {
             $clonedInvoiceCollection->getLastInvoice()->getCreditNotes()->pop();
         }
 
@@ -300,6 +221,7 @@ class LegacyOrderResponseFactory
                 ->getLastInvoice()
                 ->getOutstandingAmount()
                 ->getMoneyValue();
+
             $response
                 ->setOutstandingAmount($outstandingAmount);
         }
@@ -350,8 +272,7 @@ class LegacyOrderResponseFactory
      */
     private function addReasons(CheckResultCollection $checkResultCollection, $response)
     {
-        $failedRiskCheckResult = $checkResultCollection->getFirstHardDeclined(
-            ) ?? $checkResultCollection->getFirstSoftDeclined();
+        $failedRiskCheckResult = $checkResultCollection->getFirstHardDeclined() ?? $checkResultCollection->getFirstSoftDeclined();
         if ($failedRiskCheckResult === null) {
             return $response;
         }

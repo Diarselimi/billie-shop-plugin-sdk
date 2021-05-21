@@ -23,9 +23,6 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 class InvoiceNotificationUseCaseTest extends UnitTestCase
 {
-    /**
-     * @var SmaugClientInterface|ObjectProphecy
-     */
     private $resourceTokenService;
 
     /**

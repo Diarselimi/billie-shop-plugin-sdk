@@ -67,7 +67,10 @@ Feature:
 
   Scenario: Successful shipped order cancellation
     Given I have a shipped order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-    And I get from payments service get order details response
+    And I get from invoice-butler service good response
+    And the following invoice data exists:
+      | order_id | invoice_uuid                         |
+      | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
     And I get from payments service modify ticket response
     And I get from invoice-butler service good response
     When I send a POST request to "/order/CO123/cancel"
