@@ -51,7 +51,7 @@ class UpdateMerchantWithOrderDunningStepUseCase implements LoggingInterface
 
         $order = $orderContainer->getOrder();
         $invoice = null;
-        if ($request->getInvoiceUuid() !== null) {
+        if (!empty($request->getInvoiceUuid())) {
             $invoice = $orderContainer->getInvoices()->get($request->getInvoiceUuid());
             if ($invoice === null) {
                 $this->logSuppressedException(
