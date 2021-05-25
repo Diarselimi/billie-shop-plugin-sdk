@@ -4,8 +4,6 @@ namespace spec\App\Application\UseCase\ShipOrder;
 
 use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\CreateInvoice\CreateInvoiceRequest;
-use App\Application\UseCase\ShipOrder\ShipOrderRequest;
-use App\Application\UseCase\ShipOrder\ShipOrderRequestV1;
 use App\Application\UseCase\ShipOrder\ShipOrderUseCase;
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceFactory;
@@ -17,7 +15,6 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerAggregator;
 use App\DomainModel\OrderResponse\LegacyOrderResponse;
-use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
 use Ozean12\Money\Money;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
 use PhpSpec\ObjectBehavior;
@@ -49,7 +46,6 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
         OrderContainerFactory $orderContainerFactory,
         Registry $workflowRegistry,
         ShipOrderService $shipOrderService,
-        LegacyOrderResponseFactory $orderResponseFactory,
         InvoiceFactory $invoiceFactory,
         OrderContainer $orderContainer,
         OrderEntity $order,
@@ -75,7 +71,6 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
 
         $workflowRegistry->get($order)->willReturn($workflow);
         $validator->validate(Argument::cetera())->willReturn(new ConstraintViolationList([]));
-        $orderResponseFactory->create($orderContainer)->willReturn($orderResponse);
 
         $this->beConstructedWith(...func_get_args());
         $this->setLogger($logger);

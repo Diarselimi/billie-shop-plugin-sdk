@@ -6,6 +6,7 @@ use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\DebtorCompany\IdentifiedDebtorCompany;
+use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\Order\OrderEntity;
@@ -33,6 +34,7 @@ class LegacyOrderResponseFactory
 
         $this->addData($orderContainer, $response);
         $this->addLegacyInvoiceData($orderContainer, $response);
+        $this->addInvoiceData($orderContainer, $response); // for dashboard
 
         $response->setReasons([$response->getDeclineReason()]);
 
@@ -135,6 +137,41 @@ class LegacyOrderResponseFactory
             ->setInvoiceNumber($invoice->getExternalCode())
             ->setPendingCancellationAmount($invoice->getInvoicePendingCancellationAmount()->getMoneyValue())
             ->setPendingMerchantPaymentAmount($invoice->getMerchantPendingPaymentAmount()->getMoneyValue());
+    }
+
+    private function addInvoiceData(OrderContainer $orderContainer, LegacyOrderResponse $response): void
+    {
+        if ($orderContainer->getOrder()->isWorkflowV1()) {
+            return;
+        }
+
+        /** @var Invoice $invoice */
+        foreach ($orderContainer->getInvoices() as $invoice) {
+            $dueDate = clone $invoice->getBillingDate();
+            $dueDate->add(
+                new \DateInterval(
+                    sprintf('P%dD', $invoice->getDuration())
+                )
+            );
+
+            $response->addInvoice(
+                (new LegacyOrderInvoiceResponse())
+                    ->setUuid($invoice->getUuid())
+                    ->setDuration($invoice->getDuration())
+                    ->setAmount($invoice->getAmount())
+                    ->setDuration($invoice->getDuration())
+                    ->setFeeAmount($invoice->getFeeAmount()->getGross()->getMoneyValue())
+                    ->setFeeRate($invoice->getFeeRate()->toBase100())
+                    ->setInvoiceNumber($invoice->getExternalCode())
+                    ->setDueDate($dueDate)
+                    ->setCreatedAt($invoice->getCreatedAt())
+                    ->setPayoutAmount($invoice->getPayoutAmount()->getMoneyValue())
+                    ->setState($invoice->getState())
+                    ->setOutstandingAmount($invoice->getOutstandingAmount()->getMoneyValue())
+                    ->setPendingMerchantPaymentAmount($invoice->getMerchantPendingPaymentAmount()->getMoneyValue())
+                    ->setPendingCancellationAmount($invoice->getInvoicePendingCancellationAmount()->getMoneyValue())
+            );
+        }
     }
 
     private function addData(OrderContainer $orderContainer, LegacyOrderResponse $response): void

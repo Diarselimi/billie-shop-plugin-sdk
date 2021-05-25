@@ -60,6 +60,14 @@ class InvoiceButlerServiceContext implements Context
     }
 
     /**
+     * @Given /^I get from invoice-butler service no invoices response$/
+     */
+    public function invoiceButlerApiRespondedWithNoInvoices()
+    {
+        $this->mockRequest('/invoices', new MockResponse('[]'));
+    }
+
+    /**
      * @Given /^I get from invoice-butler service an invoice that can be extended$/
      */
     public function invoiceButlerApiRespondedWithExtendableInvoice()

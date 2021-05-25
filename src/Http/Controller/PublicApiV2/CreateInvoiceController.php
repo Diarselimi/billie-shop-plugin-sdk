@@ -14,6 +14,7 @@ use App\Http\RequestTransformer\CreateInvoice\InvoiceLineItemsFactory;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use App\Http\RequestTransformer\AmountRequestFactory;
 use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -56,7 +57,7 @@ class CreateInvoiceController
         $this->lineItemsFactory = $lineItemsFactory;
     }
 
-    public function execute(Request $request): void
+    public function execute(Request $request): JsonResponse
     {
         $shipRequest = (new CreateInvoiceRequest(
             $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID)
@@ -69,7 +70,9 @@ class CreateInvoiceController
             ->setLineItems($this->lineItemsFactory->create($request));
 
         try {
-            $this->shipOrderUseCase->execute($shipRequest);
+            return new JsonResponse([
+                'uuid' => $this->shipOrderUseCase->execute($shipRequest)->getUuid(),
+            ], JsonResponse::HTTP_CREATED);
         } catch (OrderContainerFactoryException $exception) {
             throw new NotFoundHttpException($exception->getMessage());
         } catch (WorkflowException | ShipOrderException $exception) {

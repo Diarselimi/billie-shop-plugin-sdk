@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\UseCase\CreateInvoice;
 
+use App\Application\Validator\Constraint as CustomConstrains;
 use OpenApi\Annotations as OA;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -44,6 +45,7 @@ class CreateInvoiceRequest
 
     /**
      * @Assert\Length(max="255")
+     * @CustomConstrains\InvoiceExternalCode()
      */
     private ?string $externalCode = null;
 

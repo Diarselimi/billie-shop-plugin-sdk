@@ -9,7 +9,7 @@ use App\DomainModel\Invoice\CreditNote\CreditNote;
 
 interface InvoiceServiceInterface
 {
-    public function getByUuids(array $uuids): InvoiceCollection;
+    public function getByParameters(array $parameters): InvoiceCollection;
 
     public function getOneByUuid(string $uuid): ?Invoice;
 

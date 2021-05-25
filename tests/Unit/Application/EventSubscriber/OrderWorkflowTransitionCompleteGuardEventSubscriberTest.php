@@ -9,8 +9,10 @@ use App\DomainModel\Invoice\InvoiceCollection;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\EventSubscriber\OrderWorkflowTransitionCompleteGuardEventSubscriber;
 use App\Tests\Unit\UnitTestCase;
+use Ozean12\Money\Money;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Workflow\Event\GuardEvent;
@@ -49,7 +51,14 @@ class OrderWorkflowTransitionCompleteGuardEventSubscriberTest extends UnitTestCa
     public function shouldNotBlockEventTransition(): void
     {
         $order = new OrderEntity();
+        $orderFinancialDetails = (new OrderFinancialDetailsEntity())
+            ->setUnshippedAmountGross(new Money(0));
+
         $event = new GuardEvent($order, new Marking(), new Transition('name', 'from', 'to'));
+
+        $this->orderContainer->getOrderFinancialDetails()
+            ->shouldBeCalledOnce()
+            ->willReturn($orderFinancialDetails);
 
         $this->orderContainer->getInvoices()
             ->shouldBeCalledOnce()
@@ -71,10 +80,13 @@ class OrderWorkflowTransitionCompleteGuardEventSubscriberTest extends UnitTestCa
     /**
      * @test
      */
-    public function shouldBlockEventTransition(): void
+    public function shouldBlockEventTransitionBecauseOfNewInvoice(): void
     {
         $order = new OrderEntity();
         $event = new GuardEvent($order, new Marking(), new Transition('name', 'from', 'to'));
+
+        $orderFinancialDetails = (new OrderFinancialDetailsEntity())
+            ->setUnshippedAmountGross(new Money(0));
 
         $this->orderContainer->getInvoices()
             ->shouldBeCalledOnce()
@@ -82,6 +94,35 @@ class OrderWorkflowTransitionCompleteGuardEventSubscriberTest extends UnitTestCa
                 (new Invoice())->setState(Invoice::STATE_COMPLETE),
                 (new Invoice())->setState(Invoice::STATE_NEW),
             ]));
+
+        $this->orderContainer->getOrderFinancialDetails()
+            ->shouldBeCalledOnce()
+            ->willReturn($orderFinancialDetails);
+
+        $this->orderContainerFactory
+            ->createFromOrderEntity(Argument::type(OrderEntity::class))
+            ->shouldBeCalledOnce()
+            ->willReturn($this->orderContainer->reveal())
+        ;
+
+        $this->subscriber->canComplete($event);
+        $this->assertTrue($event->isBlocked());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldBlockEventTransitionBecauseOfUnshippedAmount(): void
+    {
+        $order = new OrderEntity();
+        $event = new GuardEvent($order, new Marking(), new Transition('name', 'from', 'to'));
+
+        $orderFinancialDetails = (new OrderFinancialDetailsEntity())
+            ->setUnshippedAmountGross(new Money(1));
+
+        $this->orderContainer->getOrderFinancialDetails()
+            ->shouldBeCalledOnce()
+            ->willReturn($orderFinancialDetails);
 
         $this->orderContainerFactory
             ->createFromOrderEntity(Argument::type(OrderEntity::class))

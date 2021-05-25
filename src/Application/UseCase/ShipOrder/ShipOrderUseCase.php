@@ -17,8 +17,6 @@ use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentUploadException;
 use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerAggregator;
-use App\DomainModel\OrderResponse\LegacyOrderResponse;
-use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
 use App\DomainModel\ShipOrder\ShipOrderException;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -37,8 +35,6 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface, LoggingInterface
 
     private ShipOrderService $shipOrderService;
 
-    private LegacyOrderResponseFactory $orderResponseFactory;
-
     private InvoiceFactory $invoiceFactory;
 
     public function __construct(
@@ -46,18 +42,16 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface, LoggingInterface
         OrderContainerFactory $orderContainerFactory,
         Registry $workflowRegistry,
         ShipOrderService $shipOrderService,
-        LegacyOrderResponseFactory $orderResponseFactory,
         InvoiceFactory $invoiceFactory
     ) {
         $this->invoiceManager = $invoiceManager;
         $this->orderContainerFactory = $orderContainerFactory;
         $this->workflowRegistry = $workflowRegistry;
         $this->shipOrderService = $shipOrderService;
-        $this->orderResponseFactory = $orderResponseFactory;
         $this->invoiceFactory = $invoiceFactory;
     }
 
-    public function execute(CreateInvoiceRequest $request): LegacyOrderResponse
+    public function execute(CreateInvoiceRequest $request): Invoice
     {
         $orders = $request->getOrders();
         $orderId = reset($orders);
@@ -76,7 +70,7 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface, LoggingInterface
 
         $this->uploadInvoice($order, $request, $invoice->getUuid());
 
-        return $this->orderResponseFactory->create($orderContainer);
+        return $invoice;
     }
 
     private function uploadInvoice(OrderEntity $order, CreateInvoiceRequest $request, string $invoiceUuid): void

@@ -59,13 +59,13 @@ class InvoiceButlerClient implements InvoiceServiceInterface, LoggingInterface
         $this->paymentsService = $paymentsService;
     }
 
-    public function getByUuids(array $uuids): InvoiceCollection
+    public function getByParameters(array $parameters): InvoiceCollection
     {
         try {
             $response = $this->client->get(
                 'invoices',
                 [
-                    'query' => ['uuids' => $uuids],
+                    'query' => $parameters,
                     'on_stats' => function (TransferStats $stats) {
                         $this->logServiceRequestStats($stats, 'get_invoices');
                     },
@@ -84,7 +84,7 @@ class InvoiceButlerClient implements InvoiceServiceInterface, LoggingInterface
 
     public function getOneByUuid(string $uuid): ?Invoice
     {
-        $invoices = $this->getByUuids([$uuid]);
+        $invoices = $this->getByParameters(['uuids' => [$uuid]]);
 
         if ($invoices->isEmpty()) {
             return null;

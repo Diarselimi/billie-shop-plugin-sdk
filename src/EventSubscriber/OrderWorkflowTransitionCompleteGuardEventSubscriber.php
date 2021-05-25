@@ -31,9 +31,14 @@ class OrderWorkflowTransitionCompleteGuardEventSubscriber implements EventSubscr
         /** @var OrderEntity $order */
         $order = $event->getSubject();
         $container = $this->orderContainerFactory->createFromOrderEntity($order);
-        $invoices = $container->getInvoices();
 
-        foreach ($invoices as $invoice) {
+        if (!$container->getOrderFinancialDetails()->getUnshippedAmountGross()->isZero()) {
+            $event->setBlocked(true);
+
+            return;
+        }
+
+        foreach ($container->getInvoices() as $invoice) {
             if (!in_array($invoice->getState(), [Invoice::STATE_COMPLETE, Invoice::STATE_CANCELED], true)) {
                 $event->setBlocked(true);
 

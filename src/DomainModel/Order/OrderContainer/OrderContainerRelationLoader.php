@@ -141,7 +141,7 @@ class OrderContainerRelationLoader
 
         $uuids = array_map(fn (OrderInvoiceEntity $orderInvoice) => $orderInvoice->getInvoiceUuid(), $orderInvoices);
 
-        return $this->invoiceRepository->getByUuids($uuids);
+        return $this->invoiceRepository->getByParameters(['uuids' => $uuids]);
     }
 
     public function loadMerchant(OrderContainer $orderContainer): MerchantEntity
