@@ -20,6 +20,7 @@ class MerchantNotificationOrderWorkflowSubscriber implements EventSubscriberInte
     {
         $this->orderNotificationService->notify(
             $event->getSubject(),
+            null,
             OrderNotificationEntity::NOTIFICATION_TYPE_ORDER_SHIPPED
         );
     }
@@ -28,6 +29,7 @@ class MerchantNotificationOrderWorkflowSubscriber implements EventSubscriberInte
     {
         $this->orderNotificationService->notify(
             $event->getSubject(),
+            null,
             OrderNotificationEntity::NOTIFICATION_TYPE_ORDER_LATE
         );
     }
@@ -36,6 +38,7 @@ class MerchantNotificationOrderWorkflowSubscriber implements EventSubscriberInte
     {
         $this->orderNotificationService->notify(
             $event->getSubject(),
+            null,
             OrderNotificationEntity::NOTIFICATION_TYPE_ORDER_PAID_OUT
         );
     }
@@ -44,6 +47,7 @@ class MerchantNotificationOrderWorkflowSubscriber implements EventSubscriberInte
     {
         $this->orderNotificationService->notify(
             $event->getSubject(),
+            null,
             OrderNotificationEntity::NOTIFICATION_TYPE_ORDER_CANCELED
         );
     }
@@ -52,6 +56,7 @@ class MerchantNotificationOrderWorkflowSubscriber implements EventSubscriberInte
     {
         $this->orderNotificationService->notify(
             $event->getSubject(),
+            null,
             OrderNotificationEntity::NOTIFICATION_TYPE_ORDER_WAITING
         );
     }

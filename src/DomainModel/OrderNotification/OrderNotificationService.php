@@ -2,6 +2,7 @@
 
 namespace App\DomainModel\OrderNotification;
 
+use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Order\OrderEntity;
 
 class OrderNotificationService
@@ -18,12 +19,13 @@ class OrderNotificationService
         $this->orderNotificationPayloadFactory = $orderNotificationPayloadFactory;
     }
 
-    public function notify(OrderEntity $order, string $notificationType): void
+    public function notify(OrderEntity $order, ?Invoice $invoice, string $notificationType): void
     {
         $this->notificationScheduler->createAndSchedule(
             $order,
+            $invoice,
             $notificationType,
-            $this->orderNotificationPayloadFactory->create($order, $notificationType)
+            $this->orderNotificationPayloadFactory->create($order, $invoice, $notificationType)
         );
     }
 }

@@ -34,7 +34,7 @@ class DeclineOrderService implements LoggingInterface
         $this->workflowRegistry->get($order)->apply($order, OrderEntity::TRANSITION_DECLINE);
 
         if ($shouldNotifyWebhook) {
-            $this->orderNotificationService->notify($order, OrderNotificationEntity::NOTIFICATION_TYPE_ORDER_DECLINED);
+            $this->orderNotificationService->notify($order, null, OrderNotificationEntity::NOTIFICATION_TYPE_ORDER_DECLINED);
         }
 
         $this->logInfo("Order declined");

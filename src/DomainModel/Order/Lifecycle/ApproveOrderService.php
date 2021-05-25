@@ -48,7 +48,7 @@ class ApproveOrderService implements LoggingInterface
         $this->workflowRegistry->get($order)->apply($order, OrderEntity::TRANSITION_CREATE);
 
         if ($shouldNotifyWebhook) {
-            $this->orderNotificationService->notify($order, OrderNotificationEntity::NOTIFICATION_TYPE_ORDER_APPROVED);
+            $this->orderNotificationService->notify($order, null, OrderNotificationEntity::NOTIFICATION_TYPE_ORDER_APPROVED);
         }
 
         $this->logInfo("Order approved");

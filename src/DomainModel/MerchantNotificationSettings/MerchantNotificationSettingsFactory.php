@@ -16,6 +16,9 @@ class MerchantNotificationSettingsFactory
         OrderNotificationEntity::NOTIFICATION_TYPE_ORDER_PAID_OUT => false,
         OrderNotificationEntity::NOTIFICATION_TYPE_ORDER_LATE => false,
         OrderNotificationEntity::NOTIFICATION_TYPE_ORDER_CANCELED => false,
+        OrderNotificationEntity::NOTIFICATION_TYPE_INVOICE_PAID_OUT => false,
+        OrderNotificationEntity::NOTIFICATION_TYPE_INVOICE_LATE => false,
+        OrderNotificationEntity::NOTIFICATION_TYPE_INVOICE_CANCELED => false,
     ];
 
     /**

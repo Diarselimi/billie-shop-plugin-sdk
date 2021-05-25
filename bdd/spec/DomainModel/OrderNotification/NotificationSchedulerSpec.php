@@ -23,6 +23,8 @@ class NotificationSchedulerSpec extends ObjectBehavior
 
     const ORDER_ID = 156;
 
+    const INVOICE_UUID = 'invoice_uuid_123';
+
     const MERCHANT_ID = 78;
 
     const MERCHANT_URL = 'http://google.es/';
@@ -102,6 +104,7 @@ class NotificationSchedulerSpec extends ObjectBehavior
                 NotificationScheduler::SLACK_NOTIFICATION_MESSAGE,
                 null,
                 new SlackMessageAttachmentField('Order ID', self::ORDER_ID, true),
+                new SlackMessageAttachmentField('Invoice ID', self::INVOICE_UUID, true),
                 new SlackMessageAttachmentField('Notification ID', self::NOTIFICATION_ID, true)
             )
             ->shouldBeCalled()
@@ -129,6 +132,7 @@ class NotificationSchedulerSpec extends ObjectBehavior
     {
         $notification->getId()->willReturn(self::NOTIFICATION_ID);
         $notification->getOrderId()->willReturn(self::ORDER_ID);
+        $notification->getInvoiceUuid()->willReturn(self::INVOICE_UUID);
         $notification->getPayload()->willReturn(self::NOTIFICATION_PAYLOAD);
         $notification->isDelivered()->willReturn(false);
     }

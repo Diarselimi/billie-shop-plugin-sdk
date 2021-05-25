@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\UseCase\MarkOrderAsLate;
+namespace App\Application\UseCase\MarkOrderAsPaidOut;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
@@ -10,7 +10,7 @@ use App\DomainModel\OrderNotification\OrderNotificationEntity;
 use App\DomainModel\OrderNotification\OrderNotificationService;
 use Symfony\Component\Workflow\Registry;
 
-class MarkOrderAsLateUseCase
+class MarkOrderAsPaidOutUseCase
 {
     private OrderContainerFactory $orderContainerFactory;
 
@@ -28,7 +28,7 @@ class MarkOrderAsLateUseCase
         $this->notificationService = $notificationService;
     }
 
-    public function execute(MarkOrderAsLateRequest $request): void
+    public function execute(MarkOrderAsPaidOutRequest $request): void
     {
         try {
             $orderContainer = $this->orderContainerFactory->loadByInvoiceUuid($request->getInvoiceUuid());
@@ -41,14 +41,15 @@ class MarkOrderAsLateUseCase
         $this->notificationService->notify(
             $order,
             $orderContainer->getInvoices()->get($request->getInvoiceUuid()),
-            OrderNotificationEntity::NOTIFICATION_TYPE_INVOICE_LATE
+            OrderNotificationEntity::NOTIFICATION_TYPE_INVOICE_PAID_OUT
         );
 
         // transit legacy v1 order
         $workflow = $this->workflowRegistry->get($order);
-        if (!$workflow->can($order, OrderEntity::TRANSITION_LATE)) {
+        if (!$workflow->can($order, OrderEntity::TRANSITION_PAY_OUT)) {
             return;
         }
-        $workflow->apply($order, OrderEntity::TRANSITION_LATE);
+
+        $workflow->apply($order, OrderEntity::TRANSITION_PAY_OUT);
     }
 }

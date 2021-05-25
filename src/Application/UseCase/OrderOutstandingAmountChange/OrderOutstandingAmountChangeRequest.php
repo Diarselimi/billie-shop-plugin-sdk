@@ -10,7 +10,7 @@ class OrderOutstandingAmountChangeRequest
 
     public const TYPE_PAYMENT = 'payment';
 
-    private string $id;
+    private string $invoiceUuid;
 
     private string $type;
 
@@ -25,7 +25,7 @@ class OrderOutstandingAmountChangeRequest
     private ?string $accountHolder;
 
     public function __construct(
-        string $id,
+        string $invoiceUuid,
         string $type,
         Money $amountChange,
         Money $outstandingAmount,
@@ -33,7 +33,7 @@ class OrderOutstandingAmountChangeRequest
         ?string $iban,
         ?string $accountHolder
     ) {
-        $this->id = $id;
+        $this->invoiceUuid = $invoiceUuid;
         $this->type = $type;
         $this->amountChange = $amountChange;
         $this->outstandingAmount = $outstandingAmount;
@@ -42,9 +42,9 @@ class OrderOutstandingAmountChangeRequest
         $this->accountHolder = $accountHolder;
     }
 
-    public function getId(): string
+    public function getInvoiceUuid(): string
     {
-        return $this->id;
+        return $this->invoiceUuid;
     }
 
     public function getType(): string

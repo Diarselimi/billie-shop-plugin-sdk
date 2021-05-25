@@ -4,7 +4,6 @@ namespace App\DomainModel\OrderNotification;
 
 use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
-use App\Support\DateFormat;
 use Billie\MonitoringBundle\Service\Alerting\Slack\SlackClientAwareInterface;
 use Billie\MonitoringBundle\Service\Alerting\Slack\SlackClientAwareTrait;
 use Billie\MonitoringBundle\Service\Alerting\Slack\SlackMessageAttachmentField;
@@ -55,13 +54,13 @@ class NotificationScheduler implements LoggingInterface, SlackClientAwareInterfa
         $this->merchantNotificationSettingsRepository = $merchantNotificationSettingsRepository;
     }
 
-    public function createAndSchedule(OrderEntity $order, string $notificationType, array $payload): bool
+    public function createAndSchedule(OrderEntity $order, ?string $invoiceUuid, string $notificationType, array $payload): bool
     {
         if (!$this->isNotificationEnabledForMerchant($order->getMerchantId(), $notificationType)) {
             return false;
         }
 
-        $orderNotification = $this->orderNotificationFactory->create($order->getId(), $notificationType, $payload);
+        $orderNotification = $this->orderNotificationFactory->create($order->getId(), $invoiceUuid, $notificationType, $payload);
         $this->orderNotificationRepository->insert($orderNotification);
 
         $this->logInfo('Created notification {count} for order {id}', [
@@ -86,18 +85,17 @@ class NotificationScheduler implements LoggingInterface, SlackClientAwareInterfa
             return false;
         }
 
-        $payload = ['notification_id' => $orderNotification->getId()];
-
+        $delay = self::DELAY_MATRIX[$attemptNumber];
         $this->logInfo('Scheduling notification {id} for execution at {date}', [
             LoggingInterface::KEY_ID => $orderNotification->getId(),
-            LoggingInterface::KEY_DATE => (new \DateTime(self::DELAY_MATRIX[$attemptNumber]))->format(DateFormat::FORMAT_YMD_HIS),
             LoggingInterface::KEY_SOBAKA => [
+                'delay' => $delay,
                 'attempt' => $attemptNumber,
-                'payload' => json_encode($payload),
+                'notification_id' => $orderNotification->getId(),
             ],
         ]);
 
-        $result = $this->orderNotificationFactoryPublisher->publish($payload, self::DELAY_MATRIX[$attemptNumber]);
+        $result = $this->orderNotificationFactoryPublisher->publish(['notification_id' => $orderNotification->getId()], $delay);
 
         $this->logInfo('Scheduling '.($result ? 'successful' : 'unsuccessful'), [
             LoggingInterface::KEY_ID => $orderNotification->getId(),
@@ -113,6 +111,7 @@ class NotificationScheduler implements LoggingInterface, SlackClientAwareInterfa
             self::SLACK_NOTIFICATION_MESSAGE,
             null,
             new SlackMessageAttachmentField('Order ID', $orderNotification->getOrderId(), true),
+            new SlackMessageAttachmentField('Invoice ID', $orderNotification->getInvoiceUuid() ?? '-', true),
             new SlackMessageAttachmentField('Notification ID', $orderNotification->getId(), true)
         );
 

@@ -4,6 +4,8 @@ namespace spec\App\Application\UseCase\OrderOutstandingAmountChange;
 
 use App\Application\UseCase\OrderOutstandingAmountChange\OrderOutstandingAmountChangeRequest;
 use App\Application\UseCase\OrderOutstandingAmountChange\OrderOutstandingAmountChangeUseCase;
+use App\DomainModel\Invoice\Invoice;
+use App\DomainModel\Invoice\InvoiceCollection;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
@@ -19,7 +21,6 @@ use Ozean12\Money\Money;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\Workflow;
 
 class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
@@ -42,7 +43,6 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         MerchantRepositoryInterface $merchantRepository,
         NotificationScheduler $notificationScheduler,
         MerchantDebtorLimitsService $limitsService,
-        Registry $workflowRegistry,
         OrderNotificationPayloadFactory $orderEventPayloadFactory,
         Workflow $workflow,
         OrderContainer $orderContainer,
@@ -56,8 +56,6 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         $orderContainer->getOrder()->willReturn($order);
         $order->getId()->willReturn(1);
         $order->getExternalCode()->willReturn('ABCD123');
-
-        $workflowRegistry->get($order)->willReturn($workflow);
     }
 
     public function it_should_schedule_event_if_everything_is_fine(
@@ -80,6 +78,8 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
             'John Smith'
         );
 
+        $invoice = (new Invoice())->setUuid(self::PAYMENT_ID);
+
         $eventPayload = [
             'event' => 'payment',
             'order_id' => 'ABCD123',
@@ -92,6 +92,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
 
         $orderEventPayloadFactory->create(
             $order,
+            $invoice,
             OrderNotificationEntity::NOTIFICATION_TYPE_PAYMENT,
             [
                 'amount' => 75,
@@ -102,11 +103,17 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         )->willReturn($eventPayload);
 
         $orderContainerFactory
-            ->createFromInvoiceId(self::PAYMENT_ID)
+            ->loadByInvoiceUuid(self::PAYMENT_ID)
             ->shouldBeCalled()
             ->willReturn($orderContainer);
 
         $orderContainer->getMerchant()->shouldBeCalledOnce()->willReturn($merchant);
+        $orderContainer->getInvoices()
+            ->shouldBeCalledOnce()
+            ->willReturn(new InvoiceCollection([
+                $invoice,
+            ]))
+        ;
 
         $limitsService->unlock($orderContainer, new Money(self::AMOUNT_CHANGE_CENTS, 2))->shouldBeCalledOnce();
         $merchantRepository->update($merchant)->shouldBeCalledOnce();
@@ -114,6 +121,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         $notificationScheduler
             ->createAndSchedule(
                 $order,
+                $invoice->getUuid(),
                 OrderNotificationEntity::NOTIFICATION_TYPE_PAYMENT,
                 $eventPayload
             )
@@ -145,8 +153,10 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
             'John Smith'
         );
 
+        $invoice = (new Invoice())->setUuid(self::PAYMENT_ID);
+
         $orderContainerFactory
-            ->createFromInvoiceId(self::PAYMENT_ID)
+            ->loadByInvoiceUuid(self::PAYMENT_ID)
             ->shouldBeCalled()
             ->willReturn($orderContainer);
 
@@ -161,6 +171,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
 
         $orderEventPayloadFactory->create(
             $order,
+            $invoice,
             OrderNotificationEntity::NOTIFICATION_TYPE_PAYMENT,
             [
                 'amount' => 75,
@@ -171,6 +182,12 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         )->willReturn($eventPayload);
 
         $orderContainer->getMerchant()->shouldBeCalledOnce()->willReturn($merchant);
+        $orderContainer->getInvoices()
+            ->shouldBeCalledOnce()
+            ->willReturn(new InvoiceCollection([
+                $invoice,
+            ]))
+        ;
 
         $limitsService->unlock($orderContainer, new Money(self::AMOUNT_CHANGE_CENTS, 2))->shouldBeCalledOnce();
         $merchantRepository->update($merchant)->shouldBeCalledOnce();
@@ -180,6 +197,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         $notificationScheduler
             ->createAndSchedule(
                 $order,
+                $invoice->getUuid(),
                 OrderNotificationEntity::NOTIFICATION_TYPE_PAYMENT,
                 $eventPayload
             )
@@ -198,7 +216,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         OrderEntity $order
     ) {
         $orderContainerFactory
-            ->createFromInvoiceId(self::PAYMENT_ID)
+            ->loadByInvoiceUuid(self::PAYMENT_ID)
             ->shouldBeCalled()
             ->willReturn($orderContainer);
 
@@ -221,7 +239,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         $limitsService->unlock($orderContainer, new Money(0, 2))->shouldNotBeCalled();
         $merchantRepository->update($orderContainer->getMerchant())->shouldNotBeCalled();
 
-        $notificationScheduler->createAndSchedule(Argument::any(), Argument::any())->shouldNotBeCalled();
+        $notificationScheduler->createAndSchedule(Argument::any(), Argument::any(), Argument::any())->shouldNotBeCalled();
 
         $this->execute($request);
     }
@@ -244,14 +262,14 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         );
 
         $orderContainerFactory
-            ->createFromInvoiceId(self::PAYMENT_ID)
+            ->loadByInvoiceUuid(self::PAYMENT_ID)
             ->shouldBeCalled()
             ->willThrow(OrderContainerFactoryException::class);
 
         $limitsService->unlock($orderContainer, new Money(self::AMOUNT_CHANGE_CENTS))->shouldNotBeCalled();
         $merchantRepository->update($orderContainer->getMerchant())->shouldNotBeCalled();
 
-        $notificationScheduler->createAndSchedule(Argument::any(), Argument::any())->shouldNotBeCalled();
+        $notificationScheduler->createAndSchedule(Argument::any(), Argument::any(), Argument::any())->shouldNotBeCalled();
 
         $this->execute($request);
     }
@@ -276,7 +294,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         );
 
         $orderContainerFactory
-            ->createFromInvoiceId(self::PAYMENT_ID)
+            ->loadByInvoiceUuid(self::PAYMENT_ID)
             ->shouldBeCalled()
             ->willReturn($orderContainer);
 
@@ -285,7 +303,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
         $limitsService->unlock($orderContainer, Argument::any())->shouldNotBeCalled();
         $merchantRepository->update($merchant)->shouldBeCalledOnce();
 
-        $notificationScheduler->createAndSchedule(Argument::any(), Argument::any())->shouldNotBeCalled();
+        $notificationScheduler->createAndSchedule(Argument::any(), Argument::any(), Argument::any())->shouldNotBeCalled();
 
         $order->wasShipped()->shouldBeCalledOnce()->willReturn(true);
 

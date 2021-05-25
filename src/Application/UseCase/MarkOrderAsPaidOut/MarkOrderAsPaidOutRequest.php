@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Application\UseCase\MarkOrderAsPaidOutV1;
+namespace App\Application\UseCase\MarkOrderAsPaidOut;
 
-class MarkOrderAsPaidOutV1Request
+class MarkOrderAsPaidOutRequest
 {
     private string $invoiceUuid;
 

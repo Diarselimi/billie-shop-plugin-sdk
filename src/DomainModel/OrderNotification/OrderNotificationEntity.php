@@ -6,25 +6,33 @@ use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 
 class OrderNotificationEntity extends AbstractTimestampableEntity
 {
-    const NOTIFICATION_TYPE_ORDER_APPROVED = 'order_approved';
+    public const NOTIFICATION_TYPE_ORDER_APPROVED = 'order_approved';
 
-    const NOTIFICATION_TYPE_ORDER_DECLINED = 'order_declined';
+    public const NOTIFICATION_TYPE_ORDER_DECLINED = 'order_declined';
 
-    const NOTIFICATION_TYPE_PAYMENT = 'payment';
+    public const NOTIFICATION_TYPE_PAYMENT = 'payment';
 
-    const NOTIFICATION_TYPE_DCI_COMMUNICATION = 'dci_communication';
+    public const NOTIFICATION_TYPE_DCI_COMMUNICATION = 'dci_communication';
 
-    const NOTIFICATION_TYPE_ORDER_WAITING = 'order_waiting';
+    public const NOTIFICATION_TYPE_ORDER_WAITING = 'order_waiting';
 
-    const NOTIFICATION_TYPE_ORDER_SHIPPED = 'order_shipped';
+    public const NOTIFICATION_TYPE_ORDER_SHIPPED = 'order_shipped';
 
-    const NOTIFICATION_TYPE_ORDER_PAID_OUT = 'order_paid_out';
+    public const NOTIFICATION_TYPE_ORDER_PAID_OUT = 'order_paid_out';
 
-    const NOTIFICATION_TYPE_ORDER_LATE = 'order_late';
+    public const NOTIFICATION_TYPE_ORDER_LATE = 'order_late';
 
-    const NOTIFICATION_TYPE_ORDER_CANCELED = 'order_canceled';
+    public const NOTIFICATION_TYPE_ORDER_CANCELED = 'order_canceled';
+
+    public const NOTIFICATION_TYPE_INVOICE_CANCELED = 'invoice_canceled';
+
+    public const NOTIFICATION_TYPE_INVOICE_LATE = 'invoice_late';
+
+    public const NOTIFICATION_TYPE_INVOICE_PAID_OUT = 'invoice_paid_out';
 
     private $orderId;
+
+    private $invoiceUuid;
 
     private $notificationType;
 
@@ -34,14 +42,26 @@ class OrderNotificationEntity extends AbstractTimestampableEntity
 
     private $deliveries;
 
-    public function getOrderId(): int
+    public function getOrderId(): ?int
     {
         return $this->orderId;
     }
 
-    public function setOrderId(int $orderId): OrderNotificationEntity
+    public function setOrderId(?int $orderId): OrderNotificationEntity
     {
         $this->orderId = $orderId;
+
+        return $this;
+    }
+
+    public function getInvoiceUuid(): ?string
+    {
+        return $this->invoiceUuid;
+    }
+
+    public function setInvoiceUuid(?string $invoiceUuid): OrderNotificationEntity
+    {
+        $this->invoiceUuid = $invoiceUuid;
 
         return $this;
     }

@@ -2,7 +2,6 @@
 
 namespace App\Amqp\Handler;
 
-use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\MarkOrderAsLate\MarkOrderAsLateRequest;
 use App\Application\UseCase\MarkOrderAsLate\MarkOrderAsLateUseCase;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
@@ -27,10 +26,6 @@ class InvoiceMarkedAsLateHandler implements MessageHandlerInterface, LoggingInte
             $this->orderMakeLateUseCase->execute(
                 new MarkOrderAsLateRequest($message->getInvoice()->getUuid())
             );
-        } catch (WorkflowException $exception) {
-            $this->logInfo('Order can\'t be marked as late', [
-                LoggingInterface::KEY_UUID => $message->getInvoice()->getPaymentUuid(),
-            ]);
         } catch (\Exception $exception) {
             $this->logSuppressedException($exception, $exception->getMessage());
         }

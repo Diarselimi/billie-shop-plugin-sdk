@@ -22,6 +22,7 @@ class OrderDunningStepChangedHandler implements MessageHandlerInterface
     {
         $request = new UpdateMerchantWithOrderDunningStepRequest(
             $message->getUuid(),
+            $message->getInvoiceUuid(),
             $message->getDunningStep()
         );
 

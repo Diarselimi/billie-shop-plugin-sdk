@@ -4,8 +4,12 @@ namespace spec\App\Application\UseCase\UpdateMerchantWithOrderDunningStep;
 
 use App\Application\UseCase\UpdateMerchantWithOrderDunningStep\UpdateMerchantWithOrderDunningStepRequest;
 use App\Application\UseCase\UpdateMerchantWithOrderDunningStep\UpdateMerchantWithOrderDunningStepUseCase;
+use App\DomainModel\Invoice\Invoice;
+use App\DomainModel\Invoice\InvoiceCollection;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderNotification\NotificationScheduler;
 use App\DomainModel\OrderNotification\OrderNotificationEntity;
 use App\DomainModel\OrderNotification\OrderNotificationPayloadFactory;
@@ -16,19 +20,21 @@ use Psr\Log\NullLogger;
 
 class UpdateMerchantWithOrderDunningStepUseCaseSpec extends ObjectBehavior
 {
-    const ORDER_UUID = 'dwokwdowdo22ok2ok2o2k';
+    private const ORDER_UUID = 'dwokwdowdo22ok2ok2o2k';
 
-    const ORDER_EXTERNAL_ID = 'test';
+    private const INVOICE_UUID = 'invoice_uuid_1234';
 
-    const MERCHANT_ID = 1;
+    private const ORDER_EXTERNAL_ID = 'test';
+
+    private const MERCHANT_ID = 1;
 
     public function let(
-        OrderRepositoryInterface $orderRepository,
+        OrderContainerFactory $orderContainerFactory,
         NotificationScheduler $notificationScheduler,
         OrderNotificationPayloadFactory $orderEventPayloadFactory,
         RavenClient $sentry
     ) {
-        $this->beConstructedWith($orderRepository, $notificationScheduler, $orderEventPayloadFactory);
+        $this->beConstructedWith($orderContainerFactory, $notificationScheduler, $orderEventPayloadFactory);
 
         $this->setLogger(new NullLogger())->setSentry($sentry);
     }
@@ -39,12 +45,12 @@ class UpdateMerchantWithOrderDunningStepUseCaseSpec extends ObjectBehavior
     }
 
     public function it_does_nothing_if_order_was_not_found(
-        OrderRepositoryInterface $orderRepository,
+        OrderContainerFactory $orderContainerFactory,
         NotificationScheduler $notificationScheduler
     ) {
-        $request = new UpdateMerchantWithOrderDunningStepRequest(self::ORDER_UUID, 's');
+        $request = new UpdateMerchantWithOrderDunningStepRequest(self::ORDER_UUID, self::INVOICE_UUID, 's');
 
-        $orderRepository->getOneByUuid(self::ORDER_UUID)->shouldBeCalled()->willReturn(null);
+        $orderContainerFactory->loadByUuid(self::ORDER_UUID)->shouldBeCalled()->willThrow(new OrderContainerFactoryException());
 
         $notificationScheduler->createAndSchedule(Argument::any())->shouldNotBeCalled();
 
@@ -52,25 +58,34 @@ class UpdateMerchantWithOrderDunningStepUseCaseSpec extends ObjectBehavior
     }
 
     public function it_sends_notification_to_merchant_webhook_with_dunning_step(
-        OrderRepositoryInterface $orderRepository,
+        OrderContainerFactory $orderContainerFactory,
         NotificationScheduler $notificationScheduler,
         OrderEntity $orderEntity,
+        OrderContainer $orderContainer,
+        Invoice $invoice,
+        InvoiceCollection $invoiceCollection,
         OrderNotificationPayloadFactory $orderEventPayloadFactory
     ) {
-        $request = new UpdateMerchantWithOrderDunningStepRequest(self::ORDER_UUID, 'Dunning');
+        $request = new UpdateMerchantWithOrderDunningStepRequest(self::ORDER_UUID, self::INVOICE_UUID, 'Dunning');
 
         $orderEntity->getExternalCode()->willReturn(self::ORDER_EXTERNAL_ID);
         $orderEntity->getMerchantId()->willReturn(self::MERCHANT_ID);
-        $orderRepository->getOneByUuid(self::ORDER_UUID)->shouldBeCalled()->willReturn($orderEntity);
+        $orderContainerFactory->loadByUuid(self::ORDER_UUID)->shouldBeCalled()->willReturn($orderContainer);
+
+        $orderContainer->getOrder()->willReturn($orderEntity);
+        $orderContainer->getInvoices()->willReturn($invoiceCollection);
+        $invoice->getUuid()->willReturn(self::INVOICE_UUID);
+        $invoiceCollection->get(self::INVOICE_UUID)->willReturn($invoice);
 
         $payload = ['event' => 'Dunning', 'order_id' => self::ORDER_EXTERNAL_ID];
-        $orderEventPayloadFactory->create($orderEntity, 'Dunning')->willReturn($payload);
+        $orderEventPayloadFactory->create($orderEntity, $invoice, 'Dunning')->willReturn($payload);
 
         $notificationScheduler
             ->createAndSchedule(
                 $orderEntity,
+                Argument::any(),
                 OrderNotificationEntity::NOTIFICATION_TYPE_DCI_COMMUNICATION,
-                $payload
+                Argument::any()
             )
             ->shouldBeCalled()
         ;

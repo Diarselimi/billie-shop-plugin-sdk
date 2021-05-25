@@ -3,6 +3,7 @@
 namespace App\Application\UseCase\OrderOutstandingAmountChange;
 
 use App\Application\Exception\WorkflowException;
+use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\OrderNotification\OrderNotificationEntity;
 use App\DomainModel\OrderNotification\OrderNotificationPayloadFactory;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
@@ -14,7 +15,6 @@ use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\OrderNotification\NotificationScheduler;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
-use Symfony\Component\Workflow\Registry;
 
 class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 {
@@ -28,8 +28,6 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 
     private MerchantDebtorLimitsService $limitsService;
 
-    private Registry $workflowRegistry;
-
     private OrderNotificationPayloadFactory $orderEventPayloadFactory;
 
     public function __construct(
@@ -37,24 +35,22 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
         MerchantRepositoryInterface $merchantRepository,
         NotificationScheduler $notificationScheduler,
         MerchantDebtorLimitsService $limitsService,
-        Registry $workflowRegistry,
         OrderNotificationPayloadFactory $orderEventPayloadFactory
     ) {
         $this->orderContainerFactory = $orderContainerFactory;
         $this->merchantRepository = $merchantRepository;
         $this->notificationScheduler = $notificationScheduler;
         $this->limitsService = $limitsService;
-        $this->workflowRegistry = $workflowRegistry;
         $this->orderEventPayloadFactory = $orderEventPayloadFactory;
     }
 
     public function execute(OrderOutstandingAmountChangeRequest $request): void
     {
         try {
-            $orderContainer = $this->orderContainerFactory->createFromInvoiceId($request->getId());
+            $orderContainer = $this->orderContainerFactory->loadByInvoiceUuid($request->getInvoiceUuid());
         } catch (OrderContainerFactoryException $exception) {
             $this->logError("Skipping the invoice {uuid}", [
-                LoggingInterface::KEY_UUID => $request->getId(),
+                LoggingInterface::KEY_UUID => $request->getInvoiceUuid(),
             ]);
 
             return;
@@ -92,18 +88,25 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
             return;
         }
 
-        $this->scheduleMerchantNotification($order, $request);
+        $this->scheduleMerchantNotification(
+            $order,
+            $orderContainer->getInvoices()->get($request->getInvoiceUuid()),
+            $request
+        );
     }
 
     private function scheduleMerchantNotification(
         OrderEntity $order,
+        Invoice $invoice,
         OrderOutstandingAmountChangeRequest $request
     ): void {
         $this->notificationScheduler->createAndSchedule(
             $order,
+            $invoice->getUuid(),
             OrderNotificationEntity::NOTIFICATION_TYPE_PAYMENT,
             $this->orderEventPayloadFactory->create(
                 $order,
+                $invoice,
                 OrderNotificationEntity::NOTIFICATION_TYPE_PAYMENT,
                 [
                     'amount' => $request->getPaidAmount()->toFloat(),

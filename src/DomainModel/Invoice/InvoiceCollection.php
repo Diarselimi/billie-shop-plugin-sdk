@@ -21,6 +21,11 @@ class InvoiceCollection implements CollectionInterface
         }
     }
 
+    public function get(string $uuid): ?Invoice
+    {
+        return $this->elements[$uuid] ?? null;
+    }
+
     public function getInvoicesCreditNotesGrossSum(): Money
     {
         $totalAmount = new Money(0);

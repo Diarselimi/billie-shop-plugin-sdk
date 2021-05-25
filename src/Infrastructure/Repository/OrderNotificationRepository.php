@@ -11,7 +11,7 @@ use DateTime;
 
 class OrderNotificationRepository extends AbstractPdoRepository implements OrderNotificationRepositoryInterface
 {
-    private const SELECT_FIELDS = 'id, order_id, notification_type, payload, is_delivered, created_at, updated_at';
+    private const SELECT_FIELDS = 'id, order_id, invoice_uuid, notification_type, payload, is_delivered, created_at, updated_at';
 
     private $factory;
 
@@ -29,11 +29,12 @@ class OrderNotificationRepository extends AbstractPdoRepository implements Order
     {
         $id = $this->doInsert('
             INSERT INTO order_notifications
-            (order_id, notification_type, payload, is_delivered, created_at, updated_at)
+            (order_id, invoice_uuid, notification_type, payload, is_delivered, created_at, updated_at)
             VALUES
-            (:order_id, :notification_type, :payload, :is_delivered, :created_at, :updated_at)
+            (:order_id, :invoice_uuid, :notification_type, :payload, :is_delivered, :created_at, :updated_at)
         ', [
             'order_id' => $orderNotification->getOrderId(),
+            'invoice_uuid' => $orderNotification->getInvoiceUuid(),
             'notification_type' => $orderNotification->getNotificationType(),
             'payload' => json_encode($orderNotification->getPayload()),
             'is_delivered' => (int) $orderNotification->isDelivered(),
