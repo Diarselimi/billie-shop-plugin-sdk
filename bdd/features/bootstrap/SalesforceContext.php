@@ -117,4 +117,18 @@ class SalesforceContext implements Context
             )
         );
     }
+
+    /**
+     * @Given /^Salesforce pause dunning fails with invoice succeeds with order$/
+     */
+    public function salesforcePauseDunningFailsWithInvoiceSucceedsWithOrder()
+    {
+        $this->mockRequest(
+            '/api/services/apexrest/v1/dunning',
+            new ResponseStack(
+                new MockResponse('', [], 404),
+                new MockResponse(json_encode(['success' => true, 'message' => null]), [], 204)
+            )
+        );
+    }
 }

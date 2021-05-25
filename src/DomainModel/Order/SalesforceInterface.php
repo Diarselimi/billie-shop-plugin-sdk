@@ -3,10 +3,11 @@
 namespace App\DomainModel\Order;
 
 use App\DomainModel\Invoice\Invoice;
+use App\DomainModel\Salesforce\PauseDunningRequestBuilder;
 
 interface SalesforceInterface
 {
-    public function pauseOrderDunning(string $orderUuid, int $numberOfDays): void;
+    public function pauseDunning(PauseDunningRequestBuilder $requestBuilder): void;
 
     public function getOrderDunningStatus(string $orderUuid): ? string;
 

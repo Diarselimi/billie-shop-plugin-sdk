@@ -2,12 +2,13 @@
 
 namespace spec\App\Application\UseCase\PauseOrderDunning;
 
-use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\PauseOrderDunning\PauseOrderDunningException;
 use App\Application\UseCase\PauseOrderDunning\PauseOrderDunningRequest;
 use App\Application\UseCase\PauseOrderDunning\PauseOrderDunningUseCase;
+use App\DomainModel\Invoice\InvoiceCollection;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\SalesforceInterface;
 use App\Infrastructure\Salesforce\Exception\SalesforcePauseDunningException;
 use PhpSpec\ObjectBehavior;
@@ -25,13 +26,25 @@ class PauseOrderDunningUseCaseSpec extends ObjectBehavior
     private const ORDER_UUID = 'test-uuid';
 
     public function let(
-        OrderRepositoryInterface $orderRepository,
         SalesforceInterface $salesforce,
+        OrderContainerFactory $orderContainerFactory,
+        OrderContainer $orderContainer,
+        InvoiceCollection $invoiceCollection,
+        OrderEntity $order,
         ValidatorInterface $validator
     ) {
-        $this->beConstructedWith($orderRepository, $salesforce);
+        $orderContainer->getInvoices()->willReturn($invoiceCollection);
+        $orderContainer->getOrder()->willReturn($order);
+        $invoiceCollection->isEmpty()->willReturn(true);
+        $orderContainerFactory->loadByMerchantIdAndExternalIdOrUuid(Argument::cetera())->willReturn($orderContainer);
 
-        $validator->validate(Argument::any(), Argument::any(), Argument::any())->willReturn(new ConstraintViolationList());
+        $this->beConstructedWith($salesforce, $orderContainerFactory);
+
+        $validator->validate(
+            Argument::any(),
+            Argument::any(),
+            Argument::any()
+        )->willReturn(new ConstraintViolationList());
 
         $this->setLogger(new NullLogger())->setValidator($validator);
     }
@@ -41,64 +54,40 @@ class PauseOrderDunningUseCaseSpec extends ObjectBehavior
         $this->shouldHaveType(PauseOrderDunningUseCase::class);
     }
 
-    public function it_throws_exception_if_order_doesnt_exist(OrderRepositoryInterface $orderRepository)
-    {
-        $request = $this->mockRequest(10);
-
-        $orderRepository
-            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_ID, self::MERCHANT_ID)
-            ->shouldBeCalled()
-            ->willReturn(null)
-        ;
-
-        $this->shouldThrow(OrderNotFoundException::class)->during('execute', [$request]);
-    }
-
     public function it_throws_exception_if_order_is_not_in_state_late(
-        OrderRepositoryInterface $orderRepository,
+        OrderContainer $orderContainer,
         OrderEntity $order
     ) {
         $request = $this->mockRequest(10);
 
-        $orderRepository
-            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_ID, self::MERCHANT_ID)
-            ->shouldBeCalled()
-            ->willReturn($order)
-        ;
-
         $order->isLate()->shouldBeCalled()->willReturn(false);
+        $orderContainer->getOrder()->willReturn($order);
 
         $this->shouldThrow(PauseOrderDunningException::class)->during('execute', [$request]);
     }
 
     public function it_throws_exception_if_salesforce_call_failed(
-        OrderRepositoryInterface $orderRepository,
+        OrderContainer $orderContainer,
         SalesforceInterface $salesforce,
         OrderEntity $order
     ) {
         $request = $this->mockRequest(10);
 
         $order->getUuid()->willReturn(self::ORDER_UUID);
-
-        $orderRepository
-            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_ID, self::MERCHANT_ID)
-            ->shouldBeCalled()
-            ->willReturn($order)
-        ;
-
         $order->isLate()->shouldBeCalled()->willReturn(true);
 
+        $orderContainer->getOrder()->willReturn($order);
+
         $salesforce
-            ->pauseOrderDunning(self::ORDER_UUID, 10)
+            ->pauseDunning(Argument::any())
             ->shouldBeCalled()
-            ->willThrow(SalesforcePauseDunningException::class)
-        ;
+            ->willThrow(SalesforcePauseDunningException::class);
 
         $this->shouldThrow(PauseOrderDunningException::class)->during('execute', [$request]);
     }
 
     public function it_successfully_calls_salesforce_to_pause_order_dunning(
-        OrderRepositoryInterface $orderRepository,
+        OrderContainer $orderContainer,
         SalesforceInterface $salesforce,
         OrderEntity $order
     ) {
@@ -106,14 +95,10 @@ class PauseOrderDunningUseCaseSpec extends ObjectBehavior
 
         $order->getUuid()->willReturn(self::ORDER_UUID);
 
-        $orderRepository
-            ->getOneByMerchantIdAndExternalCodeOrUUID(self::ORDER_ID, self::MERCHANT_ID)
-            ->shouldBeCalled()
-            ->willReturn($order)
-        ;
-
         $order->isLate()->shouldBeCalled()->willReturn(true);
-        $salesforce->pauseOrderDunning(self::ORDER_UUID, 10)->shouldBeCalled();
+        $orderContainer->getOrder()->willReturn($order);
+
+        $salesforce->pauseDunning(Argument::any())->shouldBeCalled();
 
         $this->execute($request);
     }
