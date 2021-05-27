@@ -23,7 +23,7 @@ class OrderNotificationService
     {
         $this->notificationScheduler->createAndSchedule(
             $order,
-            $invoice,
+            $invoice ? $invoice->getUuid() : null,
             $notificationType,
             $this->orderNotificationPayloadFactory->create($order, $invoice, $notificationType)
         );
