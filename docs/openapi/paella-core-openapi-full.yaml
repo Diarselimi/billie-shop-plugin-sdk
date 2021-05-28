@@ -1037,6 +1037,24 @@ paths:
       security:
         -
           oauth2: []
+  '/checkout-session/{sessionUuid}/decline':
+    get:
+      tags:
+        - 'Checkout Server'
+      summary: 'Decline orders in authorised state.'
+      operationId: checkout_session_decline
+      responses:
+        '204':
+          description: 'Order successfully cancelled'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
   '/checkout-session/{sessionUuid}/authorize':
     put:
       tags:

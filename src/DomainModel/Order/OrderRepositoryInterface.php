@@ -2,7 +2,6 @@
 
 namespace App\DomainModel\Order;
 
-use App\DomainModel\Invoice\Invoice;
 use Generator;
 
 interface OrderRepositoryInterface

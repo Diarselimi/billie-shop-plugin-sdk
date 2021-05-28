@@ -88,6 +88,14 @@ security:
         authenticators:
           - App\Http\Authentication\Authenticator\ExistingCheckoutSessionAuthenticator
 
+    checkout_decline:
+      pattern: ^/(public/)?(api/)?(v[1-2]/)?checkout-session/.*/decline
+      anonymous: false
+      stateless: true
+      guard:
+        authenticators:
+          - App\Http\Authentication\Authenticator\ExistingCheckoutSessionAuthenticator
+
     get_external_debtors:
       pattern: ^/(public/)?(api/)?(v[1-2]/)?external-debtors
       anonymous: false

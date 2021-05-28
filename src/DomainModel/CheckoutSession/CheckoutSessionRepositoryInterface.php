@@ -11,4 +11,6 @@ interface CheckoutSessionRepositoryInterface
     public function findOneByUuid(string $uuid): ?CheckoutSessionEntity;
 
     public function invalidateById(int $id): bool;
+
+    public function reActivateSession(string $sessionUuid): void;
 }

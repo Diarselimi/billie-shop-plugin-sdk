@@ -66,4 +66,11 @@ class CheckoutSessionRepository extends AbstractPdoRepository implements Checkou
 
         return $this->doExecute($sql, ['id' => $id])->execute();
     }
+
+    public function reActivateSession(string $sessionUuid): void
+    {
+        $sql = "UPDATE ".self::TABLE_NAME." SET is_active = 1 WHERE uuid = :uuid";
+
+        $this->doExecute($sql, ['uuid' => $sessionUuid])->execute();
+    }
 }
