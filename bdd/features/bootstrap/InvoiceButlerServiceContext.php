@@ -68,6 +68,28 @@ class InvoiceButlerServiceContext implements Context
     }
 
     /**
+     * @Given /^I get from invoice-butler service no invoices and later one invoice responses$/
+     */
+    public function invoiceButlerApiRespondedWithNoInvoicesAndOneInvoiceLater()
+    {
+        $this->mockRequest('/invoices', new ResponseStack(
+            new MockResponse('[]'),
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/invoice_butler_good_response.json'))
+        ));
+    }
+
+    /**
+     * @Given /^I get from invoice-butler service no invoices and later one invoice no cns responses$/
+     */
+    public function invoiceButlerApiRespondedWithNoInvoicesAndOneInvoiceNoCNsLater()
+    {
+        $this->mockRequest('/invoices', new ResponseStack(
+            new MockResponse('[]'),
+            new MockResponse(file_get_contents(__DIR__ . '/../resources/invoice_butler_good_response_no_CN.json'))
+        ));
+    }
+
+    /**
      * @Given /^I get from invoice-butler service an invoice that can be extended$/
      */
     public function invoiceButlerApiRespondedWithExtendableInvoice()

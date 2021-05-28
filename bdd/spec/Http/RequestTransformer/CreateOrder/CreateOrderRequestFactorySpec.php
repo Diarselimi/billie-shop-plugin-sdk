@@ -4,6 +4,7 @@ namespace spec\App\Http\RequestTransformer\CreateOrder;
 
 use App\Application\UseCase\CreateOrder\Request\CreateOrderDebtorCompanyRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderDebtorPersonRequest;
+use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
 use App\Http\HttpConstantsInterface;
@@ -56,8 +57,10 @@ class CreateOrderRequestFactorySpec extends ObjectBehavior
         DebtorRequestFactory $debtorRequestFactory,
         DebtorPersonRequestFactory $debtorPersonRequestFactory,
         OrderLineItemsRequestFactory $lineItemsRequestFactory,
+        MerchantSettingsRepositoryInterface $merchantSettingsRepository,
         AmountRequestFactory $amountRequestFactory,
-        TaxedMoney $taxedMoney
+        TaxedMoney $taxedMoney,
+        MerchantSettingsEntity $merchantSettingsEntity
     ): void {
         $this->prepareCommonMocks(
             $debtorRequestFactory,
@@ -67,6 +70,8 @@ class CreateOrderRequestFactorySpec extends ObjectBehavior
             $taxedMoney
         );
 
+        $merchantSettingsEntity->getDebtorForgivenessThreshold()->shouldBeCalledOnce()->willReturn(41);
+        $merchantSettingsRepository->getOneByMerchant(Argument::any())->shouldBeCalledOnce()->willReturn($merchantSettingsEntity);
         $request = Request::create('/');
         $request->attributes->set(
             HttpConstantsInterface::REQUEST_ATTRIBUTE_CREATION_SOURCE,

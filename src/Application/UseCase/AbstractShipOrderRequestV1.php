@@ -24,6 +24,7 @@ abstract class AbstractShipOrderRequestV1 extends AbstractOrderRequest implement
 
     /**
      * @Assert\NotBlank()
+     * @CustomAssert\InvoiceExternalCode()
      * @Assert\Type(type="string")
      * @Assert\Length(max="255")
      */

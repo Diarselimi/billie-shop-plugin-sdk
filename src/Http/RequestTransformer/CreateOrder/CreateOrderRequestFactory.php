@@ -47,15 +47,22 @@ class CreateOrderRequestFactory
 
     public function createForLegacyCreateOrder(Request $request): LegacyCreateOrderRequest
     {
+        $merchantId = $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID);
+        $creationSource = $request->attributes->get(
+            HttpConstantsInterface::REQUEST_ATTRIBUTE_CREATION_SOURCE,
+            OrderEntity::CREATION_SOURCE_API
+        );
+
+        if ($creationSource === OrderEntity::CREATION_SOURCE_DASHBOARD) {
+            $request->attributes->set('workflow_name', $this->getWorkflowName($merchantId));
+        }
+
         $useCaseRequest = (new LegacyCreateOrderRequest())
             ->setAmount($this->amountRequestFactory->create($request))
             ->setCheckoutSessionId($request->attributes->get('checkout_session_id', null))
-            ->setCreationSource($request->attributes->get(
-                HttpConstantsInterface::REQUEST_ATTRIBUTE_CREATION_SOURCE,
-                OrderEntity::CREATION_SOURCE_API
-            ))
+            ->setCreationSource($creationSource)
             ->setWorkflowName($request->attributes->get('workflow_name', self::DEFAULT_WORKFLOW))
-            ->setMerchantId($request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID))
+            ->setMerchantId($merchantId)
             ->setDuration($request->request->getInt('duration'))
             ->setComment($request->request->get('comment'))
             ->setExternalCode($request->request->get('order_id'))
