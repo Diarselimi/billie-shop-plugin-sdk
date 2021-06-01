@@ -8,8 +8,9 @@ use App\Application\UseCase\GetMerchantCredentials\GetMerchantCredentialsRequest
 use App\Application\UseCase\GetMerchantCredentials\GetMerchantCredentialsResponse;
 use App\Application\UseCase\GetMerchantCredentials\GetMerchantCredentialsUseCase;
 use App\Http\Authentication\UserProvider;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use OpenApi\Annotations as OA;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * @IsGranted("ROLE_VIEW_CREDENTIALS")
@@ -46,6 +47,10 @@ class GetMerchantCredentialsController
     public function execute(): GetMerchantCredentialsResponse
     {
         $merchant = $this->userProvider->getUser()->getMerchant();
+        if ($merchant->getOauthClientId() === null) {
+            throw new HttpException(500, 'OAuth client not found.');
+        }
+
         $useCaseRequest = new GetMerchantCredentialsRequest(
             $merchant->getId(),
             $merchant->getOauthClientId(),
