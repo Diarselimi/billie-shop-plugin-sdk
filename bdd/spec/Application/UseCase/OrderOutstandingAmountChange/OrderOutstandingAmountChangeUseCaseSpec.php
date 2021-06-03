@@ -266,6 +266,11 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willThrow(OrderContainerFactoryException::class);
 
+        $orderContainerFactory
+            ->createFromPaymentId(self::PAYMENT_ID)
+            ->shouldBeCalled()
+            ->willThrow(OrderContainerFactoryException::class);
+
         $limitsService->unlock($orderContainer, new Money(self::AMOUNT_CHANGE_CENTS))->shouldNotBeCalled();
         $merchantRepository->update($orderContainer->getMerchant())->shouldNotBeCalled();
 

@@ -49,11 +49,21 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
         try {
             $orderContainer = $this->orderContainerFactory->loadByInvoiceUuid($request->getInvoiceUuid());
         } catch (OrderContainerFactoryException $exception) {
-            $this->logError("Skipping the invoice {uuid}", [
+            //TODO: temporary fix while we still have random orders:
+            $this->logError("Random uuid issue? Checking the payment uuid", [
                 LoggingInterface::KEY_UUID => $request->getInvoiceUuid(),
             ]);
 
-            return;
+            try {
+                $orderContainer = $this->orderContainerFactory->createFromPaymentId($request->getInvoiceUuid());
+                $this->logInfo("Found by the payment uuid");
+            } catch (OrderContainerFactoryException $exception) {
+                $this->logError("Skipping the invoice {uuid}", [
+                    LoggingInterface::KEY_UUID => $request->getInvoiceUuid(),
+                ]);
+
+                return;
+            }
         }
 
         $order = $orderContainer->getOrder();
