@@ -100,7 +100,7 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 
         $this->scheduleMerchantNotification(
             $order,
-            $orderContainer->getInvoices()->get($request->getInvoiceUuid()),
+            $orderContainer->getInvoices()->get($request->getInvoiceUuid()) ?? $orderContainer->getInvoices()->getLastInvoice(),
             $request
         );
     }
