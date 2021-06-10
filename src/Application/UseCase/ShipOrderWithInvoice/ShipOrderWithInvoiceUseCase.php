@@ -19,11 +19,12 @@ use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentCreator;
 use App\DomainModel\OrderResponse\LegacyOrderResponse;
 use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
 use App\DomainModel\ShipOrder\ShipOrderException;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
 use Symfony\Component\Workflow\Registry;
 
-class ShipOrderWithInvoiceUseCase implements ValidatedUseCaseInterface
+class ShipOrderWithInvoiceUseCase implements ValidatedUseCaseInterface, LoggingInterface
 {
     use ValidatedUseCaseTrait,
         LoggingTrait;
