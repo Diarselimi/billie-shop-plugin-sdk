@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\DomainModel\Invoice;
 
-use App\DomainModel\CollectionInterface;
+use App\Support\CollectionInterface;
 use Ozean12\Money\Money;
 
 class InvoiceCollection implements CollectionInterface
@@ -55,6 +55,9 @@ class InvoiceCollection implements CollectionInterface
         return end($this->elements) ? end($this->elements) : null;
     }
 
+    /**
+     * @return Invoice[]
+     */
     public function toArray(): array
     {
         return $this->elements;

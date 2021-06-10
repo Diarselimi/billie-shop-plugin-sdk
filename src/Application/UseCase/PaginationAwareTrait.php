@@ -2,6 +2,8 @@
 
 namespace App\Application\UseCase;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
 /**
  * @mixin PaginationAwareInterface
  */

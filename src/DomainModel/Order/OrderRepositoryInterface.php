@@ -48,26 +48,6 @@ interface OrderRepositoryInterface
      */
     public function getOrdersByInvoiceHandlingStrategy(string $strategy): Generator;
 
-    /**
-     * @param  int           $merchantId
-     * @param  int           $offset
-     * @param  int           $limit
-     * @param  string        $sortBy
-     * @param  string        $sortDirection
-     * @param  string|null   $searchString
-     * @param  array         $filters
-     * @return OrderEntity[]
-     */
-    public function search(
-        int $merchantId,
-        int $offset,
-        int $limit,
-        string $sortBy,
-        string $sortDirection,
-        ?string $searchString,
-        array $filters
-    ): array;
-
     public function getOrdersCountByMerchantDebtorAndState(int $merchantDebtorId, string $state): int;
 
     public function getOrdersCountByCompanyBillingAddressAndState(

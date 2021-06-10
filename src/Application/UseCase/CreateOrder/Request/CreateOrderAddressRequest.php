@@ -3,8 +3,8 @@
 namespace App\Application\UseCase\CreateOrder\Request;
 
 use App\DomainModel\ArrayableInterface;
-use Symfony\Component\Validator\Constraints as Assert;
 use OpenApi\Annotations as OA;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @OA\Schema(

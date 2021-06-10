@@ -1674,7 +1674,7 @@ class PaellaCoreContext extends MinkContext
             throw new \RuntimeException('Order not found');
         }
 
-        $invoices = $this->getOrderInvoiceRepository()->findByOrderId($order->getId());
+        $invoices = $this->getOrderInvoiceRepository()->findByOrderId($order->getId())->toArray();
         Assert::count($invoices, 1);
     }
 

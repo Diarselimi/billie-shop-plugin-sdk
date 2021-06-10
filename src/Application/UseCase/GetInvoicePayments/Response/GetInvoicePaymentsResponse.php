@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Application\UseCase\GetInvoicePayments\Response;
 
-use App\DomainModel\CollectionInterface;
 use App\DomainModel\Payment\BankTransaction;
+use App\Support\CollectionInterface;
 use OpenApi\Annotations as OA;
 
 /**

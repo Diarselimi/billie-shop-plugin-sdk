@@ -27,17 +27,17 @@ class OrderFinancialDetailsFactory
         ;
     }
 
-    public function createFromDatabaseRow(array $row): OrderFinancialDetailsEntity
+    public function createFromArray(array $row): OrderFinancialDetailsEntity
     {
         return (new OrderFinancialDetailsEntity)
-            ->setId((int) $row['id'])
+            ->setId((int) ($row['order_financial_details_id'] ?? $row['id']))
             ->setOrderId((int) $row['order_id'])
             ->setAmountGross(new Money((float) $row['amount_gross']))
             ->setAmountNet(new Money((float) $row['amount_net']))
             ->setAmountTax(new Money((float) $row['amount_tax']))
             ->setDuration((int) $row['duration'])
-            ->setCreatedAt(new \DateTime($row['created_at']))
-            ->setUpdatedAt(new \DateTime($row['updated_at']))
+            ->setCreatedAt(new \DateTime($row['created_at'] ?? 'now'))
+            ->setUpdatedAt(new \DateTime($row['updated_at'] ?? 'now'))
             ->setUnshippedAmountGross(new Money((float) ($row['unshipped_amount_gross'])))
             ->setUnshippedAmountNet(new Money((float) ($row['unshipped_amount_net'])))
             ->setUnshippedAmountTax(new Money((float) ($row['unshipped_amount_tax'])))

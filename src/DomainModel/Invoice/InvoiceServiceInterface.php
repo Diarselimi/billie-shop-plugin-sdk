@@ -12,6 +12,8 @@ interface InvoiceServiceInterface
 
     public function getOneByUuid(string $uuid): ?Invoice;
 
+    public function getByUuids(array $uuids): InvoiceCollection;
+
     public function createCreditNote(Invoice $invoice, CreditNote $creditNote): void;
 
     public function extendInvoiceDuration(Invoice $invoice): void;

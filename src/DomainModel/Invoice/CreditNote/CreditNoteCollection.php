@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\DomainModel\Invoice\CreditNote;
 
-use App\DomainModel\CollectionInterface;
+use App\Support\CollectionInterface;
 use Ozean12\Money\Money;
 
 class CreditNoteCollection implements CollectionInterface

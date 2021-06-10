@@ -59,7 +59,7 @@ info:
   license:
     name: '© Billie GmbH, 2020'
     url: 'https://www.billie.io/agb/'
-  version: v2021.05
+  version: v2021.06
   x-logo:
     url: 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDIyLjAuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkViZW5lXzJfS29waWUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIKCSB5PSIwcHgiIHZpZXdCb3g9IjAgMCA0OC41IDY3LjYiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDQ4LjUgNjcuNjsiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPgoJLnN0MHtkaXNwbGF5Om5vbmU7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDo3O3N0cm9rZS1taXRlcmxpbWl0OjEwO30KCS5zdDF7ZmlsbDojMUYyNTMwO30KCS5zdDJ7ZmlsbDpub25lO30KCS5zdDN7ZGlzcGxheTpub25lO2VuYWJsZS1iYWNrZ3JvdW5kOm5ldyAgICA7fQoJLnN0NHtmb250LWZhbWlseTonQXZlbmlyTmV4dC1EZW1pQm9sZCc7fQoJLnN0NXtmb250LXNpemU6My4wMzAzcHg7fQoJLnN0NntsZXR0ZXItc3BhY2luZzoyO30KPC9zdHlsZT4KPHBhdGggY2xhc3M9InN0MCIgZD0iTTkuOCw0Ni4xYy0wLjUsMCwyNS4xLTEyLjYsMjUuMS0zMi43YzAtNi45LTUuNi0xMi42LTEyLjYtMTIuNlM5LjcsNi41LDkuNywxMy40TDkuOCw0Ni4xaDE4LjUKCWM2LjksMCwxMi42LTUuNiwxMi42LTEyLjZTMzUuMiwyMSwyOC4yLDIxSDkuNyIvPgo8Zz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0yOC4yLDQ3SDguOHYtMC44YzAtMC4xLDAtMC4yLDAtMC4zVjEzLjVDOC44LDYsMTQuOSwwLDIyLjMsMHMxMy41LDYsMTMuNSwxMy41YzAsMi44LTAuNSw1LjUtMS40LDguMgoJCWM0LjMsMi4yLDcuMyw2LjcsNy4zLDExLjlDNDEuNyw0MSwzNS42LDQ3LDI4LjIsNDd6IE0xMi45LDQ1LjJoMTUuM2M2LjQsMCwxMS43LTUuMywxMS43LTExLjdjMC00LjQtMi41LTguMy02LjEtMTAuMwoJCWMtMS44LDQuNC00LjgsOC43LTksMTIuOEMyMC40LDQwLjQsMTUuOCw0My41LDEyLjksNDUuMnogTTEwLjYsMjEuOXYyMi43YzEzLTcuNywxOC45LTE1LjYsMjEuNS0yMmMtMS4yLTAuNC0yLjUtMC43LTMuOS0wLjdIMTAuNgoJCXogTTEwLjYsMjAuMWgxNy42YzEuNiwwLDMuMSwwLjMsNC41LDAuOGMxLTIuOSwxLjMtNS41LDEuMy03LjRDMzQsNywyOC44LDEuOCwyMi4zLDEuOFMxMC42LDcsMTAuNiwxMy41VjIwLjF6Ii8+CjwvZz4KPHJlY3QgeD0iLTExLjEiIHk9Ii01OC43IiBjbGFzcz0ic3QyIiB3aWR0aD0iODUuNCIgaGVpZ2h0PSI0OS41Ii8+Cjx0ZXh0IHRyYW5zZm9ybT0ibWF0cml4KDEgMCAwIDEgLTEuMDQyNCA2Ny41NzcyKSIgY2xhc3M9InN0MyBzdDQgc3Q1IHN0NiI+QklMTElFPC90ZXh0Pgo8Zz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0wLDU4LjFoMy43YzAuNCwwLDAuNywwLjEsMS4xLDAuMWMwLjQsMC4xLDAuNywwLjIsMC45LDAuNGMwLjMsMC4yLDAuNSwwLjQsMC43LDAuN2MwLjIsMC4zLDAuMywwLjcsMC4zLDEuMQoJCWMwLDAuNS0wLjIsMS0wLjUsMS4zYy0wLjMsMC40LTAuNywwLjYtMS4yLDAuOHYwYzAuNiwwLjEsMS4xLDAuMywxLjUsMC43QzYuOCw2My42LDcsNjQuMiw3LDY0LjhjMCwwLjUtMC4xLDEtMC4zLDEuMwoJCWMtMC4yLDAuNC0wLjUsMC42LTAuOCwwLjljLTAuMywwLjItMC43LDAuNC0xLjIsMC41Yy0wLjQsMC4xLTAuOSwwLjItMS4zLDAuMkgwQzAsNjcuNiwwLDU4LjEsMCw1OC4xeiBNMS43LDYyaDEuNQoJCWMwLjYsMCwxLTAuMSwxLjMtMC4zYzAuMy0wLjIsMC40LTAuNSwwLjQtMWMwLTAuNC0wLjItMC43LTAuNS0wLjljLTAuMy0wLjItMC44LTAuMy0xLjQtMC4zSDEuN0wxLjcsNjJMMS43LDYyeiBNMS43LDY2LjFoMS41CgkJYzAuMiwwLDAuNSwwLDAuNy0wLjFzMC41LTAuMSwwLjctMC4yYzAuMi0wLjEsMC40LTAuMywwLjUtMC40YzAuMS0wLjIsMC4yLTAuNCwwLjItMC44YzAtMC41LTAuMi0wLjktMC41LTEKCQljLTAuMy0wLjItMC45LTAuMy0xLjUtMC4zSDEuN1Y2Ni4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTExLjEsNTguMWgxLjd2OS41aC0xLjdWNTguMXoiLz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0xNy4zLDU4LjFoMS43djhoNHYxLjVoLTUuN1Y1OC4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTI2LjUsNTguMWgxLjd2OGg0djEuNWgtNS43TDI2LjUsNTguMUwyNi41LDU4LjF6Ii8+Cgk8cGF0aCBjbGFzcz0ic3QxIiBkPSJNMzUuNyw1OC4xaDEuN3Y5LjVoLTEuN1Y1OC4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTQxLjksNTguMWg2LjN2MS41aC00LjZWNjJINDh2MS40aC00LjNWNjZoNC44djEuNWgtNi41VjU4LjF6Ii8+CjwvZz4KPC9zdmc+Cg=='
     href: '#'
@@ -404,24 +404,6 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/ServerError'
-  /authorize-sandbox:
-    post:
-      tags:
-        - 'Dashboard Users'
-      summary: 'Authorize sandbox'
-      description: 'Authorize production users for a sandbox'
-      operationId: authorize-sandbox
-      responses:
-        '200':
-          description: 'Successful response'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthorizeSandboxDTO'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/ServerError'
   /merchant:
     post:
       tags:
@@ -529,6 +511,147 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /authorize-sandbox:
+    post:
+      tags:
+        - 'Dashboard Users'
+      summary: 'Authorize sandbox'
+      description: 'Authorize production users for a sandbox'
+      operationId: authorize-sandbox
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizeSandboxDTO'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  '/merchant/{uuid}/onboarding-step/transition':
+    post:
+      tags:
+        - 'Dashboard Merchants'
+      summary: 'Merchant Onboarding Step Transition'
+      operationId: merchant_onboarding_step_transition_update
+      parameters:
+        -
+          name: uuid
+          in: path
+          description: 'Merchant Payment UUID'
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantOnboardingStepTransitionRequest'
+      responses:
+        '204':
+          description: 'State changed successfully.'
+        '400':
+          description: 'Transition not supported'
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: 'Step not found'
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  '/merchant/{uuid}/onboarding/transition':
+    post:
+      tags:
+        - 'Dashboard Merchants'
+      summary: 'Merchant Onboarding Transition'
+      operationId: merchant_onboarding_transition_change
+      parameters:
+        -
+          name: uuid
+          in: path
+          description: 'Merchant Payment UUID'
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantOnboardingTransitionRequest'
+      responses:
+        '204':
+          description: 'Onboarding state changed successfully.'
+        '400':
+          description: 'Transition not supported'
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: 'Merchant not found'
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /merchant/registration:
+    post:
+      tags:
+        - 'Dashboard Merchants'
+      summary: 'Merchant Registration'
+      operationId: merchant_registration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterMerchantRequest'
+      responses:
+        '201':
+          description: 'Merchant registered successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterMerchantResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/ResourceConflict'
+        '404':
+          description: 'Company not found'
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  '/merchant/{merchantId}/user':
+    post:
+      tags:
+        - 'Dashboard Users'
+      summary: 'Register Merchant User'
+      operationId: register_merchant_user
+      parameters:
+        -
+          name: merchantId
+          in: path
+          description: 'Merchant ID'
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterMerchantUserRequest'
+      responses:
+        '201':
+          description: 'Merchant user was successfully registered'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -743,129 +866,6 @@ paths:
       responses:
         '204':
           description: 'Merchant debtor is marked as duplicate'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
-  '/merchant/{uuid}/onboarding-step/transition':
-    post:
-      tags:
-        - 'Dashboard Merchants'
-      summary: 'Merchant Onboarding Step Transition'
-      operationId: merchant_onboarding_step_transition_update
-      parameters:
-        -
-          name: uuid
-          in: path
-          description: 'Merchant Payment UUID'
-          required: true
-          schema:
-            $ref: '#/components/schemas/UUID'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/MerchantOnboardingStepTransitionRequest'
-      responses:
-        '204':
-          description: 'State changed successfully.'
-        '400':
-          description: 'Transition not supported'
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          description: 'Step not found'
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
-  '/merchant/{uuid}/onboarding/transition':
-    post:
-      tags:
-        - 'Dashboard Merchants'
-      summary: 'Merchant Onboarding Transition'
-      operationId: merchant_onboarding_transition_change
-      parameters:
-        -
-          name: uuid
-          in: path
-          description: 'Merchant Payment UUID'
-          required: true
-          schema:
-            $ref: '#/components/schemas/UUID'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/MerchantOnboardingTransitionRequest'
-      responses:
-        '204':
-          description: 'Onboarding state changed successfully.'
-        '400':
-          description: 'Transition not supported'
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          description: 'Merchant not found'
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
-  /merchant/registration:
-    post:
-      tags:
-        - 'Dashboard Merchants'
-      summary: 'Merchant Registration'
-      operationId: merchant_registration
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RegisterMerchantRequest'
-      responses:
-        '201':
-          description: 'Merchant registered successfully'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RegisterMerchantResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '409':
-          $ref: '#/components/responses/ResourceConflict'
-        '404':
-          description: 'Company not found'
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
-  '/merchant/{merchantId}/user':
-    post:
-      tags:
-        - 'Dashboard Users'
-      summary: 'Register Merchant User'
-      operationId: register_merchant_user
-      parameters:
-        -
-          name: merchantId
-          in: path
-          description: 'Merchant ID'
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RegisterMerchantUserRequest'
-      responses:
-        '201':
-          description: 'Merchant user was successfully registered'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -1244,6 +1244,42 @@ paths:
       security:
         -
           oauth2: []
+  /order:
+    post:
+      tags:
+        - 'Back-end Order Creation'
+      summary: 'Create Order'
+      description: |-
+        Authorization of order financing requests.
+
+        Provide with this endpoint relevant information about the customer and the respective purchase to understand if
+        Billie can offer financing for this transaction.
+
+        The decision whether or not Billie can accept a specific order is made on a single transaction basis.
+        Therefore, orders need to be created to represent a specific transaction for the merchant.
+      operationId: order_create
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LegacyCreateOrderRequest'
+      responses:
+        '200':
+          description: 'Order successfully created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
   /merchant/user/confirm-password-reset:
     get:
       tags:
@@ -1332,42 +1368,6 @@ paths:
       security:
         -
           oauth2: []
-  /order:
-    post:
-      tags:
-        - 'Back-end Order Creation'
-      summary: 'Create Order'
-      description: |-
-        Authorization of order financing requests.
-
-        Provide with this endpoint relevant information about the customer and the respective purchase to understand if
-        Billie can offer financing for this transaction.
-
-        The decision whether or not Billie can accept a specific order is made on a single transaction basis.
-        Therefore, orders need to be created to represent a specific transaction for the merchant.
-      operationId: order_create
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LegacyCreateOrderRequest'
-      responses:
-        '200':
-          description: 'Order successfully created'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
   '/merchant/user/{uuid}/deactivate':
     post:
       tags:
@@ -1389,43 +1389,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-  /external-debtors:
-    get:
-      tags:
-        - 'Dashboard Debtors'
-        - 'Checkout Client'
-      summary: 'Get External Debtors'
-      operationId: external_debtors_get
-      parameters:
-        -
-          name: search
-          in: query
-          description: 'Search text.'
-          required: true
-          schema:
-            $ref: '#/components/schemas/TinyText'
-        -
-          name: sessionUuid
-          in: query
-          required: false
-          schema:
-            $ref: '#/components/schemas/UUID'
-      responses:
-        '200':
-          description: 'External Debtors List'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetExternalDebtorsResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/ServerError'
       security:
@@ -1460,58 +1423,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-  '/invoices/{uuid}':
-    get:
-      tags:
-        - Invoices
-      summary: 'Get Invoice'
-      operationId: get_invoice
-      parameters:
-        -
-          name: uuid
-          in: path
-          description: 'Get Invoice with Uuid'
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: 'Invoice Response'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetInvoiceResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
-    delete:
-      tags:
-        - Invoices
-      summary: 'Cancel Invoice'
-      operationId: invoice_cancel_v2
-      parameters:
-        -
-          name: uuid
-          in: path
-          description: 'Invoice UUID'
-          required: true
-          schema:
-            $ref: '#/components/schemas/UUID'
-      responses:
-        '204':
-          description: 'Invoice successfully cancelled'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
   '/invoices/{uuid}/payments':
     get:
       tags:
@@ -1542,24 +1453,6 @@ paths:
       security:
         -
           oauth2: []
-  /legal-forms:
-    get:
-      tags:
-        - 'Back-end Order Creation'
-      summary: 'Get Legal Forms'
-      operationId: get_legal_forms
-      responses:
-        '200':
-          description: 'List of supported legal forms'
-          content:
-            application/json:
-              schema:
-                properties:
-                  items: { type: array, items: { properties: { code: { description: 'Legal form code', type: integer, example: '90101' }, name: { description: 'Legal form name', type: string, example: 'AG & Co. KG', nullable: true }, required_input: { description: 'Required input (HR-NR => Registration Number, Ust-ID => Registration ID)', type: string, example: HR-NR }, required: { description: Required, type: boolean } }, type: object } }
-                type: object
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security: []
   /merchant/credentials:
     get:
       tags:
@@ -2067,99 +1960,6 @@ paths:
       security:
         -
           oauth2: []
-  '/order/{id}':
-    get:
-      tags:
-        - 'Order Management'
-      summary: 'Get Order Details'
-      description: |-
-        Retrieves information about an order.
-
-        Get relevant information about an order (e.g. in order to understand, if a specific order was already repaid 
-        by your customer).
-      operationId: order_get_details
-      parameters:
-        -
-          name: id
-          in: path
-          description: 'Order external code or UUID'
-          required: true
-          schema:
-            oneOf:
-              -
-                $ref: '#/components/schemas/UUID'
-              -
-                type: string
-      responses:
-        '200':
-          description: 'Order details'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-    patch:
-      tags:
-        - 'Order Management'
-      summary: 'Update Order'
-      description: |-
-        Updates an order if changes are necessary. 
-        The following information can be updated until the order reached state complete:
-
-        - order amount: decrease the order amount (mostly due to partial cancellations of a purchase), always possible 
-          unless the order is already fully paid.
-        - duration: extend timeframe for a payment. This changes the due date (§1).
-        - invoice details like invoice number and document URL.
-
-
-        §1 This call can also be used to move the due date into the future. This is possible from the moment the shipment is 
-        confirmed until the last day before reaching the current due date.
-
-        The new duration is to be set (i.e. initial request for 30 days, shipment on the 01.01., due date = 31.01., 
-        update duration on 45 days, new due date = 15.02.).
-      operationId: order_update
-      parameters:
-        -
-          name: id
-          in: path
-          description: 'Order external code or UUID'
-          required: true
-          schema:
-            oneOf:
-              -
-                $ref: '#/components/schemas/UUID'
-              -
-                type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LegacyUpdateOrderRequest'
-      responses:
-        '204':
-          description: 'Order successfully updated'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
   '/order/{uuid}/payments':
     get:
       tags:
@@ -2264,10 +2064,7 @@ paths:
           content:
             application/json:
               schema:
-                properties:
-                  total: { type: integer, minimum: 0 }
-                  items: { type: array, items: { $ref: '#/components/schemas/OrderResponse' } }
-                type: object
+                $ref: '#/components/schemas/GetOrdersResponsePayload'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -2431,50 +2228,6 @@ paths:
           description: 'Logout successful'
         '401':
           $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-  '/order/{id}/pause-dunning':
-    post:
-      tags:
-        - 'Order Management'
-      summary: 'Pause Order Dunning Process'
-      operationId: order_pause_dunning
-      parameters:
-        -
-          name: id
-          in: path
-          description: 'Order external code or UUID'
-          required: true
-          schema:
-            oneOf:
-              -
-                $ref: '#/components/schemas/UUID'
-              -
-                type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PauseOrderDunningRequest'
-      responses:
-        '204':
-          description: 'Successfully paused order dunning'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          description: 'Pause order dunning is not allowed'
-          content:
-            application/json:
-              schema:
-                properties:
-                  errors: { type: array, items: { required: [title, code], properties: { title: { type: string, enum: ['maximum pausing attempts reached', 'requested number of days exceeds maximum duration allowed', 'maximum dunning stage reached', 'other orders exceed maximum dunning stage', 'Cannot pause dunning. Order is not in state late'], example: 'maximum pausing attempts reached', nullable: false }, code: { type: string, example: forbidden, nullable: true } }, type: object } }
-                type: object
         '500':
           $ref: '#/components/responses/ServerError'
       security:
@@ -2668,52 +2421,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      security:
-        -
-          oauth2: []
-  '/order/{id}/ship':
-    post:
-      tags:
-        - 'Order Management'
-      summary: 'Ship Order'
-      description: |-
-        Confirm that an order was shipped.
-
-        Confirm the shipment of the product or delivery of the agreed service to receive the payout of the purchase amount.
-      operationId: order_ship
-      parameters:
-        -
-          name: id
-          in: path
-          description: 'Order external code or UUID'
-          required: true
-          schema:
-            oneOf:
-              -
-                $ref: '#/components/schemas/UUID'
-              -
-                type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ShipOrderRequestV1'
-      responses:
-        '200':
-          description: 'Order successfully shipped. Order details.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -2958,6 +2665,296 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '409':
           $ref: '#/components/responses/ResourceConflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+  /external-debtors:
+    get:
+      tags:
+        - 'Dashboard Debtors'
+        - 'Checkout Client'
+      summary: 'Get External Debtors'
+      operationId: external_debtors_get
+      parameters:
+        -
+          name: search
+          in: query
+          description: 'Search text.'
+          required: true
+          schema:
+            $ref: '#/components/schemas/TinyText'
+        -
+          name: sessionUuid
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: 'External Debtors List'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetExternalDebtorsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+  '/invoices/{uuid}':
+    get:
+      tags:
+        - Invoices
+      summary: 'Get Invoice'
+      operationId: get_invoice
+      parameters:
+        -
+          name: uuid
+          in: path
+          description: 'Get Invoice with Uuid'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Invoice Response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetInvoiceResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    delete:
+      tags:
+        - Invoices
+      summary: 'Cancel Invoice'
+      operationId: invoice_cancel_v2
+      parameters:
+        -
+          name: uuid
+          in: path
+          description: 'Invoice UUID'
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '204':
+          description: 'Invoice successfully cancelled'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+  /legal-forms:
+    get:
+      tags:
+        - 'Back-end Order Creation'
+      summary: 'Get Legal Forms'
+      operationId: get_legal_forms
+      responses:
+        '200':
+          description: 'List of supported legal forms'
+          content:
+            application/json:
+              schema:
+                properties:
+                  items: { type: array, items: { properties: { code: { description: 'Legal form code', type: integer, example: '90101' }, name: { description: 'Legal form name', type: string, example: 'AG & Co. KG', nullable: true }, required_input: { description: 'Required input (HR-NR => Registration Number, Ust-ID => Registration ID)', type: string, example: HR-NR }, required: { description: Required, type: boolean } }, type: object } }
+                type: object
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security: []
+  '/order/{id}':
+    get:
+      tags:
+        - 'Order Management'
+      summary: 'Get Order Details'
+      description: |-
+        Retrieves information about an order.
+
+        Get relevant information about an order (e.g. in order to understand, if a specific order was already repaid 
+        by your customer).
+      operationId: order_get_details
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'Order external code or UUID'
+          required: true
+          schema:
+            oneOf:
+              -
+                $ref: '#/components/schemas/UUID'
+              -
+                type: string
+      responses:
+        '200':
+          description: 'Order details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+    patch:
+      tags:
+        - 'Order Management'
+      summary: 'Update Order'
+      description: |-
+        Updates an order if changes are necessary. 
+        The following information can be updated until the order reached state complete:
+
+        - order amount: decrease the order amount (mostly due to partial cancellations of a purchase), always possible 
+          unless the order is already fully paid.
+        - duration: extend timeframe for a payment. This changes the due date (§1).
+        - invoice details like invoice number and document URL.
+
+
+        §1 This call can also be used to move the due date into the future. This is possible from the moment the shipment is 
+        confirmed until the last day before reaching the current due date.
+
+        The new duration is to be set (i.e. initial request for 30 days, shipment on the 01.01., due date = 31.01., 
+        update duration on 45 days, new due date = 15.02.).
+      operationId: order_update
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'Order external code or UUID'
+          required: true
+          schema:
+            oneOf:
+              -
+                $ref: '#/components/schemas/UUID'
+              -
+                type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LegacyUpdateOrderRequest'
+      responses:
+        '204':
+          description: 'Order successfully updated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+  '/order/{id}/pause-dunning':
+    post:
+      tags:
+        - 'Order Management'
+      summary: 'Pause Order Dunning Process'
+      operationId: order_pause_dunning
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'Order external code or UUID'
+          required: true
+          schema:
+            oneOf:
+              -
+                $ref: '#/components/schemas/UUID'
+              -
+                type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PauseOrderDunningRequest'
+      responses:
+        '204':
+          description: 'Successfully paused order dunning'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: 'Pause order dunning is not allowed'
+          content:
+            application/json:
+              schema:
+                properties:
+                  errors: { type: array, items: { required: [title, code], properties: { title: { type: string, enum: ['maximum pausing attempts reached', 'requested number of days exceeds maximum duration allowed', 'maximum dunning stage reached', 'other orders exceed maximum dunning stage', 'Cannot pause dunning. Order is not in state late'], example: 'maximum pausing attempts reached', nullable: false }, code: { type: string, example: forbidden, nullable: true } }, type: object } }
+                type: object
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+  '/order/{id}/ship':
+    post:
+      tags:
+        - 'Order Management'
+      summary: 'Ship Order'
+      description: |-
+        Confirm that an order was shipped.
+
+        Confirm the shipment of the product or delivery of the agreed service to receive the payout of the purchase amount.
+      operationId: order_ship
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'Order external code or UUID'
+          required: true
+          schema:
+            oneOf:
+              -
+                $ref: '#/components/schemas/UUID'
+              -
+                type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShipOrderRequestV1'
+      responses:
+        '200':
+          description: 'Order successfully shipped. Order details.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
       security:
@@ -5826,6 +5823,83 @@ components:
           format: float
           minimum: 0
           example: 60.15
+      type: object
+    GetOrdersResponsePayloadInvoice:
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        invoice_number:
+          description: 'Invoice Number'
+          type: string
+          example: O-10123456789-0001
+          nullable: false
+        created_at:
+          nullable: false
+          $ref: '#/components/schemas/DateTime'
+        due_date:
+          nullable: false
+          $ref: '#/components/schemas/DateTime'
+        amount:
+          description: 'Gross amount'
+          type: number
+          format: float
+          example: 10
+          nullable: false
+        outstanding_amount:
+          type: number
+          format: float
+          example: 10
+          nullable: false
+      type: object
+    GetOrdersResponsePayload:
+      properties:
+        total:
+          type: number
+          example: 42500
+          nullable: false
+        items:
+          type: array
+          items:
+            properties:
+              uuid:
+                $ref: '#/components/schemas/UUID'
+              order_id:
+                description: 'Order Number'
+                type: string
+                example: O-10123456789
+                nullable: true
+              created_at:
+                nullable: false
+                $ref: '#/components/schemas/DateTime'
+              state:
+                example: created
+                nullable: false
+                $ref: '#/components/schemas/OrderState'
+              duration:
+                example: 30
+                $ref: '#/components/schemas/OrderDuration'
+              amount:
+                description: 'Gross amount'
+                type: number
+                format: float
+                example: 120
+                nullable: false
+              invoice:
+                nullable: true
+                deprecated: true
+                $ref: '#/components/schemas/GetOrdersResponsePayloadInvoice'
+              invoices:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetOrdersResponsePayloadInvoice'
+                nullable: false
+              workflow_name:
+                description: 'Workflow Name'
+                type: string
+                example: order_v1
+                nullable: false
+            type: object
+          nullable: false
       type: object
   responses:
     HtmlDocument:

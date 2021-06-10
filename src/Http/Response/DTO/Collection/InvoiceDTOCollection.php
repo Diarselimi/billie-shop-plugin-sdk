@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Response\DTO\Collection;
 
-use App\DomainModel\CollectionInterface;
 use App\Http\Response\DTO\InvoiceDTO;
+use App\Support\CollectionInterface;
 
 class InvoiceDTOCollection implements CollectionInterface
 {

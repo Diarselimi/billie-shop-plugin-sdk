@@ -134,7 +134,7 @@ class OrderContainerRelationLoader
 
     public function loadInvoices(OrderContainer $orderContainer): InvoiceCollection
     {
-        $orderInvoices = $this->orderInvoiceRepository->findByOrderId($orderContainer->getOrder()->getId());
+        $orderInvoices = $this->orderInvoiceRepository->findByOrderId($orderContainer->getOrder()->getId())->toArray();
         if (empty($orderInvoices)) {
             return new InvoiceCollection([]);
         }

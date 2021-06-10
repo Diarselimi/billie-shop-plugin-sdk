@@ -83,7 +83,7 @@ class OrderFinancialDetailsRepository extends AbstractPdoRepository implements O
             ['order_id' => $orderId]
         );
 
-        return $row ? $this->factory->createFromDatabaseRow($row) : null;
+        return $row ? $this->factory->createFromArray($row) : null;
     }
 
     public function findOneByOrderUuid(string $orderUuid): ?OrderFinancialDetailsEntity
@@ -95,6 +95,6 @@ class OrderFinancialDetailsRepository extends AbstractPdoRepository implements O
 
         $row = $this->doFetchOne($sql, ['order_uuid' => $orderUuid]);
 
-        return $row ? $this->factory->createFromDatabaseRow($row) : null;
+        return $row ? $this->factory->createFromArray($row) : null;
     }
 }

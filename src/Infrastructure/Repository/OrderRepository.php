@@ -12,7 +12,6 @@ use Billie\PdoBundle\DomainModel\StatefulEntity\StatefulEntityRepositoryTrait;
 use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 use Billie\PdoBundle\Infrastructure\Pdo\PdoConnection;
 use Generator;
-use Symfony\Component\HttpFoundation\ParameterBag;
 
 class OrderRepository extends AbstractPdoRepository implements
     OrderRepositoryInterface,
@@ -22,7 +21,7 @@ class OrderRepository extends AbstractPdoRepository implements
 
     public const TABLE_NAME = 'orders';
 
-    private const SELECT_FIELDS = [
+    public const SELECT_FIELDS = [
         'id',
         'uuid',
         'amount_forgiven',
@@ -549,64 +548,6 @@ SQL;
         }
 
         return (int) $result['total'];
-    }
-
-    public function search(
-        int $merchantId,
-        int $offset,
-        int $limit,
-        string $sortBy,
-        string $sortDirection,
-        ?string $searchString,
-        array $filters
-    ): array {
-        $query = 'SELECT %s FROM orders';
-        $filters = new ParameterBag($filters);
-
-        if ($filters->has('merchant_debtor_id')) {
-            $query .= ' INNER JOIN merchants_debtors ON orders.merchant_debtor_id = merchants_debtors.id AND merchants_debtors.uuid = :merchant_debtor_id';
-            $queryParameters['merchant_debtor_id'] = $filters->get('merchant_debtor_id');
-        }
-
-        if ($sortBy === 'amount_gross') {
-            $query .= ' INNER JOIN order_financial_details ON order_financial_details.order_id = orders.id';
-            $query .= ' INNER JOIN (SELECT MAX(id) AS maxID FROM order_financial_details GROUP BY order_id) AS of ON of.maxID = order_financial_details.id';
-        }
-
-        $query .= ' WHERE orders.merchant_id = :merchant_id AND state != :state_new';
-        $queryParameters['merchant_id'] = $merchantId;
-        $queryParameters['state_new'] = OrderEntity::STATE_NEW;
-
-        if ($searchString) {
-            $query .= ' AND (orders.external_code LIKE :search OR orders.uuid LIKE :search OR orders.invoice_number LIKE :search )';
-
-            $queryParameters['search'] = '%' . $searchString . '%';
-        }
-
-        if ($filters->has('state') && is_array($filters->get('state')) && !empty($filters->get('state'))) {
-            $states = array_map(
-                function ($state) {
-                    return "'{$state}'";
-                },
-                $filters->get('state')
-            );
-
-            $query .= ' AND orders.state IN (' . implode(',', $states) . ')';
-        }
-
-        $totalCount = $this->doFetchOne(sprintf($query, 'COUNT(*) as total_count'), $queryParameters);
-
-        $query .= " ORDER BY $sortBy $sortDirection LIMIT $offset,$limit";
-
-        $rows = $this->doFetchAll(
-            sprintf($query, 'orders.' . implode(', orders.', self::SELECT_FIELDS)),
-            $queryParameters
-        );
-
-        return [
-            'total' => $totalCount['total_count'] ?? 0,
-            'orders' => array_map([$this->orderFactory, 'createFromArray'], $rows),
-        ];
     }
 
     public function geOrdersByMerchantId(int $merchantId, \DateTime $shippedFrom, int $limit): array

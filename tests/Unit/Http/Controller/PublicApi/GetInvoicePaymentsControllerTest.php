@@ -8,7 +8,7 @@ use App\Application\Exception\InvoiceNotFoundException;
 use App\Application\UseCase\GetInvoicePayments\GetInvoicePaymentsRequest;
 use App\Application\UseCase\GetInvoicePayments\GetInvoicePaymentsUseCase;
 use App\Application\UseCase\GetInvoicePayments\Response\GetInvoicePaymentsResponse;
-use App\Http\Controller\PublicApi\GetInvoicePaymentsController;
+use App\Http\Controller\PublicApi\Dashboard\GetInvoicePaymentsController;
 use App\Http\HttpConstantsInterface;
 use App\Tests\Unit\UnitTestCase;
 use Prophecy\Argument;

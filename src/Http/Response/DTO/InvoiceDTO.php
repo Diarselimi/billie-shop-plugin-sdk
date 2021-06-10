@@ -2,8 +2,8 @@
 
 namespace App\Http\Response\DTO;
 
-use App\DomainModel\Invoice\Invoice as DomainInvoice;
 use App\DomainModel\ArrayableInterface;
+use App\DomainModel\Invoice\Invoice as DomainInvoice;
 use App\Support\DateFormat;
 use OpenApi\Annotations as OA;
 

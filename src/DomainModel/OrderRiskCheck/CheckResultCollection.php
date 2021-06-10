@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\DomainModel\OrderRiskCheck;
 
-use App\DomainModel\CollectionInterface;
+use App\Support\CollectionInterface;
 use ArrayIterator;
 use Traversable;
 

@@ -6,11 +6,9 @@ interface OrderInvoiceRepositoryInterface
 {
     public function insert(OrderInvoiceEntity $orderInvoiceEntity): OrderInvoiceEntity;
 
-    /**
-     * @param  int                        $orderId
-     * @return array|OrderInvoiceEntity[]
-     */
-    public function findByOrderId(int $orderId): array;
+    public function findByOrderId(int $orderId): OrderInvoiceCollection;
+
+    public function findByOrderIds(array $orderIds): OrderInvoiceCollection;
 
     public function getByUuidAndMerchant(string $invoiceUuid, int $merchantId): ?OrderInvoiceEntity;
 

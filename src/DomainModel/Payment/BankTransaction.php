@@ -6,8 +6,8 @@ namespace App\DomainModel\Payment;
 
 use App\DomainModel\ArrayableInterface;
 use App\Support\DateFormat;
-use Ozean12\Money\Money;
 use OpenApi\Annotations as OA;
+use Ozean12\Money\Money;
 
 /**
  * @OA\Schema(schema="BankTransactionDTO", type="object", properties={

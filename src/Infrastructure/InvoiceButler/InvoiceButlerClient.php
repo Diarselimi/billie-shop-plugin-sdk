@@ -83,6 +83,11 @@ class InvoiceButlerClient implements InvoiceServiceInterface, LoggingInterface
         return $invoices->getFirst();
     }
 
+    public function getByUuids(array $uuids): InvoiceCollection
+    {
+        return $this->getByParameters(['uuids' => $uuids]);
+    }
+
     public function createCreditNote(Invoice $invoice, CreditNote $creditNote): void
     {
         $creditNoteMessage = $this->creditNoteMessageFactory->create($creditNote);

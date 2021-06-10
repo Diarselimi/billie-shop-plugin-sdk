@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\Repository;
 
+use App\DomainModel\OrderInvoice\OrderInvoiceCollection;
 use App\DomainModel\OrderInvoice\OrderInvoiceEntity;
 use App\DomainModel\OrderInvoice\OrderInvoiceFactory;
 use App\DomainModel\OrderInvoice\OrderInvoiceRepositoryInterface;
@@ -46,15 +47,23 @@ class OrderInvoiceRepository extends AbstractPdoRepository implements OrderInvoi
         return $orderInvoiceEntity;
     }
 
-    public function findByOrderId(int $orderId): array
+    public function findByOrderId(int $orderId): OrderInvoiceCollection
     {
+        return $this->findByOrderIds([$orderId]);
+    }
+
+    public function findByOrderIds(array $orderIds): OrderInvoiceCollection
+    {
+        if (empty($orderIds)) {
+            return new OrderInvoiceCollection([]);
+        }
+
         $rows = $this->doFetchAll(
             'SELECT ' . implode(', ', self::SELECT_FIELDS) . ' FROM ' . self::TABLE_NAME .
-            ' WHERE order_id = :order_id',
-            ['order_id' => $orderId]
+            ' WHERE order_id IN (' . implode(',', $orderIds) . ')'
         );
 
-        return $rows ? $this->factory->createFromArrayCollection($rows) : [];
+        return new OrderInvoiceCollection($rows ? $this->factory->createFromArrayCollection($rows) : []);
     }
 
     public function getByUuidAndMerchant(string $invoiceUuid, int $merchantId): ?OrderInvoiceEntity

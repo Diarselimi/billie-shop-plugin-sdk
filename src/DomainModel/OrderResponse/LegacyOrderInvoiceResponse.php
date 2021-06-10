@@ -2,10 +2,10 @@
 
 namespace App\DomainModel\OrderResponse;
 
-use Ozean12\Money\TaxedMoney\TaxedMoney;
 use App\DomainModel\ArrayableInterface;
 use App\Support\DateFormat;
 use OpenApi\Annotations as OA;
+use Ozean12\Money\TaxedMoney\TaxedMoney;
 
 /**
  * @OA\Schema(schema="OrderInvoiceResponse", title="Order Entity", type="object", properties={
