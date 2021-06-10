@@ -44,12 +44,12 @@ class ExternalDebtorDTO
         return $this;
     }
 
-    public function getAddressStreet(): string
+    public function getAddressStreet(): ?string
     {
         return $this->addressStreet;
     }
 
-    public function setAddressStreet(string $addressStreet): self
+    public function setAddressStreet(?string $addressStreet): self
     {
         $this->addressStreet = $addressStreet;
 
