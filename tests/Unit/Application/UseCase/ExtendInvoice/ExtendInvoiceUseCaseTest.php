@@ -5,19 +5,18 @@ namespace App\Tests\Unit\Application\UseCase\ExtendInvoice;
 use App\Application\Exception\InvoiceNotFoundException;
 use App\Application\UseCase\ExtendInvoice\ExtendInvoiceRequest;
 use App\Application\UseCase\ExtendInvoice\ExtendInvoiceUseCase;
-use App\DomainModel\Fee\Fee;
-use App\DomainModel\Fee\FeeService;
 use App\DomainModel\Invoice\Duration;
+use App\DomainModel\Invoice\ExtendInvoiceService;
 use App\DomainModel\Invoice\Invoice;
-use App\DomainModel\Invoice\InvoiceServiceInterface;
+use App\DomainModel\Invoice\InvoiceCollection;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\SalesforceInterface;
-use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\Tests\Unit\UnitTestCase;
 use DateTime;
 use DomainException;
 use InvalidArgumentException;
-use Ozean12\Money\Money;
-use Ozean12\Money\Percent;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 
@@ -27,62 +26,66 @@ class ExtendInvoiceUseCaseTest extends UnitTestCase
 
     private const VALID_DURATION = 60;
 
-    /**
-     * @var InvoiceServiceInterface|ObjectProphecy
-     */
-    private ObjectProphecy $invoiceService;
+    private const MERCHANT_ID = 12;
 
     /**
-     * @var FeeService|ObjectProphecy
+     * @var OrderContainerFactory|ObjectProphecy
      */
-    private ObjectProphecy $feeService;
+    private ObjectProphecy $orderContainerFactory;
 
     /**
-     * @var PaymentsServiceInterface|ObjectProphecy
+     * @var OrderContainer|ObjectProphecy
      */
-    private ObjectProphecy $paymentService;
+    private ObjectProphecy $orderContainer;
 
     /**
      * @var SalesforceInterface|ObjectProphecy
      */
     private ObjectProphecy $dciService;
 
+    /**
+     * @var ExtendInvoiceService|ObjectProphecy
+     */
+    private ObjectProphecy $extendInvoiceService;
+
     private ExtendInvoiceUseCase $extendInvoiceUseCase;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->invoiceService = $this->prophesize(InvoiceServiceInterface::class);
-        $this->feeService = $this->prophesize(FeeService::class);
-        $this->paymentService = $this->prophesize(PaymentsServiceInterface::class);
+
+        $this->orderContainerFactory = $this->prophesize(OrderContainerFactory::class);
+        $this->orderContainer = $this->prophesize(OrderContainer::class);
+        $this->extendInvoiceService = $this->prophesize(ExtendInvoiceService::class);
         $this->dciService = $this->prophesize(SalesforceInterface::class);
         $this->dciService->isDunningInProgress(Argument::type(Invoice::class))
             ->willReturn(false);
+
         $this->extendInvoiceUseCase = new ExtendInvoiceUseCase(
-            $this->invoiceService->reveal(),
-            $this->feeService->reveal(),
-            $this->paymentService->reveal(),
+            $this->orderContainerFactory->reveal(),
+            $this->extendInvoiceService->reveal(),
             $this->dciService->reveal()
         );
     }
 
     public function testItShouldFailIfInvoiceNotFound(): void
     {
-        $this->invoiceService->getOneByUuid(self::INVOICE_UUID)
-            ->willReturn(null);
+        $this->orderContainerFactory->loadByInvoiceUuidAndMerchantId(self::INVOICE_UUID, self::MERCHANT_ID)
+            ->willThrow(new OrderContainerFactoryException());
         $this->expectException(InvoiceNotFoundException::class);
 
-        $request = new ExtendInvoiceRequest(self::INVOICE_UUID, self::VALID_DURATION);
+        $request = new ExtendInvoiceRequest(self::INVOICE_UUID, self::VALID_DURATION, self::MERCHANT_ID);
         $this->extendInvoiceUseCase->execute($request);
     }
 
     public function testItShouldFailIfDurationIsInvalid(): void
     {
-        $this->invoiceService->getOneByUuid(self::INVOICE_UUID)
-            ->willReturn($this->anInvoice());
+        $this->orderContainer->getInvoices()->willReturn(new InvoiceCollection([self::INVOICE_UUID => $this->aLateInvoice()]));
+        $this->orderContainerFactory->loadByInvoiceUuidAndMerchantId(self::INVOICE_UUID, self::MERCHANT_ID)
+            ->willReturn($this->orderContainer);
 
         $invalidDuration = 125;
-        $request = new ExtendInvoiceRequest(self::INVOICE_UUID, $invalidDuration);
+        $request = new ExtendInvoiceRequest(self::INVOICE_UUID, $invalidDuration, self::MERCHANT_ID);
 
         $this->expectException(InvalidArgumentException::class);
 
@@ -91,11 +94,13 @@ class ExtendInvoiceUseCaseTest extends UnitTestCase
 
     public function testItShouldFailWhenTheInvoiceIsCancelled()
     {
-        $this->invoiceService->getOneByUuid(self::INVOICE_UUID)
-            ->willReturn($this->aCancelledInvoice());
+        $this->orderContainer->getInvoices()->willReturn(new InvoiceCollection([self::INVOICE_UUID => $this->aCancelledInvoice()]));
+
+        $this->orderContainerFactory->loadByInvoiceUuidAndMerchantId(self::INVOICE_UUID, self::MERCHANT_ID)
+            ->willReturn($this->orderContainer);
 
         $validDuration = self::VALID_DURATION;
-        $request = new ExtendInvoiceRequest(self::INVOICE_UUID, $validDuration);
+        $request = new ExtendInvoiceRequest(self::INVOICE_UUID, $validDuration, self::MERCHANT_ID);
 
         $this->expectException(DomainException::class);
 
@@ -104,11 +109,12 @@ class ExtendInvoiceUseCaseTest extends UnitTestCase
 
     public function testItShouldFailWhenTheInvoiceIsComplete()
     {
-        $this->invoiceService->getOneByUuid(self::INVOICE_UUID)
-            ->willReturn($this->aCompleteInvoice());
+        $this->orderContainer->getInvoices()->willReturn(new InvoiceCollection([self::INVOICE_UUID => $this->aCompleteInvoice()]));
+        $this->orderContainerFactory->loadByInvoiceUuidAndMerchantId(self::INVOICE_UUID, self::MERCHANT_ID)
+            ->willReturn($this->orderContainer);
 
         $validDuration = self::VALID_DURATION;
-        $request = new ExtendInvoiceRequest(self::INVOICE_UUID, $validDuration);
+        $request = new ExtendInvoiceRequest(self::INVOICE_UUID, $validDuration, self::MERCHANT_ID);
 
         $this->expectException(DomainException::class);
 
@@ -117,14 +123,16 @@ class ExtendInvoiceUseCaseTest extends UnitTestCase
 
     public function testItShouldFailWhenDunningIsInProgress()
     {
-        $invoice = $this->aLateInvoice();
-        $this->invoiceService->getOneByUuid(self::INVOICE_UUID)
-            ->willReturn($invoice);
+        $invoice = $this->aCompleteInvoice();
+        $this->orderContainer->getInvoices()->willReturn(new InvoiceCollection([self::INVOICE_UUID => $invoice]));
+        $this->orderContainerFactory->loadByInvoiceUuidAndMerchantId(self::INVOICE_UUID, self::MERCHANT_ID)
+            ->willReturn($this->orderContainer);
+
         $this->dciService->isDunningInProgress($invoice)
             ->willReturn(true);
 
         $validDuration = 35;
-        $request = new ExtendInvoiceRequest(self::INVOICE_UUID, $validDuration);
+        $request = new ExtendInvoiceRequest(self::INVOICE_UUID, $validDuration, self::MERCHANT_ID);
 
         $this->expectException(DomainException::class);
 
@@ -133,19 +141,15 @@ class ExtendInvoiceUseCaseTest extends UnitTestCase
 
     public function testItShouldSucceed()
     {
-        $request = new ExtendInvoiceRequest(self::INVOICE_UUID, self::VALID_DURATION);
+        $request = new ExtendInvoiceRequest(self::INVOICE_UUID, self::VALID_DURATION, self::MERCHANT_ID);
         $duration = new Duration(self::VALID_DURATION);
         $invoice = $this->anInvoice();
-        $newFee = $this->aFee();
+        $this->orderContainer->getInvoices()->willReturn(new InvoiceCollection([self::INVOICE_UUID => $invoice]));
 
-        $this->invoiceService->getOneByUuid(self::INVOICE_UUID)
-            ->willReturn($invoice);
-        $this->paymentService->extendInvoiceDuration($invoice, $duration)
-            ->shouldBeCalled();
-        $this->feeService->getFee($invoice)
-            ->willReturn($newFee);
-        $this->invoiceService->extendInvoiceDuration($invoice, $newFee, $duration)
-            ->shouldBeCalled();
+        $this->orderContainerFactory->loadByInvoiceUuidAndMerchantId(self::INVOICE_UUID, self::MERCHANT_ID)
+            ->willReturn($this->orderContainer);
+
+        $this->extendInvoiceService->extend($this->orderContainer, $invoice, $duration->days())->shouldBeCalled();
 
         $this->extendInvoiceUseCase->execute($request);
     }
@@ -176,13 +180,6 @@ class ExtendInvoiceUseCaseTest extends UnitTestCase
             ->setState(Invoice::STATE_LATE)
             ->setDuration(15)
             ->setDueDate($lastWeek);
-    }
-
-    private function aFee(): Fee
-    {
-        $newFee = new Fee(new Percent(2), new Money(119), new Money(100), new Money(19));
-
-        return $newFee;
     }
 
     private function aCompleteInvoice(): Invoice

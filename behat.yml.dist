@@ -26,6 +26,7 @@ default:
         - App\Tests\Functional\Context\ScoringServiceContext
         - App\Tests\Functional\Context\FraudServiceContext
         - App\Tests\Functional\Context\InvoiceButlerServiceContext
+        - App\Tests\Functional\Context\VoltServiceContext
         - App\Tests\Functional\Context\MessengerContext:
             kernel: '@kernel'
             amqpMapper: '@Ozean12\AmqpPackBundle\Mapping\AmqpMapperInterface'

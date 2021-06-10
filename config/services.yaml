@@ -35,6 +35,7 @@ services:
       $webappClient: '@eight_points_guzzle.client.webapp'
       $bicLookupClient: '@eight_points_guzzle.client.fintech_toolbox'
       $cosimiClient: '@eight_points_guzzle.client.cosimi'
+      $voltClient: '@eight_points_guzzle.client.volt'
       $documentGeneratorClient: '@eight_points_guzzle.client.document_generator'
       $watsonClient: '@eight_points_guzzle.client.watson'
       $invoiceButlerClient: '@eight_points_guzzle.client.invoice_butler'

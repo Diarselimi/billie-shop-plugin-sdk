@@ -9,7 +9,6 @@ use App\DomainModel\Invoice\CreditNote\CreditNoteFactory;
 use App\DomainModel\Invoice\CreditNote\InvoiceCreditNoteMessageFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsException;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
@@ -27,8 +26,6 @@ class CancelOrderUseCase implements LoggingInterface
 
     private MerchantDebtorLimitsService $limitsService;
 
-    private PaymentsServiceInterface $paymentsService;
-
     private OrderContainerFactory $orderContainerFactory;
 
     private MerchantRepositoryInterface $merchantRepository;
@@ -43,7 +40,6 @@ class CancelOrderUseCase implements LoggingInterface
 
     public function __construct(
         MerchantDebtorLimitsService $limitsService,
-        PaymentsServiceInterface $paymentsService,
         OrderContainerFactory $orderContainerFactory,
         MerchantRepositoryInterface $merchantRepository,
         Registry $workflowRegistry,
@@ -52,7 +48,6 @@ class CancelOrderUseCase implements LoggingInterface
         MessageBusInterface $bus
     ) {
         $this->limitsService = $limitsService;
-        $this->paymentsService = $paymentsService;
         $this->orderContainerFactory = $orderContainerFactory;
         $this->merchantRepository = $merchantRepository;
         $this->workflowRegistry = $workflowRegistry;
@@ -96,14 +91,10 @@ class CancelOrderUseCase implements LoggingInterface
             $workflow->apply($order, OrderEntity::TRANSITION_CANCEL);
         } elseif ($workflow->can($order, OrderEntity::TRANSITION_CANCEL_SHIPPED)) {
             $this->logInfo('Cancel shipped order {id}', [LoggingInterface::KEY_ID => $order->getId()]);
-
-            $this->paymentsService->cancelOrder($order);
             $this->createCreditNote($orderContainer);
-
             $workflow->apply($order, OrderEntity::TRANSITION_CANCEL_SHIPPED);
         } elseif ($workflow->can($order, OrderEntity::TRANSITION_CANCEL_WAITING)) {
             $this->logInfo('Cancel waiting order {id}', [LoggingInterface::KEY_ID => $order->getId()]);
-
             $workflow->apply($order, OrderEntity::TRANSITION_CANCEL_WAITING);
         } else {
             throw new CancelOrderException("Order #{$request->getOrderId()} can not be cancelled");

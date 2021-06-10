@@ -2,16 +2,12 @@
 
 namespace App\Infrastructure\Borscht;
 
-use App\DomainModel\Invoice\Duration;
-use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\MerchantDebtor\RegisterDebtorDTO;
-use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Payment\DebtorPaymentDetailsDTO;
 use App\DomainModel\Payment\DebtorPaymentRegistrationDTO;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Payment\PaymentsServiceRequestException;
 use App\DomainModel\Payment\RequestDTO\ConfirmRequestDTO;
-use App\DomainModel\Payment\RequestDTO\ModifyRequestDTO;
 use App\Infrastructure\ClientResponseDecodeException;
 use App\Infrastructure\DecodeResponseTrait;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
@@ -28,7 +24,7 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
 
     private const EXTENDED_REQUEST_TIMEOUT = 5;
 
-    private $client;
+    private Client $client;
 
     public function __construct(Client $borschtClient)
     {
@@ -50,40 +46,6 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
             throw new PaymentsServiceRequestException($exception);
         } catch (ClientResponseDecodeException $exception) {
             throw new PaymentsServiceRequestException($exception, self::ERR_BODY_DECODE_MESSAGE);
-        }
-    }
-
-    public function cancelOrder(OrderEntity $order): void
-    {
-        $json = ['ticket_id' => $order->getPaymentId()];
-
-        $this->logInfo('Cancel borscht ticket', [
-            LoggingInterface::KEY_SOBAKA => $json,
-        ]);
-
-        try {
-            $this->client->delete('order.json', [
-                'json' => $json,
-                'retry_enabled' => false,
-            ]);
-        } catch (TransferException $exception) {
-            throw new PaymentsServiceRequestException($exception);
-        }
-    }
-
-    public function modifyOrder(ModifyRequestDTO $requestDTO): void
-    {
-        $this->logInfo('Modify borscht ticket', [
-            LoggingInterface::KEY_SOBAKA => [
-                'request' => $requestDTO->toArray(),
-                'timeout' => self::EXTENDED_REQUEST_TIMEOUT,
-            ],
-        ]);
-
-        try {
-            $this->client->put('order.json', ['json' => $requestDTO->toArray(), 'retry_enabled' => false]);
-        } catch (TransferException $exception) {
-            throw new PaymentsServiceRequestException($exception);
         }
     }
 
@@ -136,15 +98,5 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
         } catch (TransferException $exception) {
             throw new PaymentsServiceRequestException($exception, 'Fraud reclaim request to Payment failed');
         }
-    }
-
-    public function extendInvoiceDuration(Invoice $invoice, Duration $duration): void
-    {
-        $request = (new ModifyRequestDTO())
-            ->setInvoiceNumber($invoice->getExternalCode())
-            ->setPaymentUuid($invoice->getPaymentUuid())
-            ->setAmountGross($invoice->getGrossAmount()->getMoneyValue())
-            ->setDuration($duration->days());
-        $this->modifyOrder($request);
     }
 }

@@ -1,0 +1,8 @@
+{
+  "fee_rate": 2000,
+  "fee_date": "2018-08-20",
+  "fee_amount": 23800,
+  "fee_net_amount": 20000,
+  "fee_vat_amount": 3800,
+  "undiscounted_fee_amount": 0
+}

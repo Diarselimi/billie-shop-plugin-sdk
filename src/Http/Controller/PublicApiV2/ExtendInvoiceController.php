@@ -9,6 +9,7 @@ use App\Application\Exception\RequestValidationException;
 use App\Application\UseCase\ExtendInvoice\ExtendInvoiceRequest;
 use App\Application\UseCase\ExtendInvoice\ExtendInvoiceUseCase;
 use App\DomainModel\Invoice\InvalidDurationException;
+use App\Http\HttpConstantsInterface;
 use DomainException;
 use Symfony\Component\HttpFoundation\Request;
 use OpenApi\Annotations as OA;
@@ -56,7 +57,11 @@ class ExtendInvoiceController
     public function execute(string $uuid, Request $request): void
     {
         $duration = (int) $request->get('duration');
-        $extendInvoiceRequest = new ExtendInvoiceRequest($uuid, $duration);
+        $extendInvoiceRequest = new ExtendInvoiceRequest(
+            $uuid,
+            $duration,
+            $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID)
+        );
 
         try {
             $this->extendInvoiceUseCase->execute($extendInvoiceRequest);

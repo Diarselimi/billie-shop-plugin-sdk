@@ -27,6 +27,7 @@ Feature:
     And I get from payments service create ticket response
     And I get from companies service identify match response
     And I get from invoice-butler service no invoices and later one invoice responses
+    And I get from volt service good response
     When I send a POST request to "/order/CO123/ship" with body:
     """
     {

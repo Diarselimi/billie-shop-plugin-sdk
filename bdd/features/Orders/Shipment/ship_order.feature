@@ -55,6 +55,7 @@ Feature:
     And I get from payments service create ticket response
     And I get from companies service identify match response
     And GraphQL will respond to getMerchantDebtorDetails query
+    And I get from volt service good response
     And I get from files service a good response
     And I get from OAuth service "/resource-tokens" endpoint response with status 200 and body:
     """
@@ -75,6 +76,8 @@ Feature:
         "shipping_document_url": "http://example.com/proove/is/here"
     }
     """
+    Then print last JSON response
+    Then print queued messages
     Then the JSON response should be:
     """
     {

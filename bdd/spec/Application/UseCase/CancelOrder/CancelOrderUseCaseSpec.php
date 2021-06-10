@@ -19,7 +19,6 @@ use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
-use App\DomainModel\Payment\PaymentsServiceInterface;
 use Ozean12\Money\Money;
 use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
 use Ozean12\Transfer\Message\CreditNote\CreateCreditNote;
@@ -45,7 +44,6 @@ class CancelOrderUseCaseSpec extends ObjectBehavior
 
     public function let(
         MerchantDebtorLimitsService $limitsService,
-        PaymentsServiceInterface $paymentsService,
         OrderContainerFactory $orderContainerFactory,
         MerchantRepositoryInterface $merchantRepository,
         Registry $workflowRegistry,
@@ -94,7 +92,6 @@ class CancelOrderUseCaseSpec extends ObjectBehavior
 
     public function it_throws_exception_if_order_is_in_wrong_state(
         MerchantDebtorLimitsService $limitsService,
-        PaymentsServiceInterface $paymentsService,
         OrderContainerFactory $orderContainerFactory,
         CancelOrderRequest $request,
         Workflow $workflow,
@@ -112,14 +109,12 @@ class CancelOrderUseCaseSpec extends ObjectBehavior
             ->willReturn(false);
 
         $limitsService->unlock($orderContainer)->shouldNotBeCalled();
-        $paymentsService->cancelOrder($order)->shouldNotBeCalled();
 
         $this->shouldThrow(CancelOrderException::class)->during('execute', [$request]);
     }
 
     public function it_cancels_waiting_order_state(
         MerchantDebtorLimitsService $limitsService,
-        PaymentsServiceInterface $paymentsService,
         OrderContainerFactory $orderContainerFactory,
         CancelOrderRequest $request,
         Workflow $workflow,
@@ -148,7 +143,6 @@ class CancelOrderUseCaseSpec extends ObjectBehavior
             ->willReturn(true);
 
         $limitsService->unlock($orderContainer)->shouldNotBeCalled();
-        $paymentsService->cancelOrder($order)->shouldNotBeCalled();
         $creditNoteMessageFactory->create(Argument::cetera())->shouldNotBeCalled();
         $workflow->apply($order, OrderEntity::TRANSITION_CANCEL_WAITING)->shouldBeCalledOnce();
 
@@ -157,7 +151,6 @@ class CancelOrderUseCaseSpec extends ObjectBehavior
 
     public function it_cancels_shipped_order_state(
         MerchantDebtorLimitsService $limitsService,
-        PaymentsServiceInterface $paymentsService,
         OrderContainerFactory $orderContainerFactory,
         CancelOrderRequest $request,
         Workflow $workflow,
@@ -198,7 +191,6 @@ class CancelOrderUseCaseSpec extends ObjectBehavior
         $orderContainer->getInvoices()->willReturn($invoiceCollection);
 
         $limitsService->unlock($orderContainer)->shouldNotBeCalled();
-        $paymentsService->cancelOrder($order)->shouldBeCalled();
         $orderContainer->getOrderFinancialDetails()->willReturn($orderFinancialDetails);
         $creditNoteMessageFactory->create(Argument::cetera())->shouldBeCalled();
         $workflow->apply($order, OrderEntity::TRANSITION_CANCEL_SHIPPED)->shouldBeCalledOnce();

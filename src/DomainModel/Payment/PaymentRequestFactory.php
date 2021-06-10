@@ -3,43 +3,20 @@
 namespace App\DomainModel\Payment;
 
 use App\DomainModel\Invoice\Invoice;
-use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Payment\RequestDTO\ConfirmRequestDTO;
-use App\DomainModel\Payment\RequestDTO\ModifyRequestDTO;
 use Ozean12\Money\Money;
 
 class PaymentRequestFactory
 {
-    private function createModifyRequestFromOrderContainer(
-        OrderContainer $orderContainer,
-        AbstractPaymentRequestDTO $requestDTO
-    ) {
-        $requestDTO
-            ->setDuration($orderContainer->getOrderFinancialDetails()->getDuration())
-            ->setDebtorPaymentId($orderContainer->getMerchantDebtor()->getPaymentDebtorId())
-            ->setAmountGross(
-                $orderContainer
-                    ->getOrderFinancialDetails()->getAmountGross()
-                    ->subtract($orderContainer->getInvoices()->getInvoicesCreditNotesGrossSum())
-                    ->toFloat()
-            );
-        $this->createFromOrder($orderContainer->getOrder(), $requestDTO);
-    }
-
-    private function createFromOrder(OrderEntity $orderEntity, AbstractPaymentRequestDTO $requestDTO)
-    {
-        $requestDTO
-            ->setPaymentUuid($orderEntity->getPaymentId())
-            ->setInvoiceNumber($orderEntity->getInvoiceNumber())
-            ->setExternalCode($orderEntity->getExternalCode())
-            ->setShippedAt($orderEntity->getShippedAt());
-    }
-
     public function createConfirmRequestDTO(OrderEntity $order, float $paidAmount): ConfirmRequestDTO
     {
         $requestDTO = new ConfirmRequestDTO($paidAmount);
-        $this->createFromOrder($order, $requestDTO);
+        $requestDTO
+            ->setPaymentUuid($order->getPaymentId())
+            ->setInvoiceNumber($order->getInvoiceNumber())
+            ->setExternalCode($order->getExternalCode())
+            ->setShippedAt($order->getShippedAt());
 
         return $requestDTO;
     }
@@ -57,25 +34,5 @@ class PaymentRequestFactory
             ->setShippedAt($invoice->getCreatedAt());
 
         return $requestDTO;
-    }
-
-    public function createModifyRequestDTO(OrderContainer $orderContainer): ModifyRequestDTO
-    {
-        $requestDTO = new ModifyRequestDTO();
-        $this->createModifyRequestFromOrderContainer($orderContainer, $requestDTO);
-
-        return $requestDTO;
-    }
-
-    public function createModifyRequestFromInvoice(Invoice $invoice, Money $amountReduction): ModifyRequestDTO
-    {
-        return (new ModifyRequestDTO())
-            ->setDuration($invoice->getDuration())
-            ->setDebtorPaymentId($invoice->getPaymentDebtorUuid())
-            ->setAmountGross($invoice->getAmount()->getGross()->subtract($amountReduction)->toFloat())
-            ->setPaymentUuid($invoice->getPaymentUuid())
-            ->setInvoiceNumber($invoice->getExternalCode())
-            ->setExternalCode($invoice->getExternalCode())
-            ->setShippedAt($invoice->getCreatedAt());
     }
 }

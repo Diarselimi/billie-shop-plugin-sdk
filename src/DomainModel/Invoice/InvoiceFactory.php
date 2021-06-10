@@ -2,11 +2,13 @@
 
 namespace App\DomainModel\Invoice;
 
-use App\DomainModel\Fee\FeeCalculator;
+use App\DomainModel\Fee\FeeCalculationException;
+use App\DomainModel\Fee\FeeCalculatorInterface;
 use App\DomainModel\Invoice\CreditNote\CreditNoteCollection;
 use App\DomainModel\Invoice\CreditNote\CreditNoteFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\Helper\Uuid\UuidGeneratorInterface;
+use App\Infrastructure\Volt\VoltServiceException;
 use App\Support\AbstractFactory;
 use Ozean12\Money\Money;
 use Ozean12\Money\Percent;
@@ -18,13 +20,13 @@ class InvoiceFactory extends AbstractFactory
 
     private UuidGeneratorInterface $uuidGenerator;
 
-    private FeeCalculator $feeCalculator;
+    private FeeCalculatorInterface $feeCalculator;
 
     private CreditNoteFactory $creditNoteFactory;
 
     public function __construct(
         UuidGeneratorInterface $uuidGenerator,
-        FeeCalculator $feeCalculator,
+        FeeCalculatorInterface $feeCalculator,
         CreditNoteFactory $creditNoteFactory
     ) {
         $this->uuidGenerator = $uuidGenerator;
@@ -40,11 +42,20 @@ class InvoiceFactory extends AbstractFactory
         string $proofOfDeliveryUrl = null,
         string $invoiceAndPaymentUuid = null
     ): Invoice {
-        $fee = $this->feeCalculator->calculate(
-            $amount->getGross(),
-            $duration,
-            $orderContainer->getMerchantSettings()->getFeeRates()
-        );
+        $billingDate = new \DateTime('today');
+        $dueDate = new \DateTime("today + {$duration} days");
+
+        try {
+            $fee = $this->feeCalculator->getCalculateFee(
+                null,
+                $amount->getGross(),
+                $billingDate,
+                $dueDate,
+                $orderContainer->getMerchantSettings()->getFeeRates()
+            );
+        } catch (VoltServiceException $exception) {
+            throw new FeeCalculationException('Fee calculation call failed', 0, $exception);
+        }
 
         if ($invoiceAndPaymentUuid === null) {
             $invoiceAndPaymentUuid = $this->uuidGenerator->uuid4();
@@ -63,8 +74,8 @@ class InvoiceFactory extends AbstractFactory
             ->setFeeRate($fee->getFeeRate())
             ->setDuration($duration)
             ->setState(self::INITIAL_INVOICE_STATE)
-            ->setBillingDate(new \DateTime('today'))
-            ->setDueDate(new \DateTime("today + {$duration} days"))
+            ->setBillingDate($billingDate)
+            ->setDueDate($dueDate)
             ->setCreatedAt(new \DateTime())
             ->setProofOfDeliveryUrl($proofOfDeliveryUrl)
             ->setExternalCode($invoiceNumber)

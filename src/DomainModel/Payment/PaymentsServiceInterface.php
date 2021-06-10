@@ -2,12 +2,8 @@
 
 namespace App\DomainModel\Payment;
 
-use App\DomainModel\Invoice\Duration;
-use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\MerchantDebtor\RegisterDebtorDTO;
-use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Payment\RequestDTO\ConfirmRequestDTO;
-use App\DomainModel\Payment\RequestDTO\ModifyRequestDTO;
 
 interface PaymentsServiceInterface
 {
@@ -15,13 +11,7 @@ interface PaymentsServiceInterface
 
     public function getDebtorPaymentDetails(string $debtorPaymentId): DebtorPaymentDetailsDTO;
 
-    public function cancelOrder(OrderEntity $order): void;
-
-    public function modifyOrder(ModifyRequestDTO $requestDTO): void;
-
     public function confirmPayment(ConfirmRequestDTO $requestDTO): void;
 
     public function createFraudReclaim(string $orderPaymentId): void;
-
-    public function extendInvoiceDuration(Invoice $invoice, Duration $duration);
 }

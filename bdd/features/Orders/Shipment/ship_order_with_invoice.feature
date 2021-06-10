@@ -28,6 +28,7 @@ Feature:
   Scenario: Successful invoice upload and order shipment
     Given I have a created order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
     And I get from invoice-butler service no invoices and later one invoice no cns responses
+    And I get from volt service good response
     And the following invoice data exists:
       | order_id | invoice_uuid                         |
       | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
@@ -36,7 +37,6 @@ Feature:
       | invoice_number    | 123456A            |
       | external_order_id | 1233XYZ            |
       | invoice_file      | @dummy-invoice.png |
-    Then print last JSON response
     Then the JSON response should be:
     """
     {
@@ -155,6 +155,7 @@ Feature:
       | external_id | state   | gross | net | tax | duration | comment        | workflow_name |
       | CO123       | created | 1000  | 900 | 100 | 30       | "test order"   | order_v2      |
     And I get from invoice-butler service no invoices and later one invoice no cns responses
+    And I get from volt service good response
     And the order "CO123" does not have a payment id
     When I send a POST request to "/order/test-order-uuidCO123/ship-with-invoice" with parameters:
       | key               | value                            |
@@ -220,12 +221,12 @@ Feature:
         {
           "uuid":"68ccacff-8590-4b6a-8728-57b0748a07bf",
           "invoice_number":"123456A",
-          "payout_amount":381,
+          "payout_amount":262,
           "outstanding_amount":500,
           "amount":500,
           "amount_net":450,
           "amount_tax":50,
-          "fee_amount":119,
+          "fee_amount":238,
           "fee_rate":20,
           "due_date":"2021-03-19",
           "created_at":"2021-02-17",
@@ -239,10 +240,10 @@ Feature:
         "outstanding_amount": 500,
         "pending_merchant_payment_amount": 0,
         "fee_rate": 20,
-        "fee_amount": 119,
+        "fee_amount": 238,
         "pending_cancellation_amount": 0,
         "invoice_number": "123456A",
-        "payout_amount": 381,
+        "payout_amount": 262,
         "due_date": "2019-06-19"
       }
     }
@@ -264,9 +265,9 @@ Feature:
       "grossAmount":"50000",
       "netAmount":"45000",
       "feeRate":2000,
-      "grossFeeAmount":"11900",
-      "netFeeAmount":"10000",
-      "taxFeeAmount":"1900",
+      "grossFeeAmount":"23800",
+      "netFeeAmount":"20000",
+      "taxFeeAmount":"3800",
       "duration":30,
       "billingDate":"@string@",
       "services":["financing","dci"],

@@ -2,50 +2,33 @@
 
 namespace App\DomainModel\Invoice;
 
-use App\DomainModel\Fee\FeeCalculator;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
-use Ozean12\Transfer\Message\Invoice\ExtendInvoice;
-use Ozean12\Transfer\Shared\Invoice as InvoiceMessage;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 class ExtendInvoiceService implements LoggingInterface
 {
     use LoggingTrait;
 
-    private MessageBusInterface $bus;
+    private InvoiceServiceInterface $invoiceService;
 
-    private FeeCalculator $feeCalculator;
+    private UpdateInvoiceFeeService $updateInvoiceFeeService;
 
-    public function __construct(MessageBusInterface $bus, FeeCalculator $feeCalculator)
+    public function __construct(InvoiceServiceInterface $invoiceService, UpdateInvoiceFeeService $updateInvoiceFeeService)
     {
-        $this->bus = $bus;
-        $this->feeCalculator = $feeCalculator;
+        $this->invoiceService = $invoiceService;
+        $this->updateInvoiceFeeService = $updateInvoiceFeeService;
     }
 
     public function extend(OrderContainer $orderContainer, Invoice $invoice, int $duration): void
     {
-        $fee = $this->feeCalculator->calculate(
-            $invoice->getAmount()->getGross(),
-            $duration,
-            $orderContainer->getMerchantSettings()->getFeeRates()
-        );
-
-        $invoiceMessage = (new InvoiceMessage())
-            ->setUuid($invoice->getUuid())
-            ->setDueDate((clone $invoice->getBillingDate())->modify("+ {$duration} days")->format('Y-m-d'))
-            ->setFeeRate($fee->getFeeRate()->shift(2)->toInt())
-            ->setNetFeeAmount($fee->getNetFeeAmount()->shift(2)->toInt())
-            ->setVatOnFeeAmount($fee->getTaxFeeAmount()->shift(2)->toInt())
+        $dateDiff = $duration - $invoice->getDuration();
+        $invoice
+            ->setDueDate($invoice->getDueDate()->modify("+ {$dateDiff} days"))
             ->setDuration($duration)
-            ->setInvoiceReferences(
-                ['external_code' => $invoice->getExternalCode()]
-            );
+        ;
 
-        $extendInvoiceMessage = (new ExtendInvoice())
-            ->setInvoice($invoiceMessage);
-
-        $this->bus->dispatch($extendInvoiceMessage);
+        $this->updateInvoiceFeeService->updateFee($orderContainer, $invoice);
+        $this->invoiceService->extendInvoiceDuration($invoice);
     }
 }

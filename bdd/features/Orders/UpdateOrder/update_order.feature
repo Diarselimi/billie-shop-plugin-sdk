@@ -41,6 +41,7 @@ Feature: APIS-1077
   Scenario Template: Success 1: Partial provided data is OK and update is successful on any non-final state
     Given I have a "<state>" order with amounts 1000/900/100, duration 30 and comment "test order"
     And I get from invoice-butler service good response no CreditNotes
+    And I get from volt service good response
     And the following invoice data exists:
       | order_id | invoice_uuid                         |
       | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
@@ -73,6 +74,7 @@ Feature: APIS-1077
   Scenario Template: Success 2: Full provided data is OK and update is successful only when state is or was shipped
     Given I have a "<state>" order with amounts 1000/900/100, duration 30 and comment "test order"
     And I get from invoice-butler service good response no CreditNotes
+    And I get from volt service good response
     And the following invoice data exists:
       | order_id | invoice_uuid                         |
       | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |

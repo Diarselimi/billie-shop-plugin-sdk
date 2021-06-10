@@ -4,6 +4,7 @@ namespace App\DomainModel\OrderUpdate;
 
 use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\LegacyUpdateOrder\LegacyUpdateOrderRequest;
+use App\DomainModel\Fee\FeeCalculationException;
 use App\DomainModel\Invoice\CreditNote\CreditNote;
 use App\DomainModel\Invoice\CreditNote\CreditNoteFactory;
 use App\DomainModel\Invoice\CreditNote\InvoiceCreditNoteMessageFactory;
@@ -15,8 +16,6 @@ use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsPersistenceServic
 use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentUploadException;
 use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerAggregator;
 use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerInterface;
-use App\DomainModel\Payment\PaymentRequestFactory;
-use App\DomainModel\Payment\PaymentsServiceInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
@@ -26,8 +25,6 @@ class LegacyUpdateOrderService implements LoggingInterface
 {
     use LoggingTrait;
 
-    private PaymentsServiceInterface $paymentsService;
-
     private OrderRepositoryInterface $orderRepository;
 
     private InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler;
@@ -35,8 +32,6 @@ class LegacyUpdateOrderService implements LoggingInterface
     private OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService;
 
     private UpdateOrderLimitsService $updateOrderLimitsService;
-
-    private PaymentRequestFactory $paymentRequestFactory;
 
     private UpdateOrderRequestValidator $updateOrderRequestValidator;
 
@@ -49,11 +44,9 @@ class LegacyUpdateOrderService implements LoggingInterface
     private MessageBusInterface $bus;
 
     public function __construct(
-        PaymentsServiceInterface $paymentsService,
         OrderRepositoryInterface $orderRepository,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
-        PaymentRequestFactory $paymentRequestFactory,
         UpdateOrderLimitsService $updateOrderLimitsService,
         UpdateOrderRequestValidator $updateOrderRequestValidator,
         ExtendInvoiceService $extendInvoiceService,
@@ -61,11 +54,9 @@ class LegacyUpdateOrderService implements LoggingInterface
         CreditNoteFactory $creditNoteFactory,
         MessageBusInterface $bus
     ) {
-        $this->paymentsService = $paymentsService;
         $this->orderRepository = $orderRepository;
         $this->financialDetailsPersistenceService = $financialDetailsPersistenceService;
         $this->invoiceUrlHandler = $invoiceUrlHandler;
-        $this->paymentRequestFactory = $paymentRequestFactory;
         $this->updateOrderLimitsService = $updateOrderLimitsService;
         $this->updateOrderRequestValidator = $updateOrderRequestValidator;
         $this->extendInvoiceService = $extendInvoiceService;
@@ -119,7 +110,8 @@ class LegacyUpdateOrderService implements LoggingInterface
             $changedAmount = $changeSet->getAmount();
             $duration = $changeSet->isDurationChanged()
                 ? $changeSet->getDuration()
-                : $orderContainer->getOrderFinancialDetails()->getDuration();
+                : $orderContainer->getOrderFinancialDetails()->getDuration()
+            ;
 
             if (!$orderContainer->getInvoices()->isEmpty()) {
                 if ($invoice !== null && $changeSet->isInvoiceNumberChanged()) {
@@ -156,8 +148,7 @@ class LegacyUpdateOrderService implements LoggingInterface
             return;
         }
 
-        $hasChanges = $changeSet->isAmountChanged()
-            || $changeSet->isInvoiceNumberChanged()
+        $hasChanges = $changeSet->isInvoiceNumberChanged()
             || $changeSet->isInvoiceUrlChanged()
             || $changeSet->isDurationChanged();
 
@@ -172,12 +163,16 @@ class LegacyUpdateOrderService implements LoggingInterface
                 $invoice->setExternalCode($changeSet->getInvoiceNumber());
             }
             $duration = $changeSet->getDuration() ?? $invoice->getDuration();
-            $this->extendInvoiceService->extend($orderContainer, $invoice, $duration);
-        }
+            if ($changeSet->isDurationChanged()) {
+                sleep(1);
+            }
 
-        $this->paymentsService->modifyOrder(
-            $this->paymentRequestFactory->createModifyRequestDTO($orderContainer)
-        );
+            try {
+                $this->extendInvoiceService->extend($orderContainer, $invoice, $duration);
+            } catch (FeeCalculationException $exception) {
+                throw new UpdateOrderException("Order cannot be updated: fee calculation failed.", null, $exception);
+            }
+        }
     }
 
     private function updateOrder(OrderContainer $orderContainer, LegacyUpdateOrderRequest $changeSet): void

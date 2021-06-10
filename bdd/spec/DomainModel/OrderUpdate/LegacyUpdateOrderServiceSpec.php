@@ -24,9 +24,6 @@ use App\DomainModel\OrderUpdate\UpdateOrderException;
 use App\DomainModel\OrderUpdate\UpdateOrderLimitsService;
 use App\DomainModel\OrderUpdate\LegacyUpdateOrderService;
 use App\DomainModel\OrderUpdate\UpdateOrderRequestValidator;
-use App\DomainModel\Payment\PaymentRequestFactory;
-use App\DomainModel\Payment\PaymentsServiceInterface;
-use App\DomainModel\Payment\RequestDTO\ModifyRequestDTO;
 use Ozean12\Money\Money;
 use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
 use Ozean12\Transfer\Message\CreditNote\CreateCreditNote;
@@ -47,11 +44,9 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
     }
 
     public function let(
-        PaymentsServiceInterface $paymentsService,
         OrderRepositoryInterface $orderRepository,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
-        PaymentRequestFactory $paymentRequestFactory,
         UpdateOrderLimitsService $updateOrderLimitsService,
         UpdateOrderRequestValidator $updateOrderRequestValidator,
         ExtendInvoiceService $extendInvoiceService,
@@ -86,9 +81,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         MerchantRepositoryInterface $merchantRepository,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
-        InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
-        PaymentRequestFactory $paymentRequestFactory,
-        PaymentsServiceInterface $paymentsService
+        InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler
     ) {
         $order->getInvoiceNumber()->willReturn('123');
         $order->getInvoiceUrl()->willReturn('some_url');
@@ -141,12 +134,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         $orderRepository->update(Argument::any())->shouldNotBeCalled();
         $invoiceUrlHandler->handle(Argument::cetera())->shouldNotBeCalled();
 
-        // calls payments service
         $order->wasShipped()->shouldBeCalled()->willReturn(true);
-        $paymentsModifyRequest = new ModifyRequestDTO();
-        $paymentRequestFactory->createModifyRequestDTO($orderContainer)
-            ->shouldBeCalled()->willReturn($paymentsModifyRequest);
-        $paymentsService->modifyOrder($paymentsModifyRequest)->shouldBeCalled();
 
         $this->update($orderContainer, $request);
     }
@@ -159,9 +147,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         UpdateOrderLimitsService $updateOrderLimitsService,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
-        InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
-        PaymentRequestFactory $paymentRequestFactory,
-        PaymentsServiceInterface $paymentsService
+        InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler
     ) {
         $changeSet = (new LegacyUpdateOrderRequest('order123', 1))->setAmount(
             TaxedMoneyFactory::create(150, 150, 0)
@@ -199,10 +185,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         $orderRepository->update(Argument::any())->shouldNotBeCalled();
         $invoiceUrlHandler->handle(Argument::cetera())->shouldNotBeCalled();
 
-        // should NOT call payments service
         $order->wasShipped()->shouldBeCalled()->willReturn(false);
-        $paymentRequestFactory->createModifyRequestDTO(Argument::any())->shouldNotBeCalled();
-        $paymentsService->modifyOrder(Argument::any())->shouldNotBeCalled();
 
         $orderContainer->getInvoices()->willReturn(new InvoiceCollection([]));
 
@@ -218,8 +201,6 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
         InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
-        PaymentRequestFactory $paymentRequestFactory,
-        PaymentsServiceInterface $paymentsService,
         Invoice $invoice,
         InvoiceCollection $invoiceCollection
     ) {
@@ -253,11 +234,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         $orderRepository->update(Argument::any())->shouldNotBeCalled();
         $invoiceUrlHandler->handle(Argument::cetera())->shouldNotBeCalled();
 
-        // calls payments service
         $order->wasShipped()->shouldBeCalled()->willReturn(true);
-        $paymentsModifyRequest = new ModifyRequestDTO();
-        $paymentRequestFactory->createModifyRequestDTO($orderContainer)->shouldBeCalled()->willReturn($paymentsModifyRequest);
-        $paymentsService->modifyOrder($paymentsModifyRequest)->shouldBeCalled();
 
         $this->update($orderContainer, $request);
     }
@@ -271,8 +248,6 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
         InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
-        PaymentRequestFactory $paymentRequestFactory,
-        PaymentsServiceInterface $paymentsService,
         Invoice $invoice,
         InvoiceCollection $invoiceCollection
     ) {
@@ -302,11 +277,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         $orderRepository->update($order)->shouldBeCalled();
         $invoiceUrlHandler->handle($order, self::ORDER_UUID, 'some_url', '123', 'order.update')->shouldBeCalled();
 
-        // calls payments service
         $order->wasShipped()->shouldBeCalled()->willReturn(true);
-        $paymentsModifyRequest = new ModifyRequestDTO();
-        $paymentRequestFactory->createModifyRequestDTO($orderContainer)->shouldBeCalled()->willReturn($paymentsModifyRequest);
-        $paymentsService->modifyOrder($paymentsModifyRequest)->shouldBeCalled();
 
         $this->update($orderContainer, $request);
     }
@@ -319,9 +290,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         UpdateOrderLimitsService $updateOrderLimitsService,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
-        InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
-        PaymentRequestFactory $paymentRequestFactory,
-        PaymentsServiceInterface $paymentsService
+        InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler
     ) {
         $changeSet = (new LegacyUpdateOrderRequest('order123', 1))->setExternalCode('foobar001');
         $orderContainer->getInvoices()->willReturn(new InvoiceCollection([]));
@@ -347,8 +316,6 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
 
         // it does not call payments service
         $order->wasShipped()->shouldBeCalled()->willReturn(true);
-        $paymentRequestFactory->createModifyRequestDTO(Argument::any())->shouldNotBeCalled();
-        $paymentsService->modifyOrder(Argument::any())->shouldNotBeCalled();
 
         $this->update($orderContainer, $request);
     }
@@ -361,9 +328,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
         InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
-        OrderEntity $order,
-        PaymentRequestFactory $paymentRequestFactory,
-        PaymentsServiceInterface $paymentsService
+        OrderEntity $order
     ) {
         $changeSet = (new LegacyUpdateOrderRequest('order123', 1));
         $updateOrderRequestValidator->getValidatedRequest(
@@ -388,9 +353,6 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
 
         // it does not call payments service
         $order->wasShipped(Argument::any())->shouldBeCalled()->willReturn(true);
-        $paymentRequestFactory->createModifyRequestDTO(Argument::any())->shouldNotBeCalled();
-        $paymentsService->modifyOrder(Argument::any())->shouldNotBeCalled();
-
         $this->update($orderContainer, $request);
     }
 
@@ -402,9 +364,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         UpdateOrderLimitsService $updateOrderLimitsService,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
-        InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
-        PaymentRequestFactory $paymentRequestFactory,
-        PaymentsServiceInterface $paymentsService
+        InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler
     ) {
         $changeSet = (new LegacyUpdateOrderRequest('order123', 1))->setAmount(
             TaxedMoneyFactory::create(150, 150, 0)
@@ -446,9 +406,6 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
 
         // it does NOT call payments service
         $order->wasShipped()->shouldBeCalled()->willReturn(false);
-        $paymentRequestFactory->createModifyRequestDTO(Argument::any())->shouldNotBeCalled();
-        $paymentsService->modifyOrder(Argument::any())->shouldNotBeCalled();
-
         $this->update($orderContainer, $request);
     }
 
@@ -460,9 +417,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         UpdateOrderLimitsService $updateOrderLimitsService,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
-        InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
-        PaymentRequestFactory $paymentRequestFactory,
-        PaymentsServiceInterface $paymentsService
+        InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler
     ) {
         $order->getInvoiceNumber()->willReturn('123');
         $order->getInvoiceUrl()->willReturn('some_url');
@@ -487,10 +442,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         $invoiceUrlHandler->handle(Argument::cetera())
             ->shouldBeCalled()->willThrow(InvoiceDocumentUploadException::class);
 
-        // it does NOT call payments service
         $order->wasShipped()->shouldNotBeCalled();
-        $paymentRequestFactory->createModifyRequestDTO(Argument::any())->shouldNotBeCalled();
-        $paymentsService->modifyOrder(Argument::any())->shouldNotBeCalled();
 
         $this->shouldThrow(UpdateOrderException::class)->during('update', [$orderContainer, $request]);
     }
@@ -517,8 +469,6 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         ExtendInvoiceService $extendInvoiceService,
         InvoiceCreditNoteMessageFactory $creditNoteAnnouncer,
         LegacyUpdateOrderRequest $changeSet,
-        PaymentRequestFactory $paymentRequestFactory,
-        PaymentsServiceInterface $paymentsService,
         CreditNoteFactory $creditNoteFactory
     ) {
         $creditNoteFactory->create(Argument::cetera())->willReturn($this->prepareCreditNote());
@@ -564,7 +514,6 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         $orderRepository->update(Argument::any())->shouldNotBeCalled();
         $invoiceUrlHandler->handle(Argument::cetera())->shouldNotBeCalled();
 
-        // it does NOT call payments service
         $invoice = new Invoice();
         $invoice
             ->setUuid(Uuid::uuid4()->toString())
@@ -575,10 +524,6 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         $extendInvoiceService->extend(Argument::cetera())->shouldBeCalled();
 
         $creditNoteAnnouncer->create(Argument::cetera())->shouldBeCalledOnce();
-
-        $paymentsModifyRequest = new ModifyRequestDTO();
-        $paymentRequestFactory->createModifyRequestDTO($orderContainer)->shouldBeCalled()->willReturn($paymentsModifyRequest);
-        $paymentsService->modifyOrder($paymentsModifyRequest)->shouldBeCalled();
 
         $this->update($orderContainer, $request);
     }
