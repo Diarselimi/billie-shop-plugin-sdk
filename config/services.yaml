@@ -54,7 +54,6 @@ services:
       $vatRatesYamlPath: "%kernel.root_dir%/Resources/vat_rate/matrix.yaml"
       $isDummyRiskChecksFeatureEnabled: '%env(bool:DUMMY_CHECKS_ENABLED)%'
       $blacklistedAddresses: '%blacklisted_addresses%'
-      $buyerPortalEnabled: '%buyer_portal_enabled%'
 
   _instanceof:
     App\Application\UseCase\ValidatedUseCaseInterface:

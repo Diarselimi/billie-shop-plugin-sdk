@@ -36,6 +36,16 @@ class InvoiceNotificationUseCase implements LoggingInterface
         $debtorPerson = $orderContainer->getDebtorPerson();
         $email = $debtorPerson->getEmail();
 
+        if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+            $errorMessage = 'Buyer Portal: invalid email found for debtor person ID ' .
+                $debtorPerson->getId() . '. BP notification will not be sent for order ID '
+                . $orderContainer->getOrder()->getId();
+
+            $this->logSuppressedException(new \RuntimeException($errorMessage), $errorMessage);
+
+            return;
+        }
+
         try {
             $token = $this->resourceTokenService->createResourceTokenIfNotFound(
                 Uuid::fromString($orderContainer->getDebtorCompany()->getUuid()),
@@ -49,7 +59,7 @@ class InvoiceNotificationUseCase implements LoggingInterface
         } catch (SmaugClientException $exception) {
             $this->logSuppressedException(
                 $exception,
-                'Buyer Portal token retreival failed: ' . $exception->getMessage()
+                'Buyer Portal token retrieval failed: ' . $exception->getMessage()
             );
 
             return;
