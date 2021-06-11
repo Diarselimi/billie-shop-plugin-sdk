@@ -68,12 +68,12 @@ class ExternalDebtorDTO
         return $this;
     }
 
-    public function getAddressPostalCode(): string
+    public function getAddressPostalCode(): ?string
     {
         return $this->addressPostalCode;
     }
 
-    public function setAddressPostalCode(string $addressPostalCode): self
+    public function setAddressPostalCode(?string $addressPostalCode): self
     {
         $this->addressPostalCode = $addressPostalCode;
 
