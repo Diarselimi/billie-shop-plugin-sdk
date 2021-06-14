@@ -8,7 +8,7 @@ use App\Support\AbstractFactory;
 use Ozean12\Money\Money;
 
 /**
- * @method BankTransaction[] createFromArrayCollection(iterable $collection)
+ * @method BankTransaction[] createFromArrayMultiple(iterable $collection)
  */
 class BankTransactionFactory extends AbstractFactory
 {

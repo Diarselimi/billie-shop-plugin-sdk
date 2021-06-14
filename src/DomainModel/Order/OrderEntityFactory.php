@@ -15,6 +15,11 @@ class OrderEntityFactory extends AbstractFactory
         $this->uuidGenerator = $uuidGenerator;
     }
 
+    public function createCollection(iterable $arrays): OrderCollection
+    {
+        return new OrderCollection($this->createFromArrayMultiple($arrays));
+    }
+
     public function createFromRequest(CreateOrderRequestInterface $request): OrderEntity
     {
         return (new OrderEntity())

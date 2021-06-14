@@ -6,7 +6,13 @@ interface OrderFinancialDetailsRepositoryInterface
 {
     public function insert(OrderFinancialDetailsEntity $orderFinancialDetailsEntity): void;
 
-    public function getCurrentByOrderId(int $orderId): ? OrderFinancialDetailsEntity;
+    public function getLatestByOrderId(int $orderId): ? OrderFinancialDetailsEntity;
 
-    public function findOneByOrderUuid(string $orderUuid): ?OrderFinancialDetailsEntity;
+    /**
+     * @param  int[]                           $orderIds
+     * @return OrderFinancialDetailsCollection
+     */
+    public function getLatestByOrderIds(array $orderIds): OrderFinancialDetailsCollection;
+
+    public function getLatestByOrderUuid(string $orderUuid): ?OrderFinancialDetailsEntity;
 }

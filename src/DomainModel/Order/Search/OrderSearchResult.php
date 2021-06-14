@@ -4,27 +4,41 @@ declare(strict_types=1);
 
 namespace App\DomainModel\Order\Search;
 
-use App\DomainModel\Order\Aggregate\OrderAggregateCollection;
+use App\DomainModel\Order\OrderCollection;
+use App\DomainModel\Order\OrderEntity;
 
-class OrderSearchResult
+class OrderSearchResult implements \IteratorAggregate, \Countable
 {
-    private OrderAggregateCollection $collection;
+    private OrderCollection $orders;
 
     private int $totalCount;
 
-    public function __construct(OrderAggregateCollection $collection, int $totalCount)
+    public function __construct(OrderCollection $orders, int $totalCount)
     {
-        $this->collection = $collection;
+        $this->orders = $orders;
         $this->totalCount = $totalCount;
     }
 
-    public function getCollection(): OrderAggregateCollection
+    public function getOrders(): OrderCollection
     {
-        return $this->collection;
+        return $this->orders;
+    }
+
+    public function count(): int
+    {
+        return $this->getOrders()->count();
     }
 
     public function getTotalCount(): int
     {
         return $this->totalCount;
+    }
+
+    /**
+     * @return \ArrayIterator|OrderEntity[]
+     */
+    public function getIterator(): \ArrayIterator
+    {
+        return $this->getOrders()->getIterator();
     }
 }

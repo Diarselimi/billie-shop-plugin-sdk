@@ -72,7 +72,7 @@ class MerchantOnboardingStepRepository extends AbstractPdoRepository implements
 
         $rows = $this->doFetchAll($query, ['merchant_onboarding_id' => $merchantOnboardingId]);
 
-        return $this->factory->createFromArrayCollection($rows);
+        return $this->factory->createFromArrayMultiple($rows);
     }
 
     public function insert(MerchantOnboardingStepEntity $entity): void

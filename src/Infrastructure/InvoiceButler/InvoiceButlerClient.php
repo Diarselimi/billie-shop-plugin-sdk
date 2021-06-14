@@ -62,7 +62,7 @@ class InvoiceButlerClient implements InvoiceServiceInterface, LoggingInterface
                 ]
             );
 
-            $invoices = $this->invoiceFactory->createFromArrayCollection(
+            $invoices = $this->invoiceFactory->createFromArrayMultiple(
                 $this->decodeResponse($response)
             );
 

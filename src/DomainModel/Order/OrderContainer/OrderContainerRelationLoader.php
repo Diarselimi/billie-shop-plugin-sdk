@@ -156,7 +156,7 @@ class OrderContainerRelationLoader
 
     public function loadOrderFinancialDetails(OrderContainer $orderContainer): OrderFinancialDetailsEntity
     {
-        return $this->orderFinancialDetailsRepository->getCurrentByOrderId($orderContainer->getOrder()->getId());
+        return $this->orderFinancialDetailsRepository->getLatestByOrderId($orderContainer->getOrder()->getId());
     }
 
     public function loadOrderDunningStatus(OrderContainer $orderContainer): ?string

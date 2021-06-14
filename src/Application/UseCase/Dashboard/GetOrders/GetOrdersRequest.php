@@ -11,7 +11,7 @@ class GetOrdersRequest implements ValidatedRequestInterface, PaginationAwareInte
 {
     use PaginationAwareTrait;
 
-    public const DEFAULT_SORT_FIELD = 'created_at';
+    public const DEFAULT_SORT_FIELD = 'id';
 
     public const DEFAULT_SORT_DIRECTION = 'DESC';
 
@@ -23,7 +23,7 @@ class GetOrdersRequest implements ValidatedRequestInterface, PaginationAwareInte
 
     /**
      * @Assert\Type(type="string")
-     * @Assert\Choice({"created_at", "amount_gross", "external_code", "state"})
+     * @Assert\Choice({"id"})
      */
     private $sortBy;
 

@@ -2,6 +2,8 @@
 
 namespace App\DomainModel\Order;
 
+use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
+use App\DomainModel\OrderInvoice\OrderInvoiceCollection;
 use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 use Billie\PdoBundle\DomainModel\StatefulEntity\StatefulEntityInterface;
 use Billie\PdoBundle\DomainModel\StatefulEntity\StatefulEntityTrait;
@@ -164,6 +166,16 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
 
     private ?int $durationExtension;
 
+    private OrderFinancialDetailsEntity $latestOrderFinancialDetails;
+
+    private OrderInvoiceCollection $orderInvoices;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->orderInvoices = new OrderInvoiceCollection([]);
+    }
+
     public function getUuid(): string
     {
         return $this->uuid;
@@ -176,13 +188,13 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
         return $this;
     }
 
-    /** @deprecated  */
+    /** @deprecated */
     public function getAmountForgiven(): float
     {
         return $this->amountForgiven;
     }
 
-    /** @deprecated  */
+    /** @deprecated */
     public function setAmountForgiven(float $amountForgiven): OrderEntity
     {
         $this->amountForgiven = $amountForgiven;
@@ -190,7 +202,7 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
         return $this;
     }
 
-    public function getExternalCode(): ? string
+    public function getExternalCode(): ?string
     {
         return $this->externalCode;
     }
@@ -401,11 +413,15 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
 
     public function wasShipped(): bool
     {
-        return in_array($this->state, [
-            self::STATE_SHIPPED,
-            self::STATE_PAID_OUT,
-            self::STATE_LATE,
-        ], true);
+        return in_array(
+            $this->state,
+            [
+                self::STATE_SHIPPED,
+                self::STATE_PAID_OUT,
+                self::STATE_LATE,
+            ],
+            true
+        );
     }
 
     public function isPreWaiting(): bool
@@ -461,6 +477,30 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
     public function setDurationExtension(?int $durationExtension): self
     {
         $this->durationExtension = $durationExtension;
+
+        return $this;
+    }
+
+    public function getLatestOrderFinancialDetails(): OrderFinancialDetailsEntity
+    {
+        return $this->latestOrderFinancialDetails;
+    }
+
+    public function setLatestOrderFinancialDetails(OrderFinancialDetailsEntity $latestOrderFinancialDetails): self
+    {
+        $this->latestOrderFinancialDetails = $latestOrderFinancialDetails;
+
+        return $this;
+    }
+
+    public function getOrderInvoices(): OrderInvoiceCollection
+    {
+        return $this->orderInvoices;
+    }
+
+    public function setOrderInvoices(OrderInvoiceCollection $orderInvoices): self
+    {
+        $this->orderInvoices = $orderInvoices;
 
         return $this;
     }

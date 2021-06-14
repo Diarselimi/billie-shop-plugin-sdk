@@ -7,7 +7,7 @@ namespace App\Http\ResponseTransformer\Dashboard;
 use App\Application\UseCase\Dashboard\GetOrders\GetOrdersResponse;
 use App\DomainModel\ArrayableInterface;
 use App\DomainModel\Invoice\Invoice;
-use App\DomainModel\Order\Aggregate\OrderAggregate;
+use App\DomainModel\Order\OrderEntity;
 use App\Support\DateFormat;
 use OpenApi\Annotations as OA;
 
@@ -58,23 +58,22 @@ class GetOrdersResponsePayload implements ArrayableInterface
         return [
             'total' => $this->response->getTotalCount(),
             'items' => array_map(
-                function (OrderAggregate $aggregate) {
-                    return $this->transformAggregate($aggregate);
+                function (OrderEntity $order) {
+                    return $this->transformOrder($order);
                 },
-                $this->response->getCollection()->toArray()
+                $this->response->getOrders()->toArray()
             ),
         ];
     }
 
-    private function transformAggregate(OrderAggregate $aggregate): array
+    private function transformOrder(OrderEntity $order): array
     {
-        $order = $aggregate->getOrder();
-        $financialData = $aggregate->getFinancialDetails();
+        $financialData = $order->getLatestOrderFinancialDetails();
         $invoices = array_map(
             function (Invoice $invoice) {
                 return $this->transformInvoice($invoice);
             },
-            array_values($aggregate->getInvoices()->toArray())
+            array_values($order->getOrderInvoices()->toInvoiceCollection()->toArray())
         );
         $invoice = empty($invoices) ? $this->getInvoiceFallback() : $invoices[0];
         $orderDueDate = (clone $order->getCreatedAt())->modify("+ {$financialData->getDuration()} days");

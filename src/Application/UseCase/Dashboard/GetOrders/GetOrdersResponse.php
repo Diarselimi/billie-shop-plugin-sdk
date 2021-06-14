@@ -2,23 +2,23 @@
 
 namespace App\Application\UseCase\Dashboard\GetOrders;
 
-use App\DomainModel\Order\Aggregate\OrderAggregateCollection;
+use App\DomainModel\Order\OrderCollection;
 
 class GetOrdersResponse
 {
-    private OrderAggregateCollection $collection;
+    private OrderCollection $orders;
 
     private int $totalCount;
 
-    public function __construct(OrderAggregateCollection $collection, int $totalCount)
+    public function __construct(OrderCollection $orders, int $totalCount)
     {
-        $this->collection = $collection;
+        $this->orders = $orders;
         $this->totalCount = $totalCount;
     }
 
-    public function getCollection(): OrderAggregateCollection
+    public function getOrders(): OrderCollection
     {
-        return $this->collection;
+        return $this->orders;
     }
 
     public function getTotalCount(): int

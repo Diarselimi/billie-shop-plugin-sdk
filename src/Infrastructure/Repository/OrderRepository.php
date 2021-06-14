@@ -251,7 +251,7 @@ class OrderRepository extends AbstractPdoRepository implements
             ['uuid' => $invoiceUuid]
         );
 
-        return $this->orderFactory->createFromArrayCollection($orders);
+        return $this->orderFactory->createFromArrayMultiple($orders);
     }
 
     public function getByInvoiceAndMerchant(string $invoiceUuid, int $merchantId): ?OrderEntity

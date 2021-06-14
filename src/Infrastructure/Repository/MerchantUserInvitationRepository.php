@@ -198,7 +198,7 @@ class MerchantUserInvitationRepository extends AbstractPdoRepository implements 
 
         return new SearchResultIterator(
             $totalCount,
-            $this->invitedUserFactory->createFromArrayCollection($rows)
+            $this->invitedUserFactory->createFromArrayMultiple($rows)
         );
     }
 

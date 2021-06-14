@@ -63,7 +63,7 @@ class OrderInvoiceRepository extends AbstractPdoRepository implements OrderInvoi
             ' WHERE order_id IN (' . implode(',', $orderIds) . ')'
         );
 
-        return new OrderInvoiceCollection($rows ? $this->factory->createFromArrayCollection($rows) : []);
+        return new OrderInvoiceCollection($rows ? $this->factory->createFromArrayMultiple($rows) : []);
     }
 
     public function getByUuidAndMerchant(string $invoiceUuid, int $merchantId): ?OrderInvoiceEntity

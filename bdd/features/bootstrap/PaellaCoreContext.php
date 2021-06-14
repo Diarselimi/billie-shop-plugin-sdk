@@ -682,7 +682,7 @@ class PaellaCoreContext extends MinkContext
 
         Assert::notNull($order);
 
-        $orderFinancialDetails = $this->getOrderFinancialDetailsRepository()->getCurrentByOrderId($order->getId());
+        $orderFinancialDetails = $this->getOrderFinancialDetailsRepository()->getLatestByOrderId($order->getId());
 
         Assert::notNull($orderFinancialDetails);
 
@@ -1616,7 +1616,7 @@ class PaellaCoreContext extends MinkContext
     public function theOrderShouldHaveAmount(string $uuid, float $gross, float $net, float $tax)
     {
         $order = $this->getOrderRepository()->getOneByUuid($uuid);
-        $financialDetails = $this->getOrderFinancialDetailsRepository()->getCurrentByOrderId($order->getId());
+        $financialDetails = $this->getOrderFinancialDetailsRepository()->getLatestByOrderId($order->getId());
         Assert::eq($financialDetails->getAmountGross()->getMoneyValue(), $gross);
         Assert::eq($financialDetails->getAmountNet()->getMoneyValue(), $net);
         Assert::eq($financialDetails->getAmountTax()->getMoneyValue(), $tax);

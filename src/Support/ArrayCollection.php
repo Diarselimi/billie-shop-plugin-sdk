@@ -8,7 +8,7 @@ class ArrayCollection implements CollectionInterface
 {
     protected array $items;
 
-    public function __construct(array $items)
+    public function __construct(array $items = [])
     {
         $this->items = $items;
     }
@@ -26,5 +26,10 @@ class ArrayCollection implements CollectionInterface
     public function count(): int
     {
         return count($this->items);
+    }
+
+    public function isEmpty(): bool
+    {
+        return $this->count() === 0;
     }
 }

@@ -21,7 +21,7 @@ class GetInvoicePaymentsResponseFactory
 
     public function create(Invoice $invoice, PaginatedCollection $collection): GetInvoicePaymentsResponse
     {
-        $transactions = $this->bankTransactionFactory->createFromArrayCollection($collection);
+        $transactions = $this->bankTransactionFactory->createFromArrayMultiple($collection);
 
         $response = new GetInvoicePaymentsResponse();
         $summary = new InvoicePaymentSummary();

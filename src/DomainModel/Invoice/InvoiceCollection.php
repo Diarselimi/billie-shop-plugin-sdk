@@ -9,6 +9,9 @@ use Ozean12\Money\Money;
 
 class InvoiceCollection implements CollectionInterface
 {
+    /**
+     * @return Invoice[]
+     */
     private array $elements;
 
     public function __construct(array $elements)
@@ -93,5 +96,13 @@ class InvoiceCollection implements CollectionInterface
     public function getFirst(): ?Invoice
     {
         return reset($this->elements) ? reset($this->elements) : null;
+    }
+
+    /**
+     * @return Invoice[]
+     */
+    public function keyByUuid(): array
+    {
+        return $this->elements;
     }
 }

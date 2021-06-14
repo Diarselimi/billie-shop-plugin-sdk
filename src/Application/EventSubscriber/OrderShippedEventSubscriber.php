@@ -6,14 +6,10 @@ namespace App\Application\EventSubscriber;
 
 use App\Application\UseCase\BuyerPortal\InvoiceNotification\InvoiceNotificationUseCase;
 use App\DomainModel\Order\Event\OrderShippedEvent;
-use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
-use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class OrderShippedEventSubscriber implements EventSubscriberInterface, LoggingInterface
+class OrderShippedEventSubscriber implements EventSubscriberInterface
 {
-    use LoggingTrait;
-
     private InvoiceNotificationUseCase $invoiceNotificationUseCase;
 
     public function __construct(InvoiceNotificationUseCase $invoiceNotificationUseCase)

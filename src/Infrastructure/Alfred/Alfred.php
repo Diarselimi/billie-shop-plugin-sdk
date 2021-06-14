@@ -299,7 +299,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
             throw new CompaniesServiceRequestException($exception);
         }
 
-        return $this->signatoryPowersDTOFactory->createFromArrayCollection($this->decodeResponse($response));
+        return $this->signatoryPowersDTOFactory->createFromArrayMultiple($this->decodeResponse($response));
     }
 
     public function getSignatoryPowerDetails(string $token): ?SignatoryPowerDTO
@@ -390,7 +390,7 @@ class Alfred implements CompaniesServiceInterface, LoggingInterface
 
         $decodedResponse = $this->decodeResponse($response);
 
-        return $this->externalDebtorFactory->createFromArrayCollection(isset($decodedResponse['items']) ? $decodedResponse['items'] : []);
+        return $this->externalDebtorFactory->createFromArrayMultiple(isset($decodedResponse['items']) ? $decodedResponse['items'] : []);
     }
 
     public function getIdentityVerificationCase(string $caseUuid): IdentityVerificationCaseDTO

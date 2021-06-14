@@ -16,8 +16,6 @@ use App\DomainModel\OrderUpdate\UpdateOrderLimitsService;
 use App\Tests\Helpers\FakeDataFiller;
 use App\Tests\Helpers\RandomDataTrait;
 use App\Tests\Unit\UnitTestCase;
-use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
-use Ozean12\Money\Decimal;
 use Ozean12\Money\Money;
 use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
 
@@ -37,7 +35,7 @@ class UpdateOrderAmountServiceTest extends UnitTestCase
 
         $financialDetailsRepository = $this->createMock(OrderFinancialDetailsRepositoryInterface::class);
         $financialDetailsRepository
-            ->method('findOneByOrderUuid')
+            ->method('getLatestByOrderUuid')
             ->willReturn($fnd);
         $updateOrderLimitsService = $this->createMock(UpdateOrderLimitsService::class);
 

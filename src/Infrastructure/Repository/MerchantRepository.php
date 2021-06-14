@@ -5,7 +5,6 @@ namespace App\Infrastructure\Repository;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantEntityFactory;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
-use App\Infrastructure\Repository\MerchantOnboarding\MerchantOnboardingRepository;
 use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class MerchantRepository extends AbstractPdoRepository implements MerchantRepositoryInterface
@@ -165,7 +164,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
             ]
         );
 
-        return $rows ? $this->factory->createFromArrayCollection($rows) : null;
+        return $rows ? $this->factory->createFromArrayMultiple($rows) : null;
     }
 
     /**
@@ -178,7 +177,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
             ' WHERE sandbox_payment_merchant_id IS NULL'
         );
 
-        return $rows ? $this->factory->createFromArrayCollection($rows) : [];
+        return $rows ? $this->factory->createFromArrayMultiple($rows) : [];
     }
 
     public function getOneByPaymentUuid(string $paymentUuid): ?MerchantEntity

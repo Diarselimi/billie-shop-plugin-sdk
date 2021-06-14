@@ -94,7 +94,7 @@ class InvoiceFactory extends AbstractFactory
         $taxFeeAmount = new Money($data['fee_amount_vat'], 0);
 
         $creditNotesData = $data['credit_notes'] ?? [];
-        $creditNoteCollection = new CreditNoteCollection($this->creditNoteFactory->createFromArrayCollection($creditNotesData));
+        $creditNoteCollection = new CreditNoteCollection($this->creditNoteFactory->createFromArrayMultiple($creditNotesData));
 
         return (new Invoice())
             ->setUuid($data['uuid'])

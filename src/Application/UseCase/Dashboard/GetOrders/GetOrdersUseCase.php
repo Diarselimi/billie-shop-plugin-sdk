@@ -4,9 +4,12 @@ namespace App\Application\UseCase\Dashboard\GetOrders;
 
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
-use App\DomainModel\Order\Aggregate\InvoiceLoader;
+use App\DomainModel\Invoice\InvoiceServiceInterface;
+use App\DomainModel\Order\OrderCollectionRelationshipLoader;
 use App\DomainModel\Order\Search\OrderSearchQuery;
 use App\DomainModel\Order\Search\OrderSearchRepositoryInterface;
+use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface;
+use App\DomainModel\OrderInvoice\OrderInvoiceRepositoryInterface;
 
 class GetOrdersUseCase implements ValidatedUseCaseInterface
 {
@@ -14,14 +17,20 @@ class GetOrdersUseCase implements ValidatedUseCaseInterface
 
     private OrderSearchRepositoryInterface $orderSearchRepository;
 
-    private InvoiceLoader $invoiceLoader;
+    private OrderFinancialDetailsRepositoryInterface $financialDetailsRepository;
+
+    private OrderInvoiceRepositoryInterface $orderInvoiceRepository;
+
+    private InvoiceServiceInterface $invoiceService;
+
+    private OrderCollectionRelationshipLoader $orderCollectionRelationshipLoader;
 
     public function __construct(
         OrderSearchRepositoryInterface $orderSearchRepository,
-        InvoiceLoader $invoiceLoader
+        OrderCollectionRelationshipLoader $orderCollectionRelationshipLoader
     ) {
         $this->orderSearchRepository = $orderSearchRepository;
-        $this->invoiceLoader = $invoiceLoader;
+        $this->orderCollectionRelationshipLoader = $orderCollectionRelationshipLoader;
     }
 
     public function execute(GetOrdersRequest $request): GetOrdersResponse
@@ -40,8 +49,11 @@ class GetOrdersUseCase implements ValidatedUseCaseInterface
             )
         );
 
-        $orderAggregateCollection = $this->invoiceLoader->load($result->getCollection());
+        $orderCollection = $result->getOrders();
 
-        return new GetOrdersResponse($orderAggregateCollection, $result->getTotalCount());
+        $this->orderCollectionRelationshipLoader->loadLatestFinancialDetails($orderCollection);
+        $this->orderCollectionRelationshipLoader->loadOrderInvoicesWithInvoice($orderCollection);
+
+        return new GetOrdersResponse($orderCollection, $result->getTotalCount());
     }
 }

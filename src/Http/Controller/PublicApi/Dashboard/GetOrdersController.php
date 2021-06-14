@@ -25,11 +25,8 @@ use Symfony\Component\HttpFoundation\Request;
  *
  *     @OA\Parameter(in="query", name="sort_by", @OA\Schema(type="string",
  *          enum={
- *              "created_at", "created_at,desc", "created_at,asc",
- *              "external_code", "external_code,desc", "external_code,asc",
- *              "amount_gross", "amount_gross,desc", "amount_gross,asc",
- *              "state", "state,desc", "state,asc",
- *          }, default="created_at,desc"), required=false),
+ *              "id", "id,desc", "id,asc",
+ *          }, default="id,desc"), required=false),
  *
  *     @OA\Parameter(in="query", name="offset", @OA\Schema(type="integer", minimum=0), required=false),
  *     @OA\Parameter(in="query", name="limit", @OA\Schema(type="integer", minimum=1, maximum=100), required=false),

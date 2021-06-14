@@ -30,7 +30,7 @@ class UpdateAmountValidator extends ConstraintValidator
             return;
         }
 
-        $financialDetails = $this->financialDetailsRepository->findOneByOrderUuid($request->getOrderUuid());
+        $financialDetails = $this->financialDetailsRepository->getLatestByOrderUuid($request->getOrderUuid());
         if ($financialDetails->getAmountGross()->lessThan($request->getAmount()->getGross()) ||
             $financialDetails->getAmountNet()->lessThan($request->getAmount()->getNet()) ||
             $financialDetails->getAmountTax()->lessThan($request->getAmount()->getTax())

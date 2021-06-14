@@ -59,7 +59,7 @@ class GetInvoicePaymentsResponseFactoryTest extends UnitTestCase
             $transactionsData
         );
 
-        $this->bankTransactionFactory->createFromArrayCollection($paginatedCollection)
+        $this->bankTransactionFactory->createFromArrayMultiple($paginatedCollection)
             ->shouldBeCalledOnce()->willReturn($transactions);
 
         $responseFactory = new GetInvoicePaymentsResponseFactory($this->bankTransactionFactory->reveal());
