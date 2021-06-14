@@ -33,7 +33,7 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
  *          @OA\MediaType(
  *              mediaType="application/json",
  *              @OA\Schema(properties={
- *                  @OA\Property(property="duration", ref="#/components/schemas/OrderDuration")
+ *                  @OA\Property(property="duration", ref="#/components/schemas/OrderDuration", example="45", description="The number of days which the invoice is due to be paid.")
  *              })
  *          )
  *     ),

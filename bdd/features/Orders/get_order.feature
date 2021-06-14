@@ -79,7 +79,6 @@ Feature:
         "unshipped_amount":1000,
         "unshipped_amount_net":900,
         "unshipped_amount_tax":100,
-        "workflow_name":"order_v1",
         "debtor_company": {
             "name": "Test User Company",
             "address_house_number": "10",
@@ -92,7 +91,6 @@ Feature:
             "iban": null,
             "bic": null
         },
-        "invoices": [],
         "invoice": {
             "outstanding_amount": 500,
             "pending_merchant_payment_amount": 0,
@@ -162,9 +160,7 @@ Feature:
        "unshipped_amount":1000,
        "unshipped_amount_net":900,
        "unshipped_amount_tax":100,
-       "workflow_name":"order_v1",
        "due_date":"2021-01-13",
-       "invoices": [],
        "debtor_company":{
           "name":"Test User Company",
           "address_house_number":"10",
@@ -259,7 +255,6 @@ Feature:
             "iban": "DE1234",
             "bic": "BICISHERE"
         },
-        "invoices": [],
          "invoice": {
            "outstanding_amount": 500,
            "pending_merchant_payment_amount": 0,

@@ -265,11 +265,11 @@ use OpenApi\Annotations as OA;
  * @OA\Schema(schema="Address", title="Address data are all required except house number.",
  *     required={"street", "postal_code", "city", "country"},
  *     properties={
- *          @OA\Property(property="house_number", ref="#/components/schemas/TinyText"),
- *          @OA\Property(property="street", ref="#/components/schemas/TinyText"),
- *          @OA\Property(property="postal_code", ref="#/components/schemas/TinyText"),
- *          @OA\Property(property="city", ref="#/components/schemas/TinyText"),
- *          @OA\Property(property="country", ref="#/components/schemas/TinyText")
+ *          @OA\Property(property="house_number", ref="#/components/schemas/TinyText", description="House number. Leave empty if it is provided as part of the street", example="45"),
+ *          @OA\Property(property="street", ref="#/components/schemas/TinyText", description="Street can be with house number together or provide house number in the dedicated field.", example="Charlottenstr. 45"),
+ *          @OA\Property(property="postal_code", ref="#/components/schemas/PostalCode", description="ZIP or postal code.", example="94111"),
+ *          @OA\Property(property="city", ref="#/components/schemas/TinyText", example="Berlin", description="City, district, suburb, town, or village.", example="Berlin"),
+ *          @OA\Property(property="country", ref="#/components/schemas/CountryCode", description="Two-letter country code", example="DE"),
  *     }
  * )
  */

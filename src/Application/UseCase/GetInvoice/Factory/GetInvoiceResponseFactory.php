@@ -9,6 +9,7 @@ use App\DomainModel\Invoice\CreditNote\CreditNote;
 use App\DomainModel\Invoice\CreditNote\CreditNoteCollection;
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
+use App\Http\Response\DTO\TaxedMoneyDTO;
 
 class GetInvoiceResponseFactory
 {
@@ -34,9 +35,7 @@ class GetInvoiceResponseFactory
                 return [
                     'uuid' => $orderContainer->getOrder()->getUuid(),
                     'external_code' => $orderContainer->getOrder()->getExternalCode(),
-                    'amount' => $financialDetails->getAmountGross()->getMoneyValue(),
-                    'amount_net' => $financialDetails->getAmountNet()->getMoneyValue(),
-                    'amount_tax' => $financialDetails->getAmountTax()->getMoneyValue(),
+                    'amount' => (new TaxedMoneyDTO($financialDetails->getAmountTaxedMoney()))->toArray(),
                 ];
             },
             $orderContainers

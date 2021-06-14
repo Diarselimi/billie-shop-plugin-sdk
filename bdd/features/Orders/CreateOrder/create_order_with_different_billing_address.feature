@@ -169,7 +169,6 @@ Feature:
        "unshipped_amount_tax":100,
        "workflow_name":"order_v1",
        "due_date":"2021-01-13",
-       "invoices":[],
        "debtor_company":{
           "name":"Test User Company",
           "address_house_number":"10",
@@ -342,7 +341,6 @@ Feature:
        "unshipped_amount_tax":100,
        "workflow_name":"order_v1",
        "due_date":"2021-01-13",
-       "invoices":[],
        "dunning_status":null,
        "debtor_company":{
           "name":"Test User Company",
@@ -526,7 +524,6 @@ Feature:
        "unshipped_amount_tax":100,
        "workflow_name":"order_v1",
        "due_date":"2021-01-13",
-       "invoices":[],
        "debtor_company":{
           "name":"Test User Company",
           "address_house_number":"10",

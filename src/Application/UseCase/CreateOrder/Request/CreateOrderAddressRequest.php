@@ -15,11 +15,22 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     },
  *     properties={
  *          @OA\Property(property="addition", ref="#/components/schemas/TinyText", nullable=true),
- *          @OA\Property(property="house_number", ref="#/components/schemas/TinyText", example="4", nullable=true),
- *          @OA\Property(property="street", ref="#/components/schemas/TinyText", example="Charlotten Str."),
- *          @OA\Property(property="city", ref="#/components/schemas/TinyText", example="Berlin"),
- *          @OA\Property(property="postal_code", ref="#/components/schemas/PostalCode"),
- *          @OA\Property(property="country", ref="#/components/schemas/CountryCode"),
+ *          @OA\Property(
+ *              property="house_number",
+ *              ref="#/components/schemas/TinyText",
+ *              example="4",
+ *              nullable=true,
+ *              description="House number. Leave empty if it is provided as part of the street"
+ *          ),
+ *          @OA\Property(
+ *              property="street",
+ *              ref="#/components/schemas/TinyText",
+ *              example="Charlottenstr. 45",
+ *              description="Street can be with house number together or provide house number in the dedicated field."
+ *          ),
+ *          @OA\Property(property="city", ref="#/components/schemas/TinyText", example="Berlin", description="City, district, suburb, town, or village.", example="Berlin"),
+ *          @OA\Property(property="postal_code", ref="#/components/schemas/PostalCode", description="ZIP or postal code.", example="94111"),
+ *          @OA\Property(property="country", ref="#/components/schemas/CountryCode", description="Two-letter country code", example="DE"),
  *     }
  * )
  */

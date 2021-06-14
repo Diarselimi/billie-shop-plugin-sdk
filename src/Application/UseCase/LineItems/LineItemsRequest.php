@@ -12,8 +12,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     title="Order Line Item",
  *     required={"external_id", "quantity"},
  *     properties={
- *          @OA\Property(property="external_id", ref="#/components/schemas/TinyText"),
- *          @OA\Property(property="quantity", minimum=1, type="number")
+ *          @OA\Property(property="external_id", ref="#/components/schemas/TinyText", description="external identifier of the line item."),
+ *          @OA\Property(property="quantity", minimum=1, type="number", description="The quantity of the items.")
  *     }
  * )
  */

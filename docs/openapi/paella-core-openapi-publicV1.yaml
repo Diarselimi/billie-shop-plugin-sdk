@@ -690,15 +690,25 @@ components:
         - country
       properties:
         house_number:
+          description: 'House number. Leave empty if it is provided as part of the street'
+          example: '45'
           $ref: '#/components/schemas/TinyText'
         street:
+          description: 'Street can be with house number together or provide house number in the dedicated field.'
+          example: 'Charlottenstr. 45'
           $ref: '#/components/schemas/TinyText'
         postal_code:
-          $ref: '#/components/schemas/TinyText'
+          description: 'ZIP or postal code.'
+          example: '94111'
+          $ref: '#/components/schemas/PostalCode'
         city:
+          description: 'City, district, suburb, town, or village.'
+          example: Berlin
           $ref: '#/components/schemas/TinyText'
         country:
-          $ref: '#/components/schemas/TinyText'
+          description: 'Two-letter country code'
+          example: DE
+          $ref: '#/components/schemas/CountryCode'
       type: object
     OauthClientCredentialsGrantRequestBodyParams:
       title: 'Request OAuth Token'
@@ -822,18 +832,25 @@ components:
           nullable: true
           $ref: '#/components/schemas/TinyText'
         house_number:
+          description: 'House number. Leave empty if it is provided as part of the street'
           example: '4'
           nullable: true
           $ref: '#/components/schemas/TinyText'
         street:
-          example: 'Charlotten Str.'
+          description: 'Street can be with house number together or provide house number in the dedicated field.'
+          example: 'Charlottenstr. 45'
           $ref: '#/components/schemas/TinyText'
         city:
+          description: 'City, district, suburb, town, or village.'
           example: Berlin
           $ref: '#/components/schemas/TinyText'
         postal_code:
+          description: 'ZIP or postal code.'
+          example: '94111'
           $ref: '#/components/schemas/PostalCode'
         country:
+          description: 'Two-letter country code'
+          example: DE
           $ref: '#/components/schemas/CountryCode'
       type: object
     LegacyCreateOrderDebtorCompanyRequest:
@@ -972,86 +989,58 @@ components:
       title: 'Get Invoice Response'
       properties:
         uuid:
+          description: 'Unique identifier of the invoice object.'
           $ref: '#/components/schemas/UUID'
         invoice_number:
+          description: 'Customer facing merchant defined invoice number which must be unique.'
           nullable: true
           $ref: '#/components/schemas/TinyText'
         duration:
+          description: 'The defined time allowed for payment. Measured in days'
           type: number
           nullable: false
         payout_amount:
+          description: 'The amount that will be paid out to the merchant.'
           type: number
           format: float
           nullable: false
         amount:
+          description: 'Total invoice amount including gross amount, net amount and tax amount.'
           type: number
-          format: float
           nullable: false
-        amount_net:
-          type: number
-          format: float
-          nullable: false
-        amount_tax:
-          type: number
-          format: float
-          nullable: false
+          $ref: '#/components/schemas/AmountDTO'
         outstanding_amount:
+          description: 'The remaining amount that has to be paid by the debtor still.'
           type: number
           format: float
           nullable: false
         fee_amount:
+          description: 'The fee amount per invoice paid by the merchant to Billie.'
           type: number
           format: float
           nullable: false
         fee_rate:
+          description: 'The fee rate is the percentage that the merchant pays to Billie.'
           type: number
           format: float
           nullable: false
         created_at:
+          description: 'The date and time when the invoice was created.'
           type: string
           format: date
           example: '2019-03-20'
           nullable: false
         due_date:
+          description: 'The date when this invoice is due to be paid back.'
           type: string
           format: date
           example: '2019-03-20'
           nullable: false
-        pending_merchant_payment_amount:
-          type: number
-          format: float
-          nullable: false
-        pending_cancellation_amount:
-          type: number
-          format: float
-          nullable: false
         state:
+          description: 'The state of the invoice.'
           type: string
           example: created
           nullable: true
-        orders:
-          type: array
-          items:
-            properties:
-              uuid:
-                $ref: '#/components/schemas/UUID'
-              external_code:
-                type: string
-                example: C-10123456789-0001
-                nullable: true
-              amount:
-                type: number
-                format: float
-                nullable: false
-              amount_net:
-                type: number
-                format: float
-                nullable: false
-              amount_tax:
-                type: number
-                format: float
-                nullable: false
-            type: object
       type: object
     LegacyUpdateOrderRequest:
       title: 'Order Update Object'
@@ -1293,6 +1282,41 @@ components:
             industry_sector:
               nullable: true
               $ref: '#/components/schemas/TinyText'
+          type: object
+        invoice:
+          properties:
+            invoice_number:
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            payout_amount:
+              type: number
+              format: float
+              nullable: true
+            outstanding_amount:
+              type: number
+              format: float
+              nullable: true
+            pending_merchant_payment_amount:
+              type: number
+              format: float
+              nullable: true
+            pending_cancellation_amount:
+              type: number
+              format: float
+              nullable: true
+            fee_amount:
+              type: number
+              format: float
+              nullable: true
+            fee_rate:
+              type: number
+              format: float
+              nullable: true
+            due_date:
+              type: string
+              format: date
+              example: '2019-03-20'
+              nullable: true
           type: object
         delivery_address:
           type: object

@@ -25,7 +25,9 @@ final class GetInvoicePaymentsResponse implements CollectionInterface
 {
     private InvoicePaymentSummary $summary;
 
-    private array $items;
+    private array
+
+ $items;
 
     public function __construct()
     {

@@ -43,7 +43,16 @@ use Ozean12\Money\TaxedMoney\TaxedMoney;
  *          @OA\Property(property="address_house", ref="#/components/schemas/TinyText", example="4"),
  *          @OA\Property(property="industry_sector", ref="#/components/schemas/TinyText", nullable=true),
  *      }),
- *
+ *     @OA\Property(property="invoice", type="object", properties={
+ *          @OA\Property(property="invoice_number", ref="#/components/schemas/TinyText", nullable=true),
+ *          @OA\Property(property="payout_amount", type="number", format="float", nullable=true),
+ *          @OA\Property(property="outstanding_amount", type="number", format="float", nullable=true),
+ *          @OA\Property(property="pending_merchant_payment_amount", type="number", format="float", nullable=true),
+ *          @OA\Property(property="pending_cancellation_amount", type="number", format="float", nullable=true),
+ *          @OA\Property(property="fee_amount", type="number", format="float", nullable=true),
+ *          @OA\Property(property="fee_rate", type="number", format="float", nullable=true),
+ *          @OA\Property(property="due_date", type="string", format="date", nullable=true, example="2019-03-20"),
+ *      }),
  *      @OA\Property(property="delivery_address", type="object", ref="#/components/schemas/CreateOrderAddressRequest"),
  *      @OA\Property(property="billing_address", type="object", ref="#/components/schemas/CreateOrderAddressRequest"),
  *      @OA\Property(property="created_at", ref="#/components/schemas/DateTime"),
@@ -149,14 +158,14 @@ class LegacyOrderResponse implements ArrayableInterface
 
     private array
 
- $invoices = [];
+        $invoices = [];
 
     /**
      * @deprecated use declineReason
      */
     private $reasons = [];
 
-    public function getExternalCode(): ? string
+    public function getExternalCode(): ?string
     {
         return $this->externalCode;
     }
@@ -192,7 +201,7 @@ class LegacyOrderResponse implements ArrayableInterface
         return $this;
     }
 
-    public function getBankAccountIban(): ? string
+    public function getBankAccountIban(): ?string
     {
         return $this->bankAccountIban;
     }
@@ -204,7 +213,7 @@ class LegacyOrderResponse implements ArrayableInterface
         return $this;
     }
 
-    public function getBankAccountBic(): ? string
+    public function getBankAccountBic(): ?string
     {
         return $this->bankAccountBic;
     }
@@ -216,7 +225,7 @@ class LegacyOrderResponse implements ArrayableInterface
         return $this;
     }
 
-    public function getCompanyName(): ? string
+    public function getCompanyName(): ?string
     {
         return $this->companyName;
     }
@@ -228,7 +237,7 @@ class LegacyOrderResponse implements ArrayableInterface
         return $this;
     }
 
-    public function getCompanyAddressHouseNumber(): ? string
+    public function getCompanyAddressHouseNumber(): ?string
     {
         return $this->companyAddressHouseNumber;
     }
@@ -240,7 +249,7 @@ class LegacyOrderResponse implements ArrayableInterface
         return $this;
     }
 
-    public function getCompanyAddressStreet(): ? string
+    public function getCompanyAddressStreet(): ?string
     {
         return $this->companyAddressStreet;
     }
@@ -252,7 +261,7 @@ class LegacyOrderResponse implements ArrayableInterface
         return $this;
     }
 
-    public function getCompanyAddressCity(): ? string
+    public function getCompanyAddressCity(): ?string
     {
         return $this->companyAddressCity;
     }
@@ -264,7 +273,7 @@ class LegacyOrderResponse implements ArrayableInterface
         return $this;
     }
 
-    public function getCompanyAddressPostalCode(): ? string
+    public function getCompanyAddressPostalCode(): ?string
     {
         return $this->companyAddressPostalCode;
     }
@@ -276,7 +285,7 @@ class LegacyOrderResponse implements ArrayableInterface
         return $this;
     }
 
-    public function getCompanyAddressCountry(): ? string
+    public function getCompanyAddressCountry(): ?string
     {
         return $this->companyAddressCountry;
     }
@@ -348,7 +357,7 @@ class LegacyOrderResponse implements ArrayableInterface
         return $this;
     }
 
-    public function getDebtorExternalDataAddressHouse(): ? string
+    public function getDebtorExternalDataAddressHouse(): ?string
     {
         return $this->debtorExternalDataAddressHouse;
     }
@@ -360,7 +369,7 @@ class LegacyOrderResponse implements ArrayableInterface
         return $this;
     }
 
-    public function getDebtorExternalDataIndustrySector(): ? string
+    public function getDebtorExternalDataIndustrySector(): ?string
     {
         return $this->debtorExternalDataIndustrySector;
     }
@@ -576,7 +585,7 @@ class LegacyOrderResponse implements ArrayableInterface
         return $this;
     }
 
-    public function getDunningStatus(): ? string
+    public function getDunningStatus(): ?string
     {
         return $this->dunningStatus;
     }
@@ -618,7 +627,7 @@ class LegacyOrderResponse implements ArrayableInterface
         return $this;
     }
 
-    public function getInvoiceNumber(): ? string
+    public function getInvoiceNumber(): ?string
     {
         return $this->invoiceNumber;
     }
@@ -630,7 +639,7 @@ class LegacyOrderResponse implements ArrayableInterface
         return $this;
     }
 
-    public function getPayoutAmount(): ? float
+    public function getPayoutAmount(): ?float
     {
         return $this->payoutAmount;
     }
@@ -642,7 +651,7 @@ class LegacyOrderResponse implements ArrayableInterface
         return $this;
     }
 
-    public function getOutstandingAmount(): ? float
+    public function getOutstandingAmount(): ?float
     {
         return $this->outstandingAmount;
     }
@@ -654,7 +663,7 @@ class LegacyOrderResponse implements ArrayableInterface
         return $this;
     }
 
-    public function getFeeAmount(): ? float
+    public function getFeeAmount(): ?float
     {
         return $this->feeAmount;
     }
@@ -666,7 +675,7 @@ class LegacyOrderResponse implements ArrayableInterface
         return $this;
     }
 
-    public function getFeeRate(): ? float
+    public function getFeeRate(): ?float
     {
         return $this->feeRate;
     }
@@ -678,7 +687,7 @@ class LegacyOrderResponse implements ArrayableInterface
         return $this;
     }
 
-    public function getDueDate(): ? \DateTime
+    public function getDueDate(): ?\DateTime
     {
         return $this->dueDate;
     }
@@ -801,7 +810,6 @@ class LegacyOrderResponse implements ArrayableInterface
             'shipped_at' => ($this->getShippedAt() ? $this->getShippedAt()->format(\DateTime::ISO8601) : null),
             'debtor_uuid' => $this->getDebtorUuid(),
             'workflow_name' => $this->workflowName,
-            'invoices' => array_map(fn (LegacyOrderInvoiceResponse $invoice) => $invoice->toArray(), $this->invoices),
             'invoice' => [
                 'invoice_number' => $this->getInvoiceNumber(),
                 'payout_amount' => $this->getPayoutAmount(),

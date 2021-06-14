@@ -93,7 +93,6 @@ Feature:
       "shipped_at":null,
       "debtor_uuid":null,
       "workflow_name":"order_v1",
-      "invoices": [],
       "invoice": {
         "outstanding_amount": 500,
         "pending_merchant_payment_amount": 0,
@@ -217,25 +216,6 @@ Feature:
       },
       "debtor_uuid":null,
       "workflow_name":"order_v2",
-       "invoices":[
-        {
-          "uuid":"68ccacff-8590-4b6a-8728-57b0748a07bf",
-          "invoice_number":"123456A",
-          "payout_amount":262,
-          "outstanding_amount":500,
-          "amount":500,
-          "amount_net":450,
-          "amount_tax":50,
-          "fee_amount":238,
-          "fee_rate":20,
-          "due_date":"2021-03-19",
-          "created_at":"2021-02-17",
-          "duration":30,
-          "state":"new",
-          "pending_merchant_payment_amount":0,
-          "pending_cancellation_amount":0
-        }
-      ],
       "invoice": {
         "outstanding_amount": 500,
         "pending_merchant_payment_amount": 0,

@@ -25,18 +25,18 @@ Feature: Get invoice from invoice-butler
         "fee_rate": 20,
         "state": "new",
         "outstanding_amount": 500,
-        "amount_tax": 0,
-        "amount": 123.33,
+        "amount":{"gross":123.33,"net":123.33,"tax":0},
         "pending_cancellation_amount": 0,
-        "amount_net": 123.33,
         "fee_amount": 123.33,
         "orders": [
             {
                 "uuid": "test-order-uuidABCDE",
                 "external_code": "ABCDE",
-                "amount": 1000,
-                "amount_net": 900,
-                "amount_tax": 100
+                "amount":{
+                   "gross":1000,
+                   "net":900,
+                   "tax":100
+                }
             }
         ],
         "invoice_number": "some_code",

@@ -260,15 +260,25 @@ components:
         - country
       properties:
         house_number:
+          description: 'House number. Leave empty if it is provided as part of the street'
+          example: '45'
           $ref: '#/components/schemas/TinyText'
         street:
+          description: 'Street can be with house number together or provide house number in the dedicated field.'
+          example: 'Charlottenstr. 45'
           $ref: '#/components/schemas/TinyText'
         postal_code:
-          $ref: '#/components/schemas/TinyText'
+          description: 'ZIP or postal code.'
+          example: '94111'
+          $ref: '#/components/schemas/PostalCode'
         city:
+          description: 'City, district, suburb, town, or village.'
+          example: Berlin
           $ref: '#/components/schemas/TinyText'
         country:
-          $ref: '#/components/schemas/TinyText'
+          description: 'Two-letter country code'
+          example: DE
+          $ref: '#/components/schemas/CountryCode'
       type: object
     AbstractShipOrderRequest:
       allOf:
@@ -341,18 +351,25 @@ components:
           nullable: true
           $ref: '#/components/schemas/TinyText'
         house_number:
+          description: 'House number. Leave empty if it is provided as part of the street'
           example: '4'
           nullable: true
           $ref: '#/components/schemas/TinyText'
         street:
-          example: 'Charlotten Str.'
+          description: 'Street can be with house number together or provide house number in the dedicated field.'
+          example: 'Charlottenstr. 45'
           $ref: '#/components/schemas/TinyText'
         city:
+          description: 'City, district, suburb, town, or village.'
           example: Berlin
           $ref: '#/components/schemas/TinyText'
         postal_code:
+          description: 'ZIP or postal code.'
+          example: '94111'
           $ref: '#/components/schemas/PostalCode'
         country:
+          description: 'Two-letter country code'
+          example: DE
           $ref: '#/components/schemas/CountryCode'
       type: object
     LegacyCreateOrderDebtorCompanyRequest:

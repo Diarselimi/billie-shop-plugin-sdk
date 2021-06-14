@@ -3074,6 +3074,7 @@ paths:
             schema:
               properties:
                 paid_amount:
+                  description: 'The amount paid to the merchant from debtor.'
                   type: number
                   format: float
                   minimum: 0.1
@@ -3135,11 +3136,9 @@ paths:
         - Invoices
       summary: 'Create Invoice'
       description: |-
-        >By creating an invoice, you will ship that order based on the amount the invoice has.
+        Create an invoice by calling `/invoices` with either the full amount or a partial amount.
 
-        `Ex:` If you have an order of `500 Euro gross` and you want to partially ship it, just create an Invoice with the amount of `250 Euro gross`, and the order will move to `partially_shipped` state.
-
-        > To move the same order in state shipped you need to create another invoice for that same order with another 250 Euro gross.
+        > Example: If you plan to ship multiple items of an order from different warehouses at different dates to one client, you can create an invoice for each of these partial shipments now.
       operationId: invoice_create
       requestBody:
         required: true
@@ -3179,6 +3178,8 @@ paths:
             schema:
               properties:
                 duration:
+                  description: 'The number of days which the invoice is due to be paid.'
+                  example: '45'
                   $ref: '#/components/schemas/OrderDuration'
               type: object
       responses:
@@ -3542,15 +3543,25 @@ components:
         - country
       properties:
         house_number:
+          description: 'House number. Leave empty if it is provided as part of the street'
+          example: '45'
           $ref: '#/components/schemas/TinyText'
         street:
+          description: 'Street can be with house number together or provide house number in the dedicated field.'
+          example: 'Charlottenstr. 45'
           $ref: '#/components/schemas/TinyText'
         postal_code:
-          $ref: '#/components/schemas/TinyText'
+          description: 'ZIP or postal code.'
+          example: '94111'
+          $ref: '#/components/schemas/PostalCode'
         city:
+          description: 'City, district, suburb, town, or village.'
+          example: Berlin
           $ref: '#/components/schemas/TinyText'
         country:
-          $ref: '#/components/schemas/TinyText'
+          description: 'Two-letter country code'
+          example: DE
+          $ref: '#/components/schemas/CountryCode'
       type: object
     CreateOrderDebtorCompanyRequest:
       title: 'Debtor Company'
@@ -3720,17 +3731,20 @@ components:
           $ref: '#/components/schemas/OrderDuration'
       type: object
     CreateCreditNoteRequest:
-      title: 'Create Credit Note request'
+      title: 'Create Credit Note'
       properties:
         external_code:
-          nullable: true
+          description: 'The code which this invoice will be identified by.'
           $ref: '#/components/schemas/TinyText'
         amount:
+          description: 'The amount that you want to create this credit note with.'
           $ref: '#/components/schemas/AmountDTO'
         comment:
+          description: 'Comment or description why this credit note is for.'
           nullable: true
           $ref: '#/components/schemas/TinyText'
         line_items:
+          description: 'Line items from the invoice which this credit note is created for.'
           type: array
           items:
             $ref: '#/components/schemas/LineItemsRequest'
@@ -3745,20 +3759,27 @@ components:
         - amount
       properties:
         orders:
+          description: 'Include all the orders that you want to create an invoice for.'
           type: array
           items:
-            $ref: '#/components/schemas/TinyText'
+            $ref: '#/components/schemas/UUID'
           nullable: false
         external_code:
+          description: 'External code for the invoice to be identified by.'
+          example: M-0002126
           nullable: false
           $ref: '#/components/schemas/TinyText'
         invoice_url:
-          nullable: false
+          description: 'The url of the generated invoice from merchant.'
+          example: 'ftp://some_server.com/invoices/M-0002126'
           $ref: '#/components/schemas/TinyText'
         shipping_document_url:
+          description: 'The tracking url of the shipping.'
+          example: TRACK-0002126
           nullable: true
           $ref: '#/components/schemas/TinyText'
         amount:
+          description: 'The amount of the Invoice in Gross, Net, Tax.'
           nullable: false
           $ref: '#/components/schemas/AmountDTO'
         line_items:
@@ -3973,18 +3994,25 @@ components:
           nullable: true
           $ref: '#/components/schemas/TinyText'
         house_number:
+          description: 'House number. Leave empty if it is provided as part of the street'
           example: '4'
           nullable: true
           $ref: '#/components/schemas/TinyText'
         street:
-          example: 'Charlotten Str.'
+          description: 'Street can be with house number together or provide house number in the dedicated field.'
+          example: 'Charlottenstr. 45'
           $ref: '#/components/schemas/TinyText'
         city:
+          description: 'City, district, suburb, town, or village.'
           example: Berlin
           $ref: '#/components/schemas/TinyText'
         postal_code:
+          description: 'ZIP or postal code.'
+          example: '94111'
           $ref: '#/components/schemas/PostalCode'
         country:
+          description: 'Two-letter country code'
+          example: DE
           $ref: '#/components/schemas/CountryCode'
       type: object
     LegacyCreateOrderDebtorCompanyRequest:
@@ -4207,86 +4235,58 @@ components:
       title: 'Get Invoice Response'
       properties:
         uuid:
+          description: 'Unique identifier of the invoice object.'
           $ref: '#/components/schemas/UUID'
         invoice_number:
+          description: 'Customer facing merchant defined invoice number which must be unique.'
           nullable: true
           $ref: '#/components/schemas/TinyText'
         duration:
+          description: 'The defined time allowed for payment. Measured in days'
           type: number
           nullable: false
         payout_amount:
+          description: 'The amount that will be paid out to the merchant.'
           type: number
           format: float
           nullable: false
         amount:
+          description: 'Total invoice amount including gross amount, net amount and tax amount.'
           type: number
-          format: float
           nullable: false
-        amount_net:
-          type: number
-          format: float
-          nullable: false
-        amount_tax:
-          type: number
-          format: float
-          nullable: false
+          $ref: '#/components/schemas/AmountDTO'
         outstanding_amount:
+          description: 'The remaining amount that has to be paid by the debtor still.'
           type: number
           format: float
           nullable: false
         fee_amount:
+          description: 'The fee amount per invoice paid by the merchant to Billie.'
           type: number
           format: float
           nullable: false
         fee_rate:
+          description: 'The fee rate is the percentage that the merchant pays to Billie.'
           type: number
           format: float
           nullable: false
         created_at:
+          description: 'The date and time when the invoice was created.'
           type: string
           format: date
           example: '2019-03-20'
           nullable: false
         due_date:
+          description: 'The date when this invoice is due to be paid back.'
           type: string
           format: date
           example: '2019-03-20'
           nullable: false
-        pending_merchant_payment_amount:
-          type: number
-          format: float
-          nullable: false
-        pending_cancellation_amount:
-          type: number
-          format: float
-          nullable: false
         state:
+          description: 'The state of the invoice.'
           type: string
           example: created
           nullable: true
-        orders:
-          type: array
-          items:
-            properties:
-              uuid:
-                $ref: '#/components/schemas/UUID'
-              external_code:
-                type: string
-                example: C-10123456789-0001
-                nullable: true
-              amount:
-                type: number
-                format: float
-                nullable: false
-              amount_net:
-                type: number
-                format: float
-                nullable: false
-              amount_tax:
-                type: number
-                format: float
-                nullable: false
-            type: object
       type: object
     GetInvoicePaymentsResponse:
       title: 'Invoice Payments Response'
@@ -4538,8 +4538,10 @@ components:
         - quantity
       properties:
         external_id:
+          description: 'external identifier of the line item.'
           $ref: '#/components/schemas/TinyText'
         quantity:
+          description: 'The quantity of the items.'
           type: number
           minimum: 1
       type: object
@@ -4883,9 +4885,13 @@ components:
       title: 'Invoice Update Request'
       properties:
         external_code:
+          description: 'Invoice external code which the invoice will be identified by.'
+          example: M-0002126
           nullable: true
           $ref: '#/components/schemas/TinyText'
         invoice_url:
+          description: 'The url of the generated invoice from merchant.'
+          example: 'ftp://some_server.com/invoices/M-0002126'
           nullable: true
           $ref: '#/components/schemas/TinyText'
       type: object
@@ -5524,6 +5530,41 @@ components:
             industry_sector:
               nullable: true
               $ref: '#/components/schemas/TinyText'
+          type: object
+        invoice:
+          properties:
+            invoice_number:
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            payout_amount:
+              type: number
+              format: float
+              nullable: true
+            outstanding_amount:
+              type: number
+              format: float
+              nullable: true
+            pending_merchant_payment_amount:
+              type: number
+              format: float
+              nullable: true
+            pending_cancellation_amount:
+              type: number
+              format: float
+              nullable: true
+            fee_amount:
+              type: number
+              format: float
+              nullable: true
+            fee_rate:
+              type: number
+              format: float
+              nullable: true
+            due_date:
+              type: string
+              format: date
+              example: '2019-03-20'
+              nullable: true
           type: object
         delivery_address:
           type: object

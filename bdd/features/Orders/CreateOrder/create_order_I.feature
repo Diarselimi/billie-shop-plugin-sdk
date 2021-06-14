@@ -124,7 +124,6 @@ Feature:
           "iban":null,
           "bic":null
        },
-       "invoices":[],
        "invoice":{
           "invoice_number":null,
           "payout_amount":null,
@@ -294,7 +293,6 @@ Feature:
        "unshipped_amount_tax":100,
        "workflow_name":"order_v2",
        "due_date":"2021-01-13",
-       "invoices":[],
        "duration":30,
        "dunning_status":null,
        "debtor_company":{
@@ -431,7 +429,6 @@ Feature:
        "unshipped_amount_tax":100,
        "workflow_name":"order_v1",
        "due_date":"2021-01-13",
-       "invoices":[],
        "invoice":{
           "invoice_number":null,
           "payout_amount":null,

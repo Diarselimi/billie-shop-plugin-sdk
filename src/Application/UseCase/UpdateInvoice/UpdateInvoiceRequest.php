@@ -10,8 +10,8 @@ use OpenApi\Annotations as OA;
 /**
  * @OA\Schema(schema="UpdateInvoiceRequest", title="Invoice Update Request",
  *     properties={
- *          @OA\Property(property="external_code", ref="#/components/schemas/TinyText", nullable=true),
- *          @OA\Property(property="invoice_url", ref="#/components/schemas/TinyText", nullable=true)
+ *          @OA\Property(property="external_code", ref="#/components/schemas/TinyText", nullable=true, example="M-0002126", description="Invoice external code which the invoice will be identified by."),
+ *          @OA\Property(property="invoice_url", ref="#/components/schemas/TinyText", nullable=true, example="ftp://some_server.com/invoices/M-0002126", description="The url of the generated invoice from merchant.")
  *     }
  * )
  *

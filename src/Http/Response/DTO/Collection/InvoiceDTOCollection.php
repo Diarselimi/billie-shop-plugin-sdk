@@ -12,7 +12,9 @@ class InvoiceDTOCollection implements CollectionInterface
     /**
      * @var array
      */
-    private array $elements;
+    private array
+
+ $elements;
 
     public function __construct(array $elements = [])
     {

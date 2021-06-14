@@ -11,16 +11,17 @@ use Ozean12\Money\TaxedMoney\TaxedMoney;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @OA\Schema(schema="CreateCreditNoteRequest", title="Create Credit Note request",
+ * @OA\Schema(schema="CreateCreditNoteRequest", title="Create Credit Note",
  *     properties={
- *          @OA\Property(property="external_code", ref="#/components/schemas/TinyText", nullable=true),
- *          @OA\Property(property="amount", ref="#/components/schemas/AmountDTO"),
- *          @OA\Property(property="comment", ref="#/components/schemas/TinyText", nullable=true),
+ *          @OA\Property(property="external_code", ref="#/components/schemas/TinyText", description="The code which this invoice will be identified by."),
+ *          @OA\Property(property="amount", ref="#/components/schemas/AmountDTO", description="The amount that you want to create this credit note with."),
+ *          @OA\Property(property="comment", ref="#/components/schemas/TinyText", nullable=true, description="Comment or description why this credit note is for."),
  *          @OA\Property(
  *              property="line_items",
  *              type="array",
  *              nullable=true,
- *              @OA\Items(ref="#/components/schemas/LineItemsRequest")
+ *              @OA\Items(ref="#/components/schemas/LineItemsRequest"),
+ *              description="Line items from the invoice which this credit note is created for."
  *          )
  *     }
  * )

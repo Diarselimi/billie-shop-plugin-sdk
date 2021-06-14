@@ -37,7 +37,8 @@ protects you from credit risks by absorbing any potential debtor defaults.
 | State     | Description
 |-----------|---------------
 | New       | When new invoice is created.
-| Paid Out  | The outstanding amount for the respective order was successfully paid out to the merchant.
+| Paid Out  | The amount for the respective invoice was successfully paid out to the merchant.
+| Late      | When the invoice is not paid back on time.
 | Canceled  | When the invoice was canceled by the merchant.
 | Complete  | The outstanding amount was successfully paid back by the customer.
 
