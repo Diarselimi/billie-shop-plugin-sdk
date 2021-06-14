@@ -10,11 +10,13 @@ use App\DomainModel\MerchantUser\AuthenticationServiceRequestException;
 use App\DomainModel\MerchantUser\AuthenticationServiceTokenResponseDTO;
 use App\DomainModel\MerchantUser\AuthenticationServiceUserResponseDTO;
 use App\DomainModel\MerchantUser\GetMerchantCredentialsDTO;
+use App\DomainModel\MerchantUser\MerchantUserNotFoundException;
 use App\DomainModel\PasswordResetRequest\RequestPasswordResetDTO;
 use App\Infrastructure\DecodeResponseTrait;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\TransferStats;
@@ -220,6 +222,12 @@ class Smaug implements AuthenticationServiceInterface, LoggingInterface
             $decodedResponse = $this->decodeResponse($response);
 
             return new RequestPasswordResetDTO($decodedResponse['user_id'], $decodedResponse['token']);
+        } catch (ClientException $exception) {
+            if ($exception->getResponse()->getStatusCode() === 404) {
+                throw new MerchantUserNotFoundException();
+            }
+
+            throw $exception;
         } catch (TransferException $exception) {
             $this->logSuppressedException($exception, 'Failed to request new password', ['exception' => $exception]);
 

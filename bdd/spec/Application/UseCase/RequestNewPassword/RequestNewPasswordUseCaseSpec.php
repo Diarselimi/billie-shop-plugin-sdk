@@ -8,6 +8,7 @@ use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
 use App\DomainModel\MerchantUser\AuthenticationServiceRequestException;
 use App\DomainModel\MerchantUser\MerchantUserEntity;
+use App\DomainModel\MerchantUser\MerchantUserNotFoundException;
 use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
 use App\DomainModel\PasswordResetRequest\PasswordResetRequestAnnouncer;
 use App\DomainModel\PasswordResetRequest\RequestPasswordResetDTO;
@@ -83,6 +84,18 @@ class RequestNewPasswordUseCaseSpec extends ObjectBehavior
             ->requestNewPassword(Argument::cetera())
             ->willThrow($exception);
         $sentry->captureException($exception)->shouldBeCalledOnce();
+
+        $this->execute(new RequestNewPasswordRequest(''));
+    }
+
+    public function it_should_not_log_to_sentry_when_user_not_found(
+        AuthenticationServiceInterface $authenticationService,
+        RavenClient $sentry
+    ): void {
+        $authenticationService
+            ->requestNewPassword(Argument::cetera())
+            ->willThrow(MerchantUserNotFoundException::class);
+        $sentry->captureException(Argument::cetera())->shouldNotBeCalled();
 
         $this->execute(new RequestNewPasswordRequest(''));
     }

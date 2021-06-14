@@ -9,6 +9,7 @@ use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
 use App\DomainModel\MerchantUser\AuthenticationServiceRequestException;
+use App\DomainModel\MerchantUser\MerchantUserNotFoundException;
 use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
 use App\DomainModel\PasswordResetRequest\PasswordResetRequestAnnouncer;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
@@ -45,6 +46,10 @@ class RequestNewPasswordUseCase implements LoggingInterface, ValidatedUseCaseInt
 
         try {
             $requestPasswordResetDTO = $this->authenticationService->requestNewPassword($request->getEmail());
+        } catch (MerchantUserNotFoundException $exception) {
+            $this->logWarning('User with email not found', [LoggingInterface::KEY_NAME => $request->getEmail()]);
+
+            return;
         } catch (AuthenticationServiceRequestException $exception) {
             $this->logSuppressedException($exception, 'Failed to request new password');
 
