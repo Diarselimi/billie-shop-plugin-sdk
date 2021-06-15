@@ -51,6 +51,13 @@ class ApiKeyAuthenticator extends AbstractAuthenticator implements LoggingInterf
         //will be removed after some trial time.
         $merchantApi = $this->merchantRepository->getOneByApiKey($apiKey);
         if ($merchantApi !== null) {
+            $this->logInfo('Encryption debug info', [
+                LoggingInterface::KEY_SOBAKA => [
+                    'plain_key' => "<$apiKey>",
+                    'encrypted_key' => "<$encryptedPhrase>",
+                    'decrypted_key' => "<{$this->encrypt->decrypt($encryptedPhrase)}>",
+                ],
+            ]);
             $this->logSuppressedException(
                 new \Exception('Auth failed'),
                 sprintf('Encryption failed for merchant %s', $merchantApi->getId())
