@@ -6,9 +6,11 @@ use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\PaymentOrderConfirmException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Payment\PaymentRequestFactory;
 use App\DomainModel\Payment\PaymentsServiceInterface;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use Ozean12\Money\Money;
 
 /**
  * @deprecated Use ConfirmInvoicePayment* classes
@@ -17,18 +19,18 @@ class ConfirmOrderPaymentUseCase implements ValidatedUseCaseInterface
 {
     use ValidatedUseCaseTrait;
 
-    private OrderRepositoryInterface $orderRepository;
+    private OrderContainerFactory $orderContainerFactory;
 
     private PaymentsServiceInterface $paymentService;
 
     private PaymentRequestFactory $paymentRequestFactory;
 
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
+        OrderContainerFactory $orderContainerFactory,
         PaymentsServiceInterface $paymentService,
         PaymentRequestFactory $paymentRequestFactory
     ) {
-        $this->orderRepository = $orderRepository;
+        $this->orderContainerFactory = $orderContainerFactory;
         $this->paymentService = $paymentService;
         $this->paymentRequestFactory = $paymentRequestFactory;
     }
@@ -37,18 +39,22 @@ class ConfirmOrderPaymentUseCase implements ValidatedUseCaseInterface
     {
         $this->validateRequest($request);
 
-        $order = $this->orderRepository->getOneByMerchantIdAndExternalCodeOrUUID($request->getOrderId(), $request->getMerchantId());
-
-        if (!$order) {
+        try {
+            $orderContainer = $this->orderContainerFactory->loadByMerchantIdAndExternalIdOrUuid($request->getMerchantId(), $request->getOrderId());
+        } catch (OrderContainerFactoryException $exception) {
             throw new OrderNotFoundException();
         }
 
-        if ($order->wasShipped()) {
-            $requestDTO = $this->paymentRequestFactory->createConfirmRequestDTO($order, $request->getAmount());
-
-            $this->paymentService->confirmPayment($requestDTO);
-        } else {
+        $invoice = $orderContainer->getInvoices()->getLastInvoice();
+        if ($invoice === null) {
             throw new PaymentOrderConfirmException();
         }
+
+        $requestDTO = $this->paymentRequestFactory->createConfirmRequestDTOFromInvoice(
+            $invoice,
+            new Money($request->getAmount()),
+            $orderContainer->getOrder()->getExternalCode()
+        );
+        $this->paymentService->confirmPayment($requestDTO);
     }
 }
