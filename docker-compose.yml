@@ -53,6 +53,7 @@ services:
       - FINTECH_TOOLBOX_API_URL=
       - FINTECH_TOOLBOX_API_KEY=
       - DOCUMENT_GENERATOR_URL=
+      - ENCRYPTION_KEY=the_key
 
   mysql:
     image: mysql:5.7

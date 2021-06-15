@@ -44,7 +44,8 @@
         "symfony/validator": "4.4.*",
         "symfony/workflow": "4.4.*",
         "symfony/yaml": "4.4.*",
-        "zircote/swagger-php": "3.0.4"
+        "zircote/swagger-php": "3.0.4",
+        "ext-openssl": "*"
     },
     "require-dev": {
         "behat/mink": "^1.8",

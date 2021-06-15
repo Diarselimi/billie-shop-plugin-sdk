@@ -3,24 +3,34 @@
 namespace App\DomainModel\Merchant;
 
 use App\Support\AbstractFactory;
+use App\Support\TwoWayEncryption\Encryptor;
 use Ozean12\Money\Money;
 
 class MerchantEntityFactory extends AbstractFactory
 {
     private $defaultInvestorUuid;
 
-    public function __construct(string $investorUuid)
+    private Encryptor $encryptor;
+
+    public function __construct(string $investorUuid, Encryptor $encryptor)
     {
         $this->defaultInvestorUuid = $investorUuid;
+        $this->encryptor = $encryptor;
     }
 
     public function createFromArray(array $data): MerchantEntity
     {
+        try {
+            $plainApiKey = $this->encryptor->decrypt($data['api_key']);
+        } catch (\Exception $e) {
+            $plainApiKey = '';
+        }
+
         return (new MerchantEntity())
             ->setId($data['id'])
             ->setName($data['name'])
             ->setCompanyUuid($data['company_uuid'])
-            ->setApiKey($data['api_key'])
+            ->setApiKey($plainApiKey)
             ->setFinancingPower(new Money($data['financing_power']))
             ->setFinancingLimit(new Money($data['available_financing_limit']))
             ->setCompanyId($data['company_id'])

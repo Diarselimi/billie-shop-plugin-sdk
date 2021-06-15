@@ -4,6 +4,7 @@ use App\DomainModel\MerchantOnboarding\MerchantOnboardingEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntityFactory;
 use App\Infrastructure\Repository\MerchantOnboarding\MerchantOnboardingRepository;
+use App\Support\TwoWayEncryption\EncryptorImpl;
 use Phinx\Seed\AbstractSeed;
 
 class Seed001AddMerchants extends AbstractSeed
@@ -21,9 +22,12 @@ class Seed001AddMerchants extends AbstractSeed
 
     public function run()
     {
+        $key = getenv('ENCRYPTION_KEY');
+        $encryptor = new EncryptorImpl($key);
         $testApiKey = 'billie';
+        $encryptedApiKey = $encryptor->encrypt($testApiKey);
 
-        if ($this->merchantExists($testApiKey)) {
+        if ($this->merchantExists($encryptedApiKey) || $this->merchantExists($testApiKey)) {
             return;
         }
 
@@ -34,7 +38,8 @@ class Seed001AddMerchants extends AbstractSeed
                 'name' => 'Test Contorion',
                 'financing_power' => 2000000,
                 'available_financing_limit' => 2000000,
-                'api_key' => $testApiKey,
+                'api_key' => $encryptor->encrypt($testApiKey),
+                'plain_api_key' => $testApiKey,
                 'is_active' => true,
                 'company_id' => 4,
                 'company_uuid' => 'b825f0a8-7248-477f-b827-88eb927fb7c1',
@@ -124,7 +129,7 @@ class Seed001AddMerchants extends AbstractSeed
 
     private function merchantExists($apiKey): bool
     {
-        $stmt = $this->query("SELECT id FROM merchants WHERE api_key='{$apiKey}'");
+        $stmt = $this->query("SELECT id FROM merchants WHERE api_key='{$apiKey}' or plain_api_key='{$apiKey}'");
         $result = $stmt ? $stmt->fetch() : null;
 
         return !!$result;

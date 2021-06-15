@@ -15,7 +15,9 @@ use App\Support\ArrayCollection;
  */
 class OrderCollection extends ArrayCollection
 {
-    private array $orderIds;
+    private array
+
+ $orderIds;
 
     public function getIds(): array
     {

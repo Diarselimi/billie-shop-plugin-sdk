@@ -5,6 +5,7 @@ namespace App\Infrastructure\Repository;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantEntityFactory;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\Support\TwoWayEncryption\Encryptor;
 use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class MerchantRepository extends AbstractPdoRepository implements MerchantRepositoryInterface
@@ -12,31 +13,50 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
     public const TABLE_NAME = "merchants";
 
     private const SELECT_FIELDS = [
-        'id', 'name', 'api_key', 'oauth_client_id', 'company_id', 'company_uuid', 'payment_merchant_id', 'sandbox_payment_merchant_id', 'sepa_b2b_document_uuid',
-        'is_active', 'sepa_b2b_document_uuid', 'financing_power', 'available_financing_limit', 'webhook_url', 'webhook_authorization', 'created_at', 'updated_at',
+        'id',
+        'name',
+        'api_key',
+        'oauth_client_id',
+        'company_id',
+        'company_uuid',
+        'payment_merchant_id',
+        'sandbox_payment_merchant_id',
+        'sepa_b2b_document_uuid',
+        'is_active',
+        'sepa_b2b_document_uuid',
+        'financing_power',
+        'available_financing_limit',
+        'webhook_url',
+        'webhook_authorization',
+        'created_at',
+        'updated_at',
         'investor_uuid',
     ];
 
     private $factory;
 
-    public function __construct(MerchantEntityFactory $factory)
+    private Encryptor $encryptor;
+
+    public function __construct(MerchantEntityFactory $factory, Encryptor $encryptor)
     {
         $this->factory = $factory;
+        $this->encryptor = $encryptor;
     }
 
     public function insert(MerchantEntity $merchant): void
     {
         $id = $this->doInsert('
             INSERT INTO ' . self::TABLE_NAME . '
-            (name, api_key, oauth_client_id, is_active, financing_power, available_financing_limit, 
+            (name, api_key, plain_api_key, oauth_client_id, is_active, financing_power, available_financing_limit, 
                 company_id, company_uuid, sepa_b2b_document_uuid, payment_merchant_id, webhook_url, webhook_authorization, investor_uuid, created_at, updated_at)
             VALUES
-            (:name, :api_key, :oauth_client_id, :is_active, :financing_power, :available_financing_limit, 
+            (:name, :api_key, :plain_api_key, :oauth_client_id, :is_active, :financing_power, :available_financing_limit, 
                 :company_id, :company_uuid, :sepa_b2b_document_uuid, :payment_merchant_id, :webhook_url, :webhook_authorization, :investor_uuid, :created_at, :updated_at)
         ', [
             'name' => $merchant->getName(),
             'company_uuid' => $merchant->getCompanyUuid(),
-            'api_key' => $merchant->getApiKey(),
+            'api_key' => $this->encryptor->encrypt($merchant->getApiKey()),
+            'plain_api_key' => $merchant->getApiKey(),
             'oauth_client_id' => $merchant->getOauthClientId(),
             'is_active' => $merchant->isActive(),
             'financing_power' => $merchant->getFinancingPower()->getMoneyValue(),
@@ -119,7 +139,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
     public function getOneByApiKey(string $apiKey): ?MerchantEntity
     {
         $row = $this->doFetchOne($this->generateSelectQuery(self::TABLE_NAME, self::SELECT_FIELDS) . '
-          WHERE api_key = :api_key
+          WHERE api_key = :api_key OR plain_api_key = :api_key
         ', ['api_key' => $apiKey]);
 
         return $row ? $this->factory->createFromArray($row) : null;
@@ -142,7 +162,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
 
         $row = $this->doFetchOne("
             SELECT " . implode(',', $selectFields) . "
-            FROM " . self::TABLE_NAME  ."
+            FROM " . self::TABLE_NAME . "
             INNER JOIN merchant_onboardings ON (
                 merchants.id = merchant_onboardings.merchant_id
                 AND merchant_onboardings.id = :merchantOnboardingId
