@@ -93,9 +93,7 @@ class CreateOrderRequest implements ValidatedRequestInterface, CreateOrderReques
     /**
      * @Assert\Valid()
      */
-    private ?array
-
- $lineItems;
+    private ?array $lineItems;
 
     public function getAmount(): ?TaxedMoney
     {

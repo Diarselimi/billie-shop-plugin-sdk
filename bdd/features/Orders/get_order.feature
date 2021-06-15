@@ -91,6 +91,7 @@ Feature:
             "iban": null,
             "bic": null
         },
+        "invoices": [],
         "invoice": {
             "outstanding_amount": 500,
             "pending_merchant_payment_amount": 0,
@@ -173,6 +174,7 @@ Feature:
           "iban":"DE1234",
           "bic":"BICISHERE"
        },
+       "invoices": [],
        "invoice": {
            "outstanding_amount": 500,
            "pending_merchant_payment_amount": 0,
@@ -255,6 +257,7 @@ Feature:
             "iban": "DE1234",
             "bic": "BICISHERE"
         },
+        "invoices": [],
          "invoice": {
            "outstanding_amount": 500,
            "pending_merchant_payment_amount": 0,

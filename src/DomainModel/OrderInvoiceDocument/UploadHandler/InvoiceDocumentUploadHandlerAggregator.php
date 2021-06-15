@@ -30,12 +30,12 @@ class InvoiceDocumentUploadHandlerAggregator implements LoggingInterface, Invoic
         string $invoiceNumber,
         string $eventSource
     ): void {
-        $logData = [LoggingInterface::KEY_NUMBER => $order->getInvoiceNumber()];
+        $logData = [LoggingInterface::KEY_UUID => $invoiceUuid];
 
         foreach ($this->uploadHandlers as $name => $handler) {
             if ($handler->supports($order->getMerchantId())) {
                 $logData[LoggingInterface::KEY_NAME] = $name;
-                $this->logInfo('Handling URL for invoice {number} using {name} handler', $logData);
+                $this->logInfo('Handling URL for invoice {uuid} using {name} handler', $logData);
 
                 $handler->handle($order, $invoiceUuid, $invoiceUrl, $invoiceNumber, $eventSource);
 

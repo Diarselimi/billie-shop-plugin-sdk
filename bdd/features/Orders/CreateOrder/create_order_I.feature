@@ -124,6 +124,7 @@ Feature:
           "iban":null,
           "bic":null
        },
+       "invoices":[],
        "invoice":{
           "invoice_number":null,
           "payout_amount":null,
@@ -229,7 +230,7 @@ Feature:
     And Debtor has sufficient limit
     And Debtor lock limit call succeeded
     And I get from payments service register debtor positive response
-    When I send a POST request to "/public/api/v2/order" with body:
+    When I send a POST request to "/public/api/v2/orders" with body:
     """
     {
        "debtor_person":{
@@ -242,12 +243,13 @@ Feature:
        "debtor_company":{
           "merchant_customer_id":"12",
           "name":"Test User Company",
-          "address_addition":"left door",
-          "address_house_number":null,
-          "address_street":"Heinrich-Heine-Platz",
-          "address_city":"Berlin",
-          "address_postal_code":"10179",
-          "address_country":"DE",
+          "address": {
+            "house_number":null,
+            "street":"Heinrich-Heine-Platz 10",
+            "city":"Berlin",
+            "postal_code":"10179",
+            "country":"DE"
+          },
           "tax_id":"VA222",
           "tax_number":"3333",
           "registration_court":"",
@@ -260,7 +262,7 @@ Feature:
        },
        "delivery_address":{
           "house_number":null,
-          "street":"Heinrich-Heine-Platz",
+          "street":"Heinrich-Heine-Platz 10",
           "city":"Berlin",
           "postal_code":"10179",
           "country":"DE"
@@ -272,7 +274,7 @@ Feature:
        },
        "comment":"Some comment",
        "duration":30,
-       "order_id":"A1"
+       "external_code":"A1"
     }
     """
     Then the order A1 is in state created
@@ -281,72 +283,68 @@ Feature:
     And the JSON response should be:
     """
     {
-       "order_id":"A1",
-       "state":"created",
-       "reasons":null,
-       "decline_reason":null,
-       "amount":1000,
-       "amount_net":900,
-       "amount_tax":100,
-       "unshipped_amount":1000,
-       "unshipped_amount_net":900,
-       "unshipped_amount_tax":100,
-       "workflow_name":"order_v2",
-       "due_date":"2021-01-13",
-       "duration":30,
-       "dunning_status":null,
-       "debtor_company":{
-          "name":"Test User Company",
-          "address_house_number":"10",
-          "address_street":"Heinrich-Heine-Platz",
-          "address_postal_code":"10179",
-          "address_city":"Berlin",
-          "address_country":"DE"
-       },
-       "bank_account":{
-          "iban":"DE1234",
-          "bic":"BICISHERE"
-       },
-       "invoice":{
-          "invoice_number":null,
-          "payout_amount":null,
-          "outstanding_amount":null,
-          "fee_amount":null,
-          "fee_rate":null,
-          "due_date":null,
-          "pending_merchant_payment_amount":null,
-          "pending_cancellation_amount":null
-       },
-       "debtor_external_data":{
-          "merchant_customer_id":"12",
-          "name":"Test User Company",
-          "address_country":"DE",
-          "address_city":"Berlin",
-          "address_postal_code":"10179",
-          "address_street":"Heinrich-Heine-Platz",
-          "address_house":null,
-          "industry_sector":"SOME SECTOR"
-       },
-       "delivery_address":{
-          "house_number":null,
-          "street":"Heinrich-Heine-Platz",
-          "city":"Berlin",
-          "postal_code":"10179",
-          "country":"DE"
-       },
-       "billing_address":{
-          "house_number":null,
-          "street":"Heinrich-Heine-Platz",
-          "city":"Berlin",
-          "postal_code":"10179",
-          "country":"DE"
-       },
-       "created_at":"2020-02-18T12:30:08+0100",
-       "shipped_at":null,
-       "debtor_uuid":null
+     "external_code":"A1",
+     "uuid":"362d4b04-95da-4351-ad96-039da13b7e17",
+     "state":"created",
+     "decline_reason":null,
+     "amount":{
+        "gross":1000,
+        "net":900,
+        "tax":100
+     },
+     "unshipped_amount":{
+        "gross":1000,
+        "net":900,
+        "tax":100
+     },
+     "invoices":[],
+     "duration":30,
+     "created_at":"2021-06-11 16:48:33",
+     "delivery_address":{
+        "street":"Heinrich-Heine-Platz",
+        "house_number":"10",
+        "postal_code":"10179",
+        "city":"Berlin",
+        "country":"DE"
+     },
+     "debtor":{
+        "name":"Test User Company",
+        "company_address":{
+           "street":"Heinrich-Heine-Platz",
+           "house_number":"10",
+           "postal_code":"10179",
+           "city":"Berlin",
+           "country":"DE"
+        },
+        "billing_address":{
+           "street":"Heinrich-Heine-Platz",
+           "house_number":"10",
+           "postal_code":"10179",
+           "city":"Berlin",
+           "country":"DE"
+        },
+        "bank_account":{
+           "iban":"DE1234",
+           "bic":"BICISHERE"
+        },
+        "external_data":{
+           "merchant_customer_id":"12",
+           "name":"Test User Company",
+           "industry_sector":"SOME SECTOR",
+           "address":{
+              "street":"Heinrich-Heine-Platz",
+              "house_number":"10",
+              "postal_code":"10179",
+              "city":"Berlin",
+              "country":"DE"
+           }
+        }
+     },
+     "invoices":[
+     ]
     }
     """
-    And the order "A1" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz de"
+    And the order "A1" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz 10 de"
 
   Scenario: Debtor is not eligible for Point Of Sale
     Given I get from companies service identify match response
@@ -429,6 +427,7 @@ Feature:
        "unshipped_amount_tax":100,
        "workflow_name":"order_v1",
        "due_date":"2021-01-13",
+       "invoices":[],
        "invoice":{
           "invoice_number":null,
           "payout_amount":null,

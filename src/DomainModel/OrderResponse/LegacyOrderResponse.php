@@ -810,6 +810,7 @@ class LegacyOrderResponse implements ArrayableInterface
             'shipped_at' => ($this->getShippedAt() ? $this->getShippedAt()->format(\DateTime::ISO8601) : null),
             'debtor_uuid' => $this->getDebtorUuid(),
             'workflow_name' => $this->workflowName,
+            'invoices' => array_map(fn (LegacyOrderInvoiceResponse $invoice) => $invoice->toArray(), $this->invoices),
             'invoice' => [
                 'invoice_number' => $this->getInvoiceNumber(),
                 'payout_amount' => $this->getPayoutAmount(),

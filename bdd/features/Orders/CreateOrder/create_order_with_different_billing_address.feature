@@ -169,6 +169,7 @@ Feature:
        "unshipped_amount_tax":100,
        "workflow_name":"order_v1",
        "due_date":"2021-01-13",
+       "invoices":[],
        "debtor_company":{
           "name":"Test User Company",
           "address_house_number":"10",
@@ -354,6 +355,7 @@ Feature:
           "iban":"DE1234",
           "bic":"BICISHERE"
        },
+       "invoices":[],
        "invoice":{
           "invoice_number":null,
           "payout_amount":null,
@@ -536,6 +538,7 @@ Feature:
           "iban":"DE1234",
           "bic":"BICISHERE"
        },
+       "invoices":[],
        "invoice":{
           "invoice_number":null,
           "payout_amount":null,

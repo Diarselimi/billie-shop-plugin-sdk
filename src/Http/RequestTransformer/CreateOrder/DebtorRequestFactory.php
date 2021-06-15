@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class DebtorRequestFactory
 {
-    private $registrationNumberConverter;
+    private OrderRegistrationNumberConverter $registrationNumberConverter;
 
     private AddressRequestFactory $addressRequestFactory;
 
@@ -22,7 +22,21 @@ class DebtorRequestFactory
 
     public function create(Request $request): CreateOrderDebtorCompanyRequest
     {
-        $requestData = $request->request->get('debtor_company', []);
+        return $this->doCreate($request)
+            ->setAddress($this->addressRequestFactory->createFromArray($request->request->get('debtor_company')['address']))
+        ;
+    }
+
+    public function createForLegacyOrder(Request $request): CreateOrderDebtorCompanyRequest
+    {
+        return $this->doCreate($request)
+            ->setAddress($this->addressRequestFactory->createFromOldFormat($request->request->get('debtor_company')))
+        ;
+    }
+
+    private function doCreate(Request $request): CreateOrderDebtorCompanyRequest
+    {
+        $requestData = $request->request->get('debtor_company');
 
         $debtorCompany = (new CreateOrderDebtorCompanyRequest())
             ->setMerchantCustomerId($requestData['merchant_customer_id'] ?? null)
@@ -35,13 +49,6 @@ class DebtorRequestFactory
             ->setEmployeesNumber($requestData['employees_number'] ?? null)
             ->setLegalForm($requestData['legal_form'] ?? null)
             ->setEstablishedCustomer((bool) $requestData['established_customer'] ?? null);
-
-        if (array_key_exists('address', $requestData)) {
-            $address = $this->addressRequestFactory->createFromArray($requestData['address']);
-        } else {
-            $address = $this->addressRequestFactory->createFromOldFormat($requestData);
-        }
-        $debtorCompany->setAddress($address);
 
         if ($requestData['registration_number'] ?? false) {
             $debtorCompany->setRegistrationNumber(

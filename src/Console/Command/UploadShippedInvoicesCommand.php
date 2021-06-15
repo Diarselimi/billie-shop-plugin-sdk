@@ -11,6 +11,7 @@ use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentUploadException;
 use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerAggregator;
 use App\DomainModel\ShipOrder\ShipOrderException;
+use App\Infrastructure\OrderInvoice\SnsInvoiceDocumentUploadHandler;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\Console\Command\Command;
@@ -33,14 +34,14 @@ class UploadShippedInvoicesCommand extends Command implements LoggingInterface
 
     protected static $defaultName = 'paella:invoices:upload';
 
-    private InvoiceDocumentUploadHandlerAggregator $invoiceManager;
+    private SnsInvoiceDocumentUploadHandler $invoiceManager;
 
     private OrderRepositoryInterface $orderRepository;
 
     private OrderContainerFactory $orderContainerFactory;
 
     public function __construct(
-        InvoiceDocumentUploadHandlerAggregator $invoiceManager,
+        SnsInvoiceDocumentUploadHandler $invoiceManager,
         OrderRepositoryInterface $orderRepository,
         OrderContainerFactory $orderContainerFactory
     ) {

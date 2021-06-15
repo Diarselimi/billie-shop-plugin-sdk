@@ -145,11 +145,11 @@ class CreateOrderAddressRequest implements ArrayableInterface
     public function toArray(): array
     {
         return [
-            'addition' => $this->getAddition(),
-            'house_number' => $this->getHouseNumber(),
-            'street' => $this->getStreet(),
             'city' => $this->getCity(),
             'postal_code' => $this->getPostalCode(),
+            'street' => $this->getStreet(),
+            'house_number' => $this->getHouseNumber(),
+            'addition' => $this->getAddition(),
             'country' => $this->getCountry(),
         ];
     }

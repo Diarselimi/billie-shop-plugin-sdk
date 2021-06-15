@@ -131,6 +131,7 @@ Feature:
         "iban":"DE1234",
         "bic":"BICISHERE"
       },
+      "invoices":[],
       "invoice":{
         "invoice_number":null,
         "payout_amount":null,
@@ -258,6 +259,7 @@ Feature:
         "iban":null,
         "bic":null
       },
+      "invoices":[],
       "invoice":{
         "invoice_number":null,
         "payout_amount":null,

@@ -134,6 +134,7 @@ Feature:
       "shipped_at": "2021-05-12T22:33:43+0200",
       "debtor_uuid": null,
       "workflow_name": "order_v1",
+      "invoices": [],
       "invoice": {
         "outstanding_amount": 1000,
         "pending_merchant_payment_amount": 0,

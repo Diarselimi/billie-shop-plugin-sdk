@@ -66,7 +66,7 @@ class CreateOrderRequestFactory
             ->setDuration($request->request->getInt('duration'))
             ->setComment($request->request->get('comment'))
             ->setExternalCode($request->request->get('order_id'))
-            ->setDebtorCompany($this->debtorRequestFactory->create($request))
+            ->setDebtorCompany($this->debtorRequestFactory->createForLegacyOrder($request))
             ->setDebtorPerson($this->debtorPersonRequestFactory->create($request));
 
         $useCaseRequest->setDeliveryAddress(

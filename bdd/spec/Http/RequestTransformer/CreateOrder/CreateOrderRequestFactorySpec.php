@@ -92,6 +92,7 @@ class CreateOrderRequestFactorySpec extends ObjectBehavior
     ): void {
         $amountRequestFactory->create(Argument::any())->willReturn($taxedMoney);
         $debtorRequestFactory->create(Argument::any())->willReturn(new CreateOrderDebtorCompanyRequest());
+        $debtorRequestFactory->createForLegacyOrder(Argument::any())->willReturn(new CreateOrderDebtorCompanyRequest());
         $debtorPersonRequestFactory->create(Argument::any())->willReturn(new CreateOrderDebtorPersonRequest());
         $lineItemsRequestFactory->create(Argument::any())->willReturn([]);
     }

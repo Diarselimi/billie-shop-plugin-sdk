@@ -12,6 +12,7 @@
   "workflow_name":"order_v1",
   "due_date":"2021-01-13",
   "duration":30,
+  "invoices":[],
   "dunning_status":null,
   "debtor_company":{
     "name":"Test User Company",
