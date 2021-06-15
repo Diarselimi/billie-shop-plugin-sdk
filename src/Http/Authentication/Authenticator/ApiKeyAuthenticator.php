@@ -53,9 +53,9 @@ class ApiKeyAuthenticator extends AbstractAuthenticator implements LoggingInterf
         if ($merchantApi !== null) {
             $this->logInfo('Encryption debug info', [
                 LoggingInterface::KEY_SOBAKA => [
-                    'plain_key' => "<$apiKey>",
-                    'encrypted_key' => "<$encryptedPhrase>",
-                    'decrypted_key' => "<{$this->encrypt->decrypt($encryptedPhrase)}>",
+                    'plain_diar' => "<$apiKey>",
+                    'enc_diar' => "<$encryptedPhrase>",
+                    'dec_diar' => "<{$this->encrypt->decrypt($encryptedPhrase)}>",
                 ],
             ]);
             $this->logSuppressedException(
