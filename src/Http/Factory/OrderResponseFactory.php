@@ -37,8 +37,10 @@ class OrderResponseFactory
         $address = null;
         $bankAccount = null;
         $order = $orderContainer->getOrder();
+        $companyName = null;
 
-        if ($order->getMerchantDebtorId()) { // @todo this should be fixed (just grab the data)
+        if ($order->getMerchantDebtorId()) {
+            $companyName = $orderContainer->getDebtorCompany()->getName();
             $address = new AddressDTO($orderContainer->getDebtorCompany()->getAddress());
 
             if (
@@ -56,7 +58,7 @@ class OrderResponseFactory
         $companyAddress = null;
 
         return new DebtorDTO(
-            $orderContainer->getDebtorCompany()->getName(),
+            $companyName,
             $address,
             new AddressDTO($orderContainer->getBillingAddress()),
             $bankAccount,
