@@ -36,8 +36,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     @OA\RequestBody(
  *          required=true,
  *          @OA\MediaType(mediaType="application/json",
- *          @OA\Schema(type="object", properties={
- *              @OA\Property(property="paid_amount", type="number", format="float", minimum=0.1, description="The amount paid to the merchant from debtor.")
+ *          @OA\Schema(type="object", required={"paid_amount"}, properties={
+ *              @OA\Property(property="paid_amount", nullable=false, type="number", format="float", minimum=0.1, description="The amount paid to the merchant from debtor.")
  *          }))
  *     ),
  *

@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     summary="Get Invoice",
  *
  *     tags={"Invoices"},
- *     x={"groups":{"publicV1", "publicV2"}},
+ *     x={"groups":{"publicV2"}},
  *
  *     @OA\Parameter(in="path", name="uuid", @OA\Schema(type="string"), required=true, description="Get Invoice with Uuid"),
  *

@@ -326,31 +326,6 @@ paths:
       security:
         -
           oauth2: []
-  '/invoices/{uuid}':
-    get:
-      tags:
-        - Invoices
-      summary: 'Get Invoice'
-      operationId: get_invoice
-      parameters:
-        -
-          name: uuid
-          in: path
-          description: 'Get Invoice with Uuid'
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: 'Invoice Response'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetInvoiceResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
   /legal-forms:
     get:
       tags:
@@ -624,9 +599,10 @@ components:
       example: '10969'
     CountryCode:
       title: 'Country Code'
+      description: 'ISO 3166-1 alpha-2 country code (two letters: DE, AT, etc.). See https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2'
       type: string
       maxLength: 2
-      pattern: '^[A-Za-z]{2}$'
+      minLength: 2
       example: DE
     PhoneNumber:
       title: 'Phone Number'
@@ -655,8 +631,14 @@ components:
       format: url
       maxLength: 255
       example: 'https://example.com'
+    LegalForm:
+      title: 'Legal Form'
+      description: 'One of the legal form codes available in the `GET /legal-forms` API endpoint.'
+      type: string
+      example: '10001'
     AmountDTO:
-      title: 'Amount with split values for net, gross and tax.'
+      title: 'object <net, gross, tax>'
+      description: 'The amount object with split values for net, gross and tax'
       required:
         - net
         - gross
@@ -897,9 +879,7 @@ components:
           nullable: true
           $ref: '#/components/schemas/TinyText'
         legal_form:
-          description: 'One of the legal form codes available in the `GET /legal-forms` API endpoint.'
-          example: '10001'
-          $ref: '#/components/schemas/TinyText'
+          $ref: '#/components/schemas/LegalForm'
         established_customer:
           type: boolean
           nullable: true
@@ -984,63 +964,6 @@ components:
           $ref: '#/components/schemas/TinyText'
         amount:
           $ref: '#/components/schemas/AmountDTO'
-      type: object
-    GetInvoiceResponse:
-      title: 'Get Invoice Response'
-      properties:
-        uuid:
-          description: 'Unique identifier of the invoice object.'
-          $ref: '#/components/schemas/UUID'
-        invoice_number:
-          description: 'Customer facing merchant defined invoice number which must be unique.'
-          nullable: true
-          $ref: '#/components/schemas/TinyText'
-        duration:
-          description: 'The defined time allowed for payment. Measured in days'
-          type: number
-          nullable: false
-        payout_amount:
-          description: 'The amount that will be paid out to the merchant.'
-          type: number
-          format: float
-          nullable: false
-        amount:
-          description: 'Total invoice amount including gross amount, net amount and tax amount.'
-          type: number
-          nullable: false
-          $ref: '#/components/schemas/AmountDTO'
-        outstanding_amount:
-          description: 'The remaining amount that has to be paid by the debtor still.'
-          type: number
-          format: float
-          nullable: false
-        fee_amount:
-          description: 'The fee amount per invoice paid by the merchant to Billie.'
-          type: number
-          format: float
-          nullable: false
-        fee_rate:
-          description: 'The fee rate is the percentage that the merchant pays to Billie.'
-          type: number
-          format: float
-          nullable: false
-        created_at:
-          description: 'The date and time when the invoice was created.'
-          type: string
-          format: date
-          example: '2019-03-20'
-          nullable: false
-        due_date:
-          description: 'The date when this invoice is due to be paid back.'
-          type: string
-          format: date
-          example: '2019-03-20'
-          nullable: false
-        state:
-          description: 'The state of the invoice.'
-          type: string
-          example: created
-          nullable: true
       type: object
     LegacyUpdateOrderRequest:
       title: 'Order Update Object'
@@ -1328,11 +1251,6 @@ components:
           $ref: '#/components/schemas/DateTime'
         shipped_at:
           $ref: '#/components/schemas/DateTime'
-        debtor_uuid:
-          $ref: '#/components/schemas/UUID'
-        workflow_name:
-          type: string
-          example: order_v1
       type: object
     ErrorsObject:
       title: 'API Errors'

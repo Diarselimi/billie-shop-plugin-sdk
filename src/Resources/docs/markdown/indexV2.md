@@ -32,7 +32,7 @@ protects you from credit risks by absorbing any potential debtor defaults.
 | pre_waiting       | The order was created via the checkout widget and needs manual operation.
 | authorized        | State of an order after creating it via the checkout widget. For approval, it needs merchant-side confirmation.    |
 
-## Invoice Financing States
+## Invoice States
 
 | State     | Description
 |-----------|---------------

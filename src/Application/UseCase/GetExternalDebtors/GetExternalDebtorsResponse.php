@@ -11,7 +11,7 @@ use OpenApi\Annotations as OA;
 /**
  * @OA\Schema(schema="GetExternalDebtorsResponse", type="object", properties={
  *      @OA\Property(property="name", ref="#/components/schemas/TinyText"),
- *      @OA\Property(property="legal_form", ref="#/components/schemas/TinyText"),
+ *      @OA\Property(property="legal_form", ref="#/components/schemas/LegalForm"),
  *      @OA\Property(property="address_street", ref="#/components/schemas/TinyText"),
  *      @OA\Property(property="address_city", ref="#/components/schemas/TinyText"),
  *      @OA\Property(property="address_postal_code", ref="#/components/schemas/TinyText"),

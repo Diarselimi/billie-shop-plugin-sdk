@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *              type="array",
  *              nullable=false,
  *              @OA\Items(ref="#/components/schemas/UUID"),
- *              description="Include all the orders that you want to create an invoice for."
+ *              description="Include all the order uuids or external codes that you want to create an invoice for (currently only one order is supported)."
  *          ),
  *          @OA\Property(property="external_code", ref="#/components/schemas/TinyText", nullable=false, example="M-0002126", description="External code for the invoice to be identified by."),
  *          @OA\Property(property="invoice_url", ref="#/components/schemas/TinyText", example="ftp://some_server.com/invoices/M-0002126", description="The url of the generated invoice from merchant."),
@@ -42,9 +42,7 @@ class CreateInvoiceRequest
      *     minMessage="There should be at least one order specified."
      * )
      */
-    private array
-
- $orders;
+    private array $orders;
 
     /**
      * @Assert\Length(max="255")
@@ -68,9 +66,7 @@ class CreateInvoiceRequest
      */
     private ?TaxedMoney $amount = null;
 
-    private ?array
-
- $lineItems;
+    private ?array $lineItems;
 
     public function __construct(int $merchantId)
     {

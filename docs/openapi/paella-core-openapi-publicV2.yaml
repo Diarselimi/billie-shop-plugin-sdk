@@ -36,7 +36,7 @@ info:
     | pre_waiting       | The order was created via the checkout widget and needs manual operation.
     | authorized        | State of an order after creating it via the checkout widget. For approval, it needs merchant-side confirmation.    |
 
-    ## Invoice Financing States
+    ## Invoice States
 
     | State     | Description
     |-----------|---------------
@@ -367,12 +367,15 @@ paths:
         content:
           application/json:
             schema:
+              required:
+                - paid_amount
               properties:
                 paid_amount:
                   description: 'The amount paid to the merchant from debtor.'
                   type: number
                   format: float
                   minimum: 0.1
+                  nullable: false
               type: object
       responses:
         '204':
@@ -431,9 +434,11 @@ paths:
         - Invoices
       summary: 'Create Invoice'
       description: |-
-        Create an invoice by calling `/invoices` with either the full amount or a partial amount.
+        Create an invoice for the order. It can be either a partial activation or a full activation.
 
-        > Example: If you plan to ship multiple items of an order from different warehouses at different dates to one client, you can create an invoice for each of these partial shipments now.
+        > Example: If you plan to ship multiple items of an order from different warehouses at different dates to one client, you can create an invoice for each of these partial shipments by specifying the amount of each shipment (invoice).
+
+        Please specify the order which is being shipped in the `orders` property. Collective invoices are not yet supported, so only one order uuid or external code can be provided.
       operationId: invoice_create
       requestBody:
         required: true
@@ -471,6 +476,8 @@ paths:
         content:
           application/json:
             schema:
+              required:
+                - duration
               properties:
                 duration:
                   description: 'The number of days which the invoice is due to be paid.'
@@ -655,9 +662,10 @@ components:
       example: '10969'
     CountryCode:
       title: 'Country Code'
+      description: 'ISO 3166-1 alpha-2 country code (two letters: DE, AT, etc.). See https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2'
       type: string
       maxLength: 2
-      pattern: '^[A-Za-z]{2}$'
+      minLength: 2
       example: DE
     PhoneNumber:
       title: 'Phone Number'
@@ -680,8 +688,14 @@ components:
       title: string
       type: string
       maxLength: 255
+    LegalForm:
+      title: 'Legal Form'
+      description: 'One of the legal form codes available in the `GET /legal-forms` API endpoint.'
+      type: string
+      example: '10001'
     AmountDTO:
-      title: 'Amount with split values for net, gross and tax.'
+      title: 'object <net, gross, tax>'
+      description: 'The amount object with split values for net, gross and tax'
       required:
         - net
         - gross
@@ -779,9 +793,7 @@ components:
           nullable: true
           $ref: '#/components/schemas/TinyText'
         legal_form:
-          description: 'One of the legal form codes available in the `GET /legal-forms` API endpoint.'
-          example: '10001'
-          $ref: '#/components/schemas/TinyText'
+          $ref: '#/components/schemas/LegalForm'
         established_customer:
           type: boolean
           nullable: true
@@ -886,15 +898,20 @@ components:
       type: object
     CreateCreditNoteRequest:
       title: 'Create Credit Note'
+      required:
+        - external_code
+        - amount
       properties:
         external_code:
           description: 'The code which this invoice will be identified by.'
+          nullable: false
           $ref: '#/components/schemas/TinyText'
         amount:
           description: 'The amount that you want to create this credit note with.'
+          nullable: false
           $ref: '#/components/schemas/AmountDTO'
         comment:
-          description: 'Comment or description why this credit note is for.'
+          description: 'Comment or description what is this credit note for.'
           nullable: true
           $ref: '#/components/schemas/TinyText'
         line_items:
@@ -913,7 +930,7 @@ components:
         - amount
       properties:
         orders:
-          description: 'Include all the orders that you want to create an invoice for.'
+          description: 'Include all the order uuids or external codes that you want to create an invoice for (currently only one order is supported).'
           type: array
           items:
             $ref: '#/components/schemas/UUID'

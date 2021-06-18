@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      type="object",
  *      properties={
  *          @OA\Property(property="name", ref="#/components/schemas/TinyText"),
- *          @OA\Property(property="legal_form", ref="#/components/schemas/TinyText"),
+ *          @OA\Property(property="legal_form", ref="#/components/schemas/LegalForm"),
  *          @OA\Property(property="address_street", ref="#/components/schemas/TinyText", example="Charlotten Str."),
  *          @OA\Property(property="address_house", ref="#/components/schemas/TinyText", example="4", nullable=true),
  *          @OA\Property(property="address_city", ref="#/components/schemas/TinyText", example="Berlin"),

@@ -200,9 +200,10 @@ components:
       example: '10969'
     CountryCode:
       title: 'Country Code'
+      description: 'ISO 3166-1 alpha-2 country code (two letters: DE, AT, etc.). See https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2'
       type: string
       maxLength: 2
-      pattern: '^[A-Za-z]{2}$'
+      minLength: 2
       example: DE
     PhoneNumber:
       title: 'Phone Number'
@@ -225,8 +226,14 @@ components:
       title: string
       type: string
       maxLength: 255
+    LegalForm:
+      title: 'Legal Form'
+      description: 'One of the legal form codes available in the `GET /legal-forms` API endpoint.'
+      type: string
+      example: '10001'
     AmountDTO:
-      title: 'Amount with split values for net, gross and tax.'
+      title: 'object <net, gross, tax>'
+      description: 'The amount object with split values for net, gross and tax'
       required:
         - net
         - gross
@@ -416,9 +423,7 @@ components:
           nullable: true
           $ref: '#/components/schemas/TinyText'
         legal_form:
-          description: 'One of the legal form codes available in the `GET /legal-forms` API endpoint.'
-          example: '10001'
-          $ref: '#/components/schemas/TinyText'
+          $ref: '#/components/schemas/LegalForm'
         established_customer:
           type: boolean
           nullable: true

@@ -43,6 +43,7 @@ use Ozean12\Money\TaxedMoney\TaxedMoney;
  *          @OA\Property(property="address_house", ref="#/components/schemas/TinyText", example="4"),
  *          @OA\Property(property="industry_sector", ref="#/components/schemas/TinyText", nullable=true),
  *      }),
+ *
  *     @OA\Property(property="invoice", type="object", properties={
  *          @OA\Property(property="invoice_number", ref="#/components/schemas/TinyText", nullable=true),
  *          @OA\Property(property="payout_amount", type="number", format="float", nullable=true),
@@ -53,12 +54,11 @@ use Ozean12\Money\TaxedMoney\TaxedMoney;
  *          @OA\Property(property="fee_rate", type="number", format="float", nullable=true),
  *          @OA\Property(property="due_date", type="string", format="date", nullable=true, example="2019-03-20"),
  *      }),
+ *
  *      @OA\Property(property="delivery_address", type="object", ref="#/components/schemas/CreateOrderAddressRequest"),
  *      @OA\Property(property="billing_address", type="object", ref="#/components/schemas/CreateOrderAddressRequest"),
  *      @OA\Property(property="created_at", ref="#/components/schemas/DateTime"),
- *      @OA\Property(property="shipped_at", ref="#/components/schemas/DateTime"),
- *      @OA\Property(property="debtor_uuid", ref="#/components/schemas/UUID"),
- *      @OA\Property(property="workflow_name", type="string", example="order_v1"),
+ *      @OA\Property(property="shipped_at", ref="#/components/schemas/DateTime")
  * })
  *
  */
@@ -156,9 +156,7 @@ class LegacyOrderResponse implements ArrayableInterface
 
     private TaxedMoney $unshippedAmount;
 
-    private array
-
-        $invoices = [];
+    private array $invoices = [];
 
     /**
      * @deprecated use declineReason

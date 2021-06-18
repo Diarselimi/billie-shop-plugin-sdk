@@ -130,8 +130,9 @@ use OpenApi\Annotations as OA;
  *     schema="CountryCode",
  *     title="Country Code",
  *     type="string",
+ *     minLength=2,
  *     maxLength=2,
- *     pattern="^[A-Za-z]{2}$",
+ *     description="ISO 3166-1 alpha-2 country code (two letters: DE, AT, etc.). See https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2",
  *     example="DE"
  * )
  */
@@ -221,6 +222,16 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Schema(
+ *     schema="LegalForm",
+ *     title="Legal Form",
+ *     description="One of the legal form codes available in the `GET /legal-forms` API endpoint.",
+ *     type="string",
+ *     example="10001",
+ * )
+ */
+
+/**
+ * @OA\Schema(
  *     schema="Money",
  *     title="Money",
  *     type="number",
@@ -251,8 +262,9 @@ use OpenApi\Annotations as OA;
  */
 
 /**
- * @OA\Schema(schema="AmountDTO", title="Amount with split values for net, gross and tax.",
+ * @OA\Schema(schema="AmountDTO", title="object <net, gross, tax>",
  *     required={"net", "gross", "tax"},
+ *     description="The amount object with split values for net, gross and tax",
  *     properties={
  *          @OA\Property(property="gross", minimum=1.0, type="number", format="float", example=260.27, description="Value greater than 0, with max. 2 decimals. It should equal to net + tax."),
  *          @OA\Property(property="net", minimum=1.0, type="number", format="float", example=200.12, description="Value greater than 0, with max. 2 decimals."),
@@ -292,7 +304,7 @@ use OpenApi\Annotations as OA;
  *          @OA\Property(property="industry_sector", ref="#/components/schemas/TinyText", example="C", nullable=true),
  *          @OA\Property(property="subindustry_sector", ref="#/components/schemas/TinyText", nullable=true),
  *          @OA\Property(property="employees_number", ref="#/components/schemas/TinyText", example="1-5", nullable=true),
- *          @OA\Property(property="legal_form", ref="#/components/schemas/TinyText", example="10001", description="One of the legal form codes available in the `GET /legal-forms` API endpoint."),
+ *          @OA\Property(property="legal_form", ref="#/components/schemas/LegalForm"),
  *          @OA\Property(property="established_customer", type="boolean", nullable=true)
  *     }
  * )

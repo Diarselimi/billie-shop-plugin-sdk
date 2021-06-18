@@ -26,7 +26,7 @@ use OpenApi\Annotations as OA;
  *              @OA\Property(property="postal_code", type="string"),
  *          }
  *      )),
- *      @OA\Property(property="legal_form", ref="#/components/schemas/TinyText", nullable=true),
+ *      @OA\Property(property="legal_form", ref="#/components/schemas/LegalForm", nullable=true),
  * })
  */
 class MerchantDebtor extends AbstractMerchantDebtor
