@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Support;
 
-use App\Support\TwoWayEncryption\EncryptorImpl;
+use App\Support\TwoWayEncryption\OpenSslEcbEncryption;
 use App\Tests\Unit\UnitTestCase;
 
 class EncryptDecryptTest extends UnitTestCase
@@ -12,49 +12,44 @@ class EncryptDecryptTest extends UnitTestCase
     /** @test */
     public function itShouldDecryptThePhraseToThePlainText()
     {
-        $encryptDecrypt = new EncryptorImpl('key');
+        $encryptDecrypt = new OpenSslEcbEncryption('key');
 
-        $encryptionMethod = \openssl_get_cipher_methods()[0];
-        $generatedBytes = \openssl_random_pseudo_bytes(
-            \openssl_cipher_iv_length($encryptionMethod)
-        );
-        $encryptedWord = \openssl_encrypt('some_word', $encryptionMethod, 'key', 0, $generatedBytes);
-        $encryptedWord .= '::'. bin2hex($generatedBytes);
-        self::assertEquals('some_word', $encryptDecrypt->decrypt($encryptedWord));
+        self::assertNotEquals('some_word', $encryptDecrypt->encrypt('some_word'));
     }
 
-    /** @test */
-    public function itShouldEncryptThePlainTextToMatchTheKey()
+    /**
+     * @test
+     * @dataProvider dataProvider
+     */
+    public function itShouldEncryptThePlainTextToMatchTheKey($word)
     {
-        $encryptDecrypt = new EncryptorImpl('key');
+        $encryptDecrypt = new OpenSslEcbEncryption('key');
 
-        $encryptionMethod = \openssl_get_cipher_methods()[0];
-        $encryptedWord = \openssl_encrypt(
-            'some_word',
-            $encryptionMethod,
-            'key',
-            0,
-            $encryptDecrypt->getGeneratedBytes()
-        );
-        $encryptedWord .= '::'.bin2hex($encryptDecrypt->getGeneratedBytes());
-
-        self::assertEquals($encryptedWord, $encryptDecrypt->encrypt('some_word'));
+        self::assertEquals($word, $encryptDecrypt->decrypt($encryptDecrypt->encrypt($word)));
     }
 
     /** @test */
     public function itShouldNotEncryptEmptyStringOrNull()
     {
-        $encryptDecrypt = new EncryptorImpl('key');
-
-        $encryptionMethod = \openssl_get_cipher_methods()[0];
-        $encryptedWord = \openssl_encrypt(
-            'some_word',
-            $encryptionMethod,
-            'key',
-            0,
-            $encryptDecrypt->getGeneratedBytes()
-        );
+        $encryptDecrypt = new OpenSslEcbEncryption('key');
 
         self::assertEquals('', $encryptDecrypt->encrypt(''));
+    }
+
+    public function dataProvider(): array
+    {
+        return [
+            ['!$%@$#^%YRTEGDF'],
+            ['asdfagQWEDASFGFD'],
+            ['QWERR#@$%%#@%YRTHTEWTGFDERWTGFDHTEWRTGDHFDSTFGHDGTFGDHFDTRFDGHGSFSFDHGFHGF'],
+            ['QWE'],
+            [''],
+            ['1234567890'],
+            ['Länder und NationalitätenLänder und Nationalitäten'],
+            ['/QWEASD?QW+QAD?QWRDFSAF+ASDWAF:?QAF?////////'],
+            ['------------123------------------'],
+            ['0000000000000000000000000000000000'],
+            [';;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;'],
+        ];
     }
 }

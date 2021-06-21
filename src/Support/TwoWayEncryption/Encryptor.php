@@ -4,7 +4,7 @@ namespace App\Support\TwoWayEncryption;
 
 interface Encryptor
 {
-    public const DEFAULT_ENCRYPTING_ALGORITHM = 'aes-128-cbc';
+    public const DEFAULT_ENCRYPTING_ALGORITHM = 'aes-128-ecb';
 
     public function encrypt(string $phrase): string;
 

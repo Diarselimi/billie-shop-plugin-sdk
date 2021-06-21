@@ -4,7 +4,7 @@ use App\DomainModel\MerchantOnboarding\MerchantOnboardingEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntityFactory;
 use App\Infrastructure\Repository\MerchantOnboarding\MerchantOnboardingRepository;
-use App\Support\TwoWayEncryption\EncryptorImpl;
+use App\Support\TwoWayEncryption\OpenSslEcbEncryption;
 use Phinx\Seed\AbstractSeed;
 
 class Seed001AddMerchants extends AbstractSeed
@@ -23,7 +23,7 @@ class Seed001AddMerchants extends AbstractSeed
     public function run()
     {
         $key = getenv('ENCRYPTION_KEY');
-        $encryptor = new EncryptorImpl($key);
+        $encryptor = new OpenSslEcbEncryption($key);
         $testApiKey = 'billie';
         $encryptedApiKey = $encryptor->encrypt($testApiKey);
 
