@@ -149,6 +149,7 @@ Feature:
       "token":"sdg340vpl29kx"
     }
     """
+    And queue should contain 1 messages with routing key buyer_portal.buyer_portal_invoice_notification_requested
 
   Scenario: Ship order with invoice with amount (partial activation)
     Given I have orders with the following data

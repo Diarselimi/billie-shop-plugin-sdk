@@ -57,6 +57,7 @@ Feature:
     And GraphQL will respond to getMerchantDebtorDetails query
     And I get from volt service good response
     And I get from files service a good response
+    And I get from invoice-butler service no invoices response
     And I get from OAuth service "/resource-tokens" endpoint response with status 200 and body:
     """
     {
@@ -76,8 +77,6 @@ Feature:
         "shipping_document_url": "http://example.com/proove/is/here"
     }
     """
-    Then print last JSON response
-    Then print queued messages
     Then the JSON response should be:
     """
     {
@@ -191,3 +190,4 @@ Feature:
       "token":"sdg340vpl29kx"
     }
     """
+    And queue should contain 1 messages with routing key buyer_portal.buyer_portal_invoice_notification_requested

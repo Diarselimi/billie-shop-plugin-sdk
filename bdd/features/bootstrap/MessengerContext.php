@@ -121,6 +121,16 @@ class MessengerContext implements Context
     }
 
     /**
+     * @Then queue should contain :count messages with routing key :routingKey
+     */
+    public function queueDispatchedMessageCount(int $count, string $routingKey): void
+    {
+        $dispatchedMessages = $this->getQueuedMessages($routingKey);
+
+        Assert::eq($count, count($dispatchedMessages));
+    }
+
+    /**
      * @Then print queued messages
      */
     public function printQueuedMessages(): void
