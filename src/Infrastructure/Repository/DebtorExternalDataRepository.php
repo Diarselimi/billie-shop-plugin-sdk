@@ -16,7 +16,7 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
     public const INVALID_DEBTOR_DATA_HASH = 'INVALID_HASH';
 
     private const SELECT_FIELDS =
-        self::TABLE_NAME.'.id as id, 
+        self::TABLE_NAME . '.id as id, 
         name, 
         tax_id, 
         tax_number, 
@@ -31,9 +31,8 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
         is_established_customer,
         merchant_external_id, 
         debtor_data_hash,
-        '.self::TABLE_NAME.'.created_at as created_at, 
-        '.self::TABLE_NAME.'.updated_at as updated_at'
-    ;
+        ' . self::TABLE_NAME . '.created_at as created_at, 
+        ' . self::TABLE_NAME . '.updated_at as updated_at';
 
     private $debtorExternalDataEntityFactory;
 
@@ -74,7 +73,7 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
     public function getOneById(int $id): ?DebtorExternalDataEntity
     {
         $debtorRowData = $this->doFetchOne(
-            'SELECT ' . self::SELECT_FIELDS . ' FROM '. self::TABLE_NAME .' WHERE id = :id',
+            'SELECT ' . self::SELECT_FIELDS . ' FROM ' . self::TABLE_NAME . ' WHERE id = :id',
             ['id' => $id]
         );
 
@@ -120,7 +119,7 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
     public function invalidateMerchantExternalIdAndDebtorHashForCompanyUuid(string $companyUuid): void
     {
         $sql = "
-            UPDATE ". self::TABLE_NAME ." ded
+            UPDATE " . self::TABLE_NAME . " ded
             JOIN orders o ON o.debtor_external_data_id = ded.id
             JOIN merchants_debtors md ON md.id = o.merchant_debtor_id
             SET merchant_external_id = CONCAT_WS('-', merchant_external_id, :merchantExternalIdSuffix), debtor_data_hash = :invalidDebtorDataHash
@@ -156,7 +155,7 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
     {
         return $this->doFetchAll(
             '
-            SELECT DISTINCT ' . self::TABLE_NAME.'.merchant_external_id as external_id' . ' FROM ' . self::TABLE_NAME . '
+            SELECT DISTINCT ' . self::TABLE_NAME . '.merchant_external_id as external_id' . ' FROM ' . self::TABLE_NAME . '
             INNER JOIN orders ON orders.debtor_external_data_id = ' . self::TABLE_NAME . '.id
             WHERE orders.merchant_debtor_id = :merchant_debtor_id
             ORDER BY  ' . self::TABLE_NAME . '.id DESC',
@@ -185,5 +184,11 @@ class DebtorExternalDataRepository extends AbstractPdoRepository implements Debt
         return $debtorExternalData ? $this->debtorExternalDataEntityFactory->createFromDatabaseRow(
             $debtorExternalData
         ) : null;
+    }
+
+    public function invalidateMerchantExternalId(string $merchantExternalId): void
+    {
+        $sql = 'UPDATE ' . self::TABLE_NAME . ' SET merchant_external_id = CONCAT(merchant_external_id, "-INVALIDATED"), debtor_data_hash = "INVALID_HASH" WHERE merchant_external_id = :externalId';
+        $this->doUpdate($sql, ['externalId' => $merchantExternalId]);
     }
 }

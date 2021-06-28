@@ -7,14 +7,19 @@ namespace App\Application\UseCase\CheckoutDeclineOrder;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\WorkflowException;
 use App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface;
+use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\Order\Lifecycle\DeclineOrderService;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\Workflow\Registry;
 
-class CheckoutDeclineOrderUseCase
+class CheckoutDeclineOrderUseCase implements LoggingInterface
 {
+    use LoggingTrait;
+
     private Registry $workflowRegistry;
 
     private DeclineOrderService $declineOrderService;
@@ -23,16 +28,20 @@ class CheckoutDeclineOrderUseCase
 
     private CheckoutSessionRepositoryInterface $checkoutSessionRepository;
 
+    private DebtorExternalDataRepositoryInterface $debtorExternalDataRepository;
+
     public function __construct(
         Registry $workflowRegistry,
         DeclineOrderService $declineOrderService,
         OrderContainerFactory $orderContainerFactory,
-        CheckoutSessionRepositoryInterface $checkoutSessionRepository
+        CheckoutSessionRepositoryInterface $checkoutSessionRepository,
+        DebtorExternalDataRepositoryInterface $debtorExternalDataRepository
     ) {
         $this->workflowRegistry = $workflowRegistry;
         $this->declineOrderService = $declineOrderService;
         $this->orderContainerFactory = $orderContainerFactory;
         $this->checkoutSessionRepository = $checkoutSessionRepository;
+        $this->debtorExternalDataRepository = $debtorExternalDataRepository;
     }
 
     /**
@@ -51,7 +60,17 @@ class CheckoutDeclineOrderUseCase
             throw new  WorkflowException('Order cannot be declined.');
         }
 
+        $externalId = $orderContainer->getDebtorExternalData()->getMerchantExternalId();
         $this->declineOrderService->decline($orderContainer);
         $this->checkoutSessionRepository->reActivateSession($input->getSessionUuid());
+        $this->debtorExternalDataRepository->invalidateMerchantExternalId($externalId);
+
+        $this->logInfo("It's not us action triggered", [
+            LoggingInterface::KEY_UUID => $input->getSessionUuid(),
+            LoggingInterface::KEY_SOBAKA => [
+                'merchant_external_id' => $externalId,
+                'session_uuid' => $input->getSessionUuid(),
+            ],
+        ]);
     }
 }
