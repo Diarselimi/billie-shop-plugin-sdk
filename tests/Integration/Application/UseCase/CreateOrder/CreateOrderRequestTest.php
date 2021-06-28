@@ -54,7 +54,7 @@ class CreateOrderRequestTest extends IntegrationTestCase
     public function shouldFailWhenRequiredCompanyDataAreNotProvided()
     {
         $request = $this->createValidRequest();
-        $request->setDebtorCompany(new CreateOrderDebtorCompanyRequest());
+        $request->setDebtor(new CreateOrderDebtorCompanyRequest());
 
         $validator = $this->getContainer()->get(ValidatorInterface::class);
         $this->setValidator($validator);
@@ -92,7 +92,7 @@ class CreateOrderRequestTest extends IntegrationTestCase
     public function shouldFailWhenCompanyAddressIsNotCorrect()
     {
         $request = $this->createValidRequest();
-        $request->getDebtorCompany()->setAddressStreet('some str.')
+        $request->getDebtor()->setAddressStreet('some str.')
             ->setAddressCountry('GERMANY');
 
         $validator = $this->getContainer()->get(ValidatorInterface::class);
@@ -120,7 +120,7 @@ class CreateOrderRequestTest extends IntegrationTestCase
 
         $createOrderRequest
             ->setAmount(TaxedMoneyFactory::create(100, 90, 10))
-            ->setDebtorCompany($debtorCompany)
+            ->setDebtor($debtorCompany)
             ->setDuration(30)
             ->setMerchantId(1)
             ->setDebtorPerson($debtorPerson);

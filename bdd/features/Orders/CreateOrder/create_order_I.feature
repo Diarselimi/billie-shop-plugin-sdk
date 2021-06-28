@@ -240,10 +240,10 @@ Feature:
           "phone_number":"+491234567",
           "email":"someone@billie.io"
        },
-       "debtor_company":{
+       "debtor":{
           "merchant_customer_id":"12",
           "name":"Test User Company",
-          "address": {
+          "company_address": {
             "house_number":null,
             "street":"Heinrich-Heine-Platz 10",
             "city":"Berlin",
@@ -505,6 +505,7 @@ Feature:
            "comment":"Some comment"
         }
       """
+    Then print last JSON response
     Then the response status code should be 400
     And the JSON response should be:
     """

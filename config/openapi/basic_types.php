@@ -291,12 +291,13 @@ use OpenApi\Annotations as OA;
  *     schema="CreateOrderDebtorCompanyRequest",
  *     title="Debtor Company",
  *     required={
- *          "merchant_customer_id", "name", "legal_form", "address"
+ *          "merchant_customer_id", "name", "legal_form", "company_address"
  *     },
  *     properties={
  *          @OA\Property(property="merchant_customer_id", ref="#/components/schemas/TinyText", example="128483", description="Unique identifier of the customer provided by the merchant side."),
  *          @OA\Property(property="name", ref="#/components/schemas/TinyText", example="Billie GmbH"),
- *          @OA\Property(property="address", ref="#/components/schemas/Address", nullable=false),
+ *          @OA\Property(property="company_address", ref="#/components/schemas/Address", nullable=false),
+ *          @OA\Property(property="billing_address", ref="#/components/schemas/Address", nullable=true),
  *          @OA\Property(property="tax_id", ref="#/components/schemas/TinyText", example="DE1234556", nullable=true),
  *          @OA\Property(property="tax_number", ref="#/components/schemas/TinyText", nullable=true),
  *          @OA\Property(property="registration_court", ref="#/components/schemas/TinyText", nullable=true),

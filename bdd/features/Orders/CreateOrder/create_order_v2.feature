@@ -69,14 +69,7 @@ Feature:
          "postal_code":"10179",
          "country":"DE"
        },
-       "billing_address": {
-         "house_number":"10",
-         "street":"Heinrich-Heine-Platz",
-         "city":"Berlin",
-         "postal_code":"10179",
-         "country":"DE"
-       },
-       "debtor_company": {
+       "debtor": {
          "merchant_customer_id":"12",
          "name":"Test User Company",
          "tax_id":"VA222",
@@ -88,13 +81,20 @@ Feature:
          "employees_number":"33",
          "legal_form":"some legal",
          "established_customer":1,
-         "address": {
-             "addition":"left door",
-             "house_number":"10",
-             "street":"Heinrich-Heine-Platz",
-             "city":"Berlin",
-             "postal_code":"10179",
-             "country":"DE"
+         "company_address": {
+           "addition":"left door",
+           "house_number":"10",
+           "street":"Heinrich-Heine-Platz",
+           "city":"Berlin",
+           "postal_code":"10179",
+           "country":"DE"
+         },
+         "billing_address": {
+           "house_number":"10",
+           "street":"Heinrich-Heine-Platz",
+           "city":"Berlin",
+           "postal_code":"10179",
+           "country":"DE"
          }
        },
        "debtor_person":{

@@ -20,9 +20,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          @OA\Property(property="comment", ref="#/components/schemas/TinyText", nullable=true),
  *          @OA\Property(property="duration", ref="#/components/schemas/OrderDuration"),
  *          @OA\Property(property="external_code", ref="#/components/schemas/TinyText", description="Order external code", example="DE123456-1"),
- *          @OA\Property(property="delivery_address", ref="#/components/schemas/Address", nullable=true),
  *          @OA\Property(property="billing_address", ref="#/components/schemas/Address", nullable=true),
- *          @OA\Property(property="debtor_company", ref="#/components/schemas/CreateOrderDebtorCompanyRequest"),
+ *          @OA\Property(property="delivery_address", ref="#/components/schemas/Address", nullable=true),
+ *          @OA\Property(property="debtor", ref="#/components/schemas/CreateOrderDebtorCompanyRequest"),
  *          @OA\Property(property="debtor_person", ref="#/components/schemas/CreateOrderDebtorPersonRequest"),
  *          @OA\Property(
  *              property="line_items",
@@ -67,7 +67,7 @@ class CreateOrderRequest implements ValidatedRequestInterface, CreateOrderReques
     /**
      * @Assert\Valid()
      */
-    private ?CreateOrderDebtorCompanyRequest $debtorCompany;
+    private ?CreateOrderDebtorCompanyRequest $debtor;
 
     /**
      * @Assert\Valid()
@@ -88,7 +88,7 @@ class CreateOrderRequest implements ValidatedRequestInterface, CreateOrderReques
     /**
      * @Assert\Valid()
      */
-    private ?CreateOrderAddressRequest $billingAddress;
+    private ?CreateOrderAddressRequest $billingAddress = null;
 
     /**
      * @Assert\Valid()
@@ -155,14 +155,14 @@ class CreateOrderRequest implements ValidatedRequestInterface, CreateOrderReques
         return $this;
     }
 
-    public function getDebtorCompany(): ?CreateOrderDebtorCompanyRequest
+    public function getDebtor(): ?CreateOrderDebtorCompanyRequest
     {
-        return $this->debtorCompany;
+        return $this->debtor;
     }
 
-    public function setDebtorCompany(?CreateOrderDebtorCompanyRequest $debtorCompany): CreateOrderRequest
+    public function setDebtor(?CreateOrderDebtorCompanyRequest $debtor): CreateOrderRequest
     {
-        $this->debtorCompany = $debtorCompany;
+        $this->debtor = $debtor;
 
         return $this;
     }
@@ -254,13 +254,13 @@ class CreateOrderRequest implements ValidatedRequestInterface, CreateOrderReques
     public function toArray(): array
     {
         return [
-            'company_name' => $this->getDebtorCompany()->getName(),
-            'tax_id' => $this->getDebtorCompany()->getTaxId(),
-            'tax_number' => $this->getDebtorCompany()->getTaxNumber(),
-            'registration_court' => $this->getDebtorCompany()->getRegistrationCourt(),
-            'registration_number' => $this->getDebtorCompany()->getRegistrationNumber(),
-            'legal_form' => $this->getDebtorCompany()->getLegalForm(),
-            'address' => $this->getDebtorCompany()->getAddress()->toArray(),
+            'company_name' => $this->getDebtor()->getName(),
+            'tax_id' => $this->getDebtor()->getTaxId(),
+            'tax_number' => $this->getDebtor()->getTaxNumber(),
+            'registration_court' => $this->getDebtor()->getRegistrationCourt(),
+            'registration_number' => $this->getDebtor()->getRegistrationNumber(),
+            'legal_form' => $this->getDebtor()->getLegalForm(),
+            'address' => $this->getDebtor()->getAddress()->toArray(),
         ];
     }
 }

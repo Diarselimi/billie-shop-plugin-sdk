@@ -173,12 +173,12 @@ class LegacyCreateOrderRequest implements ValidatedRequestInterface, CreateOrder
         return $this;
     }
 
-    public function getDebtorCompany(): CreateOrderDebtorCompanyRequest
+    public function getDebtor(): CreateOrderDebtorCompanyRequest
     {
         return $this->debtorCompany;
     }
 
-    public function setDebtorCompany(CreateOrderDebtorCompanyRequest $debtorCompany): LegacyCreateOrderRequest
+    public function setDebtor(CreateOrderDebtorCompanyRequest $debtorCompany): LegacyCreateOrderRequest
     {
         $this->debtorCompany = $debtorCompany;
 
@@ -263,17 +263,17 @@ class LegacyCreateOrderRequest implements ValidatedRequestInterface, CreateOrder
     public function toArray(): array
     {
         return [
-            'company_name' => $this->getDebtorCompany()->getName(),
-            'tax_id' => $this->getDebtorCompany()->getTaxId(),
-            'tax_number' => $this->getDebtorCompany()->getTaxNumber(),
-            'registration_court' => $this->getDebtorCompany()->getRegistrationCourt(),
-            'registration_number' => $this->getDebtorCompany()->getRegistrationNumber(),
-            'legal_form' => $this->getDebtorCompany()->getLegalForm(),
-            'address_city' => $this->getDebtorCompany()->getAddressCity(),
-            'address_postal_code' => $this->getDebtorCompany()->getAddressPostalCode(),
-            'address_street' => $this->getDebtorCompany()->getAddressStreet(),
-            'address_house_number' => $this->getDebtorCompany()->getAddressHouseNumber(),
-            'address_house_country' => $this->getDebtorCompany()->getAddressCountry(),
+            'company_name' => $this->getDebtor()->getName(),
+            'tax_id' => $this->getDebtor()->getTaxId(),
+            'tax_number' => $this->getDebtor()->getTaxNumber(),
+            'registration_court' => $this->getDebtor()->getRegistrationCourt(),
+            'registration_number' => $this->getDebtor()->getRegistrationNumber(),
+            'legal_form' => $this->getDebtor()->getLegalForm(),
+            'address_city' => $this->getDebtor()->getAddressCity(),
+            'address_postal_code' => $this->getDebtor()->getAddressPostalCode(),
+            'address_street' => $this->getDebtor()->getAddressStreet(),
+            'address_house_number' => $this->getDebtor()->getAddressHouseNumber(),
+            'address_house_country' => $this->getDebtor()->getAddressCountry(),
         ];
     }
 }

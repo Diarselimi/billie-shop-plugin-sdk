@@ -66,7 +66,7 @@ class CreateOrderRequestFactory
             ->setDuration($request->request->getInt('duration'))
             ->setComment($request->request->get('comment'))
             ->setExternalCode($request->request->get('order_id'))
-            ->setDebtorCompany($this->debtorRequestFactory->createForLegacyOrder($request))
+            ->setDebtor($this->debtorRequestFactory->createForLegacyOrder($request))
             ->setDebtorPerson($this->debtorPersonRequestFactory->create($request));
 
         $useCaseRequest->setDeliveryAddress(
@@ -116,16 +116,18 @@ class CreateOrderRequestFactory
             ->setDuration($request->request->getInt('duration'))
             ->setComment($request->request->get('comment'))
             ->setExternalCode($request->request->get('external_code'))
-            ->setDebtorCompany($this->debtorRequestFactory->create($request))
+            ->setDebtor($this->debtorRequestFactory->create($request))
             ->setDebtorPerson($this->debtorPersonRequestFactory->create($request));
 
         $useCaseRequest->setDeliveryAddress(
             $this->addressRequestFactory->create($request, 'delivery_address')
         );
 
-        $useCaseRequest->setBillingAddress(
-            $this->addressRequestFactory->create($request, 'billing_address')
-        );
+        if (!empty($request->request->get('debtor')['billing_address'])) {
+            $useCaseRequest->setBillingAddress(
+                $this->addressRequestFactory->createFromArray($request->request->get('debtor')['billing_address'])
+            );
+        }
 
         $useCaseRequest->setLineItems(
             $this->lineItemsRequestFactory->create($request)

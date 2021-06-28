@@ -17,18 +17,18 @@ class AddressEntityFactory
             ->setPostalCode($addressRequest->getPostalCode())
             ->setCity($addressRequest->getCity())
             ->setCountry($addressRequest->getCountry())
-            ;
+        ;
     }
 
     public function createFromRequestDebtor(CreateOrderRequestInterface $request): AddressEntity
     {
         return (new AddressEntity())
-            ->setAddition($request->getDebtorCompany()->getAddressAddition())
-            ->setHouseNumber($request->getDebtorCompany()->getAddressHouseNumber())
-            ->setStreet($request->getDebtorCompany()->getAddressStreet())
-            ->setPostalCode($request->getDebtorCompany()->getAddressPostalCode())
-            ->setCity($request->getDebtorCompany()->getAddressCity())
-            ->setCountry($request->getDebtorCompany()->getAddressCountry())
+            ->setAddition($request->getDebtor()->getAddressAddition())
+            ->setHouseNumber($request->getDebtor()->getAddressHouseNumber())
+            ->setStreet($request->getDebtor()->getAddressStreet())
+            ->setPostalCode($request->getDebtor()->getAddressPostalCode())
+            ->setCity($request->getDebtor()->getAddressCity())
+            ->setCountry($request->getDebtor()->getAddressCountry())
         ;
     }
 

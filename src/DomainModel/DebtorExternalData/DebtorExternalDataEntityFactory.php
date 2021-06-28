@@ -9,17 +9,17 @@ class DebtorExternalDataEntityFactory
     public function createFromRequest(CreateOrderRequestInterface $request): DebtorExternalDataEntity
     {
         return (new DebtorExternalDataEntity())
-            ->setName($request->getDebtorCompany()->getName())
-            ->setTaxId($request->getDebtorCompany()->getTaxId())
-            ->setTaxNumber($request->getDebtorCompany()->getTaxNumber())
-            ->setRegistrationCourt($request->getDebtorCompany()->getRegistrationCourt())
-            ->setRegistrationNumber($request->getDebtorCompany()->getRegistrationNumber())
-            ->setLegalForm($request->getDebtorCompany()->getLegalForm())
-            ->setIndustrySector($request->getDebtorCompany()->getIndustrySector())
-            ->setSubindustrySector($request->getDebtorCompany()->getSubindustrySector())
-            ->setEmployeesNumber($request->getDebtorCompany()->getEmployeesNumber())
-            ->setEstablishedCustomer($request->getDebtorCompany()->isEstablishedCustomer())
-            ->setMerchantExternalId($request->getDebtorCompany()->getMerchantCustomerId());
+            ->setName($request->getDebtor()->getName())
+            ->setTaxId($request->getDebtor()->getTaxId())
+            ->setTaxNumber($request->getDebtor()->getTaxNumber())
+            ->setRegistrationCourt($request->getDebtor()->getRegistrationCourt())
+            ->setRegistrationNumber($request->getDebtor()->getRegistrationNumber())
+            ->setLegalForm($request->getDebtor()->getLegalForm())
+            ->setIndustrySector($request->getDebtor()->getIndustrySector())
+            ->setSubindustrySector($request->getDebtor()->getSubindustrySector())
+            ->setEmployeesNumber($request->getDebtor()->getEmployeesNumber())
+            ->setEstablishedCustomer($request->getDebtor()->isEstablishedCustomer())
+            ->setMerchantExternalId($request->getDebtor()->getMerchantCustomerId());
     }
 
     public function createFromDatabaseRow(array $row): DebtorExternalDataEntity

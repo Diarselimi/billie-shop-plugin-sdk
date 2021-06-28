@@ -755,7 +755,7 @@ components:
         - merchant_customer_id
         - name
         - legal_form
-        - address
+        - company_address
       properties:
         merchant_customer_id:
           description: 'Unique identifier of the customer provided by the merchant side.'
@@ -764,8 +764,11 @@ components:
         name:
           example: 'Billie GmbH'
           $ref: '#/components/schemas/TinyText'
-        address:
+        company_address:
           nullable: false
+          $ref: '#/components/schemas/Address'
+        billing_address:
+          nullable: true
           $ref: '#/components/schemas/Address'
         tax_id:
           example: DE1234556
@@ -979,13 +982,13 @@ components:
           description: 'Order external code'
           example: DE123456-1
           $ref: '#/components/schemas/TinyText'
-        delivery_address:
-          nullable: true
-          $ref: '#/components/schemas/Address'
         billing_address:
           nullable: true
           $ref: '#/components/schemas/Address'
-        debtor_company:
+        delivery_address:
+          nullable: true
+          $ref: '#/components/schemas/Address'
+        debtor:
           $ref: '#/components/schemas/CreateOrderDebtorCompanyRequest'
         debtor_person:
           $ref: '#/components/schemas/CreateOrderDebtorPersonRequest'

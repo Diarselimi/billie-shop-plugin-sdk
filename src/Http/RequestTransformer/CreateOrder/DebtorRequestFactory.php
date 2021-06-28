@@ -22,22 +22,24 @@ class DebtorRequestFactory
 
     public function create(Request $request): CreateOrderDebtorCompanyRequest
     {
-        return $this->doCreate($request)
-            ->setAddress($this->addressRequestFactory->createFromArray($request->request->get('debtor_company')['address']))
+        $requestData = $request->request->get('debtor');
+
+        return $this->doCreate($requestData)
+            ->setAddress($this->addressRequestFactory->createFromArray($requestData['company_address']))
         ;
     }
 
     public function createForLegacyOrder(Request $request): CreateOrderDebtorCompanyRequest
     {
-        return $this->doCreate($request)
-            ->setAddress($this->addressRequestFactory->createFromOldFormat($request->request->get('debtor_company')))
+        $requestData = $request->request->get('debtor_company');
+
+        return $this->doCreate($requestData)
+            ->setAddress($this->addressRequestFactory->createFromOldFormat($requestData))
         ;
     }
 
-    private function doCreate(Request $request): CreateOrderDebtorCompanyRequest
+    private function doCreate(array $requestData): CreateOrderDebtorCompanyRequest
     {
-        $requestData = $request->request->get('debtor_company');
-
         $debtorCompany = (new CreateOrderDebtorCompanyRequest())
             ->setMerchantCustomerId($requestData['merchant_customer_id'] ?? null)
             ->setName($requestData['name'] ?? null)
