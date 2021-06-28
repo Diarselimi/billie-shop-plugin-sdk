@@ -3952,9 +3952,6 @@ components:
           description: 'Order external code'
           example: DE123456-1
           $ref: '#/components/schemas/TinyText'
-        billing_address:
-          nullable: true
-          $ref: '#/components/schemas/Address'
         delivery_address:
           nullable: true
           $ref: '#/components/schemas/Address'

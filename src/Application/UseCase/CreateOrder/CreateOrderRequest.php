@@ -20,7 +20,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          @OA\Property(property="comment", ref="#/components/schemas/TinyText", nullable=true),
  *          @OA\Property(property="duration", ref="#/components/schemas/OrderDuration"),
  *          @OA\Property(property="external_code", ref="#/components/schemas/TinyText", description="Order external code", example="DE123456-1"),
- *          @OA\Property(property="billing_address", ref="#/components/schemas/Address", nullable=true),
  *          @OA\Property(property="delivery_address", ref="#/components/schemas/Address", nullable=true),
  *          @OA\Property(property="debtor", ref="#/components/schemas/CreateOrderDebtorCompanyRequest"),
  *          @OA\Property(property="debtor_person", ref="#/components/schemas/CreateOrderDebtorPersonRequest"),
