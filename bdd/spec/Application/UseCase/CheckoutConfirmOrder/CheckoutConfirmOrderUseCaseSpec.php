@@ -5,10 +5,10 @@ namespace spec\App\Application\UseCase\CheckoutConfirmOrder;
 use App\Application\Exception\RequestValidationException;
 use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmOrderRequest;
 use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmOrderUseCase;
+use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmDebtorCompanyRequest;
 use App\DomainModel\CheckoutSession\CheckoutOrderMatcherInterface;
 use App\DomainModel\CheckoutSession\CheckoutOrderMatcherViolationList;
 use App\DomainModel\CheckoutSession\CheckoutOrderRequestDTO;
-use App\DomainModel\DebtorCompany\DebtorCompanyRequest;
 use App\DomainModel\Order\Lifecycle\ApproveOrderService;
 use App\DomainModel\Order\Lifecycle\WaitingOrderService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
@@ -139,12 +139,14 @@ class CheckoutConfirmOrderUseCaseSpec extends ObjectBehavior
         float $amountTax = 0.0
     ): CheckoutConfirmOrderRequest {
         $amount = TaxedMoneyFactory::create($amountGross, $amountNet, $amountTax);
-        $debtorCompany = new DebtorCompanyRequest();
+        $debtorCompany = new CheckoutConfirmDebtorCompanyRequest();
 
         return (new CheckoutConfirmOrderRequest())
+            ->setExternalCode(null)
             ->setDuration($duration)
             ->setAmount($amount)
             ->setDebtorCompanyRequest($debtorCompany)
-            ->setSessionUuid($sessionId);
+            ->setSessionUuid($sessionId)
+            ->setDeliveryAddress(null);
     }
 }

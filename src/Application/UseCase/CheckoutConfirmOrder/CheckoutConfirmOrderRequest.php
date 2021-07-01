@@ -7,20 +7,9 @@ namespace App\Application\UseCase\CheckoutConfirmOrder;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
 use App\Application\UseCase\ValidatedRequestInterface;
 use App\Application\Validator\Constraint as PaellaAssert;
-use App\DomainModel\DebtorCompany\DebtorCompanyRequest;
-use OpenApi\Annotations as OA;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @OA\Schema(schema="CheckoutConfirmOrderRequest", required={"amount", "duration", "debtor_company"}, properties={
- *      @OA\Property(property="amount", ref="#/components/schemas/AmountDTO"),
- *      @OA\Property(property="duration", ref="#/components/schemas/OrderDuration"),
- *      @OA\Property(property="debtor_company", ref="#/components/schemas/DebtorCompanyRequest"),
- *      @OA\Property(property="delivery_address", ref="#/components/schemas/CreateOrderAddressRequest", nullable=true),
- *      @OA\Property(property="order_id", ref="#/components/schemas/TinyText", description="Order external code", example="DE123456-1")
- * })
- */
 class CheckoutConfirmOrderRequest implements ValidatedRequestInterface
 {
     /**
@@ -28,23 +17,23 @@ class CheckoutConfirmOrderRequest implements ValidatedRequestInterface
      * @Assert\Type(type="string")
      * @PaellaAssert\OrderExternalCode
      */
-    private $orderId;
+    private ?string $externalCode;
 
-    private $merchantId;
+    private int $merchantId;
 
-    private $sessionUuid;
+    private string $sessionUuid;
 
     /**
      * @Assert\NotBlank()
      * @Assert\Valid()
      */
-    private $amount;
+    private ?TaxedMoney $amount;
 
     /**
      * @Assert\NotBlank()
      * @Assert\Type(type="integer")
      */
-    private $duration;
+    private ?int $duration;
 
     /**
      * @Assert\NotBlank()
@@ -55,14 +44,50 @@ class CheckoutConfirmOrderRequest implements ValidatedRequestInterface
     /**
      * @Assert\Valid()
      */
-    private $deliveryAddress;
+    private ?CreateOrderAddressRequest $deliveryAddress;
 
-    public function getAmount(): TaxedMoney
+    public function getExternalCode(): ?string
+    {
+        return $this->externalCode;
+    }
+
+    public function setExternalCode(?string $externalCode): CheckoutConfirmOrderRequest
+    {
+        $this->externalCode = $externalCode;
+
+        return $this;
+    }
+
+    public function getMerchantId(): int
+    {
+        return $this->merchantId;
+    }
+
+    public function setMerchantId(int $merchantId): CheckoutConfirmOrderRequest
+    {
+        $this->merchantId = $merchantId;
+
+        return $this;
+    }
+
+    public function getSessionUuid(): string
+    {
+        return $this->sessionUuid;
+    }
+
+    public function setSessionUuid(string $sessionUuid): CheckoutConfirmOrderRequest
+    {
+        $this->sessionUuid = $sessionUuid;
+
+        return $this;
+    }
+
+    public function getAmount(): ?TaxedMoney
     {
         return $this->amount;
     }
 
-    public function setAmount(TaxedMoney $amount): CheckoutConfirmOrderRequest
+    public function setAmount(?TaxedMoney $amount): CheckoutConfirmOrderRequest
     {
         $this->amount = $amount;
 
@@ -81,24 +106,12 @@ class CheckoutConfirmOrderRequest implements ValidatedRequestInterface
         return $this;
     }
 
-    public function getSessionUuid(): string
-    {
-        return $this->sessionUuid;
-    }
-
-    public function setSessionUuid(string $sessionUuid): CheckoutConfirmOrderRequest
-    {
-        $this->sessionUuid = $sessionUuid;
-
-        return $this;
-    }
-
-    public function getDebtorCompanyRequest(): DebtorCompanyRequest
+    public function getDebtorCompanyRequest()
     {
         return $this->debtorCompanyRequest;
     }
 
-    public function setDebtorCompanyRequest(?DebtorCompanyRequest $debtorCompanyRequest): CheckoutConfirmOrderRequest
+    public function setDebtorCompanyRequest($debtorCompanyRequest): CheckoutConfirmOrderRequest
     {
         $this->debtorCompanyRequest = $debtorCompanyRequest;
 
@@ -113,30 +126,6 @@ class CheckoutConfirmOrderRequest implements ValidatedRequestInterface
     public function setDeliveryAddress(?CreateOrderAddressRequest $deliveryAddress): CheckoutConfirmOrderRequest
     {
         $this->deliveryAddress = $deliveryAddress;
-
-        return $this;
-    }
-
-    public function getExternalCode(): ?string
-    {
-        return $this->orderId;
-    }
-
-    public function setExternalCode($orderId): CheckoutConfirmOrderRequest
-    {
-        $this->orderId = $orderId;
-
-        return $this;
-    }
-
-    public function getMerchantId(): int
-    {
-        return $this->merchantId;
-    }
-
-    public function setMerchantId(int $merchantId): CheckoutConfirmOrderRequest
-    {
-        $this->merchantId = $merchantId;
 
         return $this;
     }

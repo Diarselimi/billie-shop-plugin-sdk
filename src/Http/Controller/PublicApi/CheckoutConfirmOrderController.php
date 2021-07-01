@@ -29,7 +29,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     @OA\RequestBody(
  *          required=true,
  *          @OA\MediaType(mediaType="application/json",
- *          @OA\Schema(ref="#/components/schemas/CheckoutConfirmOrderRequest"))
+ *          @OA\Schema(ref="#/components/schemas/CheckoutConfirmOrderRequestLegacy"))
  *     ),
  *
  *     @OA\Response(response=202, description="Order data successfully confirmed", @OA\JsonContent(ref="#/components/schemas/OrderResponse")),

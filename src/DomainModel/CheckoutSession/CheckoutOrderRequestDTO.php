@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\DomainModel\CheckoutSession;
 
+use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmDebtorCompanyRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
-use App\DomainModel\DebtorCompany\DebtorCompanyRequest;
 
 class CheckoutOrderRequestDTO
 {
@@ -56,12 +56,12 @@ class CheckoutOrderRequestDTO
         return $this;
     }
 
-    public function getDebtorCompany(): DebtorCompanyRequest
+    public function getDebtorCompany(): CheckoutConfirmDebtorCompanyRequest
     {
         return $this->debtorCompany;
     }
 
-    public function setDebtorCompany(DebtorCompanyRequest $debtorCompany): CheckoutOrderRequestDTO
+    public function setDebtorCompany(CheckoutConfirmDebtorCompanyRequest $debtorCompany): CheckoutOrderRequestDTO
     {
         $this->debtorCompany = $debtorCompany;
 

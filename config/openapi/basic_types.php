@@ -288,6 +288,28 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Schema(
+ *     schema="CheckoutConfirmDebtorCompanyRequest",
+ *     title="Checkout Confirm Debtor Company Request",
+ *     required={"name", "company_address"},
+ *     properties={
+ *          @OA\Property(property="name", ref="#/components/schemas/TinyText", example="Billie GmbH"),
+ *          @OA\Property(property="company_address", ref="#/components/schemas/Address")
+ *     }
+ * )
+ */
+
+/**
+ * @OA\Schema(schema="CheckoutConfirmOrderRequest", required={"amount", "duration", "debtor_company"}, properties={
+ *      @OA\Property(property="amount", ref="#/components/schemas/AmountDTO"),
+ *      @OA\Property(property="duration", ref="#/components/schemas/OrderDuration"),
+ *      @OA\Property(property="debtor", ref="#/components/schemas/CheckoutConfirmDebtorCompanyRequest"),
+ *      @OA\Property(property="delivery_address", ref="#/components/schemas/Address", nullable=true),
+ *      @OA\Property(property="external_code", ref="#/components/schemas/TinyText", description="Order external code", example="DE123456-1")
+ * })
+ */
+
+/**
+ * @OA\Schema(
  *     schema="CreateOrderDebtorCompanyRequest",
  *     title="Debtor Company",
  *     required={

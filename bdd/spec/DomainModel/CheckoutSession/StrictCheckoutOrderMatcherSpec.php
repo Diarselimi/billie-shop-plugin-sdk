@@ -2,6 +2,7 @@
 
 namespace spec\App\DomainModel\CheckoutSession;
 
+use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmDebtorCompanyRequestLegacy;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\CheckoutSession\CheckoutOrderMatcherViolationList;
@@ -9,7 +10,6 @@ use App\DomainModel\CheckoutSession\CheckoutOrderRequestDTO;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\CompanyRequestFactory;
 use App\DomainModel\DebtorCompany\DebtorCompany;
-use App\DomainModel\DebtorCompany\DebtorCompanyRequest;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
@@ -46,7 +46,7 @@ class StrictCheckoutOrderMatcherSpec extends ObjectBehavior
         DebtorExternalDataEntity $debtorExternalDataEntity,
         CompaniesServiceInterface $companiesService,
         TaxedMoney $taxedMoney,
-        DebtorCompanyRequest $companyRequest,
+        CheckoutConfirmDebtorCompanyRequestLegacy $companyRequest,
         AddressEntity $addressEntity,
         CreateOrderAddressRequest $addressRequest,
         OrderEntity $orderEntity,

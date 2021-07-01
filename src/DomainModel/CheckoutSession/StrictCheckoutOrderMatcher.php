@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\DomainModel\CheckoutSession;
 
+use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmDebtorCompanyRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\CompanyRequestFactory;
-use App\DomainModel\DebtorCompany\DebtorCompanyRequest;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -135,7 +135,7 @@ class StrictCheckoutOrderMatcher implements CheckoutOrderMatcherInterface, Loggi
     }
 
     private function checkCompanyMatch(
-        DebtorCompanyRequest $requestCompany,
+        CheckoutConfirmDebtorCompanyRequest $requestCompany,
         AddressEntity $addressToCompare,
         string $nameToCompare
     ): bool {

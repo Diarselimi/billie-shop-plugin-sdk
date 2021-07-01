@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\DomainModel\DebtorCompany;
 
+use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmDebtorCompanyRequest;
 use App\Application\UseCase\CreateOrder\Request\CreateOrderAddressRequest;
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\Address\AddressEntityFactory;
@@ -19,13 +20,13 @@ class CompanyRequestFactory
     }
 
     public function createCompanyStrictMatchRequestDTO(
-        DebtorCompanyRequest $company,
+        CheckoutConfirmDebtorCompanyRequest $company,
         AddressEntity $addressToCompare,
         string $nameToCompare
     ): StrictMatchRequestDTO {
         return new StrictMatchRequestDTO(
             $this->createDebtorCompanyData(
-                $this->entityFactory->createFromAddressRequest($company->getAddressRequest()),
+                $this->entityFactory->createFromAddressRequest($company->getCompanyAddress()),
                 $company->getName()
             ),
             $this->createDebtorCompanyData($addressToCompare, $nameToCompare)

@@ -7,6 +7,7 @@ namespace App\Tests\Unit\Application\Validator\Constraint;
 use App\Application\UseCase\UpdateOrder\UpdateOrderRequest;
 use App\Application\Validator\Constraint\UpdateAmount;
 use App\Application\Validator\Constraint\UpdateAmountValidator;
+use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface;
 use App\Tests\Helpers\FakeDataFiller;
 use App\Tests\Helpers\RandomDataTrait;
@@ -37,10 +38,12 @@ class UpdateAmountValidatorTest extends UnitTestCase
     {
         $value = 'not_important';
         $request = new UpdateOrderRequest('some_random_uuid', 1, null, TaxedMoneyFactory::create(123, 120, 3));
+        $financialDetails = new OrderFinancialDetailsEntity();
+        $financialDetails->setAmount(TaxedMoneyFactory::create(50, 45, 5));
 
         $this->financialDetailsRepo->expects($this->once())
-            ->method('findOneByOrderUuid')
-            ->willReturn($this->getRandomFinantialDetails(100));
+            ->method('getLatestByOrderUuid')
+            ->willReturn($financialDetails);
 
         $executionContextMock = $this->getMockBuilder(ExecutionContextInterface::class)
             ->disableOriginalConstructor()
