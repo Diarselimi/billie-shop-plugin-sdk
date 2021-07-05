@@ -21,5 +21,6 @@ query q(
         pending_amount
         created_at
         mapped_at
+        deductible_amount
     }
 }

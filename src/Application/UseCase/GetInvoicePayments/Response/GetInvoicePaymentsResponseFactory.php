@@ -27,6 +27,10 @@ class GetInvoicePaymentsResponseFactory
         $summary = new InvoicePaymentSummary();
         $totalPaid = new Money(0.0);
 
+        if ($collection->getTotal() > 0) {
+            $summary->setDeductibleAmount(new Money($collection->getItems()[0]['deductible_amount']));
+        }
+
         foreach ($transactions as $transaction) {
             $response->addItem($transaction);
 
@@ -34,12 +38,12 @@ class GetInvoicePaymentsResponseFactory
                 case BankTransaction::TYPE_MERCHANT_PAYMENT:
                     {
                         if ($transaction->getState() === BankTransaction::STATE_NEW) {
-                            $summary->setMerchantUnmappedAmount(
-                                $summary->getMerchantUnmappedAmount()->add($transaction->getAmount())
+                            $summary->setPendingMerchantPaymentAmount(
+                                $summary->getPendingMerchantPaymentAmount()->add($transaction->getAmount())
                             );
                         } elseif ($transaction->getState() === BankTransaction::STATE_COMPLETE) {
-                            $summary->setMerchantPaidAmount(
-                                $summary->getMerchantPaidAmount()->add($transaction->getAmount())
+                            $summary->setMerchantPaymentAmount(
+                                $summary->getMerchantPaymentAmount()->add($transaction->getAmount())
                             );
                             $totalPaid = $totalPaid->add($transaction->getAmount());
                         }
@@ -48,13 +52,9 @@ class GetInvoicePaymentsResponseFactory
                     break;
                 case BankTransaction::TYPE_INVOICE_PAYBACK:
                     {
-                        if ($transaction->getState() === BankTransaction::STATE_NEW) {
-                            $summary->setDebtorUnmappedAmount(
-                                $summary->getDebtorUnmappedAmount()->add($transaction->getAmount())
-                            );
-                        } elseif ($transaction->getState() === BankTransaction::STATE_COMPLETE) {
-                            $summary->setDebtorPaidAmount(
-                                $summary->getDebtorPaidAmount()->add($transaction->getAmount())
+                        if ($transaction->getState() === BankTransaction::STATE_COMPLETE) {
+                            $summary->setDebtorPaymentAmount(
+                                $summary->getDebtorPaymentAmount()->add($transaction->getAmount())
                             );
                             $totalPaid = $totalPaid->add($transaction->getAmount());
                         }
@@ -66,8 +66,8 @@ class GetInvoicePaymentsResponseFactory
                         if ($transaction->getState() !== BankTransaction::STATE_COMPLETE) {
                             break;
                         }
-                        $summary->setCancelledAmount(
-                            $summary->getCancelledAmount()->add($transaction->getAmount())
+                        $summary->setCancellationAmount(
+                            $summary->getCancellationAmount()->add($transaction->getAmount())
                         );
                     }
 
@@ -75,8 +75,9 @@ class GetInvoicePaymentsResponseFactory
             }
         }
 
-        $summary->setTotalPaidAmount($totalPaid);
-        $summary->setOpenAmount($invoice->getAmount()->getGross()->subtract($totalPaid));
+        $summary->setPendingCancellationAmount($invoice->getInvoicePendingCancellationAmount());
+        $summary->setTotalPaymentAmount($totalPaid);
+        $summary->setOutstandingAmount($invoice->getAmount()->getGross()->subtract($totalPaid));
 
         $response->setSummary($summary);
 

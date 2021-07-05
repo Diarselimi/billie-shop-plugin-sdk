@@ -4362,25 +4362,28 @@ components:
     InvoicePaymentSummaryDTO:
       title: 'Invoice Payments Summary object'
       properties:
-        merchant_paid_amount:
+        pending_cancellation_amount:
           type: number
           format: float
-        debtor_paid_amount:
+        merchant_payment_amount:
           type: number
           format: float
-        merchant_unmapped_amount:
+        debtor_payment_amount:
           type: number
           format: float
-        debtor_unmapped_amount:
+        pending_merchant_payment_amount:
           type: number
           format: float
-        total_paid_amount:
+        total_payment_amount:
           type: number
           format: float
-        cancelled_amount:
+        cancellation_amount:
           type: number
           format: float
-        open_amount:
+        outstanding_amount:
+          type: number
+          format: float
+        deductible_amount:
           type: number
           format: float
       type: object

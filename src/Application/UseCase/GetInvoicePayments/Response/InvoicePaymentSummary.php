@@ -9,122 +9,138 @@ use Ozean12\Money\Money;
 
 /**
  * @OA\Schema(schema="InvoicePaymentSummaryDTO", title="Invoice Payments Summary object", type="object", properties={
- *      @OA\Property(property="merchant_paid_amount", type="number", format="float"),
- *      @OA\Property(property="debtor_paid_amount", type="number", format="float"),
- *      @OA\Property(property="merchant_unmapped_amount", type="number", format="float"),
- *      @OA\Property(property="debtor_unmapped_amount", type="number", format="float"),
- *      @OA\Property(property="total_paid_amount", type="number", format="float"),
- *      @OA\Property(property="cancelled_amount", type="number", format="float"),
- *      @OA\Property(property="open_amount", type="number", format="float"),
+ *      @OA\Property(property="pending_cancellation_amount", type="number", format="float"),
+ *      @OA\Property(property="merchant_payment_amount", type="number", format="float"),
+ *      @OA\Property(property="debtor_payment_amount", type="number", format="float"),
+ *      @OA\Property(property="pending_merchant_payment_amount", type="number", format="float"),
+ *      @OA\Property(property="total_payment_amount", type="number", format="float"),
+ *      @OA\Property(property="cancellation_amount", type="number", format="float"),
+ *      @OA\Property(property="outstanding_amount", type="number", format="float"),
+ *      @OA\Property(property="deductible_amount", type="number", format="float"),
  * })
  */
 final class InvoicePaymentSummary implements ArrayableInterface
 {
-    private Money $merchantPaidAmount;
+    private Money $pendingCancellationAmount;
 
-    private Money $debtorPaidAmount;
+    private Money $merchantPaymentAmount;
 
-    private Money $merchantUnmappedAmount;
+    private Money $debtorPaymentAmount;
 
-    private Money $debtorUnmappedAmount;
+    private Money $pendingMerchantPaymentAmount;
 
-    private Money $totalPaidAmount;
+    private Money $totalPaymentAmount;
 
-    private Money $cancelledAmount;
+    private Money $cancellationAmount;
 
-    private Money $openAmount;
+    private Money $outstandingAmount;
+
+    private Money $deductibleAmount;
 
     public function __construct()
     {
-        $this->merchantPaidAmount = new Money(0.0);
-        $this->debtorPaidAmount = new Money(0.0);
-        $this->merchantUnmappedAmount = new Money(0.0);
-        $this->debtorUnmappedAmount = new Money(0.0);
-        $this->totalPaidAmount = new Money(0.0);
-        $this->cancelledAmount = new Money(0.0);
-        $this->openAmount = new Money(0.0);
+        $this->pendingCancellationAmount = new Money(0.0);
+        $this->merchantPaymentAmount = new Money(0.0);
+        $this->debtorPaymentAmount = new Money(0.0);
+        $this->pendingMerchantPaymentAmount = new Money(0.0);
+        $this->totalPaymentAmount = new Money(0.0);
+        $this->cancellationAmount = new Money(0.0);
+        $this->outstandingAmount = new Money(0.0);
+        $this->deductibleAmount = new Money(0.0);
     }
 
-    public function getMerchantPaidAmount(): Money
+    public function getPendingCancellationAmount(): Money
     {
-        return $this->merchantPaidAmount;
+        return $this->pendingCancellationAmount;
     }
 
-    public function setMerchantPaidAmount(Money $merchantPaidAmount): InvoicePaymentSummary
+    public function setPendingCancellationAmount(Money $pendingCancellationAmount): InvoicePaymentSummary
     {
-        $this->merchantPaidAmount = $merchantPaidAmount;
+        $this->pendingCancellationAmount = $pendingCancellationAmount;
 
         return $this;
     }
 
-    public function getDebtorPaidAmount(): Money
+    public function getMerchantPaymentAmount(): Money
     {
-        return $this->debtorPaidAmount;
+        return $this->merchantPaymentAmount;
     }
 
-    public function setDebtorPaidAmount(Money $debtorPaidAmount): InvoicePaymentSummary
+    public function setMerchantPaymentAmount(Money $merchantPaymentAmount): InvoicePaymentSummary
     {
-        $this->debtorPaidAmount = $debtorPaidAmount;
+        $this->merchantPaymentAmount = $merchantPaymentAmount;
 
         return $this;
     }
 
-    public function getMerchantUnmappedAmount(): Money
+    public function getDebtorPaymentAmount(): Money
     {
-        return $this->merchantUnmappedAmount;
+        return $this->debtorPaymentAmount;
     }
 
-    public function setMerchantUnmappedAmount(Money $merchantUnmappedAmount): InvoicePaymentSummary
+    public function setDebtorPaymentAmount(Money $debtorPaymentAmount): InvoicePaymentSummary
     {
-        $this->merchantUnmappedAmount = $merchantUnmappedAmount;
+        $this->debtorPaymentAmount = $debtorPaymentAmount;
 
         return $this;
     }
 
-    public function getDebtorUnmappedAmount(): Money
+    public function getPendingMerchantPaymentAmount(): Money
     {
-        return $this->debtorUnmappedAmount;
+        return $this->pendingMerchantPaymentAmount;
     }
 
-    public function setDebtorUnmappedAmount(Money $debtorUnmappedAmount): InvoicePaymentSummary
+    public function setPendingMerchantPaymentAmount(Money $pendingMerchantPaymentAmount): InvoicePaymentSummary
     {
-        $this->debtorUnmappedAmount = $debtorUnmappedAmount;
+        $this->pendingMerchantPaymentAmount = $pendingMerchantPaymentAmount;
 
         return $this;
     }
 
-    public function getTotalPaidAmount(): Money
+    public function getTotalPaymentAmount(): Money
     {
-        return $this->totalPaidAmount;
+        return $this->totalPaymentAmount;
     }
 
-    public function setTotalPaidAmount(Money $totalPaidAmount): InvoicePaymentSummary
+    public function setTotalPaymentAmount(Money $totalPaymentAmount): InvoicePaymentSummary
     {
-        $this->totalPaidAmount = $totalPaidAmount;
+        $this->totalPaymentAmount = $totalPaymentAmount;
 
         return $this;
     }
 
-    public function getOpenAmount(): Money
+    public function getCancellationAmount(): Money
     {
-        return $this->openAmount;
+        return $this->cancellationAmount;
     }
 
-    public function setOpenAmount(Money $openAmount): InvoicePaymentSummary
+    public function setCancellationAmount(Money $cancellationAmount): InvoicePaymentSummary
     {
-        $this->openAmount = $openAmount;
+        $this->cancellationAmount = $cancellationAmount;
 
         return $this;
     }
 
-    public function getCancelledAmount(): Money
+    public function getOutstandingAmount(): Money
     {
-        return $this->cancelledAmount;
+        return $this->outstandingAmount;
     }
 
-    public function setCancelledAmount(Money $cancelledAmount): InvoicePaymentSummary
+    public function setOutstandingAmount(Money $outstandingAmount): InvoicePaymentSummary
     {
-        $this->cancelledAmount = $cancelledAmount;
+        $this->outstandingAmount = $outstandingAmount;
+
+        return $this;
+    }
+
+    public function getDeductibleAmount(): Money
+    {
+        return $this->deductibleAmount;
+    }
+
+    public function setDeductibleAmount(Money $deductibleAmount): InvoicePaymentSummary
+    {
+        $this->deductibleAmount = $deductibleAmount;
 
         return $this;
     }
@@ -132,13 +148,14 @@ final class InvoicePaymentSummary implements ArrayableInterface
     public function toArray(): array
     {
         return [
-            'merchant_paid_amount' => $this->getMerchantPaidAmount()->getMoneyValue(),
-            'debtor_paid_amount' => $this->getDebtorPaidAmount()->getMoneyValue(),
-            'merchant_unmapped_amount' => $this->getMerchantUnmappedAmount()->getMoneyValue(),
-            'debtor_unmapped_amount' => $this->getDebtorUnmappedAmount()->getMoneyValue(),
-            'total_paid_amount' => $this->getTotalPaidAmount()->getMoneyValue(),
-            'cancelled_amount' => $this->getCancelledAmount()->getMoneyValue(),
-            'open_amount' => $this->getOpenAmount()->getMoneyValue(),
+            'pending_cancellation_amount' => $this->getPendingCancellationAmount()->getMoneyValue(),
+            'merchant_payment_amount' => $this->getMerchantPaymentAmount()->getMoneyValue(),
+            'debtor_payment_amount' => $this->getDebtorPaymentAmount()->getMoneyValue(),
+            'pending_merchant_payment_amount' => $this->getPendingMerchantPaymentAmount()->getMoneyValue(),
+            'total_payment_amount' => $this->getTotalPaymentAmount()->getMoneyValue(),
+            'cancellation_amount' => $this->getCancellationAmount()->getMoneyValue(),
+            'outstanding_amount' => $this->getOutstandingAmount()->getMoneyValue(),
+            'deductible_amount' => $this->getDeductibleAmount()->getMoneyValue(),
         ];
     }
 }

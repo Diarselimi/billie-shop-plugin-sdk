@@ -95,11 +95,12 @@ class CreditNoteCreationServiceTest extends UnitTestCase
     /**
      * @test
      */
-    public function shouldFailIfAmountIsGreaterThanInvoiceOutstandingAmount(): void
+    public function shouldFailIfAmountIsGreaterThanMaxAmountAmount(): void
     {
         $invoice = (new Invoice())
             ->setState(Invoice::STATE_NEW)
-            ->setOutstandingAmount(new Money(100));
+            ->setOutstandingAmount(new Money(600))
+            ->setMerchantPendingPaymentAmount(new Money(200));
 
         $creditNote = (new CreditNote())->setAmount(
             new TaxedMoney(new Money(500), new Money(0), new Money(0))
@@ -124,6 +125,7 @@ class CreditNoteCreationServiceTest extends UnitTestCase
         $invoice = (new Invoice())
             ->setState(Invoice::STATE_PAID_OUT)
             ->setOutstandingAmount(new Money(70))
+            ->setMerchantPendingPaymentAmount(new Money(0))
             ->setAmount(new TaxedMoney(new Money(100), new Money(90), new Money(10)));
 
         $creditNote = (new CreditNote())->setAmount(
@@ -149,6 +151,7 @@ class CreditNoteCreationServiceTest extends UnitTestCase
         $invoice = (new Invoice())
             ->setState(Invoice::STATE_PAID_OUT)
             ->setOutstandingAmount(new Money(70))
+            ->setMerchantPendingPaymentAmount(new Money(0))
             ->setAmount(new TaxedMoney(new Money(100), new Money(90), new Money(10)));
 
         $creditNote = (new CreditNote())

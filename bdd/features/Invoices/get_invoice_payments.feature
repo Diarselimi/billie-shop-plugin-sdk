@@ -45,7 +45,26 @@ Feature:
         "outstanding_amount": 500,
         "invoice_discount_rate": 0,
         "company_discount_rate": 0,
-        "proof_of_delivery_url": "http://foobar.io"
+        "proof_of_delivery_url": "http://foobar.io",
+        "invoice_pending_cancellation_amount": 2.44,
+        "credit_notes": [
+          {
+            "uuid": "208cfe7d-046f-4162-b175-748942d6cff5",
+            "amount_gross": 2.0,
+            "amount_net": 1.6,
+            "external_code": "some-code-CN-1",
+            "comment": null,
+            "created_at": "2021-03-01 12:12:12"
+          },
+          {
+            "uuid": "208cfe7d-046f-4162-b175-748942d6cff6",
+            "amount_gross": 1.0,
+            "amount_net": 0.8,
+            "external_code": "some-code-CN-2",
+            "comment": null,
+            "created_at": "2021-03-01 12:12:13"
+          }
+        ]
       }
     ]
     """
@@ -61,7 +80,18 @@ Feature:
             "pending_amount": 0.01,
             "transaction_uuid": "34bad2f1-f36d-4985-a312-2203da7ef306",
             "payment_type": "merchant_payment",
-            "debtor_name": "Dummy Merchant GmbH"
+            "debtor_name": "Dummy Merchant GmbH",
+            "deductible_amount": 6.87
+          },
+          {
+            "created_at": "2018-06-25T17:10:05Z",
+            "mapped_at": null,
+            "mapped_amount": 4.0,
+            "pending_amount": 0.01,
+            "transaction_uuid": "3fca55fc-f403-4d83-9fe4-287c862f3e51",
+            "payment_type": "merchant_payment",
+            "debtor_name": "Dummy Merchant GmbH",
+            "deductible_amount": 6.87
           },
           {
             "created_at": "2018-06-26T17:10:05Z",
@@ -70,7 +100,8 @@ Feature:
             "pending_amount": 0.01,
             "transaction_uuid": "7875a655-3263-435f-a5a6-9b0bea42e90a",
             "payment_type": "merchant_payment",
-            "debtor_name": "Dummy Merchant GmbH"
+            "debtor_name": "Dummy Merchant GmbH",
+            "deductible_amount": 6.87
           },
           {
             "created_at": "2018-06-28T17:10:05Z",
@@ -79,7 +110,18 @@ Feature:
             "pending_amount": 0.02,
             "transaction_uuid": "fc23cb4e-77c3-11e9-a2c4-02c6850949d6",
             "payment_type": "invoice_payback",
-            "debtor_name": "Dummy Debtor GmbH"
+            "debtor_name": "Dummy Debtor GmbH",
+            "deductible_amount": 6.87
+          },
+          {
+            "created_at": "2018-06-28T17:10:05Z",
+            "mapped_at": null,
+            "mapped_amount": 5.0,
+            "pending_amount": 0.02,
+            "transaction_uuid": "d5440499-9658-4c13-8ce5-5494ba3d5661",
+            "payment_type": "invoice_payback",
+            "debtor_name": "Dummy Debtor GmbH",
+            "deductible_amount": 6.87
           },
           {
             "created_at": "2018-06-29T17:10:05Z",
@@ -88,7 +130,8 @@ Feature:
             "pending_amount": 0.02,
             "transaction_uuid": "17eca8da-e9c0-4853-8597-fe756c0f2576",
             "payment_type": "invoice_payback",
-            "debtor_name": "Dummy Debtor GmbH"
+            "debtor_name": "Dummy Debtor GmbH",
+            "deductible_amount": 6.87
           },
           {
             "created_at": "2018-06-28T17:10:05Z",
@@ -97,7 +140,8 @@ Feature:
             "pending_amount": 0.03,
             "transaction_uuid": "9cda01dd-1189-4d15-92f9-ef9662292d3f",
             "payment_type": "invoice_cancellation",
-            "debtor_name": "Dummy Debtor GmbH"
+            "debtor_name": "Dummy Debtor GmbH",
+            "deductible_amount": 6.87
           },
           {
             "created_at": "2018-06-28T17:10:05Z",
@@ -106,7 +150,8 @@ Feature:
             "pending_amount": 0.04,
             "transaction_uuid": "19b5919b-efb6-4bed-b551-2481aede7ed8",
             "payment_type": "invoice_cancellation",
-            "debtor_name": "Dummy Debtor GmbH"
+            "debtor_name": "Dummy Debtor GmbH",
+            "deductible_amount": 6.87
           }
         ]
       }
@@ -118,13 +163,14 @@ Feature:
     """
     {
       "summary": {
-        "merchant_paid_amount": 24.45,
-        "debtor_paid_amount": 52.55,
-        "merchant_unmapped_amount": 0.0,
-        "debtor_unmapped_amount": 0.0,
-        "total_paid_amount": 77,
-        "cancelled_amount": 5.88,
-        "open_amount": 23
+        "pending_cancellation_amount": 2.44,
+        "merchant_payment_amount": 24.45,
+        "debtor_payment_amount": 52.55,
+        "pending_merchant_payment_amount": 4,
+        "total_payment_amount": 77,
+        "cancellation_amount": 5.88,
+        "outstanding_amount": 23,
+        "deductible_amount": 6.87
       },
       "items": [
         {
@@ -134,6 +180,14 @@ Feature:
           "amount": 22.45,
           "debtor_name": "Dummy Merchant GmbH",
           "created_at": "2018-07-01 11:06:35"
+        },
+        {
+          "transaction_uuid": "3fca55fc-f403-4d83-9fe4-287c862f3e51",
+          "type": "merchant_payment",
+          "state": "new",
+          "amount": 4.0,
+          "debtor_name": "Dummy Merchant GmbH",
+          "created_at": "2018-06-25 17:10:05"
         },
         {
           "transaction_uuid": "7875a655-3263-435f-a5a6-9b0bea42e90a",
@@ -150,6 +204,14 @@ Feature:
           "amount": 47.55,
           "debtor_name": "Dummy Debtor GmbH",
           "created_at": "2018-07-11 11:06:35"
+        },
+        {
+          "transaction_uuid": "d5440499-9658-4c13-8ce5-5494ba3d5661",
+          "type": "invoice_payback",
+          "state": "new",
+          "amount": 5.0,
+          "debtor_name": "Dummy Debtor GmbH",
+          "created_at": "2018-06-28 17:10:05"
         },
         {
           "transaction_uuid": "17eca8da-e9c0-4853-8597-fe756c0f2576",
@@ -176,6 +238,6 @@ Feature:
           "created_at": "2018-06-28 17:10:05"
         }
       ],
-      "total": 6
+      "total": 8
     }
     """

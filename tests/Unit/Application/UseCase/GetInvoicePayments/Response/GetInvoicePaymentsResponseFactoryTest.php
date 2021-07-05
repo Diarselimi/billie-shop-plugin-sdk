@@ -45,10 +45,11 @@ class GetInvoicePaymentsResponseFactoryTest extends UnitTestCase
         array $transactionsData,
         InvoicePaymentSummary $expectedSummary
     ): void {
+        $invoicePendingCancellationAmount = new Money(10);
         $paginatedCollection = new PaginatedCollection();
         $invoice = (new Invoice())->setAmount(
             new TaxedMoney(new Money($invoiceGrossAmount), new Money($invoiceGrossAmount), new Money(0))
-        );
+        )->setInvoicePendingCancellationAmount($invoicePendingCancellationAmount);
         $transactions = array_map(
             function (array $data) {
                 return (new BankTransaction())
@@ -68,11 +69,12 @@ class GetInvoicePaymentsResponseFactoryTest extends UnitTestCase
         $summary = $response->getSummary();
 
         self::assertCount(count($transactionsData), $response->getItems());
-        self::assertMoneyEquals($expectedSummary->getTotalPaidAmount(), $summary->getTotalPaidAmount());
-        self::assertMoneyEquals($expectedSummary->getCancelledAmount(), $summary->getCancelledAmount());
-        self::assertMoneyEquals($expectedSummary->getDebtorPaidAmount(), $summary->getDebtorPaidAmount());
-        self::assertMoneyEquals($expectedSummary->getMerchantPaidAmount(), $summary->getMerchantPaidAmount());
-        self::assertMoneyEquals($expectedSummary->getOpenAmount(), $summary->getOpenAmount());
+        self::assertMoneyEquals($invoicePendingCancellationAmount, $summary->getPendingCancellationAmount());
+        self::assertMoneyEquals($expectedSummary->getTotalPaymentAmount(), $summary->getTotalPaymentAmount());
+        self::assertMoneyEquals($expectedSummary->getCancellationAmount(), $summary->getCancellationAmount());
+        self::assertMoneyEquals($expectedSummary->getDebtorPaymentAmount(), $summary->getDebtorPaymentAmount());
+        self::assertMoneyEquals($expectedSummary->getMerchantPaymentAmount(), $summary->getMerchantPaymentAmount());
+        self::assertMoneyEquals($expectedSummary->getOutstandingAmount(), $summary->getOutstandingAmount());
     }
 
     public function createShouldMatchDataProvider(): array
@@ -111,20 +113,14 @@ class GetInvoicePaymentsResponseFactoryTest extends UnitTestCase
                         'state' => BankTransaction::STATE_COMPLETE,
                         'type' => BankTransaction::TYPE_INVOICE_CANCELLATION,
                     ],
-                    [
-                        'amount' => 3.00,
-                        'state' => BankTransaction::STATE_NEW,
-                        'type' => BankTransaction::TYPE_INVOICE_CANCELLATION,
-                    ],
                 ],
                 (new InvoicePaymentSummary())
-                    ->setOpenAmount(new Money(45))
-                    ->setTotalPaidAmount(new Money(55))
-                    ->setCancelledAmount(new Money(5))
-                    ->setDebtorPaidAmount(new Money(20))
-                    ->setMerchantPaidAmount(new Money(35))
-                    ->setMerchantUnmappedAmount(new Money(2))
-                    ->setDebtorUnmappedAmount(new Money(1)),
+                    ->setOutstandingAmount(new Money(45))
+                    ->setTotalPaymentAmount(new Money(55))
+                    ->setCancellationAmount(new Money(5))
+                    ->setDebtorPaymentAmount(new Money(20))
+                    ->setMerchantPaymentAmount(new Money(35))
+                    ->setPendingMerchantPaymentAmount(new Money(2)),
             ],
         ];
     }

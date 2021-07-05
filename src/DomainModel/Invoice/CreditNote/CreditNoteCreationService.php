@@ -6,6 +6,7 @@ namespace App\DomainModel\Invoice\CreditNote;
 
 use App\DomainModel\Invoice\InvoiceContainer;
 use App\DomainModel\Invoice\InvoiceServiceInterface;
+use Ozean12\Money\Money;
 
 class CreditNoteCreationService
 {
@@ -56,7 +57,9 @@ class CreditNoteCreationService
             );
         }
 
-        $maxGrossAmount = $invoice->getOutstandingAmount();
+        $maxGrossAmount = new Money(
+            $invoice->getOutstandingAmount()->subtract($invoice->getMerchantPendingPaymentAmount()->getMoneyValue())
+        );
         if ($creditNote->getAmount()->getGross()->greaterThan($maxGrossAmount)) {
             throw new CreditNoteAmountExceededException();
         }
