@@ -9,6 +9,7 @@ use App\DomainModel\Invoice\CreditNote\CreditNote;
 use App\DomainModel\Invoice\CreditNote\CreditNoteFactory;
 use App\DomainModel\Invoice\CreditNote\InvoiceCreditNoteMessageFactory;
 use App\DomainModel\Invoice\ExtendInvoiceService;
+use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
@@ -105,19 +106,14 @@ class LegacyUpdateOrderService implements LoggingInterface
     private function doUpdate(OrderContainer $orderContainer, LegacyUpdateOrderRequest $changeSet): void
     {
         $invoice = $orderContainer->getInvoices()->getLastInvoice();
+        $changedAmount = $changeSet->getAmount();
 
         if ($changeSet->isAmountChanged() || $changeSet->isDurationChanged()) {
-            $changedAmount = $changeSet->getAmount();
             $duration = $changeSet->isDurationChanged()
                 ? $changeSet->getDuration()
-                : $orderContainer->getOrderFinancialDetails()->getDuration()
-            ;
+                : $orderContainer->getOrderFinancialDetails()->getDuration();
 
-            if (!$orderContainer->getInvoices()->isEmpty()) {
-                if ($invoice !== null && $changeSet->isInvoiceNumberChanged()) {
-                    $invoice->setExternalCode($changeSet->getInvoiceNumber());
-                }
-                $this->onAmountChangeDispatchCreditNoteMessage($changeSet, $orderContainer);
+            if ($invoice !== null) {
                 $changeSet->setAmount(null);
             }
 
@@ -148,30 +144,20 @@ class LegacyUpdateOrderService implements LoggingInterface
             return;
         }
 
-        $hasChanges = $changeSet->isInvoiceNumberChanged()
-            || $changeSet->isInvoiceUrlChanged()
-            || $changeSet->isDurationChanged();
-
-        if (!$hasChanges) {
-            $this->logInfo('Update Order skipped because there were no amount/duration/document changes.');
-
+        if ($invoice === null) {
             return;
         }
 
-        if ($changeSet->isDurationChanged() || $changeSet->isInvoiceNumberChanged()) {
-            if ($changeSet->isInvoiceNumberChanged()) {
-                $invoice->setExternalCode($changeSet->getInvoiceNumber());
-            }
-            $duration = $changeSet->getDuration() ?? $invoice->getDuration();
-            if ($changeSet->isDurationChanged()) {
-                sleep(1);
-            }
+        if ($changeSet->isInvoiceNumberChanged()) {
+            $invoice->setExternalCode($changeSet->getInvoiceNumber());
+        }
 
-            try {
-                $this->extendInvoiceService->extend($orderContainer, $invoice, $duration);
-            } catch (FeeCalculationException $exception) {
-                throw new UpdateOrderException("Order cannot be updated: fee calculation failed.", null, $exception);
-            }
+        if ($changedAmount !== null) {
+            $this->dispatchCreditNoteMessage($changedAmount, $orderContainer);
+        }
+
+        if ($changeSet->isDurationChanged() || $changeSet->isInvoiceNumberChanged()) {
+            $this->dispatchExtendMessage($orderContainer, $invoice, $changeSet->getDuration());
         }
     }
 
@@ -208,32 +194,40 @@ class LegacyUpdateOrderService implements LoggingInterface
 
     private function calculateReducedAmount(
         OrderContainer $orderContainer,
-        LegacyUpdateOrderRequest $changeSet
+        TaxedMoney $changedAmount
     ): TaxedMoney {
         $initialAmountGross = $orderContainer->getOrderFinancialDetails()->getAmountGross();
         $initialAmountNet = $orderContainer->getOrderFinancialDetails()->getAmountNet();
 
         $reducedAmountGross = $initialAmountGross
             ->subtract($orderContainer->getInvoices()->getInvoicesCreditNotesGrossSum())
-            ->subtract($changeSet->getAmount()->getGross());
+            ->subtract($changedAmount->getGross());
         $reducedAmountNet = $initialAmountNet
             ->subtract($orderContainer->getInvoices()->getInvoicesCreditNotesNetSum())
-            ->subtract($changeSet->getAmount()->getNet());
+            ->subtract($changedAmount->getNet());
 
         return new TaxedMoney($reducedAmountGross, $reducedAmountNet, $reducedAmountGross->subtract($reducedAmountNet));
     }
 
-    private function onAmountChangeDispatchCreditNoteMessage(
-        LegacyUpdateOrderRequest $changeSet,
+    private function dispatchExtendMessage(
+        OrderContainer $orderContainer,
+        Invoice $invoice,
+        ?int $newDuration
+    ): void {
+        try {
+            $this->extendInvoiceService->extend($orderContainer, $invoice, $newDuration ?? $invoice->getDuration());
+        } catch (FeeCalculationException $exception) {
+            throw new UpdateOrderException("Order cannot be updated: fee calculation failed.", null, $exception);
+        }
+    }
+
+    private function dispatchCreditNoteMessage(
+        TaxedMoney $changedAmount,
         OrderContainer $orderContainer
     ): void {
-        if (!$changeSet->isAmountChanged()) {
-            return;
-        }
-
         $invoice = $orderContainer->getInvoices()->getLastInvoice();
 
-        $differenceAmount = $this->calculateReducedAmount($orderContainer, $changeSet);
+        $differenceAmount = $this->calculateReducedAmount($orderContainer, $changedAmount);
         $creditNote = $this->creditNoteFactory->create(
             $invoice,
             $differenceAmount,

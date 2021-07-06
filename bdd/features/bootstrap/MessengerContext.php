@@ -6,6 +6,7 @@ use App\Amqp\Handler\CompanyInformationChangeRequestDecisionIssuedHandler;
 use App\Amqp\Handler\IdentityVerificationSucceededHandler;
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
+use Behat\Gherkin\Node\TableNode;
 use Coduo\PHPMatcher\PHPMatcher;
 use Google\Protobuf\Internal\Message;
 use Ozean12\AmqpPackBundle\Mapping\AmqpMapperInterface;
@@ -149,6 +150,35 @@ class MessengerContext implements Context
             print_r(
                 ['routing_key' => $routingKey, 'payload' => $dispatchedMessage->serializeToJsonString()]
             );
+        }
+    }
+
+    /**
+     * @Given /^make sure the order of dispatched messages is as follows:$/
+     */
+    public function makeSureTheOrderOfDispatchedMessagesIsAsFollows(TableNode $table)
+    {
+        if (count($table->getRows()) < 2) {
+            throw new \Exception('You need to specify at least two messages to check the order.');
+        }
+
+        $orderOfMessages = [];
+        foreach ($this->getQueuedMessages() as $message) {
+            /** @var Message $dispatchedMessage */
+            $dispatchedMessage = $message['message'];
+            $orderOfMessages[] = $this->amqpMapper->mapToKey(get_class($dispatchedMessage));
+        }
+
+        foreach ($table->getRows() as $key => $row) {
+            if ($orderOfMessages[$key] !== $row[0]) {
+                $error = sprintf(
+                    'Expected message %s but got %s, order seems to not be correct.',
+                    $row[0],
+                    $orderOfMessages[$key]
+                );
+
+                throw new \Exception($error);
+            }
         }
     }
 }

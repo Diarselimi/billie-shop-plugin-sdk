@@ -46,7 +46,7 @@ class ConfirmOrderPaymentUseCase implements ValidatedUseCaseInterface
         }
 
         $invoice = $orderContainer->getInvoices()->getLastInvoice();
-        if ($invoice === null) {
+        if ($invoice === null || $invoice->isCanceled() || $invoice->isComplete()) {
             throw new PaymentOrderConfirmException();
         }
 
