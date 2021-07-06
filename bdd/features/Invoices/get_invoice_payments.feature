@@ -169,7 +169,6 @@ Feature:
         "pending_merchant_payment_amount": 4,
         "total_payment_amount": 77,
         "cancellation_amount": 5.88,
-        "outstanding_amount": 23,
         "deductible_amount": 6.87
       },
       "items": [

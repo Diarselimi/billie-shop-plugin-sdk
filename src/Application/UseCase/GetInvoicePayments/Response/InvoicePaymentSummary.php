@@ -15,7 +15,6 @@ use Ozean12\Money\Money;
  *      @OA\Property(property="pending_merchant_payment_amount", type="number", format="float"),
  *      @OA\Property(property="total_payment_amount", type="number", format="float"),
  *      @OA\Property(property="cancellation_amount", type="number", format="float"),
- *      @OA\Property(property="outstanding_amount", type="number", format="float"),
  *      @OA\Property(property="deductible_amount", type="number", format="float"),
  * })
  */
@@ -33,8 +32,6 @@ final class InvoicePaymentSummary implements ArrayableInterface
 
     private Money $cancellationAmount;
 
-    private Money $outstandingAmount;
-
     private Money $deductibleAmount;
 
     public function __construct()
@@ -45,7 +42,6 @@ final class InvoicePaymentSummary implements ArrayableInterface
         $this->pendingMerchantPaymentAmount = new Money(0.0);
         $this->totalPaymentAmount = new Money(0.0);
         $this->cancellationAmount = new Money(0.0);
-        $this->outstandingAmount = new Money(0.0);
         $this->deductibleAmount = new Money(0.0);
     }
 
@@ -121,18 +117,6 @@ final class InvoicePaymentSummary implements ArrayableInterface
         return $this;
     }
 
-    public function getOutstandingAmount(): Money
-    {
-        return $this->outstandingAmount;
-    }
-
-    public function setOutstandingAmount(Money $outstandingAmount): InvoicePaymentSummary
-    {
-        $this->outstandingAmount = $outstandingAmount;
-
-        return $this;
-    }
-
     public function getDeductibleAmount(): Money
     {
         return $this->deductibleAmount;
@@ -154,7 +138,6 @@ final class InvoicePaymentSummary implements ArrayableInterface
             'pending_merchant_payment_amount' => $this->getPendingMerchantPaymentAmount()->getMoneyValue(),
             'total_payment_amount' => $this->getTotalPaymentAmount()->getMoneyValue(),
             'cancellation_amount' => $this->getCancellationAmount()->getMoneyValue(),
-            'outstanding_amount' => $this->getOutstandingAmount()->getMoneyValue(),
             'deductible_amount' => $this->getDeductibleAmount()->getMoneyValue(),
         ];
     }

@@ -77,7 +77,6 @@ class GetInvoicePaymentsResponseFactory
 
         $summary->setPendingCancellationAmount($invoice->getInvoicePendingCancellationAmount());
         $summary->setTotalPaymentAmount($totalPaid);
-        $summary->setOutstandingAmount($invoice->getAmount()->getGross()->subtract($totalPaid));
 
         $response->setSummary($summary);
 

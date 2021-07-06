@@ -4380,9 +4380,6 @@ components:
         cancellation_amount:
           type: number
           format: float
-        outstanding_amount:
-          type: number
-          format: float
         deductible_amount:
           type: number
           format: float
