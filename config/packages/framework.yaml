@@ -4,4 +4,4 @@ framework:
         handler_id: ~
 
     php_errors:
-        log: true
+        log: 6143 # E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED & ~E_STRICT

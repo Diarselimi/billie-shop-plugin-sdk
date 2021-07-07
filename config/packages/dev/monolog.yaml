@@ -4,5 +4,5 @@ monolog:
       type: "stream"
       path: "php://stdout"
       level: info
-      channels: ["!translation", "!request"]
+      channels: ["!event", "!translation", "!request"]
       formatter: Monolog\Formatter\JsonFormatter
