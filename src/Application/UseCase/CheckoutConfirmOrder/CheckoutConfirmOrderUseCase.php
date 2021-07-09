@@ -16,14 +16,10 @@ use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\OrderResponse\LegacyOrderResponse;
-use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
 
 class CheckoutConfirmOrderUseCase implements ValidatedUseCaseInterface
 {
     use ValidatedUseCaseTrait;
-
-    private LegacyOrderResponseFactory $orderResponseFactory;
 
     private OrderContainerFactory $orderContainerFactory;
 
@@ -36,14 +32,12 @@ class CheckoutConfirmOrderUseCase implements ValidatedUseCaseInterface
     private OrderRepositoryInterface $orderRepository;
 
     public function __construct(
-        LegacyOrderResponseFactory $orderResponseFactory,
         OrderContainerFactory $orderContainerFactory,
         ApproveOrderService $approveOrderService,
         WaitingOrderService $waitingOrderService,
         CheckoutOrderMatcherInterface $dataMatcher,
         OrderRepositoryInterface $orderRepository
     ) {
-        $this->orderResponseFactory = $orderResponseFactory;
         $this->orderContainerFactory = $orderContainerFactory;
         $this->approveOrderService = $approveOrderService;
         $this->waitingOrderService = $waitingOrderService;
@@ -51,7 +45,7 @@ class CheckoutConfirmOrderUseCase implements ValidatedUseCaseInterface
         $this->orderRepository = $orderRepository;
     }
 
-    public function execute(CheckoutConfirmOrderRequest $request): LegacyOrderResponse
+    public function execute(CheckoutConfirmOrderRequest $request): OrderContainer
     {
         $this->validateRequest($request);
 
@@ -69,14 +63,13 @@ class CheckoutConfirmOrderUseCase implements ValidatedUseCaseInterface
             $this->updateOrderExternalCode($request, $orderContainer);
         }
 
-        $order = $orderContainer->getOrder();
-        if ($order->isPreWaiting()) {
+        if ($orderContainer->getOrder()->isPreWaiting()) {
             $this->waitingOrderService->wait($orderContainer);
         } else {
             $this->approveOrderService->approve($orderContainer);
         }
 
-        return $this->orderResponseFactory->create($orderContainer);
+        return $orderContainer;
     }
 
     private function assureDataMatches(CheckoutConfirmOrderRequest $request, OrderContainer $orderContainer): void

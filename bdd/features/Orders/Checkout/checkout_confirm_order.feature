@@ -34,14 +34,10 @@ Feature: As a merchant, I should be able to create an order by providing a valid
 
   Scenario: I successfully confirm the order by sending the same expected data. Order is moved to created state.
     Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
-    And I get from invoice-butler service good response
-    And the following invoice data exists:
-      | order_id | invoice_uuid                         |
-      | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
+    And I get from invoice-butler service no invoices response
     And I get from companies service a good debtor strict match response
     And Debtor lock limit call succeeded
     And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
-    # for debtor_company, use data from \PaellaCoreContext::iHaveADebtorWithoutOrders
     """
     {
        "amount":{
@@ -72,6 +68,74 @@ Feature: As a merchant, I should be able to create an order by providing a valid
     }
     """
     Then the response status code should be 202
+    And the json response should be:
+    """
+    {
+      "order_id":"CO333",
+      "state":"created",
+      "reasons":null,
+      "decline_reason":null,
+      "amount":100,
+      "amount_net":90,
+      "amount_tax":10,
+      "unshipped_amount":100,
+      "unshipped_amount_net":90,
+      "unshipped_amount_tax":10,
+      "workflow_name":"order_v1",
+      "duration":30,
+      "invoices":[],
+      "dunning_status":null,
+      "debtor_company":{
+        "name":"Test User Company",
+        "address_house_number":"10",
+        "address_street":"Heinrich-Heine-Platz",
+        "address_postal_code":"10179",
+        "address_city":"Berlin",
+        "address_country":"DE"
+      },
+      "bank_account":{
+        "iban":"DE1234",
+        "bic":"BICISHERE"
+      },
+      "debtor_external_data": {
+        "merchant_customer_id": "ext_id",
+        "name": "test",
+        "address_country": "TE",
+        "address_city": "testCity",
+        "address_postal_code": "test",
+        "address_street": "test",
+        "address_house": "test",
+        "industry_sector": "test"
+      },
+      "delivery_address": {
+        "house_number": "test",
+        "street": "test",
+        "city": "test",
+        "postal_code": "test",
+        "country": "TE"
+      },
+      "billing_address": {
+        "house_number": "test",
+        "street": "test",
+        "city": "test",
+        "postal_code": "test",
+        "country": "TE"
+      },
+      "created_at":"2020-02-18T12:28:46+0100",
+      "shipped_at":null,
+      "debtor_uuid":null,
+      "invoice":{
+        "due_date":"2019-06-19",
+        "invoice_number":null,
+        "payout_amount":null,
+        "outstanding_amount":null,
+        "fee_amount":null,
+        "fee_rate":null,
+        "pending_merchant_payment_amount":null,
+        "pending_cancellation_amount":null
+      }
+    }
+    """
     And the order CO333 is in state created
 
   Scenario: I successfully confirm the order that is in pre_waiting state. Order is moved to waiting state.

@@ -1,5 +1,9 @@
 Feature: As a merchant, I should be able to create an order by providing a valid session ID and data
 
+  # The whole feature replicates the checkout_confirm_order feature, only difference is request/response format
+  # So it doesn't make sense to duplicate all the scenarios
+  # What's left is only positive and two negative flows
+
   Background:
     Given I add "Content-type" header equal to "application/json"
     And I add "X-Test" header equal to 1
@@ -34,14 +38,9 @@ Feature: As a merchant, I should be able to create an order by providing a valid
 
   Scenario: I successfully confirm the order by sending the same expected data. Order is moved to created state.
     Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
-    And I get from invoice-butler service good response
-    And the following invoice data exists:
-      | order_id | invoice_uuid                         |
-      | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
     And I get from companies service a good debtor strict match response
     And Debtor lock limit call succeeded
-    And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
-    # for debtor_company, use data from \PaellaCoreContext::iHaveADebtorWithoutOrders
+    And I send a PUT request to "/public/api/v2/checkout-sessions/123123CO123/confirm" with body:
     """
     {
        "amount":{
@@ -72,104 +71,75 @@ Feature: As a merchant, I should be able to create an order by providing a valid
     }
     """
     Then the response status code should be 202
+    Then the json response should be:
+    """
+    {
+       "external_code":"CO123",
+       "uuid":"test-order-uuidCO123",
+       "state":"created",
+       "decline_reason":null,
+       "amount":{
+          "gross":100,
+          "net":90,
+          "tax":10
+       },
+       "unshipped_amount":{
+          "gross":100,
+          "net":90,
+          "tax":10
+       },
+       "duration":30,
+       "created_at":"2019-05-20 13:00:00",
+       "delivery_address":{
+          "street":"test",
+          "house_number":"test",
+          "postal_code":"test",
+          "city":"test",
+          "country":"TE"
+       },
+       "debtor":{
+          "name":"Test User Company",
+          "company_address":{
+             "street":"Heinrich-Heine-Platz",
+             "house_number":"10",
+             "postal_code":"10179",
+             "city":"Berlin",
+             "country":"DE"
+          },
+          "billing_address":{
+             "street":"test",
+             "house_number":"test",
+             "postal_code":"test",
+             "city":"test",
+             "country":"TE"
+          },
+          "bank_account":{
+             "iban":"DE1234",
+             "bic":"BICISHERE"
+          },
+          "external_data":{
+             "merchant_customer_id":"ext_id",
+             "name":"test",
+             "industry_sector":"test",
+             "address":{
+                "street":"test",
+                "house_number":"test",
+                "postal_code":"test",
+                "city":"testCity",
+                "country":"TE"
+             }
+          }
+       },
+       "invoices":[
+       ]
+    }
+    """
     And the order CO123 is in state created
-
-  Scenario: I successfully confirm the order that is in pre_waiting state. Order is moved to waiting state.
-    Given I have a pre_waiting order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
-    And I get from invoice-butler service good response
-    And the following invoice data exists:
-      | order_id | invoice_uuid                         |
-      | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
-    And I get from companies service a good debtor strict match response
-    And Debtor lock limit call succeeded
-    And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
-    """
-    {
-       "amount":{
-          "gross":100.0,
-          "net":90.0,
-          "tax":10.0
-       },
-       "duration":30,
-       "debtor":{
-          "name":"Test User Company",
-          "legal_form": "GmbH",
-          "company_address": {
-            "addition":"lorem ipsum",
-            "house_number":"10",
-            "street":"Heinrich-Heine-Platz",
-            "city":"Berlin",
-            "postal_code":"10179",
-            "country":"DE"
-          }
-       }
-    }
-    """
-    Then the response status code should be 202
-    And the order CO123 is in state waiting
-
-  Scenario: I fail to confirm the order if I do not send a request body
-    Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
-    And I send a PUT request to "/checkout-session/123123CO123/confirm"
-    Then the JSON response should be:
-    """
-    {
-      "errors": [
-        {
-          "title": "This value should not be blank.",
-          "code": "request_validation_error",
-          "source": "amount.gross"
-        },
-        {
-          "title": "This value should not be blank.",
-          "code": "request_validation_error",
-          "source": "amount.net"
-        },
-        {
-          "title": "This value should not be blank.",
-          "code": "request_validation_error",
-          "source": "amount.tax"
-        },
-        {
-          "title": "This value should not be blank.",
-          "code": "request_validation_error",
-          "source": "debtor_company_request"
-        }
-      ]
-    }
-    """
-    And the response status code should be 400
-
-  Scenario: I fail to find the order by giving a wrong sessionUuid
-    Given I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
-    """
-    {
-       "amount":{
-          "gross":100.0,
-          "net":90.0,
-          "tax":10.0
-       },
-       "duration":30,
-       "debtor":{
-          "name":"Test User Company",
-          "legal_form": "GmbH",
-          "company_address": {
-            "addition":"lorem ipsum",
-            "house_number":"10",
-            "street":"Heinrich-Heine-Platz",
-            "city":"Berlin",
-            "postal_code":"10179",
-            "country":"DE"
-          }
-       }
-    }
-    """
-    And the response status code should be 404
 
   Scenario: I fail to confirm the order if I send a different amount
     Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
     And I get from companies service a good debtor strict match response
-    And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
+    And I send a PUT request to "/checkout-sessions/123123CO123/confirm" with body:
     """
     {
        "amount":{
@@ -212,61 +182,10 @@ Feature: As a merchant, I should be able to create an order by providing a valid
     """
     And the response status code should be 400
 
-  Scenario: I fail to confirm the order if I send mismatched debtor company
-    Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
-    And I get from companies service a bad debtor strict match response
-    And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
-    """
-    {
-       "amount":{
-          "gross":100.0,
-          "net":90.0,
-          "tax":10.0
-       },
-       "duration":30,
-       "debtor":{
-          "name":"Different Company",
-          "company_address": {
-            "addition":"lorem ipsum",
-            "house_number":"10",
-            "street":"Heinrich-Heine-Platz",
-            "city":"Berlin",
-            "postal_code":"10179",
-            "country":"DE"
-          }
-       }
-    }
-    """
-    Then the order CO123 is in state authorized
-    Then the JSON response should be:
-    """
-    {
-    "errors": [
-            {
-                "source_value": {
-                    "name": "Different Company",
-                    "company_address": {
-                        "house_number": "10",
-                        "street": "Heinrich-Heine-Platz",
-                        "postal_code": "10179",
-                        "country": "DE",
-                        "addition": null,
-                        "city": "Berlin"
-                    }
-                },
-                "source": "debtor_company",
-                "title": "Value of [debtor_company] does not match the original one.",
-                "code": "request_validation_error"
-            }
-        ]
-    }
-    """
-    And the response status code should be 400
-
   Scenario: Multiple mismatch errors returned when multiple properties have mismatches
     Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
     And I get from companies service a bad debtor strict match response
-    And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
+    And I send a PUT request to "/checkout-sessions/123123CO123/confirm" with body:
     """
     {
        "amount":{
@@ -299,205 +218,48 @@ Feature: As a merchant, I should be able to create an order by providing a valid
     Then the order CO123 is in state authorized
     Then the JSON response should be:
     """
-{
-    "errors": [
-        {
-            "source_value": {
-                "gross": 101,
-                "net": 91,
-                "tax": 10
+    {
+        "errors": [
+            {
+                "source_value": {
+                    "gross": 101,
+                    "net": 91,
+                    "tax": 10
+                },
+                "source": "amount",
+                "title": "Value of [amount] does not match the original one.",
+                "code": "request_validation_error"
             },
-            "source": "amount",
-            "title": "Value of [amount] does not match the original one.",
-            "code": "request_validation_error"
-        },
-        {
-            "source_value": {
-                "house_number": "10",
-                "street": "Heinrich-Heine-Platz",
-                "postal_code": "10179",
-                "country": "DE",
-                "addition": null,
-                "city": "Somewhere"
-            },
-            "source": "delivery_address",
-            "title": "Value of [delivery_address] does not match the original one.",
-            "code": "request_validation_error"
-        },
-        {
-            "source_value": {
-                "name": "Different Company",
-                "company_address": {
+            {
+                "source_value": {
                     "house_number": "10",
                     "street": "Heinrich-Heine-Platz",
                     "postal_code": "10179",
                     "country": "DE",
                     "addition": null,
-                    "city": "Berlin"
-                }
+                    "city": "Somewhere"
+                },
+                "source": "delivery_address",
+                "title": "Value of [delivery_address] does not match the original one.",
+                "code": "request_validation_error"
             },
-            "source": "debtor_company",
-            "title": "Value of [debtor_company] does not match the original one.",
-            "code": "request_validation_error"
-        }
-    ]
-}
-    """
-    And the response status code should be 400
-
-  Scenario: Successfully order confirmation returns exactly the same decimal numbers for amounts
-    Given I have orders with the following data
-      | external_id | state      | gross | net  | tax | duration | checkout_session |
-      | CO123       | authorized | 100.3 | 99.1 | 1.2 | 30       | 123123CO123      |
-    And I get from companies service a good debtor strict match response
-    And I get from invoice-butler service good response no CreditNotes
-    And the following invoice data exists:
-      | order_id | invoice_uuid                         |
-      | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
-    And Debtor lock limit call succeeded
-    And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
-    """
-    {
-       "amount":{
-          "gross":100.3,
-          "net":99.1,
-          "tax":1.2
-       },
-       "duration":30,
-       "debtor":{
-          "name":"Test User Company",
-          "legal_form": "GmbH",
-          "company_address": {
-            "addition":"lorem ipsum",
-            "house_number":"10",
-            "street":"Heinrich-Heine-Platz",
-            "city":"Berlin",
-            "postal_code":"10179",
-            "country":"DE"
-          }
-       }
-    }
-    """
-    Then the order CO123 is in state created
-    And the response status code should be 202
-    And the JSON at "amount" should be 100.3
-    And the JSON at "unshipped_amount" should be 100.3
-    And the JSON at "amount_net" should be 99.1
-    And the JSON at "amount_tax" should be 1.2
-
-  Scenario: Returns proper errors when data is null
-    Given I have a authorized order "CO123" with amounts 100.3/99.1/1.2, duration 30 and checkout session "123123CO123"
-    And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
-    """
-    {
-       "amount": null,
-       "duration": null,
-       "debtor": null,
-       "delivery_address": null
-    }
-    """
-    Then the JSON response should be:
-    """
-{
-    "errors": [
-        {
-            "source": "amount.gross",
-            "title": "This value should not be blank.",
-            "code": "request_validation_error"
-        },
-        {
-            "source": "amount.net",
-            "title": "This value should not be blank.",
-            "code": "request_validation_error"
-        },
-        {
-            "source": "amount.tax",
-            "title": "This value should not be blank.",
-            "code": "request_validation_error"
-        },
-        {
-            "source": "debtor_company_request",
-            "title": "This value should not be blank.",
-            "code": "request_validation_error"
-        }
-    ]
-}
-    """
-    And the response status code should be 400
-
-  Scenario: Returns proper errors when data is not provided
-    Given I have a authorized order "CO123" with amounts 100.3/99.1/1.2, duration 30 and checkout session "123123CO123"
-    And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
-    """
-    {}
-    """
-    Then the JSON response should be:
-    """
-    {
-      "errors": [
-        {
-          "title": "This value should not be blank.",
-          "code": "request_validation_error",
-          "source": "amount.gross"
-        },
-        {
-          "title": "This value should not be blank.",
-          "code": "request_validation_error",
-          "source": "amount.net"
-        },
-        {
-          "title": "This value should not be blank.",
-          "code": "request_validation_error",
-          "source": "amount.tax"
-        },
-        {
-          "title": "This value should not be blank.",
-          "code": "request_validation_error",
-          "source": "debtor_company_request"
-        }
-      ]
+            {
+                "source_value": {
+                    "name": "Different Company",
+                    "company_address": {
+                        "house_number": "10",
+                        "street": "Heinrich-Heine-Platz",
+                        "postal_code": "10179",
+                        "country": "DE",
+                        "addition": null,
+                        "city": "Berlin"
+                    }
+                },
+                "source": "debtor_company",
+                "title": "Value of [debtor_company] does not match the original one.",
+                "code": "request_validation_error"
+            }
+        ]
     }
     """
     And the response status code should be 400
-
-  Scenario: I fail to confirm the order if there is not enough limits
-    Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
-    And I get from invoice-butler service good response
-    And the following invoice data exists:
-      | order_id | invoice_uuid                         |
-      | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
-    And I get from companies service a good debtor strict match response
-    And Debtor lock limit call failed
-    And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
-    """
-    {
-       "amount":{
-          "gross":100.0,
-          "net":90.0,
-          "tax":10.0
-       },
-       "duration":30,
-       "debtor":{
-          "name":"Test User Company",
-          "legal_form": "GmbH",
-          "company_address": {
-            "addition":"lorem ipsum",
-            "house_number":"10",
-            "street":"Heinrich-Heine-Platz",
-            "city":"Berlin",
-            "postal_code":"10179",
-            "country":"DE"
-          }
-       },
-        "billing_address":{
-          "addition":"lorem ipsum",
-          "house_number":"10",
-          "street":"Heinrich-Heine-Platz",
-          "city":"Berlin",
-          "postal_code":"10179",
-          "country":"DE"
-       }
-    }
-    """
-    Then the response status code should be 403
-    And the order CO123 is in state authorized

@@ -5,8 +5,10 @@ namespace App\Http\Controller\PublicApiV2;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmOrderUseCase;
+use App\Http\Factory\OrderResponseFactory;
 use App\Http\RequestTransformer\CheckoutConfirmOrderRequestFactory;
 use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -42,24 +44,33 @@ class CheckoutConfirmOrderController
 
     private CheckoutConfirmOrderRequestFactory $confirmOrderRequestFactory;
 
+    private OrderResponseFactory $responseFactory;
+
     public function __construct(
         CheckoutConfirmOrderUseCase $checkoutSessionUseCase,
-        CheckoutConfirmOrderRequestFactory $confirmOrderRequestFactory
+        CheckoutConfirmOrderRequestFactory $confirmOrderRequestFactory,
+        OrderResponseFactory $responseFactory
     ) {
         $this->useCase = $checkoutSessionUseCase;
         $this->confirmOrderRequestFactory = $confirmOrderRequestFactory;
+        $this->responseFactory = $responseFactory;
     }
 
-    public function execute(Request $request, string $sessionUuid): void
+    public function execute(Request $request, string $sessionUuid): JsonResponse
     {
         $checkoutRequest = $this->confirmOrderRequestFactory->create($request, $sessionUuid);
 
         try {
-            $this->useCase->execute($checkoutRequest);
+            $response = $this->useCase->execute($checkoutRequest);
         } catch (OrderNotFoundException $exception) {
             throw new NotFoundHttpException($exception->getMessage());
         } catch (WorkflowException $exception) {
             throw new AccessDeniedHttpException($exception->getMessage());
         }
+
+        return new JsonResponse(
+            $this->responseFactory->create($response)->toArray(),
+            JsonResponse::HTTP_ACCEPTED
+        );
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controller\PublicApi;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\CheckoutConfirmOrder\CheckoutConfirmOrderUseCase;
+use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
 use App\Http\RequestTransformer\CheckoutConfirmOrderRequestFactory;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -41,16 +42,20 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class CheckoutConfirmOrderController
 {
-    private $useCase;
+    private CheckoutConfirmOrderUseCase $useCase;
 
-    private $confirmOrderRequestFactory;
+    private CheckoutConfirmOrderRequestFactory $confirmOrderRequestFactory;
+
+    private LegacyOrderResponseFactory $orderResponseFactory;
 
     public function __construct(
         CheckoutConfirmOrderUseCase $checkoutSessionUseCase,
-        CheckoutConfirmOrderRequestFactory $confirmOrderRequestFactory
+        CheckoutConfirmOrderRequestFactory $confirmOrderRequestFactory,
+        LegacyOrderResponseFactory $orderResponseFactory
     ) {
         $this->useCase = $checkoutSessionUseCase;
         $this->confirmOrderRequestFactory = $confirmOrderRequestFactory;
+        $this->orderResponseFactory = $orderResponseFactory;
     }
 
     public function execute(Request $request, string $sessionUuid): JsonResponse
@@ -58,13 +63,16 @@ class CheckoutConfirmOrderController
         $checkoutRequest = $this->confirmOrderRequestFactory->create($request, $sessionUuid);
 
         try {
-            $orderResponse = $this->useCase->execute($checkoutRequest);
+            $response = $this->useCase->execute($checkoutRequest);
         } catch (OrderNotFoundException $exception) {
             throw new NotFoundHttpException($exception->getMessage());
         } catch (WorkflowException $exception) {
             throw new AccessDeniedHttpException($exception->getMessage());
         }
 
-        return new JsonResponse($orderResponse->toArray(), JsonResponse::HTTP_ACCEPTED);
+        return new JsonResponse(
+            $this->orderResponseFactory->create($response)->toArray(),
+            JsonResponse::HTTP_ACCEPTED
+        );
     }
 }
