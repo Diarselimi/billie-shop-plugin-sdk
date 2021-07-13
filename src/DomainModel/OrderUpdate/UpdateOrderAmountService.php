@@ -6,26 +6,26 @@ namespace App\DomainModel\OrderUpdate;
 
 use App\Application\Exception\OrderBeingCollectedException;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
-use App\DomainModel\Order\SalesforceInterface;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface;
+use App\DomainModel\Salesforce\ClaimStateService;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
 
 class UpdateOrderAmountService
 {
     //TODO: Add the assertion inside the service instead of the validation.
-    private SalesforceInterface $salesforce;
+    private ClaimStateService $claimStateService;
 
     private OrderFinancialDetailsRepositoryInterface $financialDetailsRepository;
 
     private UpdateOrderLimitsService $updateOrderLimitsService;
 
     public function __construct(
-        SalesforceInterface $salesforce,
+        ClaimStateService $claimStateService,
         OrderFinancialDetailsRepositoryInterface $financialDetailsRepository,
         UpdateOrderLimitsService $updateOrderLimitsService
     ) {
-        $this->salesforce = $salesforce;
+        $this->claimStateService = $claimStateService;
         $this->financialDetailsRepository = $financialDetailsRepository;
         $this->updateOrderLimitsService = $updateOrderLimitsService;
     }
@@ -37,7 +37,7 @@ class UpdateOrderAmountService
             throw new UpdateOrderException(sprintf('Order in state %s cannot be updated.', $order->getState()));
         }
 
-        if ($order->isLate() && $this->salesforce->getOrderCollectionsStatus($order->getUuid()) !== null) {
+        if ($order->isLate() && $this->claimStateService->isInCollection($order->getUuid())) {
             throw new OrderBeingCollectedException();
         }
 

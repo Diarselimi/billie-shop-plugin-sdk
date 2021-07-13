@@ -10,7 +10,7 @@ use App\DomainModel\Invoice\Duration;
 use App\DomainModel\Invoice\ExtendInvoiceService;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
-use App\DomainModel\Order\SalesforceInterface as DciService;
+use App\DomainModel\Salesforce\ClaimStateService;
 
 class ExtendInvoiceUseCase implements ValidatedUseCaseInterface
 {
@@ -18,18 +18,18 @@ class ExtendInvoiceUseCase implements ValidatedUseCaseInterface
 
     private OrderContainerFactory $orderContainerFactory;
 
-    private DciService $dciService;
+    private ClaimStateService $claimStateService;
 
     private ExtendInvoiceService $extendInvoiceService;
 
     public function __construct(
         OrderContainerFactory $orderContainerFactory,
         ExtendInvoiceService $extendInvoiceService,
-        DciService $dciService
+        ClaimStateService $claimStateService
     ) {
         $this->orderContainerFactory = $orderContainerFactory;
         $this->extendInvoiceService = $extendInvoiceService;
-        $this->dciService = $dciService;
+        $this->claimStateService = $claimStateService;
     }
 
     public function execute(ExtendInvoiceRequest $request): void
@@ -54,7 +54,7 @@ class ExtendInvoiceUseCase implements ValidatedUseCaseInterface
             throw new InvoiceNotExtendableException('Invoice cannot be extended');
         }
 
-        if ($invoice->isLate() && $this->dciService->isDunningInProgress($invoice)) {
+        if ($invoice->isLate() && $this->claimStateService->isInCollection($invoice->getUuid())) {
             throw new InvoiceNotExtendableException('Invoice cannot be extended');
         }
 

@@ -193,7 +193,7 @@ class LegacyOrderResponseFactory
         }
 
         if ($order->isLate()) {
-            $response->setDunningStatus($orderContainer->getDunningStatus());
+            $response->setDunningStatus($orderContainer->getDunningState());
         }
 
         $this->addReasons($orderContainer->getRiskCheckResultCollection(), $response);

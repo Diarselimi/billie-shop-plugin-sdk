@@ -12,7 +12,6 @@ use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceContainerFactory;
 use App\DomainModel\Invoice\InvoiceNotFoundException;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\SalesforceInterface;
 use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentUploadException;
 use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerAggregator;
 use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerInterface;

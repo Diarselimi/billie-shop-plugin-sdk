@@ -99,7 +99,7 @@ class SalesforceContext implements Context
     public function iGetFromSalesforceDunningStatusEndpointStatus($status, $orderUuid)
     {
         $this->mockRequest(
-            '/api/services/apexrest/v1/dunning/' . $orderUuid,
+            '/api/services/apexrest/v1/dci/' . $orderUuid,
             new ResponseStack(
                 new MockResponse(
                     json_encode(
@@ -107,7 +107,12 @@ class SalesforceContext implements Context
                             'success' => false,
                             'message' => null,
                             'result' => [
-                                ['referenceUuid' => 'test-order-uuidXF43Y', 'collectionClaimStatus' => $status],
+                                [
+                                    'referenceUuid' => 'test-order-uuidXF43Y',
+                                    'dunning' => [
+                                        'status' => $status,
+                                    ],
+                                ],
                             ],
                         ]
                     ),

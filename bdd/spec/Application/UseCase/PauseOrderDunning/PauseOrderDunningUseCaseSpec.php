@@ -9,7 +9,7 @@ use App\DomainModel\Invoice\InvoiceCollection;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\SalesforceInterface;
+use App\DomainModel\Salesforce\SalesforceInterface;
 use App\Infrastructure\Salesforce\Exception\SalesforcePauseDunningException;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;

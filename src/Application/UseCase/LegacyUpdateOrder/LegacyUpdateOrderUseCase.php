@@ -9,8 +9,8 @@ use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\SalesforceInterface;
 use App\DomainModel\OrderUpdate\LegacyUpdateOrderService;
+use App\DomainModel\Salesforce\ClaimStateService;
 
 class LegacyUpdateOrderUseCase implements ValidatedUseCaseInterface
 {
@@ -20,16 +20,16 @@ class LegacyUpdateOrderUseCase implements ValidatedUseCaseInterface
 
     private LegacyUpdateOrderService $legacyUpdateOrderService;
 
-    private SalesforceInterface $salesforce;
+    private ClaimStateService $claimStateService;
 
     public function __construct(
         OrderContainerFactory $orderContainerFactory,
         LegacyUpdateOrderService $legacyUpdateOrderService,
-        SalesforceInterface $salesforce
+        ClaimStateService $claimStateService
     ) {
         $this->orderContainerFactory = $orderContainerFactory;
         $this->legacyUpdateOrderService = $legacyUpdateOrderService;
-        $this->salesforce = $salesforce;
+        $this->claimStateService = $claimStateService;
     }
 
     public function execute(LegacyUpdateOrderRequest $request): void
@@ -47,19 +47,15 @@ class LegacyUpdateOrderUseCase implements ValidatedUseCaseInterface
             throw new OrderNotFoundException($exception);
         }
 
-        if ($this->isOrderLateAndInCollections($order)) {
+        if ($this->isOrderLateAndInCollection($order)) {
             throw new OrderBeingCollectedException();
         }
 
         $this->legacyUpdateOrderService->update($orderContainer, $request);
     }
 
-    private function isOrderLateAndInCollections(OrderEntity $order): bool
+    private function isOrderLateAndInCollection(OrderEntity $order): bool
     {
-        if (!$order->isLate()) {
-            return false;
-        }
-
-        return $this->salesforce->getOrderCollectionsStatus($order->getUuid()) !== null;
+        return $order->isLate() && $this->claimStateService->isInCollection($order->getUuid());
     }
 }

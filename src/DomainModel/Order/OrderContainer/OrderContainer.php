@@ -270,10 +270,10 @@ class OrderContainer
         return $this->identifiedDebtorCompany;
     }
 
-    public function getDunningStatus(): ?string
+    public function getDunningState(): ?string
     {
         return $this->dunningStatus
-            ?: $this->dunningStatus = $this->relationLoader->loadOrderDunningStatus($this);
+            ?: $this->dunningStatus = $this->relationLoader->loadOrderDunningState($this);
     }
 
     public function setDunningStatus(?string $dunningStatus): OrderContainer

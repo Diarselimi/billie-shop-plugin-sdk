@@ -2,10 +2,9 @@
 
 namespace App\Infrastructure\Salesforce;
 
-use App\DomainModel\Invoice\Invoice;
-use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\Order\SalesforceInterface;
+use App\DomainModel\Salesforce\ClaimState;
 use App\DomainModel\Salesforce\PauseDunningRequestBuilder;
+use App\DomainModel\Salesforce\SalesforceInterface;
 use App\Infrastructure\ClientResponseDecodeException;
 use App\Infrastructure\DecodeResponseTrait;
 use App\Infrastructure\Salesforce\Exception\SalesforceAuthenticationException;
@@ -20,14 +19,11 @@ class Salesforce implements SalesforceInterface
 {
     use DecodeResponseTrait;
 
-    private $client;
+    private Client $client;
 
-    private OrderRepositoryInterface $orderRepository;
-
-    public function __construct(Client $salesforceClient, OrderRepositoryInterface $orderRepository)
+    public function __construct(Client $salesforceClient)
     {
         $this->client = $salesforceClient;
-        $this->orderRepository = $orderRepository;
     }
 
     public function pauseDunning(PauseDunningRequestBuilder $requestBuilder): void
@@ -48,51 +44,22 @@ class Salesforce implements SalesforceInterface
         $this->handleException($exception);
     }
 
-    public function getOrderDunningStatus(string $orderUuid): ?string
+    public function getOrderClaimState(string $uuid): ClaimState
     {
         try {
-            $response = $this->client->get("api/services/apexrest/v1/dunning/$orderUuid");
-
-            $decodedResponse = $this->decodeResponse($response);
-
-            $this->validateDecodedResponseRoot($decodedResponse);
-
-            foreach ($decodedResponse['result'] as $result) {
-                if ($orderUuid === $result['referenceUuid']) {
-                    return $result['collectionClaimStatus'];
-                }
-            }
-
-            return null;
-        } catch (RequestException $exception) {
-            $this->handleException($exception);
-        }
-    }
-
-    public function getOrderCollectionsStatus(string $orderUuid): ?string
-    {
-        try {
-            $response = $this->client->get("api/services/apexrest/v1/dci/$orderUuid");
+            $response = $this->client->get("api/services/apexrest/v1/dci/$uuid");
             $decodedResponse = $this->decodeResponse($response);
             $this->validateDecodedResponseRoot($decodedResponse);
 
-            return $decodedResponse['result'][0]['collection']['stage'] ?? null;
+            return new ClaimState(
+                $decodedResponse['result'][0]['dunning']['status'],
+                $decodedResponse['result'][0]['dunning']['stage'],
+                $decodedResponse['result'][0]['collection']['status'],
+                $decodedResponse['result'][0]['collection']['stage'],
+            );
         } catch (RequestException $exception) {
             $this->handleException($exception);
         }
-    }
-
-    public function isDunningInProgress(Invoice $invoice): bool
-    {
-        $orders = $this->orderRepository->getByInvoice($invoice->getUuid());
-
-        foreach ($orders as $order) {
-            if ($this->getOrderCollectionsStatus($order->getUuid()) !== null) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private function handleException(RequestException $exception): void

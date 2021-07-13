@@ -12,7 +12,8 @@ use App\DomainModel\Invoice\InvoiceCollection;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
-use App\DomainModel\Order\SalesforceInterface;
+use App\DomainModel\Salesforce\ClaimStateService;
+use App\DomainModel\Salesforce\SalesforceInterface;
 use App\Tests\Unit\UnitTestCase;
 use DateTime;
 use DomainException;
@@ -41,7 +42,7 @@ class ExtendInvoiceUseCaseTest extends UnitTestCase
     /**
      * @var SalesforceInterface|ObjectProphecy
      */
-    private ObjectProphecy $dciService;
+    private ObjectProphecy $claimStateService;
 
     /**
      * @var ExtendInvoiceService|ObjectProphecy
@@ -57,14 +58,14 @@ class ExtendInvoiceUseCaseTest extends UnitTestCase
         $this->orderContainerFactory = $this->prophesize(OrderContainerFactory::class);
         $this->orderContainer = $this->prophesize(OrderContainer::class);
         $this->extendInvoiceService = $this->prophesize(ExtendInvoiceService::class);
-        $this->dciService = $this->prophesize(SalesforceInterface::class);
-        $this->dciService->isDunningInProgress(Argument::type(Invoice::class))
+        $this->claimStateService = $this->prophesize(ClaimStateService::class);
+        $this->claimStateService->isInCollection(Argument::any())
             ->willReturn(false);
 
         $this->extendInvoiceUseCase = new ExtendInvoiceUseCase(
             $this->orderContainerFactory->reveal(),
             $this->extendInvoiceService->reveal(),
-            $this->dciService->reveal()
+            $this->claimStateService->reveal()
         );
     }
 
@@ -128,7 +129,7 @@ class ExtendInvoiceUseCaseTest extends UnitTestCase
         $this->orderContainerFactory->loadByInvoiceUuidAndMerchantId(self::INVOICE_UUID, self::MERCHANT_ID)
             ->willReturn($this->orderContainer);
 
-        $this->dciService->isDunningInProgress($invoice)
+        $this->claimStateService->isInCollection(Argument::any())
             ->willReturn(true);
 
         $validDuration = 35;

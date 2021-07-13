@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Application\UseCase\UpdateInvoice;
 
-use App\Application\Exception\InvoiceNotFoundException;
 use App\Application\Exception\RequestValidationException;
 use App\Application\UseCase\UpdateInvoice\UpdateInvoiceRequest;
 use App\Application\UseCase\UpdateInvoice\UpdateInvoiceUseCase;
@@ -15,7 +14,6 @@ use App\DomainModel\Invoice\InvoiceContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\Order\SalesforceInterface;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerAggregator;
 use App\Tests\Helpers\FakeDataFiller;

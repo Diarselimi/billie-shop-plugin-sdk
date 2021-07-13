@@ -28,9 +28,9 @@ use App\DomainModel\OrderLineItem\OrderLineItemEntity;
 use App\DomainModel\OrderLineItem\OrderLineItemRepositoryInterface;
 use App\DomainModel\OrderRiskCheck\CheckResultCollection;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
-use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonRepositoryInterface;
+use App\DomainModel\Salesforce\ClaimStateService;
 
 class OrderContainerRelationLoader
 {
@@ -48,11 +48,9 @@ class OrderContainerRelationLoader
 
     private $orderFinancialDetailsRepository;
 
-    private $orderDunningStatusService;
+    private $claimStatusService;
 
     private $orderLineItemRepository;
-
-    private $paymentsService;
 
     private $debtorSettingsRepository;
 
@@ -74,10 +72,9 @@ class OrderContainerRelationLoader
         MerchantSettingsRepositoryInterface $merchantSettingsRepository,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
-        OrderDunningStatusService $orderDunningStatusService,
+        ClaimStateService $orderDunningStatusService,
         OrderRiskCheckRepositoryInterface $orderRiskCheckRepository,
         OrderLineItemRepositoryInterface $orderLineItemRepository,
-        PaymentsServiceInterface $paymentsService,
         DebtorSettingsRepositoryInterface $debtorSettingsRepository,
         CompaniesServiceInterface $companiesService,
         MerchantDebtorDetailsRepositoryInterface $merchantDebtorDetailsRepository,
@@ -91,9 +88,8 @@ class OrderContainerRelationLoader
         $this->merchantSettingsRepository = $merchantSettingsRepository;
         $this->merchantDebtorRepository = $merchantDebtorRepository;
         $this->orderFinancialDetailsRepository = $orderFinancialDetailsRepository;
-        $this->orderDunningStatusService = $orderDunningStatusService;
+        $this->claimStatusService = $orderDunningStatusService;
         $this->orderLineItemRepository = $orderLineItemRepository;
-        $this->paymentsService = $paymentsService;
         $this->debtorSettingsRepository = $debtorSettingsRepository;
         $this->orderRiskCheckRepository = $orderRiskCheckRepository;
         $this->companiesService = $companiesService;
@@ -159,9 +155,9 @@ class OrderContainerRelationLoader
         return $this->orderFinancialDetailsRepository->getLatestByOrderId($orderContainer->getOrder()->getId());
     }
 
-    public function loadOrderDunningStatus(OrderContainer $orderContainer): ?string
+    public function loadOrderDunningState(OrderContainer $orderContainer): ?string
     {
-        return $this->orderDunningStatusService->getStatus($orderContainer->getOrder()->getUuid());
+        return $this->claimStatusService->getClaimDunningState($orderContainer->getOrder()->getUuid());
     }
 
     /**

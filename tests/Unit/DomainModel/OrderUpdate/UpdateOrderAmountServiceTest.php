@@ -7,12 +7,12 @@ namespace App\Tests\Unit\DomainModel\OrderUpdate;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerRelationLoader;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\SalesforceInterface;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface;
 use App\DomainModel\OrderUpdate\UpdateOrderAmountException;
 use App\DomainModel\OrderUpdate\UpdateOrderAmountService;
 use App\DomainModel\OrderUpdate\UpdateOrderLimitsService;
+use App\DomainModel\Salesforce\ClaimStateService;
 use App\Tests\Helpers\FakeDataFiller;
 use App\Tests\Helpers\RandomDataTrait;
 use App\Tests\Unit\UnitTestCase;
@@ -28,8 +28,8 @@ class UpdateOrderAmountServiceTest extends UnitTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $salesforce = $this->prophesize(SalesforceInterface::class);
-        $salesforce->getOrderCollectionsStatus()->willReturn(null);
+        $claimStateService = $this->prophesize(ClaimStateService::class);
+        $claimStateService->isInCollection()->willReturn(null);
 
         $fnd = $this->getRandomFinantialDetails(500.00);
 
@@ -40,7 +40,7 @@ class UpdateOrderAmountServiceTest extends UnitTestCase
         $updateOrderLimitsService = $this->createMock(UpdateOrderLimitsService::class);
 
         $this->useCase = new UpdateOrderAmountService(
-            $salesforce->reveal(),
+            $claimStateService->reveal(),
             $financialDetailsRepository,
             $updateOrderLimitsService
         );
