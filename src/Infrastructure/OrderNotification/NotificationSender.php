@@ -14,7 +14,7 @@ class NotificationSender implements NotificationSenderInterface, LoggingInterfac
 {
     use LoggingTrait;
 
-    private $client;
+    private Client $client;
 
     public function __construct(Client $notificationSenderClient)
     {

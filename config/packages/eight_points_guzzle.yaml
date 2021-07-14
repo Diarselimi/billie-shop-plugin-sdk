@@ -1,6 +1,8 @@
 eight_points_guzzle:
   clients:
     webhook:
+      options:
+        timeout: 2
     url_downloader:
     alfred:
       base_url: "%env(string:ALFRED_URL)%"
