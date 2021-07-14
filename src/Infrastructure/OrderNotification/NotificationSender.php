@@ -42,10 +42,18 @@ class NotificationSender implements NotificationSenderInterface, LoggingInterfac
                 'headers' => $headers,
             ]);
         } catch (RequestException $exception) {
-            $this->logSuppressedException($exception, 'Exception while delivering notification');
-            $response = $exception->getResponse();
+            $this->logError('Exception while delivering notification', [
+                LoggingInterface::KEY_EXCEPTION => $exception,
+            ]);
 
-            return new NotificationDeliveryResultDTO($response->getStatusCode(), (string) $response->getBody() ?: null);
+            if ($exception->getResponse() !== null) {
+                return new NotificationDeliveryResultDTO(
+                    $exception->getResponse()->getStatusCode(),
+                    (string) $exception->getResponse()->getBody()
+                );
+            }
+
+            return new NotificationDeliveryResultDTO(0, 'Connection exception');
         } catch (\Exception $exception) {
             throw new NotificationSenderException('Unhandled exception while delivering notification', null, $exception);
         }
