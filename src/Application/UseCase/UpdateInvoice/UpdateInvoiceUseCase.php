@@ -12,10 +12,8 @@ use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceContainerFactory;
 use App\DomainModel\Invoice\InvoiceNotFoundException;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentUploadException;
 use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerAggregator;
 use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerInterface;
-use App\DomainModel\OrderUpdate\UpdateOrderException;
 use Ozean12\Transfer\Message\Invoice\ExtendInvoice;
 use Ozean12\Transfer\Shared\Invoice as InvoiceMessage;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -74,17 +72,13 @@ class UpdateInvoiceUseCase implements ValidatedUseCaseInterface
 
     private function updateInvoiceDocument(OrderEntity $order, Invoice $invoice): void
     {
-        try {
-            $this->invoiceUrlHandler->handle(
-                $order,
-                $invoice->getUuid(),
-                $order->getInvoiceUrl(),
-                $invoice->getExternalCode(),
-                InvoiceDocumentUploadHandlerInterface::EVENT_SOURCE_UPDATE
-            );
-        } catch (InvoiceDocumentUploadException $exception) {
-            throw new UpdateOrderException("Invoice cannot be updated: upload failed.", 0, $exception);
-        }
+        $this->invoiceUrlHandler->handle(
+            $order,
+            $invoice->getUuid(),
+            $order->getInvoiceUrl(),
+            $invoice->getExternalCode(),
+            InvoiceDocumentUploadHandlerInterface::EVENT_SOURCE_UPDATE
+        );
     }
 
     private function dispatchInvoiceUpdateMessage(Invoice $invoice): void

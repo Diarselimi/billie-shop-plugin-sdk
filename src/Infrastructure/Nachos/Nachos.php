@@ -11,7 +11,6 @@ use App\DomainModel\FileService\FileSizeExceededException;
 use App\Infrastructure\DecodeResponseTrait;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
-use Psr\Http\Message\StreamInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class Nachos implements FileServiceInterface

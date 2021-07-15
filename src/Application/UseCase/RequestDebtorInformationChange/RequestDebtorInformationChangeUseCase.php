@@ -14,10 +14,8 @@ use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeReques
 use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestEntity;
 use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestEntityFactory;
 use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestRepositoryInterface;
-use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestTransitionEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\Helper\Uuid\UuidGeneratorInterface;
-use Symfony\Component\Workflow\Workflow;
 
 class RequestDebtorInformationChangeUseCase implements ValidatedUseCaseInterface
 {

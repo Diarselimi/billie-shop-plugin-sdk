@@ -43,9 +43,8 @@ class InvoiceDocumentUploadHandlerAggregator implements LoggingInterface, Invoic
             }
         }
 
-        $this->logInfo('No supported handler for {number} found', $logData);
-
-        throw new InvoiceDocumentUploadException('No supported handler found');
+        $errorMessage = 'No supported handler for invoice upload';
+        $this->logSuppressedException(new InvoiceDocumentUploadException($errorMessage), $errorMessage, $logData);
     }
 
     public function supports(int $merchantId): bool

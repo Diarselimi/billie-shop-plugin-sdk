@@ -413,8 +413,16 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateCreditNoteRequest'
       responses:
-        '204':
+        '201':
           description: 'Credit note successfully created'
+          content:
+            application/json:
+              schema:
+                required:
+                  - uuid
+                properties:
+                  uuid: { $ref: '#/components/schemas/UUID' }
+                type: object
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -449,6 +457,14 @@ paths:
       responses:
         '201':
           description: 'Invoice successfully created'
+          content:
+            application/json:
+              schema:
+                required:
+                  - uuid
+                properties:
+                  uuid: { $ref: '#/components/schemas/UUID' }
+                type: object
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1728,7 +1744,7 @@ tags:
       {
           created_at: (datetime)
           event: (string) (event name, -check the following section for more details-)
-          order_id: (string)
+          order_id: (string) (order external code)
           order_uuid: (string)
           invoice_uuid: (string)
           amount: (string) (optional) (contains sum of paid amounts)

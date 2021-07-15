@@ -8,11 +8,13 @@ use App\Application\Exception\InvoiceNotFoundException;
 use App\Application\Exception\RequestValidationException;
 use App\Application\UseCase\ExtendInvoice\ExtendInvoiceRequest;
 use App\Application\UseCase\ExtendInvoice\ExtendInvoiceUseCase;
+use App\Application\UseCase\ExtendInvoice\InvoiceNotExtendableException;
 use App\DomainModel\Invoice\InvalidDurationException;
 use App\Http\HttpConstantsInterface;
 use DomainException;
 use Symfony\Component\HttpFoundation\Request;
 use OpenApi\Annotations as OA;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
@@ -73,6 +75,8 @@ class ExtendInvoiceController
                 'duration',
                 $extendInvoiceRequest->getDuration()
             );
+        } catch (InvoiceNotExtendableException $exception) {
+            throw new BadRequestHttpException($exception->getMessage(), $exception);
         } catch (DomainException $exception) {
             throw new UnprocessableEntityHttpException('Invoice cannot be extended');
         }

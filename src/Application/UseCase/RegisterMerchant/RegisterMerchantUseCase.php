@@ -16,7 +16,6 @@ use App\DomainModel\MerchantUser\MerchantUserDefaultRoles;
 use App\DomainModel\MerchantUserInvitation\MerchantUserInvitationPersistenceService;
 use App\Helper\Uuid\UuidGeneratorInterface;
 use App\Infrastructure\Repository\MerchantRepository;
-use Ramsey\Uuid\Uuid;
 
 class RegisterMerchantUseCase implements ValidatedUseCaseInterface
 {

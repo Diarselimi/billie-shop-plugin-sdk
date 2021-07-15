@@ -8,7 +8,6 @@ use App\DomainModel\OrderNotification\Exception\NotificationSenderException;
 use App\DomainModel\OrderNotification\NotificationScheduler;
 use App\DomainModel\OrderNotification\NotificationSenderInterface;
 use App\DomainModel\OrderNotification\OrderNotificationDeliveryFactory;
-use App\DomainModel\OrderNotification\OrderNotificationEntity;
 use App\DomainModel\OrderNotification\OrderNotificationRepositoryInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -124,12 +123,5 @@ class NotificationDeliveryUseCase implements LoggingInterface
         }
 
         $this->notificationScheduler->schedule($notification);
-    }
-
-    private function isFirstOnOrderPendingNotificationsList(OrderNotificationEntity $orderNotification): bool
-    {
-        $pendingNotifications = $this->notificationRepository->getFailedByOrderId($orderNotification->getOrderId());
-
-        return $pendingNotifications[0]->getId() === $orderNotification->getId();
     }
 }

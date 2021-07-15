@@ -7,7 +7,6 @@ namespace App\EventSubscriber;
 use App\Application\UseCase\CheckoutConfirmOrder\AnalyticsEvent\SessionConfirmationExecutedAnalyticsEvent;
 use App\Infrastructure\Events\Repository\EventRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 
 class KernelTerminateEventSubscriber implements EventSubscriberInterface

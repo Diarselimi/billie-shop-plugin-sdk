@@ -3,7 +3,6 @@
 use App\Infrastructure\Phinx\TransactionalMigration;
 use App\Infrastructure\Repository\MerchantOnboarding\MerchantOnboardingRepository;
 use App\Infrastructure\Repository\MerchantOnboarding\MerchantOnboardingStepRepository;
-use App\Infrastructure\Repository\MerchantOnboarding\MerchantOnboardingTransitionRepository;
 
 class AddMerchantOnboardingTables extends TransactionalMigration
 {

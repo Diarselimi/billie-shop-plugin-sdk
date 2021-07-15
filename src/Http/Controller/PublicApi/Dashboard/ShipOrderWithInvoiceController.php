@@ -2,12 +2,14 @@
 
 namespace App\Http\Controller\PublicApi\Dashboard;
 
+use App\Application\Exception\RequestValidationException;
 use App\Application\Exception\WorkflowException;
+use App\Application\UseCase\ShipOrder\Exception\ShipOrderAmountExceededException;
+use App\Application\UseCase\ShipOrder\Exception\ShipOrderMerchantFeeNotSetException;
 use App\Application\UseCase\ShipOrderWithInvoice\ShipOrderWithInvoiceRequest;
 use App\Application\UseCase\ShipOrderWithInvoice\ShipOrderWithInvoiceUseCase;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\OrderResponse\LegacyOrderResponse;
-use App\DomainModel\ShipOrder\ShipOrderException;
 use App\Http\HttpConstantsInterface;
 use App\Http\RequestTransformer\UpdateOrder\UpdateOrderAmountRequestFactory;
 use OpenApi\Annotations as OA;
@@ -15,6 +17,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationList;
 
 /**
  * @IsGranted("ROLE_SHIP_ORDERS")
@@ -77,7 +81,11 @@ class ShipOrderWithInvoiceController
             return $this->useCase->execute($orderRequest);
         } catch (OrderContainerFactoryException $exception) {
             throw new NotFoundHttpException($exception->getMessage());
-        } catch (WorkflowException | ShipOrderException $exception) {
+        } catch (ShipOrderAmountExceededException $exception) {
+            $constraint = new ConstraintViolation('Requested amount exceeds order unshipped amount', null, [], '', 'amount', $shipRequest->getAmount()->getGross());
+
+            throw new RequestValidationException(new ConstraintViolationList([$constraint]));
+        } catch (WorkflowException | ShipOrderMerchantFeeNotSetException $exception) {
             throw new BadRequestHttpException('Shipment is not allowed', $exception);
         }
     }

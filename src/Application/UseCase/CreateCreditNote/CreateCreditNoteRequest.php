@@ -38,7 +38,6 @@ class CreateCreditNoteRequest implements ValidatedRequestInterface
 
     /**
      * @Assert\NotBlank()
-     * @Assert\NotNull()
      * @Assert\Valid()
      * @TaxedMoneyAssert\ValidTaxSum()
      * @var TaxedMoney
@@ -47,7 +46,6 @@ class CreateCreditNoteRequest implements ValidatedRequestInterface
 
     /**
      * @Assert\NotBlank()
-     * @Assert\NotNull()
      * @Assert\Length(max=255)
      */
     private $externalCode;

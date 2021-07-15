@@ -6,6 +6,10 @@ namespace App\Application\UseCase\ShipOrder;
 
 use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\CreateInvoice\CreateInvoiceRequest;
+use App\Application\UseCase\ShipOrder\Exception\ShipOrderAmountExceededException;
+use App\Application\UseCase\ShipOrder\Exception\ShipOrderMerchantFeeNotSetException;
+use App\Application\UseCase\ShipOrder\Exception\ShipOrderNoOrderUuidException;
+use App\Application\UseCase\ShipOrder\Exception\ShipOrderOrderExternalCodeNotSetException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Fee\FeeCalculationException;
@@ -15,9 +19,7 @@ use App\DomainModel\Order\Lifecycle\ShipOrder\ShipOrderService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentUploadException;
 use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerAggregator;
-use App\DomainModel\ShipOrder\ShipOrderException;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\Workflow\Registry;
@@ -54,6 +56,10 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface, LoggingInterface
     public function execute(CreateInvoiceRequest $request): Invoice
     {
         $orders = $request->getOrders();
+        if (count($orders) !== 1) {
+            throw new ShipOrderNoOrderUuidException();
+        }
+
         $orderId = reset($orders);
 
         $orderContainer = $this->orderContainerFactory->loadByMerchantIdAndExternalIdOrUuid(
@@ -75,17 +81,13 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface, LoggingInterface
 
     private function uploadInvoice(OrderEntity $order, CreateInvoiceRequest $request, string $invoiceUuid): void
     {
-        try {
-            $this->invoiceManager->handle(
-                $order,
-                $invoiceUuid,
-                $request->getInvoiceUrl(),
-                $request->getExternalCode(),
-                InvoiceDocumentUploadHandlerAggregator::EVENT_SOURCE_SHIPMENT
-            );
-        } catch (InvoiceDocumentUploadException $exception) {
-            throw new ShipOrderException("Invoice can't be scheduled for upload", 0, $exception);
-        }
+        $this->invoiceManager->handle(
+            $order,
+            $invoiceUuid,
+            $request->getInvoiceUrl(),
+            $request->getExternalCode(),
+            InvoiceDocumentUploadHandlerAggregator::EVENT_SOURCE_SHIPMENT
+        );
     }
 
     private function validate(CreateInvoiceRequest $request, OrderContainer $orderContainer): void
@@ -94,7 +96,7 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface, LoggingInterface
         $this->validateRequest($request, null, ['Default']);
 
         if (empty($order->getExternalCode())) {
-            throw new ShipOrderException('Order id is not set');
+            throw new ShipOrderOrderExternalCodeNotSetException();
         }
 
         $workflow = $this->workflowRegistry->get($order);
@@ -108,7 +110,7 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface, LoggingInterface
             || $request->getAmount()->getNet()->greaterThan($financialDetails->getUnshippedAmountNet())
             || $request->getAmount()->getTax()->greaterThan($financialDetails->getUnshippedAmountTax())
         ) {
-            throw new ShipOrderException('Requested amount exceeds order unshipped amount');
+            throw new ShipOrderAmountExceededException();
         }
     }
 
@@ -125,7 +127,7 @@ class ShipOrderUseCase implements ValidatedUseCaseInterface, LoggingInterface
         } catch (FeeCalculationException $exception) {
             $this->logSuppressedException($exception, 'Merchant fee configuration is incorrect');
 
-            throw new ShipOrderException("Configuration isn't properly set");
+            throw new ShipOrderMerchantFeeNotSetException();
         }
     }
 }

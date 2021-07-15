@@ -6,7 +6,6 @@ namespace App\Http\Controller\PublicApiV2;
 
 use App\Application\Exception\InvoiceNotFoundException;
 use App\Application\Exception\InvoiceUpdateException;
-use App\Application\Exception\OrderBeingCollectedException;
 use App\Application\UseCase\UpdateInvoice\UpdateInvoiceRequest;
 use App\Application\UseCase\UpdateInvoice\UpdateInvoiceUseCase;
 use App\Http\Authentication\UserProvider;

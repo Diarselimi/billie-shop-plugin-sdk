@@ -19,8 +19,6 @@ use App\DomainModel\Order\OrderRepositoryInterface;
 use App\Infrastructure\Repository\OrderFinancialDetailsRepository;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
-use Symfony\Component\Validator\ConstraintViolation;
-use Symfony\Component\Validator\ConstraintViolationList;
 
 class CheckoutUpdateOrderUseCase implements ValidatedUseCaseInterface, LoggingInterface
 {

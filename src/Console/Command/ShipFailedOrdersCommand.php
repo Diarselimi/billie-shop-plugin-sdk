@@ -5,9 +5,7 @@ namespace App\Console\Command;
 use App\DomainModel\Invoice\InvoiceAnnouncer;
 use App\DomainModel\Invoice\InvoiceFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
-use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentUploadException;
 use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerAggregator;
-use App\DomainModel\ShipOrder\ShipOrderException;
 use Billie\PdoBundle\Infrastructure\Pdo\PdoConnection;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
 use Symfony\Component\Console\Command\Command;
@@ -73,17 +71,13 @@ class ShipFailedOrdersCommand extends Command
 
             $this->announcer->announce($invoice, $orderContainer->getDebtorCompany()->getName(), $orderContainer->getOrder()->getExternalCode());
 
-            try {
-                $this->invoiceManager->handle(
-                    $orderContainer->getOrder(),
-                    $invoice->getUuid(),
-                    $orderContainer->getOrder()->getInvoiceUrl(),
-                    $orderContainer->getOrder()->getInvoiceNumber(),
-                    InvoiceDocumentUploadHandlerAggregator::EVENT_SOURCE_SHIPMENT
-                );
-            } catch (InvoiceDocumentUploadException $exception) {
-                throw new ShipOrderException("Invoice can't be scheduled for upload", 0, $exception);
-            }
+            $this->invoiceManager->handle(
+                $orderContainer->getOrder(),
+                $invoice->getUuid(),
+                $orderContainer->getOrder()->getInvoiceUrl(),
+                $orderContainer->getOrder()->getInvoiceNumber(),
+                InvoiceDocumentUploadHandlerAggregator::EVENT_SOURCE_SHIPMENT
+            );
 
             $output->writeln("Order {$orderContainer->getOrder()->getId()} processed");
         }

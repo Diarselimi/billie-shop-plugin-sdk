@@ -3,7 +3,6 @@
 namespace App\Application\UseCase\UpdateMerchantDebtorLimit;
 
 use App\Application\UseCase\ValidatedRequestInterface;
-use App\Application\Validator\Constraint as PaellaAssert;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class UpdateMerchantDebtorLimitRequest implements ValidatedRequestInterface

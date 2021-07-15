@@ -60,6 +60,7 @@ class CreditNoteCreationService
         $maxGrossAmount = new Money(
             $invoice->getOutstandingAmount()->subtract($invoice->getMerchantPendingPaymentAmount()->getMoneyValue())
         );
+
         if ($creditNote->getAmount()->getGross()->greaterThan($maxGrossAmount)) {
             throw new CreditNoteAmountExceededException();
         }

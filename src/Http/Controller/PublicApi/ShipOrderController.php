@@ -3,11 +3,11 @@
 namespace App\Http\Controller\PublicApi;
 
 use App\Application\Exception\WorkflowException;
+use App\Application\UseCase\ShipOrder\Exception\ShipOrderMerchantFeeNotSetException;
 use App\Application\UseCase\ShipOrder\ShipOrderRequestV1;
 use App\Application\UseCase\ShipOrder\ShipOrderUseCaseV1;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\OrderResponse\LegacyOrderResponse;
-use App\DomainModel\ShipOrder\ShipOrderException;
 use App\Http\HttpConstantsInterface;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -69,7 +69,7 @@ class ShipOrderController
             return $this->useCase->execute($orderRequest);
         } catch (OrderContainerFactoryException $exception) {
             throw new NotFoundHttpException($exception->getMessage());
-        } catch (WorkflowException | ShipOrderException $exception) {
+        } catch (WorkflowException | ShipOrderMerchantFeeNotSetException $exception) {
             throw new BadRequestHttpException('Shipment is not allowed', $exception);
         }
     }

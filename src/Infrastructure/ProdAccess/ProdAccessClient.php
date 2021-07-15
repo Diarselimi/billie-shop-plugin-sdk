@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Infrastructure\ProdAccess;
 
 use App\Application\UseCase\AuthorizeSandbox\AuthorizeSandboxDTO;
-use App\DomainModel\Merchant\MerchantEntityFactory;
 use App\DomainModel\MerchantUser\MerchantUserEntityFactory;
 use App\DomainModel\Sandbox\ProdAccessClientInterface;
 use App\DomainModel\Sandbox\ProdAccessRequestException;

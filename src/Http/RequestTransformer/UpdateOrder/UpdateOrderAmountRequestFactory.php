@@ -20,6 +20,7 @@ class UpdateOrderAmountRequestFactory
     public function create(Request $request): ?TaxedMoney
     {
         $amount = $request->request->get('amount');
+
         if (is_string($amount)) {
             $amount = json_decode($amount, true);
         }

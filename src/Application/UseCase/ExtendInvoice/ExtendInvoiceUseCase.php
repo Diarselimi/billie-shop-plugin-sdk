@@ -50,8 +50,12 @@ class ExtendInvoiceUseCase implements ValidatedUseCaseInterface
 
         $duration = new Duration($request->getDuration());
 
+        if ($invoice->isComplete() || $invoice->isCanceled()) {
+            throw new InvoiceNotExtendableException("Invoice state doesn't support extension");
+        }
+
         if (!$invoice->canBeExtendedWith($duration)) {
-            throw new InvoiceNotExtendableException('Invoice cannot be extended');
+            throw new InvoiceNotExtendableException('New duration should be longer than existing');
         }
 
         if ($invoice->isLate() && $this->claimStateService->isInCollection($invoice->getUuid())) {

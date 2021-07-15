@@ -6,6 +6,7 @@ namespace App\Application\UseCase\CreateCreditNote;
 
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
+use App\DomainModel\Invoice\CreditNote\CreditNote;
 use App\DomainModel\Invoice\CreditNote\CreditNoteCreationService;
 use App\DomainModel\Invoice\CreditNote\CreditNoteFactory;
 use App\DomainModel\Invoice\InvoiceContainerFactory;
@@ -30,7 +31,7 @@ class CreateCreditNoteUseCase implements ValidatedUseCaseInterface
         $this->creditNoteCreationService = $creditNoteCreationService;
     }
 
-    public function execute(CreateCreditNoteRequest $request): void
+    public function execute(CreateCreditNoteRequest $request): CreditNote
     {
         $this->validateRequest($request);
 
@@ -47,5 +48,7 @@ class CreateCreditNoteUseCase implements ValidatedUseCaseInterface
         )->setExternalComment($request->getExternalComment());
 
         $this->creditNoteCreationService->create($invoiceContainer, $creditNote);
+
+        return $creditNote;
     }
 }

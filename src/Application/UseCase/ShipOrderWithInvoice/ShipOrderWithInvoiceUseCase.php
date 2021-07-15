@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Application\UseCase\ShipOrderWithInvoice;
 
 use App\Application\Exception\WorkflowException;
+use App\Application\UseCase\ShipOrder\Exception\ShipOrderAmountExceededException;
+use App\Application\UseCase\ShipOrder\Exception\ShipOrderMerchantFeeNotSetException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Fee\FeeCalculationException;
@@ -18,7 +20,6 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentCreator;
 use App\DomainModel\OrderResponse\LegacyOrderResponse;
 use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
-use App\DomainModel\ShipOrder\ShipOrderException;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
@@ -116,7 +117,7 @@ class ShipOrderWithInvoiceUseCase implements ValidatedUseCaseInterface, LoggingI
                 || $request->getAmount()->getNet()->greaterThan($financialDetails->getUnshippedAmountNet())
                 || $request->getAmount()->getTax()->greaterThan($financialDetails->getUnshippedAmountTax())
             ) {
-                throw new ShipOrderException('Requested amount exceeds order unshipped amount');
+                throw new ShipOrderAmountExceededException();
             }
         }
     }
@@ -154,7 +155,7 @@ class ShipOrderWithInvoiceUseCase implements ValidatedUseCaseInterface, LoggingI
         } catch (FeeCalculationException $exception) {
             $this->logSuppressedException($exception, 'Merchant fee configuration is incorrect');
 
-            throw new ShipOrderException("Configuration isn't properly set");
+            throw new ShipOrderMerchantFeeNotSetException();
         }
 
         return $invoice;

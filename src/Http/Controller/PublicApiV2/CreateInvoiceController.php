@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace App\Http\Controller\PublicApiV2;
 
+use App\Application\Exception\RequestValidationException;
 use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\CreateInvoice\CreateInvoiceRequest;
+use App\Application\UseCase\ShipOrder\Exception\ShipOrderAmountExceededException;
+use App\Application\UseCase\ShipOrder\Exception\ShipOrderMerchantFeeNotSetException;
+use App\Application\UseCase\ShipOrder\Exception\ShipOrderNoOrderUuidException;
+use App\Application\UseCase\ShipOrder\Exception\ShipOrderOrderExternalCodeNotSetException;
 use App\Application\UseCase\ShipOrder\ShipOrderUseCase;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
-use App\DomainModel\ShipOrder\ShipOrderException;
 use App\Http\HttpConstantsInterface;
 use App\Http\RequestTransformer\CreateInvoice\InvoiceLineItemsFactory;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -36,7 +40,17 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *          @OA\Schema(ref="#/components/schemas/CreateInvoiceRequest"))
  *     ),
  *
- *     @OA\Response(response=201, description="Invoice successfully created"),
+ *     @OA\Response(
+ *          response=201,
+ *          description="Invoice successfully created",
+ *          @OA\JsonContent(
+ *              type="object",
+ *              required={"uuid"},
+ *              properties={
+ *                  @OA\Property(property="uuid", ref="#/components/schemas/UUID")
+ *              }
+ *          )
+ *     ),
  *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),
  *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
  *     @OA\Response(response=500, ref="#/components/responses/ServerError")
@@ -75,7 +89,21 @@ class CreateInvoiceController
             ], JsonResponse::HTTP_CREATED);
         } catch (OrderContainerFactoryException $exception) {
             throw new NotFoundHttpException($exception->getMessage());
-        } catch (WorkflowException | ShipOrderException $exception) {
+        } catch (ShipOrderNoOrderUuidException $exception) {
+            throw RequestValidationException::createForInvalidValue(
+                'One order uuid should be provided',
+                'orders',
+                ''
+            );
+        } catch (ShipOrderAmountExceededException $exception) {
+            throw RequestValidationException::createForInvalidValue(
+                'Invoice amount should not exceed order unshipped amount',
+                'amount',
+                ''
+            );
+        } catch (ShipOrderOrderExternalCodeNotSetException $exception) {
+            throw new BadRequestHttpException('Order external code should be set beforehand.', $exception);
+        } catch (WorkflowException | ShipOrderMerchantFeeNotSetException $exception) {
             throw new BadRequestHttpException('Invoice could not be created.', $exception);
         }
     }

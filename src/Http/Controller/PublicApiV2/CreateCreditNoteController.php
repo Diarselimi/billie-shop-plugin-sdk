@@ -15,6 +15,7 @@ use App\Http\HttpConstantsInterface;
 use App\Http\RequestTransformer\UpdateOrder\UpdateOrderAmountRequestFactory;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -38,7 +39,17 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *          @OA\Schema(ref="#/components/schemas/CreateCreditNoteRequest"))
  *     ),
  *
- *     @OA\Response(response=204, description="Credit note successfully created"),
+ *     @OA\Response(
+ *          response=201,
+ *          description="Credit note successfully created",
+ *          @OA\JsonContent(
+ *              type="object",
+ *              required={"uuid"},
+ *              properties={
+ *                  @OA\Property(property="uuid", ref="#/components/schemas/UUID")
+ *              }
+ *          )
+ *     ),
  *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),
  *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
  *     @OA\Response(response=403, ref="#/components/responses/Forbidden"),
@@ -60,7 +71,7 @@ class CreateCreditNoteController
         $this->updateOrderAmountRequestFactory = $updateOrderAmountRequestFactory;
     }
 
-    public function execute(string $uuid, Request $request): void
+    public function execute(string $uuid, Request $request): JsonResponse
     {
         $merchantId = $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID);
         $useCaseRequest = (new CreateCreditNoteRequest())
@@ -71,7 +82,7 @@ class CreateCreditNoteController
             ->setExternalComment($request->request->get('comment'));
 
         try {
-            $this->useCase->execute($useCaseRequest);
+            $response = $this->useCase->execute($useCaseRequest);
         } catch (InvoiceNotFoundException $exception) {
             throw new NotFoundHttpException('Invoice not found', $exception);
         } catch (CreditNoteNotAllowedException $exception) {
@@ -89,5 +100,9 @@ class CreateCreditNoteController
                 $useCaseRequest->getAmount()->getTax()->getMoneyValue()
             );
         }
+
+        return new JsonResponse([
+            'uuid' => $response->getUuid(),
+        ], JsonResponse::HTTP_CREATED);
     }
 }

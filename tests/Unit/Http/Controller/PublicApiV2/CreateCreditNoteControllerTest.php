@@ -7,6 +7,7 @@ namespace App\Tests\Unit\Http\Controller\PublicApiV2;
 use App\Application\Exception\RequestValidationException;
 use App\Application\UseCase\CreateCreditNote\CreateCreditNoteRequest;
 use App\Application\UseCase\CreateCreditNote\CreateCreditNoteUseCase;
+use App\DomainModel\Invoice\CreditNote\CreditNote;
 use App\DomainModel\Invoice\CreditNote\CreditNoteAmountExceededException;
 use App\DomainModel\Invoice\CreditNote\CreditNoteAmountTaxExceededException;
 use App\DomainModel\Invoice\CreditNote\CreditNoteNotAllowedException;
@@ -18,6 +19,7 @@ use App\Tests\Unit\UnitTestCase;
 use Ozean12\Money\Money;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
 use Prophecy\Argument;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -34,7 +36,7 @@ class CreateCreditNoteControllerTest extends UnitTestCase
     /**
      * @test
      */
-    public function shouldSucceedCallingUsecase(): void
+    public function shouldSucceedCallingUseCase(): void
     {
         $httpRequest = $this->createRequest();
         $useCase = $this->prophesize(CreateCreditNoteUseCase::class);
@@ -52,7 +54,7 @@ class CreateCreditNoteControllerTest extends UnitTestCase
                     return true;
                 }
             )
-        )->shouldBeCalledOnce();
+        )->shouldBeCalledOnce()->willReturn((new CreditNote())->setUuid(Uuid::uuid4()->toString()));
 
         $controller = new CreateCreditNoteController($useCase->reveal(), $amountFactory->reveal());
         $controller->execute(self::INVOICE_UUID, $httpRequest);

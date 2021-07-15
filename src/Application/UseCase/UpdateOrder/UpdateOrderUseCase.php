@@ -40,8 +40,6 @@ class UpdateOrderUseCase implements ValidatedUseCaseInterface
      */
     public function execute(UpdateOrderRequest $input): void
     {
-        $this->validateRequest($input);
-
         try {
             $orderContainer = $this->orderContainerFactory->loadByMerchantIdAndExternalIdOrUuid(
                 $input->getMerchantId(),
@@ -50,6 +48,8 @@ class UpdateOrderUseCase implements ValidatedUseCaseInterface
         } catch (OrderContainerFactoryException $e) {
             throw new OrderNotFoundException();
         }
+
+        $this->validateRequest($input);
 
         if ($input->isAmountChanged()) {
             try {

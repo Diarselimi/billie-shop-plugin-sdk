@@ -5,7 +5,6 @@ namespace App\Http\Controller\PrivateApi;
 use App\Application\Exception\MerchantDebtorNotFoundException;
 use App\Application\UseCase\SynchronizeMerchantDebtor\SynchronizeMerchantDebtorUseCase;
 use OpenApi\Annotations as OA;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class SynchronizeMerchantDebtorController

@@ -20,7 +20,7 @@ the `application/json` Content-Type and the following body format:
 {
     created_at: (datetime)
     event: (string) (event name, -check the following section for more details-)
-    order_id: (string)
+    order_id: (string) (order external code)
     order_uuid: (string)
     invoice_uuid: (string)
     amount: (string) (optional) (contains sum of paid amounts)

@@ -9,5 +9,5 @@ use Symfony\Component\Validator\Constraint;
  */
 class UpdateAmount extends Constraint
 {
-    public $message = 'The amount values are not correct.';
+    public $message = 'The new order amount should be less then existing order amount';
 }

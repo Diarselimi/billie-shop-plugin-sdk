@@ -1,11 +1,11 @@
-Feature: Confirm invoice payments
+Feature: Create Credit Note
 
   Background:
     Given I add "Content-type" header equal to "application/json"
     And I add "X-Test" header equal to 1
     And I add "X-Api-Key" header equal to test
 
-  Scenario: Successful payment confirmation
+  Scenario: Successful credit note creation
     Given I have orders with the following data
       | external_id | state   | gross | net | tax | duration | comment    | workflow_name |
       | CO123       | shipped | 1000  | 900 | 100 | 30       | test order | order_v2      |
@@ -23,8 +23,13 @@ Feature: Confirm invoice payments
           "comment": "ext-comment"
         }
         """
-    Then the response status code should be 204
-    And the response should be empty
+    Then the response status code should be 201
+    And the JSON response should be:
+    """
+    {
+      "uuid": "uuid"
+    }
+    """NotificationDeliveryUseCase
     And queue should contain message with routing key credit_note.create_credit_note with below data:
     """
     {

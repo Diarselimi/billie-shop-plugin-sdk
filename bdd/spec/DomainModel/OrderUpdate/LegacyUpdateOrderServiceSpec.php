@@ -17,10 +17,7 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsPersistenceService;
-use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentUploadException;
 use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerAggregator;
-use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerInterface;
-use App\DomainModel\OrderUpdate\UpdateOrderException;
 use App\DomainModel\OrderUpdate\UpdateOrderLimitsService;
 use App\DomainModel\OrderUpdate\LegacyUpdateOrderService;
 use App\DomainModel\OrderUpdate\UpdateOrderRequestValidator;
@@ -407,44 +404,6 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         // it does NOT call payments service
         $order->wasShipped()->shouldBeCalled()->willReturn(false);
         $this->update($orderContainer, $request);
-    }
-
-    public function it_fails_on_upload_invoice(
-        OrderContainer $orderContainer,
-        OrderEntity $order,
-        LegacyUpdateOrderRequest $request,
-        UpdateOrderRequestValidator $updateOrderRequestValidator,
-        UpdateOrderLimitsService $updateOrderLimitsService,
-        OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
-        OrderRepositoryInterface $orderRepository,
-        InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler
-    ) {
-        $order->getInvoiceNumber()->willReturn('123');
-        $order->getInvoiceUrl()->willReturn('some_url');
-        $changeSet = (new LegacyUpdateOrderRequest('order123', 1))->setInvoiceNumber('foobar')->setInvoiceUrl('foobar.pdf');
-        $updateOrderRequestValidator->getValidatedRequest(
-            $orderContainer,
-            $request
-        )->shouldBeCalled()->willReturn($changeSet);
-        $orderContainer->getInvoices()->willReturn(new InvoiceCollection([]));
-
-        // it does NOT unlock limits
-        $updateOrderLimitsService->updateLimitAmounts($orderContainer, Argument::any())->shouldNotBeCalled();
-
-        // it does NOT update financial details
-        $financialDetailsPersistenceService->updateFinancialDetails(
-            Argument::any(),
-            InvoiceDocumentUploadHandlerInterface::EVENT_SOURCE_UPDATE
-        )->shouldNotBeCalled();
-
-        // update order and invoice
-        $orderRepository->update($order)->shouldBeCalled();
-        $invoiceUrlHandler->handle(Argument::cetera())
-            ->shouldBeCalled()->willThrow(InvoiceDocumentUploadException::class);
-
-        $order->wasShipped()->shouldNotBeCalled();
-
-        $this->shouldThrow(UpdateOrderException::class)->during('update', [$orderContainer, $request]);
     }
 
     public function it_fails_on_workflow_v2(

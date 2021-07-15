@@ -14,7 +14,6 @@ use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsPersistenceService;
-use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentUploadException;
 use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerAggregator;
 use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
@@ -179,17 +178,13 @@ class LegacyUpdateOrderService implements LoggingInterface
 
     private function updateInvoiceDocument(OrderEntity $order): void
     {
-        try {
-            $this->invoiceUrlHandler->handle(
-                $order,
-                $order->getUuid(),
-                $order->getInvoiceUrl(),
-                $order->getInvoiceNumber(),
-                InvoiceDocumentUploadHandlerInterface::EVENT_SOURCE_UPDATE
-            );
-        } catch (InvoiceDocumentUploadException $exception) {
-            throw new UpdateOrderException("Order invoice cannot be updated: upload failed.", 0, $exception);
-        }
+        $this->invoiceUrlHandler->handle(
+            $order,
+            $order->getUuid(),
+            $order->getInvoiceUrl(),
+            $order->getInvoiceNumber(),
+            InvoiceDocumentUploadHandlerInterface::EVENT_SOURCE_UPDATE
+        );
     }
 
     private function calculateReducedAmount(

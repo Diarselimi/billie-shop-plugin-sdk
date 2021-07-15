@@ -45,9 +45,7 @@ class UpdateOrderAmountService
             throw new UpdateOrderAmountException();
         }
 
-        if (!$order->wasShipped()) {
-            $this->updateOrderLimitsService->updateLimitAmounts($orderContainer, $newAmount);
-        }
+        $this->updateOrderLimitsService->updateLimitAmounts($orderContainer, $newAmount);
 
         $newFinancialDetails = clone $orderContainer->getOrderFinancialDetails();
         $calculatedTaxedMoney = new TaxedMoney(

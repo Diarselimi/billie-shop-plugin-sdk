@@ -8,9 +8,7 @@ use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentUploadException;
 use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerAggregator;
-use App\DomainModel\ShipOrder\ShipOrderException;
 use App\Infrastructure\OrderInvoice\SnsInvoiceDocumentUploadHandler;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -130,16 +128,12 @@ class UploadShippedInvoicesCommand extends Command implements LoggingInterface
             )
         );
 
-        try {
-            $this->invoiceManager->handle(
-                $order,
-                $invoiceUuid,
-                $invoiceUrl,
-                $invoiceNumber,
-                InvoiceDocumentUploadHandlerAggregator::EVENT_SOURCE_SHIPMENT
-            );
-        } catch (InvoiceDocumentUploadException $exception) {
-            throw new ShipOrderException("Invoice can't be scheduled for upload", 0, $exception);
-        }
+        $this->invoiceManager->handle(
+            $order,
+            $invoiceUuid,
+            $invoiceUrl,
+            $invoiceNumber,
+            InvoiceDocumentUploadHandlerAggregator::EVENT_SOURCE_SHIPMENT
+        );
     }
 }

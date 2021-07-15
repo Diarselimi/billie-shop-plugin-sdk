@@ -334,14 +334,7 @@ class Invoice
 
     public function canBeExtendedWith(Duration $newDuration): bool
     {
-        if ($this->isCanceled() || $this->isComplete()) {
-            return false;
-        }
-        if ($this->duration >= $newDuration->days()) {
-            return false;
-        }
-
-        return true;
+        return $newDuration->days() > $this->duration;
     }
 
     public function isLate(): bool
