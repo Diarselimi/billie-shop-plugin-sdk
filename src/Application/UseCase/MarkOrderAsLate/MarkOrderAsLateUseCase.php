@@ -2,16 +2,19 @@
 
 namespace App\Application\UseCase\MarkOrderAsLate;
 
-use App\Application\Exception\OrderNotFoundException;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderNotification\OrderNotificationEntity;
 use App\DomainModel\OrderNotification\OrderNotificationService;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\Workflow\Registry;
 
-class MarkOrderAsLateUseCase
+class MarkOrderAsLateUseCase implements LoggingInterface
 {
+    use LoggingTrait;
+
     private OrderContainerFactory $orderContainerFactory;
 
     private Registry $workflowRegistry;
@@ -33,7 +36,9 @@ class MarkOrderAsLateUseCase
         try {
             $orderContainer = $this->orderContainerFactory->loadByInvoiceUuid($request->getInvoiceUuid());
         } catch (OrderContainerFactoryException $exception) {
-            throw new OrderNotFoundException();
+            $this->logInfo('Order not found, belongs to Flow');
+
+            return;
         }
 
         $order = $orderContainer->getOrder();

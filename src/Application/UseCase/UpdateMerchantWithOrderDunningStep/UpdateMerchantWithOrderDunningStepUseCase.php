@@ -2,7 +2,6 @@
 
 namespace App\Application\UseCase\UpdateMerchantWithOrderDunningStep;
 
-use App\Application\Exception\OrderNotFoundException;
 use App\DomainModel\Invoice\InvoiceNotFoundException;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
@@ -37,14 +36,7 @@ class UpdateMerchantWithOrderDunningStepUseCase implements LoggingInterface
         try {
             $orderContainer = $this->orderContainerFactory->loadByUuid($request->getOrderUuid());
         } catch (OrderContainerFactoryException $exception) {
-            $this->logSuppressedException(
-                new OrderNotFoundException(),
-                'Failed to notify merchant with order dunning step change. Order not found',
-                [
-                    'order_uuid' => $request->getOrderUuid(),
-                    'dunning_step' => $request->getStep(),
-                ]
-            );
+            $this->logInfo('Order not found, belongs to Flow');
 
             return;
         }
@@ -55,11 +47,10 @@ class UpdateMerchantWithOrderDunningStepUseCase implements LoggingInterface
             $invoice = $orderContainer->getInvoices()->get($request->getInvoiceUuid());
             if ($invoice === null) {
                 $this->logSuppressedException(
-                    new InvoiceNotFoundException(),
+                    new InvoiceNotFoundException('Invoice not found for dunning step update: ' . $request->getInvoiceUuid()),
                     'Failed to notify merchant with order dunning step change. Invoice not found',
                     [
-                        'invoice_uuid' => $request->getInvoiceUuid(),
-                        'dunning_step' => $request->getStep(),
+                        LoggingInterface::KEY_UUID => $request->getInvoiceUuid(),
                     ]
                 );
 
