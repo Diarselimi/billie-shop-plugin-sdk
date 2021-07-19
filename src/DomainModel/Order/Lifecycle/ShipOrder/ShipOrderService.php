@@ -75,7 +75,8 @@ class ShipOrderService implements ShipOrderInterface, LoggingInterface
         $this->announcer->announce(
             $invoice,
             $orderContainer->getDebtorCompany()->getName(),
-            $orderContainer->getOrder()->getExternalCode()
+            $orderContainer->getOrder()->getExternalCode(),
+            $orderContainer->getOrder()->getDebtorSepaMandateUuid()
         );
 
         if ($order->isWorkflowV2()) {

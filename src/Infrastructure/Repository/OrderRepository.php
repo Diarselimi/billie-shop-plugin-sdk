@@ -46,6 +46,7 @@ class OrderRepository extends AbstractPdoRepository implements
         'company_billing_address_uuid',
         'creation_source',
         'duration_extension',
+        'debtor_sepa_mandate_uuid',
     ];
 
     private OrderEntityFactory $orderFactory;
@@ -84,6 +85,7 @@ class OrderRepository extends AbstractPdoRepository implements
               rid, 
               company_billing_address_uuid,
               creation_source,
+              debtor_sepa_mandate_uuid,
               created_at, 
               updated_at
             ) VALUES (
@@ -107,6 +109,7 @@ class OrderRepository extends AbstractPdoRepository implements
               :rid,
               :company_billing_address_uuid,
               :creation_source,
+              :debtor_sepa_mandate_uuid,
               :created_at, 
               :updated_at
             )
@@ -134,6 +137,7 @@ class OrderRepository extends AbstractPdoRepository implements
                 'merchant_debtor_id' => $order->getMerchantDebtorId(),
                 'company_billing_address_uuid' => $order->getCompanyBillingAddressUuid(),
                 'creation_source' => $order->getCreationSource(),
+                'debtor_sepa_mandate_uuid' => $order->getDebtorSepaMandateUuid() ? $order->getDebtorSepaMandateUuid()->toString() : null,
             ]
         );
 
@@ -310,7 +314,8 @@ class OrderRepository extends AbstractPdoRepository implements
               invoice_url = :invoice_url,
               proof_of_delivery_url = :proof_of_delivery_url,
               company_billing_address_uuid = :company_billing_address_uuid,
-              creation_source = :creation_source
+              creation_source = :creation_source,
+              debtor_sepa_mandate_uuid = :debtor_sepa_mandate_uuid
             WHERE id = :id
         ',
             [
@@ -326,6 +331,7 @@ class OrderRepository extends AbstractPdoRepository implements
                 'proof_of_delivery_url' => $order->getProofOfDeliveryUrl(),
                 'company_billing_address_uuid' => $order->getCompanyBillingAddressUuid(),
                 'creation_source' => $order->getCreationSource(),
+                'debtor_sepa_mandate_uuid' => $order->getDebtorSepaMandateUuid() ? $order->getDebtorSepaMandateUuid()->toString() : null,
                 'id' => $order->getId(),
             ]
         );

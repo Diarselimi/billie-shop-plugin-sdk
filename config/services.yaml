@@ -106,6 +106,7 @@ services:
       - '@App\Infrastructure\OpenApi\Routing\OpenApiClassLoader'
 
   App\Helper\Uuid\UuidGeneratorInterface: '@App\Helper\Uuid\UuidGenerator'
+  App\Helper\Uuid\UuidFactoryInterface: '@App\Helper\Uuid\UuidFactory'
   App\DomainModel\Payment\PaymentsRepositoryInterface: '@App\Infrastructure\Graphql\PaymentsGraphQLRepository'
   App\DomainModel\MerchantDebtor\SearchMerchantDebtorsRepositoryInterface: '@App\Infrastructure\Graphql\MerchantDebtorsGraphQLRepository'
   App\DomainModel\MerchantDebtor\Details\MerchantDebtorDetailsRepositoryInterface: '@App\Infrastructure\Graphql\MerchantDebtorDetailsGraphQLRepository'

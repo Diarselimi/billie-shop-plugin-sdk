@@ -3,6 +3,7 @@
 namespace App\DomainModel\Order;
 
 use App\Application\UseCase\CreateOrder\CreateOrderRequestInterface;
+use App\Helper\Uuid\UuidFactoryInterface;
 use App\Helper\Uuid\UuidGeneratorInterface;
 use App\Support\AbstractFactory;
 
@@ -10,9 +11,12 @@ class OrderEntityFactory extends AbstractFactory
 {
     private UuidGeneratorInterface $uuidGenerator;
 
-    public function __construct(UuidGeneratorInterface $uuidGenerator)
+    private UuidFactoryInterface $uuidFactory;
+
+    public function __construct(UuidGeneratorInterface $uuidGenerator, UuidFactoryInterface $uuidFactory)
     {
         $this->uuidGenerator = $uuidGenerator;
+        $this->uuidFactory = $uuidFactory;
     }
 
     public function createCollection(iterable $arrays): OrderCollection
@@ -60,6 +64,8 @@ class OrderEntityFactory extends AbstractFactory
             ->setCreationSource($row['creation_source'])
             ->setCompanyBillingAddressUuid($row['company_billing_address_uuid'])
             ->setWorkflowName($row['workflow_name'])
-            ->setDurationExtension($row['duration_extension']);
+            ->setDurationExtension($row['duration_extension'])
+            ->setDebtorSepaMandateUuid($row['debtor_sepa_mandate_uuid'] ? $this->uuidFactory->fromString($row['debtor_sepa_mandate_uuid']) : null)
+        ;
     }
 }

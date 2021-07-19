@@ -7,6 +7,7 @@ use App\DomainModel\OrderInvoice\OrderInvoiceCollection;
 use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 use Billie\PdoBundle\DomainModel\StatefulEntity\StatefulEntityInterface;
 use Billie\PdoBundle\DomainModel\StatefulEntity\StatefulEntityTrait;
+use Ramsey\Uuid\UuidInterface;
 
 class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityInterface
 {
@@ -162,6 +163,8 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
 
     private ?string $companyBillingAddressUuid = null;
 
+    private ?UuidInterface $debtorSepaMandateUuid = null;
+
     private string $workflowName;
 
     private ?int $durationExtension;
@@ -173,6 +176,7 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
     public function __construct()
     {
         parent::__construct();
+
         $this->orderInvoices = new OrderInvoiceCollection([]);
     }
 
@@ -477,6 +481,18 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
     public function setDurationExtension(?int $durationExtension): self
     {
         $this->durationExtension = $durationExtension;
+
+        return $this;
+    }
+
+    public function getDebtorSepaMandateUuid(): ?UuidInterface
+    {
+        return $this->debtorSepaMandateUuid;
+    }
+
+    public function setDebtorSepaMandateUuid(?UuidInterface $debtorSepaMandateUuid): OrderEntity
+    {
+        $this->debtorSepaMandateUuid = $debtorSepaMandateUuid;
 
         return $this;
     }

@@ -8,6 +8,7 @@ use App\Helper\Uuid\UuidGeneratorInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Ozean12\Transfer\Message\Invoice\CreateInvoice;
+use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class InvoiceAnnouncer implements LoggingInterface
@@ -23,8 +24,12 @@ class InvoiceAnnouncer implements LoggingInterface
         $this->bus = $bus;
     }
 
-    public function announce(Invoice $invoice, string $debtorCompanyName, string $orderExternalCode): void
-    {
+    public function announce(
+        Invoice $invoice,
+        string $debtorCompanyName,
+        string $orderExternalCode,
+        ?UuidInterface $debtorSepaMandateUuid
+    ): void {
         $message = (new CreateInvoice())
             ->setUuid($invoice->getUuid())
             ->setCustomerUuid($invoice->getCustomerUuid())
@@ -44,6 +49,7 @@ class InvoiceAnnouncer implements LoggingInterface
             ->setServices(self::SERVICES)
             ->setExternalCode($invoice->getExternalCode())
             ->setOrderExternalCode($orderExternalCode)
+            ->setDebtorSepaMandateUuid($debtorSepaMandateUuid ? $debtorSepaMandateUuid->toString() : null)
         ;
 
         $this->bus->dispatch($message);
