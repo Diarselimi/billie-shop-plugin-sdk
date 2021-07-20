@@ -29,8 +29,10 @@ class CheckoutConfirmOrderRequestFactory
     {
         if ($this->isV2Request($request)) {
             $debtorCompanyData = $request->request->get('debtor');
+            $externalCode = $request->request->get('external_code');
         } else {
             $debtorCompanyData = $request->request->get('debtor_company');
+            $externalCode = $request->request->get('order_id');
         }
 
         $duration = $request->request->getInt('duration', 0);
@@ -41,7 +43,7 @@ class CheckoutConfirmOrderRequestFactory
             ->setAmount($this->amountRequestFactory->create($request))
             ->setDeliveryAddress($this->addressRequestFactory->create($request, 'delivery_address'))
             ->setDuration($duration)
-            ->setExternalCode($request->request->get('order_id'))
+            ->setExternalCode($externalCode)
             ->setSessionUuid($sessionUuid);
     }
 

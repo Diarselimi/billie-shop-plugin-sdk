@@ -74,7 +74,7 @@ Feature: As a merchant, I should be able to create an order by providing a valid
     Then the json response should be:
     """
     {
-       "external_code":"CO123",
+       "external_code":"CO333",
        "uuid":"test-order-uuidCO123",
        "state":"created",
        "decline_reason":null,
@@ -134,7 +134,7 @@ Feature: As a merchant, I should be able to create an order by providing a valid
        ]
     }
     """
-    And the order CO123 is in state created
+    And the order CO333 is in state created
 
   Scenario: I fail to confirm the order if I send a different amount
     Given I have a authorized order "CO123" with amounts 100.0/90.0/10.0, duration 30 and checkout session "123123CO123"
