@@ -107,4 +107,20 @@ class InvoiceCollection implements CollectionInterface
     {
         return $this->elements;
     }
+
+    public function hasOpenInvoices(): bool
+    {
+        return count(array_filter(
+            $this->elements,
+            fn ($invoice) => in_array(
+                $invoice->getState(),
+                [Invoice::STATE_NEW, Invoice::STATE_LATE, Invoice::STATE_PAID_OUT]
+            )
+        )) > 0;
+    }
+
+    public function hasCompletedInvoice(): bool
+    {
+        return count(array_filter($this->elements, fn ($invoice) => $invoice->getState() === Invoice::STATE_COMPLETE)) > 0;
+    }
 }

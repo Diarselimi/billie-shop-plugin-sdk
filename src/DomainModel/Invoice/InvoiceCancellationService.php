@@ -48,6 +48,8 @@ class InvoiceCancellationService
             CreditNote::INTERNAL_COMMENT_CANCELATION
         );
 
+        $invoice->setState(Invoice::STATE_CANCELED);
+
         $this->messageBus->dispatch($this->creditNoteMessageFactory->create($creditNote));
         $invoice->getCreditNotes()->add($creditNote);
 

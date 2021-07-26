@@ -9,7 +9,7 @@ Feature: Cancel Invoice feature
 
   Scenario: Cancel an invoice successfully
     Given I have a shipped order "ABCDE" with amounts 1000/900/100, duration 30 and checkout session "208cfe7d-046f-4162-b175-748942d6cff2"
-    And I get from invoice-butler service good response
+    And I get from invoice-butler service good response with all invoices canceled
     And the following invoice data exists:
       | order_id | invoice_uuid                         |
       | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
@@ -27,3 +27,4 @@ Feature: Cancel Invoice feature
       "externalCode": "some_code-CN"
     }
     """
+    And the order "ABCDE" is in state canceled

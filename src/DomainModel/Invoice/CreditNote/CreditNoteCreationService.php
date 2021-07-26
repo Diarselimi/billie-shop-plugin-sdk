@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\DomainModel\Invoice\CreditNote;
 
-use App\DomainModel\Invoice\InvoiceContainer;
+use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceServiceInterface;
 use Ozean12\Money\Money;
 
@@ -17,40 +17,15 @@ class CreditNoteCreationService
         $this->invoiceService = $invoiceService;
     }
 
-    /**
-     * @param  InvoiceContainer                     $invoiceContainer
-     * @param  CreditNote                           $creditNote
-     * @throws CreditNoteAmountExceededException
-     * @throws CreditNoteAmountTaxExceededException
-     * @throws CreditNoteNotAllowedException
-     */
-    public function create(InvoiceContainer $invoiceContainer, CreditNote $creditNote): void
+    public function create(Invoice $invoice, CreditNote $creditNote): void
     {
-        $this->validate($invoiceContainer, $creditNote);
-
-        $invoice = $invoiceContainer->getInvoice();
-
-        // TODO return this field from butler and set it in the Invoice factory, not here (BXP-412)
-        // Depends on: https://github.com/ozean12/invoice-butler/pull/71/files
-        $invoice->setPaymentDebtorUuid(
-            $invoiceContainer->getOrderContainer()->getDebtorCompany()->getUuid()
-        );
+        $this->validate($invoice, $creditNote);
 
         $this->invoiceService->createCreditNote($invoice, $creditNote);
     }
 
-    private function validate(InvoiceContainer $invoiceContainer, CreditNote $creditNote): void
+    private function validate(Invoice $invoice, CreditNote $creditNote): void
     {
-        if (!$invoiceContainer->getOrder()->isWorkflowV2()) {
-            throw new CreditNoteNotAllowedException(
-                sprintf(
-                    'Credit note creation not supported for order workflow: %s',
-                    $invoiceContainer->getOrder()->getWorkflowName()
-                )
-            );
-        }
-
-        $invoice = $invoiceContainer->getInvoice();
         if ($invoice->isComplete() || $invoice->isCanceled()) {
             throw new CreditNoteNotAllowedException(
                 'Credit note creation not supported for current invoice state'

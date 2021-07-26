@@ -10,10 +10,9 @@ use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
-use App\EventSubscriber\OrderWorkflowTransitionCompleteGuardEventSubscriber;
+use App\EventSubscriber\OrderWorkflowTransitionGuardEventSubscriber;
 use App\Tests\Unit\UnitTestCase;
 use Ozean12\Money\Money;
-use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\Marking;
@@ -31,7 +30,7 @@ class OrderWorkflowTransitionCompleteGuardEventSubscriberTest extends UnitTestCa
      */
     private ObjectProphecy $orderContainer;
 
-    private OrderWorkflowTransitionCompleteGuardEventSubscriber $subscriber;
+    private OrderWorkflowTransitionGuardEventSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -40,14 +39,11 @@ class OrderWorkflowTransitionCompleteGuardEventSubscriberTest extends UnitTestCa
         $this->orderContainerFactory = $this->prophesize(OrderContainerFactory::class);
         $this->orderContainer = $this->prophesize(OrderContainer::class);
 
-        $this->subscriber = new OrderWorkflowTransitionCompleteGuardEventSubscriber(
+        $this->subscriber = new OrderWorkflowTransitionGuardEventSubscriber(
             $this->orderContainerFactory->reveal()
         );
     }
 
-    /**
-     * @test
-     */
     public function shouldNotBlockEventTransition(): void
     {
         $order = new OrderEntity();
@@ -61,25 +57,20 @@ class OrderWorkflowTransitionCompleteGuardEventSubscriberTest extends UnitTestCa
             ->willReturn($orderFinancialDetails);
 
         $this->orderContainer->getInvoices()
-            ->shouldBeCalledOnce()
             ->willReturn(new InvoiceCollection([
                 (new Invoice())->setState(Invoice::STATE_COMPLETE),
                 (new Invoice())->setState(Invoice::STATE_CANCELED),
             ]));
 
         $this->orderContainerFactory
-            ->createFromOrderEntity(Argument::type(OrderEntity::class))
+            ->getCachedOrderContainer()
             ->shouldBeCalledOnce()
-            ->willReturn($this->orderContainer->reveal())
-        ;
+            ->willReturn($this->orderContainer->reveal());
 
         $this->subscriber->canComplete($event);
         $this->assertFalse($event->isBlocked());
     }
 
-    /**
-     * @test
-     */
     public function shouldBlockEventTransitionBecauseOfNewInvoice(): void
     {
         $order = new OrderEntity();
@@ -100,18 +91,14 @@ class OrderWorkflowTransitionCompleteGuardEventSubscriberTest extends UnitTestCa
             ->willReturn($orderFinancialDetails);
 
         $this->orderContainerFactory
-            ->createFromOrderEntity(Argument::type(OrderEntity::class))
+            ->getCachedOrderContainer()
             ->shouldBeCalledOnce()
-            ->willReturn($this->orderContainer->reveal())
-        ;
+            ->willReturn($this->orderContainer->reveal());
 
         $this->subscriber->canComplete($event);
         $this->assertTrue($event->isBlocked());
     }
 
-    /**
-     * @test
-     */
     public function shouldBlockEventTransitionBecauseOfUnshippedAmount(): void
     {
         $order = new OrderEntity();
@@ -125,12 +112,63 @@ class OrderWorkflowTransitionCompleteGuardEventSubscriberTest extends UnitTestCa
             ->willReturn($orderFinancialDetails);
 
         $this->orderContainerFactory
-            ->createFromOrderEntity(Argument::type(OrderEntity::class))
+            ->getCachedOrderContainer()
             ->shouldBeCalledOnce()
-            ->willReturn($this->orderContainer->reveal())
-        ;
+            ->willReturn($this->orderContainer->reveal());
 
         $this->subscriber->canComplete($event);
         $this->assertTrue($event->isBlocked());
+    }
+
+    public function shouldCancelOrderWhenThereAreOpenInvoices()
+    {
+        $order = new OrderEntity();
+        $event = new GuardEvent($order, new Marking(), new Transition('name', 'from', 'to'));
+
+        $invoice = (new Invoice())
+            ->setState('new');
+        $invoiceCollection = new InvoiceCollection([$invoice]);
+
+        $this->orderContainer->getInvoices()->willReturn($invoiceCollection);
+
+        $orderFinantialDetails = (new OrderFinancialDetailsEntity())
+            ->setUnshippedAmountGross(new Money(0));
+
+        $this->orderContainer->getOrderFinancialDetails()
+            ->shouldBeCalledOnce()
+            ->willReturn($orderFinantialDetails);
+
+        $this->orderContainerFactory->getCachedOrderContainer()
+            ->shouldBeCalledOnce()
+            ->willReturn($this->orderContainer->reveal());
+
+        $this->subscriber->canCancel($event);
+        $this->assertTrue($event->isBlocked());
+    }
+
+    public function shouldNotCancelOrderWhenAllInvoicesAreCanceled()
+    {
+        $order = new OrderEntity();
+        $event = new GuardEvent($order, new Marking(), new Transition('name', 'from', 'to'));
+
+        $invoice = (new Invoice())
+            ->setState('canceled');
+        $invoiceCollection = new InvoiceCollection([$invoice]);
+
+        $this->orderContainer->getInvoices()->willReturn($invoiceCollection);
+
+        $orderFinantialDetails = (new OrderFinancialDetailsEntity())
+            ->setUnshippedAmountGross(new Money(0));
+
+        $this->orderContainer->getOrderFinancialDetails()
+            ->shouldBeCalledOnce()
+            ->willReturn($orderFinantialDetails);
+
+        $this->orderContainerFactory->getCachedOrderContainer()
+            ->shouldBeCalledOnce()
+            ->willReturn($this->orderContainer->reveal());
+
+        $this->subscriber->canCancel($event);
+        $this->assertFalse($event->isBlocked());
     }
 }

@@ -11,6 +11,7 @@ use App\DomainModel\Invoice\CreditNote\CreditNoteAmountExceededException;
 use App\DomainModel\Invoice\CreditNote\CreditNoteAmountTaxExceededException;
 use App\DomainModel\Invoice\CreditNote\CreditNoteNotAllowedException;
 use App\DomainModel\Invoice\InvoiceNotFoundException;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\Http\HttpConstantsInterface;
 use App\Http\RequestTransformer\UpdateOrder\UpdateOrderAmountRequestFactory;
 use OpenApi\Annotations as OA;
@@ -83,7 +84,7 @@ class CreateCreditNoteController
 
         try {
             $response = $this->useCase->execute($useCaseRequest);
-        } catch (InvoiceNotFoundException $exception) {
+        } catch (InvoiceNotFoundException | OrderContainerFactoryException $exception) {
             throw new NotFoundHttpException('Invoice not found', $exception);
         } catch (CreditNoteNotAllowedException $exception) {
             throw new AccessDeniedHttpException('Credit notes not allowed for this invoice', $exception);

@@ -29,7 +29,7 @@ Feature: Create Credit Note
     {
       "uuid": "uuid"
     }
-    """NotificationDeliveryUseCase
+    """
     And queue should contain message with routing key credit_note.create_credit_note with below data:
     """
     {

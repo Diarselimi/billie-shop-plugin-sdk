@@ -7,38 +7,43 @@ namespace App\Application\UseCase\CancelInvoice;
 use App\Application\Exception\InvoiceNotFoundException as InvoiceNotFound;
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceCancellationService;
-use App\DomainModel\Invoice\InvoiceContainerFactory;
-use App\DomainModel\Invoice\InvoiceNotFoundException;
-use App\DomainModel\Payment\PaymentsServiceInterface;
+use App\DomainModel\Order\Lifecycle\OrderTerminalStateChangeService;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 
 class CancelInvoiceUseCase
 {
     private InvoiceCancellationService $invoiceCancelationService;
 
-    private InvoiceContainerFactory $invoiceContainerFactory;
+    private OrderTerminalStateChangeService $orderTerminalStateChangeService;
 
-    private PaymentsServiceInterface $paymentsService;
+    private OrderContainerFactory $orderContainerFactory;
 
     public function __construct(
-        InvoiceContainerFactory $invoiceContainerFactory,
-        InvoiceCancellationService $invoiceFullCancelationService
+        InvoiceCancellationService $invoiceFullCancelationService,
+        OrderTerminalStateChangeService $orderStateChangeService,
+        OrderContainerFactory $orderContainerFactory
     ) {
         $this->invoiceCancelationService = $invoiceFullCancelationService;
-        $this->invoiceContainerFactory = $invoiceContainerFactory;
+        $this->orderTerminalStateChangeService = $orderStateChangeService;
+        $this->orderContainerFactory = $orderContainerFactory;
     }
 
     public function execute(CancelInvoiceRequest $request): Invoice
     {
         try {
-            $invoiceContainer = $this->invoiceContainerFactory->createFromInvoiceAndMerchant(
+            $orderContainer = $this->orderContainerFactory->loadByInvoiceUuidAndMerchantId(
                 $request->getUuid(),
                 $request->getMerchantId()
             );
-            $invoice = $invoiceContainer->getInvoice();
-        } catch (InvoiceNotFoundException $e) {
+            $invoice = $orderContainer->getInvoices()->get($request->getUuid());
+        } catch (OrderContainerFactoryException $e) {
             throw new InvoiceNotFound();
         }
 
-        return $this->invoiceCancelationService->cancelInvoiceFully($invoice);
+        $invoice = $this->invoiceCancelationService->cancelInvoiceFully($invoice);
+        $this->orderTerminalStateChangeService->execute($orderContainer);
+
+        return $invoice;
     }
 }

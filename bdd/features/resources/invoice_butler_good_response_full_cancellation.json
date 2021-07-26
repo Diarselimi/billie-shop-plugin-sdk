@@ -1,0 +1,53 @@
+[
+  {
+    "uuid": "208cfe7d-046f-4162-b175-748942d6cff4",
+    "payment_uuid": "8e6a9efa-3a76-44f1-ad98-24f0ef15d7ad",
+    "external_code": "some_code",
+    "invoice_number": "123",
+    "offered_amount": 123.33,
+    "amount": 123.33,
+    "amount_net": 123.33,
+    "created_at": "2020-10-12 12:12:12",
+    "billing_date": "2020-12-01 12:12:12",
+    "due_date": "2020-12-26 12:12:12",
+    "payout_date": "2021-01-01 10:10:10",
+    "state": "canceled",
+    "duration": 30,
+    "payout_amount": 123.33,
+    "fee_amount": 123.33,
+    "fee_net_amount": 123.33,
+    "fee_vat_amount": 123,
+    "factoring_fee_rate": 20,
+    "deferral_fee_rate": 20,
+    "discount_rate": 5,
+    "outstanding_amount": 500,
+    "collateral_owner": "none",
+    "workflow_name": "v1",
+    "invoice_discount_rate": 0,
+    "company_discount_rate": 0,
+    "proof_of_delivery_url": "url",
+    "credit_notes": [
+      {
+        "uuid": "208cfe7d-046f-4162-b175-748942d6cff5",
+        "amount_net": 20.0,
+        "amount_gross": 22.0,
+        "external_code": "some-code-CN",
+        "created_at": "2021-03-01 12:12:12"
+      },
+      {
+        "uuid": "208cfe7d-046f-4162-b175-748942d6cff6",
+        "amount_net": 30.0,
+        "amount_gross": 33.0,
+        "external_code": "another-code-CN",
+        "created_at": "2021-03-01 12:12:12"
+      },
+      {
+        "uuid": "208cfe7d-046f-4162-b175-748942d6cff7",
+        "amount_gross": 68.33,
+        "amount_net": 73.33,
+        "external_code": "full cancellation",
+        "created_at": "2021-03-01 12:12:12"
+      }
+    ]
+  }
+]

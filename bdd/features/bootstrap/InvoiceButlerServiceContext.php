@@ -28,7 +28,21 @@ class InvoiceButlerServiceContext implements Context
         $this->mockRequest(
             '/invoices',
             new ResponseStack(
-                new MockResponse(file_get_contents(__DIR__ . '/../resources/invoice_butler_good_response.json'))
+                new MockResponse(file_get_contents(__DIR__ . '/../resources/invoice_butler_good_response.json')),
+            )
+        );
+    }
+
+    /**
+     * @Given /^I get from invoice-butler service good response with all invoices canceled$/
+     */
+    public function invoiceButlerApiRespondedWithSuccessWithAllInvoicesCancelled()
+    {
+        $this->mockRequest(
+            '/invoices',
+            new ResponseStack(
+                new MockResponse(file_get_contents(__DIR__ . '/../resources/invoice_butler_good_response.json')),
+                new MockResponse(file_get_contents(__DIR__ . '/../resources/invoice_butler_good_response_full_cancellation.json')),
             )
         );
     }

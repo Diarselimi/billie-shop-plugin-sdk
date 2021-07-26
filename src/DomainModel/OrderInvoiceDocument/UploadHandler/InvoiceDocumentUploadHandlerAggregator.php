@@ -13,7 +13,9 @@ class InvoiceDocumentUploadHandlerAggregator implements LoggingInterface, Invoic
 {
     use LoggingTrait;
 
-    private array $uploadHandlers;
+    private array
+
+ $uploadHandlers;
 
     /**
      * @param InvoiceDocumentUploadHandlerInterface[] $invoiceUploadHandlers

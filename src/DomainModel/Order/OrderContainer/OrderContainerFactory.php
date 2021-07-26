@@ -13,6 +13,8 @@ class OrderContainerFactory
 
     private $relationLoader;
 
+    private ?OrderContainer $cachedOrderContainer;
+
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         OrderContainerRelationLoader $relationLoader
@@ -28,12 +30,12 @@ class OrderContainerFactory
             throw new OrderContainerFactoryException("Order not found");
         }
 
-        return new OrderContainer($order, $this->relationLoader);
+        return $this->cachedOrderContainer = new OrderContainer($order, $this->relationLoader);
     }
 
     public function createFromOrderEntity(OrderEntity $order): OrderContainer
     {
-        return new OrderContainer($order, $this->relationLoader);
+        return $this->cachedOrderContainer = new OrderContainer($order, $this->relationLoader);
     }
 
     public function createFromPaymentId(string $paymentId): OrderContainer
@@ -43,7 +45,7 @@ class OrderContainerFactory
             throw new OrderContainerFactoryException("Order not found");
         }
 
-        return new OrderContainer($order, $this->relationLoader);
+        return $this->cachedOrderContainer = new OrderContainer($order, $this->relationLoader);
     }
 
     public function createFromInvoiceId(string $paymentId): OrderContainer
@@ -53,7 +55,7 @@ class OrderContainerFactory
             throw new OrderContainerFactoryException("Order not found");
         }
 
-        return new OrderContainer($order, $this->relationLoader);
+        return $this->cachedOrderContainer = new OrderContainer($order, $this->relationLoader);
     }
 
     public function loadByUuid(string $uuid): OrderContainer
@@ -63,7 +65,7 @@ class OrderContainerFactory
             throw new OrderContainerFactoryException("Order not found");
         }
 
-        return new OrderContainer($order, $this->relationLoader);
+        return $this->cachedOrderContainer = new OrderContainer($order, $this->relationLoader);
     }
 
     public function loadByInvoiceUuid(string $uuid): OrderContainer
@@ -73,7 +75,7 @@ class OrderContainerFactory
             throw new OrderContainerFactoryException("Order not found");
         }
 
-        return new OrderContainer($orders[0], $this->relationLoader);
+        return $this->cachedOrderContainer = new OrderContainer($orders[0], $this->relationLoader);
     }
 
     public function loadByInvoiceUuidAndMerchantId(string $uuid, int $merchantId): OrderContainer
@@ -83,7 +85,7 @@ class OrderContainerFactory
             throw new OrderContainerFactoryException("Order not found");
         }
 
-        return new OrderContainer($order, $this->relationLoader);
+        return $this->cachedOrderContainer = new OrderContainer($order, $this->relationLoader);
     }
 
     public function loadByMerchantIdAndExternalIdOrUuid(int $merchantId, string $orderId): OrderContainer
@@ -93,7 +95,7 @@ class OrderContainerFactory
             throw new OrderContainerFactoryException("Order not found");
         }
 
-        return new OrderContainer($order, $this->relationLoader);
+        return $this->cachedOrderContainer = new OrderContainer($order, $this->relationLoader);
     }
 
     public function loadByMerchantIdAndUuid(int $merchantId, string $uuid): OrderContainer
@@ -103,7 +105,7 @@ class OrderContainerFactory
             throw new OrderContainerFactoryException("Order not found");
         }
 
-        return new OrderContainer($order, $this->relationLoader);
+        return $this->cachedOrderContainer = new OrderContainer($order, $this->relationLoader);
     }
 
     public function loadNotYetConfirmedByCheckoutSessionUuid(string $checkoutSessionUuid): OrderContainer
@@ -113,7 +115,12 @@ class OrderContainerFactory
             throw new OrderContainerFactoryException("Order not found");
         }
 
-        return new OrderContainer($order, $this->relationLoader);
+        return $this->cachedOrderContainer = new OrderContainer($order, $this->relationLoader);
+    }
+
+    public function getCachedOrderContainer(): ?OrderContainer
+    {
+        return $this->cachedOrderContainer ?? null;
     }
 
     public function createFromNewOrderDTO(OrderCreationDTO $newOrder): OrderContainer
