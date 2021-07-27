@@ -47,16 +47,15 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
     {
         $id = $this->doInsert('
             INSERT INTO ' . self::TABLE_NAME . '
-            (name, api_key, plain_api_key, oauth_client_id, is_active, financing_power, available_financing_limit, 
+            (name, api_key, oauth_client_id, is_active, financing_power, available_financing_limit, 
                 company_id, company_uuid, sepa_b2b_document_uuid, payment_merchant_id, webhook_url, webhook_authorization, investor_uuid, created_at, updated_at)
             VALUES
-            (:name, :api_key, :plain_api_key, :oauth_client_id, :is_active, :financing_power, :available_financing_limit, 
+            (:name, :api_key, :oauth_client_id, :is_active, :financing_power, :available_financing_limit, 
                 :company_id, :company_uuid, :sepa_b2b_document_uuid, :payment_merchant_id, :webhook_url, :webhook_authorization, :investor_uuid, :created_at, :updated_at)
         ', [
             'name' => $merchant->getName(),
             'company_uuid' => $merchant->getCompanyUuid(),
             'api_key' => $this->encryptor->encrypt($merchant->getApiKey()),
-            'plain_api_key' => $merchant->getApiKey(),
             'oauth_client_id' => $merchant->getOauthClientId(),
             'is_active' => $merchant->isActive(),
             'financing_power' => $merchant->getFinancingPower()->getMoneyValue(),
@@ -139,7 +138,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
     public function getOneByApiKey(string $apiKey): ?MerchantEntity
     {
         $row = $this->doFetchOne($this->generateSelectQuery(self::TABLE_NAME, self::SELECT_FIELDS) . '
-          WHERE api_key = :api_key OR plain_api_key = :api_key
+          WHERE api_key = :api_key
         ', ['api_key' => $apiKey]);
 
         return $row ? $this->factory->createFromArray($row) : null;
