@@ -8,6 +8,7 @@
         "ext-iconv": "*",
         "ext-intl": "*",
         "ext-json": "*",
+        "ext-openssl": "*",
         "ext-pdo": "*",
         "aws/aws-sdk-php-symfony": "^2.2",
         "billie/monitoring-bundle": "^3.0",
@@ -28,7 +29,9 @@
         "ozean12/company-strict-match-bundle": "^1.0",
         "ozean12/graphql-repository-client": "^1.0",
         "ozean12/money": "^3.2",
+        "ozean12/sepa-client": "^1.1",
         "ozean12/smaug-client": "^1.0.0",
+        "ozean12/support": "^3.0",
         "ramsey/uuid": "^3.9",
         "robmorgan/phinx": "^0.12.1",
         "sensio/framework-extra-bundle": "^5.5",
@@ -44,8 +47,7 @@
         "symfony/validator": "4.4.*",
         "symfony/workflow": "4.4.*",
         "symfony/yaml": "4.4.*",
-        "zircote/swagger-php": "3.0.4",
-        "ext-openssl": "*"
+        "zircote/swagger-php": "3.0.4"
     },
     "require-dev": {
         "behat/mink": "^1.8",
@@ -88,6 +90,14 @@
         "symfony/polyfill-php56": "*"
     },
     "repositories": {
+        "ozean12-sepa-client": {
+            "type": "vcs",
+            "url": "https://github.com/ozean12/sepa-client-php"
+        },
+        "ozean12-support": {
+            "type": "vcs",
+            "url": "https://github.com/ozean12/support-php"
+        },
         "ozean12-company-strict-match-bundle": {
             "type": "vcs",
             "url": "https://github.com/ozean12/CompanyStrictMatchBundle"

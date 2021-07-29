@@ -1,0 +1,11 @@
+services:
+  Ozean12\Support\FlowControl\RetryOnFailure\RetryableCallbackRunner: ~
+  Ozean12\Support\HttpClient\JsonResponseDeserializer: ~
+
+  Ozean12\Sepa\Client\Infrastructure\SepaClient:
+    arguments:
+      - '@eight_points_guzzle.client.sepa'
+      - '@Ozean12\Support\HttpClient\JsonResponseDeserializer'
+      - '@Ozean12\Support\FlowControl\RetryOnFailure\RetryableCallbackRunner'
+  Ozean12\Sepa\Client\DomainModel\SepaClientInterface: '@Ozean12\Sepa\Client\Infrastructure\SepaClient'
+

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cf3d4308ed5a7bc069762125edcf8ff2",
+    "content-hash": "b3c692ce824f1a67a673edd23ed977bb",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -2161,16 +2161,16 @@
         },
         {
             "name": "guzzlehttp/psr7",
-            "version": "1.7.0",
+            "version": "1.8.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "53330f47520498c0ae1f61f7e2c90f55690c06a3"
+                "reference": "dc960a912984efb74d0a90222870c72c87f10c91"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/53330f47520498c0ae1f61f7e2c90f55690c06a3",
-                "reference": "53330f47520498c0ae1f61f7e2c90f55690c06a3",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/dc960a912984efb74d0a90222870c72c87f10c91",
+                "reference": "dc960a912984efb74d0a90222870c72c87f10c91",
                 "shasum": ""
             },
             "require": {
@@ -2228,7 +2228,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2020-09-30T07:37:11+00:00"
+            "time": "2021-04-26T09:17:50+00:00"
         },
         {
             "name": "illuminate/contracts",
@@ -2335,6 +2335,52 @@
             "description": "The Illuminate Support package.",
             "homepage": "https://laravel.com",
             "time": "2020-12-22T16:12:23+00:00"
+        },
+        {
+            "name": "ircmaxell/security-lib",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ircmaxell/SecurityLib.git",
+                "reference": "f3db6de12c20c9bcd1aa3db4353a1bbe0e44e1b5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ircmaxell/SecurityLib/zipball/f3db6de12c20c9bcd1aa3db4353a1bbe0e44e1b5",
+                "reference": "f3db6de12c20c9bcd1aa3db4353a1bbe0e44e1b5",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2"
+            },
+            "require-dev": {
+                "mikey179/vfsstream": "1.1.*"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "SecurityLib": "lib"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Anthony Ferrara",
+                    "email": "ircmaxell@ircmaxell.com",
+                    "homepage": "http://blog.ircmaxell.com"
+                }
+            ],
+            "description": "A Base Security Library",
+            "homepage": "https://github.com/ircmaxell/SecurityLib",
+            "time": "2015-03-20T14:31:23+00:00"
         },
         {
             "name": "laminas/laminas-code",
@@ -3299,6 +3345,63 @@
             "time": "2021-07-15T08:57:52+00:00"
         },
         {
+            "name": "ozean12/sepa-client",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:ozean12/sepa-client-php.git",
+                "reference": "d6a4e168163db10f8f15299dcf2ec99430d9cc7a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ozean12/sepa-client-php/zipball/d6a4e168163db10f8f15299dcf2ec99430d9cc7a",
+                "reference": "d6a4e168163db10f8f15299dcf2ec99430d9cc7a",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "guzzlehttp/guzzle": "~6.0 | ~7.0",
+                "guzzlehttp/psr7": "^1.8 | ^2.0",
+                "ozean12/support": "^3.0",
+                "php": ">=7.2",
+                "psr/log": "^1.1",
+                "ramsey/uuid": "^3.9.3 | ^4.1"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.18",
+                "phpspec/prophecy": "^1.13",
+                "phpunit/phpunit": "^8.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Ozean12\\Sepa\\Client\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Ozean12\\Sepa\\Client\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "XDEBUG_MODE=coverage ./vendor/bin/phpunit --stop-on-failure --testdox --colors=always -v --do-not-cache-result"
+                ],
+                "csfix": [
+                    "./vendor/bin/php-cs-fixer fix --ansi"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Sepa service HTTP client for PHP",
+            "support": {
+                "source": "https://github.com/ozean12/sepa-client-php/tree/1.1.0",
+                "issues": "https://github.com/ozean12/sepa-client-php/issues"
+            },
+            "time": "2021-07-29T09:48:27+00:00"
+        },
+        {
             "name": "ozean12/smaug-client",
             "version": "1.0.1",
             "source": {
@@ -3351,6 +3454,73 @@
                 "issues": "https://github.com/ozean12/smaug-client-php/issues"
             },
             "time": "2021-05-12T20:13:51+00:00"
+        },
+        {
+            "name": "ozean12/support",
+            "version": "3.0.3",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:ozean12/support-php.git",
+                "reference": "f0d9ae6fddc65c24952f03b91c46a95c46c5ec6a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ozean12/support-php/zipball/f0d9ae6fddc65c24952f03b91c46a95c46c5ec6a",
+                "reference": "f0d9ae6fddc65c24952f03b91c46a95c46c5ec6a",
+                "shasum": ""
+            },
+            "require": {
+                "ext-ctype": "*",
+                "ext-iconv": "*",
+                "ext-json": "*",
+                "guzzlehttp/guzzle": "~6.0|~7.0",
+                "paragonie/random-lib": "^2.0",
+                "php": ">=7.2",
+                "psr/http-message": "^1.0",
+                "ramsey/uuid": "^3.9.3",
+                "symfony/polyfill-php80": "^1.23"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "phpunit/phpunit": "^8.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Ozean12\\Support\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Tests\\Ozean12\\Support\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "./vendor/bin/phpunit --no-coverage"
+                ],
+                "test-coverage": [
+                    "XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-text"
+                ],
+                "phpcs": [
+                    "./vendor/bin/php-cs-fixer fix --ansi"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Javier Aguilar",
+                    "email": "javi@billie.io"
+                }
+            ],
+            "description": "Ozean12 Support utils for PHP",
+            "support": {
+                "source": "https://github.com/ozean12/support-php/tree/3.0.3",
+                "issues": "https://github.com/ozean12/support-php/issues"
+            },
+            "time": "2021-07-29T14:27:58+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",
@@ -3413,6 +3583,150 @@
                 "rfc4648"
             ],
             "time": "2020-12-06T15:14:20+00:00"
+        },
+        {
+            "name": "paragonie/random-lib",
+            "version": "v2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/paragonie/RandomLib.git",
+                "reference": "f0ca6a2859b22f7caea9c343e63ffb3ce9b2ffa7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/paragonie/RandomLib/zipball/f0ca6a2859b22f7caea9c343e63ffb3ce9b2ffa7",
+                "reference": "f0ca6a2859b22f7caea9c343e63ffb3ce9b2ffa7",
+                "shasum": ""
+            },
+            "require": {
+                "ircmaxell/security-lib": "^1.1",
+                "paragonie/random_compat": "^2",
+                "paragonie/sodium_compat": "^1.3",
+                "php": ">=5.3.2"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^1.11",
+                "mikey179/vfsstream": "^1.6",
+                "phpunit/phpunit": "^4.8 || >=5.0.0 <5.4"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "RandomLib": "lib"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Paragon Initiative Enterprises",
+                    "email": "security@paragonie.com",
+                    "homepage": "https://paragonie.com"
+                },
+                {
+                    "name": "Anthony Ferrara",
+                    "email": "ircmaxell@ircmaxell.com",
+                    "homepage": "http://blog.ircmaxell.com"
+                }
+            ],
+            "description": "A Library For Generating Secure Random Numbers",
+            "homepage": "https://github.com/ircmaxell/RandomLib",
+            "keywords": [
+                "cryptography",
+                "random",
+                "random-numbers",
+                "random-strings"
+            ],
+            "time": "2019-12-23T23:03:52+00:00"
+        },
+        {
+            "name": "paragonie/sodium_compat",
+            "version": "v1.16.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/paragonie/sodium_compat.git",
+                "reference": "2e856afe80bfc968b47da1f4a7e1ea8f03d06b38"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/paragonie/sodium_compat/zipball/2e856afe80bfc968b47da1f4a7e1ea8f03d06b38",
+                "reference": "2e856afe80bfc968b47da1f4a7e1ea8f03d06b38",
+                "shasum": ""
+            },
+            "require": {
+                "paragonie/random_compat": ">=1",
+                "php": "^5.2.4|^5.3|^5.4|^5.5|^5.6|^7|^8"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^3|^4|^5|^6|^7|^8|^9"
+            },
+            "suggest": {
+                "ext-libsodium": "PHP < 7.0: Better performance, password hashing (Argon2i), secure memory management (memzero), and better security.",
+                "ext-sodium": "PHP >= 7.0: Better performance, password hashing (Argon2i), secure memory management (memzero), and better security."
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "autoload.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "ISC"
+            ],
+            "authors": [
+                {
+                    "name": "Paragon Initiative Enterprises",
+                    "email": "security@paragonie.com"
+                },
+                {
+                    "name": "Frank Denis",
+                    "email": "jedisct1@pureftpd.org"
+                }
+            ],
+            "description": "Pure PHP implementation of libsodium; uses the PHP extension if it exists",
+            "keywords": [
+                "Authentication",
+                "BLAKE2b",
+                "ChaCha20",
+                "ChaCha20-Poly1305",
+                "Chapoly",
+                "Curve25519",
+                "Ed25519",
+                "EdDSA",
+                "Edwards-curve Digital Signature Algorithm",
+                "Elliptic Curve Diffie-Hellman",
+                "Poly1305",
+                "Pure-PHP cryptography",
+                "RFC 7748",
+                "RFC 8032",
+                "Salpoly",
+                "Salsa20",
+                "X25519",
+                "XChaCha20-Poly1305",
+                "XSalsa20-Poly1305",
+                "Xchacha20",
+                "Xsalsa20",
+                "aead",
+                "cryptography",
+                "ecdh",
+                "elliptic curve",
+                "elliptic curve cryptography",
+                "encryption",
+                "libsodium",
+                "php",
+                "public-key cryptography",
+                "secret-key cryptography",
+                "side-channel resistant"
+            ],
+            "time": "2021-05-25T12:58:14+00:00"
         },
         {
             "name": "php-amqplib/php-amqplib",
@@ -3886,16 +4200,16 @@
         },
         {
             "name": "psr/log",
-            "version": "1.1.3",
+            "version": "1.1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/log.git",
-                "reference": "0f73288fd15629204f9d42b7055f72dacbe811fc"
+                "reference": "d49695b909c3b7628b6289db5479a1c204601f11"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/0f73288fd15629204f9d42b7055f72dacbe811fc",
-                "reference": "0f73288fd15629204f9d42b7055f72dacbe811fc",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/d49695b909c3b7628b6289db5479a1c204601f11",
+                "reference": "d49695b909c3b7628b6289db5479a1c204601f11",
                 "shasum": ""
             },
             "require": {
@@ -3919,7 +4233,7 @@
             "authors": [
                 {
                     "name": "PHP-FIG",
-                    "homepage": "http://www.php-fig.org/"
+                    "homepage": "https://www.php-fig.org/"
                 }
             ],
             "description": "Common interface for logging libraries",
@@ -3929,7 +4243,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2020-03-23T09:12:05+00:00"
+            "time": "2021-05-03T11:20:27+00:00"
         },
         {
             "name": "psr/simple-cache",
@@ -6444,16 +6758,16 @@
         },
         {
             "name": "symfony/polyfill-intl-idn",
-            "version": "v1.22.1",
+            "version": "v1.23.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-intl-idn.git",
-                "reference": "2d63434d922daf7da8dd863e7907e67ee3031483"
+                "reference": "65bd267525e82759e7d8c4e8ceea44f398838e65"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-intl-idn/zipball/2d63434d922daf7da8dd863e7907e67ee3031483",
-                "reference": "2d63434d922daf7da8dd863e7907e67ee3031483",
+                "url": "https://api.github.com/repos/symfony/polyfill-intl-idn/zipball/65bd267525e82759e7d8c4e8ceea44f398838e65",
+                "reference": "65bd267525e82759e7d8c4e8ceea44f398838e65",
                 "shasum": ""
             },
             "require": {
@@ -6467,7 +6781,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "1.22-dev"
+                    "dev-main": "1.23-dev"
                 },
                 "thanks": {
                     "name": "symfony/polyfill",
@@ -6524,20 +6838,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-01-22T09:19:47+00:00"
+            "time": "2021-05-27T09:27:20+00:00"
         },
         {
             "name": "symfony/polyfill-intl-normalizer",
-            "version": "v1.22.1",
+            "version": "v1.23.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-intl-normalizer.git",
-                "reference": "43a0283138253ed1d48d352ab6d0bdb3f809f248"
+                "reference": "8590a5f561694770bdcd3f9b5c69dde6945028e8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-intl-normalizer/zipball/43a0283138253ed1d48d352ab6d0bdb3f809f248",
-                "reference": "43a0283138253ed1d48d352ab6d0bdb3f809f248",
+                "url": "https://api.github.com/repos/symfony/polyfill-intl-normalizer/zipball/8590a5f561694770bdcd3f9b5c69dde6945028e8",
+                "reference": "8590a5f561694770bdcd3f9b5c69dde6945028e8",
                 "shasum": ""
             },
             "require": {
@@ -6549,7 +6863,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "1.22-dev"
+                    "dev-main": "1.23-dev"
                 },
                 "thanks": {
                     "name": "symfony/polyfill",
@@ -6605,20 +6919,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-01-22T09:19:47+00:00"
+            "time": "2021-02-19T12:13:01+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.22.1",
+            "version": "v1.23.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "5232de97ee3b75b0360528dae24e73db49566ab1"
+                "reference": "2df51500adbaebdc4c38dea4c89a2e131c45c8a1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/5232de97ee3b75b0360528dae24e73db49566ab1",
-                "reference": "5232de97ee3b75b0360528dae24e73db49566ab1",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/2df51500adbaebdc4c38dea4c89a2e131c45c8a1",
+                "reference": "2df51500adbaebdc4c38dea4c89a2e131c45c8a1",
                 "shasum": ""
             },
             "require": {
@@ -6630,7 +6944,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "1.22-dev"
+                    "dev-main": "1.23-dev"
                 },
                 "thanks": {
                     "name": "symfony/polyfill",
@@ -6682,20 +6996,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-01-22T09:19:47+00:00"
+            "time": "2021-05-27T09:27:20+00:00"
         },
         {
             "name": "symfony/polyfill-php72",
-            "version": "v1.22.1",
+            "version": "v1.23.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php72.git",
-                "reference": "cc6e6f9b39fe8075b3dabfbaf5b5f645ae1340c9"
+                "reference": "9a142215a36a3888e30d0a9eeea9766764e96976"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php72/zipball/cc6e6f9b39fe8075b3dabfbaf5b5f645ae1340c9",
-                "reference": "cc6e6f9b39fe8075b3dabfbaf5b5f645ae1340c9",
+                "url": "https://api.github.com/repos/symfony/polyfill-php72/zipball/9a142215a36a3888e30d0a9eeea9766764e96976",
+                "reference": "9a142215a36a3888e30d0a9eeea9766764e96976",
                 "shasum": ""
             },
             "require": {
@@ -6704,7 +7018,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "1.22-dev"
+                    "dev-main": "1.23-dev"
                 },
                 "thanks": {
                     "name": "symfony/polyfill",
@@ -6755,7 +7069,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-01-07T16:49:33+00:00"
+            "time": "2021-05-27T09:17:38+00:00"
         },
         {
             "name": "symfony/polyfill-php73",
@@ -6835,16 +7149,16 @@
         },
         {
             "name": "symfony/polyfill-php80",
-            "version": "v1.22.1",
+            "version": "v1.23.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php80.git",
-                "reference": "dc3063ba22c2a1fd2f45ed856374d79114998f91"
+                "reference": "eca0bf41ed421bed1b57c4958bab16aa86b757d0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php80/zipball/dc3063ba22c2a1fd2f45ed856374d79114998f91",
-                "reference": "dc3063ba22c2a1fd2f45ed856374d79114998f91",
+                "url": "https://api.github.com/repos/symfony/polyfill-php80/zipball/eca0bf41ed421bed1b57c4958bab16aa86b757d0",
+                "reference": "eca0bf41ed421bed1b57c4958bab16aa86b757d0",
                 "shasum": ""
             },
             "require": {
@@ -6853,7 +7167,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "1.22-dev"
+                    "dev-main": "1.23-dev"
                 },
                 "thanks": {
                     "name": "symfony/polyfill",
@@ -6911,7 +7225,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-01-07T16:49:33+00:00"
+            "time": "2021-02-19T12:13:01+00:00"
         },
         {
             "name": "symfony/property-access",
@@ -11431,6 +11745,7 @@
                     "type": "github"
                 }
             ],
+            "abandoned": true,
             "time": "2020-11-30T07:30:19+00:00"
         },
         {
@@ -11845,8 +12160,8 @@
         "ext-iconv": "*",
         "ext-intl": "*",
         "ext-json": "*",
-        "ext-pdo": "*",
-        "ext-openssl": "*"
+        "ext-openssl": "*",
+        "ext-pdo": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "1.1.0"
