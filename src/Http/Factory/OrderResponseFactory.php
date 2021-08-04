@@ -28,7 +28,8 @@ class OrderResponseFactory
         return new OrderResponseModel(
             $orderContainer,
             $this->createInvoices($orderContainer),
-            $this->createDebtor($orderContainer)
+            $this->createDebtor($orderContainer),
+            $orderContainer->getPaymentMethods()
         );
     }
 

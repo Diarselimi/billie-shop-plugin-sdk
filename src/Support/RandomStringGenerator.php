@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Support;
 
+/**
+ * @deprecated
+ * @see \Ozean12\Support\Random\RandomStringGeneratorInterface
+ */
 class RandomStringGenerator
 {
     public function generateHexToken(int $length = 32): string

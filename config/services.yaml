@@ -6,6 +6,7 @@ parameters:
   smaug_client_id: '%env(string:SMAUG_CLIENT_ID)%'
   smaug_client_secret: '%env(string:SMAUG_CLIENT_SECRET)%'
   redoc_js_url: 'https://cdn.jsdelivr.net/npm/redoc@v2.0.0-rc.23/bundles/redoc.standalone.js'
+  banco_url: '%env(string:BANCO_URL)%/public/api/v1'
 
 services:
   _defaults:
@@ -55,6 +56,7 @@ services:
       $isDummyRiskChecksFeatureEnabled: '%env(bool:DUMMY_CHECKS_ENABLED)%'
       $blacklistedAddresses: '%blacklisted_addresses%'
       $encryptionKey: '%env(ENCRYPTION_KEY)%'
+      $bancoApiUrl: "%banco_url%"
 
   _instanceof:
     App\Application\UseCase\ValidatedUseCaseInterface:

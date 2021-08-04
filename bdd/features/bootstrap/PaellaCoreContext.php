@@ -61,6 +61,7 @@ use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRep
 use App\Infrastructure\Repository\DebtorExternalDataRepository;
 use App\Infrastructure\Repository\DebtorInformationChangeRequestRepository;
 use App\Infrastructure\Repository\MerchantDebtorRepository;
+use App\Tests\Helpers\TestUuidGenerator;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Driver\BrowserKitDriver;
@@ -121,9 +122,11 @@ class PaellaCoreContext extends MinkContext
      */
     public function setup()
     {
+        TestUuidGenerator::enableDynamicGeneration();
         $this->initMinkExtension();
         $this->cleanUpDatabase();
         $this->createInitialDataset();
+        TestUuidGenerator::disableDynamicGeneration();
     }
 
     /**
@@ -700,6 +703,16 @@ class PaellaCoreContext extends MinkContext
         $this->getConnection()
             ->prepare("UPDATE orders SET uuid = :uuid WHERE external_code = :orderExternalCode", [])
             ->execute([':uuid' => $uuid, ':orderExternalCode' => $orderExternalCode]);
+    }
+
+    /**
+     * @Given The order :orderExternalCode has a payment UUID
+     */
+    public function theOrderHasPaymentUUID($orderExternalCode)
+    {
+        $this->getConnection()
+            ->prepare("UPDATE orders SET payment_id = :uuid WHERE external_code = :orderExternalCode", [])
+            ->execute([':uuid' => self::DUMMY_UUID4, ':orderExternalCode' => $orderExternalCode]);
     }
 
     /**

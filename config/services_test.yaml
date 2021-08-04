@@ -104,8 +104,6 @@ services:
     public: true
   App\DomainModel\MerchantOnboarding\MerchantOnboardingPersistenceService:
     public: true
-  App\DomainModel\SignatoryPowersSelection\SignatoryPowerAutoIdentifyUserService:
-    public: true
   App\DomainModel\MerchantFinancialAssessment\MerchantFinancialAssessmentRepositoryInterface:
     alias: 'App\Infrastructure\Repository\MerchantFinancialAssessmentRepository'
     public: true
@@ -118,3 +116,5 @@ services:
   App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestRepositoryInterface:
     alias: 'App\Infrastructure\Repository\DebtorInformationChangeRequestRepository'
     public: true
+  App\Tests\Helpers\TestUuidGenerator: ~
+  App\Helper\Uuid\UuidGeneratorInterface: '@App\Tests\Helpers\TestUuidGenerator'

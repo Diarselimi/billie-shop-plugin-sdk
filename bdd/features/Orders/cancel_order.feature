@@ -28,6 +28,8 @@ Feature:
     And I get from companies service identify match response
     And I get from invoice-butler service no invoices and later one invoice responses
     And I get from volt service good response
+    And The order "CO123" has a payment UUID
+    And I get from payments service get order details response
     When I send a POST request to "/order/CO123/ship" with body:
     """
     {
@@ -42,6 +44,7 @@ Feature:
     And I add "X-Api-Key" header equal to test
     And I add "X-Test" header equal to 1
     And I get from payments service create ticket response
+    And I get from payments service get order details response
     When I send a POST request to "/order/CO123/cancel"
     Then the response status code should be 204
     And the response should be empty

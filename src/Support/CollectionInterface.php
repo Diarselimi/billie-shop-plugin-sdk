@@ -8,6 +8,10 @@ use App\DomainModel\ArrayableInterface;
 use Countable;
 use IteratorAggregate;
 
+/**
+ * @deprecated
+ * @see \Ozean12\Support\Collections\CollectionInterface
+ */
 interface CollectionInterface extends Countable, IteratorAggregate, ArrayableInterface
 {
 }

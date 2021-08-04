@@ -44,7 +44,7 @@
     },
     "bank_account": {
       "bic": "BICISHERE",
-      "iban": "DE1234"
+      "iban": "DE27500105171416939916"
     }
   },
   "delivery_address": {
@@ -55,5 +55,15 @@
     "postal_code": "10179"
   },
   "invoices": [],
-  "created_at": "2021-05-06 11:13:43"
+  "created_at": "2021-05-06 11:13:43",
+  "payment_methods": [
+    {
+      "type": "bank_transfer",
+      "data": {
+        "iban": "DE27500105171416939916",
+        "bic": "BICISHERE",
+        "bank_name": null
+      }
+    }
+  ]
 }

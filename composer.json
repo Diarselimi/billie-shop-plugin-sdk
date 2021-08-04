@@ -11,7 +11,7 @@
         "ext-openssl": "*",
         "ext-pdo": "*",
         "aws/aws-sdk-php-symfony": "^2.2",
-        "billie/monitoring-bundle": "^3.0",
+        "billie/monitoring-bundle": "^3.1",
         "billie/pdo-bundle": "^2.1",
         "caseyamcl/guzzle_retry_middleware": "^2.6",
         "doctrine/annotations": "^1.10",
@@ -26,6 +26,8 @@
         "league/flysystem-bundle": "^1.5",
         "ozean12/amqp-pack": "^1.1",
         "ozean12/amqp-transfers": "^0.4",
+        "ozean12/banco-sdk-php": "^1.0",
+        "ozean12/borscht-client": "^1.0",
         "ozean12/company-strict-match-bundle": "^1.0",
         "ozean12/graphql-repository-client": "^1.0",
         "ozean12/money": "^3.2",
@@ -55,7 +57,7 @@
         "behat/symfony2-extension": "^2.1",
         "behatch/contexts": "^3.3",
         "coduo/php-matcher": "^6.0",
-        "donatj/mock-webserver": "^2.1",
+        "donatj/mock-webserver": "^2.3",
         "duxet/json_spec": "^1.2",
         "fzaninotto/faker": "^1.9",
         "ozean12/php-cs-fixer": "^1.2",
@@ -98,35 +100,43 @@
             "type": "vcs",
             "url": "https://github.com/ozean12/support-php"
         },
+        "ozean12-borscht-client": {
+            "type": "vcs",
+            "url": "https://github.com/ozean12/borscht-client-php"
+        },
+        "ozean12-banco-sdk": {
+            "type": "vcs",
+            "url": "https://github.com/ozean12/banco-sdk-php"
+        },
         "ozean12-company-strict-match-bundle": {
             "type": "vcs",
             "url": "https://github.com/ozean12/CompanyStrictMatchBundle"
         },
-        "0": {
+        "ozean12-monitoring-bundle": {
             "type": "vcs",
             "url": "https://github.com/ozean12/MonitoringBundle"
         },
-        "1": {
+        "ozean12-pdo-bundle": {
             "type": "vcs",
             "url": "https://github.com/ozean12/PdoBundle"
         },
-        "2": {
+        "ozean12-amqp-pack": {
             "type": "vcs",
             "url": "https://github.com/ozean12/amqp-pack"
         },
-        "3": {
+        "ozean12-amqp-transfers": {
             "type": "vcs",
             "url": "https://github.com/ozean12/amqp-transfers"
         },
-        "4": {
+        "ozean12-amqp-transfers-serializer": {
             "type": "vcs",
             "url": "https://github.com/ozean12/amqp-transfers-serializer"
         },
-        "5": {
+        "ozean12-graphql-repository-client": {
             "type": "vcs",
             "url": "https://github.com/ozean12/graphql-repository-client"
         },
-        "6": {
+        "ozean12-money": {
             "type": "vcs",
             "url": "https://github.com/ozean12/money-php"
         },

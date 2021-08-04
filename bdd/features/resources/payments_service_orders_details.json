@@ -1,6 +1,6 @@
 [
   {
-    "id": 1,
+    "id": "6d6b4222-be8c-11e9-9cb5-2a2ae2dbcce4",
     "state": "new",
     "payout_amount": 1000,
     "outstanding_amount": 1000,
@@ -9,7 +9,7 @@
     "due_date": "20-11-1978"
   },
   {
-    "id": 2,
+    "id": "4c505361-b44d-4ec0-9d3c-25a5a327c0e3",
     "state": "new",
     "payout_amount": 1000,
     "outstanding_amount": 1000,

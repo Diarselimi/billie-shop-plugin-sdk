@@ -114,7 +114,7 @@ Feature: As a merchant, I should be able to create an order by providing a valid
              "country":"TE"
           },
           "bank_account":{
-             "iban":"DE1234",
+             "iban":"DE27500105171416939916",
              "bic":"BICISHERE"
           },
           "external_data":{
@@ -131,6 +131,16 @@ Feature: As a merchant, I should be able to create an order by providing a valid
           }
        },
        "invoices":[
+       ],
+       "payment_methods": [
+         {
+           "type": "bank_transfer",
+           "data": {
+             "iban": "DE27500105171416939916",
+             "bic": "BICISHERE",
+             "bank_name": null
+           }
+         }
        ]
     }
     """

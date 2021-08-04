@@ -3,6 +3,7 @@
 namespace App\DomainModel\MerchantDebtorResponse;
 
 use App\DomainModel\ArrayableInterface;
+use App\Support\DateFormat;
 use OpenApi\Annotations as OA;
 
 /**
@@ -183,7 +184,7 @@ abstract class AbstractMerchantDebtor implements ArrayableInterface
             'bank_account_iban' => $this->bankAccountIban,
             'bank_account_bic' => $this->bankAccountBic,
 
-            'created_at' => $this->createdAt->format(\DateTime::ISO8601),
+            'created_at' => $this->createdAt->format(DateFormat::ISO8601),
 
             'debtor_information_change_request_state' => $this->debtorInformationChangeRequestState,
         ];

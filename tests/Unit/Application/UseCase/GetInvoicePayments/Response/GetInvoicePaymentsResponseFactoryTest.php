@@ -74,7 +74,6 @@ class GetInvoicePaymentsResponseFactoryTest extends UnitTestCase
         self::assertMoneyEquals($expectedSummary->getCancellationAmount(), $summary->getCancellationAmount());
         self::assertMoneyEquals($expectedSummary->getDebtorPaymentAmount(), $summary->getDebtorPaymentAmount());
         self::assertMoneyEquals($expectedSummary->getMerchantPaymentAmount(), $summary->getMerchantPaymentAmount());
-        self::assertMoneyEquals($expectedSummary->getOutstandingAmount(), $summary->getOutstandingAmount());
     }
 
     public function createShouldMatchDataProvider(): array
@@ -115,7 +114,6 @@ class GetInvoicePaymentsResponseFactoryTest extends UnitTestCase
                     ],
                 ],
                 (new InvoicePaymentSummary())
-                    ->setOutstandingAmount(new Money(45))
                     ->setTotalPaymentAmount(new Money(55))
                     ->setCancellationAmount(new Money(5))
                     ->setDebtorPaymentAmount(new Money(20))

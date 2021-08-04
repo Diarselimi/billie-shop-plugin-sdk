@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Support;
 
+/**
+ * @deprecated
+ * @see \Ozean12\Support\Collections\ArrayCollection
+ */
 class ArrayCollection implements CollectionInterface
 {
     protected array $items;

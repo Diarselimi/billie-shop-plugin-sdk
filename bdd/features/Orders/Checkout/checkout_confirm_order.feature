@@ -64,7 +64,17 @@ Feature: As a merchant, I should be able to create an order by providing a valid
           "postal_code":"10179",
           "country":"DE"
        },
-       "order_id": "CO333"
+       "order_id": "CO333",
+       "payment_methods": [
+         {
+           "type": "bank_transfer",
+           "data": {
+             "iban": "DE27500105171416939916",
+             "bic": "BICISHERE",
+             "bank_name": null
+           }
+         }
+       ]
     }
     """
     Then the response status code should be 202
@@ -94,7 +104,7 @@ Feature: As a merchant, I should be able to create an order by providing a valid
         "address_country":"DE"
       },
       "bank_account":{
-        "iban":"DE1234",
+        "iban":"DE27500105171416939916",
         "bic":"BICISHERE"
       },
       "debtor_external_data": {
@@ -133,7 +143,17 @@ Feature: As a merchant, I should be able to create an order by providing a valid
         "fee_rate":null,
         "pending_merchant_payment_amount":null,
         "pending_cancellation_amount":null
-      }
+      },
+       "payment_methods": [
+         {
+           "type": "bank_transfer",
+           "data": {
+             "iban": "DE27500105171416939916",
+             "bic": "BICISHERE",
+             "bank_name": null
+           }
+         }
+       ]
     }
     """
     And the order CO333 is in state created

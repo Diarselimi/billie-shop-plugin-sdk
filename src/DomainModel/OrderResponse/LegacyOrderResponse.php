@@ -3,6 +3,8 @@
 namespace App\DomainModel\OrderResponse;
 
 use App\DomainModel\ArrayableInterface;
+use App\DomainModel\PaymentMethod\PaymentMethodCollection;
+use App\Http\Response\DTO\PaymentMethodDTO;
 use App\Support\DateFormat;
 use OpenApi\Annotations as OA;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
@@ -28,7 +30,7 @@ use Ozean12\Money\TaxedMoney\TaxedMoney;
  *          @OA\Property(property="address_country", type="string", nullable=true, maxLength=2),
  *      }),
  *
- *      @OA\Property(property="bank_account", type="object", properties={
+ *      @OA\Property(property="bank_account", deprecated=true, type="object", properties={
  *          @OA\Property(property="iban", ref="#/components/schemas/TinyText", nullable=true, description="Virtual IBAN provided by Billie"),
  *          @OA\Property(property="bic", ref="#/components/schemas/TinyText", nullable=true),
  *      }),
@@ -54,11 +56,12 @@ use Ozean12\Money\TaxedMoney\TaxedMoney;
  *          @OA\Property(property="fee_rate", type="number", format="float", nullable=true),
  *          @OA\Property(property="due_date", type="string", format="date", nullable=true, example="2019-03-20"),
  *      }),
+ *      @OA\Property(property="payment_methods", ref="#/components/schemas/PaymentMethodCollection"),
  *
  *      @OA\Property(property="delivery_address", type="object", ref="#/components/schemas/CreateOrderAddressRequest"),
  *      @OA\Property(property="billing_address", type="object", ref="#/components/schemas/CreateOrderAddressRequest"),
  *      @OA\Property(property="created_at", ref="#/components/schemas/DateTime"),
- *      @OA\Property(property="shipped_at", ref="#/components/schemas/DateTime")
+ *      @OA\Property(property="shipped_at", ref="#/components/schemas/DateTime"),
  * })
  *
  */
@@ -162,6 +165,8 @@ class LegacyOrderResponse implements ArrayableInterface
      * @deprecated use declineReason
      */
     private $reasons = [];
+
+    private PaymentMethodCollection $paymentMethods;
 
     public function getExternalCode(): ?string
     {
@@ -755,7 +760,7 @@ class LegacyOrderResponse implements ArrayableInterface
     public function toArray(): array
     {
         return [
-            'order_id' => $this->getExternalCode(), // This is very confusing because the api used to return the external_code as an order_id.
+            'order_id' => $this->getExternalCode(),
             'uuid' => $this->getUuid(),
             'state' => $this->getState(),
             'decline_reason' => $this->getDeclineReason(),
@@ -804,11 +809,14 @@ class LegacyOrderResponse implements ArrayableInterface
                 'postal_code' => $this->getBillingAddressPostalCode(),
                 'country' => $this->getBillingAddressCountry(),
             ],
-            'created_at' => $this->getCreatedAt()->format(\DateTime::ISO8601),
-            'shipped_at' => ($this->getShippedAt() ? $this->getShippedAt()->format(\DateTime::ISO8601) : null),
+            'created_at' => $this->getCreatedAt()->format(DateFormat::ISO8601),
+            'shipped_at' => ($this->getShippedAt() ? $this->getShippedAt()->format(DateFormat::ISO8601) : null),
             'debtor_uuid' => $this->getDebtorUuid(),
             'workflow_name' => $this->workflowName,
-            'invoices' => array_map(fn (LegacyOrderInvoiceResponse $invoice) => $invoice->toArray(), $this->invoices),
+            'invoices' => array_map(
+                static fn (LegacyOrderInvoiceResponse $invoice) => $invoice->toArray(),
+                $this->invoices
+            ),
             'invoice' => [
                 'invoice_number' => $this->getInvoiceNumber(),
                 'payout_amount' => $this->getPayoutAmount(),
@@ -819,6 +827,14 @@ class LegacyOrderResponse implements ArrayableInterface
                 'pending_merchant_payment_amount' => $this->getPendingMerchantPaymentAmount(),
                 'pending_cancellation_amount' => $this->getPendingCancellationAmount(),
             ],
+            'payment_methods' => PaymentMethodDTO::collectionToArray($this->paymentMethods),
         ];
+    }
+
+    public function setPaymentMethods(PaymentMethodCollection $paymentMethods): self
+    {
+        $this->paymentMethods = $paymentMethods;
+
+        return $this;
     }
 }

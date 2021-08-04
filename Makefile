@@ -120,6 +120,12 @@ local-test-coverage:
 	bin/docker/app make test-coverage
 	open var/tests/_output/index.html
 
+view-docs:
+	docker-compose up -d openapi
+	DOCS_URL="http://$$(docker-compose port openapi 80)" && \
+	echo "Starting OpenAPI docs viewer on $${DOCS_URL}" && \
+	open "$${DOCS_URL}"
+
 ###################################################################################
 
 $(V).SILENT:

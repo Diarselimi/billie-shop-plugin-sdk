@@ -28,6 +28,8 @@ use App\DomainModel\OrderLineItem\OrderLineItemEntity;
 use App\DomainModel\OrderLineItem\OrderLineItemRepositoryInterface;
 use App\DomainModel\OrderRiskCheck\CheckResultCollection;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
+use App\DomainModel\PaymentMethod\PaymentMethodCollection;
+use App\DomainModel\PaymentMethod\OrderPaymentMethodResolver;
 use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonRepositoryInterface;
 use App\DomainModel\Salesforce\ClaimStateService;
@@ -64,6 +66,8 @@ class OrderContainerRelationLoader
 
     private InvoiceServiceInterface $invoiceRepository;
 
+    private OrderPaymentMethodResolver $paymentMethodResolver;
+
     public function __construct(
         DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
         AddressRepositoryInterface $addressRepository,
@@ -79,7 +83,8 @@ class OrderContainerRelationLoader
         CompaniesServiceInterface $companiesService,
         MerchantDebtorDetailsRepositoryInterface $merchantDebtorDetailsRepository,
         OrderInvoiceRepositoryInterface $orderInvoiceRepository,
-        InvoiceServiceInterface $invoiceRepository
+        InvoiceServiceInterface $invoiceRepository,
+        OrderPaymentMethodResolver $paymentMethodResolver
     ) {
         $this->debtorExternalDataRepository = $debtorExternalDataRepository;
         $this->addressRepository = $addressRepository;
@@ -96,6 +101,7 @@ class OrderContainerRelationLoader
         $this->merchantDebtorDetailsRepository = $merchantDebtorDetailsRepository;
         $this->orderInvoiceRepository = $orderInvoiceRepository;
         $this->invoiceRepository = $invoiceRepository;
+        $this->paymentMethodResolver = $paymentMethodResolver;
     }
 
     public function loadMerchantDebtor(OrderContainer $orderContainer): MerchantDebtorEntity
@@ -172,7 +178,9 @@ class OrderContainerRelationLoader
 
     public function loadDebtorDetails(OrderContainer $orderContainer): MerchantDebtorDetailsDTO
     {
-        return $this->merchantDebtorDetailsRepository->getMerchantDebtorDetails($orderContainer->getOrder()->getMerchantDebtorId());
+        return $this->merchantDebtorDetailsRepository->getMerchantDebtorDetails(
+            $orderContainer->getOrder()->getMerchantDebtorId()
+        );
     }
 
     public function loadDebtorSettings(OrderContainer $orderContainer): ?DebtorSettingsEntity
@@ -188,5 +196,10 @@ class OrderContainerRelationLoader
     public function loadFailedRiskChecks(OrderContainer $orderContainer): CheckResultCollection
     {
         return $this->orderRiskCheckRepository->findLastFailedRiskChecksByOrderId($orderContainer->getOrder()->getId());
+    }
+
+    public function loadPaymentMethods(OrderContainer $orderContainer): PaymentMethodCollection
+    {
+        return $this->paymentMethodResolver->getOrderPaymentMethods($orderContainer);
     }
 }

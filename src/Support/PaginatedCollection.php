@@ -7,6 +7,10 @@ use ArrayIterator;
 use Countable;
 use IteratorAggregate;
 
+/**
+ * @deprecated
+ * @see \Ozean12\Support\Collections\PaginatedCollection
+ */
 class PaginatedCollection implements IteratorAggregate, Countable, ArrayableInterface
 {
     private $items;

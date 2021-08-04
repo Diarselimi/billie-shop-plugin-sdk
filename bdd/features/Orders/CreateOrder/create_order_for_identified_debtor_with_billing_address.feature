@@ -128,7 +128,7 @@ Feature:
         "address_country":"DE"
       },
       "bank_account":{
-        "iban":"DE1234",
+        "iban":"DE27500105171416939916",
         "bic":"BICISHERE"
       },
       "invoices":[],
@@ -142,6 +142,16 @@ Feature:
         "pending_merchant_payment_amount":null,
         "pending_cancellation_amount":null
       },
+       "payment_methods": [
+         {
+           "type": "bank_transfer",
+           "data": {
+             "iban": "DE27500105171416939916",
+             "bic": "BICISHERE",
+             "bank_name": null
+           }
+         }
+       ],
       "debtor_external_data":{
         "merchant_customer_id":"12",
         "name":"Test User Company",
@@ -270,6 +280,16 @@ Feature:
         "pending_merchant_payment_amount":null,
         "pending_cancellation_amount":null
       },
+       "payment_methods": [
+         {
+           "type": "bank_transfer",
+           "data": {
+             "iban": "DE27500105171416939916",
+             "bic": "BICISHERE",
+             "bank_name": null
+           }
+         }
+       ],
       "debtor_external_data":{
         "merchant_customer_id":"12",
         "name":"Test User Company",

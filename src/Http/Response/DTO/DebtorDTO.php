@@ -11,7 +11,7 @@ use App\DomainModel\ArrayableInterface;
  *      @OA\Property(property="name", type="string", example="C-10123456789-0001"),
  *      @OA\Property(property="company_address", ref="#/components/schemas/Address"),
  *      @OA\Property(property="billing_address", ref="#/components/schemas/Address"),
- *      @OA\Property(property="bank_account", ref="#/components/schemas/BankAccount", nullable=true),
+ *      @OA\Property(property="bank_account", deprecated=true, ref="#/components/schemas/BankAccount", nullable=true),
  *      @OA\Property(property="external_data", ref="#/components/schemas/DebtorExternalData"),
  * })
  */

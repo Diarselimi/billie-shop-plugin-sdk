@@ -1,0 +1,11 @@
+billie_pdo:
+  connections:
+    default:
+      dsn: 'mysql:dbname=%env(DATABASE_NAME)%;host=%env(DATABASE_HOST)%;charset=UTF8'
+      username: '%env(DATABASE_USERNAME)%'
+      password: '%env(DATABASE_PASSWORD)%'
+      retries: 3
+      retry_delay: 100
+
+billie_monitoring:
+  strict_logging: true

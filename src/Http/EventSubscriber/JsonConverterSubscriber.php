@@ -3,6 +3,7 @@
 namespace App\Http\EventSubscriber;
 
 use App\DomainModel\ArrayableInterface;
+use Ozean12\Support\Serialization\ArrayableInterface as SupportArrayable;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -59,7 +60,7 @@ class JsonConverterSubscriber implements EventSubscriberInterface
             $event->setResponse(new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT));
         }
 
-        if ($response instanceof ArrayableInterface) {
+        if ($response instanceof ArrayableInterface || $response instanceof SupportArrayable) {
             $event->setResponse(new JsonResponse($response->toArray()));
         }
     }

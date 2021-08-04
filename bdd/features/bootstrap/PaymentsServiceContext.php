@@ -2,6 +2,7 @@
 
 namespace App\Tests\Functional\Context;
 
+use App\Tests\Helpers\TestUuidGenerator;
 use Behat\Behat\Context\Context;
 use donatj\MockWebServer\Response as MockResponse;
 use donatj\MockWebServer\ResponseStack;
@@ -20,9 +21,12 @@ class PaymentsServiceContext implements Context
      */
     public function iGetFromPaymentsServiceRegisterDebtorPositiveResponse()
     {
-        $this->mockRequest('/debtor.json', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__ . '/../resources/payments_service_register_debtor.json'))
-        ));
+        $this->mockRequest(
+            '/debtor.json',
+            new ResponseStack(
+                new MockResponse(file_get_contents(__DIR__ . '/../resources/payments_service_register_debtor.json'))
+            )
+        );
     }
 
     /**
@@ -30,10 +34,13 @@ class PaymentsServiceContext implements Context
      */
     public function iGetFromPaymentsServiceGetDebtorResponse()
     {
-        $this->mockRequest('/debtor/test.json', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__ . '/../resources/payments_service_get_debtor.json')),
-            new MockResponse(file_get_contents(__DIR__ . '/../resources/payments_service_get_debtor.json'))
-        ));
+        $this->mockRequest(
+            '/debtor/test.json',
+            new ResponseStack(
+                new MockResponse(file_get_contents(__DIR__ . '/../resources/payments_service_get_debtor.json')),
+                new MockResponse(file_get_contents(__DIR__ . '/../resources/payments_service_get_debtor.json'))
+            )
+        );
     }
 
     /**
@@ -50,10 +57,13 @@ class PaymentsServiceContext implements Context
     public function iGetFromPaymentsServiceGetOrderDetailsFirstTryFailResponse()
     {
         //This will test the retry mechanism.
-        $this->mockRequest('/order/' . PaellaCoreContext::DUMMY_UUID4 . '.json', new ResponseStack(
-            new MockResponse('', [], 404),
-            new MockResponse(file_get_contents(__DIR__ . '/../resources/payments_service_order_details.json'))
-        ));
+        $this->mockRequest(
+            '/order/' . PaellaCoreContext::DUMMY_UUID4 . '.json',
+            new ResponseStack(
+                new MockResponse('', [], 404),
+                new MockResponse(file_get_contents(__DIR__ . '/../resources/payments_service_order_details.json'))
+            )
+        );
     }
 
     /**
@@ -61,27 +71,24 @@ class PaymentsServiceContext implements Context
      */
     public function iGetFromPaymentsServiceGetOrderDetailsResponse()
     {
-        $orderUuids = [
-            PaellaCoreContext::DUMMY_UUID4,
-            '123456a',
-            '123456b',
-        ];
+        $orderUuids = array_merge(
+            [
+                '123456a',
+                '123456b',
+                'test-order-uuid',
+            ],
+            TestUuidGenerator::getUuids()
+        );
 
         foreach ($orderUuids as $orderUuid) {
-            $this->mockRequest('/order/' . $orderUuid . '.json', new MockResponse(
-                file_get_contents(__DIR__ . '/../resources/payments_service_order_details.json')
-            ));
+            $this->mockRequest(
+                '/order/' . $orderUuid . '.json',
+                new MockResponse(
+                    file_get_contents(__DIR__ . '/../resources/payments_service_order_details.json'),
+                    ['Content-Type' => 'application/json']
+                )
+            );
         }
-    }
-
-    /**
-     * @Given /^I get from payments service get order detail response$/
-     */
-    public function iGetFromPaymentsServiceGetOrderDetailResponse()
-    {
-        $this->mockRequest('/order/8e6a9efa-3a76-44f1-ad98-24f0ef15d7ad.json', new MockResponse(
-            file_get_contents(__DIR__ . '/../resources/payments_service_order_details.json')
-        ));
     }
 
     /**
@@ -89,9 +96,12 @@ class PaymentsServiceContext implements Context
      */
     public function iGetFromPaymentsServiceCreateTicketResponse()
     {
-        $this->mockRequest('/order.json', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__ . '/../resources/payments_service_create_order.json'))
-        ));
+        $this->mockRequest(
+            '/order.json',
+            new ResponseStack(
+                new MockResponse(file_get_contents(__DIR__ . '/../resources/payments_service_create_order.json'))
+            )
+        );
     }
 
     /**
@@ -99,9 +109,12 @@ class PaymentsServiceContext implements Context
      */
     public function iGetFromPaymentsServiceModifyTicketResponse()
     {
-        $this->mockRequest('/order.json', new ResponseStack(
-            new MockResponse('')
-        ));
+        $this->mockRequest(
+            '/order.json',
+            new ResponseStack(
+                new MockResponse('')
+            )
+        );
     }
 
     /**
@@ -109,10 +122,13 @@ class PaymentsServiceContext implements Context
      */
     public function iGetFromPaymentsServiceTwoModifyTicketResponses()
     {
-        $this->mockRequest('/order.json', new ResponseStack(
-            new MockResponse(''),
-            new MockResponse('')
-        ));
+        $this->mockRequest(
+            '/order.json',
+            new ResponseStack(
+                new MockResponse(''),
+                new MockResponse('')
+            )
+        );
     }
 
     /**
@@ -120,8 +136,11 @@ class PaymentsServiceContext implements Context
      */
     public function iGetFromPaymentsServiceGetOrdersDetailsResponse()
     {
-        $this->mockRequest('/orders.json', new ResponseStack(
-            new MockResponse(file_get_contents(__DIR__ . '/../resources/payments_service_orders_details.json'))
-        ));
+        $this->mockRequest(
+            '/orders.json',
+            new ResponseStack(
+                new MockResponse(file_get_contents(__DIR__ . '/../resources/payments_service_orders_details.json'))
+            )
+        );
     }
 }

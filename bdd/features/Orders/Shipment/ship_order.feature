@@ -102,7 +102,7 @@ Feature:
         "address_country": "DE"
       },
       "bank_account": {
-        "iban": "DE1234",
+        "iban": "DE27500105171416939916",
         "bic": "BICISHERE"
       },
       "debtor_external_data": {
@@ -143,7 +143,17 @@ Feature:
         "invoice_number": "123456A",
         "payout_amount": 762,
         "due_date": "2019-06-19"
-      }
+      },
+     "payment_methods": [
+       {
+         "type": "bank_transfer",
+         "data": {
+           "iban": "DE27500105171416939916",
+           "bic": "BICISHERE",
+           "bank_name": null
+         }
+       }
+     ]
     }
     """
     And the response status code should be 200

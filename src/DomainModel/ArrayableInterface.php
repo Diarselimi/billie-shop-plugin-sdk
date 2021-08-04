@@ -2,7 +2,12 @@
 
 namespace App\DomainModel;
 
-interface ArrayableInterface
+use Ozean12\Support\Serialization\ArrayableInterface as SupportArrayableInterface;
+
+/**
+ * @deprecated
+ * @see \Ozean12\Support\Serialization\ArrayableInterface
+ */
+interface ArrayableInterface extends SupportArrayableInterface
 {
-    public function toArray(): array;
 }

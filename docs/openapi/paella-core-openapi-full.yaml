@@ -5541,6 +5541,7 @@ components:
               nullable: true
               $ref: '#/components/schemas/TinyText'
           type: object
+          deprecated: true
         debtor_external_data:
           description: 'Data provided in the order creation'
           properties:
@@ -5606,6 +5607,8 @@ components:
               example: '2019-03-20'
               nullable: true
           type: object
+        payment_methods:
+          $ref: '#/components/schemas/PaymentMethodCollection'
         delivery_address:
           type: object
           $ref: '#/components/schemas/CreateOrderAddressRequest'
@@ -5771,6 +5774,7 @@ components:
           $ref: '#/components/schemas/Address'
         bank_account:
           nullable: true
+          deprecated: true
           $ref: '#/components/schemas/BankAccount'
         external_data:
           $ref: '#/components/schemas/DebtorExternalData'
@@ -5864,7 +5868,53 @@ components:
           items:
             $ref: '#/components/schemas/OrderInvoiceResponse'
           nullable: false
+        payment_methods:
+          $ref: '#/components/schemas/PaymentMethodCollection'
       type: object
+    PaymentMethodType:
+      title: 'Payment Method Type'
+      type: string
+      enum:
+        - bank_transfer
+        - direct_debit
+      example: bank_transfer
+    PaymentMethod:
+      title: 'Payment Method'
+      properties:
+        type:
+          $ref: '#/components/schemas/PaymentMethodType'
+        data:
+          description: 'Identified company'
+          properties:
+            iban:
+              nullable: false
+              $ref: '#/components/schemas/TinyText'
+            bic:
+              nullable: false
+              $ref: '#/components/schemas/TinyText'
+            bank_name:
+              description: 'Name of the Bank entity'
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            mandate_reference:
+              description: 'Direct Debit SEPA Mandate Reference'
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            mandate_execution_date:
+              description: 'Execution Date of the Direct Debit SEPA mandate'
+              nullable: true
+              $ref: '#/components/schemas/DateTime'
+            creditor_identification:
+              description: 'Creditor Identification Code (for Direct Debit only)'
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+          type: object
+      type: object
+    PaymentMethodCollection:
+      title: 'Eligible Payment Methods'
+      type: array
+      items:
+        $ref: '#/components/schemas/PaymentMethod'
     TaxedMoney:
       title: 'Amount with split values for net, gross and tax.'
       required:

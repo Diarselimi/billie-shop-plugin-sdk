@@ -1,16 +1,3 @@
-billie_pdo:
-  connections:
-    default:
-      dsn: 'mysql:dbname=%env(DATABASE_NAME)%;host=%env(DATABASE_HOST)%;charset=UTF8'
-      username: '%env(DATABASE_USERNAME)%'
-      password: '%env(DATABASE_PASSWORD)%'
-      retries: 3
-      retry_delay: 100
-
-ozean12_graphql_client:
-  dsn: '%env(GRAPHQL_ENDPOINT)%'
-  api_key: "%env(GRAPHQL_API_KEY)%"
-
 ozean12_amqp_pack:
   publish:
     customer.customer_created: Ozean12\Transfer\Message\Customer\CustomerCreated
@@ -45,6 +32,3 @@ ozean12_amqp_pack:
     invoice.invoice_marked_as_late: Ozean12\Transfer\Message\Invoice\InvoiceMarkedAsLate
     invoice.invoice_completed: Ozean12\Transfer\Message\Invoice\InvoiceCompleted
     ticket.ticket_outstanding_amount_changed: Ozean12\Transfer\Message\Ticket\TicketOutstandingAmountChanged
-
-billie_monitoring:
-  strict_logging: true

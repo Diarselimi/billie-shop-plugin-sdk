@@ -4,6 +4,7 @@ namespace App\Http\Response\DTO;
 
 use App\DomainModel\ArrayableInterface;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
+use App\DomainModel\PaymentMethod\PaymentMethodCollection;
 use App\Http\Response\DTO\Collection\InvoiceDTOCollection;
 use App\Support\DateFormat;
 use OpenApi\Annotations as OA;
@@ -25,7 +26,8 @@ use OpenApi\Annotations as OA;
  *          type="array",
  *          nullable=false,
  *          @OA\Items(ref="#/components/schemas/OrderInvoiceResponse")
- *      )
+ *      ),
+ *      @OA\Property(property="payment_methods", ref="#/components/schemas/PaymentMethodCollection"),
  * })
  */
 class OrderDTO implements ArrayableInterface
@@ -34,7 +36,7 @@ class OrderDTO implements ArrayableInterface
 
     private string $uuid;
 
-    private string $state;
+    private ?string $state;
 
     private ?string $declineReason;
 
@@ -52,29 +54,35 @@ class OrderDTO implements ArrayableInterface
 
     private DebtorDTO $debtor;
 
+    private PaymentMethodCollection $paymentMethods;
+
     public function __construct(
         OrderContainer $orderContainer,
         InvoiceDTOCollection $invoices,
-        DebtorDTO $debtor
+        DebtorDTO $debtor,
+        PaymentMethodCollection $paymentMethods
     ) {
         $this->externalCode = $orderContainer->getOrder()->getExternalCode();
         $this->uuid = $orderContainer->getOrder()->getUuid();
         $this->state = $orderContainer->getOrder()->getState();
         $this->declineReason = $orderContainer->getDeclineReason();
         $this->amount = new TaxedMoneyDTO($orderContainer->getOrderFinancialDetails()->getAmountTaxedMoney());
-        $this->unshippedAmount = new TaxedMoneyDTO($orderContainer->getOrderFinancialDetails()->getUnshippedAmountTaxedMoney());
+        $this->unshippedAmount = new TaxedMoneyDTO(
+            $orderContainer->getOrderFinancialDetails()->getUnshippedAmountTaxedMoney()
+        );
         $this->duration = $orderContainer->getOrderFinancialDetails()->getDuration();
         $this->deliveryAddress = new AddressDTO($orderContainer->getDeliveryAddress());
         $this->createdAt = $orderContainer->getOrder()->getCreatedAt();
         $this->invoices = $invoices;
         $this->debtor = $debtor;
+        $this->paymentMethods = $paymentMethods;
     }
 
     public function toArray(): array
     {
         return [
-            'external_code' => $this->externalCode,
             'uuid' => $this->uuid,
+            'external_code' => $this->externalCode,
             'state' => $this->state,
             'decline_reason' => $this->declineReason,
             'amount' => $this->amount->toArray(),
@@ -84,6 +92,7 @@ class OrderDTO implements ArrayableInterface
             'delivery_address' => $this->deliveryAddress->toArray(),
             'debtor' => $this->debtor->toArray(),
             'invoices' => $this->invoices->toArray(),
+            'payment_methods' => PaymentMethodDTO::collectionToArray($this->paymentMethods),
         ];
     }
 }

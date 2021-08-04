@@ -10,7 +10,8 @@
 version: "2.4"
 services:
   app:
-    entrypoint: []
+    entrypoint: docker-php-entrypoint
+    command: "php-fpm"
     environment:
       - APP_DEBUG=1
       - PHP_XDEBUG_ENABLED=true
@@ -24,3 +25,18 @@ services:
   mysql:
     ports:
       - "3308:3306" # This allows you to connect to this MySQL container, if needed
+
+  openapi:
+    # View OpenAPI docs page running: `open "http://$(docker-compose port openapi 80)"`
+    # Redoc Image: https://hub.docker.com/r/redocly/redoc
+    image: redocly/redoc
+    environment:
+      - PAGE_TITLE="Buyer Portal API Docs"
+      - PAGE_FAVICON=favicon.png
+      - SPEC_URL=specs-mounted/paella-core-openapi-full.yaml
+      - PORT=80
+      - REDOC_OPTIONS=
+    ports:
+      - 80 # Map to random port (to avoid collisions)
+    volumes:
+      - './docs/openapi:/usr/share/nginx/html/specs-mounted'

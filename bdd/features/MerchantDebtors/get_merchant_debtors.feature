@@ -60,7 +60,7 @@ Feature:
                     "name":"Test User Company",
                     "financing_limit":7500,
                     "financing_power":4500,
-                    "bank_account_iban":"DE1234",
+                    "bank_account_iban":"DE27500105171416939916",
                     "bank_account_bic":"BICISHERE",
                     "debtor_information_change_request_state":"complete"
                 }

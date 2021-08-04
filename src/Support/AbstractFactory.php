@@ -2,6 +2,10 @@
 
 namespace App\Support;
 
+/**
+ * @deprecated
+ * @see \Ozean12\Support\Serialization\AbstractArrayDeserializer
+ */
 abstract class AbstractFactory
 {
     abstract public function createFromArray(array $data);

@@ -41,31 +41,6 @@ class LegacyOrderResponseFactory
         return $response;
     }
 
-    /**
-     * @param  OrderContainer[]      $orderContainers
-     * @return LegacyOrderResponse[]
-     */
-    public function createFromOrderContainers(array $orderContainers): array
-    {
-        if (empty($orderContainers)) {
-            return [];
-        }
-
-        $orderResponses = [];
-
-        $debtorCompanies = $this->getDebtorCompanies($orderContainers);
-        foreach ($orderContainers as $orderContainer) {
-            if ($orderContainer->getOrder()->getMerchantDebtorId() !== null) {
-                $key = $orderContainer->getMerchantDebtor()->getDebtorId();
-                $orderContainer->setDebtorCompany($debtorCompanies[$key]);
-            }
-
-            $orderResponses[] = $this->create($orderContainer);
-        }
-
-        return $orderResponses;
-    }
-
     public function createAuthorizeResponse(OrderContainer $orderContainer): CheckoutAuthorizeOrderResponse
     {
         $order = $orderContainer->getOrder();
@@ -197,6 +172,7 @@ class LegacyOrderResponseFactory
         }
 
         $this->addReasons($orderContainer->getRiskCheckResultCollection(), $response);
+        $response->setPaymentMethods($orderContainer->getPaymentMethods());
     }
 
     /**
@@ -309,7 +285,8 @@ class LegacyOrderResponseFactory
      */
     private function addReasons(CheckResultCollection $checkResultCollection, $response)
     {
-        $failedRiskCheckResult = $checkResultCollection->getFirstHardDeclined() ?? $checkResultCollection->getFirstSoftDeclined();
+        $failedRiskCheckResult = $checkResultCollection->getFirstHardDeclined(
+            ) ?? $checkResultCollection->getFirstSoftDeclined();
         if ($failedRiskCheckResult === null) {
             return $response;
         }

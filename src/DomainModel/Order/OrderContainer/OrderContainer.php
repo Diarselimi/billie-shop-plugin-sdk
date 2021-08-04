@@ -25,6 +25,7 @@ use App\DomainModel\OrderRiskCheck\Checker\DebtorScoreAvailableCheck;
 use App\DomainModel\OrderRiskCheck\Checker\LimitCheck;
 use App\DomainModel\OrderRiskCheck\CheckResultCollection;
 use App\DomainModel\Payment\DebtorPaymentDetailsDTO;
+use App\DomainModel\PaymentMethod\PaymentMethodCollection;
 use App\DomainModel\Person\PersonEntity;
 
 class OrderContainer
@@ -101,6 +102,8 @@ class OrderContainer
     private $debtorScoringResponse;
 
     private ?DebtorPaymentDetailsDTO $debtorPaymentDetails = null;
+
+    private PaymentMethodCollection $paymentMethods;
 
     public function __construct(OrderEntity $order, OrderContainerRelationLoader $relationLoader)
     {
@@ -309,7 +312,9 @@ class OrderContainer
 
     public function getRiskCheckResultCollection(): CheckResultCollection
     {
-        return $this->riskCheckResultCollection ?: $this->riskCheckResultCollection = $this->relationLoader->loadFailedRiskChecks($this);
+        return $this->riskCheckResultCollection ?: $this->riskCheckResultCollection = $this->relationLoader->loadFailedRiskChecks(
+            $this
+        );
     }
 
     public function setRiskCheckResultCollection(CheckResultCollection $checkResultCollection)
@@ -363,5 +368,14 @@ class OrderContainer
 
         $this->debtorCompany = $debtorDetails->getCompany();
         $this->debtorPaymentDetails = $debtorDetails->getPaymentDetails();
+    }
+
+    public function getPaymentMethods(): PaymentMethodCollection
+    {
+        if (!isset($this->paymentMethods)) {
+            $this->paymentMethods = $this->relationLoader->loadPaymentMethods($this);
+        }
+
+        return $this->paymentMethods;
     }
 }

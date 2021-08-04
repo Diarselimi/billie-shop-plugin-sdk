@@ -135,6 +135,7 @@ Feature:
           "pending_merchant_payment_amount":null,
           "pending_cancellation_amount":null
        },
+       "payment_methods": [],
        "debtor_external_data":{
           "merchant_customer_id":"12",
           "name":"billie GmbH",
@@ -298,6 +299,16 @@ Feature:
         "tax":100
      },
      "invoices":[],
+     "payment_methods": [
+       {
+         "type": "bank_transfer",
+         "data": {
+           "iban": "DE27500105171416939916",
+           "bic": "BICISHERE",
+           "bank_name": null
+         }
+       }
+     ],
      "duration":30,
      "created_at":"2021-06-11 16:48:33",
      "delivery_address":{
@@ -324,7 +335,7 @@ Feature:
            "country":"DE"
         },
         "bank_account":{
-           "iban":"DE1234",
+           "iban":"DE27500105171416939916",
            "bic":"BICISHERE"
         },
         "external_data":{
@@ -341,6 +352,16 @@ Feature:
         }
      },
      "invoices":[
+     ],
+     "payment_methods": [
+       {
+         "type": "bank_transfer",
+         "data": {
+           "iban": "DE27500105171416939916",
+           "bic": "BICISHERE",
+           "bank_name": null
+         }
+       }
      ]
     }
     """
@@ -438,6 +459,16 @@ Feature:
           "pending_merchant_payment_amount":null,
           "pending_cancellation_amount":null
        },
+       "payment_methods": [
+         {
+           "type": "bank_transfer",
+           "data": {
+             "iban": "DE27500105171416939916",
+             "bic": "BICISHERE",
+             "bank_name": null
+           }
+         }
+       ],
        "debtor_external_data":{
           "merchant_customer_id":"12",
           "name":"Test User Company",

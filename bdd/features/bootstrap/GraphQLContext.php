@@ -48,7 +48,7 @@ class GraphQLContext implements Context
         "country": "DE",
         "schufa_id": "123",
         "crefo_id": "123",
-        "iban": "DE1234",
+        "iban": "DE27500105171416939916",
         "bic": "BICISHERE"
       }
     ]

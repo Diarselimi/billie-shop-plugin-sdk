@@ -102,6 +102,16 @@ Feature:
             "payout_amount": 123.33,
             "due_date": "2019-06-19"
         },
+       "payment_methods": [
+         {
+           "type": "bank_transfer",
+           "data": {
+             "iban": "DE27500105171416939916",
+             "bic": "BICISHERE",
+             "bank_name": null
+           }
+         }
+       ],
         "debtor_external_data": {
             "name": "test",
             "address_country": "TE",
@@ -171,7 +181,7 @@ Feature:
           "address_country":"DE"
        },
        "bank_account":{
-          "iban":"DE1234",
+          "iban":"DE27500105171416939916",
           "bic":"BICISHERE"
        },
        "invoices": [],
@@ -185,6 +195,16 @@ Feature:
            "payout_amount": 123.33,
            "due_date": "2019-06-19"
        },
+       "payment_methods": [
+         {
+           "type": "bank_transfer",
+           "data": {
+             "iban": "DE27500105171416939916",
+             "bic": "BICISHERE",
+             "bank_name": null
+           }
+         }
+       ],
        "debtor_external_data":{
           "merchant_customer_id":"ext_id",
           "name":"test",
@@ -254,7 +274,7 @@ Feature:
             "name": "Test User Company"
         },
         "bank_account": {
-            "iban": "DE1234",
+            "iban": "DE27500105171416939916",
             "bic": "BICISHERE"
         },
         "invoices": [],
@@ -268,6 +288,16 @@ Feature:
            "payout_amount": 123.33,
            "due_date": "2019-06-19"
         },
+       "payment_methods": [
+         {
+           "type": "bank_transfer",
+           "data": {
+             "iban": "DE27500105171416939916",
+             "bic": "BICISHERE",
+             "bank_name": null
+           }
+         }
+       ],
         "debtor_external_data": {
             "merchant_customer_id": "ext_id",
             "name": "test",

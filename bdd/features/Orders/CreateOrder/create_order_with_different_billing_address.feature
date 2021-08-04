@@ -170,6 +170,16 @@ Feature:
        "workflow_name":"order_v1",
        "due_date":"2021-01-13",
        "invoices":[],
+       "payment_methods": [
+         {
+           "type": "bank_transfer",
+           "data": {
+             "iban": "DE27500105171416939916",
+             "bic": "BICISHERE",
+             "bank_name": null
+           }
+         }
+       ],
        "debtor_company":{
           "name":"Test User Company",
           "address_house_number":"10",
@@ -179,7 +189,7 @@ Feature:
           "address_country":"DE"
        },
        "bank_account":{
-          "iban":"DE1234",
+          "iban":"DE27500105171416939916",
           "bic":"BICISHERE"
        },
        "invoice":{
@@ -352,7 +362,7 @@ Feature:
           "address_country":"DE"
        },
        "bank_account":{
-          "iban":"DE1234",
+          "iban":"DE27500105171416939916",
           "bic":"BICISHERE"
        },
        "invoices":[],
@@ -366,6 +376,16 @@ Feature:
           "pending_merchant_payment_amount":null,
           "pending_cancellation_amount":null
        },
+       "payment_methods": [
+         {
+           "type": "bank_transfer",
+           "data": {
+             "iban": "DE27500105171416939916",
+             "bic": "BICISHERE",
+             "bank_name": null
+           }
+         }
+       ],
        "debtor_external_data":{
           "merchant_customer_id":"12",
           "name":"Test User Company",
@@ -535,7 +555,7 @@ Feature:
           "address_country":"DE"
        },
        "bank_account":{
-          "iban":"DE1234",
+          "iban":"DE27500105171416939916",
           "bic":"BICISHERE"
        },
        "invoices":[],
@@ -549,6 +569,16 @@ Feature:
           "pending_merchant_payment_amount":null,
           "pending_cancellation_amount":null
        },
+       "payment_methods": [
+         {
+           "type": "bank_transfer",
+           "data": {
+             "iban": "DE27500105171416939916",
+             "bic": "BICISHERE",
+             "bank_name": null
+           }
+         }
+       ],
        "debtor_external_data":{
           "merchant_customer_id":"12",
           "name":"Test User Company",

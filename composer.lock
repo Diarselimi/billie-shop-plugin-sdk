@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b3c692ce824f1a67a673edd23ed977bb",
+    "content-hash": "eaf1b0d1f84b98f00edd6187117fa4f6",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -146,16 +146,16 @@
         },
         {
             "name": "billie/monitoring-bundle",
-            "version": "3.0.6",
+            "version": "3.1.0",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/MonitoringBundle.git",
-                "reference": "babb62104b8ff4bb7cc15496b57b0f2850225ee1"
+                "reference": "75a2d0c44a7058ea3f52ef4d4b15d71b58b2ffd4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/MonitoringBundle/zipball/babb62104b8ff4bb7cc15496b57b0f2850225ee1",
-                "reference": "babb62104b8ff4bb7cc15496b57b0f2850225ee1",
+                "url": "https://api.github.com/repos/ozean12/MonitoringBundle/zipball/75a2d0c44a7058ea3f52ef4d4b15d71b58b2ffd4",
+                "reference": "75a2d0c44a7058ea3f52ef4d4b15d71b58b2ffd4",
                 "shasum": ""
             },
             "require": {
@@ -163,7 +163,7 @@
                 "ext-json": "*",
                 "guzzlehttp/guzzle": "^6.3|^7.0",
                 "monolog/monolog": "^1.24",
-                "php": "^7.3",
+                "php": "^7.3|^8.0",
                 "ramsey/uuid": "^3.8",
                 "sentry/sentry": "^1.10",
                 "symfony/config": "^4.2|^5.0",
@@ -184,9 +184,9 @@
                 }
             ],
             "support": {
-                "source": "https://github.com/ozean12/MonitoringBundle/tree/3.0.6"
+                "source": "https://github.com/ozean12/MonitoringBundle/tree/3.1.0"
             },
-            "time": "2020-12-03T11:15:42+00:00"
+            "time": "2021-07-07T16:09:07+00:00"
         },
         {
             "name": "billie/pdo-bundle",
@@ -3171,6 +3171,125 @@
             "time": "2019-03-12T17:12:20+00:00"
         },
         {
+            "name": "ozean12/banco-sdk-php",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:ozean12/banco-sdk-php.git",
+                "reference": "ea7841865e643d5587a2f611ec325a65b46d6f27"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ozean12/banco-sdk-php/zipball/ea7841865e643d5587a2f611ec325a65b46d6f27",
+                "reference": "ea7841865e643d5587a2f611ec325a65b46d6f27",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "ext-mbstring": "*",
+                "guzzlehttp/guzzle": "^6.2",
+                "php": ">=7.2"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.12",
+                "phpunit/phpunit": "^8.0 || ^9.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Ozean12\\BancoSDK\\": "lib/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Ozean12\\BancoSDK\\Test\\": "test/"
+                }
+            },
+            "license": [
+                "unlicense"
+            ],
+            "authors": [
+                {
+                    "name": "OpenAPI-Generator contributors",
+                    "homepage": "https://openapi-generator.tech"
+                }
+            ],
+            "description": "# Introduction  The Banco API provides Bank Account connections, from different providers  ## Current supported providers - Figo - EuroData",
+            "homepage": "https://openapi-generator.tech",
+            "keywords": [
+                "api",
+                "openapi",
+                "openapi-generator",
+                "openapitools",
+                "php",
+                "rest",
+                "sdk"
+            ],
+            "support": {
+                "source": "https://github.com/ozean12/banco-sdk-php/tree/1.0.0",
+                "issues": "https://github.com/ozean12/banco-sdk-php/issues"
+            },
+            "time": "2021-07-14T09:10:57+00:00"
+        },
+        {
+            "name": "ozean12/borscht-client",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:ozean12/borscht-client-php.git",
+                "reference": "8e21d974c8605c57879776d5fbf2494a08c7ba0a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ozean12/borscht-client-php/zipball/8e21d974c8605c57879776d5fbf2494a08c7ba0a",
+                "reference": "8e21d974c8605c57879776d5fbf2494a08c7ba0a",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "guzzlehttp/guzzle": "~6.0 | ~7.0",
+                "guzzlehttp/psr7": "^1.8 | ^2.0",
+                "ozean12/support": "^3.0",
+                "php": ">=7.2",
+                "psr/log": "^1.1",
+                "ramsey/uuid": "^3.9.3 | ^4.1"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.18",
+                "phpspec/prophecy": "^1.13",
+                "phpunit/phpunit": "^8.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Ozean12\\Borscht\\Client\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Ozean12\\Borscht\\Client\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "XDEBUG_MODE=coverage ./vendor/bin/phpunit --stop-on-failure --testdox --colors=always -v --do-not-cache-result"
+                ],
+                "csfix": [
+                    "./vendor/bin/php-cs-fixer fix --ansi"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Borscht service HTTP client for PHP",
+            "support": {
+                "source": "https://github.com/ozean12/borscht-client-php/tree/1.0.1",
+                "issues": "https://github.com/ozean12/borscht-client-php/issues"
+            },
+            "time": "2021-08-03T12:26:30+00:00"
+        },
+        {
             "name": "ozean12/company-strict-match-bundle",
             "version": "1.0.2",
             "source": {
@@ -3237,31 +3356,31 @@
         },
         {
             "name": "ozean12/graphql-repository-client",
-            "version": "1.0.0",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/graphql-repository-client.git",
-                "reference": "220ce1a9dcbfc65aa043a136d8d6f2e6496fbd4b"
+                "reference": "3d2ffaeafb54492e2a04c382437a946150217413"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/graphql-repository-client/zipball/220ce1a9dcbfc65aa043a136d8d6f2e6496fbd4b",
-                "reference": "220ce1a9dcbfc65aa043a136d8d6f2e6496fbd4b",
+                "url": "https://api.github.com/repos/ozean12/graphql-repository-client/zipball/3d2ffaeafb54492e2a04c382437a946150217413",
+                "reference": "3d2ffaeafb54492e2a04c382437a946150217413",
                 "shasum": ""
             },
             "require": {
                 "guzzlehttp/guzzle": ">=6.0",
-                "php": "^7.1",
-                "symfony/config": "^3.4|^4.0",
-                "symfony/console": "^3.4|^4.0",
-                "symfony/dependency-injection": "^3.4|^4.0",
-                "symfony/framework-bundle": "^3.4|^4.0",
-                "symfony/http-kernel": "^3.4|^4.0"
+                "php": "^7.1|^8.0",
+                "symfony/config": "^3.4|^4.0|^5.0",
+                "symfony/console": "^3.4|^4.0|^5.0",
+                "symfony/dependency-injection": "^3.4|^4.0|^5.0",
+                "symfony/framework-bundle": "^3.4|^4.0|^5.0",
+                "symfony/http-kernel": "^3.4|^4.0|^5.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "~7.0",
                 "spatie/phpunit-snapshot-assertions": "^1.4",
-                "symfony/phpunit-bridge": "^4.3"
+                "symfony/phpunit-bridge": "^4.3|^5.0"
             },
             "type": "symfony-bundle",
             "autoload": {
@@ -3279,9 +3398,9 @@
             ],
             "description": "PHP Library which provides access to the billie data world using graphQL",
             "support": {
-                "source": "https://github.com/ozean12/graphql-repository-client/tree/1.0.0"
+                "source": "https://github.com/ozean12/graphql-repository-client/tree/1.1.0"
             },
-            "time": "2019-07-10T07:25:24+00:00"
+            "time": "2021-07-01T15:42:40+00:00"
         },
         {
             "name": "ozean12/money",
@@ -3346,16 +3465,16 @@
         },
         {
             "name": "ozean12/sepa-client",
-            "version": "1.1.0",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/sepa-client-php.git",
-                "reference": "d6a4e168163db10f8f15299dcf2ec99430d9cc7a"
+                "reference": "520ef1905a43406ce5bdc497e17a8970a4054489"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/sepa-client-php/zipball/d6a4e168163db10f8f15299dcf2ec99430d9cc7a",
-                "reference": "d6a4e168163db10f8f15299dcf2ec99430d9cc7a",
+                "url": "https://api.github.com/repos/ozean12/sepa-client-php/zipball/520ef1905a43406ce5bdc497e17a8970a4054489",
+                "reference": "520ef1905a43406ce5bdc497e17a8970a4054489",
                 "shasum": ""
             },
             "require": {
@@ -3396,10 +3515,10 @@
             ],
             "description": "Sepa service HTTP client for PHP",
             "support": {
-                "source": "https://github.com/ozean12/sepa-client-php/tree/1.1.0",
+                "source": "https://github.com/ozean12/sepa-client-php/tree/1.2.0",
                 "issues": "https://github.com/ozean12/sepa-client-php/issues"
             },
-            "time": "2021-07-29T09:48:27+00:00"
+            "time": "2021-07-29T16:27:49+00:00"
         },
         {
             "name": "ozean12/smaug-client",
@@ -3457,16 +3576,16 @@
         },
         {
             "name": "ozean12/support",
-            "version": "3.0.3",
+            "version": "3.1.0",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/support-php.git",
-                "reference": "f0d9ae6fddc65c24952f03b91c46a95c46c5ec6a"
+                "reference": "ad633c56d6a94aad52c181945dd14927d9ba8d90"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/support-php/zipball/f0d9ae6fddc65c24952f03b91c46a95c46c5ec6a",
-                "reference": "f0d9ae6fddc65c24952f03b91c46a95c46c5ec6a",
+                "url": "https://api.github.com/repos/ozean12/support-php/zipball/ad633c56d6a94aad52c181945dd14927d9ba8d90",
+                "reference": "ad633c56d6a94aad52c181945dd14927d9ba8d90",
                 "shasum": ""
             },
             "require": {
@@ -3502,7 +3621,7 @@
                 "test-coverage": [
                     "XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-text"
                 ],
-                "phpcs": [
+                "csfix": [
                     "./vendor/bin/php-cs-fixer fix --ansi"
                 ]
             },
@@ -3517,10 +3636,10 @@
             ],
             "description": "Ozean12 Support utils for PHP",
             "support": {
-                "source": "https://github.com/ozean12/support-php/tree/3.0.3",
+                "source": "https://github.com/ozean12/support-php/tree/3.1.0",
                 "issues": "https://github.com/ozean12/support-php/issues"
             },
-            "time": "2021-07-29T14:27:58+00:00"
+            "time": "2021-08-02T09:24:58+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",
@@ -9862,16 +9981,16 @@
         },
         {
             "name": "donatj/mock-webserver",
-            "version": "v2.2.0",
+            "version": "v2.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/donatj/mock-webserver.git",
-                "reference": "f440b543e85edd1c4b64094b32ad70451d97a228"
+                "reference": "db54c1d3cee0cfcef0317451ac23735c6a1a54fc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/donatj/mock-webserver/zipball/f440b543e85edd1c4b64094b32ad70451d97a228",
-                "reference": "f440b543e85edd1c4b64094b32ad70451d97a228",
+                "url": "https://api.github.com/repos/donatj/mock-webserver/zipball/db54c1d3cee0cfcef0317451ac23735c6a1a54fc",
+                "reference": "db54c1d3cee0cfcef0317451ac23735c6a1a54fc",
                 "shasum": ""
             },
             "require": {
@@ -9903,9 +10022,13 @@
                 }
             ],
             "description": "Simple mock web server for unit testing",
+            "support": {
+                "issues": "https://github.com/donatj/mock-webserver/issues",
+                "source": "https://github.com/donatj/mock-webserver/tree/v2.3.0"
+            },
             "funding": [
                 {
-                    "url": "https://www.paypal.me/donatj/15",
+                    "url": "https://www.paypal.me/donatj/5",
                     "type": "custom"
                 },
                 {
@@ -9913,7 +10036,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-12-02T18:34:01+00:00"
+            "time": "2021-06-01T17:47:41+00:00"
         },
         {
             "name": "duxet/json_spec",
@@ -12164,5 +12287,5 @@
         "ext-pdo": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "1.1.0"
+    "plugin-api-version": "2.1.0"
 }

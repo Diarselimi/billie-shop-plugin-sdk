@@ -54,6 +54,9 @@ services:
       - FINTECH_TOOLBOX_API_KEY=
       - DOCUMENT_GENERATOR_URL=
       - ENCRYPTION_KEY=the_key
+      - SEPA_URL=
+      - BANCO_URL=
+      - WATSON_URL=
 
   mysql:
     image: mysql:5.7
