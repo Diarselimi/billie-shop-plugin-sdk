@@ -22,6 +22,7 @@ use Ozean12\Borscht\Client\DomainModel\Ticket\Ticket;
 use Ozean12\Sepa\Client\DomainModel\Mandate\SepaMandate;
 use Ozean12\Sepa\Client\DomainModel\SepaClientInterface;
 use Ozean12\Support\ValueObject\BankAccount;
+use Ozean12\Support\ValueObject\Exception\InvalidIbanException;
 use Ozean12\Support\ValueObject\Iban;
 use Prophecy\Argument;
 use Psr\Log\NullLogger;
@@ -259,5 +260,34 @@ class OrderPaymentMethodResolverUnitTest extends UnitTestCase
         $this->assertEquals(null, $paymentMethod->getBankAccount()->getBankName());
         $this->assertNotNull($paymentMethod->getSepaMandate());
         $this->assertNotNull($paymentMethod->getSepaMandateExecutionDate());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldReturnEmptyPaymentMethodsIfIbanIsInvalid(): void
+    {
+        $resolver = $this->createResolver();
+
+        $orderContainer = $this->prophesize(OrderContainer::class);
+        $orderContainer->getOrder()->willReturn(
+            (new OrderEntity())
+                ->setMerchantDebtorId(1)
+                ->setWorkflowName(OrderEntity::WORKFLOW_NAME_V2)
+        );
+
+        $debtorPaymentDetails = new DebtorPaymentDetailsDTO();
+        $debtorPaymentDetails->setBankAccountIban('DE27500105171416939916');
+        $debtorPaymentDetails->setBankAccountBic('BICXXXX');
+        $debtorPaymentDetails->setOutstandingAmount(0);
+
+        $this->bankAccountService->getBankByBic('BICXXXX')
+            ->shouldBeCalledOnce()
+            ->willThrow(InvalidIbanException::class);
+
+        $orderContainer->getDebtorPaymentDetails()->willReturn($debtorPaymentDetails);
+
+        $paymentMethods = $resolver->getOrderPaymentMethods($orderContainer->reveal());
+        $this->assertTrue($paymentMethods->isEmpty());
     }
 }

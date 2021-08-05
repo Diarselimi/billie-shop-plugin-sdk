@@ -17,6 +17,7 @@ use Ozean12\Sepa\Client\DomainModel\Mandate\SepaMandateNotValidException;
 use Ozean12\Sepa\Client\DomainModel\SepaClientInterface;
 use Ozean12\Support\HttpClient\Exception\HttpClientExceptionInterface;
 use Ozean12\Support\ValueObject\BankAccount;
+use Ozean12\Support\ValueObject\Exception\InvalidIbanException;
 use Ozean12\Support\ValueObject\Iban;
 use Ramsey\Uuid\Uuid;
 
@@ -47,15 +48,21 @@ class OrderPaymentMethodResolver implements LoggingInterface
             return new PaymentMethodCollection([]);
         }
 
-        $directDebitMethod = $this->getDirectDebitMethod($orderContainer);
+        try {
+            $directDebitMethod = $this->getDirectDebitMethod($orderContainer);
 
-        if ($directDebitMethod !== null) {
-            return new PaymentMethodCollection([$directDebitMethod]);
+            if ($directDebitMethod !== null) {
+                return new PaymentMethodCollection([$directDebitMethod]);
+            }
+
+            $bankTransferMethod = $this->getBankTransferMethod($orderContainer);
+
+            return new PaymentMethodCollection([$bankTransferMethod]);
+        } catch (InvalidIbanException $exception) {
+            $this->logWarning($exception->getMessage());
+
+            return new PaymentMethodCollection([]);
         }
-
-        $bankTransferMethod = $this->getBankTransferMethod($orderContainer);
-
-        return new PaymentMethodCollection([$bankTransferMethod]);
     }
 
     private function getBankTransferMethod(OrderContainer $orderContainer): PaymentMethod
@@ -74,7 +81,9 @@ class OrderPaymentMethodResolver implements LoggingInterface
                 $vibanAccount->getBic()
             )->getName();
         } catch (BankAccountServiceException | BankNotFoundException $exception) {
-            $this->logSuppressedException($exception);
+            $this->logDebug(
+                'Banco getBankByBic failed: ' . $exception->getMessage() . '. BIC was ' . $vibanAccount->getBic()
+            );
             $bankName = null;
         }
 
