@@ -21,6 +21,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     operationId="checkout_session_decline",
  *     summary="Decline orders in authorised state.",
  *     security={{"oauth2"={}}},
+ *     @OA\Parameter(in="path", name="reason",
+ *          @OA\Schema(type="string"),
+ *          description="Reason for declining the order.",
+ *          required=false
+ *     ),
  *
  *     tags={"Checkout Server"},
  *     x={"groups":{"private"}},
@@ -42,9 +47,11 @@ class CheckoutDeclineOrderController
 
     public function execute(Request $request, string $sessionUuid): void
     {
+        $reason = $request->get('reason', CheckoutDeclineOrderRequest::REASON_WRONG_IDENTIFICATION);
+
         try {
             $this->declineOrderUseCase->execute(
-                new CheckoutDeclineOrderRequest($sessionUuid)
+                new CheckoutDeclineOrderRequest($sessionUuid, $reason)
             );
         } catch (OrderNotFoundException $e) {
             throw new NotFoundHttpException($e->getMessage());

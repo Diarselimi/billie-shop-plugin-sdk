@@ -63,11 +63,15 @@ class CheckoutDeclineOrderUseCase implements LoggingInterface
         $externalId = $orderContainer->getDebtorExternalData()->getMerchantExternalId();
         $this->declineOrderService->decline($orderContainer);
         $this->checkoutSessionRepository->reActivateSession($input->getSessionUuid());
-        $this->debtorExternalDataRepository->invalidateMerchantExternalId($externalId);
 
-        $this->logInfo("It's not us action triggered", [
+        if ($input->isWronglyIdentified()) {
+            $this->debtorExternalDataRepository->invalidateMerchantExternalId($externalId);
+        }
+
+        $this->logInfo("Decline checkout order triggered.", [
             LoggingInterface::KEY_UUID => $input->getSessionUuid(),
             LoggingInterface::KEY_SOBAKA => [
+                'reason' => $input->getReason(),
                 'merchant_external_id' => $externalId,
                 'session_uuid' => $input->getSessionUuid(),
             ],

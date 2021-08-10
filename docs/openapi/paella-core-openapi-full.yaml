@@ -1043,6 +1043,14 @@ paths:
         - 'Checkout Server'
       summary: 'Decline orders in authorised state.'
       operationId: checkout_session_decline
+      parameters:
+        -
+          name: reason
+          in: path
+          description: 'Reason for declining the order.'
+          required: false
+          schema:
+            type: string
       responses:
         '204':
           description: 'Order successfully cancelled'
