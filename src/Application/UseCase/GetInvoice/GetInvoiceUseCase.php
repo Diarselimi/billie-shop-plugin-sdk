@@ -10,40 +10,47 @@ use App\DomainModel\Invoice\InvoiceServiceInterface;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\PaymentMethod\BankNameDecorator;
+use Ozean12\InvoiceButler\Client\DomainModel\InvoiceButlerClientInterface;
 
 class GetInvoiceUseCase
 {
-    private InvoiceServiceInterface $invoiceButler;
+    private InvoiceServiceInterface $legacyInvoiceButler;
 
     private GetInvoiceResponseFactory $responseFactory;
 
     private OrderRepositoryInterface $orderRepository;
 
-    /**
-     * @var OrderContainerFactory
-     */
+    private InvoiceButlerClientInterface $invoiceButler;
+
     private OrderContainerFactory $orderContainerFactory;
 
+    private BankNameDecorator $bankNameDecorator;
+
     public function __construct(
-        InvoiceServiceInterface $invoiceButler,
+        InvoiceServiceInterface $legacyInvoiceButler,
         GetInvoiceResponseFactory $responseFactory,
         OrderRepositoryInterface $orderRepository,
-        OrderContainerFactory $orderContainerFactory
+        OrderContainerFactory $orderContainerFactory,
+        InvoiceButlerClientInterface $invoiceButler,
+        BankNameDecorator $bankNameDecorator
     ) {
-        $this->invoiceButler = $invoiceButler;
+        $this->legacyInvoiceButler = $legacyInvoiceButler;
         $this->responseFactory = $responseFactory;
         $this->orderRepository = $orderRepository;
         $this->orderContainerFactory = $orderContainerFactory;
+        $this->invoiceButler = $invoiceButler;
+        $this->bankNameDecorator = $bankNameDecorator;
     }
 
     public function execute(GetInvoiceRequest $request): GetInvoiceResponse
     {
-        $order = $this->orderRepository->getByInvoiceAndMerchant($request->getUuid(), $request->getMerchantId());
+        $order = $this->orderRepository->getByInvoiceAndMerchant($request->getUuid()->toString(), $request->getMerchantId());
         if ($order === null) {
             throw new InvoiceNotFoundException();
         }
 
-        $invoice = $this->invoiceButler->getOneByUuid($request->getUuid());
+        $invoice = $this->legacyInvoiceButler->getOneByUuid($request->getUuid()->toString());
         if ($invoice === null) {
             throw new InvoiceNotFoundException();
         }
@@ -54,6 +61,9 @@ class GetInvoiceUseCase
             $orders
         );
 
-        return $this->responseFactory->create($invoice, $orderContainers);
+        $clientPaymentMethodCollection = $this->invoiceButler->accountsReceivableGetPaymentMethods($request->getUuid());
+        $paymentMethodCollection = $this->bankNameDecorator->addBankName($clientPaymentMethodCollection);
+
+        return $this->responseFactory->create($invoice, $orderContainers, $paymentMethodCollection);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Authentication;
 
+use App\DomainModel\MerchantUser\MerchantUserNotFoundException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -61,5 +62,15 @@ class UserProvider
     public function getSignatoryPowerTokenUser(): ?SignatoryPowerTokenUser
     {
         return $this->getUserOfType(SignatoryPowerTokenUser::class);
+    }
+
+    public function getAuthenticatedMerchantUser(): AbstractUser
+    {
+        $user = $this->getMerchantApiUser() ?? $this->getMerchantUser();
+        if ($user === null) {
+            throw new MerchantUserNotFoundException();
+        }
+
+        return $user;
     }
 }

@@ -56,7 +56,6 @@ services:
       $isDummyRiskChecksFeatureEnabled: '%env(bool:DUMMY_CHECKS_ENABLED)%'
       $blacklistedAddresses: '%blacklisted_addresses%'
       $encryptionKey: '%env(ENCRYPTION_KEY)%'
-      $bancoApiUrl: "%banco_url%"
 
   _instanceof:
     App\Application\UseCase\ValidatedUseCaseInterface:
@@ -183,9 +182,3 @@ services:
 
   sandbox_request_matcher:
     class: App\Http\RequestMatcher\SandboxRequestMatcher
-
-  Ozean12\Smaug\Client\SmaugClient:
-    arguments:
-      - '@eight_points_guzzle.client.smaug'
-
-  Ozean12\Smaug\Client\SmaugClientInterface: '@Ozean12\Smaug\Client\SmaugClient'

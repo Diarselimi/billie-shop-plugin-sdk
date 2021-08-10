@@ -8,6 +8,7 @@ use App\Application\Exception\InvoiceNotFoundException;
 use App\Application\Exception\InvoiceUpdateException;
 use App\Application\UseCase\UpdateInvoice\UpdateInvoiceRequest;
 use App\Application\UseCase\UpdateInvoice\UpdateInvoiceUseCase;
+use App\DomainModel\MerchantUser\MerchantUserNotFoundException;
 use App\Http\Authentication\UserProvider;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -34,8 +35,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *
  *     @OA\Response(response=204, description="Invoice successfully updated"),
  *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),
- *     @OA\Response(response=404, ref="#/components/responses/NotFound"),
  *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+ *     @OA\Response(response=404, ref="#/components/responses/NotFound"),
  *     @OA\Response(response=500, ref="#/components/responses/ServerError")
  * )
  */
@@ -53,16 +54,17 @@ class UpdateInvoiceController
 
     public function execute(string $uuid, Request $request): void
     {
-        $merchantUser = $this->userProvider->getMerchantApiUser() ?? $this->userProvider->getMerchantUser();
-        $useCaseRequest = (new UpdateInvoiceRequest($uuid, $merchantUser->getMerchant()->getId()))
-            ->setExternalCode($request->request->get('external_code'))
-            ->setInvoiceUrl($request->request->get('invoice_url'));
-
         try {
+            $useCaseRequest = (new UpdateInvoiceRequest(
+                $uuid,
+                $this->userProvider->getAuthenticatedMerchantUser()->getMerchant()->getId()
+            ))
+                ->setExternalCode($request->request->get('external_code'))
+                ->setInvoiceUrl($request->request->get('invoice_url'));
             $this->useCase->execute($useCaseRequest);
         } catch (InvoiceUpdateException $e) {
             throw new BadRequestHttpException($e->getMessage());
-        } catch (InvoiceNotFoundException $e) {
+        } catch (InvoiceNotFoundException | MerchantUserNotFoundException $e) {
             throw new NotFoundHttpException($e->getMessage());
         }
     }

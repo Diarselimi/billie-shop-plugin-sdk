@@ -1,0 +1,9 @@
+[
+  {
+    "type": "bank_transfer",
+    "data": {
+      "bic": "INGDDEFFXXX",
+      "iban": "DE12500105179542622426"
+    }
+  }
+]

@@ -2737,6 +2737,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GetInvoiceResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -3299,10 +3301,10 @@ paths:
           description: 'Invoice successfully updated'
         '400':
           $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
       security:
@@ -3334,6 +3336,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
       security:
@@ -4377,6 +4381,8 @@ components:
           type: string
           example: created
           nullable: true
+        payment_methods:
+          $ref: '#/components/schemas/PaymentMethodCollection'
       type: object
     GetInvoicePaymentsResponse:
       title: 'Invoice Payments Response'

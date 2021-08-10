@@ -74,6 +74,9 @@
             "config/routes/annotations.yaml"
         ]
     },
+    "doctrine/deprecations": {
+        "version": "v0.5.3"
+    },
     "doctrine/inflector": {
         "version": "2.0.3"
     },
@@ -259,6 +262,9 @@
     "ozean12/graphql-repository-client": {
         "version": "1.0.0"
     },
+    "ozean12/invoice-butler-client": {
+        "version": "dev-bxp-547-payment-methods-endpoint"
+    },
     "ozean12/money": {
         "version": "3.1.0"
     },
@@ -275,7 +281,7 @@
         "version": "1.0.0"
     },
     "ozean12/support": {
-        "version": "2.0.0"
+        "version": "2.2.0"
     },
     "paragonie/constant_time_encoding": {
         "version": "v2.4.0"
@@ -485,6 +491,9 @@
     },
     "symfony/polyfill-php80": {
         "version": "v1.17.1"
+    },
+    "symfony/polyfill-php81": {
+        "version": "v1.23.0"
     },
     "symfony/process": {
         "version": "v4.4.20"

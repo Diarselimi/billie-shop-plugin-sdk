@@ -9,16 +9,21 @@ use App\DomainModel\Invoice\CreditNote\CreditNote;
 use App\DomainModel\Invoice\CreditNote\CreditNoteCollection;
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
+use App\DomainModel\PaymentMethod\PaymentMethodCollection;
 use App\Http\Response\DTO\TaxedMoneyDTO;
 
 class GetInvoiceResponseFactory
 {
-    public function create(Invoice $invoice, array $orderContainers): GetInvoiceResponse
-    {
+    public function create(
+        Invoice $invoice,
+        array $orderContainers,
+        PaymentMethodCollection $paymentMethods
+    ): GetInvoiceResponse {
         return (new GetInvoiceResponse(
             $invoice,
             $this->createOrdersResponse($orderContainers),
-            $this->createCreditNotesResponse($invoice->getCreditNotes())
+            $this->createCreditNotesResponse($invoice->getCreditNotes()),
+            $paymentMethods
         ))->setUuid($invoice->getUuid());
     }
 

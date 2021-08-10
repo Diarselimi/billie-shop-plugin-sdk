@@ -7,6 +7,7 @@ namespace App\Http\Controller\PublicApiV2;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\UpdateOrder\UpdateOrderRequest;
 use App\Application\UseCase\UpdateOrder\UpdateOrderUseCase;
+use App\DomainModel\MerchantUser\MerchantUserNotFoundException;
 use App\DomainModel\OrderUpdate\UpdateOrderException;
 use App\Http\Authentication\UserProvider;
 use App\Support\TaxedMoneyFactoryDecorator;
@@ -38,6 +39,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     @OA\Response(response=204, description="Order successfully updated"),
  *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),
  *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+ *     @OA\Response(response=404, ref="#/components/responses/NotFound"),
  *     @OA\Response(response=500, ref="#/components/responses/ServerError")
  * )
  */
@@ -55,19 +57,17 @@ class UpdateOrderController
 
     public function execute(string $uuid, Request $request): void
     {
-        $userMerchant = $this->userProvider->getMerchantApiUser() ?? $this->userProvider->getMerchantUser();
-        $useCaseInput = new UpdateOrderRequest(
-            $uuid,
-            $userMerchant->getMerchant()->getId(),
-            $request->request->get('external_code'),
-            TaxedMoneyFactoryDecorator::createFromRequest($request)
-        );
-
         try {
+            $useCaseInput = new UpdateOrderRequest(
+                $uuid,
+                $this->userProvider->getAuthenticatedMerchantUser()->getMerchant()->getId(),
+                $request->request->get('external_code'),
+                TaxedMoneyFactoryDecorator::createFromRequest($request)
+            );
             $this->useCase->execute($useCaseInput);
         } catch (UpdateOrderException $e) {
             throw new BadRequestHttpException($e->getMessage());
-        } catch (OrderNotFoundException $e) {
+        } catch (OrderNotFoundException | MerchantUserNotFoundException $e) {
             throw new NotFoundHttpException($e->getMessage());
         }
     }

@@ -127,6 +127,20 @@ class InvoiceButlerServiceContext implements Context
     }
 
     /**
+     * @Given /^I get from invoice-butler payment methods response$/
+     */
+    public function invoiceButlerApiRespondedWithPaymentMethods(): void
+    {
+        $this->mockRequest(
+            'accounts-receivable/208cfe7d-046f-4162-b175-748942d6cff4/payment-methods',
+            new ResponseStack(new MockResponse(
+                file_get_contents(__DIR__ . '/../resources/invoice_butler_payment_methods.json'),
+                ['Content-Type' => 'application/json']
+            ))
+        );
+    }
+
+    /**
      * @param $invoiceResponse
      * @return false|string
      */

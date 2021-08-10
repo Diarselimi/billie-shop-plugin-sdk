@@ -10,6 +10,7 @@ Feature: Get invoice from invoice-butler
   Scenario: Get an invoice successfully
     Given I have a new order "ABCDE" with amounts 1000/900/100, duration 30 and checkout session "208cfe7d-046f-4162-b175-748942d6cff2"
     And I get from invoice-butler service good response
+    And I get from invoice-butler payment methods response
     And the following invoice data exists:
       | order_id | invoice_uuid                         |
       | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
@@ -63,6 +64,16 @@ Feature: Get invoice from invoice-butler
             "external_code":  "another-code-CN",
             "comment": null,
             "created_at": "2021-03-01 12:12:12"
+          }
+        ],
+        "payment_methods": [
+          {
+            "type":"bank_transfer",
+            "data":{
+              "bank_name":"Mocked Bank Name GmbH",
+              "bic":"INGDDEFFXXX",
+              "iban":"DE12500105179542622426"
+            }
           }
         ]
     }

@@ -118,3 +118,6 @@ services:
     public: true
   App\Tests\Helpers\TestUuidGenerator: ~
   App\Helper\Uuid\UuidGeneratorInterface: '@App\Tests\Helpers\TestUuidGenerator'
+
+  App\Tests\Helpers\Behat\FakeBankAccountService: ~
+  App\DomainModel\BankAccount\BankAccountServiceInterface: '@App\Tests\Helpers\Behat\FakeBankAccountService'

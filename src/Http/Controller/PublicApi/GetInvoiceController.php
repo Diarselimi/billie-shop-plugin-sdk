@@ -8,10 +8,12 @@ use App\Application\Exception\InvoiceNotFoundException;
 use App\Application\UseCase\GetInvoice\GetInvoiceRequest;
 use App\Application\UseCase\GetInvoice\GetInvoiceResponse;
 use App\Application\UseCase\GetInvoice\GetInvoiceUseCase;
+use App\DomainModel\MerchantUser\MerchantUserNotFoundException;
 use App\Http\Authentication\UserProvider;
 use OpenApi\Annotations as OA;
+use Ozean12\InvoiceButler\Client\DomainModel\Invoice\InvoiceNotFoundException as ClientInvoiceNotFoundException;
+use Ramsey\Uuid\UuidInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -28,6 +30,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     @OA\Parameter(in="path", name="uuid", @OA\Schema(type="string"), required=true, description="Get Invoice with Uuid"),
  *
  *     @OA\Response(response=200, @OA\JsonContent(ref="#/components/schemas/GetInvoiceResponse"), description="Invoice Response"),
+ *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
  *     @OA\Response(response=404, ref="#/components/responses/NotFound"),
  *     @OA\Response(response=500, ref="#/components/responses/ServerError")
  * )
@@ -44,18 +47,16 @@ class GetInvoiceController
         $this->userProvider = $userProvider;
     }
 
-    public function execute(string $uuid, Request $request): GetInvoiceResponse
+    public function execute(UuidInterface $uuid): GetInvoiceResponse
     {
-        $merchantUser = $this->userProvider->getMerchantApiUser() ?? $this->userProvider->getMerchantUser();
-
-        $useCaseRequest = new GetInvoiceRequest(
-            $uuid,
-            $merchantUser->getMerchant()->getId()
-        );
-
         try {
+            $useCaseRequest = new GetInvoiceRequest(
+                $uuid,
+                $this->userProvider->getAuthenticatedMerchantUser()->getMerchant()->getId()
+            );
+
             return $this->useCase->execute($useCaseRequest);
-        } catch (InvoiceNotFoundException $exception) {
+        } catch (InvoiceNotFoundException | ClientInvoiceNotFoundException | MerchantUserNotFoundException $exception) {
             throw new NotFoundHttpException($exception->getMessage());
         }
     }

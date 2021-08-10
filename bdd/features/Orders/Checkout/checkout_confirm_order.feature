@@ -71,7 +71,7 @@ Feature: As a merchant, I should be able to create an order by providing a valid
            "data": {
              "iban": "DE27500105171416939916",
              "bic": "BICISHERE",
-             "bank_name": null
+             "bank_name": "Mocked Bank Name GmbH"
            }
          }
        ]
@@ -150,7 +150,7 @@ Feature: As a merchant, I should be able to create an order by providing a valid
            "data": {
              "iban": "DE27500105171416939916",
              "bic": "BICISHERE",
-             "bank_name": null
+             "bank_name": "Mocked Bank Name GmbH"
            }
          }
        ]

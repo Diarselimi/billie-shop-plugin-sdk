@@ -8,6 +8,7 @@ use App\DomainModel\BankAccount\BicLookupServiceInterface;
 use App\DomainModel\BankAccount\BicLookupServiceRequestException;
 use App\DomainModel\BankAccount\BicNotFoundException;
 use App\DomainModel\BankAccount\IbanDTO;
+use App\Infrastructure\Banco\BancoSdkWrapper;
 use App\Infrastructure\DecodeResponseTrait;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -15,6 +16,10 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\TransferStats;
 
+/**
+ * @deprecated
+ * @see BancoSdkWrapper
+ */
 class FinTechToolboxService implements BicLookupServiceInterface, LoggingInterface
 {
     use LoggingTrait, DecodeResponseTrait;

@@ -305,7 +305,7 @@ Feature:
          "data": {
            "iban": "DE27500105171416939916",
            "bic": "BICISHERE",
-           "bank_name": null
+           "bank_name": "Mocked Bank Name GmbH"
          }
        }
      ],
@@ -359,7 +359,7 @@ Feature:
          "data": {
            "iban": "DE27500105171416939916",
            "bic": "BICISHERE",
-           "bank_name": null
+           "bank_name": "Mocked Bank Name GmbH"
          }
        }
      ]
@@ -465,7 +465,7 @@ Feature:
            "data": {
              "iban": "DE27500105171416939916",
              "bic": "BICISHERE",
-             "bank_name": null
+             "bank_name": "Mocked Bank Name GmbH"
            }
          }
        ],

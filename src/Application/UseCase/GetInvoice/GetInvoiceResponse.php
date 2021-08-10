@@ -6,10 +6,12 @@ namespace App\Application\UseCase\GetInvoice;
 
 use App\DomainModel\ArrayableInterface;
 use App\DomainModel\Invoice\Invoice;
+use App\DomainModel\PaymentMethod\PaymentMethodCollection;
+use App\Http\Response\DTO\PaymentMethodDTO;
 use App\Http\Response\DTO\TaxedMoneyDTO;
-use App\Support\DateFormat;
 use OpenApi\Annotations as OA;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
+use Ozean12\Support\Formatting\DateFormat;
 
 /**
  * @OA\Schema(schema="GetInvoiceResponse", title="Get Invoice Response", type="object", properties={
@@ -23,7 +25,8 @@ use Ozean12\Money\TaxedMoney\TaxedMoney;
  *      @OA\Property(property="fee_rate", type="number", format="float", nullable=false, description="The fee rate is the percentage that the merchant pays to Billie."),
  *      @OA\Property(property="created_at", type="string", format="date", nullable=false, example="2019-03-20", description="The date and time when the invoice was created."),
  *      @OA\Property(property="due_date", type="string", format="date", nullable=false, example="2019-03-20", description="The date when this invoice is due to be paid back."),
- *      @OA\Property(property="state", type="string", nullable=true, example="created", description="The state of the invoice.")
+ *      @OA\Property(property="state", type="string", nullable=true, example="created", description="The state of the invoice."),
+ *      @OA\Property(property="payment_methods", ref="#/components/schemas/PaymentMethodCollection")
  * })
  */
 class GetInvoiceResponse implements ArrayableInterface
@@ -54,16 +57,18 @@ class GetInvoiceResponse implements ArrayableInterface
 
     private ?string $state;
 
-    private array
+    private array $ordersResponse;
 
- $ordersResponse;
+    private array $creditNotesResponse;
 
-    private array
+    private PaymentMethodCollection $paymentMethods;
 
- $creditNotesResponse;
-
-    public function __construct(Invoice $invoice, array $ordersResponse, array $creditNotesResponse)
-    {
+    public function __construct(
+        Invoice $invoice,
+        array $ordersResponse,
+        array $creditNotesResponse,
+        PaymentMethodCollection $paymentMethods
+    ) {
         $this->invoiceNumber = $invoice->getExternalCode();
         $this->duration = $invoice->getDuration();
         $this->payoutAmount = $invoice->getPayoutAmount()->getMoneyValue();
@@ -78,6 +83,7 @@ class GetInvoiceResponse implements ArrayableInterface
         $this->state = $invoice->getState();
         $this->ordersResponse = $ordersResponse;
         $this->creditNotesResponse = $creditNotesResponse;
+        $this->paymentMethods = $paymentMethods;
     }
 
     public function getUuid(): string
@@ -170,6 +176,7 @@ class GetInvoiceResponse implements ArrayableInterface
             'state' => $this->getState(),
             'orders' => $this->ordersResponse,
             'credit_notes' => $this->creditNotesResponse,
+            'payment_methods' => PaymentMethodDTO::collectionToArray($this->paymentMethods),
         ];
     }
 }
