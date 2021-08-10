@@ -23,6 +23,7 @@ default:
         - App\Tests\Functional\Context\BicLookupServiceContext
         - App\Tests\Functional\Context\DocumentGeneratorContext
         - App\Tests\Functional\Context\NachosContext
+        - App\Tests\Functional\Context\SepaServiceContext
         - App\Tests\Functional\Context\ScoringServiceContext
         - App\Tests\Functional\Context\FraudServiceContext
         - App\Tests\Functional\Context\InvoiceButlerServiceContext

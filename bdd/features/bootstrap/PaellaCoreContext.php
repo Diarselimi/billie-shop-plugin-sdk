@@ -71,6 +71,7 @@ use Behat\Symfony2Extension\Context\KernelDictionary;
 use Billie\PdoBundle\Infrastructure\Pdo\PdoConnection;
 use Ozean12\Money\Money;
 use Ozean12\Money\Percent;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpKernel\HttpKernelBrowser;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
@@ -127,6 +128,16 @@ class PaellaCoreContext extends MinkContext
         $this->cleanUpDatabase();
         $this->createInitialDataset();
         TestUuidGenerator::disableDynamicGeneration();
+    }
+
+    /**
+     * @Given /^A sepa mandate already exists for order "([^"]*)"$/
+     */
+    public function aSepaMandateAlreadyExistsForOrder($orderExternalCode)
+    {
+        $order = $this->getOrderRepository()->getOneByExternalCodeAndMerchantId($orderExternalCode, 1);
+        $order->setDebtorSepaMandateUuid(Uuid::fromString(SepaServiceContext::DUMMY_SEPA_MANDATE_UUID));
+        $this->getOrderRepository()->update($order);
     }
 
     /**
