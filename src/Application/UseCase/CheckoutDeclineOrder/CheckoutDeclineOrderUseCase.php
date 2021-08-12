@@ -14,6 +14,8 @@ use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
+use Ozean12\Sepa\Client\DomainModel\SepaClientInterface;
+use Ozean12\Support\HttpClient\Exception\HttpClientExceptionInterface;
 use Symfony\Component\Workflow\Registry;
 
 class CheckoutDeclineOrderUseCase implements LoggingInterface
@@ -30,18 +32,22 @@ class CheckoutDeclineOrderUseCase implements LoggingInterface
 
     private DebtorExternalDataRepositoryInterface $debtorExternalDataRepository;
 
+    private SepaClientInterface $sepaClient;
+
     public function __construct(
         Registry $workflowRegistry,
         DeclineOrderService $declineOrderService,
         OrderContainerFactory $orderContainerFactory,
         CheckoutSessionRepositoryInterface $checkoutSessionRepository,
-        DebtorExternalDataRepositoryInterface $debtorExternalDataRepository
+        DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
+        SepaClientInterface $sepaClient
     ) {
         $this->workflowRegistry = $workflowRegistry;
         $this->declineOrderService = $declineOrderService;
         $this->orderContainerFactory = $orderContainerFactory;
         $this->checkoutSessionRepository = $checkoutSessionRepository;
         $this->debtorExternalDataRepository = $debtorExternalDataRepository;
+        $this->sepaClient = $sepaClient;
     }
 
     /**
@@ -66,6 +72,17 @@ class CheckoutDeclineOrderUseCase implements LoggingInterface
 
         if ($input->isWronglyIdentified()) {
             $this->debtorExternalDataRepository->invalidateMerchantExternalId($externalId);
+        }
+
+        try {
+            if ($order->getDebtorSepaMandateUuid() !== null) {
+                $this->sepaClient->revokeMandate($order->getDebtorSepaMandateUuid());
+            }
+        } catch (HttpClientExceptionInterface $exception) {
+            $this->logSuppressedException(
+                $exception,
+                sprintf('Mandate revoke call failed for uuid %s ', $order->getDebtorSepaMandateUuid())
+            );
         }
 
         $this->logInfo("Decline checkout order triggered.", [

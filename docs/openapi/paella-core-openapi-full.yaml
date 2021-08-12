@@ -1046,7 +1046,7 @@ paths:
       parameters:
         -
           name: reason
-          in: path
+          in: query
           description: 'Reason for declining the order.'
           required: false
           schema:

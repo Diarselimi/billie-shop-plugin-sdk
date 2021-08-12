@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     operationId="checkout_session_decline",
  *     summary="Decline orders in authorised state.",
  *     security={{"oauth2"={}}},
- *     @OA\Parameter(in="path", name="reason",
+ *     @OA\Parameter(in="query", name="reason",
  *          @OA\Schema(type="string"),
  *          description="Reason for declining the order.",
  *          required=false
