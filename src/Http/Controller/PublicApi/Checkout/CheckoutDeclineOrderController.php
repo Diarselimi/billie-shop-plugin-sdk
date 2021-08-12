@@ -21,18 +21,21 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     operationId="checkout_session_decline",
  *     summary="Decline orders in authorised state.",
  *     security={{"oauth2"={}}},
+ *
+ *     tags={"Checkout Server"},
+ *     x={"groups":{"private"}},
+ *
+ *     @OA\Parameter(in="path", name="sessionUuid", @OA\Schema(ref="#/components/schemas/UUID"), required=true),
  *     @OA\Parameter(in="query", name="reason",
  *          @OA\Schema(type="string"),
  *          description="Reason for declining the order.",
  *          required=false
  *     ),
  *
- *     tags={"Checkout Server"},
- *     x={"groups":{"private"}},
- *
  *     @OA\Response(response=204, description="Order successfully cancelled"),
  *     @OA\Response(response=400, ref="#/components/responses/BadRequest"),
  *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+ *     @OA\Response(response=404, ref="#/components/responses/NotFound"),
  *     @OA\Response(response=500, ref="#/components/responses/ServerError")
  * )
  */

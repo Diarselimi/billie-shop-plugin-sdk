@@ -1,5 +1,8 @@
 parameters:
   behat_mock_server_url: "http://localhost:7070"
+  banco_url: '%behat_mock_server_url%/banco'
+  banco_public_api_url: '%banco_url%/public/api/v1'
+  banco_private_api_url: '%banco_url%/api/v1'
   #billie_monitoring_slack_webhook_url: null # do not use slack client for tests!
 
 services:
@@ -12,7 +15,6 @@ services:
   App\Test\TestSentryClient: ~
   App\Test\TestSentrySubscriber: ~
   Psr\Log\NullLogger: ~
-
 
   Billie\MonitoringBundle\Service\Alerting\Sentry\Raven\RavenClient: '@App\Test\TestSentryClient'
   Billie\MonitoringBundle\Service\Alerting\Sentry\SentrySubscriber: '@App\Test\TestSentrySubscriber'
@@ -118,6 +120,3 @@ services:
     public: true
   App\Tests\Helpers\TestUuidGenerator: ~
   App\Helper\Uuid\UuidGeneratorInterface: '@App\Tests\Helpers\TestUuidGenerator'
-
-  App\Tests\Helpers\Behat\FakeBankAccountService: ~
-  App\DomainModel\BankAccount\BankAccountServiceInterface: '@App\Tests\Helpers\Behat\FakeBankAccountService'

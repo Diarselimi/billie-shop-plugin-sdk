@@ -207,12 +207,6 @@
     "laminas/laminas-code": {
         "version": "4.0.0"
     },
-    "laminas/laminas-eventmanager": {
-        "version": "3.3.1"
-    },
-    "laminas/laminas-zendframework-bridge": {
-        "version": "1.1.1"
-    },
     "league/flysystem": {
         "version": "1.1.0"
     },
@@ -282,6 +276,9 @@
     },
     "ozean12/support": {
         "version": "2.2.0"
+    },
+    "ozean12/watson-client": {
+        "version": "1.0.1"
     },
     "paragonie/constant_time_encoding": {
         "version": "v2.4.0"
@@ -490,7 +487,7 @@
         "version": "v1.18.1"
     },
     "symfony/polyfill-php80": {
-        "version": "v1.17.1"
+        "version": "v1.23.0"
     },
     "symfony/polyfill-php81": {
         "version": "v1.23.0"

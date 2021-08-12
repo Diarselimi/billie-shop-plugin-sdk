@@ -33,7 +33,6 @@ Feature: Retrieve and search all orders of a merchant
       | order_id | invoice_uuid                         |
       | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
     When I send a GET request to "/public/orders?sort_by=id,desc"
-    Then print last response
     Then the response status code should be 200
     Then the JSON response should be:
     """

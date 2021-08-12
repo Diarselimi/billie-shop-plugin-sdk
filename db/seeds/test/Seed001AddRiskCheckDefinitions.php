@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\DomainModel\Iban\IbanFraudCheck;
 use App\DomainModel\OrderRiskCheck\Checker\AmountCheck;
 use App\DomainModel\OrderRiskCheck\Checker\AvailableFinancingLimitCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorBlacklistedCheck;
@@ -29,6 +30,7 @@ class Seed001AddRiskCheckDefinitions extends AbstractSeed
             DebtorBlacklistedCheck::NAME,
             DebtorOverdueCheck::NAME,
             DebtorScoreCheck::NAME,
+            IbanFraudCheck::RISK_CHECK_NAME,
         ];
 
         foreach ($riskCheckDefinitions as $riskCheckDefinitionName) {

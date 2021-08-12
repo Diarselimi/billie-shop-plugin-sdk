@@ -50,6 +50,7 @@ Feature:
     And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And Debtor has sufficient limit
     And Debtor lock limit call succeeded
+    And I get from Banco service search bank good response
     And I get from payments service register debtor positive response
     When I send a POST request to "/public/api/v2/orders" with body:
     """

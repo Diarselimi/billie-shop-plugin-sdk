@@ -40,6 +40,7 @@ Feature:
       | debtor_overdue            | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
       | fraud_score               | 1       | 0                  |
+    And I get from Banco service search bank good response
 
   Scenario: Unsuccessful order retrieve - order doesn't exist
     When I send a GET request to "/order/ABC"

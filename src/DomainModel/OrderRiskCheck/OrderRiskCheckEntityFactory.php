@@ -4,16 +4,11 @@ namespace App\DomainModel\OrderRiskCheck;
 
 class OrderRiskCheckEntityFactory
 {
-    private $riskCheckDefinitionRepository;
+    private RiskCheckDefinitionRepositoryInterface $riskCheckDefinitionRepository;
 
-    private $riskCheckDefinitionEntityFactory;
-
-    public function __construct(
-        RiskCheckDefinitionRepositoryInterface $riskCheckDefinitionRepository,
-        RiskCheckDefinitionEntityFactory $riskCheckDefinitionEntityFactory
-    ) {
+    public function __construct(RiskCheckDefinitionRepositoryInterface $riskCheckDefinitionRepository)
+    {
         $this->riskCheckDefinitionRepository = $riskCheckDefinitionRepository;
-        $this->riskCheckDefinitionEntityFactory = $riskCheckDefinitionEntityFactory;
     }
 
     public function createFromCheckResult(CheckResult $checkResult, int $orderId): OrderRiskCheckEntity

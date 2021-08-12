@@ -53,6 +53,7 @@ Feature:
     And I get from companies service identify match response
     And Debtor has sufficient limit
     And Debtor lock limit call succeeded
+    And I get from Banco service search bank good response
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
     """

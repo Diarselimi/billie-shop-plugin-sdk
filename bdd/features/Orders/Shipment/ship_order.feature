@@ -58,6 +58,7 @@ Feature:
     And I get from volt service good response
     And I get from files service a good response
     And I get from invoice-butler service no invoices response
+    And I get from Banco service search bank good response
     And I get from OAuth service "/resource-tokens" endpoint response with status 200 and body:
     """
     {

@@ -6,7 +6,9 @@ parameters:
   smaug_client_id: '%env(string:SMAUG_CLIENT_ID)%'
   smaug_client_secret: '%env(string:SMAUG_CLIENT_SECRET)%'
   redoc_js_url: 'https://cdn.jsdelivr.net/npm/redoc@v2.0.0-rc.23/bundles/redoc.standalone.js'
-  banco_url: '%env(string:BANCO_URL)%/public/api/v1'
+  banco_url: '%env(string:BANCO_URL)%'
+  banco_public_api_url: '%banco_url%/public/api/v1'
+  banco_private_api_url: '%banco_url%/api/v1'
 
 services:
   _defaults:
@@ -38,7 +40,7 @@ services:
       $cosimiClient: '@eight_points_guzzle.client.cosimi'
       $voltClient: '@eight_points_guzzle.client.volt'
       $documentGeneratorClient: '@eight_points_guzzle.client.document_generator'
-      $watsonClient: '@eight_points_guzzle.client.watson'
+      $legacyWatsonClient: '@eight_points_guzzle.client.watson'
       $invoiceButlerClient: '@eight_points_guzzle.client.invoice_butler'
       $projectRootDir: '%kernel.root_dir%/..'
       $smaugClientId: '%smaug_client_id%'
@@ -56,6 +58,8 @@ services:
       $isDummyRiskChecksFeatureEnabled: '%env(bool:DUMMY_CHECKS_ENABLED)%'
       $blacklistedAddresses: '%blacklisted_addresses%'
       $encryptionKey: '%env(ENCRYPTION_KEY)%'
+      $bancoPrivateApi: '@private_bank_api'
+      $bancoPublicApi: '@public_bank_api'
 
   _instanceof:
     App\Application\UseCase\ValidatedUseCaseInterface:

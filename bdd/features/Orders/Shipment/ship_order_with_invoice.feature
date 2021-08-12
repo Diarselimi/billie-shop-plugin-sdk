@@ -29,6 +29,7 @@ Feature:
     Given I have a created order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
     And I get from invoice-butler service no invoices and later one invoice no cns responses
     And I get from volt service good response
+    And I get from Banco service search bank good response
     And the following invoice data exists:
       | order_id | invoice_uuid                         |
       | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
@@ -167,6 +168,7 @@ Feature:
       | CO123       | created | 1000  | 900 | 100 | 30       | "test order"   | order_v2      |
     And I get from invoice-butler service no invoices and later one invoice no cns responses
     And I get from volt service good response
+    And I get from Banco service search bank good response
     And the order "CO123" does not have a payment id
     When I send a POST request to "/order/test-order-uuidCO123/ship-with-invoice" with parameters:
       | key               | value                            |

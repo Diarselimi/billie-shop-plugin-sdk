@@ -80,24 +80,8 @@ security:
         authenticators:
           - App\Http\Authentication\Authenticator\ActiveCheckoutSessionAuthenticator
 
-    checkout_update:
-      pattern: ^/(public/)?(api/)?(v[1-2]/)?checkout-session/.*/update
-      anonymous: false
-      stateless: true
-      guard:
-        authenticators:
-          - App\Http\Authentication\Authenticator\ExistingCheckoutSessionAuthenticator
-
-    checkout_sign_mandate:
-      pattern: ^/(public/)?(api/)?(v[1-2]/)?checkout-session/.*/sign-mandate
-      anonymous: false
-      stateless: true
-      guard:
-        authenticators:
-          - App\Http\Authentication\Authenticator\ExistingCheckoutSessionAuthenticator
-
-    checkout_decline:
-      pattern: ^/(public/)?(api/)?(v[1-2]/)?checkout-session/.*/decline
+    checkout_update_provide_iban_decline:
+      pattern: ^/(public/)?(api/)?(v[1-2]/)?checkout-session/.*/(update|iban|decline|sign-mandate)
       anonymous: false
       stateless: true
       guard:

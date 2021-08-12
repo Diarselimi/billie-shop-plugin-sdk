@@ -42,4 +42,36 @@ class FraudServiceContext implements Context
             )
         );
     }
+
+    /**
+     * @Given /^I get from Fraud service a non fraud iban response$/
+     */
+    public function fraudApiRespondedWithIbanNotFraud()
+    {
+        $this->mockRequest(
+            '/check-iban-fraud',
+            new ResponseStack(
+                new MockResponse(
+                    json_encode(['is_fraud' => false]),
+                    ['Content-Type' => 'application/json']
+                )
+            )
+        );
+    }
+
+    /**
+     * @Given /^I get from Fraud service a fraud iban response$/
+     */
+    public function fraudApiRespondedWithIbanFraud()
+    {
+        $this->mockRequest(
+            '/check-iban-fraud',
+            new ResponseStack(
+                new MockResponse(
+                    json_encode(['is_fraud' => true]),
+                    ['Content-Type' => 'application/json']
+                )
+            )
+        );
+    }
 }

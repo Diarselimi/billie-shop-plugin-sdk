@@ -1,5 +1,5 @@
 Feature:
-  As a merchant user I want to be able to decline my checkout orders from the widget.
+  As a debtor I want to be able to decline my checkout orders from the widget.
   Also declining the order will reactivate the session so that I can re-use it for authorising an order.
 
   Background:

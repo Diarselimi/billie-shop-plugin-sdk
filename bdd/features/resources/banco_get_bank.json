@@ -1,0 +1,10 @@
+{
+  "bic": "INGDDEFFXXX",
+  "code": "50010517",
+  "postal_code": "60628",
+  "country": "DE",
+  "city": "Frankfurt am Main",
+  "name": "ING-DiBa Frankfurt am Main",
+  "is_sepa_country": true,
+  "is_supported": true
+}

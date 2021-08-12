@@ -1045,6 +1045,12 @@ paths:
       operationId: checkout_session_decline
       parameters:
         -
+          name: sessionUuid
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        -
           name: reason
           in: query
           description: 'Reason for declining the order.'
@@ -1058,6 +1064,47 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      security:
+        -
+          oauth2: []
+  '/checkout-session/{sessionUuid}/iban':
+    post:
+      tags:
+        - 'Checkout Server'
+      summary: 'Provide an IBAN for the checkout session (for DirectDebit payment)'
+      operationId: checkout_session_iban
+      parameters:
+        -
+          name: sessionUuid
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckoutProvideIbanRequest'
+      responses:
+        '200':
+          description: 'SEPA Mandate is created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckoutProvideIbanResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: 'IBAN is not acceptable'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
       security:
@@ -1076,6 +1123,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
       security:
@@ -3823,6 +3872,13 @@ components:
           example: DE123456-1
           $ref: '#/components/schemas/TinyText'
       type: object
+    CheckoutProvideIbanRequest:
+      required:
+        - iban
+      properties:
+        iban:
+          $ref: '#/components/schemas/IBAN'
+      type: object
     CheckoutUpdateOrderRequest:
       required:
         - billing_address
@@ -5972,6 +6028,22 @@ components:
           format: float
           minimum: 0
           example: 60.15
+      type: object
+    CheckoutProvideIbanResponse:
+      title: 'Provide IBAN for checkout session response'
+      properties:
+        iban:
+          nullable: false
+          $ref: '#/components/schemas/IBAN'
+        mandate_reference:
+          nullable: false
+          $ref: '#/components/schemas/TinyText'
+        creditor_name:
+          nullable: false
+          $ref: '#/components/schemas/TinyText'
+        creditor_identifier:
+          nullable: false
+          $ref: '#/components/schemas/TinyText'
       type: object
     GetOrdersResponsePayloadInvoice:
       properties:

@@ -43,6 +43,7 @@ Feature:
       | fraud_score               | 1       | 0                  |
     And I get from Fraud service a non fraud response
     And GraphQL will respond to getMerchantDebtorDetails query
+    And I get from Banco service search bank good response
 
   Scenario: Debtor identification failed
     Given I get from companies service identify no match response
@@ -536,7 +537,6 @@ Feature:
            "comment":"Some comment"
         }
       """
-    Then print last JSON response
     Then the response status code should be 400
     And the JSON response should be:
     """

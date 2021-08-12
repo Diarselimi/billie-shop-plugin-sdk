@@ -21,13 +21,13 @@ class Watson implements FraudServiceInterface, LoggingInterface
 {
     use LoggingTrait, DecodeResponseTrait;
 
-    private $client;
+    private Client $client;
 
-    private $factory;
+    private FraudResponseDTOFactory $factory;
 
-    public function __construct(Client $watsonClient, FraudResponseDTOFactory $factory)
+    public function __construct(Client $legacyWatsonClient, FraudResponseDTOFactory $factory)
     {
-        $this->client = $watsonClient;
+        $this->client = $legacyWatsonClient;
         $this->factory = $factory;
     }
 

@@ -12,16 +12,33 @@ use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Ozean12\BancoSDK\Api\BankApi;
 use Ozean12\BancoSDK\ApiException;
 use Ozean12\BancoSDK\Model\Bank;
+use Ozean12\Support\ValueObject\Iban;
 
 class BancoSdkWrapper implements BankAccountServiceInterface, LoggingInterface
 {
     use LoggingTrait;
 
-    private BankApi $bancoApi;
+    private BankApi $bancoPrivateApi;
 
-    public function __construct(BankApi $bancoApi)
+    private BankApi $bancoPublicApi;
+
+    public function __construct(BankApi $bancoPrivateApi, BankApi $bancoPublicApi)
     {
-        $this->bancoApi = $bancoApi;
+        $this->bancoPrivateApi = $bancoPrivateApi;
+        $this->bancoPublicApi = $bancoPublicApi;
+    }
+
+    public function getBankByIban(Iban $iban): Bank
+    {
+        $ibanString = strtoupper($iban->toString());
+
+        try {
+            return $this->bancoPrivateApi->banks($ibanString);
+        } catch (ApiException $exception) {
+            $this->logSuppressedException($exception);
+
+            throw new BankAccountServiceException();
+        }
     }
 
     public function getBankByBic(string $bic): Bank
@@ -29,7 +46,7 @@ class BancoSdkWrapper implements BankAccountServiceInterface, LoggingInterface
         $bic = strtoupper($bic);
 
         try {
-            $response = $this->bancoApi->searchBanks($bic, 3);
+            $response = $this->bancoPublicApi->searchBanks($bic, 3);
         } catch (ApiException $exception) {
             $this->logSuppressedException($exception);
 

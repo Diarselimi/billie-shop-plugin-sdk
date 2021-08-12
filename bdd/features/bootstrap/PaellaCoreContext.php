@@ -380,6 +380,24 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
+     * @deprecated use iHaveOrdersWithTheFollowingData() instead
+     *
+     * @Given I have a(n) :state order :externalCode with amounts :gross/:net/:tax, duration :duration and checkout session :checkoutSession and uuid :uuid
+     */
+    public function iHaveAnOrderWithCheckoutSessionAndUuid(
+        $state,
+        $externalCode,
+        $gross,
+        $net,
+        $tax,
+        $duration,
+        $checkoutSession,
+        $uuid
+    ) {
+        $this->createOrder($state, $externalCode, $gross, $net, $tax, $duration, 'test', null, $checkoutSession, OrderEntity::CREATION_SOURCE_CHECKOUT, OrderEntity::WORKFLOW_NAME_V1, $uuid);
+    }
+
+    /**
      * @Given /^I have orders with the following data$/
      */
     public function iHaveOrdersWithTheFollowingData(TableNode $table)
@@ -412,7 +430,8 @@ class PaellaCoreContext extends MinkContext
         $paymentUuid = null,
         $checkoutSession = null,
         string $creationSource = OrderEntity::CREATION_SOURCE_API,
-        string $workflowName = OrderEntity::WORKFLOW_NAME_V1
+        string $workflowName = OrderEntity::WORKFLOW_NAME_V1,
+        string $uuid = null
     ) {
         [$person, $deliveryAddress, $debtor, $merchantDebtor] = $this->debtorData ?? $this->iHaveADebtorWithoutOrders();
 
@@ -428,7 +447,7 @@ class PaellaCoreContext extends MinkContext
             ->setMerchantId($this->merchant->getId())
             ->setPaymentId($paymentUuid)
             ->setCreatedAt(new \DateTime('2019-05-20 13:00:00'))
-            ->setUuid('test-order-uuid' . $externalCode)
+            ->setUuid($uuid ?: 'test-order-uuid' . $externalCode)
             ->setCompanyBillingAddressUuid('c7be46c0-e049-4312-b274-258ec5aeeb71')
             ->setCreationSource($creationSource)
             ->setWorkflowName($workflowName)
@@ -813,7 +832,7 @@ class PaellaCoreContext extends MinkContext
     /**
      * @Given /^The following risk check definitions exist:$/
      */
-    public function theFollowingRiskCheckDefinitionsExist1(TableNode $table)
+    public function theFollowingRiskCheckDefinitionsExist(TableNode $table)
     {
         foreach ($table as $row) {
             $riskCheckDefinition = (new RiskCheckDefinitionEntity())->setName($row['name']);
@@ -825,7 +844,7 @@ class PaellaCoreContext extends MinkContext
     /**
      * @Given The following merchant risk check settings exist for merchant :merchantId:
      */
-    public function theFollowingRiskCheckDefinitionsExist(TableNode $table, $merchantId)
+    public function theFollowingRiskCheckDefinitionsExistForMerchant(TableNode $table, $merchantId)
     {
         foreach ($table as $row) {
             $riskCheckDefinition = $this->getRiskCheckDefinitionRepository()->getByName($row['risk_check_name']);

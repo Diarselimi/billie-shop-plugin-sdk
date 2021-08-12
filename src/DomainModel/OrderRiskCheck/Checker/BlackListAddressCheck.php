@@ -18,9 +18,7 @@ class BlackListAddressCheck implements CheckInterface
 
     private AddressDTOFactory $addressDTOFactory;
 
-    private array
-
- $blacklistedAddresses;
+    private array $blacklistedAddresses;
 
     public function __construct(
         AddressMatchService $addressMatchService,

@@ -40,6 +40,7 @@ Feature:
       | debtor_overdue                    | 1       | 1                  |
       | company_b2b_score                 | 1       | 1                  |
     And GraphQL will respond to getMerchantDebtorDetails query
+    And I get from Banco service search bank good response
 
   Scenario: Successful order creation after company is identified by the billing address with at least one complete older order
     Given I have a complete order "XF43Y" with amounts 1000/900/100, duration 30 and comment "test order"

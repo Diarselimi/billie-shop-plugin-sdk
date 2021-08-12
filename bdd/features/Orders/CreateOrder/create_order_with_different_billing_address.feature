@@ -35,6 +35,7 @@ Feature:
       | debtor_overdue            | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
     And GraphQL will respond to getMerchantDebtorDetails query
+    And I get from Banco service search bank good response
 
   Scenario: Successful order creation
     Given I get from companies service identify match response
