@@ -108,3 +108,27 @@ Feature:
     """
     {"errors":[{"title":"Order not found","code":"resource_not_found"}]}
     """
+
+  Scenario: Successful shipped order v2 cancellation
+    Given I have a partially_shipped v2 order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
+    And I get from invoice-butler service good response
+    And the following invoice data exists:
+      | order_id | invoice_uuid                         |
+      | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
+    And I get from invoice-butler service good response no CreditNotes
+    When I send a POST request to "/public/api/v2/orders/CO123/cancel"
+    Then the response status code should be 204
+    And the response should be empty
+    And the order "CO123" is in state canceled
+    And Order notification should exist for order "CO123" with type "order_canceled"
+    And queue should contain message with routing key credit_note.create_credit_note with below data:
+    """
+    {
+      "uuid": "@string@",
+      "invoiceUuid": "208cfe7d-046f-4162-b175-748942d6cff4",
+      "grossAmount": "12333",
+      "netAmount": "12333",
+      "externalCode": "some_code-CN",
+      "internalComment": "cancelation"
+    }
+    """

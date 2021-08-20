@@ -14,7 +14,7 @@ class MerchantDebtorLimitsService implements LoggingInterface
 {
     use LoggingTrait;
 
-    private $debtorLimitService;
+    private DebtorLimitServiceInterface $debtorLimitService;
 
     public function __construct(DebtorLimitServiceInterface $debtorLimitService)
     {

@@ -36,7 +36,6 @@ class OrderWorkflowTransitionGuardEventSubscriber implements EventSubscriberInte
     {
         /** @var OrderEntity $order */
         $order = $event->getSubject();
-
         $container = $this->getOrderContainer($order);
 
         $this->logInfo(sprintf('Order is in state %s', $container->getOrder()->getState()));

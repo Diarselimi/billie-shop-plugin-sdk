@@ -4,56 +4,37 @@ namespace App\Application\UseCase\CancelOrder;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\WorkflowException;
-use App\DomainModel\Invoice\CreditNote\CreditNote;
-use App\DomainModel\Invoice\CreditNote\CreditNoteFactory;
-use App\DomainModel\Invoice\CreditNote\InvoiceCreditNoteMessageFactory;
-use App\DomainModel\Order\OrderContainer\OrderContainer;
+use App\DomainModel\Invoice\InvoiceCancellationService;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
-use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsException;
-use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
+use App\DomainModel\OrderUpdate\UpdateOrderLimitsService;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
-use Ozean12\Money\TaxedMoney\TaxedMoney;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Workflow\Registry;
 
 class CancelOrderUseCase implements LoggingInterface
 {
     use LoggingTrait;
 
-    private MerchantDebtorLimitsService $limitsService;
-
     private OrderContainerFactory $orderContainerFactory;
-
-    private MerchantRepositoryInterface $merchantRepository;
 
     private Registry $workflowRegistry;
 
-    private InvoiceCreditNoteMessageFactory $creditNoteMessageFactory;
+    private InvoiceCancellationService $invoiceCancellationService;
 
-    private CreditNoteFactory $creditNoteFactory;
-
-    private MessageBusInterface $bus;
+    private UpdateOrderLimitsService $updateLimitsService;
 
     public function __construct(
-        MerchantDebtorLimitsService $limitsService,
         OrderContainerFactory $orderContainerFactory,
-        MerchantRepositoryInterface $merchantRepository,
+        UpdateOrderLimitsService $updateLimitsService,
         Registry $workflowRegistry,
-        InvoiceCreditNoteMessageFactory $creditNoteMessageFactory,
-        CreditNoteFactory $creditNoteFactory,
-        MessageBusInterface $bus
+        InvoiceCancellationService $invoiceCancellationService
     ) {
-        $this->limitsService = $limitsService;
         $this->orderContainerFactory = $orderContainerFactory;
-        $this->merchantRepository = $merchantRepository;
         $this->workflowRegistry = $workflowRegistry;
-        $this->creditNoteMessageFactory = $creditNoteMessageFactory;
-        $this->creditNoteFactory = $creditNoteFactory;
-        $this->bus = $bus;
+        $this->invoiceCancellationService = $invoiceCancellationService;
+        $this->updateLimitsService = $updateLimitsService;
     }
 
     public function execute(CancelOrderRequest $request): void
@@ -70,57 +51,32 @@ class CancelOrderUseCase implements LoggingInterface
         $order = $orderContainer->getOrder();
         $workflow = $this->workflowRegistry->get($order);
 
-        if ($order->isWorkflowV2()) {
-            throw new WorkflowException('Order workflow is not supported by api v1');
+        if ($order->isWorkflowV1()) {
+            throw new WorkflowException('Order workflow is not supported by api v2');
         }
 
-        if ($workflow->can($order, OrderEntity::TRANSITION_CANCEL)) {
-            $this->logInfo('Cancel order {id}', [LoggingInterface::KEY_ID => $order->getId()]);
+        if ($orderContainer->getInvoices()->hasCompletedInvoice()
+            || $orderContainer->getInvoices()->hasPartiallyPaidInvoice()
+        ) {
+            throw new WorkflowException("Order can't be canceled anymore, there are paid back invoices");
+        }
 
-            $orderContainer->getMerchant()->increaseFinancingLimit(
-                $orderContainer->getOrderFinancialDetails()->getAmountGross()
+        if ($workflow->can($order, OrderEntity::TRANSITION_CANCEL_EXPLICITLY)) {
+            $newLockedAmount = $orderContainer->getOrderFinancialDetails()->getAmountGross()->subtract(
+                $orderContainer->getOrderFinancialDetails()->getUnshippedAmountGross()
             );
-            $this->merchantRepository->update($orderContainer->getMerchant());
 
-            try {
-                $this->limitsService->unlock($orderContainer);
-            } catch (MerchantDebtorLimitsException $exception) {
-                throw new LimitUnlockException("Limits cannot be unlocked for merchant #{$orderContainer->getMerchantDebtor()->getId()}");
+            $this->updateLimitsService->updateLimitAmounts($orderContainer, $newLockedAmount);
+
+            $workflow->apply($order, OrderEntity::TRANSITION_CANCEL_EXPLICITLY);
+
+            foreach ($orderContainer->getInvoices() as $invoice) {
+                $this->invoiceCancellationService->cancelInvoiceFully($invoice);
             }
-
-            $workflow->apply($order, OrderEntity::TRANSITION_CANCEL);
-        } elseif ($workflow->can($order, OrderEntity::TRANSITION_CANCEL_SHIPPED)) {
-            $this->logInfo('Cancel shipped order {id}', [LoggingInterface::KEY_ID => $order->getId()]);
-            $this->createCreditNote($orderContainer);
-            $workflow->apply($order, OrderEntity::TRANSITION_CANCEL_SHIPPED);
         } elseif ($workflow->can($order, OrderEntity::TRANSITION_CANCEL_WAITING)) {
-            $this->logInfo('Cancel waiting order {id}', [LoggingInterface::KEY_ID => $order->getId()]);
             $workflow->apply($order, OrderEntity::TRANSITION_CANCEL_WAITING);
         } else {
             throw new CancelOrderException("Order #{$request->getOrderId()} can not be cancelled");
         }
-    }
-
-    private function createCreditNote(OrderContainer $orderContainer): void
-    {
-        $invoices = $orderContainer->getInvoices();
-        $invoice = $invoices->getLastInvoice();
-        $financialDetails = $orderContainer->getOrderFinancialDetails();
-
-        $amount = new TaxedMoney(
-            $financialDetails->getAmountGross()->subtract($grossSum = $invoices->getInvoicesCreditNotesGrossSum()),
-            $financialDetails->getAmountNet()->subtract($netSum = $invoices->getInvoicesCreditNotesNetSum()),
-            $financialDetails->getAmountTax()->subtract($grossSum->subtract($netSum))
-        );
-
-        $creditNote = $this->creditNoteFactory->create(
-            $invoice,
-            $amount,
-            $invoice->getExternalCode().CreditNote::EXTERNAL_CODE_SUFFIX,
-            CreditNote::INTERNAL_COMMENT_CANCELATION
-        );
-
-        $this->bus->dispatch($this->creditNoteMessageFactory->create($creditNote));
-        $invoice->getCreditNotes()->add($creditNote);
     }
 }

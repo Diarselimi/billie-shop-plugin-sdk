@@ -169,7 +169,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         $orderContainer->getOrderFinancialDetails()->shouldBeCalled()->willReturn($orderFinancialDetails);
 
         // unlocks merchant debtor limit
-        $updateOrderLimitsService->updateLimitAmounts($orderContainer, $changeSet->getAmount())->shouldBeCalled();
+        $updateOrderLimitsService->updateLimitAmounts($orderContainer, $changeSet->getAmount()->getGross())->shouldBeCalled();
 
         // update financial details
         $financialDetailsPersistenceService->updateFinancialDetails(
@@ -388,7 +388,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         $orderContainer->getOrderFinancialDetails()->shouldBeCalled()->willReturn($orderFinancialDetails);
 
         // unlocks merchant debtor limit
-        $updateOrderLimitsService->updateLimitAmounts($orderContainer, $changeSet->getAmount())->shouldBeCalled();
+        $updateOrderLimitsService->updateLimitAmounts($orderContainer, $changeSet->getAmount()->getGross())->shouldBeCalled();
 
         // update financial details
         $financialDetailsPersistenceService->updateFinancialDetails(

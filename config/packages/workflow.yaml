@@ -98,6 +98,9 @@ framework:
         cancel:
           from: [new, created, shipped, partially_shipped]
           to: canceled
+        cancel_explicitly:
+          from: [new, created, shipped, partially_shipped]
+          to: canceled
         cancel_waiting:
           from: [waiting]
           to: canceled

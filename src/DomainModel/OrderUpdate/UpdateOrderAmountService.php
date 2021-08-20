@@ -45,7 +45,7 @@ class UpdateOrderAmountService
             throw new UpdateOrderAmountException();
         }
 
-        $this->updateOrderLimitsService->updateLimitAmounts($orderContainer, $newAmount);
+        $this->updateOrderLimitsService->updateLimitAmounts($orderContainer, $newAmount->getGross());
 
         $newFinancialDetails = clone $orderContainer->getOrderFinancialDetails();
         $calculatedTaxedMoney = new TaxedMoney(

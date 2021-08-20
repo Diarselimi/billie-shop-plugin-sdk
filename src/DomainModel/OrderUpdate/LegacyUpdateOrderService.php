@@ -76,7 +76,7 @@ class LegacyUpdateOrderService implements LoggingInterface
         $this->logChangeSet($orderContainer, $changeSet);
 
         if ($changeSet->isAmountChanged() && !$order->wasShipped()) {
-            $this->updateOrderLimitsService->updateLimitAmounts($orderContainer, $changeSet->getAmount());
+            $this->updateOrderLimitsService->updateLimitAmounts($orderContainer, $changeSet->getAmount()->getGross());
         }
 
         $this->doUpdate($orderContainer, $changeSet);

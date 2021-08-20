@@ -121,6 +121,16 @@ class InvoiceCollection implements CollectionInterface
 
     public function hasCompletedInvoice(): bool
     {
-        return count(array_filter($this->elements, fn ($invoice) => $invoice->getState() === Invoice::STATE_COMPLETE)) > 0;
+        return count(array_filter($this->elements, fn (Invoice $invoice) => $invoice->isComplete())) > 0;
+    }
+
+    public function hasPartiallyPaidInvoice(): bool
+    {
+        return count(array_filter($this->elements, static function (Invoice $invoice) {
+            return $invoice->getOutstandingAmount()->lessThan($invoice->getGrossAmount())
+                && !$invoice->isCanceled()
+                && !$invoice->isComplete()
+            ;
+        })) > 0;
     }
 }

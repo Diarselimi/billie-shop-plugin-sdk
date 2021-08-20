@@ -5,7 +5,7 @@ namespace spec\App\Application\UseCase\CancelOrder;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\CancelOrder\CancelOrderException;
 use App\Application\UseCase\CancelOrder\CancelOrderRequest;
-use App\Application\UseCase\CancelOrder\CancelOrderUseCase;
+use App\Application\UseCase\CancelOrder\LegacyCancelOrderUseCase;
 use App\DomainModel\Invoice\CreditNote\CreditNote;
 use App\DomainModel\Invoice\CreditNote\CreditNoteCollection;
 use App\DomainModel\Invoice\CreditNote\CreditNoteFactory;
@@ -34,7 +34,7 @@ use Symfony\Component\Workflow\Workflow;
 /**
  * @TODO: add the scenarios for normal and shipped order cancellations
  */
-class CancelOrderUseCaseSpec extends ObjectBehavior
+class LegacyCancelOrderUseCaseSpec extends ObjectBehavior
 {
     private const ORDER_UUID = 'test-order-uuid';
 
@@ -75,7 +75,7 @@ class CancelOrderUseCaseSpec extends ObjectBehavior
 
     public function it_is_initializable()
     {
-        $this->shouldHaveType(CancelOrderUseCase::class);
+        $this->shouldHaveType(LegacyCancelOrderUseCase::class);
     }
 
     public function it_throws_exception_if_order_does_not_exist(

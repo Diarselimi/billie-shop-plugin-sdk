@@ -6,7 +6,7 @@ use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\CancelOrder\CancelOrderException;
 use App\Application\UseCase\CancelOrder\CancelOrderRequest;
-use App\Application\UseCase\CancelOrder\CancelOrderUseCase;
+use App\Application\UseCase\CancelOrder\LegacyCancelOrderUseCase;
 use App\Http\HttpConstantsInterface;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -36,9 +36,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class CancelOrderController
 {
-    private CancelOrderUseCase $useCase;
+    private LegacyCancelOrderUseCase $useCase;
 
-    public function __construct(CancelOrderUseCase $useCase)
+    public function __construct(LegacyCancelOrderUseCase $useCase)
     {
         $this->useCase = $useCase;
     }

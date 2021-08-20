@@ -65,6 +65,8 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
 
     public const TRANSITION_CANCEL_WAITING = 'cancel_waiting';
 
+    public const TRANSITION_CANCEL_EXPLICITLY = 'cancel_explicitly';
+
     public const ALL_STATES = [
         self::STATE_NEW,
         self::STATE_PRE_WAITING,
