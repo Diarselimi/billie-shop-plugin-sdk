@@ -24,6 +24,7 @@ Feature: Endpoint to decline an order in waiting state
 		And The following notification settings exist for merchant 1:
 			| notification_type | enabled |
 			| order_declined    | 1       |
+    And Order CO123 has sepa mandate uuid "a5cf2662-35a4-11e9-a2c4-02c6850949b3"
     And GraphQL will respond to getMerchantDebtorDetails query
 		When I send a POST request to "/private/order/test-order-uuidCO123/decline"
 		Then the response status code should be 204

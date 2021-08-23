@@ -15,7 +15,7 @@ use App\DomainModel\Order\OrderEntity;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Ozean12\Sepa\Client\DomainModel\SepaClientInterface;
-use Ozean12\Support\HttpClient\Exception\HttpClientExceptionInterface;
+use Ozean12\Support\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Component\Workflow\Registry;
 
 class CheckoutDeclineOrderUseCase implements LoggingInterface
@@ -78,7 +78,7 @@ class CheckoutDeclineOrderUseCase implements LoggingInterface
             if ($order->getDebtorSepaMandateUuid() !== null) {
                 $this->sepaClient->revokeMandate($order->getDebtorSepaMandateUuid());
             }
-        } catch (HttpClientExceptionInterface $exception) {
+        } catch (HttpExceptionInterface $exception) {
             $this->logSuppressedException(
                 $exception,
                 sprintf('Mandate revoke call failed for uuid %s ', $order->getDebtorSepaMandateUuid())

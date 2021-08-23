@@ -8,24 +8,34 @@ use App\DomainModel\Order\Lifecycle\DeclineOrderService;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
+use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
+use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
+use Ozean12\Sepa\Client\DomainModel\SepaClientInterface;
+use Ozean12\Support\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Component\Workflow\Registry;
 
-class DeclineOrderUseCase
+class DeclineOrderUseCase implements LoggingInterface
 {
+    use LoggingTrait;
+
     private Registry $workflowRegistry;
 
     private DeclineOrderService $declineOrderService;
 
     private OrderContainerFactory $orderContainerFactory;
 
+    private SepaClientInterface $sepaClient;
+
     public function __construct(
         Registry $workflowRegistry,
         DeclineOrderService $declineOrderService,
-        OrderContainerFactory $orderManagerFactory
+        OrderContainerFactory $orderManagerFactory,
+        SepaClientInterface $sepaClient
     ) {
         $this->workflowRegistry = $workflowRegistry;
         $this->declineOrderService = $declineOrderService;
         $this->orderContainerFactory = $orderManagerFactory;
+        $this->sepaClient = $sepaClient;
     }
 
     public function execute(DeclineOrderRequest $request): void
@@ -43,5 +53,18 @@ class DeclineOrderUseCase
         }
 
         $this->declineOrderService->decline($orderContainer);
+
+        if ($order->getDebtorSepaMandateUuid() === null) {
+            return;
+        }
+
+        try {
+            $this->sepaClient->revokeMandate($order->getDebtorSepaMandateUuid());
+        } catch (HttpExceptionInterface $exception) {
+            $this->logSuppressedException(
+                $exception,
+                sprintf('Mandate revoke call failed for uuid %s ', $order->getDebtorSepaMandateUuid())
+            );
+        }
     }
 }

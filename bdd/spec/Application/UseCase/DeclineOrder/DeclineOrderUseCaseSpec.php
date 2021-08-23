@@ -11,7 +11,9 @@ use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
+use Ozean12\Sepa\Client\DomainModel\SepaClientInterface;
 use PhpSpec\ObjectBehavior;
+use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\Workflow;
 
@@ -23,6 +25,7 @@ class DeclineOrderUseCaseSpec extends ObjectBehavior
         Registry $workflowRegistry,
         DeclineOrderService $declineOrderService,
         OrderContainerFactory $orderContainerFactory,
+        SepaClientInterface $sepaClient,
         Workflow $workflow,
         OrderContainer $orderContainer,
         OrderEntity $order,
@@ -81,7 +84,9 @@ class DeclineOrderUseCaseSpec extends ObjectBehavior
         DeclineOrderRequest $request,
         DeclineOrderService $declineOrderService,
         Workflow $workflow,
+        SepaClientInterface $sepaClient,
         OrderEntity $order,
+        UuidInterface $sepaMandateUuid,
         OrderContainer $orderContainer
     ) {
         $orderContainerFactory
@@ -90,11 +95,17 @@ class DeclineOrderUseCaseSpec extends ObjectBehavior
             ->willReturn($orderContainer)
         ;
 
+        $order->getDebtorSepaMandateUuid()
+            ->shouldBeCalled()
+            ->willReturn($sepaMandateUuid);
+
         $workflow
             ->can($order, OrderEntity::TRANSITION_DECLINE)
             ->shouldBeCalled()
             ->willReturn(true)
         ;
+
+        $sepaClient->revokeMandate($sepaMandateUuid)->shouldBeCalled();
 
         $declineOrderService->decline($orderContainer)->shouldBeCalledOnce();
         $this->execute($request);

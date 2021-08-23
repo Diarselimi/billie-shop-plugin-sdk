@@ -398,6 +398,16 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
+     * @Given Order :externalCode has sepa mandate uuid :uuid
+     */
+    public function orderHasSepaMandateUuid($externalCode, $sepaMandateUuid)
+    {
+        $order = $this->getOrder($externalCode);
+        $order->setDebtorSepaMandateUuid(Uuid::fromString($sepaMandateUuid));
+        $this->getOrderRepository()->update($order);
+    }
+
+    /**
      * @Given /^I have orders with the following data$/
      */
     public function iHaveOrdersWithTheFollowingData(TableNode $table)
