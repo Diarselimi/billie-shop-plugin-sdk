@@ -62,11 +62,13 @@ class CancelOrderUseCase implements LoggingInterface
         }
 
         if ($workflow->can($order, OrderEntity::TRANSITION_CANCEL_EXPLICITLY)) {
-            $newLockedAmount = $orderContainer->getOrderFinancialDetails()->getAmountGross()->subtract(
-                $orderContainer->getOrderFinancialDetails()->getUnshippedAmountGross()
-            );
+            if (!$orderContainer->getOrderFinancialDetails()->getUnshippedAmountGross()->isZero()) {
+                $newLockedAmount = $orderContainer->getOrderFinancialDetails()->getAmountGross()->subtract(
+                    $orderContainer->getOrderFinancialDetails()->getUnshippedAmountGross()
+                );
 
-            $this->updateLimitsService->updateLimitAmounts($orderContainer, $newLockedAmount);
+                $this->updateLimitsService->updateLimitAmounts($orderContainer, $newLockedAmount);
+            }
 
             $workflow->apply($order, OrderEntity::TRANSITION_CANCEL_EXPLICITLY);
 
