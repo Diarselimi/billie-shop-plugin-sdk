@@ -533,6 +533,8 @@ class PaellaCoreContext extends MinkContext
     public function orderIsInState($orderId, $state)
     {
         $order = $this->getOrderRepository()->getOneByExternalCodeAndMerchantId($orderId, $this->merchant->getId());
+
+        $order = $order ?? $this->getOrderRepository()->getOneByUuid($orderId);
         if ($order === null) {
             if ($state === 'null') {
                 return;

@@ -25,9 +25,9 @@ Feature: We should be able to update an order if it's not in states declined/can
     {
       "external_code": "foobar",
       "amount": {
-        "gross": 500,
-        "net": 400,
-        "tax": 100
+        "gross": 123.33,
+        "net": 100.33,
+        "tax": 23
       }
     }
     """
