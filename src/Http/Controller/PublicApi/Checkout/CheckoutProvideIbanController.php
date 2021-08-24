@@ -54,7 +54,11 @@ class CheckoutProvideIbanController
 
     public function execute(Request $request, string $sessionUuid): CheckoutProvideIbanResponsePayload
     {
-        $input = new CheckoutProvideIbanRequest($sessionUuid, $request->request->get('iban'));
+        $input = new CheckoutProvideIbanRequest(
+            $sessionUuid,
+            $request->request->get('iban'),
+            $request->request->get('bank_account_owner')
+        );
 
         try {
             return new CheckoutProvideIbanResponsePayload($this->useCase->execute($input));

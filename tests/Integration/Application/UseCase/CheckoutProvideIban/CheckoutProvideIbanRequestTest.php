@@ -20,7 +20,7 @@ class CheckoutProvideIbanRequestTest extends IntegrationTestCase
      */
     public function validationShouldFailOnEmptyIbanProvided()
     {
-        $request = new CheckoutProvideIbanRequest(Uuid::uuid4()->toString(), null);
+        $request = new CheckoutProvideIbanRequest(Uuid::uuid4()->toString(), null, 'Edeka Co Kg');
 
         $validator = $this->getContainer()->get(ValidatorInterface::class);
         $this->setValidator($validator);
@@ -34,7 +34,21 @@ class CheckoutProvideIbanRequestTest extends IntegrationTestCase
      */
     public function validationShouldFailOnInvalidIbanProvided()
     {
-        $request = new CheckoutProvideIbanRequest(Uuid::uuid4()->toString(), 'DEINVALID');
+        $request = new CheckoutProvideIbanRequest(Uuid::uuid4()->toString(), 'DEINVALID', 'Edeka Co Kg');
+
+        $validator = $this->getContainer()->get(ValidatorInterface::class);
+        $this->setValidator($validator);
+
+        $this->expectException(RequestValidationException::class);
+        $this->validateRequest($request);
+    }
+
+    /**
+     * @test
+     */
+    public function validationShouldFailOnMissingOwner()
+    {
+        $request = new CheckoutProvideIbanRequest(Uuid::uuid4()->toString(), 'DE42500105172497563393', null);
 
         $validator = $this->getContainer()->get(ValidatorInterface::class);
         $this->setValidator($validator);
@@ -48,7 +62,7 @@ class CheckoutProvideIbanRequestTest extends IntegrationTestCase
      */
     public function validationShouldPassIfValidIbanProvided()
     {
-        $request = new CheckoutProvideIbanRequest(Uuid::uuid4()->toString(), 'DE42500105172497563393');
+        $request = new CheckoutProvideIbanRequest(Uuid::uuid4()->toString(), 'DE42500105172497563393', 'Edeka Co Kg');
 
         $validator = $this->getContainer()->get(ValidatorInterface::class);
         $this->setValidator($validator);

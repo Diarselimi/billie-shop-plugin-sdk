@@ -32,7 +32,7 @@ class SepaMandateGenerator implements LoggingInterface
         $this->bankAccountService = $bankAccountService;
     }
 
-    public function generateForOrderContainer(OrderContainer $orderContainer, Iban $iban): SepaMandate
+    public function generateForOrderContainer(OrderContainer $orderContainer, Iban $iban, string $bankAccountOwner): SepaMandate
     {
         $debtorAddress = $orderContainer->getDebtorCompany()->getAddress();
         $address = new Address(
@@ -52,7 +52,7 @@ class SepaMandateGenerator implements LoggingInterface
             throw new GenerateMandateException($exception);
         }
 
-        $bankAccount = new BankAccount($iban, $bank->getBic(), $bank->getName(), $orderContainer->getDebtorCompany()->getName());
+        $bankAccount = new BankAccount($iban, $bank->getBic(), $bank->getName(), $bankAccountOwner);
         $bankAccountUuid = Uuid::uuid4(); // awaits clarifications from Payments team
 
         $request = new GenerateMandateRequest(

@@ -3878,6 +3878,8 @@ components:
       properties:
         iban:
           $ref: '#/components/schemas/IBAN'
+        bank_account_owner:
+          $ref: '#/components/schemas/TinyText'
       type: object
     CheckoutUpdateOrderRequest:
       required:

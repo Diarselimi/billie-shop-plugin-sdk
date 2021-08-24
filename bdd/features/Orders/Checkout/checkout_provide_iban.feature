@@ -19,7 +19,8 @@ Feature:
     And I send a POST request to "/checkout-session/123123CO123/iban" with body:
     """
       {
-        "iban": "DE42500105172497563393"
+        "iban": "DE42500105172497563393",
+        "bank_account_owner": "Edeka Co Kg"
       }
     """
     Then the response status code should be 200
@@ -44,7 +45,8 @@ Feature:
     And I send a POST request to "/checkout-session/123123CO123/iban" with body:
     """
       {
-        "iban": "DE42500105172497563393"
+        "iban": "DE42500105172497563393",
+        "bank_account_owner": "Edeka Co Kg"
       }
     """
     Then the response status code should be 403

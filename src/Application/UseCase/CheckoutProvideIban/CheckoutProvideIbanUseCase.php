@@ -73,7 +73,7 @@ final class CheckoutProvideIbanUseCase implements LoggingInterface, ValidatedUse
         $this->declineIfIbanFraud($iban, $orderContainer);
 
         try {
-            $mandate = $this->sepaMandateGenerator->generateForOrderContainer($orderContainer, $iban);
+            $mandate = $this->sepaMandateGenerator->generateForOrderContainer($orderContainer, $iban, $input->getBankAccountOwner());
         } catch (GenerateMandateException $exception) {
             throw new CheckoutProvideIbanFailedException("SEPA Mandate can't be generated: " . $exception->getMessage(), 0, $exception);
         }

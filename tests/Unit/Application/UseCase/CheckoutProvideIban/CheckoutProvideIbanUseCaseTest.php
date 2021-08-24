@@ -37,6 +37,8 @@ class CheckoutProvideIbanUseCaseTest extends IntegrationTestCase
 
     private const IBAN = 'DE42500105172497563393';
 
+    private const OWNER = 'Edeka Co Kg';
+
     /**
      * @var OrderContainerFactory|ObjectProphecy
      */
@@ -107,7 +109,7 @@ class CheckoutProvideIbanUseCaseTest extends IntegrationTestCase
         $this->orderContainerFactory->loadNotYetConfirmedByCheckoutSessionUuid(self::SESSION_UUID)->shouldBeCalledOnce()->willReturn($this->orderContainer);
 
         $this->useCase->execute(
-            new CheckoutProvideIbanRequest(self::SESSION_UUID, null)
+            new CheckoutProvideIbanRequest(self::SESSION_UUID, null, self::OWNER)
         );
     }
 
@@ -130,7 +132,7 @@ class CheckoutProvideIbanUseCaseTest extends IntegrationTestCase
         $this->workflowRegistry->get($order)->shouldBeCalledOnce()->willReturn($workflow);
 
         $this->useCase->execute(
-            new CheckoutProvideIbanRequest(self::SESSION_UUID, self::IBAN)
+            new CheckoutProvideIbanRequest(self::SESSION_UUID, self::IBAN, self::OWNER)
         );
     }
 
@@ -157,12 +159,12 @@ class CheckoutProvideIbanUseCaseTest extends IntegrationTestCase
         $this->ibanFraudCheck->check(Argument::cetera())->shouldBeCalledOnce()->willReturn(true);
         $this->sepaMandateGenerator->generateForOrderContainer($this->orderContainer, Argument::that(function (Iban $iban) {
             return $iban->toString() === self::IBAN;
-        }))->shouldBeCalledOnce()->willReturn($mandate);
+        }), self::OWNER)->shouldBeCalledOnce()->willReturn($mandate);
 
         $this->orderRepository->update($order)->shouldBeCalledOnce();
 
         $response = $this->useCase->execute(
-            new CheckoutProvideIbanRequest(self::SESSION_UUID, self::IBAN)
+            new CheckoutProvideIbanRequest(self::SESSION_UUID, self::IBAN, self::OWNER)
         );
 
         Assert::isInstanceOf($response, CheckoutProvideIbanResponse::class);

@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      type="object",
  *      properties={
  *          @OA\Property(property="iban", ref="#/components/schemas/IBAN"),
+ *          @OA\Property(property="bank_account_owner", ref="#/components/schemas/TinyText"),
  *      },
  *      required={"iban"}
  * )
@@ -29,10 +30,16 @@ final class CheckoutProvideIbanRequest implements ValidatedRequestInterface
      */
     private ?string $iban;
 
-    public function __construct(string $sessionUuid, ?string $iban)
+    /**
+     * @Assert\NotBlank()
+     */
+    private ?string $bankAccountOwner;
+
+    public function __construct(string $sessionUuid, ?string $iban, ?string $bankAccountOwner)
     {
         $this->sessionUuid = $sessionUuid;
         $this->iban = $iban;
+        $this->bankAccountOwner = $bankAccountOwner;
     }
 
     public function getSessionUuid(): string
@@ -43,5 +50,10 @@ final class CheckoutProvideIbanRequest implements ValidatedRequestInterface
     public function getIban(): ?string
     {
         return $this->iban;
+    }
+
+    public function getBankAccountOwner(): ?string
+    {
+        return $this->bankAccountOwner;
     }
 }
