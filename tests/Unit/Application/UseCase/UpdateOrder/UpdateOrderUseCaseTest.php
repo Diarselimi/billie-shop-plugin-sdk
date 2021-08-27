@@ -6,7 +6,6 @@ namespace App\Tests\Unit\Application\UseCase\UpdateOrder;
 
 use App\Application\UseCase\UpdateOrder\UpdateOrderRequest;
 use App\Application\UseCase\UpdateOrder\UpdateOrderUseCase;
-use App\DomainModel\Invoice\InvoiceCancellationService;
 use App\DomainModel\Invoice\InvoiceCollection;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
@@ -14,7 +13,6 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderUpdate\UpdateOrderAmountService;
-use App\DomainModel\OrderUpdate\UpdateOrderAmountValidator;
 use App\Tests\Unit\UnitTestCase;
 use Ozean12\Money\Money;
 use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
@@ -46,24 +44,12 @@ class UpdateOrderUseCaseTest extends UnitTestCase
      */
     private $registry;
 
-    /**
-     * @var InvoiceCancellationService|\Prophecy\Prophecy\ObjectProphecy
-     */
-    private $invoiceCancellationService;
-
-    /**
-     * @var UpdateOrderAmountValidator|\Prophecy\Prophecy\ObjectProphecy
-     */
-    private $amountValidator;
-
     public function setUp(): void
     {
-        $this->amountValidator = $this->prophesize(UpdateOrderAmountValidator::class);
         $this->amountService = $this->prophesize(UpdateOrderAmountService::class);
         $this->orderContainerFactory = $this->prophesize(OrderContainerFactory::class);
         $this->orderRepository = $this->prophesize(OrderRepositoryInterface::class);
         $this->registry = $this->prophesize(Registry::class);
-        $this->invoiceCancellationService = $this->prophesize(InvoiceCancellationService::class);
     }
 
     /** @test */
@@ -106,7 +92,6 @@ class UpdateOrderUseCaseTest extends UnitTestCase
         $this->registry->get(Argument::any())->willReturn($workflow);
 
         $useCase = new UpdateOrderUseCase(
-            $this->amountValidator->reveal(),
             $this->amountService->reveal(),
             $this->orderContainerFactory->reveal(),
             $this->orderRepository->reveal(),
@@ -156,7 +141,6 @@ class UpdateOrderUseCaseTest extends UnitTestCase
         $this->registry->get(Argument::any())->willReturn($workflow);
 
         $useCase = new UpdateOrderUseCase(
-            $this->amountValidator->reveal(),
             $this->amountService->reveal(),
             $this->orderContainerFactory->reveal(),
             $this->orderRepository->reveal(),
@@ -206,7 +190,6 @@ class UpdateOrderUseCaseTest extends UnitTestCase
         $this->registry->get(Argument::any())->willReturn($workflow);
 
         $useCase = new UpdateOrderUseCase(
-            $this->amountValidator->reveal(),
             $this->amountService->reveal(),
             $this->orderContainerFactory->reveal(),
             $this->orderRepository->reveal(),
