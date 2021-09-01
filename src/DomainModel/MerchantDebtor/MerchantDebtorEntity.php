@@ -3,6 +3,7 @@
 namespace App\DomainModel\MerchantDebtor;
 
 use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
+use Ramsey\Uuid\UuidInterface;
 
 class MerchantDebtorEntity extends AbstractTimestampableEntity
 {
@@ -15,6 +16,8 @@ class MerchantDebtorEntity extends AbstractTimestampableEntity
     private $companyUuid;
 
     private $paymentDebtorId;
+
+    private $investorUuid;
 
     private $scoreThresholdsConfigurationId;
 
@@ -74,6 +77,18 @@ class MerchantDebtorEntity extends AbstractTimestampableEntity
     public function setPaymentDebtorId(?string $paymentDebtorId): MerchantDebtorEntity
     {
         $this->paymentDebtorId = $paymentDebtorId;
+
+        return $this;
+    }
+
+    public function getInvestorUuid(): ?UuidInterface
+    {
+        return $this->investorUuid;
+    }
+
+    public function setInvestorUuid(?UuidInterface $investorUuid): MerchantDebtorEntity
+    {
+        $this->investorUuid = $investorUuid;
 
         return $this;
     }

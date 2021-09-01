@@ -21,6 +21,7 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
         'debtor_id',
         'company_uuid',
         'payment_debtor_id',
+        'investor_uuid',
         'uuid',
         'score_thresholds_configuration_id',
         'created_at',
@@ -38,14 +39,15 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
     {
         $id = $this->doInsert('
             INSERT INTO ' . self::TABLE_NAME . '
-            (merchant_id, debtor_id, company_uuid, payment_debtor_id, uuid, score_thresholds_configuration_id, created_at, updated_at)
+            (merchant_id, debtor_id, company_uuid, payment_debtor_id, investor_uuid, uuid, score_thresholds_configuration_id, created_at, updated_at)
             VALUES
-            (:merchant_id, :debtor_id, :company_uuid, :payment_debtor_id, :uuid, :score_thresholds_configuration_id, :created_at, :updated_at)
+            (:merchant_id, :debtor_id, :company_uuid, :payment_debtor_id, :investor_uuid, :uuid, :score_thresholds_configuration_id, :created_at, :updated_at)
         ', [
             'merchant_id' => $merchantDebtor->getMerchantId(),
             'debtor_id' => $merchantDebtor->getDebtorId(),
             'company_uuid' => $merchantDebtor->getCompanyUuid(),
             'payment_debtor_id' => $merchantDebtor->getPaymentDebtorId(),
+            'investor_uuid' => $merchantDebtor->getInvestorUuid() ? $merchantDebtor->getInvestorUuid()->toString() : null,
             'uuid' => $merchantDebtor->getUuid(),
             'score_thresholds_configuration_id' => $merchantDebtor->getScoreThresholdsConfigurationId(),
             'created_at' => $merchantDebtor->getCreatedAt()->format(self::DATE_FORMAT),

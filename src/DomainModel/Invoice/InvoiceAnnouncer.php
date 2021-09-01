@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\DomainModel\Invoice;
 
-use App\Helper\Uuid\UuidGeneratorInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Ozean12\Transfer\Message\Invoice\CreateInvoice;
@@ -19,7 +18,7 @@ class InvoiceAnnouncer implements LoggingInterface
 
     private MessageBusInterface $bus;
 
-    public function __construct(MessageBusInterface $bus, UuidGeneratorInterface $uuidGenerator)
+    public function __construct(MessageBusInterface $bus)
     {
         $this->bus = $bus;
     }
@@ -28,7 +27,8 @@ class InvoiceAnnouncer implements LoggingInterface
         Invoice $invoice,
         string $debtorCompanyName,
         string $orderExternalCode,
-        ?UuidInterface $debtorSepaMandateUuid
+        ?UuidInterface $debtorSepaMandateUuid,
+        ?UuidInterface $investorUuid
     ): void {
         $message = (new CreateInvoice())
             ->setUuid($invoice->getUuid())
@@ -50,6 +50,7 @@ class InvoiceAnnouncer implements LoggingInterface
             ->setExternalCode($invoice->getExternalCode())
             ->setOrderExternalCode($orderExternalCode)
             ->setDebtorSepaMandateUuid($debtorSepaMandateUuid ? $debtorSepaMandateUuid->toString() : null)
+            ->setInvestorUuid($investorUuid ? $investorUuid->toString() : null)
         ;
 
         $this->bus->dispatch($message);

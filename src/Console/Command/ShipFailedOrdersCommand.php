@@ -69,7 +69,7 @@ class ShipFailedOrdersCommand extends Command
                 $orderContainer->getOrder()->getPaymentId()
             );
 
-            $this->announcer->announce($invoice, $orderContainer->getDebtorCompany()->getName(), $orderContainer->getOrder()->getExternalCode(), null);
+            $this->announcer->announce($invoice, $orderContainer->getDebtorCompany()->getName(), $orderContainer->getOrder()->getExternalCode(), null, null);
 
             $this->invoiceManager->handle(
                 $orderContainer->getOrder(),

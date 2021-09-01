@@ -5,6 +5,7 @@ namespace App\DomainModel\MerchantDebtor;
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\Helper\Uuid\UuidGeneratorInterface;
 use App\Support\AbstractFactory;
+use Ramsey\Uuid\Uuid;
 
 class MerchantDebtorEntityFactory extends AbstractFactory
 {
@@ -24,6 +25,7 @@ class MerchantDebtorEntityFactory extends AbstractFactory
             ->setCompanyUuid($data['company_uuid'])
             ->setUuid($data['uuid'])
             ->setPaymentDebtorId($data['payment_debtor_id'])
+            ->setInvestorUuid($data['investor_uuid'] ? Uuid::fromString($data['investor_uuid']) : null)
             ->setScoreThresholdsConfigurationId($data['score_thresholds_configuration_id'])
             ->setCreatedAt(new \DateTime($data['created_at']))
             ->setUpdatedAt(new \DateTime($data['updated_at']));
