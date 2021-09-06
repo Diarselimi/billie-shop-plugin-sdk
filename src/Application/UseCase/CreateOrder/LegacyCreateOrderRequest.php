@@ -18,17 +18,16 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @OA\Schema(schema="LegacyCreateOrderRequest", title="Order Creation Request", required={"amount", "duration", "debtor_company", "debtor_person"},
  *     properties={
  *          @OA\Property(property="amount", ref="#/components/schemas/AmountDTO"),
- *          @OA\Property(property="comment", ref="#/components/schemas/TinyText", nullable=true),
+ *          @OA\Property(property="comment", ref="#/components/schemas/TinyText"),
  *          @OA\Property(property="duration", ref="#/components/schemas/OrderDuration"),
  *          @OA\Property(property="order_id", ref="#/components/schemas/TinyText", description="Order external code", example="DE123456-1"),
- *          @OA\Property(property="delivery_address", ref="#/components/schemas/CreateOrderAddressRequest", nullable=true),
- *          @OA\Property(property="billing_address", ref="#/components/schemas/CreateOrderAddressRequest", nullable=true),
+ *          @OA\Property(property="delivery_address", ref="#/components/schemas/CreateOrderAddressRequest"),
+ *          @OA\Property(property="billing_address", ref="#/components/schemas/CreateOrderAddressRequest"),
  *          @OA\Property(property="debtor_company", ref="#/components/schemas/LegacyCreateOrderDebtorCompanyRequest"),
  *          @OA\Property(property="debtor_person", ref="#/components/schemas/CreateOrderDebtorPersonRequest"),
  *          @OA\Property(
  *              property="line_items",
  *              type="array",
- *              nullable=true,
  *              @OA\Items(ref="#/components/schemas/CreateOrderLineItemRequest")
  *          )
  *     }

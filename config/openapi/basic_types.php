@@ -121,6 +121,8 @@ use OpenApi\Annotations as OA;
  *     title="Postal Code",
  *     type="string",
  *     maxLength=5,
+ *     minLength=5,
+ *     pattern="^[0-9]{5}$",
  *     example="10969"
  * )
  */
@@ -274,12 +276,25 @@ use OpenApi\Annotations as OA;
  */
 
 /**
- * @OA\Schema(schema="Address", title="Address data are all required except house number.",
+ * @OA\Schema(schema="AddressStrictPostalCode", title="Address data are all required except house number.",
  *     required={"street", "postal_code", "city", "country"},
  *     properties={
  *          @OA\Property(property="house_number", ref="#/components/schemas/TinyText", description="House number. Leave empty if it is provided as part of the street", example="45"),
  *          @OA\Property(property="street", ref="#/components/schemas/TinyText", description="Street can be with house number together or provide house number in the dedicated field.", example="Charlottenstr. 45"),
  *          @OA\Property(property="postal_code", ref="#/components/schemas/PostalCode", description="ZIP or postal code.", example="94111"),
+ *          @OA\Property(property="city", ref="#/components/schemas/TinyText", example="Berlin", description="City, district, suburb, town, or village.", example="Berlin"),
+ *          @OA\Property(property="country", ref="#/components/schemas/CountryCode", description="Two-letter country code", example="DE"),
+ *     }
+ * )
+ */
+
+/**
+ * @OA\Schema(schema="Address", title="Address data are all required except house number.",
+ *     required={"street", "postal_code", "city", "country"},
+ *     properties={
+ *          @OA\Property(property="house_number", ref="#/components/schemas/TinyText", description="House number. Leave empty if it is provided as part of the street", example="45"),
+ *          @OA\Property(property="street", ref="#/components/schemas/TinyText", description="Street can be with house number together or provide house number in the dedicated field.", example="Charlottenstr. 45"),
+ *          @OA\Property(property="postal_code", ref="#/components/schemas/TinyText", description="ZIP or postal code.", example="94111"),
  *          @OA\Property(property="city", ref="#/components/schemas/TinyText", example="Berlin", description="City, district, suburb, town, or village.", example="Berlin"),
  *          @OA\Property(property="country", ref="#/components/schemas/CountryCode", description="Two-letter country code", example="DE"),
  *     }
@@ -293,7 +308,7 @@ use OpenApi\Annotations as OA;
  *     required={"name", "company_address"},
  *     properties={
  *          @OA\Property(property="name", ref="#/components/schemas/TinyText", example="Billie GmbH"),
- *          @OA\Property(property="company_address", ref="#/components/schemas/Address")
+ *          @OA\Property(property="company_address", ref="#/components/schemas/AddressStrictPostalCode")
  *     }
  * )
  */
@@ -303,7 +318,7 @@ use OpenApi\Annotations as OA;
  *      @OA\Property(property="amount", ref="#/components/schemas/AmountDTO"),
  *      @OA\Property(property="duration", ref="#/components/schemas/OrderDuration"),
  *      @OA\Property(property="debtor", ref="#/components/schemas/CheckoutConfirmDebtorCompanyRequest"),
- *      @OA\Property(property="delivery_address", ref="#/components/schemas/Address", nullable=true),
+ *      @OA\Property(property="delivery_address", ref="#/components/schemas/Address"),
  *      @OA\Property(property="external_code", ref="#/components/schemas/TinyText", description="Order external code", example="DE123456-1")
  * })
  */
@@ -318,17 +333,17 @@ use OpenApi\Annotations as OA;
  *     properties={
  *          @OA\Property(property="merchant_customer_id", ref="#/components/schemas/TinyText", example="128483", description="Unique identifier of the customer provided by the merchant side."),
  *          @OA\Property(property="name", ref="#/components/schemas/TinyText", example="Billie GmbH"),
- *          @OA\Property(property="company_address", ref="#/components/schemas/Address", nullable=false),
- *          @OA\Property(property="billing_address", ref="#/components/schemas/Address", nullable=true),
- *          @OA\Property(property="tax_id", ref="#/components/schemas/TinyText", example="DE1234556", nullable=true),
- *          @OA\Property(property="tax_number", ref="#/components/schemas/TinyText", nullable=true),
- *          @OA\Property(property="registration_court", ref="#/components/schemas/TinyText", nullable=true),
- *          @OA\Property(property="registration_number", ref="#/components/schemas/TinyText", example="HRB 1234556", nullable=true),
- *          @OA\Property(property="industry_sector", ref="#/components/schemas/TinyText", example="C", nullable=true),
- *          @OA\Property(property="subindustry_sector", ref="#/components/schemas/TinyText", nullable=true),
- *          @OA\Property(property="employees_number", ref="#/components/schemas/TinyText", example="1-5", nullable=true),
+ *          @OA\Property(property="company_address", ref="#/components/schemas/AddressStrictPostalCode"),
+ *          @OA\Property(property="billing_address", ref="#/components/schemas/Address"),
+ *          @OA\Property(property="tax_id", ref="#/components/schemas/TinyText", example="DE1234556"),
+ *          @OA\Property(property="tax_number", ref="#/components/schemas/TinyText"),
+ *          @OA\Property(property="registration_court", ref="#/components/schemas/TinyText"),
+ *          @OA\Property(property="registration_number", ref="#/components/schemas/TinyText", example="HRB 1234556"),
+ *          @OA\Property(property="industry_sector", ref="#/components/schemas/TinyText", example="C"),
+ *          @OA\Property(property="subindustry_sector", ref="#/components/schemas/TinyText"),
+ *          @OA\Property(property="employees_number", ref="#/components/schemas/TinyText", example="1-5"),
  *          @OA\Property(property="legal_form", ref="#/components/schemas/LegalForm"),
- *          @OA\Property(property="established_customer", type="boolean", nullable=true)
+ *          @OA\Property(property="established_customer", type="boolean")
  *     }
  * )
  */

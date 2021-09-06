@@ -25,7 +25,7 @@ use Ozean12\Money\TaxedMoney\TaxedMoney;
  *          @OA\Property(property="name", ref="#/components/schemas/TinyText", nullable=true, example="Billie GmbH"),
  *          @OA\Property(property="address_house_number", ref="#/components/schemas/TinyText", nullable=true, example="4"),
  *          @OA\Property(property="address_street", ref="#/components/schemas/TinyText", nullable=true, example="Charlottenstr."),
- *          @OA\Property(property="address_postal_code", type="string", nullable=true, maxLength=5, example="10969"),
+ *          @OA\Property(property="address_postal_code", type="string", nullable=true, maxLength=5, minLength=5, example="10969"),
  *          @OA\Property(property="address_city", ref="#/components/schemas/TinyText", nullable=true, example="Berlin"),
  *          @OA\Property(property="address_country", type="string", nullable=true, maxLength=2),
  *      }),

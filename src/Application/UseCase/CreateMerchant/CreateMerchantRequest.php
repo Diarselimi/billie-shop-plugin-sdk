@@ -9,8 +9,8 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="company_id", type="string", format="numeric", description="Company ID from webapp.companies"),
  *     @OA\Property(property="merchant_financing_limit", type="number", format="float"),
  *     @OA\Property(property="initial_debtor_financing_limit", type="number", format="float"),
- *     @OA\Property(property="webhook_url", type="string", format="uri", nullable=true),
- *     @OA\Property(property="webhook_authorization", type="string", nullable=true, example="X-Api-Key: test",
+ *     @OA\Property(property="webhook_url", type="string", format="uri"),
+ *     @OA\Property(property="webhook_authorization", type="string", example="X-Api-Key: test",
  *          description="Authorization header that will be sent with the merchant webhooks. Currently `X-Api-Key: XXX` and `Authorization: Basic XXX` are supported."
  *     )
  * })

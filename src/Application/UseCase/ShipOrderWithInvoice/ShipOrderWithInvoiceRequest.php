@@ -15,7 +15,7 @@ use OpenApi\Annotations as OA;
  *     allOf={@OA\Schema(ref="#/components/schemas/AbstractShipOrderRequestV1")},
  *     properties={
  *         @OA\Property(property="invoice_file", description="Invoice file", type="string", format="binary"),
- *         @OA\Property(property="amount", ref="#/components/schemas/AmountDTO", nullable=true)
+ *         @OA\Property(property="amount", ref="#/components/schemas/AmountDTO")
  *     }
  * )
  */

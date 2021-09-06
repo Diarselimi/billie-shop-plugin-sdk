@@ -16,7 +16,6 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(
  *          property="permissions",
  *          type="array",
- *          nullable=true,
  *          default={},
  *          @OA\Items(ref="#/components/schemas/MerchantUserPermissions")
  *      )

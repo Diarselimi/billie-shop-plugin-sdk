@@ -4,7 +4,6 @@ To integrate the Billie checkout widget, the following steps are required:
 2. Provide config data _(with the `session_id` from the server-side integration)_
 3. Provide order details and call the mount method
 4. Handle the widget responses
-5. Apply customized styling _[optional]_
 
 This section provides a step-by-step guide of the setup process.
 
@@ -99,7 +98,7 @@ The order data object must contain all information about an order, in the follow
   - `house_number`  _[string]_ `<= 255 characters`
   - `addition` _[string]_ `<= 255 characters`
   - `city` **[string]** `<= 255 characters`
-  - `postal_code` **[string]** `<= 5 characters`
+  - `postal_code` **[string]** 
   - `country` **[string]** `2 characters` `^[A-Za-z]{2}$`
 - `debtor_company` **[object]**
   - `name` **[string]** `<= 255 characters`
@@ -108,7 +107,7 @@ The order data object must contain all information about an order, in the follow
   - `address_house_number` **[string]** `<= 255 characters`
   - `address_addition` _[string]_  `<= 255 characters`
   - `address_city` **[string]** `<= 255 characters`
-  - `address_postal_code` **[string]** `<= 5 characters`
+  - `address_postal_code` **[string]** `5 characters` `^[0-9]{5}$`
   - `address_country` **[string]** `2 characters` `^[A-Za-z]{2}$`
 - `debtor_person`  **[object]**
   - `salutation` **[string]** `1 character` `["m" / "f"]`
@@ -200,26 +199,9 @@ After submitting the widget, following data will be returned to either `then` or
   - `address_street` **[string]** `<= 255 characters`
   - `address_house_number` **[string]** `<= 255 characters`
   - `address_city` **[string]** `<= 255 characters`
-  - `address_postal_code` **[string]** `<= 5 characters`
+  - `address_postal_code` **[string]** `5 characters` `^[0-9]{5}$`
   - `address_country` **[string]** `2 characters` `^[A-Za-z]{2}$`
 
 _**Special note**_  
 * `decline_reason` will be set only when `state` value is `declined`
 * `validation_error_source` will be set only when `decline_reason` value is `validation_error`. We will fill this property with information to help you find which fields are failing validation checks. 
-
-#### 5. Apply Customized Styling
-
-It is possible to set some CSS rules to be applied over widget in a simple format. Simply use this snippet:
-
-```html
-<style>
-  .billie-checkout-modal {
-    --c-primary: #FF4338;
-  }
-</style>
-```
-
-Other available options are:
-- `c-primary` -  color of submit button
-- `s-font` - font size inside the widget 
-- `s-font-small` - font size of small text inside the widget 

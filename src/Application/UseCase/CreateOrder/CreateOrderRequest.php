@@ -17,10 +17,10 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @OA\Schema(schema="CreateOrderRequest", title="Order Creation Request", required={"amount", "duration", "debtor_company", "debtor_person", "line_items"},
  *     properties={
  *          @OA\Property(property="amount", ref="#/components/schemas/AmountDTO"),
- *          @OA\Property(property="comment", ref="#/components/schemas/TinyText", nullable=true),
+ *          @OA\Property(property="comment", ref="#/components/schemas/TinyText"),
  *          @OA\Property(property="duration", ref="#/components/schemas/OrderDuration"),
  *          @OA\Property(property="external_code", ref="#/components/schemas/TinyText", description="Order external code", example="DE123456-1"),
- *          @OA\Property(property="delivery_address", ref="#/components/schemas/Address", nullable=true),
+ *          @OA\Property(property="delivery_address", ref="#/components/schemas/Address"),
  *          @OA\Property(property="debtor", ref="#/components/schemas/CreateOrderDebtorCompanyRequest"),
  *          @OA\Property(property="debtor_person", ref="#/components/schemas/CreateOrderDebtorPersonRequest"),
  *          @OA\Property(

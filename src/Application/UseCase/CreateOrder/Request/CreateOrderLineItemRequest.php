@@ -14,12 +14,12 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     properties={
  *          @OA\Property(property="external_id", ref="#/components/schemas/TinyText"),
  *          @OA\Property(property="title", ref="#/components/schemas/TinyText"),
- *          @OA\Property(property="description", type="string", nullable=true),
+ *          @OA\Property(property="description", type="string"),
  *          @OA\Property(property="quantity", minimum=1, type="number"),
- *          @OA\Property(property="category", ref="#/components/schemas/TinyText", nullable=true),
- *          @OA\Property(property="brand", ref="#/components/schemas/TinyText", nullable=true),
- *          @OA\Property(property="gtin", ref="#/components/schemas/TinyText", nullable=true, description="Global Trade Item Number"),
- *          @OA\Property(property="mpn", ref="#/components/schemas/TinyText", nullable=true, description="Manufacturer Part Numbers"),
+ *          @OA\Property(property="category", ref="#/components/schemas/TinyText"),
+ *          @OA\Property(property="brand", ref="#/components/schemas/TinyText"),
+ *          @OA\Property(property="gtin", ref="#/components/schemas/TinyText", description="Global Trade Item Number"),
+ *          @OA\Property(property="mpn", ref="#/components/schemas/TinyText", description="Manufacturer Part Numbers"),
  *          @OA\Property(property="amount", ref="#/components/schemas/AmountDTO"),
  *     }
  * )

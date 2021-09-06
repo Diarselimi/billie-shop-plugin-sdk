@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          "street", "city", "postal_code", "country"
  *     },
  *     properties={
- *          @OA\Property(property="addition", ref="#/components/schemas/TinyText", nullable=true),
+ *          @OA\Property(property="addition", ref="#/components/schemas/TinyText"),
  *          @OA\Property(
  *              property="house_number",
  *              ref="#/components/schemas/TinyText",
@@ -29,7 +29,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *              description="Street can be with house number together or provide house number in the dedicated field."
  *          ),
  *          @OA\Property(property="city", ref="#/components/schemas/TinyText", example="Berlin", description="City, district, suburb, town, or village.", example="Berlin"),
- *          @OA\Property(property="postal_code", ref="#/components/schemas/PostalCode", description="ZIP or postal code.", example="94111"),
+ *          @OA\Property(property="postal_code", ref="#/components/schemas/TinyText", description="ZIP or postal code.", example="94111"),
  *          @OA\Property(property="country", ref="#/components/schemas/CountryCode", description="Two-letter country code", example="DE"),
  *     }
  * )

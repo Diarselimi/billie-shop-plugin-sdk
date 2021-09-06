@@ -59,7 +59,7 @@ info:
   license:
     name: '© Billie GmbH, 2020'
     url: 'https://www.billie.io/agb/'
-  version: v2021.08
+  version: v2021.09
   x-logo:
     url: 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDIyLjAuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkViZW5lXzJfS29waWUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIKCSB5PSIwcHgiIHZpZXdCb3g9IjAgMCA0OC41IDY3LjYiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDQ4LjUgNjcuNjsiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPgoJLnN0MHtkaXNwbGF5Om5vbmU7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDo3O3N0cm9rZS1taXRlcmxpbWl0OjEwO30KCS5zdDF7ZmlsbDojMUYyNTMwO30KCS5zdDJ7ZmlsbDpub25lO30KCS5zdDN7ZGlzcGxheTpub25lO2VuYWJsZS1iYWNrZ3JvdW5kOm5ldyAgICA7fQoJLnN0NHtmb250LWZhbWlseTonQXZlbmlyTmV4dC1EZW1pQm9sZCc7fQoJLnN0NXtmb250LXNpemU6My4wMzAzcHg7fQoJLnN0NntsZXR0ZXItc3BhY2luZzoyO30KPC9zdHlsZT4KPHBhdGggY2xhc3M9InN0MCIgZD0iTTkuOCw0Ni4xYy0wLjUsMCwyNS4xLTEyLjYsMjUuMS0zMi43YzAtNi45LTUuNi0xMi42LTEyLjYtMTIuNlM5LjcsNi41LDkuNywxMy40TDkuOCw0Ni4xaDE4LjUKCWM2LjksMCwxMi42LTUuNiwxMi42LTEyLjZTMzUuMiwyMSwyOC4yLDIxSDkuNyIvPgo8Zz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0yOC4yLDQ3SDguOHYtMC44YzAtMC4xLDAtMC4yLDAtMC4zVjEzLjVDOC44LDYsMTQuOSwwLDIyLjMsMHMxMy41LDYsMTMuNSwxMy41YzAsMi44LTAuNSw1LjUtMS40LDguMgoJCWM0LjMsMi4yLDcuMyw2LjcsNy4zLDExLjlDNDEuNyw0MSwzNS42LDQ3LDI4LjIsNDd6IE0xMi45LDQ1LjJoMTUuM2M2LjQsMCwxMS43LTUuMywxMS43LTExLjdjMC00LjQtMi41LTguMy02LjEtMTAuMwoJCWMtMS44LDQuNC00LjgsOC43LTksMTIuOEMyMC40LDQwLjQsMTUuOCw0My41LDEyLjksNDUuMnogTTEwLjYsMjEuOXYyMi43YzEzLTcuNywxOC45LTE1LjYsMjEuNS0yMmMtMS4yLTAuNC0yLjUtMC43LTMuOS0wLjdIMTAuNgoJCXogTTEwLjYsMjAuMWgxNy42YzEuNiwwLDMuMSwwLjMsNC41LDAuOGMxLTIuOSwxLjMtNS41LDEuMy03LjRDMzQsNywyOC44LDEuOCwyMi4zLDEuOFMxMC42LDcsMTAuNiwxMy41VjIwLjF6Ii8+CjwvZz4KPHJlY3QgeD0iLTExLjEiIHk9Ii01OC43IiBjbGFzcz0ic3QyIiB3aWR0aD0iODUuNCIgaGVpZ2h0PSI0OS41Ii8+Cjx0ZXh0IHRyYW5zZm9ybT0ibWF0cml4KDEgMCAwIDEgLTEuMDQyNCA2Ny41NzcyKSIgY2xhc3M9InN0MyBzdDQgc3Q1IHN0NiI+QklMTElFPC90ZXh0Pgo8Zz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0wLDU4LjFoMy43YzAuNCwwLDAuNywwLjEsMS4xLDAuMWMwLjQsMC4xLDAuNywwLjIsMC45LDAuNGMwLjMsMC4yLDAuNSwwLjQsMC43LDAuN2MwLjIsMC4zLDAuMywwLjcsMC4zLDEuMQoJCWMwLDAuNS0wLjIsMS0wLjUsMS4zYy0wLjMsMC40LTAuNywwLjYtMS4yLDAuOHYwYzAuNiwwLjEsMS4xLDAuMywxLjUsMC43QzYuOCw2My42LDcsNjQuMiw3LDY0LjhjMCwwLjUtMC4xLDEtMC4zLDEuMwoJCWMtMC4yLDAuNC0wLjUsMC42LTAuOCwwLjljLTAuMywwLjItMC43LDAuNC0xLjIsMC41Yy0wLjQsMC4xLTAuOSwwLjItMS4zLDAuMkgwQzAsNjcuNiwwLDU4LjEsMCw1OC4xeiBNMS43LDYyaDEuNQoJCWMwLjYsMCwxLTAuMSwxLjMtMC4zYzAuMy0wLjIsMC40LTAuNSwwLjQtMWMwLTAuNC0wLjItMC43LTAuNS0wLjljLTAuMy0wLjItMC44LTAuMy0xLjQtMC4zSDEuN0wxLjcsNjJMMS43LDYyeiBNMS43LDY2LjFoMS41CgkJYzAuMiwwLDAuNSwwLDAuNy0wLjFzMC41LTAuMSwwLjctMC4yYzAuMi0wLjEsMC40LTAuMywwLjUtMC40YzAuMS0wLjIsMC4yLTAuNCwwLjItMC44YzAtMC41LTAuMi0wLjktMC41LTEKCQljLTAuMy0wLjItMC45LTAuMy0xLjUtMC4zSDEuN1Y2Ni4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTExLjEsNTguMWgxLjd2OS41aC0xLjdWNTguMXoiLz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0xNy4zLDU4LjFoMS43djhoNHYxLjVoLTUuN1Y1OC4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTI2LjUsNTguMWgxLjd2OGg0djEuNWgtNS43TDI2LjUsNTguMUwyNi41LDU4LjF6Ii8+Cgk8cGF0aCBjbGFzcz0ic3QxIiBkPSJNMzUuNyw1OC4xaDEuN3Y5LjVoLTEuN1Y1OC4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTQxLjksNTguMWg2LjN2MS41aC00LjZWNjJINDh2MS40aC00LjNWNjZoNC44djEuNWgtNi41VjU4LjF6Ii8+CjwvZz4KPC9zdmc+Cg=='
     href: '#'
@@ -3510,6 +3510,8 @@ components:
       title: 'Postal Code'
       type: string
       maxLength: 5
+      minLength: 5
+      pattern: '^[0-9]{5}$'
       example: '10969'
     CountryCode:
       title: 'Country Code'
@@ -3643,7 +3645,7 @@ components:
           minimum: 0
           example: 60.15
       type: object
-    Address:
+    AddressStrictPostalCode:
       title: 'Address data are all required except house number.'
       required:
         - street
@@ -3672,6 +3674,35 @@ components:
           example: DE
           $ref: '#/components/schemas/CountryCode'
       type: object
+    Address:
+      title: 'Address data are all required except house number.'
+      required:
+        - street
+        - postal_code
+        - city
+        - country
+      properties:
+        house_number:
+          description: 'House number. Leave empty if it is provided as part of the street'
+          example: '45'
+          $ref: '#/components/schemas/TinyText'
+        street:
+          description: 'Street can be with house number together or provide house number in the dedicated field.'
+          example: 'Charlottenstr. 45'
+          $ref: '#/components/schemas/TinyText'
+        postal_code:
+          description: 'ZIP or postal code.'
+          example: '94111'
+          $ref: '#/components/schemas/TinyText'
+        city:
+          description: 'City, district, suburb, town, or village.'
+          example: Berlin
+          $ref: '#/components/schemas/TinyText'
+        country:
+          description: 'Two-letter country code'
+          example: DE
+          $ref: '#/components/schemas/CountryCode'
+      type: object
     CheckoutConfirmDebtorCompanyRequest:
       title: 'Checkout Confirm Debtor Company Request'
       required:
@@ -3682,7 +3713,7 @@ components:
           example: 'Billie GmbH'
           $ref: '#/components/schemas/TinyText'
         company_address:
-          $ref: '#/components/schemas/Address'
+          $ref: '#/components/schemas/AddressStrictPostalCode'
       type: object
     CheckoutConfirmOrderRequest:
       required:
@@ -3697,7 +3728,6 @@ components:
         debtor:
           $ref: '#/components/schemas/CheckoutConfirmDebtorCompanyRequest'
         delivery_address:
-          nullable: true
           $ref: '#/components/schemas/Address'
         external_code:
           description: 'Order external code'
@@ -3720,41 +3750,31 @@ components:
           example: 'Billie GmbH'
           $ref: '#/components/schemas/TinyText'
         company_address:
-          nullable: false
-          $ref: '#/components/schemas/Address'
+          $ref: '#/components/schemas/AddressStrictPostalCode'
         billing_address:
-          nullable: true
           $ref: '#/components/schemas/Address'
         tax_id:
           example: DE1234556
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         tax_number:
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         registration_court:
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         registration_number:
           example: 'HRB 1234556'
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         industry_sector:
           example: C
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         subindustry_sector:
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         employees_number:
           example: 1-5
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         legal_form:
           $ref: '#/components/schemas/LegalForm'
         established_customer:
           type: boolean
-          nullable: true
       type: object
     OauthClientCredentialsGrantRequestBodyParams:
       title: 'Request OAuth Token'
@@ -3796,7 +3816,6 @@ components:
           properties:
             external_order_id:
               description: 'External Order ID. It should only be provided if it was not provided in the create order call.'
-              nullable: true
               $ref: '#/components/schemas/TinyText'
             invoice_number:
               $ref: '#/components/schemas/TinyText'
@@ -3906,14 +3925,12 @@ components:
           $ref: '#/components/schemas/AmountDTO'
         comment:
           description: 'Comment or description what is this credit note for.'
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         line_items:
           description: 'Line items from the invoice which this credit note is created for.'
           type: array
           items:
             $ref: '#/components/schemas/LineItemsRequest'
-          nullable: true
       type: object
     CreateInvoiceRequest:
       title: 'Create Invoice Request'
@@ -3941,7 +3958,6 @@ components:
         shipping_document_url:
           description: 'The tracking url of the shipping.'
           example: TRACK-0002126
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         amount:
           description: 'The amount of the Invoice in Gross, Net, Tax.'
@@ -3951,7 +3967,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/LineItemsRequest'
-          nullable: true
       type: object
     CreateMerchantRequest:
       title: 'Merchant Data'
@@ -3973,12 +3988,10 @@ components:
         webhook_url:
           type: string
           format: uri
-          nullable: true
         webhook_authorization:
           description: 'Authorization header that will be sent with the merchant webhooks. Currently `X-Api-Key: XXX` and `Authorization: Basic XXX` are supported.'
           type: string
           example: 'X-Api-Key: test'
-          nullable: true
       type: object
     CreateMerchantResponse:
       properties:
@@ -4028,7 +4041,6 @@ components:
           $ref: '#/components/schemas/TinyText'
         address_house:
           example: '4'
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         address_city:
           example: Berlin
@@ -4042,30 +4054,24 @@ components:
         schufa_id:
           $ref: '#/components/schemas/TinyText'
         tax_id:
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         registration_number:
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         merchant_financing_limit:
           type: number
           format: float
-          nullable: true
         initial_debtor_financing_limit:
           type: number
           format: float
-          nullable: true
         webhook_url:
           type: string
           format: uri
-          nullable: true
         webhook_authorization:
           description: |-
             Authorization header that will be sent with the merchant webhooks.
              *                             Currently only `X-Api-Key: XXX` and `Authorization: Basic XXX` formats are supported.
           type: string
           example: 'X-Api-Key: test'
-          nullable: true
         iban:
           example: DE87500105173872482875
           $ref: '#/components/schemas/TinyText'
@@ -4089,7 +4095,6 @@ components:
         amount:
           $ref: '#/components/schemas/AmountDTO'
         comment:
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         duration:
           $ref: '#/components/schemas/OrderDuration'
@@ -4098,7 +4103,6 @@ components:
           example: DE123456-1
           $ref: '#/components/schemas/TinyText'
         delivery_address:
-          nullable: true
           $ref: '#/components/schemas/Address'
         debtor:
           $ref: '#/components/schemas/CreateOrderDebtorCompanyRequest'
@@ -4120,7 +4124,6 @@ components:
         amount:
           $ref: '#/components/schemas/AmountDTO'
         comment:
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         duration:
           $ref: '#/components/schemas/OrderDuration'
@@ -4129,10 +4132,8 @@ components:
           example: DE123456-1
           $ref: '#/components/schemas/TinyText'
         delivery_address:
-          nullable: true
           $ref: '#/components/schemas/CreateOrderAddressRequest'
         billing_address:
-          nullable: true
           $ref: '#/components/schemas/CreateOrderAddressRequest'
         debtor_company:
           $ref: '#/components/schemas/LegacyCreateOrderDebtorCompanyRequest'
@@ -4142,7 +4143,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CreateOrderLineItemRequest'
-          nullable: true
       type: object
     CreateOrderAddressRequest:
       title: Address
@@ -4153,7 +4153,6 @@ components:
         - country
       properties:
         addition:
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         house_number:
           description: 'House number. Leave empty if it is provided as part of the street'
@@ -4171,7 +4170,7 @@ components:
         postal_code:
           description: 'ZIP or postal code.'
           example: '94111'
-          $ref: '#/components/schemas/PostalCode'
+          $ref: '#/components/schemas/TinyText'
         country:
           description: 'Two-letter country code'
           example: DE
@@ -4197,40 +4196,30 @@ components:
           $ref: '#/components/schemas/TinyText'
         tax_id:
           example: DE1234556
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         tax_number:
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         registration_court:
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         registration_number:
           example: 'HRB 1234556'
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         industry_sector:
           example: C
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         subindustry_sector:
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         employees_number:
           example: 1-5
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         legal_form:
           $ref: '#/components/schemas/LegalForm'
         established_customer:
           type: boolean
-          nullable: true
         address_addition:
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         address_house_number:
           example: '4'
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         address_street:
           example: Charlottenstr.
@@ -4256,7 +4245,6 @@ components:
           enum:
             - m
             - f
-          nullable: true
         first_name:
           example: James
           $ref: '#/components/schemas/TinyText'
@@ -4286,23 +4274,18 @@ components:
           $ref: '#/components/schemas/TinyText'
         description:
           type: string
-          nullable: true
         quantity:
           type: number
           minimum: 1
         category:
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         brand:
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         gtin:
           description: 'Global Trade Item Number'
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         mpn:
           description: 'Manufacturer Part Numbers'
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         amount:
           $ref: '#/components/schemas/AmountDTO'
@@ -4881,7 +4864,6 @@ components:
           items:
             $ref: '#/components/schemas/MerchantUserPermissions'
           default: []
-          nullable: true
       type: object
     RequestNewPasswordRequest:
       required:
@@ -4936,7 +4918,6 @@ components:
           type: number
           format: float
           example: 90
-          nullable: true
         default_rate:
           type: number
           format: float
@@ -4994,7 +4975,6 @@ components:
           type: string
           format: binary
         amount:
-          nullable: true
           $ref: '#/components/schemas/AmountDTO'
       type: object
       allOf:
@@ -5049,12 +5029,10 @@ components:
         external_code:
           description: 'Invoice external code which the invoice will be identified by.'
           example: M-0002126
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         invoice_url:
           description: 'The url of the generated invoice from merchant.'
           example: 'ftp://some_server.com/invoices/M-0002126'
-          nullable: true
           $ref: '#/components/schemas/TinyText'
       type: object
     UpdateMerchantDebtorCompanyRequest:
@@ -5610,6 +5588,7 @@ components:
             address_postal_code:
               type: string
               maxLength: 5
+              minLength: 5
               example: '10969'
               nullable: true
             address_city:
@@ -6236,7 +6215,6 @@ tags:
       2. Provide config data _(with the `session_id` from the server-side integration)_
       3. Provide order details and call the mount method
       4. Handle the widget responses
-      5. Apply customized styling _[optional]_
 
       This section provides a step-by-step guide of the setup process.
 
@@ -6331,7 +6309,7 @@ tags:
         - `house_number`  _[string]_ `<= 255 characters`
         - `addition` _[string]_ `<= 255 characters`
         - `city` **[string]** `<= 255 characters`
-        - `postal_code` **[string]** `<= 5 characters`
+        - `postal_code` **[string]** 
         - `country` **[string]** `2 characters` `^[A-Za-z]{2}$`
       - `debtor_company` **[object]**
         - `name` **[string]** `<= 255 characters`
@@ -6340,7 +6318,7 @@ tags:
         - `address_house_number` **[string]** `<= 255 characters`
         - `address_addition` _[string]_  `<= 255 characters`
         - `address_city` **[string]** `<= 255 characters`
-        - `address_postal_code` **[string]** `<= 5 characters`
+        - `address_postal_code` **[string]** `5 characters` `^[0-9]{5}$`
         - `address_country` **[string]** `2 characters` `^[A-Za-z]{2}$`
       - `debtor_person`  **[object]**
         - `salutation` **[string]** `1 character` `["m" / "f"]`
@@ -6432,29 +6410,12 @@ tags:
         - `address_street` **[string]** `<= 255 characters`
         - `address_house_number` **[string]** `<= 255 characters`
         - `address_city` **[string]** `<= 255 characters`
-        - `address_postal_code` **[string]** `<= 5 characters`
+        - `address_postal_code` **[string]** `5 characters` `^[0-9]{5}$`
         - `address_country` **[string]** `2 characters` `^[A-Za-z]{2}$`
 
       _**Special note**_  
       * `decline_reason` will be set only when `state` value is `declined`
-      * `validation_error_source` will be set only when `decline_reason` value is `validation_error`. We will fill this property with information to help you find which fields are failing validation checks. 
-
-      #### 5. Apply Customized Styling
-
-      It is possible to set some CSS rules to be applied over widget in a simple format. Simply use this snippet:
-
-      ```html
-      <style>
-        .billie-checkout-modal {
-          --c-primary: #FF4338;
-        }
-      </style>
-      ```
-
-      Other available options are:
-      - `c-primary` -  color of submit button
-      - `s-font` - font size inside the widget 
-      - `s-font-small` - font size of small text inside the widget
+      * `validation_error_source` will be set only when `decline_reason` value is `validation_error`. We will fill this property with information to help you find which fields are failing validation checks.
   -
     name: 'Checkout Server'
   -

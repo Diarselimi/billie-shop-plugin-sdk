@@ -59,7 +59,7 @@ info:
   license:
     name: '© Billie GmbH, 2020'
     url: 'https://www.billie.io/agb/'
-  version: v2021.08
+  version: v2021.09
   x-logo:
     url: 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDIyLjAuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkViZW5lXzJfS29waWUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIKCSB5PSIwcHgiIHZpZXdCb3g9IjAgMCA0OC41IDY3LjYiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDQ4LjUgNjcuNjsiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPgoJLnN0MHtkaXNwbGF5Om5vbmU7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDo3O3N0cm9rZS1taXRlcmxpbWl0OjEwO30KCS5zdDF7ZmlsbDojMUYyNTMwO30KCS5zdDJ7ZmlsbDpub25lO30KCS5zdDN7ZGlzcGxheTpub25lO2VuYWJsZS1iYWNrZ3JvdW5kOm5ldyAgICA7fQoJLnN0NHtmb250LWZhbWlseTonQXZlbmlyTmV4dC1EZW1pQm9sZCc7fQoJLnN0NXtmb250LXNpemU6My4wMzAzcHg7fQoJLnN0NntsZXR0ZXItc3BhY2luZzoyO30KPC9zdHlsZT4KPHBhdGggY2xhc3M9InN0MCIgZD0iTTkuOCw0Ni4xYy0wLjUsMCwyNS4xLTEyLjYsMjUuMS0zMi43YzAtNi45LTUuNi0xMi42LTEyLjYtMTIuNlM5LjcsNi41LDkuNywxMy40TDkuOCw0Ni4xaDE4LjUKCWM2LjksMCwxMi42LTUuNiwxMi42LTEyLjZTMzUuMiwyMSwyOC4yLDIxSDkuNyIvPgo8Zz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0yOC4yLDQ3SDguOHYtMC44YzAtMC4xLDAtMC4yLDAtMC4zVjEzLjVDOC44LDYsMTQuOSwwLDIyLjMsMHMxMy41LDYsMTMuNSwxMy41YzAsMi44LTAuNSw1LjUtMS40LDguMgoJCWM0LjMsMi4yLDcuMyw2LjcsNy4zLDExLjlDNDEuNyw0MSwzNS42LDQ3LDI4LjIsNDd6IE0xMi45LDQ1LjJoMTUuM2M2LjQsMCwxMS43LTUuMywxMS43LTExLjdjMC00LjQtMi41LTguMy02LjEtMTAuMwoJCWMtMS44LDQuNC00LjgsOC43LTksMTIuOEMyMC40LDQwLjQsMTUuOCw0My41LDEyLjksNDUuMnogTTEwLjYsMjEuOXYyMi43YzEzLTcuNywxOC45LTE1LjYsMjEuNS0yMmMtMS4yLTAuNC0yLjUtMC43LTMuOS0wLjdIMTAuNgoJCXogTTEwLjYsMjAuMWgxNy42YzEuNiwwLDMuMSwwLjMsNC41LDAuOGMxLTIuOSwxLjMtNS41LDEuMy03LjRDMzQsNywyOC44LDEuOCwyMi4zLDEuOFMxMC42LDcsMTAuNiwxMy41VjIwLjF6Ii8+CjwvZz4KPHJlY3QgeD0iLTExLjEiIHk9Ii01OC43IiBjbGFzcz0ic3QyIiB3aWR0aD0iODUuNCIgaGVpZ2h0PSI0OS41Ii8+Cjx0ZXh0IHRyYW5zZm9ybT0ibWF0cml4KDEgMCAwIDEgLTEuMDQyNCA2Ny41NzcyKSIgY2xhc3M9InN0MyBzdDQgc3Q1IHN0NiI+QklMTElFPC90ZXh0Pgo8Zz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0wLDU4LjFoMy43YzAuNCwwLDAuNywwLjEsMS4xLDAuMWMwLjQsMC4xLDAuNywwLjIsMC45LDAuNGMwLjMsMC4yLDAuNSwwLjQsMC43LDAuN2MwLjIsMC4zLDAuMywwLjcsMC4zLDEuMQoJCWMwLDAuNS0wLjIsMS0wLjUsMS4zYy0wLjMsMC40LTAuNywwLjYtMS4yLDAuOHYwYzAuNiwwLjEsMS4xLDAuMywxLjUsMC43QzYuOCw2My42LDcsNjQuMiw3LDY0LjhjMCwwLjUtMC4xLDEtMC4zLDEuMwoJCWMtMC4yLDAuNC0wLjUsMC42LTAuOCwwLjljLTAuMywwLjItMC43LDAuNC0xLjIsMC41Yy0wLjQsMC4xLTAuOSwwLjItMS4zLDAuMkgwQzAsNjcuNiwwLDU4LjEsMCw1OC4xeiBNMS43LDYyaDEuNQoJCWMwLjYsMCwxLTAuMSwxLjMtMC4zYzAuMy0wLjIsMC40LTAuNSwwLjQtMWMwLTAuNC0wLjItMC43LTAuNS0wLjljLTAuMy0wLjItMC44LTAuMy0xLjQtMC4zSDEuN0wxLjcsNjJMMS43LDYyeiBNMS43LDY2LjFoMS41CgkJYzAuMiwwLDAuNSwwLDAuNy0wLjFzMC41LTAuMSwwLjctMC4yYzAuMi0wLjEsMC40LTAuMywwLjUtMC40YzAuMS0wLjIsMC4yLTAuNCwwLjItMC44YzAtMC41LTAuMi0wLjktMC41LTEKCQljLTAuMy0wLjItMC45LTAuMy0xLjUtMC4zSDEuN1Y2Ni4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTExLjEsNTguMWgxLjd2OS41aC0xLjdWNTguMXoiLz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0xNy4zLDU4LjFoMS43djhoNHYxLjVoLTUuN1Y1OC4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTI2LjUsNTguMWgxLjd2OGg0djEuNWgtNS43TDI2LjUsNTguMUwyNi41LDU4LjF6Ii8+Cgk8cGF0aCBjbGFzcz0ic3QxIiBkPSJNMzUuNyw1OC4xaDEuN3Y5LjVoLTEuN1Y1OC4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTQxLjksNTguMWg2LjN2MS41aC00LjZWNjJINDh2MS40aC00LjNWNjZoNC44djEuNWgtNi41VjU4LjF6Ii8+CjwvZz4KPC9zdmc+Cg=='
     href: '#'
@@ -197,6 +197,8 @@ components:
       title: 'Postal Code'
       type: string
       maxLength: 5
+      minLength: 5
+      pattern: '^[0-9]{5}$'
       example: '10969'
     CountryCode:
       title: 'Country Code'
@@ -277,7 +279,7 @@ components:
         postal_code:
           description: 'ZIP or postal code.'
           example: '94111'
-          $ref: '#/components/schemas/PostalCode'
+          $ref: '#/components/schemas/TinyText'
         city:
           description: 'City, district, suburb, town, or village.'
           example: Berlin
@@ -296,7 +298,6 @@ components:
           properties:
             external_order_id:
               description: 'External Order ID. It should only be provided if it was not provided in the create order call.'
-              nullable: true
               $ref: '#/components/schemas/TinyText'
             invoice_number:
               $ref: '#/components/schemas/TinyText'
@@ -322,7 +323,6 @@ components:
         amount:
           $ref: '#/components/schemas/AmountDTO'
         comment:
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         duration:
           $ref: '#/components/schemas/OrderDuration'
@@ -331,10 +331,8 @@ components:
           example: DE123456-1
           $ref: '#/components/schemas/TinyText'
         delivery_address:
-          nullable: true
           $ref: '#/components/schemas/CreateOrderAddressRequest'
         billing_address:
-          nullable: true
           $ref: '#/components/schemas/CreateOrderAddressRequest'
         debtor_company:
           $ref: '#/components/schemas/LegacyCreateOrderDebtorCompanyRequest'
@@ -344,7 +342,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CreateOrderLineItemRequest'
-          nullable: true
       type: object
     CreateOrderAddressRequest:
       title: Address
@@ -355,7 +352,6 @@ components:
         - country
       properties:
         addition:
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         house_number:
           description: 'House number. Leave empty if it is provided as part of the street'
@@ -373,7 +369,7 @@ components:
         postal_code:
           description: 'ZIP or postal code.'
           example: '94111'
-          $ref: '#/components/schemas/PostalCode'
+          $ref: '#/components/schemas/TinyText'
         country:
           description: 'Two-letter country code'
           example: DE
@@ -399,40 +395,30 @@ components:
           $ref: '#/components/schemas/TinyText'
         tax_id:
           example: DE1234556
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         tax_number:
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         registration_court:
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         registration_number:
           example: 'HRB 1234556'
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         industry_sector:
           example: C
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         subindustry_sector:
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         employees_number:
           example: 1-5
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         legal_form:
           $ref: '#/components/schemas/LegalForm'
         established_customer:
           type: boolean
-          nullable: true
         address_addition:
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         address_house_number:
           example: '4'
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         address_street:
           example: Charlottenstr.
@@ -458,7 +444,6 @@ components:
           enum:
             - m
             - f
-          nullable: true
         first_name:
           example: James
           $ref: '#/components/schemas/TinyText'
@@ -488,23 +473,18 @@ components:
           $ref: '#/components/schemas/TinyText'
         description:
           type: string
-          nullable: true
         quantity:
           type: number
           minimum: 1
         category:
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         brand:
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         gtin:
           description: 'Global Trade Item Number'
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         mpn:
           description: 'Manufacturer Part Numbers'
-          nullable: true
           $ref: '#/components/schemas/TinyText'
         amount:
           $ref: '#/components/schemas/AmountDTO'

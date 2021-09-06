@@ -21,12 +21,11 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          ),
  *          @OA\Property(property="external_code", ref="#/components/schemas/TinyText", nullable=false, example="M-0002126", description="External code for the invoice to be identified by."),
  *          @OA\Property(property="invoice_url", ref="#/components/schemas/TinyText", example="ftp://some_server.com/invoices/M-0002126", description="The url of the generated invoice from merchant."),
- *          @OA\Property(property="shipping_document_url", ref="#/components/schemas/TinyText", nullable=true, example="TRACK-0002126", description="The tracking url of the shipping."),
+ *          @OA\Property(property="shipping_document_url", ref="#/components/schemas/TinyText", example="TRACK-0002126", description="The tracking url of the shipping."),
  *          @OA\Property(property="amount", ref="#/components/schemas/AmountDTO", nullable=false, description="The amount of the Invoice in Gross, Net, Tax."),
  *          @OA\Property(
  *              property="line_items",
  *              type="array",
- *              nullable=true,
  *              @OA\Items(ref="#/components/schemas/LineItemsRequest")
  *          )
  *     }
