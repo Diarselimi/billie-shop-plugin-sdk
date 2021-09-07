@@ -69,4 +69,19 @@ class AddressRequestFactoryTest extends UnitTestCase
         self::assertEquals('Charlo', $address->getStreet());
         self::assertEquals('4a', $address->getHouseNumber());
     }
+
+    /** @test */
+    public function shouldHaveStreetAndHouseFromParserLegacyRequest()
+    {
+        $request = [
+            'address_street' => 'Charlottenstr. 4a',
+            'address_house_number' => '',
+        ];
+
+        $this->parser->extractStreetAndHouse('Charlottenstr. 4a')->shouldBeCalled()->willReturn(['Charlo', '4a']);
+        $address = $this->factory->createFromOldFormat($request);
+
+        self::assertEquals('Charlo', $address->getStreet());
+        self::assertEquals('4a', $address->getHouseNumber());
+    }
 }

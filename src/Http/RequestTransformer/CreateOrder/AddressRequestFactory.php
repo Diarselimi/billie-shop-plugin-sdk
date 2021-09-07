@@ -36,18 +36,10 @@ class AddressRequestFactory implements LoggingInterface
             return null;
         }
 
-        $street = $data['street'] ?? null;
-        $house = $data['house_number'] ?? null;
-        if (empty($data['house_number']) && !empty($data['street'])) {
-            [$street, $house] = $this->streetHouseParser->extractStreetAndHouse($data['street']);
-            $this->logInfo('Extracted street and house from input', [
-                LoggingInterface::KEY_SOBAKA => [
-                    'input' => $data['street'],
-                    'street' => $street,
-                    'house' => $house,
-                ],
-            ]);
-        }
+        [$street, $house] = $this->extractStreetAndHouse(
+            $data['street'] ?? null,
+            $data['house_number'] ?? null
+        );
 
         return (new CreateOrderAddressRequest())
             ->setHouseNumber($house)
@@ -64,15 +56,38 @@ class AddressRequestFactory implements LoggingInterface
      */
     public function createFromOldFormat(array $requestData): CreateOrderAddressRequest
     {
+        [$street, $house] = $this->extractStreetAndHouse(
+            $requestData['address_street'] ?? null,
+            $requestData['address_house_number'] ?? null
+        );
+
         return (new CreateOrderAddressRequest())
             ->setAddition($requestData['address_addition'] ?? null)
-            ->setHouseNumber($requestData['address_house_number'] ?? null)
-            ->setStreet($requestData['address_street'] ?? null)
+            ->setHouseNumber($house)
+            ->setStreet($street)
             ->setCity($requestData['address_city'] ?? null)
             ->setPostalCode($requestData['address_postal_code'] ?? null)
             ->setCountry(
                 $this->normalizeCountry($requestData['address_country'] ?? null)
             );
+    }
+
+    private function extractStreetAndHouse(?string $inputStreet, ?string $inputHouse): array
+    {
+        [$outputStreet, $outputHouse] = [$inputStreet, $inputHouse];
+
+        if (empty($inputHouse) && !empty($inputStreet)) {
+            [$outputStreet, $outputHouse] = $this->streetHouseParser->extractStreetAndHouse($inputStreet);
+            $this->logInfo('Extracted street and house from input', [
+                LoggingInterface::KEY_SOBAKA => [
+                    'input' => $inputStreet,
+                    'street' => $outputStreet,
+                    'house' => $outputHouse,
+                ],
+            ]);
+        }
+
+        return [$outputStreet, $outputHouse];
     }
 
     private function normalizeCountry(?string $country): ?string
