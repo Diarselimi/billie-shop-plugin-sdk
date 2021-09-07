@@ -93,7 +93,7 @@ framework:
           from: [created, partially_shipped]
           to: shipped
         complete:
-          from: shipped
+          from: [shipped, partially_shipped]
           to: complete
         cancel:
           from: [new, created, shipped, partially_shipped]
