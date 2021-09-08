@@ -18,7 +18,6 @@ Feature:
       | limit                     |
       | debtor_not_customer       |
       | debtor_blacklisted        |
-      | debtor_overdue            |
       | company_b2b_score         |
     And The following merchant risk check settings exist for merchant 1:
       | risk_check_name           | enabled | decline_on_failure |
@@ -32,7 +31,6 @@ Feature:
       | limit                     | 1       | 1                  |
       | debtor_not_customer       | 1       | 1                  |
       | debtor_blacklisted        | 1       | 1                  |
-      | debtor_overdue            | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
     And GraphQL will respond to getMerchantDebtorDetails query
     And I get from Banco service search bank good response

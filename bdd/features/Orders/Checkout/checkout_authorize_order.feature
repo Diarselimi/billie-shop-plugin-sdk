@@ -15,7 +15,6 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
       | limit                     |
       | debtor_not_customer       |
       | debtor_blacklisted        |
-      | debtor_overdue            |
       | company_b2b_score         |
       | debtor_identified_strict  |
     And The following merchant risk check settings exist for merchant 1:
@@ -29,7 +28,6 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
       | limit                     | 1       | 1                  |
       | debtor_not_customer       | 1       | 1                  |
       | debtor_blacklisted        | 1       | 1                  |
-      | debtor_overdue            | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
       | debtor_identified_strict  | 1       | 1                  |
     And I get from companies service "/debtor/1" endpoint response with status 200 and body

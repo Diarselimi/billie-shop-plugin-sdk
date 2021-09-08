@@ -18,7 +18,6 @@ Feature:
       | limit                             |
       | debtor_not_customer               |
       | debtor_blacklisted                |
-      | debtor_overdue                    |
       | company_b2b_score                 |
       | line_items                        |
       | debtor_identified_billing_address |
@@ -37,7 +36,6 @@ Feature:
       | limit                             | 1       | 1                  |
       | debtor_not_customer               | 1       | 1                  |
       | debtor_blacklisted                | 1       | 1                  |
-      | debtor_overdue                    | 1       | 1                  |
       | company_b2b_score                 | 1       | 1                  |
     And GraphQL will respond to getMerchantDebtorDetails query
 

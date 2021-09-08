@@ -30,8 +30,6 @@ interface OrderRepositoryInterface
 
     public function getOneByUuid(string $uuid): ?OrderEntity;
 
-    public function getDebtorMaximumOverdue(string $companyUuid): int;
-
     public function debtorHasAtLeastOneFullyPaidOrder(string $companyUuid): bool;
 
     public function countOrdersByState(int $merchantDebtorId): OrderStateCounterDTO;

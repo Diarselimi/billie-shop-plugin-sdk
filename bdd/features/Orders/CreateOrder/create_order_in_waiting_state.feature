@@ -17,7 +17,6 @@ Feature:
       | limit                     |
       | debtor_not_customer       |
       | debtor_blacklisted        |
-      | debtor_overdue            |
       | company_b2b_score         |
       | delivery_address          |
       | fraud_score 						  |
@@ -39,7 +38,6 @@ Feature:
       | limit                     | 1       | 0                  |
       | debtor_not_customer       | 1       | 1                  |
       | debtor_blacklisted        | 1       | 1                  |
-      | debtor_overdue            | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
     And I get from companies service identify match response
     And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
@@ -108,7 +106,6 @@ Feature:
       | limit                     | 1       | 0                  |
       | debtor_not_customer       | 1       | 1                  |
       | debtor_blacklisted        | 1       | 1                  |
-      | debtor_overdue            | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
     And I get from companies service identify match response
     And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
@@ -178,7 +175,6 @@ Feature:
       | limit                     | 1       | 0                  |
       | debtor_not_customer       | 1       | 1                  |
       | debtor_blacklisted        | 1       | 1                  |
-      | debtor_overdue            | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
     And I get from companies service identify match response
     And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
@@ -244,7 +240,6 @@ Feature:
 			| limit                     | 1       | 0                  |
 			| debtor_not_customer       | 1       | 1                  |
 			| debtor_blacklisted        | 1       | 1                  |
-			| debtor_overdue            | 1       | 1                  |
 			| company_b2b_score         | 1       | 1                  |
 			| fraud_score               | 1       | 0                  |
 		And I get from companies service identify match response
@@ -315,7 +310,6 @@ Feature:
       | limit                     | 1       | 1                  |
       | debtor_not_customer       | 1       | 1                  |
       | debtor_blacklisted        | 1       | 1                  |
-      | debtor_overdue            | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
       | fraud_score               | 1       | 0                  |
     And I get from companies service identify match from untrusted source
@@ -387,7 +381,6 @@ Feature:
       | limit                     | 1       | 1                  |
       | debtor_not_customer       | 1       | 1                  |
       | debtor_blacklisted        | 1       | 1                  |
-      | debtor_overdue            | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
     And I get from companies service identify match response
     And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"

@@ -373,28 +373,6 @@ class OrderRepository extends AbstractPdoRepository implements
         );
     }
 
-    public function getDebtorMaximumOverdue(string $companyUuid): int
-    {
-        $result = $this->doFetchOne(
-            '
-            SELECT MAX(CEIL((:current_time - UNIX_TIMESTAMP(shipped_at) - (order_financial_details.duration * 86400)) / 86400)) as max_overdue
-            FROM merchants_debtors
-            INNER JOIN orders ON orders.merchant_debtor_id = merchants_debtors.id
-            INNER JOIN order_financial_details ON order_financial_details.order_id = orders.id
-            WHERE merchants_debtors.company_uuid = :company_uuid
-            AND state = :state
-            AND shipped_at IS NOT NULL
-        ',
-            [
-                'current_time' => time(),
-                'company_uuid' => $companyUuid,
-                'state' => OrderEntity::STATE_LATE,
-            ]
-        );
-
-        return $result['max_overdue'] ?: 0;
-    }
-
     public function debtorHasAtLeastOneFullyPaidOrder(string $companyUuid): bool
     {
         $result = $this->doFetchOne(

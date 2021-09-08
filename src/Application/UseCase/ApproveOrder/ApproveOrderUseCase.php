@@ -10,7 +10,6 @@ use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderDeclinedReasonsMapper;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedBillingAddressCheck;
-use App\DomainModel\OrderRiskCheck\Checker\DebtorOverdueCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DeliveryAddressCheck;
 use App\DomainModel\OrderRiskCheck\Checker\FraudScoreCheck;
 use App\DomainModel\OrderRiskCheck\Checker\LimitCheck;
@@ -22,7 +21,6 @@ class ApproveOrderUseCase
         DebtorIdentifiedBillingAddressCheck::NAME,
         FraudScoreCheck::NAME,
         LimitCheck::NAME,
-        DebtorOverdueCheck::NAME,
     ];
 
     private OrderContainerFactory $orderContainerFactory;
