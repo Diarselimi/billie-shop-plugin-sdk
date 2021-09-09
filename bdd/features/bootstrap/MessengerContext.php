@@ -8,8 +8,9 @@ use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Coduo\PHPMatcher\PHPMatcher;
+use Enqueue\MessengerAdapter\EnvelopeItem\TransportConfiguration;
 use Google\Protobuf\Internal\Message;
-use Ozean12\AmqpPackBundle\Mapping\AmqpMapperInterface;
+use Ozean12\AmqpTransfers\Mapping\Amqp\AmqpMapperInterface;
 use Ozean12\Transfer\Message\CompanyInformationChangeRequest\CompanyInformationChangeRequestDecisionIssued;
 use Ozean12\Transfer\Message\Identity\IdentityVerificationSucceeded;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -76,7 +77,7 @@ class MessengerContext implements Context
             $dispatchedMessages = array_filter(
                 $dispatchedMessages,
                 function (array $messageContext) use ($routingKey) {
-                    return $routingKey === $this->amqpMapper->mapToKey(get_class($messageContext['message']));
+                    return $routingKey === $this->getRoutingKeyFromMessageContextStamps($messageContext['message'], $messageContext['stamps_after_dispatch']);
                 }
             );
         }
@@ -180,5 +181,30 @@ class MessengerContext implements Context
                 throw new \Exception($error);
             }
         }
+    }
+
+    private function getRoutingKeyFromMessageContextStamps($message, array $stamps)
+    {
+        $transport = null;
+
+        foreach ($stamps as $i => $stamp) {
+            if (!$stamp instanceof TransportConfiguration) {
+                continue;
+            }
+
+            $transport = $stamp;
+
+            break;
+        }
+
+        if ($transport === null) {
+            throw new \Exception('Transport configuration was not found for the message ' . get_class($message));
+        }
+
+        if (!array_key_exists('routingKey', $transport->getMetadata())) {
+            throw new \Exception('Transport configuration does not have routingKey');
+        }
+
+        return $transport->getMetadata()['routingKey'];
     }
 }

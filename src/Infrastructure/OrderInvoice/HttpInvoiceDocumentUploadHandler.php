@@ -2,14 +2,14 @@
 
 namespace App\Infrastructure\OrderInvoice;
 
-use App\Application\UseCase\HttpInvoiceUpload\HttpInvoiceUploadRequest;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\OrderInvoiceDocument\DomainEvent\HttpUploadInvoiceDomainEvent;
 use App\DomainModel\OrderInvoiceDocument\UploadHandler\AbstractInvoiceDocumentUploadHandler;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
-use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class HttpInvoiceDocumentUploadHandler extends AbstractInvoiceDocumentUploadHandler implements LoggingInterface
 {
@@ -17,13 +17,13 @@ class HttpInvoiceDocumentUploadHandler extends AbstractInvoiceDocumentUploadHand
 
     protected const SUPPORTED_STRATEGY = MerchantSettingsEntity::INVOICE_HANDLING_STRATEGY_HTTP;
 
-    private ProducerInterface $producer;
+    private MessageBusInterface $bus;
 
     public function __construct(
-        ProducerInterface $producer,
+        MessageBusInterface $bus,
         MerchantSettingsRepositoryInterface $merchantSettingsRepository
     ) {
-        $this->producer = $producer;
+        $this->bus = $bus;
 
         parent::__construct($merchantSettingsRepository);
     }
@@ -35,21 +35,32 @@ class HttpInvoiceDocumentUploadHandler extends AbstractInvoiceDocumentUploadHand
         string $invoiceNumber,
         string $eventSource
     ): void {
-        $message = new HttpInvoiceUploadRequest(
-            $order->getMerchantId(),
-            $order->getExternalCode(),
-            $invoiceUuid,
-            $invoiceUrl,
-            $invoiceNumber,
-            $eventSource
-        );
-
-        $data = json_encode($message->toArray());
-
         try {
-            $this->producer->publish($data, 'http_invoice_upload');
+            $message = new HttpUploadInvoiceDomainEvent(
+                $order->getMerchantId(),
+                $order->getExternalCode(),
+                $invoiceUuid,
+                $invoiceUrl,
+                $invoiceNumber,
+                '',
+                $eventSource
+            );
+            $this->bus->dispatch($message);
         } catch (\Exception $exception) {
-            $this->logSuppressedException($exception, 'Rabbit producer exception', ['data' => $data]);
+            $this->logSuppressedException(
+                $exception,
+                'Rabbit producer exception',
+                [
+                    'data' => [
+                        'merchant_id' => $order->getMerchantId(),
+                        'external_code' => $order->getExternalCode(),
+                        'invoice_uuid' => $invoiceUuid,
+                        'invoice_url' => $invoiceUrl,
+                        'invoice_number' => $invoiceNumber,
+                        'event_source' => $eventSource,
+                    ],
+                ]
+            );
         }
     }
 }

@@ -4,40 +4,35 @@ namespace App\Amqp\Producer;
 
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
-use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 
 class DelayedMessageProducer implements LoggingInterface
 {
     use LoggingTrait;
 
-    private $delayedProducer;
+    private MessageBusInterface $bus;
 
-    public function __construct(ProducerInterface $delayedProducer)
+    public function __construct(MessageBusInterface $bus)
     {
-        $this->delayedProducer = $delayedProducer;
+        $this->bus = $bus;
     }
 
-    public function produce(string $routingKey, array $payload, string $interval): bool
+    public function produce($message, string $interval): void
     {
         $delayInMilliseconds = ((new \DateTime($interval))->getTimestamp() - (new \DateTime())->getTimestamp()) * 1000;
-        $payload = json_encode($payload);
 
         try {
-            $this->delayedProducer->publish(
-                $payload,
-                $routingKey,
-                [],
-                ['x-delay' => $delayInMilliseconds]
+            $this->bus->dispatch(
+                $message,
+                [
+                    new DelayStamp($delayInMilliseconds),
+                ]
             );
-
-            return true;
         } catch (\Exception $exception) {
             $this->logSuppressedException($exception, '[suppressed] Rabbit producer exception', [
                 'exception' => $exception,
-                'data' => $payload,
             ]);
         }
-
-        return false;
     }
 }

@@ -4,10 +4,11 @@ namespace App\DomainModel\Order;
 
 use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\MerchantDebtor\Finder\MerchantDebtorFinder;
+use App\DomainModel\Order\DomainEvent\OrderDebtorIdentificationV2DomainEvent;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
-use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class IdentifyAndTriggerAsyncIdentification implements LoggingInterface
 {
@@ -15,14 +16,14 @@ class IdentifyAndTriggerAsyncIdentification implements LoggingInterface
 
     private $debtorFinderService;
 
-    private $producer;
+    private $bus;
 
     public function __construct(
         MerchantDebtorFinder $debtorFinderService,
-        ProducerInterface $producer
+        MessageBusInterface $bus
     ) {
         $this->debtorFinderService = $debtorFinderService;
-        $this->producer = $producer;
+        $this->bus = $bus;
     }
 
     public function identifyDebtor(OrderContainer $orderContainer): bool
@@ -58,15 +59,25 @@ class IdentifyAndTriggerAsyncIdentification implements LoggingInterface
 
     protected function triggerV2DebtorIdentificationAsync(OrderEntity $order, ?DebtorCompany $identifiedDebtorCompany): void
     {
-        $data = [
-            'order_id' => $order->getId(),
-            'v1_company_id' => $identifiedDebtorCompany ? $identifiedDebtorCompany->getId() : null,
-        ];
-
         try {
-            $this->producer->publish(json_encode($data), 'order_debtor_identification_v2_paella');
+            $this->bus->dispatch(
+                new OrderDebtorIdentificationV2DomainEvent(
+                    $order->getId(),
+                    $identifiedDebtorCompany ? $identifiedDebtorCompany->getId() : null
+                )
+            );
         } catch (\Exception $exception) {
-            $this->logSuppressedException($exception, 'Rabbit producer exception', ['data' => $data]);
+            // temporary. Will be replaced with outbox pattern.
+            $this->logSuppressedException(
+                $exception,
+                'Rabbit producer exception',
+                [
+                    'data' => [
+                        'order_id' => $order->getId(),
+                        'v1_company_id' => $identifiedDebtorCompany ? $identifiedDebtorCompany->getId() : null,
+                    ],
+                ]
+            );
         }
     }
 }

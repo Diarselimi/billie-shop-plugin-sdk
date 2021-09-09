@@ -32,10 +32,10 @@ default:
         - App\Tests\Functional\Context\BancoServiceContext
         - App\Tests\Functional\Context\MessengerContext:
             kernel: '@kernel'
-            amqpMapper: '@Ozean12\AmqpPackBundle\Mapping\AmqpMapperInterface'
+            amqpMapper: '@Ozean12\AmqpTransfers\Mapping\Amqp\AmqpMapperInterface'
             changeRequestDecisionIssuesHandler: '@App\Amqp\Handler\CompanyInformationChangeRequestDecisionIssuedHandler'
             identityVerificationSucceededHandler: '@App\Amqp\Handler\IdentityVerificationSucceededHandler'
-            traceableMessageBus: '@Symfony\Component\Messenger\MessageBusInterface'
+            traceableMessageBus: '@Symfony\Component\Messenger\TraceableMessageBus'
         - App\Tests\Functional\Context\RepositoryIntegrationContext:
             kernel: '@kernel'
 

@@ -24,7 +24,9 @@ services:
   App\Http\ApiError\VerboseApiErrorResponseFactory: ~
   App\Http\ApiError\ApiErrorResponseFactory: '@App\Http\ApiError\VerboseApiErrorResponseFactory'
 
-  Symfony\Component\Messenger\MessageBus: ~
+  Symfony\Component\Messenger\MessageBus:
+    arguments:
+      - ['@Ozean12\AmqpPackBundle\Middleware\IntegrationEventTransportConfigurationMiddleware', '@Ozean12\AmqpPackBundle\Middleware\DomainEventTransportConfigurationMiddleware']
   Symfony\Component\Messenger\TraceableMessageBus:
     arguments: [ '@Symfony\Component\Messenger\MessageBus' ]
   Symfony\Component\Messenger\MessageBusInterface: '@Symfony\Component\Messenger\TraceableMessageBus'

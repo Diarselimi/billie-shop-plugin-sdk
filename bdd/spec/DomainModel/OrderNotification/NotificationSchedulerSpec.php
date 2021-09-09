@@ -2,8 +2,9 @@
 
 namespace spec\App\DomainModel\OrderNotification;
 
+use App\Amqp\Producer\DelayedMessageProducer;
 use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsRepositoryInterface;
-use App\DomainModel\OrderNotification\NotificationPublisherInterface;
+use App\DomainModel\Order\DomainEvent\NotificationDeliveryDomainEvent;
 use App\DomainModel\OrderNotification\NotificationScheduler;
 use App\DomainModel\OrderNotification\OrderNotificationDeliveryEntity;
 use App\DomainModel\OrderNotification\OrderNotificationEntity;
@@ -38,7 +39,7 @@ class NotificationSchedulerSpec extends ObjectBehavior
     const DELIVERY_RESULT_BODY = 'body';
 
     public function let(
-        NotificationPublisherInterface $orderNotificationFactoryPublisher,
+        DelayedMessageProducer $delayedMessageProducer,
         OrderNotificationFactory $orderNotificationFactory,
         OrderNotificationRepositoryInterface $orderNotificationRepository,
         MerchantNotificationSettingsRepositoryInterface $notificationSettingsRepository,
@@ -48,7 +49,7 @@ class NotificationSchedulerSpec extends ObjectBehavior
         OrderNotificationEntity $orderNotification
     ) {
         $this->beConstructedWith(
-            $orderNotificationFactoryPublisher,
+            $delayedMessageProducer,
             $orderNotificationFactory,
             $orderNotificationRepository,
             $slackMessageFactory,
@@ -67,7 +68,7 @@ class NotificationSchedulerSpec extends ObjectBehavior
     }
 
     public function it_schedules_the_notification_according_to_the_escalation_matrix(
-        NotificationPublisherInterface $orderNotificationFactoryPublisher,
+        DelayedMessageProducer $delayedMessageProducer,
         OrderNotificationEntity $orderNotification
     ) {
         $orderNotification
@@ -75,16 +76,14 @@ class NotificationSchedulerSpec extends ObjectBehavior
             ->willReturn($this->generateDeliveries(1))
         ;
 
-        $payload = ['notification_id' => self::NOTIFICATION_ID];
+        $payload = new NotificationDeliveryDomainEvent(self::NOTIFICATION_ID);
 
-        $orderNotificationFactoryPublisher
-            ->publish($payload, NotificationScheduler::DELAY_MATRIX[1])
+        $delayedMessageProducer
+            ->produce($payload, NotificationScheduler::DELAY_MATRIX[1])
             ->shouldBeCalled()
-            ->willReturn(true)
         ;
 
-        $result = $this->schedule($orderNotification);
-        $result->shouldBe(true);
+        $this->schedule($orderNotification);
     }
 
     public function it_sends_slack_message_if_max_attempts_has_been_reached(
@@ -113,8 +112,7 @@ class NotificationSchedulerSpec extends ObjectBehavior
 
         $slackClient->sendMessage($slackMessage)->shouldBeCalled();
 
-        $result = $this->schedule($orderNotification);
-        $result->shouldBe(false);
+        $this->schedule($orderNotification);
     }
 
     private function generateDeliveries(int $count): array

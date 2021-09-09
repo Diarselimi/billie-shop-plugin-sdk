@@ -1,17 +1,16 @@
 <?php
 
-namespace App\Amqp\Consumer;
+namespace App\Amqp\Handler;
 
 use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\DeclineOrder\DeclineOrderRequest;
 use App\Application\UseCase\DeclineOrder\DeclineOrderUseCase;
+use App\DomainModel\Order\DomainEvent\AbstractOrderStateDomainEvent;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
-use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
-use PhpAmqpLib\Message\AMQPMessage;
 
-abstract class AbstractOrderDeclineByStateConsumer implements ConsumerInterface, LoggingInterface
+abstract class AbstractOrderDeclineByStateHandler implements LoggingInterface
 {
     use LoggingTrait;
 
@@ -25,16 +24,13 @@ abstract class AbstractOrderDeclineByStateConsumer implements ConsumerInterface,
         $this->orderRepository = $orderRepository;
     }
 
-    abstract protected function getTargetedStates(): array;
-
-    public function execute(AMQPMessage $msg)
+    protected function execute(AbstractOrderStateDomainEvent $message, array $targetedStates)
     {
-        $data = json_decode($msg->getBody(), true);
-        $orderUuid = $data['order_id'];
+        $orderUuid = $message->getOrderId();
 
         try {
             $order = $this->orderRepository->getOneByUuid($orderUuid);
-            if (!$order || !in_array($order->getState(), $this->getTargetedStates(), true)) {
+            if (!$order || !in_array($order->getState(), $targetedStates, true)) {
                 // Order does not exist or it is not in that state anymore
                 return;
             }

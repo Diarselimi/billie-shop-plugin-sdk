@@ -32,3 +32,18 @@ ozean12_amqp_pack:
     invoice.invoice_marked_as_late: Ozean12\Transfer\Message\Invoice\InvoiceMarkedAsLate
     invoice.invoice_completed: Ozean12\Transfer\Message\Invoice\InvoiceCompleted
     ticket.ticket_outstanding_amount_changed: Ozean12\Transfer\Message\Ticket\TicketOutstandingAmountChanged
+  local:
+    order_debtor_identification_v2: App\DomainModel\Order\DomainEvent\OrderDebtorIdentificationV2DomainEvent
+    http_upload_invoice: App\DomainModel\OrderInvoiceDocument\DomainEvent\HttpUploadInvoiceDomainEvent
+    notification_delivery:
+      class: App\DomainModel\Order\DomainEvent\NotificationDeliveryDomainEvent
+      delay: 1000
+    order_in_waiting_state:
+      class: App\DomainModel\Order\DomainEvent\OrderInWaitingStateDomainEvent
+      delay: 1000
+    order_in_pre_waiting_state:
+      class: App\DomainModel\Order\DomainEvent\OrderInPreWaitingStateDomainEvent
+      delay: 1000
+    order_in_authorized_state:
+      class: App\DomainModel\Order\DomainEvent\OrderInAuthorizedStateDomainEvent
+      delay: 1000

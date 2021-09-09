@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Amqp\Consumer;
+namespace App\Amqp\Handler;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\IdentifyAndScoreDebtor\Exception\DebtorNotIdentifiedException;
 use App\Application\UseCase\OrderDebtorIdentificationV2\OrderDebtorIdentificationV2Request;
 use App\Application\UseCase\OrderDebtorIdentificationV2\OrderDebtorIdentificationV2UseCase;
+use App\DomainModel\Order\DomainEvent\OrderDebtorIdentificationV2DomainEvent;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
-use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
-use PhpAmqpLib\Message\AMQPMessage;
+use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
-class OrderDebtorIdentificationV2Consumer implements ConsumerInterface, LoggingInterface
+class OrderDebtorIdentificationV2Handler implements MessageHandlerInterface, LoggingInterface
 {
     use LoggingTrait;
 
@@ -22,12 +22,13 @@ class OrderDebtorIdentificationV2Consumer implements ConsumerInterface, LoggingI
         $this->useCase = $useCase;
     }
 
-    public function execute(AMQPMessage $msg)
+    public function __invoke(OrderDebtorIdentificationV2DomainEvent $message)
     {
-        $data = $msg->getBody();
-        $data = json_decode($data, true);
-
-        $request = new OrderDebtorIdentificationV2Request($data['order_id'], null, $data['v1_company_id']);
+        $request = new OrderDebtorIdentificationV2Request(
+            $message->getOrderId(),
+            null,
+            $message->getV1CompanyId()
+        );
 
         try {
             $this->useCase->execute($request);

@@ -2,7 +2,9 @@
 
 namespace App\DomainModel\OrderNotification;
 
+use App\Amqp\Producer\DelayedMessageProducer;
 use App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsRepositoryInterface;
+use App\DomainModel\Order\DomainEvent\NotificationDeliveryDomainEvent;
 use App\DomainModel\Order\OrderEntity;
 use Billie\MonitoringBundle\Service\Alerting\Slack\SlackClientAwareInterface;
 use Billie\MonitoringBundle\Service\Alerting\Slack\SlackClientAwareTrait;
@@ -30,34 +32,34 @@ class NotificationScheduler implements LoggingInterface, SlackClientAwareInterfa
 
     const SLACK_NOTIFICATION_MESSAGE = 'Order notification reached maximum delivery attempts';
 
-    private $orderNotificationFactoryPublisher;
+    private DelayedMessageProducer $delayedMessageProducer;
 
-    private $orderNotificationFactory;
+    private OrderNotificationFactory $orderNotificationFactory;
 
-    private $orderNotificationRepository;
+    private OrderNotificationRepositoryInterface $orderNotificationRepository;
 
     private $slackMessageFactory;
 
-    private $merchantNotificationSettingsRepository;
+    private MerchantNotificationSettingsRepositoryInterface $merchantNotificationSettingsRepository;
 
     public function __construct(
-        NotificationPublisherInterface $orderNotificationFactoryPublisher,
+        DelayedMessageProducer $delayedMessageProducer,
         OrderNotificationFactory $orderNotificationFactory,
         OrderNotificationRepositoryInterface $orderNotificationRepository,
         SlackMessageFactory $slackMessageFactory,
         MerchantNotificationSettingsRepositoryInterface $merchantNotificationSettingsRepository
     ) {
-        $this->orderNotificationFactoryPublisher = $orderNotificationFactoryPublisher;
+        $this->delayedMessageProducer = $delayedMessageProducer;
         $this->orderNotificationFactory = $orderNotificationFactory;
         $this->orderNotificationRepository = $orderNotificationRepository;
         $this->slackMessageFactory = $slackMessageFactory;
         $this->merchantNotificationSettingsRepository = $merchantNotificationSettingsRepository;
     }
 
-    public function createAndSchedule(OrderEntity $order, ?string $invoiceUuid, string $notificationType, array $payload): bool
+    public function createAndSchedule(OrderEntity $order, ?string $invoiceUuid, string $notificationType, array $payload)
     {
         if (!$this->isNotificationEnabledForMerchant($order->getMerchantId(), $notificationType)) {
-            return false;
+            return;
         }
 
         $orderNotification = $this->orderNotificationFactory->create($order->getId(), $invoiceUuid, $notificationType, $payload);
@@ -68,10 +70,10 @@ class NotificationScheduler implements LoggingInterface, SlackClientAwareInterfa
             LoggingInterface::KEY_ID => $order->getId(),
         ]);
 
-        return $this->schedule($orderNotification);
+        $this->schedule($orderNotification);
     }
 
-    public function schedule(OrderNotificationEntity $orderNotification): bool
+    public function schedule(OrderNotificationEntity $orderNotification)
     {
         $attemptNumber = count($orderNotification->getDeliveries());
         if (!array_key_exists($attemptNumber, self::DELAY_MATRIX)) {
@@ -82,7 +84,7 @@ class NotificationScheduler implements LoggingInterface, SlackClientAwareInterfa
 
             $this->sendSlackMessage($orderNotification);
 
-            return false;
+            return;
         }
 
         $delay = self::DELAY_MATRIX[$attemptNumber];
@@ -96,7 +98,10 @@ class NotificationScheduler implements LoggingInterface, SlackClientAwareInterfa
             ],
         ]);
 
-        return $this->orderNotificationFactoryPublisher->publish(['notification_id' => $orderNotification->getId()], $delay);
+        $this->delayedMessageProducer->produce(
+            new NotificationDeliveryDomainEvent($orderNotification->getId()),
+            $delay
+        );
     }
 
     private function sendSlackMessage(OrderNotificationEntity $orderNotification): void
