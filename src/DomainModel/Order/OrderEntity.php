@@ -93,9 +93,9 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
         self::STATE_AUTHORIZED,
     ];
 
-    public const MAX_DURATION_IN_AUTHORIZED_STATE = '1 minute'; // '1 days'
+    public const MAX_DURATION_IN_AUTHORIZED_STATE = '1 days';
 
-    public const MAX_DURATION_IN_WAITING_STATE = '1 minute'; // '9 days'
+    public const MAX_DURATION_IN_WAITING_STATE = '9 days';
 
     public const CREATION_SOURCE_API = 'api';
 
