@@ -11,7 +11,7 @@
         "ext-openssl": "*",
         "ext-pdo": "*",
         "aws/aws-sdk-php-symfony": "^2.2",
-        "billie/monitoring-bundle": "^3.1",
+        "billie/monitoring-bundle": "^3.1.1",
         "billie/pdo-bundle": "^2.1",
         "caseyamcl/guzzle_retry_middleware": "^2.6",
         "doctrine/annotations": "^1.10",

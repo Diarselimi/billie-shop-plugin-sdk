@@ -2,11 +2,12 @@
 
 namespace App\Application\Exception;
 
+use Billie\MonitoringBundle\Service\Alerting\Sentry\SentryIgnoredExceptionInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
-class RequestValidationException extends \RuntimeException
+class RequestValidationException extends \RuntimeException implements SentryIgnoredExceptionInterface
 {
     private const MESSAGE = 'request_validation_error';
 
