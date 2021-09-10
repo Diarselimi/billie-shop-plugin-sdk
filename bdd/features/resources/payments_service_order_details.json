@@ -13,5 +13,9 @@
     "paid_amount_merchant_payment": 0.00,
     "paid_amount_invoice_cancellation": 0.00,
     "paid_amount_fraud_reclaim": 0.00,
-    "paid_amount_invoice_payback": 0.00
+    "paid_amount_invoice_payback": 0.00,
+    "direct_debit_state": "new",
+    "direct_debit_execution_date": "2020-01-01 00:00:00",
+    "sepa_mandate_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb71",
+    "has_direct_debit_scheduled": true
 }

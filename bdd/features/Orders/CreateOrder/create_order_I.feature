@@ -134,6 +134,7 @@ Feature:
           "pending_merchant_payment_amount":null,
           "pending_cancellation_amount":null
        },
+       "selected_payment_method": null,
        "payment_methods": [],
        "debtor_external_data":{
           "merchant_customer_id":"12",
@@ -297,17 +298,6 @@ Feature:
         "net":900,
         "tax":100
      },
-     "invoices":[],
-     "payment_methods": [
-       {
-         "type": "bank_transfer",
-         "data": {
-           "iban": "DE27500105171416939916",
-           "bic": "BICISHERE",
-           "bank_name": "Mocked Bank Name GmbH"
-         }
-       }
-     ],
      "duration":30,
      "created_at":"2021-06-11 16:48:33",
      "delivery_address":{
@@ -352,6 +342,7 @@ Feature:
      },
      "invoices":[
      ],
+     "selected_payment_method": "bank_transfer",
      "payment_methods": [
        {
          "type": "bank_transfer",
@@ -458,6 +449,7 @@ Feature:
           "pending_merchant_payment_amount":null,
           "pending_cancellation_amount":null
        },
+       "selected_payment_method": "bank_transfer",
        "payment_methods": [
          {
            "type": "bank_transfer",

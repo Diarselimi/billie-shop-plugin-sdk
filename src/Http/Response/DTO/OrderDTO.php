@@ -27,6 +27,7 @@ use OpenApi\Annotations as OA;
  *          nullable=false,
  *          @OA\Items(ref="#/components/schemas/OrderInvoiceResponse")
  *      ),
+ *      @OA\Property(property="selected_payment_method", enum={"bank_transfer", "direct_debit"}, type="string", nullable=true, example="bank_transfer"),
  *      @OA\Property(property="payment_methods", ref="#/components/schemas/PaymentMethodCollection"),
  * })
  */
@@ -92,6 +93,7 @@ class OrderDTO implements ArrayableInterface
             'delivery_address' => $this->deliveryAddress->toArray(),
             'debtor' => $this->debtor->toArray(),
             'invoices' => $this->invoices->toArray(),
+            'selected_payment_method' => $this->paymentMethods->getSelectedPaymentMethod(),
             'payment_methods' => PaymentMethodDTO::collectionToArray($this->paymentMethods),
         ];
     }

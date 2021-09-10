@@ -62,4 +62,14 @@ class PaymentMethod
     {
         return $this->sepaMandateExecutionDate !== null;
     }
+
+    public function isBankTransfer(): bool
+    {
+        return $this->type === self::TYPE_BANK_TRANSFER;
+    }
+
+    public function isDirectDebit(): bool
+    {
+        return $this->type === self::TYPE_DIRECT_DEBIT;
+    }
 }

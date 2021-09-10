@@ -5,5 +5,17 @@
       "bic": "BICISHERE",
       "iban": "DE27500105171416939916"
     }
+  },
+  {
+    "type": "direct_debit",
+    "data": {
+      "bic": "INGDDEFFXXX",
+      "iban": "DE12500105179542622426",
+      "mandate_uuid": "55d3bae2-2ae9-414e-b7e5-9c557b183505",
+      "mandate_reference": "some_reference",
+      "mandate_execution_date": "2020-01-01 00:00:00",
+      "creditor_identification": "some_identification",
+      "mandate_valid": true
+    }
   }
 ]

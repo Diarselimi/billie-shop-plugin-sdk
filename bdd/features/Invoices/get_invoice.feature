@@ -67,6 +67,7 @@ Feature: Get invoice from invoice-butler
             "created_at": "2021-03-01 12:12:12"
           }
         ],
+        "selected_payment_method": "direct_debit",
         "payment_methods": [
           {
             "type":"bank_transfer",
@@ -74,6 +75,17 @@ Feature: Get invoice from invoice-butler
               "bank_name":"Mocked Bank Name GmbH",
               "bic":"BICISHERE",
               "iban":"DE27500105171416939916"
+            }
+          },
+          {
+            "type":"direct_debit",
+            "data":{
+              "iban":"DE12500105179542622426",
+              "bic":"INGDDEFFXXX",
+              "bank_name":null,
+              "mandate_reference":"some_reference",
+              "mandate_execution_date":"2020-01-01 00:00:00",
+              "creditor_identification":"some_identification"
             }
           }
         ]

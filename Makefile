@@ -72,7 +72,7 @@ test-integration: test-seed
 test-unit:
 	echo " > Running unit tests... "
 	./vendor/bin/phpspec run --stop-on-failure -vvv
-	./vendor/bin/phpunit tests/Unit --stop-on-failure -vvv
+	php -d memory_limit=256M ./vendor/bin/phpunit tests/Unit --stop-on-failure -vvv
 
 test-coverage:
 	echo " > Running tests with code coverage..."

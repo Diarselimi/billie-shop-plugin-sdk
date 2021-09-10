@@ -172,6 +172,7 @@ class LegacyOrderResponseFactory
         }
 
         $this->addReasons($orderContainer->getRiskCheckResultCollection(), $response);
+
         $response->setPaymentMethods($orderContainer->getPaymentMethods());
     }
 

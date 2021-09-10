@@ -35,6 +35,8 @@ Feature: As a merchant, I should be able to create an order by providing a valid
     And I get from invoice-butler service no invoices response
     And I get from companies service a good debtor strict match response
     And I get from Banco service search bank good response
+    And I get from payments service get order details response
+    And I get from Sepa service get mandate valid response
     And Debtor lock limit call succeeded
     And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
     """
@@ -143,6 +145,7 @@ Feature: As a merchant, I should be able to create an order by providing a valid
         "pending_merchant_payment_amount":null,
         "pending_cancellation_amount":null
       },
+       "selected_payment_method": "bank_transfer",
        "payment_methods": [
          {
            "type": "bank_transfer",

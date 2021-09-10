@@ -59,6 +59,8 @@ Feature:
     And I get from files service a good response
     And I get from invoice-butler service no invoices response
     And I get from Banco service search bank good response
+    And I get from payments service get order details response
+    And I get from Sepa service get mandate valid response
     And I get from OAuth service "/resource-tokens" endpoint response with status 200 and body:
     """
     {
@@ -145,16 +147,28 @@ Feature:
         "payout_amount": 762,
         "due_date": "2019-06-19"
       },
-     "payment_methods": [
-       {
-         "type": "bank_transfer",
-         "data": {
-           "iban": "DE27500105171416939916",
-           "bic": "BICISHERE",
-           "bank_name": "Mocked Bank Name GmbH"
-         }
-       }
-     ]
+      "selected_payment_method": "direct_debit",
+      "payment_methods": [
+        {
+          "type": "bank_transfer",
+          "data": {
+            "iban": "DE27500105171416939916",
+            "bic": "BICISHERE",
+            "bank_name": "Mocked Bank Name GmbH"
+          }
+        },
+        {
+          "type":"direct_debit",
+          "data":{
+            "iban":"DE42500105172497563393",
+            "bic":"DENTSXXX",
+            "bank_name":"Possum Bank",
+            "mandate_reference":"YGG6VI5RQ4OR3GJ0",
+            "mandate_execution_date":"2020-01-01 00:00:00",
+            "creditor_identification":"DE26ZZZ00001981599"
+          }
+        }
+      ]
     }
     """
     And the response status code should be 200

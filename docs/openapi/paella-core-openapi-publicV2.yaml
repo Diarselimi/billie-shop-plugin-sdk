@@ -1128,6 +1128,13 @@ components:
           type: string
           example: created
           nullable: true
+        selected_payment_method:
+          type: string
+          enum:
+            - bank_transfer
+            - direct_debit
+          example: bank_transfer
+          nullable: true
         payment_methods:
           $ref: '#/components/schemas/PaymentMethodCollection'
       type: object
@@ -1317,6 +1324,13 @@ components:
           items:
             $ref: '#/components/schemas/OrderInvoiceResponse'
           nullable: false
+        selected_payment_method:
+          type: string
+          enum:
+            - bank_transfer
+            - direct_debit
+          example: bank_transfer
+          nullable: true
         payment_methods:
           $ref: '#/components/schemas/PaymentMethodCollection'
       type: object

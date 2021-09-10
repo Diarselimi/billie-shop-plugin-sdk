@@ -46,7 +46,12 @@ class BankNameDecoratorTest extends UnitTestCase
             null
         );
         $bankName = 'Mocked Bank Name GmbH';
-        $clientPaymentMethod = new ClientPaymentMethod(ClientPaymentMethod::TYPE_BANK_TRANSFER, $bankAccount);
+        $clientPaymentMethod = new ClientPaymentMethod(
+            ClientPaymentMethod::TYPE_BANK_TRANSFER,
+            $bankAccount,
+            null,
+            null
+        );
         $clientCollection = new ClientCollection([$clientPaymentMethod]);
         $this->bankAccountService->getBankByBic($bankAccount->getBic())->willReturn(new Bank(['name' => $bankName]));
 
@@ -66,7 +71,12 @@ class BankNameDecoratorTest extends UnitTestCase
             null,
             null
         );
-        $clientPaymentMethod = new ClientPaymentMethod(ClientPaymentMethod::TYPE_BANK_TRANSFER, $bankAccount);
+        $clientPaymentMethod = new ClientPaymentMethod(
+            ClientPaymentMethod::TYPE_BANK_TRANSFER,
+            $bankAccount,
+            null,
+            null
+        );
         $clientCollection = new ClientCollection([$clientPaymentMethod]);
         $this->bankAccountService
             ->getBankByBic(Argument::cetera())

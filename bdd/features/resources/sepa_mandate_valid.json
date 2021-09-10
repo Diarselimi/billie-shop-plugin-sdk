@@ -1,0 +1,23 @@
+{
+  "address": {
+    "street": "Charlottenstr",
+    "house_number": "4",
+    "postcode": "10969",
+    "city_name": "Berlin"
+  },
+  "uuid": "622b2048-8f73-4fc5-8e66-5523bdbfcf44",
+  "mandate_reference": "YGG6VI5RQ4OR3GJ0",
+  "mandate_valid_from": null,
+  "mandate_revoked_at": null,
+  "scheme": "core",
+  "creditor_company_uuid": "cb92625e-e4cb-4cf7-89ee-5d438e313828",
+  "order_uuid": "cb92625e-e4cb-4cf7-89ee-5d438e313828",
+  "bank_account_uuid": "cb92625e-e4cb-4cf7-89ee-5d438e313828",
+  "iban": "DE42500105172497563393",
+  "bic": "DENTSXXX",
+  "bank_name": "Possum Bank",
+  "bank_account_owner": "Alex Possum",
+  "document_uuid": null,
+  "creditor_identification": "DE26ZZZ00001981599",
+  "valid": true
+}

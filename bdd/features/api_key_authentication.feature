@@ -28,6 +28,7 @@ Feature: As a merchant, i should be able to access all endpoints by providing AP
       | order_id | invoice_uuid                         |
       | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
     And GraphQL will respond to getMerchantDebtorDetails query
+    And I get from Sepa service get mandate valid response
     And I add "X-Api-Key" header equal to test
     And I get from payments service get order details response
     When I send a GET request to "/order/XF43Y2"

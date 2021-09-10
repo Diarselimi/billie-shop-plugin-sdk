@@ -44,6 +44,7 @@ class OrderWorkflowTransitionCompleteGuardEventSubscriberTest extends UnitTestCa
         );
     }
 
+    /** @test */
     public function shouldNotBlockEventTransition(): void
     {
         $order = new OrderEntity();
@@ -71,6 +72,7 @@ class OrderWorkflowTransitionCompleteGuardEventSubscriberTest extends UnitTestCa
         $this->assertFalse($event->isBlocked());
     }
 
+    /** @test */
     public function shouldBlockEventTransitionBecauseOfNewInvoice(): void
     {
         $order = new OrderEntity();
@@ -99,6 +101,7 @@ class OrderWorkflowTransitionCompleteGuardEventSubscriberTest extends UnitTestCa
         $this->assertTrue($event->isBlocked());
     }
 
+    /** @test */
     public function shouldBlockEventTransitionBecauseOfUnshippedAmount(): void
     {
         $order = new OrderEntity();
@@ -118,57 +121,5 @@ class OrderWorkflowTransitionCompleteGuardEventSubscriberTest extends UnitTestCa
 
         $this->subscriber->canComplete($event);
         $this->assertTrue($event->isBlocked());
-    }
-
-    public function shouldCancelOrderWhenThereAreOpenInvoices()
-    {
-        $order = new OrderEntity();
-        $event = new GuardEvent($order, new Marking(), new Transition('name', 'from', 'to'));
-
-        $invoice = (new Invoice())
-            ->setState('new');
-        $invoiceCollection = new InvoiceCollection([$invoice]);
-
-        $this->orderContainer->getInvoices()->willReturn($invoiceCollection);
-
-        $orderFinantialDetails = (new OrderFinancialDetailsEntity())
-            ->setUnshippedAmountGross(new Money(0));
-
-        $this->orderContainer->getOrderFinancialDetails()
-            ->shouldBeCalledOnce()
-            ->willReturn($orderFinantialDetails);
-
-        $this->orderContainerFactory->getCachedOrderContainer()
-            ->shouldBeCalledOnce()
-            ->willReturn($this->orderContainer->reveal());
-
-        $this->subscriber->canCancel($event);
-        $this->assertTrue($event->isBlocked());
-    }
-
-    public function shouldNotCancelOrderWhenAllInvoicesAreCanceled()
-    {
-        $order = new OrderEntity();
-        $event = new GuardEvent($order, new Marking(), new Transition('name', 'from', 'to'));
-
-        $invoice = (new Invoice())
-            ->setState('canceled');
-        $invoiceCollection = new InvoiceCollection([$invoice]);
-
-        $this->orderContainer->getInvoices()->willReturn($invoiceCollection);
-
-        $orderFinantialDetails = (new OrderFinancialDetailsEntity())
-            ->setUnshippedAmountGross(new Money(0));
-
-        $this->orderContainer->getOrderFinancialDetails()
-            ->shouldBeCalledOnce()
-            ->willReturn($orderFinantialDetails);
-
-        $this->orderContainerFactory->getCachedOrderContainer()
-            ->shouldBeCalledOnce()
-            ->willReturn($this->orderContainer->reveal());
-
-        $this->subscriber->canCancel($event);
-        $this->assertFalse($event->isBlocked());
     }
 }

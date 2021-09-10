@@ -568,6 +568,7 @@ Feature:
           "pending_merchant_payment_amount":null,
           "pending_cancellation_amount":null
        },
+       "selected_payment_method": "bank_transfer",
        "payment_methods": [
          {
            "type": "bank_transfer",

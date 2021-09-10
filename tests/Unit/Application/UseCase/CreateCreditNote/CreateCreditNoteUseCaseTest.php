@@ -22,6 +22,7 @@ use Ozean12\Money\TaxedMoney\TaxedMoney;
 use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
+use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\Uuid;
 
 class CreateCreditNoteUseCaseTest extends UnitTestCase
@@ -36,12 +37,15 @@ class CreateCreditNoteUseCaseTest extends UnitTestCase
 
     private ObjectProphecy $orderTerminalStateChange;
 
+    private ObjectProphecy $logger;
+
     public function setUp(): void
     {
         $this->creditNoteFactory = $this->prophesize(CreditNoteFactory::class);
         $this->orderContainerFactory = $this->prophesize(OrderContainerFactory::class);
         $this->orderTerminalStateChange = $this->prophesize(OrderTerminalStateChangeService::class);
         $this->creditNoteCreationService = $this->prophesize(CreditNoteCreationService::class);
+        $this->logger = $this->prophesize(LoggerInterface::class);
 
         $this->useCase = new CreateCreditNoteUseCase(
             $this->creditNoteFactory->reveal(),
@@ -51,8 +55,10 @@ class CreateCreditNoteUseCaseTest extends UnitTestCase
         );
 
         $this->useCase->setValidator($this->createFakeValidator());
+        $this->useCase->setLogger($this->logger->reveal());
     }
 
+    /** @test */
     public function shouldCallCreditNoteCreationServiceCorrectly(): void
     {
         $invoiceUuid = Uuid::uuid4()->toString();

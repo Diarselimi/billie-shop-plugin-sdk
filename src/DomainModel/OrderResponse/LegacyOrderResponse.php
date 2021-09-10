@@ -56,6 +56,7 @@ use Ozean12\Money\TaxedMoney\TaxedMoney;
  *          @OA\Property(property="fee_rate", type="number", format="float", nullable=true),
  *          @OA\Property(property="due_date", type="string", format="date", nullable=true, example="2019-03-20"),
  *      }),
+ *      @OA\Property(property="selected_payment_method", enum={"bank_transfer", "direct_debit"}, type="string", nullable=true, example="bank_transfer"),
  *      @OA\Property(property="payment_methods", ref="#/components/schemas/PaymentMethodCollection"),
  *
  *      @OA\Property(property="delivery_address", type="object", ref="#/components/schemas/CreateOrderAddressRequest"),
@@ -757,6 +758,13 @@ class LegacyOrderResponse implements ArrayableInterface
         return $this;
     }
 
+    public function setPaymentMethods(PaymentMethodCollection $paymentMethods): self
+    {
+        $this->paymentMethods = $paymentMethods;
+
+        return $this;
+    }
+
     public function toArray(): array
     {
         return [
@@ -827,14 +835,8 @@ class LegacyOrderResponse implements ArrayableInterface
                 'pending_merchant_payment_amount' => $this->getPendingMerchantPaymentAmount(),
                 'pending_cancellation_amount' => $this->getPendingCancellationAmount(),
             ],
+            'selected_payment_method' => $this->paymentMethods->getSelectedPaymentMethod(),
             'payment_methods' => PaymentMethodDTO::collectionToArray($this->paymentMethods),
         ];
-    }
-
-    public function setPaymentMethods(PaymentMethodCollection $paymentMethods): self
-    {
-        $this->paymentMethods = $paymentMethods;
-
-        return $this;
     }
 }

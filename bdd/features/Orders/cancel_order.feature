@@ -28,6 +28,7 @@ Feature:
     And I get from companies service identify match response
     And I get from invoice-butler service no invoices and later one invoice responses
     And I get from volt service good response
+    And I get from Sepa service get mandate valid response
     And The order "CO123" has a payment UUID
     And I get from payments service get order details response
     When I send a POST request to "/order/CO123/ship" with body:

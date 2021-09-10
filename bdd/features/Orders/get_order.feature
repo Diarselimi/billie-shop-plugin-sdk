@@ -58,6 +58,8 @@ Feature:
       | limit       | 0         |
     And GraphQL will respond to getMerchantDebtorDetails query
     And I get from invoice-butler service good response no CreditNotes
+    And I get from payments service get order details response
+    And I get from Sepa service get mandate valid response
     And the following invoice data exists:
       | order_id | invoice_uuid                         |
       | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
@@ -101,16 +103,28 @@ Feature:
             "payout_amount": 123.33,
             "due_date": "2019-06-19"
         },
-       "payment_methods": [
-         {
-           "type": "bank_transfer",
-           "data": {
-             "iban": "DE27500105171416939916",
-             "bic": "BICISHERE",
-             "bank_name": "Mocked Bank Name GmbH"
-           }
-         }
-       ],
+        "selected_payment_method": "direct_debit",
+        "payment_methods": [
+            {
+                "type": "bank_transfer",
+                "data": {
+                    "iban": "DE27500105171416939916",
+                    "bic": "BICISHERE",
+                    "bank_name": "Mocked Bank Name GmbH"
+                }
+            },
+            {
+                "type":"direct_debit",
+                "data":{
+                    "iban":"DE42500105172497563393",
+                    "bic":"DENTSXXX",
+                    "bank_name":"Possum Bank",
+                    "mandate_reference":"YGG6VI5RQ4OR3GJ0",
+                    "mandate_execution_date":"2020-01-01 00:00:00",
+                    "creditor_identification":"DE26ZZZ00001981599"
+                }
+            }
+        ],
         "debtor_external_data": {
             "name": "test",
             "address_country": "TE",
@@ -150,6 +164,8 @@ Feature:
     And GraphQL will respond to getMerchantDebtorDetails query
     And I get from salesforce dunning status endpoint "Created" status for order "test-order-uuidXF43Y"
     And I get from invoice-butler service good response no CreditNotes
+    And I get from payments service get order details response
+    And I get from Sepa service get mandate valid response
     And the following invoice data exists:
       | order_id | invoice_uuid                         |
       | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
@@ -194,16 +210,28 @@ Feature:
            "payout_amount": 123.33,
            "due_date": "2019-06-19"
        },
-       "payment_methods": [
-         {
-           "type": "bank_transfer",
-           "data": {
-             "iban": "DE27500105171416939916",
-             "bic": "BICISHERE",
-             "bank_name": "Mocked Bank Name GmbH"
-           }
-         }
-       ],
+        "selected_payment_method": "direct_debit",
+        "payment_methods": [
+            {
+                "type": "bank_transfer",
+                "data": {
+                    "iban": "DE27500105171416939916",
+                    "bic": "BICISHERE",
+                    "bank_name": "Mocked Bank Name GmbH"
+                }
+            },
+            {
+                "type":"direct_debit",
+                "data":{
+                    "iban":"DE42500105172497563393",
+                    "bic":"DENTSXXX",
+                    "bank_name":"Possum Bank",
+                    "mandate_reference":"YGG6VI5RQ4OR3GJ0",
+                    "mandate_execution_date":"2020-01-01 00:00:00",
+                    "creditor_identification":"DE26ZZZ00001981599"
+                }
+            }
+        ],
        "debtor_external_data":{
           "merchant_customer_id":"ext_id",
           "name":"test",
@@ -240,6 +268,8 @@ Feature:
       | external_id | state    | gross | net | tax | duration | comment    | payment_uuid                         |
       | XF43Y       | complete | 1000  | 900 | 100 | 30       | test order | 6d6b4222-be8c-11e9-9cb5-2a2ae2dbcce4 |
     And I get from invoice-butler service good response no CreditNotes
+    And I get from payments service get order details response
+    And I get from Sepa service get mandate valid response
     And the following invoice data exists:
       | order_id | invoice_uuid                         |
       | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
@@ -287,16 +317,28 @@ Feature:
            "payout_amount": 123.33,
            "due_date": "2019-06-19"
         },
-       "payment_methods": [
-         {
-           "type": "bank_transfer",
-           "data": {
-             "iban": "DE27500105171416939916",
-             "bic": "BICISHERE",
-             "bank_name": "Mocked Bank Name GmbH"
-           }
-         }
-       ],
+      "selected_payment_method": "direct_debit",
+      "payment_methods": [
+        {
+          "type": "bank_transfer",
+          "data": {
+            "iban": "DE27500105171416939916",
+            "bic": "BICISHERE",
+            "bank_name": "Mocked Bank Name GmbH"
+          }
+        },
+        {
+          "type":"direct_debit",
+          "data":{
+            "iban":"DE42500105172497563393",
+            "bic":"DENTSXXX",
+            "bank_name":"Possum Bank",
+            "mandate_reference":"YGG6VI5RQ4OR3GJ0",
+            "mandate_execution_date":"2020-01-01 00:00:00",
+            "creditor_identification":"DE26ZZZ00001981599"
+          }
+        }
+      ],
         "debtor_external_data": {
             "merchant_customer_id": "ext_id",
             "name": "test",

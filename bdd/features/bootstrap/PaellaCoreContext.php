@@ -72,6 +72,7 @@ use Billie\PdoBundle\Infrastructure\Pdo\PdoConnection;
 use Ozean12\Money\Money;
 use Ozean12\Money\Percent;
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\HttpKernel\HttpKernelBrowser;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
@@ -424,7 +425,9 @@ class PaellaCoreContext extends MinkContext
                 $row['payment_uuid'],
                 $row['checkout_session'],
                 OrderEntity::CREATION_SOURCE_API,
-                $row['workflow_name'] ?? OrderEntity::WORKFLOW_NAME_V1
+                $row['workflow_name'] ?? OrderEntity::WORKFLOW_NAME_V1,
+                null,
+                Uuid::fromString(SepaServiceContext::DUMMY_SEPA_MANDATE_UUID)
             );
         }
     }
@@ -441,7 +444,8 @@ class PaellaCoreContext extends MinkContext
         $checkoutSession = null,
         string $creationSource = OrderEntity::CREATION_SOURCE_API,
         string $workflowName = OrderEntity::WORKFLOW_NAME_V1,
-        string $uuid = null
+        string $uuid = null,
+        ?UuidInterface $sepaMandateUuid = null
     ) {
         [$person, $deliveryAddress, $debtor, $merchantDebtor] = $this->debtorData ?? $this->iHaveADebtorWithoutOrders();
 
@@ -461,6 +465,7 @@ class PaellaCoreContext extends MinkContext
             ->setCompanyBillingAddressUuid('c7be46c0-e049-4312-b274-258ec5aeeb71')
             ->setCreationSource($creationSource)
             ->setWorkflowName($workflowName)
+            ->setDebtorSepaMandateUuid($sepaMandateUuid)
         ;
 
         if ($checkoutSession) {

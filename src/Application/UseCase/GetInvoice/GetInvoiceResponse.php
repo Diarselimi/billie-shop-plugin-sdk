@@ -26,6 +26,7 @@ use Ozean12\Support\Formatting\DateFormat;
  *      @OA\Property(property="created_at", type="string", format="date", nullable=false, example="2019-03-20", description="The date and time when the invoice was created."),
  *      @OA\Property(property="due_date", type="string", format="date", nullable=false, example="2019-03-20", description="The date when this invoice is due to be paid back."),
  *      @OA\Property(property="state", type="string", nullable=true, example="created", description="The state of the invoice."),
+ *      @OA\Property(property="selected_payment_method", enum={"bank_transfer", "direct_debit"}, type="string", nullable=true, example="bank_transfer"),
  *      @OA\Property(property="payment_methods", ref="#/components/schemas/PaymentMethodCollection")
  * })
  */
@@ -176,6 +177,7 @@ class GetInvoiceResponse implements ArrayableInterface
             'state' => $this->getState(),
             'orders' => $this->ordersResponse,
             'credit_notes' => $this->creditNotesResponse,
+            'selected_payment_method' => $this->paymentMethods->getSelectedPaymentMethod(),
             'payment_methods' => PaymentMethodDTO::collectionToArray($this->paymentMethods),
         ];
     }

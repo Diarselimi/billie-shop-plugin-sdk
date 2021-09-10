@@ -141,16 +141,17 @@ Feature:
         "pending_merchant_payment_amount":null,
         "pending_cancellation_amount":null
       },
-       "payment_methods": [
-         {
-           "type": "bank_transfer",
-           "data": {
-             "iban": "DE27500105171416939916",
-             "bic": "BICISHERE",
-             "bank_name": "Mocked Bank Name GmbH"
-           }
-         }
-       ],
+      "selected_payment_method": "bank_transfer",
+      "payment_methods": [
+        {
+          "type": "bank_transfer",
+          "data": {
+            "iban": "DE27500105171416939916",
+            "bic": "BICISHERE",
+            "bank_name": "Mocked Bank Name GmbH"
+          }
+        }
+      ],
       "debtor_external_data":{
         "merchant_customer_id":"12",
         "name":"Test User Company",
@@ -279,16 +280,17 @@ Feature:
         "pending_merchant_payment_amount":null,
         "pending_cancellation_amount":null
       },
-       "payment_methods": [
-         {
-           "type": "bank_transfer",
-           "data": {
-             "iban": "DE27500105171416939916",
-             "bic": "BICISHERE",
-             "bank_name": "Mocked Bank Name GmbH"
-           }
-         }
-       ],
+      "selected_payment_method": "bank_transfer",
+      "payment_methods": [
+        {
+          "type": "bank_transfer",
+          "data": {
+            "iban": "DE27500105171416939916",
+            "bic": "BICISHERE",
+            "bank_name": "Mocked Bank Name GmbH"
+          }
+        }
+      ],
       "debtor_external_data":{
         "merchant_customer_id":"12",
         "name":"Test User Company",

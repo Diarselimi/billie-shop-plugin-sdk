@@ -49,15 +49,13 @@ class OrderPaymentMethodResolver implements LoggingInterface
         }
 
         try {
+            $paymentMethods = [$this->getBankTransferMethod($orderContainer)];
             $directDebitMethod = $this->getDirectDebitMethod($orderContainer);
-
             if ($directDebitMethod !== null) {
-                return new PaymentMethodCollection([$directDebitMethod]);
+                $paymentMethods[] = $directDebitMethod;
             }
 
-            $bankTransferMethod = $this->getBankTransferMethod($orderContainer);
-
-            return new PaymentMethodCollection([$bankTransferMethod]);
+            return new PaymentMethodCollection($paymentMethods);
         } catch (InvalidIbanException $exception) {
             $this->logWarning($exception->getMessage());
 

@@ -29,25 +29,26 @@ class BankNameDecorator implements LoggingInterface
         $paymentMethods = [];
         foreach ($clientCollection as $clientPaymentMethod) {
             /** @var ClientPaymentMethod $clientPaymentMethod */
-            if ($clientPaymentMethod->isBankTransfer()) {
-                $bankAccount = $clientPaymentMethod->getBankAccount();
+            $bankAccount = $clientPaymentMethod->getBankAccount();
 
-                try {
-                    $bankName = $bankAccount->getBankName() ?: $this->bankAccountService->getBankByBic(
-                        $bankAccount->getBic()
-                    )->getName();
-                } catch (BankAccountServiceException | BankNotFoundException $exception) {
-                    $this->logDebug(
-                        'Banco getBankByBic failed: ' . $exception->getMessage()
-                        . '. BIC was ' . $bankAccount->getBic()
-                    );
-                    $bankName = null;
-                }
-                $paymentMethods[] = new PaymentMethod(
-                    PaymentMethod::TYPE_BANK_TRANSFER,
-                    new BankAccount($bankAccount->getIban(), $bankAccount->getBic(), $bankName, null)
+            try {
+                $bankName = $bankAccount->getBankName() ?: $this->bankAccountService->getBankByBic(
+                    $bankAccount->getBic()
+                )->getName();
+            } catch (BankAccountServiceException | BankNotFoundException $exception) {
+                $this->logDebug(
+                    'Banco getBankByBic failed: ' . $exception->getMessage()
+                    . '. BIC was ' . $bankAccount->getBic()
                 );
+                $bankName = null;
             }
+
+            $paymentMethods[] = new PaymentMethod(
+                $clientPaymentMethod->getType(),
+                new BankAccount($bankAccount->getIban(), $bankAccount->getBic(), $bankName, null),
+                $clientPaymentMethod->getSepaMandate(),
+                $clientPaymentMethod->getSepaMandateExecutionDate()
+            );
         }
 
         return new PaymentMethodCollection($paymentMethods);
