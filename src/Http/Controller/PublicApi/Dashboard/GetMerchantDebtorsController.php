@@ -8,6 +8,7 @@ use App\Application\UseCase\GetMerchantDebtors\GetMerchantDebtorsRequest;
 use App\Application\UseCase\GetMerchantDebtors\GetMerchantDebtorsUseCase;
 use App\DomainModel\MerchantDebtorResponse\MerchantDebtorList;
 use App\Http\HttpConstantsInterface;
+use App\Support\SearchInput;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
@@ -64,7 +65,7 @@ class GetMerchantDebtorsController
             $request->query->getInt('limit', GetMerchantDebtorsRequest::DEFAULT_LIMIT),
             $sortField,
             strtoupper($sortDirection ?: GetMerchantDebtorsRequest::DEFAULT_SORT_DIRECTION),
-            trim($request->query->get('search', ''))
+            SearchInput::asString($request->query->get('search', '')),
         );
 
         return $this->useCase->execute($useCaseRequest);

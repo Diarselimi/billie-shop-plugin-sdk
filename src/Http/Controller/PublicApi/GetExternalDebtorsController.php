@@ -7,6 +7,7 @@ use App\Application\UseCase\GetExternalDebtors\GetExternalDebtorsRequest;
 use App\Application\UseCase\GetExternalDebtors\GetExternalDebtorsUseCase;
 use App\Application\UseCase\GetExternalDebtors\GetExternalDebtorsUseCaseException;
 use App\Http\HttpConstantsInterface;
+use App\Support\SearchInput;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
@@ -47,7 +48,7 @@ class GetExternalDebtorsController
     {
         $useCaseRequest = new GetExternalDebtorsRequest(
             $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID),
-            trim($request->query->get('search')),
+            SearchInput::asString($request->query->get('search', ''), true, 200),
             self::ITEMS_LIMIT
         );
 

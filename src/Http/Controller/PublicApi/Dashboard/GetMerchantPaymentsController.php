@@ -8,6 +8,7 @@ use App\Application\UseCase\GetMerchantPayments\GetMerchantPaymentsRequest;
 use App\Application\UseCase\GetMerchantPayments\GetMerchantPaymentsUseCase;
 use App\Http\HttpConstantsInterface;
 use App\Support\PaginatedCollection;
+use App\Support\SearchInput;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
@@ -85,7 +86,7 @@ class GetMerchantPaymentsController
             ->setTransactionUuid($data['transaction_uuid'] ?? null)
             ->setSortBy($data['sort_by'] ?? GetMerchantPaymentsRequest::DEFAULT_SORTING_FIELD)
             ->setSortDirection($data['sort_direction'] ?? 'desc')
-            ->setSearchKeyword($data['search'] ?? '')
+            ->setSearchKeyword(SearchInput::asString($data['search'] ?? ''))
             ->setIsAllocated(isset($filters['is_allocated']) ? (bool) $filters['is_allocated'] : null)
             ->setIsOverpayment(isset($filters['is_overpayment']) ? (bool) $filters['is_overpayment'] : null)
             ->setLimit((int) ($data['limit'] ?? GetMerchantPaymentsRequest::DEFAULT_LIMIT))

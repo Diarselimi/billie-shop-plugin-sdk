@@ -6,6 +6,7 @@ use App\Application\UseCase\Dashboard\GetOrders\GetOrdersRequest;
 use App\Application\UseCase\Dashboard\GetOrders\GetOrdersUseCase;
 use App\Http\HttpConstantsInterface;
 use App\Http\ResponseTransformer\Dashboard\GetOrdersResponsePayload;
+use App\Support\SearchInput;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -63,13 +64,16 @@ class GetOrdersController
     {
         [$sortField, $sortDirection] = $this->parseSortBy($request->query);
 
+        $searchString = $request->query->has('search') ?
+            SearchInput::asString($request->query->get('search', '')) : null;
+
         $useCaseRequest = new GetOrdersRequest(
             $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID),
             $request->query->getInt('offset', 0),
             $request->query->getInt('limit', GetOrdersRequest::DEFAULT_LIMIT),
             $sortField,
             strtoupper($sortDirection ?: GetOrdersRequest::DEFAULT_SORT_DIRECTION),
-            $request->query->has('search') ? trim($request->query->get('search')) : null,
+            $searchString,
             $this->parseFilters($request)
         );
 
