@@ -27,6 +27,7 @@ final class CheckoutProvideIbanRequest implements ValidatedRequestInterface
     /**
      * @Assert\NotBlank()
      * @Assert\Iban()
+     * @Assert\Regex(pattern="/^DE.*$/", message="Only German IBANs are allowed")
      */
     private ?string $iban;
 

@@ -46,6 +46,20 @@ class CheckoutProvideIbanRequestTest extends IntegrationTestCase
     /**
      * @test
      */
+    public function validationShouldFailOnNonGermanIbanProvided()
+    {
+        $request = new CheckoutProvideIbanRequest(Uuid::uuid4()->toString(), 'NL11RABO3382647974', 'Edeka Co Kg');
+
+        $validator = $this->getContainer()->get(ValidatorInterface::class);
+        $this->setValidator($validator);
+
+        $this->expectException(RequestValidationException::class);
+        $this->validateRequest($request);
+    }
+
+    /**
+     * @test
+     */
     public function validationShouldFailOnMissingOwner()
     {
         $request = new CheckoutProvideIbanRequest(Uuid::uuid4()->toString(), 'DE42500105172497563393', null);
