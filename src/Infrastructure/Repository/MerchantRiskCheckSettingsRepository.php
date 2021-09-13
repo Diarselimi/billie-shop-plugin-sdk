@@ -19,6 +19,7 @@ class MerchantRiskCheckSettingsRepository extends AbstractPdoRepository implemen
         DebtorScoreAvailableCheck::NAME,
         LineItemsCheck::NAME,
         'debtor_overdue',
+        'black_listed_address',
     ];
 
     private $factory;

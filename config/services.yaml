@@ -56,7 +56,6 @@ services:
       $paellaSandboxUrl: '%env(string:PAELLA_SANDBOX_URL)%'
       $vatRatesYamlPath: "%kernel.root_dir%/Resources/vat_rate/matrix.yaml"
       $isDummyRiskChecksFeatureEnabled: '%env(bool:DUMMY_CHECKS_ENABLED)%'
-      $blacklistedAddresses: '%blacklisted_addresses%'
       $encryptionKey: '%env(ENCRYPTION_KEY)%'
       $bancoPrivateApi: '@private_bank_api'
       $bancoPublicApi: '@public_bank_api'
@@ -124,7 +123,6 @@ services:
         - 'line_items'
         - 'debtor_country'
         - 'debtor_industry_sector'
-        - 'black_listed_address'
       $postIdentificationChecks:
         - 'debtor_identified'
         - 'debtor_identified_strict'
@@ -159,7 +157,6 @@ services:
             delivery_address: '@App\DomainModel\OrderRiskCheck\Checker\DeliveryAddressCheck'
             fraud_score: '@App\DomainModel\OrderRiskCheck\Checker\FraudScoreCheck'
             debtor_score_available_dummy: '@App\DomainModel\OrderRiskCheck\DummyChecker\DebtorScoreAvailableDummyCheck'
-            black_listed_address: '@App\DomainModel\OrderRiskCheck\Checker\BlackListAddressCheck'
 
   App\DomainModel\OrderRiskCheck\Flagception\DummyRiskCheckStrategyManager:
     class: App\DomainModel\OrderRiskCheck\Flagception\DummyRiskCheckStrategyManager

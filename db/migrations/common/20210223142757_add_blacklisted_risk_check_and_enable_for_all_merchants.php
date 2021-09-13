@@ -1,6 +1,5 @@
 <?php
 
-use App\DomainModel\OrderRiskCheck\Checker\BlackListAddressCheck;
 use App\Infrastructure\Phinx\MigrationHelperTrait;
 use App\Infrastructure\Phinx\TransactionalMigration;
 
@@ -10,6 +9,6 @@ class AddBlacklistedRiskCheckAndEnableForAllMerchants extends TransactionalMigra
 
     public function migrate()
     {
-        $this->addNewRiskCheck(BlackListAddressCheck::NAME, true, true);
+        $this->addNewRiskCheck('black_listed_address', true, true);
     }
 }
