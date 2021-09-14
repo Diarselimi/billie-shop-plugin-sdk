@@ -6280,14 +6280,21 @@ tags:
 
       ### 3. Provide Order Details and Call Mount Method
 
-      Once the user reviews his checkout basket and is ready to pay, he can click on the **Pay with Billie** button. When this happens, Billie expects the `mount` method to be called. The easiest integration option is to inline the function call directly on the button, for example:
+      Once the user reviews their checkout basket and is ready to pay, they can click on the **Pay with Billie** button. When this happens, Billie expects the `mount` method to be called. If you want to offer payments with direct debit you can pass an __optional__ `billie_widget_options` object containing `payment_method`.
+      The easiest integration option is to inline the function call directly on the button, for example:
+
       ```html
       <script>
         function payWithBillie() {
           // prepare / get all the data and assign it to billie_order_data, please refer to 3a section
           BillieCheckoutWidget.mount({
             billie_config_data: billie_config_data, 
-            billie_order_data: billie_order_data
+            billie_order_data: billie_order_data,
+
+            // not required additional options, please refer to 3c section
+            billie_widget_options: {
+              payment_method: payment_method
+            }
           })
           .then(function success(ao) {
             // code to execute when approved order
@@ -6311,10 +6318,10 @@ tags:
 
       #### 3.a Mount Method Parameters
 
-      `BillieCheckoutWidget.mount` expects two parameters:
+      `BillieCheckoutWidget.mount` expects three parameters:
       - `billie_config_data` is the object received in step two which includes the `session_id` and `merchant_name`
       - `billie_order_data`  is a collection of order data from the user
-
+      - `billie_widget_options` __[optional]__ is an object which includes `payment_method`
 
       #### 3.b Order Data Object
 
@@ -6408,6 +6415,14 @@ tags:
         ]
       };
       ```
+
+      #### 3.c Widget Options
+
+      An __optional__ collection of additional options to pass to the widget
+
+      - `payment_method` **[string]**  
+      &nbsp;&nbsp;&nbsp;&nbsp;Enum: `invoice` `direct_debit`  
+      &nbsp;&nbsp;&nbsp;&nbsp;Default: `invoice`
 
       ### 4. Handle Widget Responses
 
