@@ -184,7 +184,6 @@ Feature: Register a new merchant with an invitation for the initial admin user.
       | debtor_identified_strict  |
       | limit                     |
       | debtor_not_customer       |
-      | debtor_blacklisted        |
       | company_b2b_score         |
     And I successfully create OAuth client with id testClientId and secret testClientSecret
     And I get from limit service create default debtor-customer limit successful response

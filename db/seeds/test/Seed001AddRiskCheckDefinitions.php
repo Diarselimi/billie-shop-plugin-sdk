@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\DomainModel\Iban\IbanFraudCheck;
 use App\DomainModel\OrderRiskCheck\Checker\AmountCheck;
 use App\DomainModel\OrderRiskCheck\Checker\AvailableFinancingLimitCheck;
-use App\DomainModel\OrderRiskCheck\Checker\DebtorBlacklistedCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorCountryCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedCheck;
 use App\DomainModel\OrderRiskCheck\Checker\DebtorIndustrySectorCheck;
@@ -26,7 +25,6 @@ class Seed001AddRiskCheckDefinitions extends AbstractSeed
             DebtorIdentifiedCheck::NAME,
             LimitCheck::NAME,
             DebtorNotCustomerCheck::NAME,
-            DebtorBlacklistedCheck::NAME,
             DebtorScoreCheck::NAME,
             IbanFraudCheck::RISK_CHECK_NAME,
         ];

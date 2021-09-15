@@ -298,7 +298,6 @@ Feature: Create a new merchant specifying the data of the company that will be c
       | debtor_identified_strict  |
       | limit                     |
       | debtor_not_customer       |
-      | debtor_blacklisted        |
       | company_b2b_score         |
     And I successfully create OAuth client with id testClientId and secret testClientSecret
     And I get from limit service create default debtor-customer limit successful response
@@ -359,7 +358,6 @@ Feature: Create a new merchant specifying the data of the company that will be c
       | debtor_identified_strict  |
       | limit                     |
       | debtor_not_customer       |
-      | debtor_blacklisted        |
       | company_b2b_score         |
     And I successfully create OAuth client with id testClientId and secret testClientSecret
     And I get from limit service create default debtor-customer limit successful response

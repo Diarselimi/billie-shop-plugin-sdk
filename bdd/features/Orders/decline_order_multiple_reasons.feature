@@ -14,7 +14,6 @@ Feature:
       | debtor_identified         |
       | limit                     |
       | debtor_not_customer       |
-      | debtor_blacklisted        |
       | company_b2b_score         |
       | debtor_is_trusted         |
       | debtor_identified_strict  |
@@ -35,7 +34,6 @@ Feature:
       | debtor_is_trusted         | 1       | 1                  |
       | limit                     | 1       | 0                  |
       | debtor_not_customer       | 1       | 1                  |
-      | debtor_blacklisted        | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
     And I get from companies service identify match response
     And I get from scoring service bad debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
@@ -105,7 +103,6 @@ Feature:
       | debtor_is_trusted         | 1       | 1                  |
       | limit                     | 1       | 1                  |
       | debtor_not_customer       | 1       | 1                  |
-      | debtor_blacklisted        | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
     And I get from companies service identify match response
     And I get from scoring service bad debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
@@ -174,7 +171,6 @@ Feature:
       | debtor_is_trusted         | 1       | 1                  |
       | limit                     | 1       | 0                  |
       | debtor_not_customer       | 1       | 1                  |
-      | debtor_blacklisted        | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
     And I get from companies service identify no match and respond with suggestion
     And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"

@@ -46,7 +46,6 @@ class MerchantDebtorResponseFactory
             ->setCompanyId($container->getDebtorCompany()->getId())
             ->setCompanyUuid($container->getDebtorCompany()->getUuid())
             ->setPaymentId($container->getMerchantDebtor()->getPaymentDebtorId())
-            ->setIsBlacklisted($container->getDebtorCompany()->isBlacklisted())
             ->setIsTrustedSource($container->getDebtorCompany()->isTrustedSource())
             ->setCrefoId($container->getDebtorCompany()->getCrefoId())
             ->setSchufaId($container->getDebtorCompany()->getSchufaId())

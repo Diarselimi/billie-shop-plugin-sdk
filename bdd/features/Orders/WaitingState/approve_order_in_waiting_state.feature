@@ -14,7 +14,6 @@ Feature: Endpoint to approve an order in waiting state
 			| delivery_address          |
 			| limit                     |
 			| debtor_not_customer       |
-			| debtor_blacklisted        |
 			| company_b2b_score         |
 		And The following merchant risk check settings exist for merchant 1:
 			| risk_check_name           | enabled | decline_on_failure |
@@ -27,7 +26,6 @@ Feature: Endpoint to approve an order in waiting state
 			| debtor_identified_strict  | 1       | 1                  |
 			| limit                     | 1       | 0                  |
 			| debtor_not_customer       | 1       | 1                  |
-			| debtor_blacklisted        | 1       | 1                  |
 			| company_b2b_score         | 1       | 1                  |
 		And The following notification settings exist for merchant 1:
 			| notification_type | enabled |
@@ -69,7 +67,6 @@ Feature: Endpoint to approve an order in waiting state
 			| debtor_identified_strict  | 1         |
 			| limit                     | 0         |
 			| debtor_not_customer       | 1         |
-			| debtor_blacklisted        | 1         |
 			| company_b2b_score         | 1         |
     And Debtor has insufficient limit
 		When I send a POST request to "/private/order/test-order-uuidCO123/approve"
@@ -93,7 +90,6 @@ Feature: Endpoint to approve an order in waiting state
 			| debtor_identified_strict  | 1         |
 			| limit                     | 0         |
 			| debtor_not_customer       | 1         |
-			| debtor_blacklisted        | 1         |
 			| company_b2b_score         | 1         |
 		And Debtor has sufficient limit
 		And Debtor lock limit call succeeded
@@ -113,7 +109,6 @@ Feature: Endpoint to approve an order in waiting state
 			| debtor_identified_strict  | 1         |
 			| limit                     | 0         |
 			| debtor_not_customer       | 1         |
-			| debtor_blacklisted        | 1         |
 			| company_b2b_score         | 1         |
 		And Debtor has insufficient limit
 		When I send a POST request to "/private/order/test-order-uuidCO123/approve"
@@ -132,7 +127,6 @@ Feature: Endpoint to approve an order in waiting state
 			| debtor_identified_strict  | 1         |
 			| limit                     | 1         |
 			| debtor_not_customer       | 1         |
-			| debtor_blacklisted        | 0         |
 			| company_b2b_score         | 1         |
 		And Debtor has sufficient limit
 		And Debtor lock limit call succeeded
@@ -153,7 +147,6 @@ Feature: Endpoint to approve an order in waiting state
 			| debtor_identified_strict  | 1         |
 			| limit                     | 1         |
 			| debtor_not_customer       | 1         |
-			| debtor_blacklisted        | 0         |
 			| company_b2b_score         | 1         |
 		And Debtor has insufficient limit
 		When I send a POST request to "/private/order/test-order-uuidCO123/approve"
@@ -174,11 +167,9 @@ Feature: Endpoint to approve an order in waiting state
 			| debtor_country            | 1         |
 			| debtor_industry_sector    | 1         |
 			| debtor_identified         | 1         |
-			| debtor_blacklisted        | 1         |
 			| delivery_address          | 0         |
 			| limit                     | 1         |
 			| debtor_not_customer       | 1         |
-			| debtor_blacklisted        | 1         |
 			| company_b2b_score         | 1         |
 		And Debtor has sufficient limit
 		And Debtor lock limit call succeeded

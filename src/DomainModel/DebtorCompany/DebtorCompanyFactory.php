@@ -4,7 +4,6 @@ namespace App\DomainModel\DebtorCompany;
 
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\Address\AddressEntityFactory;
-use function Webmozart\Assert\Tests\StaticAnalysis\null;
 
 class DebtorCompanyFactory
 {
@@ -27,7 +26,6 @@ class DebtorCompanyFactory
             ->setAddress($debtorAddress)
             ->setCrefoId($identifiedCompany['crefo_id'])
             ->setSchufaId($identifiedCompany['schufa_id'])
-            ->setIsBlacklisted($identifiedCompany['is_blacklisted'])
             ->setIsTrustedSource((bool) $identifiedCompany['is_from_trusted_source'])
             ->setIsStrictMatch($isStrictMatch)
             ->setIsSynchronized((bool) ($identifiedCompany['is_synchronized'] ?? null))
@@ -53,7 +51,6 @@ class DebtorCompanyFactory
             ->setAddress($debtorAddress)
             ->setCrefoId($identifiedCompany['crefo_id'])
             ->setSchufaId($identifiedCompany['schufa_id'])
-            ->setIsBlacklisted($identifiedCompany['is_blacklisted'])
             ->setIsTrustedSource(boolval($identifiedCompany['is_from_trusted_source']))
             ->setIsStrictMatch($isStrictMatch)
             ->setIsSynchronized(boolval($identifiedCompany['is_synchronized'] ?? null))

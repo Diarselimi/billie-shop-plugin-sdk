@@ -18,7 +18,6 @@ Feature:
       | debtor_is_trusted         |
       | limit                     |
       | debtor_not_customer       |
-      | debtor_blacklisted        |
       | line_items                |
       | company_b2b_score         |
       | debtor_score_available    |
@@ -35,7 +34,6 @@ Feature:
       | debtor_is_trusted         | 1       | 1                  |
       | limit                     | 1       | 1                  |
       | debtor_not_customer       | 1       | 1                  |
-      | debtor_blacklisted        | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
       | debtor_score_available    | 1       | 1                  |
 

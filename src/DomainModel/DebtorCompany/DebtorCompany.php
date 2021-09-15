@@ -6,8 +6,6 @@ use App\DomainModel\Address\AddressEntity;
 
 class DebtorCompany extends Company
 {
-    private $isBlacklisted;
-
     private $isStrictMatch;
 
     private $isTrustedSource;
@@ -52,18 +50,6 @@ class DebtorCompany extends Company
     public function setName(string $name): DebtorCompany
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function isBlacklisted(): ? bool
-    {
-        return $this->isBlacklisted;
-    }
-
-    public function setIsBlacklisted(?bool $isBlacklisted): DebtorCompany
-    {
-        $this->isBlacklisted = $isBlacklisted;
 
         return $this;
     }

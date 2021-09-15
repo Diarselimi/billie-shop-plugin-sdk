@@ -17,7 +17,6 @@ Feature:
       | debtor_is_trusted         |
       | limit                     |
       | debtor_not_customer       |
-      | debtor_blacklisted        |
       | company_b2b_score         |
       | line_items                |
     And The following merchant risk check settings exist for merchant 1:
@@ -33,7 +32,6 @@ Feature:
       | debtor_is_trusted         | 1       | 1                  |
       | limit                     | 1       | 1                  |
       | debtor_not_customer       | 1       | 1                  |
-      | debtor_blacklisted        | 1       | 1                  |
       | company_b2b_score         | 1       | 1                  |
     And GraphQL will respond to getMerchantDebtorDetails query
 
