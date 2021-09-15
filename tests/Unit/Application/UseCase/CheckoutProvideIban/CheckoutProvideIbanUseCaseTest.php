@@ -147,7 +147,7 @@ class CheckoutProvideIbanUseCaseTest extends IntegrationTestCase
         $this->orderContainer->getOrder()->shouldBeCalled()->willReturn($order);
 
         $iban = new Iban(self::IBAN);
-        $bankAccount = new BankAccount($iban, 'bic', null, null);
+        $bankAccount = new BankAccount($iban, 'bic', 'Billie Bank', null);
 
         $mandate = $this->prophesize(SepaMandate::class);
         $mandate->getUuid()->willReturn(Uuid::uuid4());

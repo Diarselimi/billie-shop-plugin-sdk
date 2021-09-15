@@ -19,7 +19,7 @@ Feature:
     And I send a POST request to "/checkout-session/123123CO123/iban" with body:
     """
       {
-        "iban": "DE42500105172497563393",
+        "iban": "DE 4250 0105172497563393 ",
         "bank_account_owner": "Edeka Co Kg"
       }
     """
@@ -28,6 +28,7 @@ Feature:
     """
     {
       "iban": "DE42500105172497563393",
+      "bank_name": "Possum Bank",
       "mandate_reference": "YGG6VI5RQ4OR3GJ0",
       "creditor_name": "Billie GmbH",
       "creditor_identifier": "DE26ZZZ00001981599"

@@ -6037,6 +6037,9 @@ components:
         iban:
           nullable: false
           $ref: '#/components/schemas/IBAN'
+        bank_name:
+          nullable: false
+          $ref: '#/components/schemas/TinyText'
         mandate_reference:
           nullable: false
           $ref: '#/components/schemas/TinyText'

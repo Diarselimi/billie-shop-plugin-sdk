@@ -56,7 +56,7 @@ class CheckoutProvideIbanController
     {
         $input = new CheckoutProvideIbanRequest(
             $sessionUuid,
-            $request->request->get('iban'),
+            preg_replace('/\s+/', '', $request->request->get('iban')),
             $request->request->get('bank_account_owner')
         );
 
