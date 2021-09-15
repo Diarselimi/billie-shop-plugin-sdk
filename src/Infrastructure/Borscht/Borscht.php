@@ -74,6 +74,7 @@ class Borscht implements PaymentsServiceInterface, LoggingInterface
                 'headers' => [
                     'x-merchant-id' => $registerDebtorDTO->getMerchantPaymentUuid(),
                 ],
+                'timeout' => self::EXTENDED_REQUEST_TIMEOUT,
                 'json' => $json,
                 'on_stats' => function (TransferStats $stats) {
                     $this->logServiceRequestStats($stats, 'create_borscht_debtor');
