@@ -38,10 +38,4 @@ class FeatureFlagManager
     {
         $this->overrides[$featureName] = $enabled;
     }
-
-    public function isButlerFullyEnabled(): bool
-    {
-        return false;
-//        return $this->isEnabled(self::FEATURE_INVOICE_BUTLER);
-    }
 }

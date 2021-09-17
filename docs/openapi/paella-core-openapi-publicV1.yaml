@@ -1061,19 +1061,6 @@ components:
           minimum: 1
           nullable: false
       type: object
-    ShipOrderRequest:
-      title: 'Order Shipping Object'
-      required:
-        - invoice_url
-      properties:
-        invoice_url:
-          $ref: '#/components/schemas/URL'
-        shipping_document_url:
-          $ref: '#/components/schemas/URL'
-      type: object
-      allOf:
-        -
-          $ref: '#/components/schemas/AbstractShipOrderRequest'
     ShipOrderRequestV1:
       title: 'Order Shipping Object'
       required:

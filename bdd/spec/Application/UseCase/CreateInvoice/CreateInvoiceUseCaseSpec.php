@@ -1,10 +1,10 @@
 <?php
 
-namespace spec\App\Application\UseCase\ShipOrder;
+namespace spec\App\Application\UseCase\CreateInvoice;
 
 use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\CreateInvoice\CreateInvoiceRequest;
-use App\Application\UseCase\ShipOrder\ShipOrderUseCase;
+use App\Application\UseCase\CreateInvoice\CreateInvoiceUseCase;
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceFactory;
 use App\DomainModel\Order\Lifecycle\ShipOrder\ShipOrderInterface;
@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\Workflow;
 
-class ShipOrderUseCaseSpec extends ObjectBehavior
+class CreateInvoiceUseCaseSpec extends ObjectBehavior
 {
     private const ID = 'uuidAAABBB';
 
@@ -79,7 +79,7 @@ class ShipOrderUseCaseSpec extends ObjectBehavior
 
     public function it_is_initializable()
     {
-        $this->shouldHaveType(ShipOrderUseCase::class);
+        $this->shouldHaveType(CreateInvoiceUseCase::class);
     }
 
     public function it_ships_order_if_already_has_payment_details_and_can_ship(

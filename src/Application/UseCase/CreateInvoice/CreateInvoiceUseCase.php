@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Application\UseCase\ShipOrder;
+namespace App\Application\UseCase\CreateInvoice;
 
 use App\Application\Exception\WorkflowException;
-use App\Application\UseCase\CreateInvoice\CreateInvoiceRequest;
 use App\Application\UseCase\ShipOrder\Exception\ShipOrderAmountExceededException;
 use App\Application\UseCase\ShipOrder\Exception\ShipOrderMerchantFeeNotSetException;
 use App\Application\UseCase\ShipOrder\Exception\ShipOrderNoOrderUuidException;
@@ -24,7 +23,7 @@ use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\Workflow\Registry;
 
-class ShipOrderUseCase implements ValidatedUseCaseInterface, LoggingInterface
+class CreateInvoiceUseCase implements ValidatedUseCaseInterface, LoggingInterface
 {
     use ValidatedUseCaseTrait,
         LoggingTrait;

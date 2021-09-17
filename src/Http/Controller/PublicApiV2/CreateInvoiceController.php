@@ -11,7 +11,7 @@ use App\Application\UseCase\ShipOrder\Exception\ShipOrderAmountExceededException
 use App\Application\UseCase\ShipOrder\Exception\ShipOrderMerchantFeeNotSetException;
 use App\Application\UseCase\ShipOrder\Exception\ShipOrderNoOrderUuidException;
 use App\Application\UseCase\ShipOrder\Exception\ShipOrderOrderExternalCodeNotSetException;
-use App\Application\UseCase\ShipOrder\ShipOrderUseCase;
+use App\Application\UseCase\CreateInvoice\CreateInvoiceUseCase;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\Http\HttpConstantsInterface;
 use App\Http\RequestTransformer\CreateInvoice\InvoiceLineItemsFactory;
@@ -58,15 +58,15 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class CreateInvoiceController
 {
-    private ShipOrderUseCase $shipOrderUseCase;
+    private CreateInvoiceUseCase $useCase;
 
     private AmountRequestFactory $requestFactory;
 
     private InvoiceLineItemsFactory $lineItemsFactory;
 
-    public function __construct(ShipOrderUseCase $shipOrderUseCase, AmountRequestFactory $requestFactory, InvoiceLineItemsFactory $lineItemsFactory)
+    public function __construct(CreateInvoiceUseCase $useCase, AmountRequestFactory $requestFactory, InvoiceLineItemsFactory $lineItemsFactory)
     {
-        $this->shipOrderUseCase = $shipOrderUseCase;
+        $this->useCase = $useCase;
         $this->requestFactory = $requestFactory;
         $this->lineItemsFactory = $lineItemsFactory;
     }
@@ -85,7 +85,7 @@ class CreateInvoiceController
 
         try {
             return new JsonResponse([
-                'uuid' => $this->shipOrderUseCase->execute($shipRequest)->getUuid(),
+                'uuid' => $this->useCase->execute($shipRequest)->getUuid(),
             ], JsonResponse::HTTP_CREATED);
         } catch (OrderContainerFactoryException $exception) {
             throw new NotFoundHttpException($exception->getMessage());
