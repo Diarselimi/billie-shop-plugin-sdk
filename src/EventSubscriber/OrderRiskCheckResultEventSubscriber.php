@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\DomainEvent\OrderRiskCheck;
+namespace App\EventSubscriber;
 
+use App\DomainEvent\OrderRiskCheck\RiskCheckResultEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class OrderRiskCheckResultEventSubscriber implements EventSubscriberInterface

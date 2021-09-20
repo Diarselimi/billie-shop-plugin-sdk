@@ -1,7 +1,8 @@
 <?php
 
-namespace App\DomainEvent\DebtorInformationChangeRequest;
+namespace App\EventSubscriber;
 
+use App\DomainEvent\DebtorInformationChangeRequest\DebtorInformationChangeRequestCompletedEvent;
 use App\Infrastructure\Repository\DebtorExternalDataRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 

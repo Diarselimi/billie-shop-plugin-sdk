@@ -67,7 +67,26 @@ services:
 
   App\:
     resource: '../src/*'
-    exclude: '../src/{Resources,Entity,Migrations,Tests,Test,Kernel.php}'
+    exclude: [
+        '../src/{Resources,Entity,Migrations,Tests,Test,Kernel.php}',
+        '../src/Application/**/*Request.php',
+        '../src/Application/Exception',
+        '../src/Application/**/Exception/*Exception.php',
+        '../src/Application/UseCase/**/*Exception.php',
+        '../src/Http/Response/DTO',
+        '../src/Http/Authentication/*User.php',
+        '../src/Application/**/*Response.php',
+        '../src/DomainModel/**/*Entity.php',
+        '../src/DomainModel/**/*Collection.php',
+        '../src/DomainModel/**/*DTO.php',
+        '../src/DomainModel/**/*Exception.php',
+        '../src/Infrastructure/*Exception.php',
+        '../src/Infrastructure/**/*Exception.php',
+        '../src/Infrastructure/**/*DTO.php',
+        '../src/DomainModel/**/*Event.php',
+        '../src/DomainModel/**/**/*Event.php',
+        '../src/DomainEvent'
+    ]
 
   App\Http\Controller\:
     resource: '../src/Http/Controller'
@@ -90,8 +109,7 @@ services:
     arguments:
       - '@kernel'
       - '%kernel.root_dir%/Resources'
-      -
-        - '%kernel.root_dir%'
+      - - '%kernel.root_dir%'
         - '%kernel.root_dir%/..'
 
   App\Infrastructure\OpenApi\Routing\OpenApiClassLoader:
@@ -136,10 +154,9 @@ services:
         - 'company_b2b_score'
       $checkLoader: !service
         class: Symfony\Component\DependencyInjection\ServiceLocator
-        tags: ['container.service_locator']
+        tags: [ 'container.service_locator' ]
         arguments:
-          -
-            amount: '@App\DomainModel\OrderRiskCheck\Checker\AmountCheck'
+          - amount: '@App\DomainModel\OrderRiskCheck\Checker\AmountCheck'
             debtor_country: '@App\DomainModel\OrderRiskCheck\Checker\DebtorCountryCheck'
             debtor_industry_sector: '@App\DomainModel\OrderRiskCheck\Checker\DebtorIndustrySectorCheck'
             debtor_not_customer: '@App\DomainModel\OrderRiskCheck\Checker\DebtorNotCustomerCheck'
