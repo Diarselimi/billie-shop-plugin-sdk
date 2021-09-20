@@ -7,9 +7,9 @@ namespace App\Http\Controller\PublicApiV2;
 use App\Application\Exception\InvoiceNotFoundException;
 use App\Application\Exception\InvoiceUpdateException;
 use App\Application\UseCase\UpdateInvoice\UpdateInvoiceRequest;
-use App\Application\UseCase\UpdateInvoice\UpdateInvoiceUseCase;
 use App\DomainModel\MerchantUser\MerchantUserNotFoundException;
 use App\Http\Authentication\UserProvider;
+use App\Application\CommandBus;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,13 +42,13 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class UpdateInvoiceController
 {
-    private UpdateInvoiceUseCase $useCase;
+    private CommandBus $commandBus;
 
     private UserProvider $userProvider;
 
-    public function __construct(UpdateInvoiceUseCase $useCase, UserProvider $userProvider)
+    public function __construct(CommandBus $commandBus, UserProvider $userProvider)
     {
-        $this->useCase = $useCase;
+        $this->commandBus = $commandBus;
         $this->userProvider = $userProvider;
     }
 
@@ -61,7 +61,7 @@ class UpdateInvoiceController
             ))
                 ->setExternalCode($request->request->get('external_code'))
                 ->setInvoiceUrl($request->request->get('invoice_url'));
-            $this->useCase->execute($useCaseRequest);
+            $this->commandBus->process($useCaseRequest);
         } catch (InvoiceUpdateException $e) {
             throw new BadRequestHttpException($e->getMessage());
         } catch (InvoiceNotFoundException | MerchantUserNotFoundException $e) {

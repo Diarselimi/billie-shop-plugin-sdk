@@ -29,7 +29,7 @@ class InvoiceCancellationService
         $this->creditNoteMessageFactory = $creditNoteMessageFactory;
     }
 
-    public function cancelInvoiceFully(Invoice $invoice): Invoice
+    public function cancelInvoiceFully(Invoice $invoice): void
     {
         if ($invoice->isCanceled() || $invoice->isComplete()) {
             throw new CreditNoteNotAllowedException();
@@ -52,7 +52,5 @@ class InvoiceCancellationService
 
         $this->messageBus->dispatch($this->creditNoteMessageFactory->create($creditNote));
         $invoice->getCreditNotes()->add($creditNote);
-
-        return $invoice;
     }
 }

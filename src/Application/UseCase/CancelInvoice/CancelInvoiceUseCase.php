@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Application\UseCase\CancelInvoice;
 
 use App\Application\Exception\InvoiceNotFoundException as InvoiceNotFound;
-use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceCancellationService;
 use App\DomainModel\Order\Lifecycle\OrderTerminalStateChangeService;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
@@ -29,7 +28,7 @@ class CancelInvoiceUseCase
         $this->orderContainerFactory = $orderContainerFactory;
     }
 
-    public function execute(CancelInvoiceRequest $request): Invoice
+    public function execute(CancelInvoiceRequest $request): void
     {
         try {
             $orderContainer = $this->orderContainerFactory->loadByInvoiceUuidAndMerchantId(
@@ -41,9 +40,7 @@ class CancelInvoiceUseCase
             throw new InvoiceNotFound();
         }
 
-        $invoice = $this->invoiceCancelationService->cancelInvoiceFully($invoice);
+        $this->invoiceCancelationService->cancelInvoiceFully($invoice);
         $this->orderTerminalStateChangeService->execute($orderContainer);
-
-        return $invoice;
     }
 }

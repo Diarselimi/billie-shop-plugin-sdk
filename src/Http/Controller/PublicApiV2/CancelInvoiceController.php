@@ -4,9 +4,9 @@ namespace App\Http\Controller\PublicApiV2;
 
 use App\Application\Exception\InvoiceNotFoundException;
 use App\Application\UseCase\CancelInvoice\CancelInvoiceRequest;
-use App\Application\UseCase\CancelInvoice\CancelInvoiceUseCase;
 use App\DomainModel\Invoice\CreditNote\CreditNoteNotAllowedException;
 use App\Http\Authentication\UserProvider;
+use App\Application\CommandBus;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -34,13 +34,13 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class CancelInvoiceController
 {
-    private CancelInvoiceUseCase $useCase;
+    private CommandBus $commandBus;
 
     private UserProvider $userProvider;
 
-    public function __construct(CancelInvoiceUseCase $useCase, UserProvider $userProvider)
+    public function __construct(CommandBus $commandBus, UserProvider $userProvider)
     {
-        $this->useCase = $useCase;
+        $this->commandBus = $commandBus;
         $this->userProvider = $userProvider;
     }
 
@@ -49,7 +49,7 @@ class CancelInvoiceController
         $merchant = $this->userProvider->getMerchantUser() ?? $this->userProvider->getMerchantApiUser();
 
         try {
-            $this->useCase->execute(new CancelInvoiceRequest(
+            $this->commandBus->process(new CancelInvoiceRequest(
                 $uuid,
                 $merchant->getMerchant()->getId()
             ));
