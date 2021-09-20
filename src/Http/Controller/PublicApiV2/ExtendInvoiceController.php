@@ -75,9 +75,7 @@ class ExtendInvoiceController
                 'duration',
                 $extendInvoiceRequest->getDuration()
             );
-        } catch (InvoiceNotExtendableException $exception) {
-            throw new BadRequestHttpException($exception->getMessage(), $exception);
-        } catch (DomainException $exception) {
+        } catch (InvoiceNotExtendableException | DomainException $exception) {
             throw new UnprocessableEntityHttpException('Invoice cannot be extended');
         }
     }
