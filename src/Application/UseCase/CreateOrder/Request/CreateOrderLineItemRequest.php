@@ -2,7 +2,7 @@
 
 namespace App\Application\UseCase\CreateOrder\Request;
 
-use Ozean12\Money\TaxedMoney\TaxedMoney;
+use App\Support\NullableTaxedMoney;
 use OpenApi\Annotations as OA;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -171,12 +171,12 @@ class CreateOrderLineItemRequest
         return $this;
     }
 
-    public function getAmount(): TaxedMoney
+    public function getAmount(): NullableTaxedMoney
     {
         return $this->amount;
     }
 
-    public function setAmount(TaxedMoney $amount): CreateOrderLineItemRequest
+    public function setAmount(NullableTaxedMoney $amount): CreateOrderLineItemRequest
     {
         $this->amount = $amount;
 

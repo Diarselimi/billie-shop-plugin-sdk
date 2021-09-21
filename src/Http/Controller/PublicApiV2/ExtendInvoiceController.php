@@ -14,7 +14,6 @@ use App\Http\HttpConstantsInterface;
 use DomainException;
 use Symfony\Component\HttpFoundation\Request;
 use OpenApi\Annotations as OA;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 

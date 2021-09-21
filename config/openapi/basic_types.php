@@ -268,9 +268,21 @@ use OpenApi\Annotations as OA;
  *     required={"net", "gross", "tax"},
  *     description="The amount object with split values for net, gross and tax",
  *     properties={
- *          @OA\Property(property="gross", minimum=1.0, type="number", format="float", example=260.27, description="Value greater than 0, with max. 2 decimals. It should equal to net + tax."),
- *          @OA\Property(property="net", minimum=1.0, type="number", format="float", example=200.12, description="Value greater than 0, with max. 2 decimals."),
- *          @OA\Property(property="tax", minimum=0.0, type="number", format="float", example=60.15, description="Value greater than or equal to 0, with max. 2 decimals."),
+ *          @OA\Property(property="gross", minimum=0.01, type="number", format="float", example=260.27, description="Value greater than 0, with max. 2 decimals. It should equal to net + tax."),
+ *          @OA\Property(property="net", minimum=0.01, type="number", format="float", example=200.12, description="Value greater than 0, with max. 2 decimals."),
+ *          @OA\Property(property="tax", minimum=0, type="number", format="float", example=60.15, description="Value greater than or equal to 0, with max. 2 decimals."),
+ *     }
+ * )
+ */
+
+/**
+ * @OA\Schema(schema="NullableAmountDTO", title="object <net, gross, tax>",
+ *     required={"net", "gross", "tax"},
+ *     description="The amount object with split values for net, gross and tax",
+ *     properties={
+ *          @OA\Property(property="gross", minimum=0, type="number", format="float", example=260.27, description="Value greater than or equal to 0, with max. 2 decimals. It should equal to net + tax."),
+ *          @OA\Property(property="net", minimum=0, type="number", format="float", example=200.12, description="Value greater than or equal to 0, with max. 2 decimals."),
+ *          @OA\Property(property="tax", minimum=0, type="number", format="float", example=60.15, description="Value greater than or equal to 0, with max. 2 decimals."),
  *     }
  * )
  */

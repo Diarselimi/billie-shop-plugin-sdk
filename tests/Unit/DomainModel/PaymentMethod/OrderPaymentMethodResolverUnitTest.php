@@ -200,7 +200,8 @@ class OrderPaymentMethodResolverUnitTest extends UnitTestCase
                     new DirectDebit(
                         DirectDebit::STATE_NEW,
                         new \DateTime('2020-01-01 00:00:00'),
-                        $sepaMandateUuid
+                        $sepaMandateUuid,
+                        true
                     )
                 )
             );

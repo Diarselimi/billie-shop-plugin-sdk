@@ -3630,13 +3630,13 @@ components:
           description: 'Value greater than 0, with max. 2 decimals. It should equal to net + tax.'
           type: number
           format: float
-          minimum: 1
+          minimum: 0.01
           example: 260.27
         net:
           description: 'Value greater than 0, with max. 2 decimals.'
           type: number
           format: float
-          minimum: 1
+          minimum: 0.01
           example: 200.12
         tax:
           description: 'Value greater than or equal to 0, with max. 2 decimals.'

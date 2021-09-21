@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class OrderLineItemsRequestFactory
 {
-    private $amountRequestFactory;
+    private AmountRequestFactory $amountRequestFactory;
 
     public function __construct(AmountRequestFactory $amountRequestFactory)
     {
@@ -37,6 +37,6 @@ class OrderLineItemsRequestFactory
             ->setBrand($data['brand'] ?? null)
             ->setGtin($data['gtin'] ?? null)
             ->setMpn($data['mpn'] ?? null)
-            ->setAmount($this->amountRequestFactory->createFromArray($data['amount'] ?? []));
+            ->setAmount($this->amountRequestFactory->createNullableFromArray($data['amount'] ?? []));
     }
 }

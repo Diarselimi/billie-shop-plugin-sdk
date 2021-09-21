@@ -117,6 +117,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
        ]
     }
     """
+    Then print last JSON response
     And the JSON response should be:
     """
     {
