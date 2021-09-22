@@ -7,6 +7,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class IntegrationTestCase extends KernelTestCase
 {
+    protected function replaceService(string $id, object $service): void
+    {
+        $this->getContainer()->set($id, $service);
+    }
+
     protected function loadService(string $id): object
     {
         return $this->getContainer()->get($id);

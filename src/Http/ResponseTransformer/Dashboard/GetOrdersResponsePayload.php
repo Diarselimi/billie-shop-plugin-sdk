@@ -76,7 +76,9 @@ class GetOrdersResponsePayload implements ArrayableInterface
             array_values($order->getOrderInvoices()->toInvoiceCollection()->toArray())
         );
         $invoice = empty($invoices) ? $this->getInvoiceFallback() : $invoices[0];
-        $orderDueDate = (clone $order->getCreatedAt())->modify("+ {$financialData->getDuration()} days");
+        $orderDueDate = new \DateTime();
+        $orderDueDate->setTimestamp($order->getCreatedAt()->getTimestamp());
+        $orderDueDate->modify("+ {$financialData->getDuration()} days");
         $orderDueDateStr = $orderDueDate->format(DateFormat::FORMAT_YMD);
         $invoice['due_date'] = $orderDueDateStr; // to keep backwards compat.
 

@@ -202,7 +202,11 @@ services:
   App\Application\UseCase\UpdateInvoice\UpdateInvoiceUseCase:
     tags: [ { name: 'app.command_handler' } ]
 
-  App\Application\CommandBus: '@App\Infrastructure\CommandBus\SynchronousCommandBus'
-
-  App\Infrastructure\CommandBus\CommandHandlerLocator:
+  App\Application\CommandBus: '@App\Infrastructure\CommandBus\SynchronousCommandBus\SynchronousCommandBus'
+  App\Infrastructure\CommandBus\SynchronousCommandBus\SynchronousCommandBus: ~
+  App\Infrastructure\CommandBus\SynchronousCommandBus\CommandHandlerLocator:
     arguments: [ !tagged_locator app.command_handler ]
+  App\Infrastructure\CommandBus\SynchronousCommandBus\Decorators\DbTransactionCommandBusDecorator:
+    decorates: App\Infrastructure\CommandBus\SynchronousCommandBus\SynchronousCommandBus
+    arguments:
+      $dbConn: '@billie_pdo.default_statement_executor'

@@ -123,13 +123,14 @@ services:
   App\Tests\Helpers\TestUuidGenerator: ~
   App\Helper\Uuid\UuidGeneratorInterface: '@App\Tests\Helpers\TestUuidGenerator'
 
-  App\Infrastructure\CommandBus\SynchronousCommandBus:
+  App\Infrastructure\CommandBus\SynchronousCommandBus\SynchronousCommandBus:
     public: true
-
   App\Tests\Integration\Infrastructure\CommandBus\CommandHandlerSpy: ~
   App\Tests\Integration\Infrastructure\CommandBus\SampleHandlerA:
     tags: [ { name: 'app.command_handler' } ]
   App\Tests\Integration\Infrastructure\CommandBus\SampleHandlerB:
+    tags: [ { name: 'app.command_handler' } ]
+  App\Tests\Integration\Infrastructure\CommandBus\SampleHandlerThatThrowsException:
     tags: [ { name: 'app.command_handler' } ]
   App\Tests\Integration\Infrastructure\CommandBus\SampleMultipleHandlerA:
     tags: [ { name: 'app.command_handler' } ]

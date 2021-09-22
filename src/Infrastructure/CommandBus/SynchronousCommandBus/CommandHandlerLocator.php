@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\CommandBus;
+namespace App\Infrastructure\CommandBus\SynchronousCommandBus;
 
 use ReflectionClass;
 use Symfony\Component\DependencyInjection\ServiceLocator;

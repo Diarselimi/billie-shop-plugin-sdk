@@ -142,16 +142,7 @@ abstract class AbstractMerchantDebtor implements ArrayableInterface
         return $this;
     }
 
-    public function getCreatedAt(): \DateTime
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param  \DateTime                     $createdAt
-     * @return AbstractMerchantDebtor|static
-     */
-    public function setCreatedAt(\DateTime $createdAt): AbstractMerchantDebtor
+    public function setCreatedAt(\DateTimeInterface $createdAt): AbstractMerchantDebtor
     {
         $this->createdAt = $createdAt;
 

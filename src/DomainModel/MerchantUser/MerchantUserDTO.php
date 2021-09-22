@@ -100,12 +100,12 @@ class MerchantUserDTO implements ArrayableInterface
         return $this;
     }
 
-    public function getOnboardingCompleteAt(): ?\DateTime
+    public function getOnboardingCompleteAt(): ?\DateTimeInterface
     {
         return $this->onboardingCompleteAt;
     }
 
-    public function setOnboardingCompleteAt(?\DateTime $onboardingCompleteAt): MerchantUserDTO
+    public function setOnboardingCompleteAt(?\DateTimeInterface $onboardingCompleteAt): MerchantUserDTO
     {
         $this->onboardingCompleteAt = $onboardingCompleteAt;
 

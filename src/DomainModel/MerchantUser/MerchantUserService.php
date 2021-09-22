@@ -75,11 +75,11 @@ class MerchantUserService
         ;
     }
 
-    private function getOnboardingCompleteAt(MerchantOnboardingContainer $onboardingContainer): ?\DateTime
+    private function getOnboardingCompleteAt(MerchantOnboardingContainer $onboardingContainer): ?\DateTimeInterface
     {
         foreach ($onboardingContainer->getOnboardingTransitions() as $onboardingTransition) {
             if ($onboardingTransition->getTransition() === MerchantOnboardingTransitionEntity::TRANSITION_COMPLETE) {
-                return  $onboardingTransition->getTransitedAt();
+                return $onboardingTransition->getTransitedAt();
             }
         }
 

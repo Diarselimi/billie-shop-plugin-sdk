@@ -216,7 +216,8 @@ class LegacyOrderResponseFactory
             $financialDetails->getAmountTax()->subtract($gross->subtract($net))
         );
 
-        $createdAt = clone $orderContainer->getOrder()->getCreatedAt();
+        $createdAt = new \DateTime();
+        $createdAt->setTimestamp($orderContainer->getOrder()->getCreatedAt()->getTimestamp());
         $response
             ->setAmount($calculatedTaxedAmount)
             ->setDuration($orderContainer->getOrderFinancialDetails()->getDuration())

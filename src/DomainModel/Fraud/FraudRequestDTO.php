@@ -46,7 +46,7 @@ class FraudRequestDTO implements ArrayableInterface
         ?string $ipAddress,
         AddressEntity $billingAddress,
         AddressEntity $shippingAddress,
-        \DateTime $invoiceCreatedAt,
+        \DateTimeInterface $invoiceCreatedAt,
         array $lineItems,
         ?string $debtorCompanySchufaId = null
     ) {

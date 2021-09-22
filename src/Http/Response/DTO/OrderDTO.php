@@ -49,7 +49,7 @@ class OrderDTO implements ArrayableInterface
 
     private AddressDTO $deliveryAddress;
 
-    private \DateTime $createdAt;
+    private \DateTimeInterface $createdAt;
 
     private InvoiceDTOCollection $invoices;
 
