@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Support;
 
+use App\Application\Validator\Constraint as PaellaAssert;
 use Ozean12\Money\Money;
 use Ozean12\Money\Symfony\Validator as Assert;
-use Ozean12\Money\TaxedMoney\TaxedMoney;
 
 /**
  * A copy-paste of TaxedMoney allowing 0 amount
- * @see TaxedMoney
+ * @see Ozean12\Money\TaxedMoney\TaxedMoney
  *
- * @Assert\TaxedMoney\ValidTaxSum()
+ * @PaellaAssert\ValidNullableTaxSum()
  */
-class NullableTaxedMoney extends TaxedMoney
+class NullableTaxedMoney
 {
     /**
      * @Assert\Decimal\NotBlank()
@@ -42,4 +42,26 @@ class NullableTaxedMoney extends TaxedMoney
      * @var Money
      */
     protected $tax;
+
+    final public function __construct(Money $gross, Money $net, Money $tax)
+    {
+        $this->gross = $gross;
+        $this->net = $net;
+        $this->tax = $tax;
+    }
+
+    public function getGross(): Money
+    {
+        return $this->gross;
+    }
+
+    public function getNet(): Money
+    {
+        return $this->net;
+    }
+
+    public function getTax(): Money
+    {
+        return $this->tax;
+    }
 }
