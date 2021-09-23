@@ -1,6 +1,5 @@
 <?php
 
-use App\DomainModel\OrderRiskCheck\Checker\DeliveryAddressCheck;
 use Phinx\Migration\AbstractMigration;
 
 class AddDeliveryAddressRiskCheckToAllMerchants extends AbstractMigration
@@ -9,7 +8,7 @@ class AddDeliveryAddressRiskCheckToAllMerchants extends AbstractMigration
     {
         $now = (new DateTime())->format('Y-m-d H:i:s');
 
-        $riskCheckName = DeliveryAddressCheck::NAME;
+        $riskCheckName = 'delivery_address';
         $this
             ->table('risk_check_definitions')
             ->insert(

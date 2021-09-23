@@ -14,7 +14,6 @@ Feature:
       | debtor_industry_sector    |
       | debtor_identified         |
       | debtor_identified_strict  |
-      | delivery_address          |
       | debtor_is_trusted         |
       | limit                     |
       | debtor_not_customer       |
@@ -29,7 +28,6 @@ Feature:
       | debtor_country            | 1       | 1                  |
       | debtor_industry_sector    | 1       | 1                  |
       | debtor_identified         | 1       | 1                  |
-      | delivery_address          | 1       | 1                  |
       | debtor_identified_strict  | 1       | 1                  |
       | debtor_is_trusted         | 1       | 1                  |
       | limit                     | 1       | 0                  |

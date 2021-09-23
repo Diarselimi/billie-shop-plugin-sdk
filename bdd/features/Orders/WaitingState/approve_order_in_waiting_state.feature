@@ -11,7 +11,6 @@ Feature: Endpoint to approve an order in waiting state
 			| debtor_industry_sector    |
 			| debtor_identified         |
 			| debtor_identified_strict  |
-			| delivery_address          |
 			| limit                     |
 			| debtor_not_customer       |
 			| company_b2b_score         |
@@ -22,7 +21,6 @@ Feature: Endpoint to approve an order in waiting state
 			| debtor_country            | 1       | 1                  |
 			| debtor_industry_sector    | 1       | 1                  |
 			| debtor_identified         | 1       | 1                  |
-			| delivery_address          | 1       | 0                  |
 			| debtor_identified_strict  | 1       | 1                  |
 			| limit                     | 1       | 0                  |
 			| debtor_not_customer       | 1       | 1                  |
@@ -157,23 +155,3 @@ Feature: Endpoint to approve an order in waiting state
 		And the response status code should be 403
 		And the order CO123 is in state waiting
 		And the order CO123 has risk check limit failed
-
-	Scenario: Order in waiting state because of delivery_address check - approve order and override delivery_address check
-		Given I have a waiting order "CO123" with amounts 1000/900/100, duration 30 and comment "test order"
-		And The following risk check results exist for order CO123:
-			| check_name                | is_passed |
-			| available_financing_limit | 1         |
-			| amount                    | 1         |
-			| debtor_country            | 1         |
-			| debtor_industry_sector    | 1         |
-			| debtor_identified         | 1         |
-			| delivery_address          | 0         |
-			| limit                     | 1         |
-			| debtor_not_customer       | 1         |
-			| company_b2b_score         | 1         |
-		And Debtor has sufficient limit
-		And Debtor lock limit call succeeded
-		When I send a POST request to "/private/order/test-order-uuidCO123/approve"
-		Then the response status code should be 204
-		And the order CO123 is in state created
-		And Order notification should exist for order "CO123" with type "order_approved"

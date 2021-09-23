@@ -146,7 +146,6 @@ services:
         - 'debtor_identified_strict'
         - 'debtor_identified_billing_address'
         - 'fraud_score'
-        - 'delivery_address'
         - 'debtor_is_trusted'
         - 'debtor_not_customer'
         - 'limit'
@@ -169,7 +168,6 @@ services:
             debtor_identified_strict: '@App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedStrictCheck'
             debtor_identified_billing_address: '@App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedBillingAddressCheck'
             debtor_is_trusted: '@App\DomainModel\OrderRiskCheck\Checker\DebtorIsTrustedCheck'
-            delivery_address: '@App\DomainModel\OrderRiskCheck\Checker\DeliveryAddressCheck'
             fraud_score: '@App\DomainModel\OrderRiskCheck\Checker\FraudScoreCheck'
             debtor_score_available_dummy: '@App\DomainModel\OrderRiskCheck\DummyChecker\DebtorScoreAvailableDummyCheck'
 

@@ -17,7 +17,6 @@ Feature:
       | company_b2b_score         |
       | debtor_is_trusted         |
       | debtor_identified_strict  |
-      | delivery_address          |
     And GraphQL will respond to getMerchantDebtorDetails query
 
   Scenario: When multiple reasons fail then we should return the reason that was declined for,
@@ -29,7 +28,6 @@ Feature:
       | debtor_country            | 1       | 1                  |
       | debtor_industry_sector    | 1       | 1                  |
       | debtor_identified         | 1       | 1                  |
-      | delivery_address          | 1       | 0                  |
       | debtor_identified_strict  | 1       | 1                  |
       | debtor_is_trusted         | 1       | 1                  |
       | limit                     | 1       | 0                  |
@@ -98,7 +96,6 @@ Feature:
       | debtor_country            | 1       | 1                  |
       | debtor_industry_sector    | 1       | 1                  |
       | debtor_identified         | 1       | 1                  |
-      | delivery_address          | 1       | 0                  |
       | debtor_identified_strict  | 1       | 1                  |
       | debtor_is_trusted         | 1       | 1                  |
       | limit                     | 1       | 1                  |
@@ -167,7 +164,6 @@ Feature:
       | debtor_industry_sector    | 1       | 1                  |
       | debtor_identified         | 1       | 1                  |
       | debtor_identified_strict  | 1       | 0                  |
-      | delivery_address          | 1       | 0                  |
       | debtor_is_trusted         | 1       | 1                  |
       | limit                     | 1       | 0                  |
       | debtor_not_customer       | 1       | 1                  |

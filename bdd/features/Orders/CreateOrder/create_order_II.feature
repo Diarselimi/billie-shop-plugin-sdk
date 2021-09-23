@@ -15,7 +15,6 @@ Feature:
       | debtor_industry_sector    |
       | debtor_identified         |
       | debtor_identified_strict  |
-      | delivery_address          |
       | debtor_is_trusted         |
       | limit                     |
       | debtor_not_customer       |
@@ -29,7 +28,6 @@ Feature:
       | debtor_country            | 1       | 1                  |
       | debtor_industry_sector    | 1       | 1                  |
       | debtor_identified         | 1       | 1                  |
-      | delivery_address          | 1       | 1                  |
       | debtor_identified_strict  | 1       | 1                  |
       | debtor_is_trusted         | 1       | 1                  |
       | limit                     | 1       | 1                  |
@@ -540,59 +538,6 @@ Feature:
     }
     """
     Then the order A1 is in state created
-    And the response status code should be 200
-
-  Scenario: Order declined (delivery and company address mismatch and Order amount > 250)
-    Given I get from companies service identify match response
-    And I get from scoring service good debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
-    And I get from payments service register debtor positive response
-    When I send a POST request to "/order" with body:
-    """
-    {
-       "debtor_person":{
-          "salutation":"m",
-          "first_name":"",
-          "last_name":"else",
-          "phone_number":"+491234567",
-          "email":"someone@billie.io"
-       },
-       "debtor_company":{
-          "merchant_customer_id":"12",
-          "name":"Test User Company",
-          "address_addition":"left door",
-          "address_house_number":"10",
-          "address_street":"Heinrich-Heine-Platz",
-          "address_city":"Berlin",
-          "address_postal_code":"10179",
-          "address_country":"DE",
-          "tax_id":"VA222",
-          "tax_number":"3333",
-          "registration_court":"",
-          "registration_number":" some number",
-          "industry_sector":"some sector",
-          "subindustry_sector":"some sub",
-          "employees_number":"33",
-          "legal_form":"some legal",
-          "established_customer":1
-       },
-       "delivery_address":{
-          "house_number":"4",
-          "street":"somestr.",
-          "city":"Berlin",
-          "postal_code":"10000",
-          "country":"DE"
-       },
-       "amount":{
-          "net":500.00,
-          "gross":600.00,
-          "tax":100.00
-       },
-       "comment":"Some comment",
-       "duration":30,
-       "order_id":"A1"
-    }
-    """
-    Then the order A1 is in state declined
     And the response status code should be 200
 
   Scenario: Successful order creation with line items

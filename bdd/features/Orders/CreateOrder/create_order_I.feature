@@ -15,7 +15,6 @@ Feature:
       | debtor_industry_sector    |
       | debtor_identified          |
       | debtor_identified_strict   |
-      | delivery_address          |
       | debtor_is_trusted         |
       | limit                     |
       | debtor_not_customer       |
@@ -30,7 +29,6 @@ Feature:
       | debtor_country            | 1       | 1                  |
       | debtor_industry_sector    | 1       | 1                  |
       | debtor_identified          | 1       | 1                  |
-      | delivery_address          | 1       | 1                  |
       | debtor_identified_strict   | 1       | 1                  |
       | debtor_is_trusted         | 1       | 1                  |
       | limit                     | 1       | 1                  |
@@ -357,6 +355,8 @@ Feature:
 
   Scenario: Debtor is not eligible for Point Of Sale
     Given I get from companies service identify match response
+    And Debtor has sufficient limit
+    And Debtor lock limit call succeeded
     And I get from scoring service bad debtor scoring decision for debtor "c7be46c0-e049-4312-b274-258ec5aeeb70"
     And I get from payments service register debtor positive response
     When I send a POST request to "/order" with body:
@@ -387,13 +387,6 @@ Feature:
             "employees_number":"33",
             "legal_form":"some legal",
             "established_customer":1
-         },
-         "delivery_address":{
-            "house_number":"22",
-            "street":"Charlot strasse",
-            "city":"Paris",
-            "postal_code":"98765",
-            "country":"DE"
          },
          "amount":{
             "net":900.00,
@@ -469,10 +462,10 @@ Feature:
           "industry_sector":"SOME SECTOR"
        },
        "delivery_address":{
-          "house_number":"22",
-          "street":"Charlot strasse",
-          "city":"Paris",
-          "postal_code":"98765",
+          "house_number":"10",
+          "street":"Heinrich-Heine-Platz",
+          "city":"Berlin",
+          "postal_code":"10179",
           "country":"DE"
        },
        "billing_address":{
