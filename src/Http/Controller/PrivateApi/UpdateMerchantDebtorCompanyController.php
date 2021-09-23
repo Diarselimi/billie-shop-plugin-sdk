@@ -2,9 +2,9 @@
 
 namespace App\Http\Controller\PrivateApi;
 
+use App\Application\CommandBus;
 use App\Application\Exception\MerchantDebtorNotFoundException;
 use App\Application\UseCase\UpdateMerchantDebtorCompany\UpdateMerchantDebtorCompanyRequest;
-use App\Application\UseCase\UpdateMerchantDebtorCompany\UpdateMerchantDebtorCompanyUseCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use OpenApi\Annotations as OA;
@@ -33,11 +33,11 @@ use OpenApi\Annotations as OA;
  */
 class UpdateMerchantDebtorCompanyController
 {
-    private $useCase;
+    private CommandBus $commandBus;
 
-    public function __construct(UpdateMerchantDebtorCompanyUseCase $useCase)
+    public function __construct(CommandBus $commandBus)
     {
-        $this->useCase = $useCase;
+        $this->commandBus = $commandBus;
     }
 
     public function execute(Request $request, string $debtorUuid): void
@@ -51,7 +51,7 @@ class UpdateMerchantDebtorCompanyController
                 ->setAddressCity($request->request->get('address_city'))
                 ->setAddressPostalCode($request->request->get('address_postal_code'));
 
-            $this->useCase->execute($request);
+            $this->commandBus->process($request);
         } catch (MerchantDebtorNotFoundException $exception) {
             throw new NotFoundHttpException('Merchant debtor not found');
         }

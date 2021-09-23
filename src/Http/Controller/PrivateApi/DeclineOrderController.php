@@ -2,10 +2,10 @@
 
 namespace App\Http\Controller\PrivateApi;
 
+use App\Application\CommandBus;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\DeclineOrder\DeclineOrderRequest;
-use App\Application\UseCase\DeclineOrder\DeclineOrderUseCase;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -36,17 +36,17 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class DeclineOrderController
 {
-    private $useCase;
+    private CommandBus $commandBus;
 
-    public function __construct(DeclineOrderUseCase $useCase)
+    public function __construct(CommandBus $commandBus)
     {
-        $this->useCase = $useCase;
+        $this->commandBus = $commandBus;
     }
 
     public function execute(string $uuid): void
     {
         try {
-            $this->useCase->execute(new DeclineOrderRequest($uuid));
+            $this->commandBus->process(new DeclineOrderRequest($uuid));
         } catch (OrderNotFoundException $e) {
             throw new NotFoundHttpException($e->getMessage());
         } catch (WorkflowException $e) {

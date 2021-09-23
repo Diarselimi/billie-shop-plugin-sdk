@@ -36,7 +36,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class ApproveOrderController
 {
-    private $useCase;
+    private ApproveOrderUseCase $useCase;
 
     public function __construct(ApproveOrderUseCase $useCase)
     {

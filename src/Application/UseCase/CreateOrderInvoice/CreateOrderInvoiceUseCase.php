@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Application\UseCase\CreateOrderInvoice;
 
+use App\Application\CommandHandler;
 use App\Application\Exception\OrderNotFoundException;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentCreator;
 use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentUpload;
 
-class CreateOrderInvoiceUseCase
+class CreateOrderInvoiceUseCase implements CommandHandler
 {
     private OrderRepositoryInterface $orderRepository;
 

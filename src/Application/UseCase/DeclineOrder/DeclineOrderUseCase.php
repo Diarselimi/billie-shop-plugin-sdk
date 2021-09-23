@@ -2,6 +2,7 @@
 
 namespace App\Application\UseCase\DeclineOrder;
 
+use App\Application\CommandHandler;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\WorkflowException;
 use App\DomainModel\Order\Lifecycle\DeclineOrderService;
@@ -14,7 +15,7 @@ use Ozean12\Sepa\Client\DomainModel\SepaClientInterface;
 use Ozean12\Support\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Component\Workflow\Registry;
 
-class DeclineOrderUseCase implements LoggingInterface
+class DeclineOrderUseCase implements LoggingInterface, CommandHandler
 {
     use LoggingTrait;
 

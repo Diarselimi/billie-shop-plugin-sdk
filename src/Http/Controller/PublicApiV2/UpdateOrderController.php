@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controller\PublicApiV2;
 
+use App\Application\CommandBus;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\UpdateOrder\UpdateOrderRequest;
-use App\Application\UseCase\UpdateOrder\UpdateOrderUseCase;
 use App\DomainModel\MerchantUser\MerchantUserNotFoundException;
 use App\DomainModel\OrderUpdate\UpdateOrderException;
 use App\Http\Authentication\UserProvider;
@@ -47,11 +47,11 @@ class UpdateOrderController
 {
     private UserProvider $userProvider;
 
-    private UpdateOrderUseCase $useCase;
+    private CommandBus $commandBus;
 
-    public function __construct(UpdateOrderUseCase $useCase, UserProvider $userProvider)
+    public function __construct(CommandBus $commandBus, UserProvider $userProvider)
     {
-        $this->useCase = $useCase;
+        $this->commandBus = $commandBus;
         $this->userProvider = $userProvider;
     }
 
@@ -64,7 +64,7 @@ class UpdateOrderController
                 $request->request->get('external_code'),
                 TaxedMoneyFactoryDecorator::createFromRequest($request)
             );
-            $this->useCase->execute($useCaseInput);
+            $this->commandBus->process($useCaseInput);
         } catch (UpdateOrderException $e) {
             throw new BadRequestHttpException($e->getMessage());
         } catch (OrderNotFoundException | MerchantUserNotFoundException $e) {

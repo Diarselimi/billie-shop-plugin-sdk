@@ -2,9 +2,9 @@
 
 namespace App\Http\Controller\PrivateApi;
 
+use App\Application\CommandBus;
 use App\Application\Exception\MerchantDebtorNotFoundException;
 use App\Application\UseCase\UpdateMerchantDebtorLimit\UpdateMerchantDebtorLimitRequest;
-use App\Application\UseCase\UpdateMerchantDebtorLimit\UpdateMerchantDebtorLimitUseCase;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -47,17 +47,17 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class UpdateMerchantDebtorLimitController
 {
-    private $useCase;
+    private CommandBus $commandBus;
 
-    public function __construct(UpdateMerchantDebtorLimitUseCase $useCase)
+    public function __construct(CommandBus $commandBus)
     {
-        $this->useCase = $useCase;
+        $this->commandBus = $commandBus;
     }
 
     public function execute(Request $request, string $debtorUuid): void
     {
         try {
-            $this->useCase->execute(
+            $this->commandBus->process(
                 new UpdateMerchantDebtorLimitRequest($debtorUuid, $request->request->get('financing_limit'))
             );
         } catch (MerchantDebtorNotFoundException $e) {

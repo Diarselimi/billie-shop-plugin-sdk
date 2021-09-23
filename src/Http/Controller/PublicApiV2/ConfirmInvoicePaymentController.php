@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Controller\PublicApiV2;
 
+use App\Application\CommandBus;
 use App\Application\Exception\InvoiceNotFoundException;
 use App\Application\Exception\RequestValidationException;
 use App\Application\UseCase\ConfirmInvoicePayment\ConfirmInvoicePaymentNotAllowedException;
 use App\Application\UseCase\ConfirmInvoicePayment\ConfirmInvoicePaymentRequest;
-use App\Application\UseCase\ConfirmInvoicePayment\ConfirmInvoicePaymentUseCase;
 use App\Application\UseCase\ConfirmInvoicePayment\AmountExceededException;
 use App\Http\Controller\MerchantIdTrait;
 use OpenApi\Annotations as OA;
@@ -53,11 +53,11 @@ class ConfirmInvoicePaymentController
 {
     use MerchantIdTrait;
 
-    private ConfirmInvoicePaymentUseCase $useCase;
+    private CommandBus $commandBus;
 
-    public function __construct(ConfirmInvoicePaymentUseCase $useCase)
+    public function __construct(CommandBus $commandBus)
     {
-        $this->useCase = $useCase;
+        $this->commandBus = $commandBus;
     }
 
     public function execute(string $uuid, Request $request): void
@@ -69,7 +69,7 @@ class ConfirmInvoicePaymentController
         );
 
         try {
-            $this->useCase->execute($useCaseRequest);
+            $this->commandBus->process($useCaseRequest);
         } catch (InvoiceNotFoundException $exception) {
             throw new NotFoundHttpException($exception->getMessage(), $exception);
         } catch (ConfirmInvoicePaymentNotAllowedException $exception) {

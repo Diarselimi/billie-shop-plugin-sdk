@@ -2,7 +2,9 @@
 
 namespace App\Tests\Integration\Infrastructure\CommandBus;
 
-class SampleHandlerThatThrowsException
+use App\Application\CommandHandler;
+
+class SampleHandlerThatThrowsException implements CommandHandler
 {
     public function execute(SampleCommandForHandlerThatThrowsException $command): void
     {

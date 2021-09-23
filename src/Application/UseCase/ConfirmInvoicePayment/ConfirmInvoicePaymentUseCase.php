@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\UseCase\ConfirmInvoicePayment;
 
+use App\Application\CommandHandler;
 use App\Application\Exception\InvoiceNotFoundException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
@@ -14,7 +15,7 @@ use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Payment\PaymentRequestFactory;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 
-class ConfirmInvoicePaymentUseCase implements ValidatedUseCaseInterface
+class ConfirmInvoicePaymentUseCase implements ValidatedUseCaseInterface, CommandHandler
 {
     use ValidatedUseCaseTrait;
 

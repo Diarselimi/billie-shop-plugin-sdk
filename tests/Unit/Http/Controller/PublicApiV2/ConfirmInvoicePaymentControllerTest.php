@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Http\Controller\PublicApiV2;
 
+use App\Application\CommandBus;
 use App\Application\Exception\InvoiceNotFoundException;
 use App\Application\Exception\RequestValidationException;
 use App\Application\UseCase\ConfirmInvoicePayment\ConfirmInvoicePaymentNotAllowedException;
 use App\Application\UseCase\ConfirmInvoicePayment\ConfirmInvoicePaymentRequest;
-use App\Application\UseCase\ConfirmInvoicePayment\ConfirmInvoicePaymentUseCase;
 use App\Application\UseCase\ConfirmInvoicePayment\AmountExceededException;
 use App\Http\Controller\PublicApiV2\ConfirmInvoicePaymentController;
 use App\Http\HttpConstantsInterface;
@@ -33,9 +33,9 @@ class ConfirmInvoicePaymentControllerTest extends UnitTestCase
     public function shouldSucceedCallingUsecase(): void
     {
         $httpRequest = $this->createRequest();
-        $useCase = $this->prophesize(ConfirmInvoicePaymentUseCase::class);
+        $commandBus = $this->prophesize(CommandBus::class);
 
-        $useCase->execute(
+        $commandBus->process(
             Argument::that(
                 function (ConfirmInvoicePaymentRequest $request) {
                     self::assertEquals(self::INVOICE_UUID, $request->getInvoiceUuid());
@@ -46,7 +46,7 @@ class ConfirmInvoicePaymentControllerTest extends UnitTestCase
             )
         )->shouldBeCalledOnce();
 
-        $controller = new ConfirmInvoicePaymentController($useCase->reveal());
+        $controller = new ConfirmInvoicePaymentController($commandBus->reveal());
         $controller->execute(self::INVOICE_UUID, $httpRequest);
     }
 
@@ -60,13 +60,13 @@ class ConfirmInvoicePaymentControllerTest extends UnitTestCase
     public function shouldCatchUseCaseException(string $useCaseException, string $expectedException): void
     {
         $httpRequest = $this->createRequest();
-        $useCase = $this->prophesize(ConfirmInvoicePaymentUseCase::class);
+        $commandBus = $this->prophesize(CommandBus::class);
 
-        $useCase->execute(Argument::type(ConfirmInvoicePaymentRequest::class))
+        $commandBus->process(Argument::type(ConfirmInvoicePaymentRequest::class))
             ->shouldBeCalled()
             ->willThrow($useCaseException);
 
-        $controller = new ConfirmInvoicePaymentController($useCase->reveal());
+        $controller = new ConfirmInvoicePaymentController($commandBus->reveal());
 
         $this->expectException($expectedException);
 

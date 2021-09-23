@@ -2,7 +2,9 @@
 
 namespace App\Tests\Integration\Infrastructure\CommandBus;
 
-class SampleHandlerA
+use App\Application\CommandHandler;
+
+class SampleHandlerA implements CommandHandler
 {
     private CommandHandlerSpy $spy;
 

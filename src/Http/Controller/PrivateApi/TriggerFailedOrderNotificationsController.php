@@ -2,9 +2,9 @@
 
 namespace App\Http\Controller\PrivateApi;
 
+use App\Application\CommandBus;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\TriggerFailedOrderNotifications\TriggerFailedOrderNotificationsRequest;
-use App\Application\UseCase\TriggerFailedOrderNotifications\TriggerFailedOrderNotificationsUseCase;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use OpenApi\Annotations as OA;
 
@@ -32,17 +32,17 @@ use OpenApi\Annotations as OA;
  */
 class TriggerFailedOrderNotificationsController
 {
-    private $useCase;
+    private CommandBus $commandBus;
 
-    public function __construct(TriggerFailedOrderNotificationsUseCase $useCase)
+    public function __construct(CommandBus $commandBus)
     {
-        $this->useCase = $useCase;
+        $this->commandBus = $commandBus;
     }
 
     public function execute(string $uuid): void
     {
         try {
-            $this->useCase->execute(new TriggerFailedOrderNotificationsRequest($uuid));
+            $this->commandBus->process(new TriggerFailedOrderNotificationsRequest($uuid));
         } catch (OrderNotFoundException $e) {
             throw new NotFoundHttpException($e->getMessage());
         }

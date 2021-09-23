@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\UseCase\UpdateInvoice;
 
+use App\Application\CommandHandler;
 use App\Application\Exception\InvoiceNotFoundException as InvoiceNotFound;
 use App\Application\Exception\InvoiceUpdateException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
@@ -18,7 +19,7 @@ use Ozean12\Transfer\Message\Invoice\ExtendInvoice;
 use Ozean12\Transfer\Shared\Invoice as InvoiceMessage;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-class UpdateInvoiceUseCase implements ValidatedUseCaseInterface
+class UpdateInvoiceUseCase implements ValidatedUseCaseInterface, CommandHandler
 {
     use ValidatedUseCaseTrait;
 

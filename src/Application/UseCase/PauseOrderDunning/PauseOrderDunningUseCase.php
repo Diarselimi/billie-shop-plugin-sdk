@@ -2,6 +2,7 @@
 
 namespace App\Application\UseCase\PauseOrderDunning;
 
+use App\Application\CommandHandler;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
@@ -15,7 +16,7 @@ use App\Infrastructure\Salesforce\Exception\SalesforcePauseDunningException;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
-class PauseOrderDunningUseCase implements ValidatedUseCaseInterface, LoggingInterface
+class PauseOrderDunningUseCase implements ValidatedUseCaseInterface, LoggingInterface, CommandHandler
 {
     use ValidatedUseCaseTrait, LoggingTrait;
 

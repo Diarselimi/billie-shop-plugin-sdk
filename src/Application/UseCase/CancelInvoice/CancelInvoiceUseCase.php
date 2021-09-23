@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Application\UseCase\CancelInvoice;
 
+use App\Application\CommandHandler;
 use App\Application\Exception\InvoiceNotFoundException as InvoiceNotFound;
 use App\DomainModel\Invoice\InvoiceCancellationService;
 use App\DomainModel\Order\Lifecycle\OrderTerminalStateChangeService;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 
-class CancelInvoiceUseCase
+class CancelInvoiceUseCase implements CommandHandler
 {
     private InvoiceCancellationService $invoiceCancelationService;
 

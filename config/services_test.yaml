@@ -126,13 +126,11 @@ services:
   App\Infrastructure\CommandBus\SynchronousCommandBus\SynchronousCommandBus:
     public: true
   App\Tests\Integration\Infrastructure\CommandBus\CommandHandlerSpy: ~
-  App\Tests\Integration\Infrastructure\CommandBus\SampleHandlerA:
-    tags: [ { name: 'app.command_handler' } ]
-  App\Tests\Integration\Infrastructure\CommandBus\SampleHandlerB:
-    tags: [ { name: 'app.command_handler' } ]
-  App\Tests\Integration\Infrastructure\CommandBus\SampleHandlerThatThrowsException:
-    tags: [ { name: 'app.command_handler' } ]
-  App\Tests\Integration\Infrastructure\CommandBus\SampleMultipleHandlerA:
-    tags: [ { name: 'app.command_handler' } ]
-  App\Tests\Integration\Infrastructure\CommandBus\SampleMultipleHandlerB:
-    tags: [ { name: 'app.command_handler' } ]
+  App\Tests\Integration\Infrastructure\CommandBus\SampleHandlerA: ~
+  App\Tests\Integration\Infrastructure\CommandBus\SampleHandlerB: ~
+  App\Tests\Integration\Infrastructure\CommandBus\SampleHandlerThatThrowsException: ~
+  App\Tests\Integration\Infrastructure\CommandBus\SampleMultipleHandlerA: ~
+  App\Tests\Integration\Infrastructure\CommandBus\SampleMultipleHandlerB: ~
+  _instanceof:
+    App\Application\CommandHandler:
+      tags: [ 'app.command_handler' ]

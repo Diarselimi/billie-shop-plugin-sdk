@@ -2,9 +2,9 @@
 
 namespace App\Http\Controller\PrivateApi;
 
+use App\Application\CommandBus;
 use App\Application\Exception\CompanyNotFoundException;
 use App\Application\UseCase\UpdateDebtorWhitelist\UpdateDebtorWhitelistRequest;
-use App\Application\UseCase\UpdateDebtorWhitelist\UpdateDebtorWhitelistUseCase;
 use Symfony\Component\HttpFoundation\Request;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -35,17 +35,17 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class DebtorWhitelistController
 {
-    private $useCase;
+    private CommandBus $commandBus;
 
-    public function __construct(UpdateDebtorWhitelistUseCase $useCase)
+    public function __construct(CommandBus $commandBus)
     {
-        $this->useCase = $useCase;
+        $this->commandBus = $commandBus;
     }
 
     public function execute(Request $request, string $companyUuid): void
     {
         try {
-            $this->useCase->execute(
+            $this->commandBus->process(
                 new UpdateDebtorWhitelistRequest(
                     $companyUuid,
                     $request->request->get('is_whitelisted')

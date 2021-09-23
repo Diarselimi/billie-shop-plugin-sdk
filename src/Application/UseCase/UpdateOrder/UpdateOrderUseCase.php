@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\UseCase\UpdateOrder;
 
+use App\Application\CommandHandler;
 use App\Application\Exception\OrderBeingCollectedException;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
@@ -18,7 +19,7 @@ use App\DomainModel\OrderUpdate\UpdateOrderAmountService;
 use App\DomainModel\OrderUpdate\UpdateOrderException;
 use Symfony\Component\Workflow\Registry;
 
-class UpdateOrderUseCase implements ValidatedUseCaseInterface
+class UpdateOrderUseCase implements ValidatedUseCaseInterface, CommandHandler
 {
     use ValidatedUseCaseTrait;
 

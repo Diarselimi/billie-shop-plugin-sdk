@@ -2,6 +2,7 @@
 
 namespace App\Application\UseCase\ConfirmOrderPayment;
 
+use App\Application\CommandHandler;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\PaymentOrderConfirmException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
@@ -15,7 +16,7 @@ use Ozean12\Money\Money;
 /**
  * @deprecated Use ConfirmInvoicePayment* classes
  */
-class ConfirmOrderPaymentUseCase implements ValidatedUseCaseInterface
+class ConfirmOrderPaymentUseCase implements ValidatedUseCaseInterface, CommandHandler
 {
     use ValidatedUseCaseTrait;
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\UseCase\CheckoutUpdateOrder;
 
+use App\Application\CommandHandler;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\RequestValidationException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
@@ -20,7 +21,7 @@ use App\Infrastructure\Repository\OrderFinancialDetailsRepository;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
-class CheckoutUpdateOrderUseCase implements ValidatedUseCaseInterface, LoggingInterface
+class CheckoutUpdateOrderUseCase implements ValidatedUseCaseInterface, LoggingInterface, CommandHandler
 {
     use ValidatedUseCaseTrait, LoggingTrait;
 

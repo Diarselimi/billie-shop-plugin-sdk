@@ -2,10 +2,10 @@
 
 namespace App\Http\Controller\PublicApi;
 
+use App\Application\CommandBus;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\PaymentOrderConfirmException;
 use App\Application\UseCase\ConfirmOrderPayment\ConfirmOrderPaymentRequest;
-use App\Application\UseCase\ConfirmOrderPayment\ConfirmOrderPaymentUseCase;
 use App\Http\HttpConstantsInterface;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -46,11 +46,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class ConfirmOrderPaymentController
 {
-    private ConfirmOrderPaymentUseCase $useCase;
+    private CommandBus $commandBus;
 
-    public function __construct(ConfirmOrderPaymentUseCase $useCase)
+    public function __construct(CommandBus $commandBus)
     {
-        $this->useCase = $useCase;
+        $this->commandBus = $commandBus;
     }
 
     public function execute(string $id, Request $request): void
@@ -61,7 +61,7 @@ class ConfirmOrderPaymentController
                 $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID),
                 $request->request->get('paid_amount')
             );
-            $this->useCase->execute($orderRequest);
+            $this->commandBus->process($orderRequest);
         } catch (OrderNotFoundException $exception) {
             throw new NotFoundHttpException($exception->getMessage(), $exception);
         } catch (PaymentOrderConfirmException $exception) {

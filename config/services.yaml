@@ -64,6 +64,8 @@ services:
     App\Application\UseCase\ValidatedUseCaseInterface:
       calls:
         - [ setValidator, [ '@Symfony\Component\Validator\Validator\ValidatorInterface' ] ]
+    App\Application\CommandHandler:
+      tags: [ 'app.command_handler' ]
 
   App\:
     resource: '../src/*'
@@ -194,11 +196,6 @@ services:
 
   sandbox_request_matcher:
     class: App\Http\RequestMatcher\SandboxRequestMatcher
-
-  App\Application\UseCase\CancelInvoice\CancelInvoiceUseCase:
-    tags: [ { name: 'app.command_handler' } ]
-  App\Application\UseCase\UpdateInvoice\UpdateInvoiceUseCase:
-    tags: [ { name: 'app.command_handler' } ]
 
   App\Application\CommandBus: '@App\Infrastructure\CommandBus\SynchronousCommandBus\SynchronousCommandBus'
   App\Infrastructure\CommandBus\SynchronousCommandBus\SynchronousCommandBus: ~

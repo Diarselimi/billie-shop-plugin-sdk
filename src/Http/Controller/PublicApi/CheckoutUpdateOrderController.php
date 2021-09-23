@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controller\PublicApi;
 
+use App\Application\CommandBus;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\CheckoutUpdateOrder\CheckoutUpdateOrderRequest;
-use App\Application\UseCase\CheckoutUpdateOrder\CheckoutUpdateOrderUseCase;
 use App\Http\RequestTransformer\CreateOrder\AddressRequestFactory;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -41,15 +41,15 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class CheckoutUpdateOrderController
 {
-    private $useCase;
+    private CommandBus $commandBus;
 
-    private $addressRequestFactory;
+    private AddressRequestFactory $addressRequestFactory;
 
     public function __construct(
-        CheckoutUpdateOrderUseCase $checkoutSessionUseCase,
+        CommandBus $commandBus,
         AddressRequestFactory $addressRequestFactory
     ) {
-        $this->useCase = $checkoutSessionUseCase;
+        $this->commandBus = $commandBus;
         $this->addressRequestFactory = $addressRequestFactory;
     }
 
@@ -61,7 +61,7 @@ class CheckoutUpdateOrderController
             ->setBillingAddress($this->addressRequestFactory->create($request, 'billing_address'));
 
         try {
-            $this->useCase->execute($useCaseRequest);
+            $this->commandBus->process($useCaseRequest);
         } catch (OrderNotFoundException $exception) {
             throw new NotFoundHttpException($exception->getMessage());
         }

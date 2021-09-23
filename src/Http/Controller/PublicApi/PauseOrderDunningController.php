@@ -2,10 +2,10 @@
 
 namespace App\Http\Controller\PublicApi;
 
+use App\Application\CommandBus;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\PauseOrderDunning\PauseOrderDunningException;
 use App\Application\UseCase\PauseOrderDunning\PauseOrderDunningRequest;
-use App\Application\UseCase\PauseOrderDunning\PauseOrderDunningUseCase;
 use App\Http\HttpConstantsInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
@@ -70,17 +70,17 @@ use OpenApi\Annotations as OA;
  */
 class PauseOrderDunningController
 {
-    private $useCase;
+    private CommandBus $commandBus;
 
-    public function __construct(PauseOrderDunningUseCase $useCase)
+    public function __construct(CommandBus $commandBus)
     {
-        $this->useCase = $useCase;
+        $this->commandBus = $commandBus;
     }
 
-    public function execute(string $id, Request $request)
+    public function execute(string $id, Request $request): void
     {
         try {
-            $this->useCase->execute(
+            $this->commandBus->process(
                 new PauseOrderDunningRequest(
                     $id,
                     $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID),

@@ -2,6 +2,7 @@
 
 namespace App\Application\UseCase\LegacyUpdateOrder;
 
+use App\Application\CommandHandler;
 use App\Application\Exception\OrderBeingCollectedException;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
@@ -12,7 +13,7 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderUpdate\LegacyUpdateOrderService;
 use App\DomainModel\Salesforce\ClaimStateService;
 
-class LegacyUpdateOrderUseCase implements ValidatedUseCaseInterface
+class LegacyUpdateOrderUseCase implements ValidatedUseCaseInterface, CommandHandler
 {
     use ValidatedUseCaseTrait;
 

@@ -2,6 +2,7 @@
 
 namespace App\Application\UseCase\CancelOrder;
 
+use App\Application\CommandHandler;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\WorkflowException;
 use App\DomainModel\Invoice\InvoiceCancellationService;
@@ -13,7 +14,7 @@ use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\Workflow\Registry;
 
-class CancelOrderUseCase implements LoggingInterface
+class CancelOrderUseCase implements LoggingInterface, CommandHandler
 {
     use LoggingTrait;
 

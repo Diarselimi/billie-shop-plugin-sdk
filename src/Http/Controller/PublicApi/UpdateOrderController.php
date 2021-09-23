@@ -2,10 +2,10 @@
 
 namespace App\Http\Controller\PublicApi;
 
+use App\Application\CommandBus;
 use App\Application\Exception\OrderBeingCollectedException;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\LegacyUpdateOrder\LegacyUpdateOrderRequest;
-use App\Application\UseCase\LegacyUpdateOrder\LegacyUpdateOrderUseCase;
 use App\DomainModel\OrderUpdate\UpdateOrderException;
 use App\Http\HttpConstantsInterface;
 use App\Http\RequestTransformer\UpdateOrder\UpdateOrderAmountRequestFactory;
@@ -47,15 +47,15 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class UpdateOrderController
 {
-    private LegacyUpdateOrderUseCase $useCase;
+    private CommandBus $commandBus;
 
     private UpdateOrderAmountRequestFactory $updateOrderAmountRequestFactory;
 
     public function __construct(
-        LegacyUpdateOrderUseCase $useCase,
+        CommandBus $commandBus,
         UpdateOrderAmountRequestFactory $updateOrderAmountRequestFactory
     ) {
-        $this->useCase = $useCase;
+        $this->commandBus = $commandBus;
         $this->updateOrderAmountRequestFactory = $updateOrderAmountRequestFactory;
     }
 
@@ -70,7 +70,7 @@ class UpdateOrderController
                 ->setInvoiceUrl($request->request->get('invoice_url'))
                 ->setExternalCode($request->request->get('order_id'));
 
-            $this->useCase->execute($orderRequest);
+            $this->commandBus->process($orderRequest);
         } catch (UpdateOrderException | OrderBeingCollectedException $e) {
             throw new AccessDeniedHttpException($e->getMessage());
         } catch (OrderNotFoundException $exception) {

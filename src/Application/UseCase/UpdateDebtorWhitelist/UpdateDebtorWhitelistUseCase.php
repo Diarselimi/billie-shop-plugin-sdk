@@ -2,6 +2,7 @@
 
 namespace App\Application\UseCase\UpdateDebtorWhitelist;
 
+use App\Application\CommandHandler;
 use App\Application\Exception\CompanyNotFoundException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
@@ -12,7 +13,7 @@ use App\DomainModel\DebtorSettings\DebtorSettingsRepositoryInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
-class UpdateDebtorWhitelistUseCase implements LoggingInterface, ValidatedUseCaseInterface
+class UpdateDebtorWhitelistUseCase implements LoggingInterface, ValidatedUseCaseInterface, CommandHandler
 {
     use LoggingTrait, ValidatedUseCaseTrait;
 

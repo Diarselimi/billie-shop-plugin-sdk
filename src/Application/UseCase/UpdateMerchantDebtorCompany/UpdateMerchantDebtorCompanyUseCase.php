@@ -2,6 +2,7 @@
 
 namespace App\Application\UseCase\UpdateMerchantDebtorCompany;
 
+use App\Application\CommandHandler;
 use App\Application\Exception\MerchantDebtorNotFoundException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
@@ -12,7 +13,7 @@ use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
-class UpdateMerchantDebtorCompanyUseCase implements LoggingInterface, ValidatedUseCaseInterface
+class UpdateMerchantDebtorCompanyUseCase implements LoggingInterface, ValidatedUseCaseInterface, CommandHandler
 {
     use LoggingTrait, ValidatedUseCaseTrait;
 

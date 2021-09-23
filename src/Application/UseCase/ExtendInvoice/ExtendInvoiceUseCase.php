@@ -2,6 +2,7 @@
 
 namespace App\Application\UseCase\ExtendInvoice;
 
+use App\Application\CommandHandler;
 use App\Application\Exception\InvoiceNotFoundException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
@@ -12,7 +13,7 @@ use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Salesforce\ClaimStateService;
 
-class ExtendInvoiceUseCase implements ValidatedUseCaseInterface
+class ExtendInvoiceUseCase implements ValidatedUseCaseInterface, CommandHandler
 {
     use ValidatedUseCaseTrait;
 

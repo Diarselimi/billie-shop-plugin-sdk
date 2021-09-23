@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controller\PublicApiV2;
 
+use App\Application\CommandBus;
 use App\Application\Exception\InvoiceNotFoundException;
 use App\Application\Exception\RequestValidationException;
 use App\Application\UseCase\ExtendInvoice\ExtendInvoiceRequest;
-use App\Application\UseCase\ExtendInvoice\ExtendInvoiceUseCase;
 use App\Application\UseCase\ExtendInvoice\InvoiceNotExtendableException;
 use App\DomainModel\Invoice\InvalidDurationException;
 use App\Http\HttpConstantsInterface;
@@ -48,11 +48,11 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
  */
 class ExtendInvoiceController
 {
-    private ExtendInvoiceUseCase $extendInvoiceUseCase;
+    private CommandBus $commandBus;
 
-    public function __construct(ExtendInvoiceUseCase $extendInvoiceUseCase)
+    public function __construct(CommandBus $commandBus)
     {
-        $this->extendInvoiceUseCase = $extendInvoiceUseCase;
+        $this->commandBus = $commandBus;
     }
 
     public function execute(string $uuid, Request $request): void
@@ -65,7 +65,7 @@ class ExtendInvoiceController
         );
 
         try {
-            $this->extendInvoiceUseCase->execute($extendInvoiceRequest);
+            $this->commandBus->process($extendInvoiceRequest);
         } catch (InvoiceNotFoundException $exception) {
             throw new NotFoundHttpException('Invoice not found', $exception);
         } catch (InvalidDurationException $exception) {

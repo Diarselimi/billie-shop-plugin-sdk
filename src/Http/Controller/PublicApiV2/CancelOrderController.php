@@ -2,11 +2,11 @@
 
 namespace App\Http\Controller\PublicApiV2;
 
+use App\Application\CommandBus;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\CancelOrder\CancelOrderException;
 use App\Application\UseCase\CancelOrder\CancelOrderRequest;
-use App\Application\UseCase\CancelOrder\CancelOrderUseCase;
 use App\Http\HttpConstantsInterface;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -36,11 +36,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class CancelOrderController
 {
-    private CancelOrderUseCase $useCase;
+    private CommandBus $commandBus;
 
-    public function __construct(CancelOrderUseCase $useCase)
+    public function __construct(CommandBus $commandBus)
     {
-        $this->useCase = $useCase;
+        $this->commandBus = $commandBus;
     }
 
     public function execute(string $id, Request $request): void
@@ -50,7 +50,7 @@ class CancelOrderController
                 $id,
                 $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID)
             );
-            $this->useCase->execute($orderRequest);
+            $this->commandBus->process($orderRequest);
         } catch (CancelOrderException | WorkflowException $e) {
             throw new AccessDeniedHttpException($e->getMessage());
         } catch (OrderNotFoundException $e) {

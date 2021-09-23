@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controller\PrivateApi;
 
+use App\Application\CommandBus;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\CreateOrderInvoice\CreateOrderInvoiceRequest;
-use App\Application\UseCase\CreateOrderInvoice\CreateOrderInvoiceUseCase;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -52,11 +52,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class CreateOrderInvoiceController
 {
-    private CreateOrderInvoiceUseCase $createOrderInvoiceUseCase;
+    private CommandBus $commandBus;
 
-    public function __construct(CreateOrderInvoiceUseCase $createOrderInvoiceUseCase)
+    public function __construct(CommandBus $commandBus)
     {
-        $this->createOrderInvoiceUseCase = $createOrderInvoiceUseCase;
+        $this->commandBus = $commandBus;
     }
 
     public function execute(string $uuid, Request $request): JsonResponse
@@ -70,7 +70,7 @@ class CreateOrderInvoiceController
                 $request->request->getInt('file_id'),
             );
 
-            $this->createOrderInvoiceUseCase->execute($useCaseRequest);
+            $this->commandBus->process($useCaseRequest);
         } catch (OrderNotFoundException $e) {
             throw new NotFoundHttpException($e->getMessage());
         }
