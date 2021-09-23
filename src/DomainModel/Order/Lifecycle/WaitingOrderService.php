@@ -27,6 +27,8 @@ class WaitingOrderService implements SlackClientAwareInterface
 
         $this->workflowRegistry->get($order)->apply($order, OrderEntity::TRANSITION_WAITING);
 
+        return;
+
         $failedRiskCheckNames = array_map(
             function (CheckResult $result) {
                 return $result->getName();
