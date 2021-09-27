@@ -6,7 +6,7 @@ namespace App\EventSubscriber;
 
 use App\Application\Tracking\TrackingEventCollector;
 use App\DomainModel\TrackingAnalytics\TrackingAnalyticsServiceInterface;
-use Composer\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class TrackingEventSubscriber implements EventSubscriberInterface
 {
@@ -23,11 +23,11 @@ class TrackingEventSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            'kernel.terminate' => 'sendTrackingEvents',
+            'kernel.terminate' => 'sendCollectedTrackingEvents',
         ];
     }
 
-    public function sendTrackingEvents(): void
+    public function sendCollectedTrackingEvents(): void
     {
         foreach ($this->collector->getEvents() as $event) {
             $this->client->trackEvent($event);

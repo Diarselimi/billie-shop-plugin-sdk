@@ -35,7 +35,7 @@ class TrackingItsNotUsEvent implements TrackingEvent
 
     public function getMerchantId(): int
     {
-        return $this->getMerchantId();
+        return $this->merchantId;
     }
 
     public function getPayload(): array
