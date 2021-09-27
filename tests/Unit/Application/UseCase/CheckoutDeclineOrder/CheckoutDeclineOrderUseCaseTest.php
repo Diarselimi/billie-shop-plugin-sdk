@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\UseCase\CheckoutDeclineOrder;
 
+use App\Application\Tracking\TrackingEventCollector;
 use App\Application\UseCase\CheckoutDeclineOrder\CheckoutDeclineOrderRequest;
 use App\Application\UseCase\CheckoutDeclineOrder\CheckoutDeclineOrderUseCase;
+use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
@@ -36,6 +38,8 @@ class CheckoutDeclineOrderUseCaseTest extends UnitTestCase
 
     private ObjectProphecy $sepaClient;
 
+    private ObjectProphecy $trackingEventCollector;
+
     private CheckoutDeclineOrderUseCase $useCase;
 
     public function setUp(): void
@@ -48,15 +52,28 @@ class CheckoutDeclineOrderUseCaseTest extends UnitTestCase
         $this->sepaClient = $this->prophesize(SepaClientInterface::class);
         $orderContainer = $this->prophesize(OrderContainer::class);
         $workFlow = $this->prophesize(Workflow::class);
+
+        $this->trackingEventCollector = $this->prophesize(TrackingEventCollector::class);
         $workFlow->can(Argument::cetera())->willReturn(true);
 
         $order = $this->prophesize(OrderEntity::class);
         $order->getDebtorSepaMandateUuid()->willReturn(Uuid::uuid4());
+        $order->getMerchantId()->willReturn(1);
         $externalData = $this->prophesize(DebtorExternalDataEntity::class);
         $externalData->getMerchantExternalId()->willReturn('1');
+        $externalData->getName()->willReturn('Billie GmbH');
+
+        $debtorExternalDataAddress = $this->prophesize(AddressEntity::class);
+        $debtorExternalDataAddress->getStreet()->willReturn('Wedekingstr.');
+        $debtorExternalDataAddress->getHouseNumber()->willReturn('23');
+        $debtorExternalDataAddress->getCity()->willReturn('Berlin');
+        $debtorExternalDataAddress->getPostalCode()->willReturn('10243');
+        $debtorExternalDataAddress->getCountry()->willReturn('DE');
 
         $orderContainer->getDebtorExternalData()->willReturn($externalData);
         $orderContainer->getOrder()->willReturn($order->reveal());
+        $orderContainer->getDebtorExternalDataAddress()->willReturn($debtorExternalDataAddress);
+
         $this->orderContainerFactory->loadNotYetConfirmedByCheckoutSessionUuid(Argument::any())->willReturn($orderContainer->reveal());
         $this->workFlowRegistry->get(Argument::any())->willReturn($workFlow->reveal());
 
@@ -66,10 +83,29 @@ class CheckoutDeclineOrderUseCaseTest extends UnitTestCase
             $this->orderContainerFactory->reveal(),
             $this->checkoutSessionRepository->reveal(),
             $this->debtorExternalDataRepository->reveal(),
-            $this->sepaClient->reveal()
+            $this->sepaClient->reveal(),
+            $this->trackingEventCollector->reveal()
         );
 
         $this->useCase->setLogger(new NullLogger());
+    }
+
+    /** @test */
+    public function shouldSendEventToTheCollector(): void
+    {
+        $this->declineOrderService->decline(Argument::any())->shouldBeCalled();
+        $this->checkoutSessionRepository->reActivateSession(Argument::any())->shouldBeCalled();
+
+        $this->debtorExternalDataRepository->invalidateMerchantExternalId(Argument::any())->shouldBeCalled();
+        $this->sepaClient->revokeMandate(Argument::any())->shouldBeCalled();
+
+        $this->trackingEventCollector->collect(Argument::any())->shouldBeCalled();
+        self::assertNotEmpty($this->trackingEventCollector->getEvents());
+
+        $this->useCase->execute(new CheckoutDeclineOrderRequest(
+            Uuid::uuid4()->toString(),
+            CheckoutDeclineOrderRequest::REASON_WRONG_IDENTIFICATION
+        ));
     }
 
     /** @test */

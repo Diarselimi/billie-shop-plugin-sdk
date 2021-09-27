@@ -4,9 +4,16 @@ declare(strict_types=1);
 
 namespace App\Application\UseCase\CheckoutDeclineOrder;
 
+use App\Application\Tracking\TrackingEventCollector;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\WorkflowException;
+use App\DomainEvent\AnalyticsEvent\TrackingItsNotUsEvent;
+use App\DomainModel\Address\Address;
+use App\DomainModel\Address\AddressEntity;
+use App\DomainModel\Address\Exception\InvalidAddressException;
 use App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface;
+use App\DomainModel\DebtorExternalData\DebtorExternalData;
+use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\Order\Lifecycle\DeclineOrderService;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
@@ -34,13 +41,16 @@ class CheckoutDeclineOrderUseCase implements LoggingInterface
 
     private SepaClientInterface $sepaClient;
 
+    private TrackingEventCollector $eventsCollector;
+
     public function __construct(
         Registry $workflowRegistry,
         DeclineOrderService $declineOrderService,
         OrderContainerFactory $orderContainerFactory,
         CheckoutSessionRepositoryInterface $checkoutSessionRepository,
         DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
-        SepaClientInterface $sepaClient
+        SepaClientInterface $sepaClient,
+        TrackingEventCollector $eventsCollector
     ) {
         $this->workflowRegistry = $workflowRegistry;
         $this->declineOrderService = $declineOrderService;
@@ -48,6 +58,7 @@ class CheckoutDeclineOrderUseCase implements LoggingInterface
         $this->checkoutSessionRepository = $checkoutSessionRepository;
         $this->debtorExternalDataRepository = $debtorExternalDataRepository;
         $this->sepaClient = $sepaClient;
+        $this->eventsCollector = $eventsCollector;
     }
 
     /**
@@ -70,10 +81,6 @@ class CheckoutDeclineOrderUseCase implements LoggingInterface
         $this->declineOrderService->decline($orderContainer);
         $this->checkoutSessionRepository->reActivateSession($input->getSessionUuid());
 
-        if ($input->isWronglyIdentified()) {
-            $this->debtorExternalDataRepository->invalidateMerchantExternalId($externalId);
-        }
-
         try {
             if ($order->getDebtorSepaMandateUuid() !== null) {
                 $this->sepaClient->revokeMandate($order->getDebtorSepaMandateUuid());
@@ -93,5 +100,56 @@ class CheckoutDeclineOrderUseCase implements LoggingInterface
                 'session_uuid' => $input->getSessionUuid(),
             ],
         ]);
+
+        if (!$input->isWronglyIdentified()) {
+            return;
+        }
+
+        $this->debtorExternalDataRepository->invalidateMerchantExternalId($externalId);
+
+        $debtorExternalData = $orderContainer->getDebtorExternalData();
+        $debtorExternalDataAddress = $orderContainer->getDebtorExternalDataAddress();
+
+        try {
+            $event = $this->prepareTrackingEvent($debtorExternalData, $debtorExternalDataAddress, $order, $input);
+            $this->eventsCollector->collect($event);
+        } catch (InvalidAddressException $e) {
+            $this->logError(sprintf(
+                'Tracking event %s failed because of not valid data, with the message %s',
+                $event ? $event->getEventName() : 'tracking_event',
+                $e->getMessage()
+            ));
+        }
+    }
+
+    private function prepareTrackingEvent(
+        DebtorExternalDataEntity $debtorExternalData,
+        AddressEntity $debtorExternalDataAddress,
+        OrderEntity $order,
+        CheckoutDeclineOrderRequest $input
+    ): TrackingItsNotUsEvent {
+
+        //TODO: Make VO's autoload from the database automatically, no need to fill the data like this.
+
+        $externalData = new DebtorExternalData(
+            $debtorExternalData->getName(),
+            $debtorExternalData->getMerchantExternalId()
+        );
+        $address = new Address(
+            $debtorExternalDataAddress->getStreet(),
+            $debtorExternalDataAddress->getHouseNumber(),
+            $debtorExternalDataAddress->getPostalCode(),
+            $debtorExternalDataAddress->getCity(),
+            $debtorExternalDataAddress->getCountry()
+        );
+
+        $event = new TrackingItsNotUsEvent(
+            $order->getMerchantId(),
+            $input->getSessionUuid(),
+            $externalData,
+            $address
+        );
+
+        return $event;
     }
 }

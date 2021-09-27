@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\SegmentIO;
 
+use App\Application\Tracking\TrackingEvent;
 use App\DomainModel\TrackingAnalytics\TrackingAnalyticsServiceInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -41,5 +42,10 @@ class SegmentIOClient implements TrackingAnalyticsServiceInterface, LoggingInter
                 LoggingInterface::KEY_EXCEPTION => $e,
             ]);
         }
+    }
+
+    public function trackEvent(TrackingEvent $event): void
+    {
+        $this->track($event->getEventName(), $event->getMerchantId(), $event->getPayload());
     }
 }
