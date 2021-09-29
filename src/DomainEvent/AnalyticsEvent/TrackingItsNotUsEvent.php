@@ -10,7 +10,7 @@ use App\DomainModel\DebtorExternalData\DebtorExternalData;
 
 class TrackingItsNotUsEvent implements TrackingEvent
 {
-    private const EVENT_NAME = "its_not_us";
+    private const EVENT_NAME = "BC_re-identification_completed";
 
     private string $sessionUuid;
 
