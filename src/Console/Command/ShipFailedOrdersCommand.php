@@ -2,12 +2,14 @@
 
 namespace App\Console\Command;
 
+use App\Application\UseCase\CreateInvoice\CreateInvoiceRequest;
 use App\DomainModel\Invoice\InvoiceAnnouncer;
 use App\DomainModel\Invoice\InvoiceFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerAggregator;
 use Billie\PdoBundle\Infrastructure\Pdo\PdoConnection;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -26,8 +28,13 @@ class ShipFailedOrdersCommand extends Command
 
     private OrderContainerFactory $orderContainerFactory;
 
-    public function __construct(InvoiceFactory $invoiceFactory, PdoConnection $db, InvoiceAnnouncer $announcer, InvoiceDocumentUploadHandlerAggregator $invoiceManager, OrderContainerFactory $orderContainerFactory)
-    {
+    public function __construct(
+        InvoiceFactory $invoiceFactory,
+        PdoConnection $db,
+        InvoiceAnnouncer $announcer,
+        InvoiceDocumentUploadHandlerAggregator $invoiceManager,
+        OrderContainerFactory $orderContainerFactory
+    ) {
         parent::__construct();
 
         $this->invoiceFactory = $invoiceFactory;
@@ -40,8 +47,7 @@ class ShipFailedOrdersCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Ship failed orders')
-        ;
+            ->setDescription('Ship failed orders');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -55,21 +61,29 @@ class ShipFailedOrdersCommand extends Command
         while ($item = $stmt->fetch(\PDO::FETCH_ASSOC)) {
             $orderContainer = $this->orderContainerFactory->loadById((int) $item['id']);
             $financialDetails = $orderContainer->getOrderFinancialDetails();
-
-            $invoice = $this->invoiceFactory->create(
-                $orderContainer,
+            $request = new CreateInvoiceRequest($orderContainer->getMerchant()->getId(), Uuid::uuid4());
+            $request->setAmount(
                 new TaxedMoney(
                     $financialDetails->getAmountGross(),
                     $financialDetails->getAmountNet(),
                     $financialDetails->getAmountTax()
-                ),
-                $orderContainer->getOrderFinancialDetails()->getDuration(),
-                $orderContainer->getOrder()->getInvoiceNumber(),
-                $orderContainer->getOrder()->getProofOfDeliveryUrl(),
-                $orderContainer->getOrder()->getPaymentId()
+                )
+            )
+                ->setExternalCode($orderContainer->getOrder()->getInvoiceNumber())
+                ->setShippingDocumentUrl($orderContainer->getOrder()->getProofOfDeliveryUrl());
+
+            $invoice = $this->invoiceFactory->create(
+                $orderContainer,
+                $request
             );
 
-            $this->announcer->announce($invoice, $orderContainer->getDebtorCompany()->getName(), $orderContainer->getOrder()->getExternalCode(), null, null);
+            $this->announcer->announce(
+                $invoice,
+                $orderContainer->getDebtorCompany()->getName(),
+                $orderContainer->getOrder()->getExternalCode(),
+                null,
+                null
+            );
 
             $this->invoiceManager->handle(
                 $orderContainer->getOrder(),

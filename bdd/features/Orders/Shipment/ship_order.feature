@@ -28,6 +28,7 @@ Feature:
 
   Scenario: Order not shipped if no external code exists nor provided
     Given I have a created order with amounts 1000/900/100, duration 30 and comment "test order"
+    And I get from invoice-butler service no invoices response
     When I send a POST request to "/order/test-order-uuid/ship" with body:
         """
         {

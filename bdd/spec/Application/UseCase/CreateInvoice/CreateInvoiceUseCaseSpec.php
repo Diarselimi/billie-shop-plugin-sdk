@@ -103,6 +103,9 @@ class CreateInvoiceUseCaseSpec extends ObjectBehavior
         $shipAmount->getTax()->willReturn(new Money(50));
 
         $request->getAmount()->willReturn($shipAmount);
+        $request->getExternalCode()->willReturn(self::INVOICE_NUMBER);
+        $request->getShippingDocumentUrl()->willReturn(self::PROOF_OF_DELIVERY_URL);
+        $request->getInvoiceUrl()->willReturn(self::PROOF_OF_DELIVERY_URL);
 
         $financialDetailsEntity->getUnshippedAmountGross()->willReturn(new Money(1000));
         $financialDetailsEntity->getUnshippedAmountNet()->willReturn(new Money(1100));
@@ -110,10 +113,7 @@ class CreateInvoiceUseCaseSpec extends ObjectBehavior
 
         $invoiceFactory->create(
             $orderContainer,
-            $shipAmount,
-            30,
-            self::INVOICE_NUMBER,
-            self::PROOF_OF_DELIVERY_URL
+            $request
         )->willReturn($invoice);
 
         $order->getUuid()->willReturn('1768ab4c-8cab-4166-a892-6bd3efe9ec13');

@@ -2,6 +2,7 @@
 
 namespace spec\App\Application\UseCase\ShipOrderWithInvoice;
 
+use App\Application\UseCase\CreateInvoice\CreateInvoiceRequest;
 use App\Application\UseCase\ShipOrderWithInvoice\ShipOrderWithInvoiceRequest;
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceFactory;
@@ -13,6 +14,7 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentCreator;
 use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
+use App\Tests\Helpers\TestUuidGenerator;
 use Ozean12\Money\Money;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
 use PhpSpec\ObjectBehavior;
@@ -38,7 +40,12 @@ class ShipOrderWithInvoiceUseCaseSpec extends ObjectBehavior
         InvoiceFactory $invoiceFactory,
         ValidatorInterface $validator
     ) {
-        $this->beConstructedWith(...func_get_args());
+        $args = func_get_args();
+        $validator = array_pop($args);
+        $args[] = new TestUuidGenerator();
+        $args[] = $validator;
+
+        $this->beConstructedWith(...$args);
 
         $this->testFile = tempnam(sys_get_temp_dir(), 'upl');
 
@@ -67,6 +74,7 @@ class ShipOrderWithInvoiceUseCaseSpec extends ObjectBehavior
             $this->testFile,
             'test.txt'
         );
+
         $request = (new ShipOrderWithInvoiceRequest($orderId, $merchantId))
             ->setAmount(new TaxedMoney(
                 new Money(500),
@@ -75,9 +83,23 @@ class ShipOrderWithInvoiceUseCaseSpec extends ObjectBehavior
             ))
             ->setInvoiceNumber(123)
             ->setInvoiceFile($uploadedFile);
+
+        $invoice = (new Invoice())
+            ->setUuid(Uuid::uuid4()->toString());
+
+        $input = new CreateInvoiceRequest($merchantId, Uuid::uuid4());
+        $input->setAmount($request->getAmount())
+            ->setExternalCode($request->getInvoiceNumber());
+
+        $invoiceFactory->create(
+            $orderContainer,
+            Argument::any()
+        )->willReturn($invoice);
+
         $order = (new OrderEntity())
             ->setId($orderId)
-            ->setWorkflowName(OrderEntity::WORKFLOW_NAME_V2);
+            ->setWorkflowName(OrderEntity::WORKFLOW_NAME_V2)
+            ->setMerchantId($merchantId);
         $orderContainer->getOrder()->willReturn($order);
         $orderContainerFactory->loadByMerchantIdAndUuid(
             $request->getOrderId(),
@@ -92,15 +114,7 @@ class ShipOrderWithInvoiceUseCaseSpec extends ObjectBehavior
             ->setUnshippedAmountTax(new Money(200))
             ->setDuration($duration);
         $orderContainer->getOrderFinancialDetails()->willReturn($financialDetails);
-        $invoice = (new Invoice())
-            ->setUuid(Uuid::uuid4()->toString());
-        $invoiceFactory->create(
-            $orderContainer,
-            $request->getAmount(),
-            $duration,
-            $request->getInvoiceNumber(),
-            null
-        )->willReturn($invoice);
+
         $orderResponseFactory->create($orderContainer);
         $invoiceManager->createFromUpload(Argument::cetera());
 

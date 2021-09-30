@@ -7,6 +7,7 @@ namespace App\Tests\Helpers;
 use App\Helper\Uuid\UuidGeneratorInterface;
 use App\Tests\Functional\Context\PaellaCoreContext;
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 class TestUuidGenerator implements UuidGeneratorInterface
 {
@@ -21,7 +22,9 @@ class TestUuidGenerator implements UuidGeneratorInterface
         'e4ab7f06-4f5e-4ac2-9998-4750c0e18f49',
     ];
 
-    private static array $constantUuids = self::DEFAULT_UUIDS;
+    private static array
+
+ $constantUuids = self::DEFAULT_UUIDS;
 
     private static bool $dynamic = false;
 
@@ -48,6 +51,11 @@ class TestUuidGenerator implements UuidGeneratorInterface
     public static function resetConstantUuids()
     {
         self::$constantUuids = self::DEFAULT_UUIDS;
+    }
+
+    public function uuid(): UuidInterface
+    {
+        return Uuid::fromString(self::DEFAULT_UUIDS[2]);
     }
 
     public function uuid4(): string

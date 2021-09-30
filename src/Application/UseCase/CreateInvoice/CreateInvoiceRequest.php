@@ -7,6 +7,7 @@ namespace App\Application\UseCase\CreateInvoice;
 use App\Application\Validator\Constraint as CustomConstrains;
 use OpenApi\Annotations as OA;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
+use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -43,6 +44,8 @@ class CreateInvoiceRequest
      */
     private array $orders;
 
+    private UuidInterface $invoiceUuid;
+
     /**
      * @Assert\Length(max="255")
      * @CustomConstrains\InvoiceExternalCode()
@@ -67,9 +70,10 @@ class CreateInvoiceRequest
 
     private ?array $lineItems;
 
-    public function __construct(int $merchantId)
+    public function __construct(int $merchantId, UuidInterface $invoiceUuid)
     {
         $this->merchantId = $merchantId;
+        $this->invoiceUuid = $invoiceUuid;
     }
 
     public function getOrders(): array
@@ -147,5 +151,10 @@ class CreateInvoiceRequest
     public function getMerchantId(): ?int
     {
         return $this->merchantId;
+    }
+
+    public function getInvoiceUuid(): UuidInterface
+    {
+        return $this->invoiceUuid;
     }
 }

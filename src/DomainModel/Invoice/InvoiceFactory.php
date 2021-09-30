@@ -2,6 +2,8 @@
 
 namespace App\DomainModel\Invoice;
 
+use App\Application\UseCase\CreateInvoice\CreateInvoiceRequest;
+use App\Application\UseCase\ShipOrder\ShipOrderRequestV1;
 use App\DomainModel\Fee\FeeCalculationException;
 use App\DomainModel\Fee\FeeCalculatorInterface;
 use App\DomainModel\Invoice\CreditNote\CreditNoteCollection;
@@ -10,9 +12,11 @@ use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\Helper\Uuid\UuidGeneratorInterface;
 use App\Infrastructure\Volt\VoltServiceException;
 use App\Support\AbstractFactory;
+use DateTime;
 use Ozean12\Money\Money;
 use Ozean12\Money\Percent;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
+use Ramsey\Uuid\Uuid;
 
 class InvoiceFactory extends AbstractFactory
 {
@@ -36,19 +40,16 @@ class InvoiceFactory extends AbstractFactory
 
     public function create(
         OrderContainer $orderContainer,
-        TaxedMoney $amount,
-        int $duration,
-        string $invoiceNumber,
-        string $proofOfDeliveryUrl = null,
-        string $invoiceAndPaymentUuid = null
+        CreateInvoiceRequest $invoiceRequest
     ): Invoice {
-        $billingDate = new \DateTime('today');
-        $dueDate = new \DateTime("today + {$duration} days");
+        $duration = $orderContainer->getOrderFinancialDetails()->getDuration();
+        $billingDate = new DateTime('today');
+        $dueDate = new DateTime("today + {$duration} days");
 
         try {
             $fee = $this->feeCalculator->getCalculateFee(
                 null,
-                $amount->getGross(),
+                $invoiceRequest->getAmount()->getGross(),
                 $billingDate,
                 $dueDate,
                 $orderContainer->getMerchantSettings()->getFeeRates()
@@ -57,16 +58,14 @@ class InvoiceFactory extends AbstractFactory
             throw new FeeCalculationException('Fee calculation call failed', 0, $exception);
         }
 
-        if ($invoiceAndPaymentUuid === null) {
-            $invoiceAndPaymentUuid = $this->uuidGenerator->uuid4();
-        }
+        $amount = $invoiceRequest->getAmount();
 
         return (new Invoice())
-            ->setUuid($invoiceAndPaymentUuid)
+            ->setUuid($invoiceRequest->getInvoiceUuid()->toString())
             ->setCustomerUuid($orderContainer->getMerchant()->getPaymentUuid())
             ->setDebtorCompanyUuid($orderContainer->getMerchantDebtor()->getCompanyUuid())
             ->setPaymentDebtorUuid($orderContainer->getMerchantDebtor()->getPaymentDebtorId())
-            ->setPaymentUuid($invoiceAndPaymentUuid)
+            ->setPaymentUuid($invoiceRequest->getInvoiceUuid()->toString())
             ->setAmount(clone $amount)
             ->setOutstandingAmount($amount->getGross())
             ->setPayoutAmount($amount->getGross()->subtract($fee->getGrossFeeAmount()))
@@ -77,8 +76,8 @@ class InvoiceFactory extends AbstractFactory
             ->setBillingDate($billingDate)
             ->setDueDate($dueDate)
             ->setCreatedAt(new \DateTime())
-            ->setProofOfDeliveryUrl($proofOfDeliveryUrl)
-            ->setExternalCode($invoiceNumber)
+            ->setProofOfDeliveryUrl($invoiceRequest->getShippingDocumentUrl())
+            ->setExternalCode($invoiceRequest->getExternalCode())
             ->setInvoicePendingCancellationAmount(new Money(0))
             ->setMerchantPendingPaymentAmount(new Money(0));
     }
@@ -105,17 +104,44 @@ class InvoiceFactory extends AbstractFactory
             ->setFeeAmount(new TaxedMoney($grossFeeAmount, $netFeeAmount, $taxFeeAmount))
             ->setFeeRate(new Percent($data['factoring_fee_rate'], 0))
             ->setDuration($data['duration'])
-            ->setCreatedAt(new \DateTime($data['created_at']))
-            ->setDueDate(new \DateTime($data['due_date']))
+            ->setCreatedAt(new DateTime($data['created_at']))
+            ->setDueDate(new DateTime($data['due_date']))
             ->setDuration($data['duration'])
-            ->setBillingDate(new \DateTime($data['billing_date']))
+            ->setBillingDate(new DateTime($data['billing_date']))
             ->setProofOfDeliveryUrl('proof_of_delivery_url')
             ->setExternalCode($data['external_code'])
             ->setPaymentUuid($data['payment_uuid'])
             ->setState($data['state'])
-            ->setCreatedAt(new \DateTime($data['created_at']))
+            ->setCreatedAt(new DateTime($data['created_at']))
             ->setMerchantPendingPaymentAmount(new Money($data['merchant_pending_payment_amount'], 0))
             ->setInvoicePendingCancellationAmount(new Money($data['invoice_pending_cancellation_amount'], 0))
             ->setCreditNotes($creditNoteCollection);
+    }
+
+    public function createForShipment(
+        OrderContainer $orderContainer,
+        ShipOrderRequestV1 $request
+    ): Invoice {
+        $financialDetails = $orderContainer->getOrderFinancialDetails();
+        $order = $orderContainer->getOrder();
+
+        if ($order->getPaymentId() !== null) {
+            $invoiceUuid = Uuid::fromString($order->getPaymentId());
+        } else {
+            $invoiceUuid = $this->uuidGenerator->uuid();
+        }
+
+        $input = new CreateInvoiceRequest($orderContainer->getMerchant()->getId(), $invoiceUuid);
+        $input->setAmount(
+            new TaxedMoney(
+                $financialDetails->getAmountGross(),
+                $financialDetails->getAmountNet(),
+                $financialDetails->getAmountTax()
+            )
+        )
+            ->setExternalCode($request->getInvoiceNumber())
+            ->setShippingDocumentUrl($request->getShippingDocumentUrl());
+
+        return $this->create($orderContainer, $input);
     }
 }

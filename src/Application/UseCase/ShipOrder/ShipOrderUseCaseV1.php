@@ -16,12 +16,12 @@ use App\DomainModel\Order\Lifecycle\ShipOrder\ShipOrderService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\OrderResponse\LegacyOrderResponse;
 use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerAggregator;
+use App\DomainModel\OrderResponse\LegacyOrderResponse;
 use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
+use App\Helper\Uuid\UuidGeneratorInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
-use Ozean12\Money\TaxedMoney\TaxedMoney;
 use Symfony\Component\Workflow\Registry;
 
 class ShipOrderUseCaseV1 implements ValidatedUseCaseInterface, LoggingInterface
@@ -43,6 +43,8 @@ class ShipOrderUseCaseV1 implements ValidatedUseCaseInterface, LoggingInterface
 
     private InvoiceFactory $invoiceFactory;
 
+    private UuidGeneratorInterface $uuidGenerator;
+
     public function __construct(
         InvoiceDocumentUploadHandlerAggregator $invoiceManager,
         OrderContainerFactory $orderContainerFactory,
@@ -50,7 +52,8 @@ class ShipOrderUseCaseV1 implements ValidatedUseCaseInterface, LoggingInterface
         ShipOrderService $shipOrderService,
         LegacyShipOrderService $legacyShipOrderService,
         LegacyOrderResponseFactory $orderResponseFactory,
-        InvoiceFactory $invoiceFactory
+        InvoiceFactory $invoiceFactory,
+        UuidGeneratorInterface $uuidGenerator
     ) {
         $this->invoiceManager = $invoiceManager;
         $this->orderContainerFactory = $orderContainerFactory;
@@ -59,6 +62,7 @@ class ShipOrderUseCaseV1 implements ValidatedUseCaseInterface, LoggingInterface
         $this->legacyShipOrderService = $legacyShipOrderService;
         $this->orderResponseFactory = $orderResponseFactory;
         $this->invoiceFactory = $invoiceFactory;
+        $this->uuidGenerator = $uuidGenerator;
     }
 
     public function execute(ShipOrderRequestV1 $request): LegacyOrderResponse
@@ -121,19 +125,10 @@ class ShipOrderUseCaseV1 implements ValidatedUseCaseInterface, LoggingInterface
 
     private function makeInvoice(OrderContainer $orderContainer, ShipOrderRequestV1 $request): Invoice
     {
-        $financialDetails = $orderContainer->getOrderFinancialDetails();
-
         try {
-            $invoice = $this->invoiceFactory->create(
+            $invoice = $this->invoiceFactory->createForShipment(
                 $orderContainer,
-                new TaxedMoney(
-                    $financialDetails->getAmountGross(),
-                    $financialDetails->getAmountNet(),
-                    $financialDetails->getAmountTax()
-                ),
-                $orderContainer->getOrderFinancialDetails()->getDuration(),
-                $request->getInvoiceNumber(),
-                $request->getShippingDocumentUrl()
+                $request
             );
         } catch (FeeCalculationException $exception) {
             $this->logSuppressedException($exception, 'Merchant fee configuration is incorrect');

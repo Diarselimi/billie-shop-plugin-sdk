@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\UseCase\CreateInvoice;
 
+use App\Application\CommandHandler;
 use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\ShipOrder\Exception\ShipOrderAmountExceededException;
 use App\Application\UseCase\ShipOrder\Exception\ShipOrderMerchantFeeNotSetException;
@@ -23,7 +24,7 @@ use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\Workflow\Registry;
 
-class CreateInvoiceUseCase implements ValidatedUseCaseInterface, LoggingInterface
+class CreateInvoiceUseCase implements ValidatedUseCaseInterface, LoggingInterface, CommandHandler
 {
     use ValidatedUseCaseTrait,
         LoggingTrait;
@@ -52,7 +53,7 @@ class CreateInvoiceUseCase implements ValidatedUseCaseInterface, LoggingInterfac
         $this->invoiceFactory = $invoiceFactory;
     }
 
-    public function execute(CreateInvoiceRequest $request): Invoice
+    public function execute(CreateInvoiceRequest $request): void
     {
         $orders = $request->getOrders();
         if (count($orders) !== 1) {
@@ -74,8 +75,6 @@ class CreateInvoiceUseCase implements ValidatedUseCaseInterface, LoggingInterfac
         $this->shipOrderService->ship($orderContainer, $invoice);
 
         $this->uploadInvoice($order, $request, $invoice->getUuid());
-
-        return $invoice;
     }
 
     private function uploadInvoice(OrderEntity $order, CreateInvoiceRequest $request, string $invoiceUuid): void
@@ -118,10 +117,7 @@ class CreateInvoiceUseCase implements ValidatedUseCaseInterface, LoggingInterfac
         try {
             return $this->invoiceFactory->create(
                 $orderContainer,
-                $request->getAmount(),
-                $orderContainer->getOrderFinancialDetails()->getDuration(),
-                $request->getExternalCode(),
-                $request->getShippingDocumentUrl()
+                $request
             );
         } catch (FeeCalculationException $exception) {
             $this->logSuppressedException($exception, 'Merchant fee configuration is incorrect');

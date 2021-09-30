@@ -11,13 +11,15 @@ use App\Application\UseCase\ShipOrder\Exception\ShipOrderAmountExceededException
 use App\Application\UseCase\ShipOrder\Exception\ShipOrderMerchantFeeNotSetException;
 use App\Application\UseCase\ShipOrder\Exception\ShipOrderNoOrderUuidException;
 use App\Application\UseCase\ShipOrder\Exception\ShipOrderOrderExternalCodeNotSetException;
-use App\Application\UseCase\CreateInvoice\CreateInvoiceUseCase;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
+use App\Helper\Uuid\UuidGeneratorInterface;
 use App\Http\HttpConstantsInterface;
-use App\Http\RequestTransformer\CreateInvoice\InvoiceLineItemsFactory;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use App\Http\RequestTransformer\AmountRequestFactory;
+use App\Http\RequestTransformer\CreateInvoice\InvoiceLineItemsFactory;
+use App\Infrastructure\CommandBus\SynchronousCommandBus\Decorators\DbTransactionCommandBusDecorator;
 use OpenApi\Annotations as OA;
+use Ramsey\Uuid\Uuid;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -58,23 +60,31 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class CreateInvoiceController
 {
-    private CreateInvoiceUseCase $useCase;
-
     private AmountRequestFactory $requestFactory;
 
     private InvoiceLineItemsFactory $lineItemsFactory;
 
-    public function __construct(CreateInvoiceUseCase $useCase, AmountRequestFactory $requestFactory, InvoiceLineItemsFactory $lineItemsFactory)
-    {
-        $this->useCase = $useCase;
+    private DbTransactionCommandBusDecorator $synchronousCommandBus;
+
+    private UuidGeneratorInterface $uuidGenerator;
+
+    public function __construct(
+        AmountRequestFactory $requestFactory,
+        InvoiceLineItemsFactory $lineItemsFactory,
+        DbTransactionCommandBusDecorator $synchronousCommandBus,
+        UuidGeneratorInterface $uuidGenerator
+    ) {
         $this->requestFactory = $requestFactory;
         $this->lineItemsFactory = $lineItemsFactory;
+        $this->synchronousCommandBus = $synchronousCommandBus;
+        $this->uuidGenerator = $uuidGenerator;
     }
 
     public function execute(Request $request): JsonResponse
     {
         $shipRequest = (new CreateInvoiceRequest(
-            $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID)
+            $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID),
+            $this->uuidGenerator->uuid()
         ))
             ->setExternalCode($request->request->get('external_code'))
             ->setInvoiceUrl($request->request->get('invoice_url'))
@@ -84,8 +94,10 @@ class CreateInvoiceController
             ->setLineItems($this->lineItemsFactory->create($request));
 
         try {
+            $this->synchronousCommandBus->process($shipRequest);
+
             return new JsonResponse([
-                'uuid' => $this->useCase->execute($shipRequest)->getUuid(),
+                'uuid' => $shipRequest->getInvoiceUuid(),
             ], JsonResponse::HTTP_CREATED);
         } catch (OrderContainerFactoryException $exception) {
             throw new NotFoundHttpException($exception->getMessage());
