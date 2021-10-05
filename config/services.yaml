@@ -140,7 +140,6 @@ services:
       $preIdentificationChecks:
         - 'available_financing_limit'
         - 'amount'
-        - 'line_items'
         - 'debtor_country'
         - 'debtor_industry_sector'
       $postIdentificationChecks:
@@ -165,7 +164,6 @@ services:
             debtor_score_available: '@App\DomainModel\OrderRiskCheck\Checker\DebtorScoreAvailableCheck'
             company_b2b_score: '@App\DomainModel\OrderRiskCheck\Checker\DebtorScoreCheck'
             limit: '@App\DomainModel\OrderRiskCheck\Checker\LimitCheck'
-            line_items: '@App\DomainModel\OrderRiskCheck\Checker\LineItemsCheck'
             debtor_identified: '@App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedCheck'
             debtor_identified_strict: '@App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedStrictCheck'
             debtor_identified_billing_address: '@App\DomainModel\OrderRiskCheck\Checker\DebtorIdentifiedBillingAddressCheck'

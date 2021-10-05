@@ -1,6 +1,5 @@
 <?php
 
-use App\DomainModel\OrderRiskCheck\Checker\LineItemsCheck;
 use App\Infrastructure\Repository\MerchantRiskCheckSettingsRepository;
 use App\Infrastructure\Repository\RiskCheckDefinitionRepository;
 use Phinx\Migration\AbstractMigration;
@@ -12,7 +11,7 @@ class AddNewFraudRiskCheck extends AbstractMigration
         $now = (new DateTime())->format('Y-m-d H:i:s');
         $this->table(RiskCheckDefinitionRepository::TABLE_NAME)
             ->insert([
-                'name' => LineItemsCheck::NAME,
+                'name' => 'line_items',
                 'created_at' => $now,
                 'updated_at' => $now,
             ])

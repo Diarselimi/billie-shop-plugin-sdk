@@ -8,7 +8,6 @@ Feature: As a merchant debtor, I want to use my initially provided address (whic
       | name                      |
       | available_financing_limit |
       | amount                    |
-      | line_items                |
       | debtor_country            |
       | debtor_industry_sector    |
       | debtor_identified         |
@@ -20,7 +19,6 @@ Feature: As a merchant debtor, I want to use my initially provided address (whic
       | risk_check_name           | enabled | decline_on_failure |
       | available_financing_limit | 1       | 0                  |
       | amount                    | 1       | 0                  |
-      | line_items                | 1       | 1                  |
       | debtor_country            | 1       | 1                  |
       | debtor_industry_sector    | 1       | 1                  |
       | debtor_identified         | 1       | 1                  |

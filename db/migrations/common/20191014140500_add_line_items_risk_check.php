@@ -1,13 +1,12 @@
 <?php
 
-use App\Infrastructure\Repository\FraudRuleRepository;
 use Phinx\Migration\AbstractMigration;
 
 class AddLineItemsRiskCheck extends AbstractMigration
 {
     public function change()
     {
-        $table = FraudRuleRepository::TABLE_NAME;
+        $table = 'risk_check_rules';
         $this
             ->table($table)
             ->addColumn('excluded_words', 'json', ['null' => false])

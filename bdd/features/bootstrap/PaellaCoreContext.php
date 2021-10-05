@@ -12,8 +12,6 @@ use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeReques
 use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestRepositoryInterface;
 use App\DomainModel\DebtorSettings\DebtorSettingsEntity;
 use App\DomainModel\DebtorSettings\DebtorSettingsRepositoryInterface;
-use App\DomainModel\FraudRules\FraudRuleEntity;
-use App\DomainModel\FraudRules\FraudRuleRepositoryInterface;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
@@ -169,12 +167,6 @@ class PaellaCoreContext extends MinkContext
 
     private function createInitialDataset()
     {
-        $fraudRule = (new FraudRuleEntity())
-            ->setIncludedWords(['Download', 'ESD'])
-            ->setExcludedWords(['Lizenz'])
-            ->setCheckForPublicDomain(true);
-
-        $this->getFraudCheckRulesRepository()->insert($fraudRule);
         $this->merchant = $this->createMerchant();
     }
 
@@ -236,7 +228,7 @@ class PaellaCoreContext extends MinkContext
         $tables = $this->connection->query(
             'SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES 
                 WHERE TABLE_TYPE="BASE TABLE" 
-                AND TABLE_NAME NOT IN ("phinxlog", "public_domains");'
+                AND TABLE_NAME NOT IN ("phinxlog");'
         )->fetchAll(\PDO::FETCH_ASSOC);
 
         foreach ($tables as $table) {
@@ -1311,11 +1303,6 @@ class PaellaCoreContext extends MinkContext
     private function getOrderNotificationRepository(): OrderNotificationRepositoryInterface
     {
         return $this->get(OrderNotificationRepositoryInterface::class);
-    }
-
-    private function getFraudCheckRulesRepository(): FraudRuleRepositoryInterface
-    {
-        return $this->get(FraudRuleRepositoryInterface::class);
     }
 
     private function getMerchantOnboardingRepository(): MerchantOnboardingRepositoryInterface

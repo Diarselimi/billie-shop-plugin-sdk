@@ -17,12 +17,10 @@ Feature:
       | debtor_is_trusted         |
       | limit                     |
       | debtor_not_customer       |
-      | line_items                |
       | company_b2b_score         |
       | debtor_score_available    |
     And The following merchant risk check settings exist for merchant 1:
       | risk_check_name           | enabled | decline_on_failure |
-      | line_items                | 1       | 1                  |
       | available_financing_limit | 1       | 1                  |
       | amount                    | 1       | 1                  |
       | debtor_country            | 1       | 1                  |
