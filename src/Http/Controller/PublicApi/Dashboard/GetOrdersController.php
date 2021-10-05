@@ -5,7 +5,7 @@ namespace App\Http\Controller\PublicApi\Dashboard;
 use App\Application\UseCase\Dashboard\GetOrders\GetOrdersRequest;
 use App\Application\UseCase\Dashboard\GetOrders\GetOrdersUseCase;
 use App\Http\HttpConstantsInterface;
-use App\Http\ResponseTransformer\Dashboard\GetOrdersResponsePayload;
+use App\Http\Response\Dashboard\GetOrdersResponsePayload;
 use App\Support\SearchInput;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;

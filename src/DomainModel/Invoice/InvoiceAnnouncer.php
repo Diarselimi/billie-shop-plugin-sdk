@@ -25,6 +25,7 @@ class InvoiceAnnouncer implements LoggingInterface
 
     public function announce(
         Invoice $invoice,
+        string $orderUuid,
         string $debtorCompanyName,
         string $orderExternalCode,
         ?UuidInterface $debtorSepaMandateUuid,
@@ -32,6 +33,7 @@ class InvoiceAnnouncer implements LoggingInterface
     ): void {
         $message = (new CreateInvoice())
             ->setUuid($invoice->getUuid())
+            ->setOrderUuid($orderUuid)
             ->setCustomerUuid($invoice->getCustomerUuid())
             ->setDebtorCompanyUuid($invoice->getDebtorCompanyUuid())
             ->setDebtorCompanyName($debtorCompanyName)

@@ -82,7 +82,15 @@ class ShipOrderWithInvoiceController
         } catch (OrderContainerFactoryException $exception) {
             throw new NotFoundHttpException($exception->getMessage());
         } catch (ShipOrderAmountExceededException $exception) {
-            $constraint = new ConstraintViolation('Requested amount exceeds order unshipped amount', null, [], '', 'amount', $shipRequest->getAmount()->getGross());
+            $constraint = new ConstraintViolation(
+                'Requested amount exceeds order unshipped amount',
+                null,
+                [],
+                '',
+                'amount',
+                $orderRequest->getAmount() !== null ?
+                    $orderRequest->getAmount()->getGross()->getMoneyValue() : null
+            );
 
             throw new RequestValidationException(new ConstraintViolationList([$constraint]));
         } catch (WorkflowException | ShipOrderMerchantFeeNotSetException $exception) {

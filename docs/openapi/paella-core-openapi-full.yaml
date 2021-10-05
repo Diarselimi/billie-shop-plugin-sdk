@@ -797,6 +797,35 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
+  '/compact/orders/{uuid}':
+    get:
+      tags:
+        - Internal
+      summary: 'Get Order Details (Compact)'
+      operationId: compact_order_get_details
+      parameters:
+        -
+          name: uuid
+          in: path
+          description: 'Order UUID'
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: 'Order Details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetOrderCompactResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
   /publish-to-amqp:
     post:
       summary: 'Publish a message to the amqp broker'
@@ -5823,6 +5852,25 @@ components:
           type: integer
       type: object
       deprecated: true
+    CheckoutProvideIbanResponse:
+      title: 'Provide IBAN for checkout session response'
+      properties:
+        iban:
+          nullable: false
+          $ref: '#/components/schemas/IBAN'
+        bank_name:
+          nullable: false
+          $ref: '#/components/schemas/TinyText'
+        mandate_reference:
+          nullable: false
+          $ref: '#/components/schemas/TinyText'
+        creditor_name:
+          nullable: false
+          $ref: '#/components/schemas/TinyText'
+        creditor_identifier:
+          nullable: false
+          $ref: '#/components/schemas/TinyText'
+      type: object
     BankAccount:
       title: 'Simple representation of a bank account'
       properties:
@@ -6018,25 +6066,6 @@ components:
           minimum: 0
           example: 60.15
       type: object
-    CheckoutProvideIbanResponse:
-      title: 'Provide IBAN for checkout session response'
-      properties:
-        iban:
-          nullable: false
-          $ref: '#/components/schemas/IBAN'
-        bank_name:
-          nullable: false
-          $ref: '#/components/schemas/TinyText'
-        mandate_reference:
-          nullable: false
-          $ref: '#/components/schemas/TinyText'
-        creditor_name:
-          nullable: false
-          $ref: '#/components/schemas/TinyText'
-        creditor_identifier:
-          nullable: false
-          $ref: '#/components/schemas/TinyText'
-      type: object
     GetOrdersResponsePayloadInvoice:
       properties:
         uuid:
@@ -6112,6 +6141,110 @@ components:
                 example: order_v1
                 nullable: false
             type: object
+          nullable: false
+      type: object
+    GetOrderCompactResponse:
+      properties:
+        order:
+          properties:
+            uuid:
+              nullable: false
+              $ref: '#/components/schemas/UUID'
+            external_code:
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            state:
+              nullable: false
+              $ref: '#/components/schemas/OrderState'
+            amount:
+              type: number
+              format: float
+              nullable: false
+            workflow_name:
+              nullable: false
+              $ref: '#/components/schemas/TinyText'
+            created_at:
+              nullable: false
+              $ref: '#/components/schemas/DateTime'
+          type: object
+          nullable: false
+        invoices:
+          properties:
+            uuid:
+              nullable: false
+              $ref: '#/components/schemas/UUID'
+            payment_uuid:
+              nullable: false
+              $ref: '#/components/schemas/UUID'
+            external_code:
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            state:
+              nullable: false
+              $ref: '#/components/schemas/TinyText'
+            amount:
+              type: number
+              format: float
+              nullable: false
+            outstanding_amount:
+              type: number
+              format: float
+              nullable: false
+            duration:
+              nullable: false
+              $ref: '#/components/schemas/OrderDuration'
+            due_date:
+              nullable: false
+              $ref: '#/components/schemas/DateTime'
+            created_at:
+              nullable: false
+              $ref: '#/components/schemas/DateTime'
+          type: object
+          nullable: false
+        merchant:
+          properties:
+            company_uuid:
+              nullable: false
+              $ref: '#/components/schemas/UUID'
+            payment_uuid:
+              nullable: true
+              $ref: '#/components/schemas/UUID'
+            name:
+              nullable: false
+              $ref: '#/components/schemas/TinyText'
+          type: object
+          nullable: false
+        debtor:
+          description: 'If null, the debtor was not identified'
+          properties:
+            uuid:
+              nullable: false
+              $ref: '#/components/schemas/UUID'
+            company_uuid:
+              nullable: false
+              $ref: '#/components/schemas/UUID'
+            payment_uuid:
+              nullable: true
+              $ref: '#/components/schemas/UUID'
+            name:
+              nullable: false
+              $ref: '#/components/schemas/TinyText'
+          type: object
+          nullable: true
+        buyer:
+          description: 'Data of the person who bought the order in the checkout'
+          properties:
+            first_name:
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            last_name:
+              nullable: true
+              $ref: '#/components/schemas/TinyText'
+            email:
+              type: string
+              format: email
+              nullable: false
+          type: object
           nullable: false
       type: object
   responses:

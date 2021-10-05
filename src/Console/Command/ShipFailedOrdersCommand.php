@@ -52,11 +52,13 @@ class ShipFailedOrdersCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $stmt = $this->db->query('
+        $stmt = $this->db->query(
+            '
             select orders.id from orders
             left join borscht.tickets on orders.payment_id = borscht.tickets.uuid
             where orders.payment_id is not null and borscht.tickets.uuid is null;
-        ');
+        '
+        );
 
         while ($item = $stmt->fetch(\PDO::FETCH_ASSOC)) {
             $orderContainer = $this->orderContainerFactory->loadById((int) $item['id']);
@@ -79,6 +81,7 @@ class ShipFailedOrdersCommand extends Command
 
             $this->announcer->announce(
                 $invoice,
+                $orderContainer->getOrder()->getUuid(),
                 $orderContainer->getDebtorCompany()->getName(),
                 $orderContainer->getOrder()->getExternalCode(),
                 null,

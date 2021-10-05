@@ -9,7 +9,7 @@ use App\Application\UseCase\CheckoutProvideIban\CheckoutProvideIbanFailedExcepti
 use App\Application\UseCase\CheckoutProvideIban\CheckoutProvideIbanNotAllowedException;
 use App\Application\UseCase\CheckoutProvideIban\CheckoutProvideIbanRequest;
 use App\Application\UseCase\CheckoutProvideIban\CheckoutProvideIbanUseCase;
-use App\Http\ResponseFormatter\CheckoutProvideIbanResponsePayload;
+use App\Http\Response\CheckoutProvideIbanResponsePayload;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;

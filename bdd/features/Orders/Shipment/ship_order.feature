@@ -182,6 +182,7 @@ Feature:
       "uuid":"@string@",
       "externalCode":"123456A",
       "orderExternalCode":"CO123",
+      "orderUuid": "test-order-uuidCO123",
       "customerUuid":"f2ec4d5e-79f4-40d6-b411-31174b6519ac",
       "debtorCompanyUuid":"c7be46c0-e049-4312-b274-258ec5aeeb70",
       "debtorCompanyName":"Test User Company",
@@ -200,20 +201,3 @@ Feature:
     }
     """
     And the order "CO123" has a payment id
-    And queue should contain message with routing key buyer_portal.buyer_portal_invoice_notification_requested with below data:
-    """
-    {
-      "user": {
-        "firstName":"test",
-        "lastName":"test",
-        "email":"test@ozean12.com",
-        "gender":"t"
-      },
-      "invoiceUuid": "@string@",
-      "invoiceAmount": "100000",
-      "creditorName": "Behat Merchant",
-      "debtorName":"Test User Company",
-      "token":"sdg340vpl29kx"
-    }
-    """
-    And queue should contain 1 messages with routing key buyer_portal.buyer_portal_invoice_notification_requested

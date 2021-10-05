@@ -418,7 +418,7 @@ class PaellaCoreContext extends MinkContext
                 $row['checkout_session'],
                 OrderEntity::CREATION_SOURCE_API,
                 $row['workflow_name'] ?? OrderEntity::WORKFLOW_NAME_V1,
-                null,
+                $row['uuid'] ?? null,
                 Uuid::fromString(SepaServiceContext::DUMMY_SEPA_MANDATE_UUID)
             );
         }

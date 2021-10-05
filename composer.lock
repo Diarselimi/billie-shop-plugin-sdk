@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "de8c9cfd8abef53a415289eea7ebee6f",
+    "content-hash": "8dc2710f68157adc2037f1cf6075a7c3",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -2983,16 +2983,16 @@
         },
         {
             "name": "ozean12/amqp-pack",
-            "version": "2.2.0",
+            "version": "2.2.1",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/amqp-pack.git",
-                "reference": "a79ca1cf87dad92dc44232dcfe842abf85671341"
+                "reference": "15a808e6ac9c126f82c005e7cb65e57a2e713c0f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/amqp-pack/zipball/a79ca1cf87dad92dc44232dcfe842abf85671341",
-                "reference": "a79ca1cf87dad92dc44232dcfe842abf85671341",
+                "url": "https://api.github.com/repos/ozean12/amqp-pack/zipball/15a808e6ac9c126f82c005e7cb65e57a2e713c0f",
+                "reference": "15a808e6ac9c126f82c005e7cb65e57a2e713c0f",
                 "shasum": ""
             },
             "require": {
@@ -3020,7 +3020,7 @@
             "require-dev": {
                 "phpunit/phpunit": "~7.0"
             },
-            "type": "symfony-pack",
+            "type": "library",
             "autoload": {
                 "psr-4": {
                     "Ozean12\\AmqpPackBundle\\": ""
@@ -3036,28 +3036,28 @@
             ],
             "description": "A pack for using the AMQP transport within Billie",
             "support": {
-                "source": "https://github.com/ozean12/amqp-pack/tree/2.2.0",
+                "source": "https://github.com/ozean12/amqp-pack/tree/2.2.1",
                 "issues": "https://github.com/ozean12/amqp-pack/issues"
             },
-            "time": "2021-08-06T09:11:53+00:00"
+            "time": "2021-09-29T09:55:06+00:00"
         },
         {
             "name": "ozean12/amqp-transfers",
-            "version": "0.4.83",
+            "version": "0.4.86",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/amqp-transfers.git",
-                "reference": "da8863317b71cda727ddd5d4be864fb9fab3d5de"
+                "reference": "cbd6409d91f1d08b9d09027bf9bbaa25d4da1f42"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/amqp-transfers/zipball/da8863317b71cda727ddd5d4be864fb9fab3d5de",
-                "reference": "da8863317b71cda727ddd5d4be864fb9fab3d5de",
+                "url": "https://api.github.com/repos/ozean12/amqp-transfers/zipball/cbd6409d91f1d08b9d09027bf9bbaa25d4da1f42",
+                "reference": "cbd6409d91f1d08b9d09027bf9bbaa25d4da1f42",
                 "shasum": ""
             },
             "require": {
                 "google/protobuf": "^3.7.0",
-                "php": "^7.2"
+                "php": ">=7.2"
             },
             "type": "library",
             "autoload": {
@@ -3072,10 +3072,10 @@
             ],
             "description": "Transfer objects across Billie universe",
             "support": {
-                "source": "https://github.com/ozean12/amqp-transfers/tree/0.4.83",
+                "source": "https://github.com/ozean12/amqp-transfers/tree/0.4.86",
                 "issues": "https://github.com/ozean12/amqp-transfers/issues"
             },
-            "time": "2021-09-14T06:45:41+00:00"
+            "time": "2021-09-30T20:06:29+00:00"
         },
         {
             "name": "ozean12/amqp-transfers-serializer",
@@ -3530,60 +3530,6 @@
                 "issues": "https://github.com/ozean12/sepa-client-php/issues"
             },
             "time": "2021-08-10T13:46:02+00:00"
-        },
-        {
-            "name": "ozean12/smaug-client",
-            "version": "1.0.1",
-            "source": {
-                "type": "git",
-                "url": "git@github.com:ozean12/smaug-client-php.git",
-                "reference": "65b013c7b0fa587e2b355dc1fa2125b56d0f22b9"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/smaug-client-php/zipball/65b013c7b0fa587e2b355dc1fa2125b56d0f22b9",
-                "reference": "65b013c7b0fa587e2b355dc1fa2125b56d0f22b9",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "guzzlehttp/guzzle": "~6.0 | ~7.0",
-                "php": ">=7.2",
-                "psr/log": "^1.1",
-                "ramsey/uuid": "^3.9.3 | ^4.1"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "^2.18",
-                "phpunit/phpunit": "^8.5"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Ozean12\\Smaug\\Client\\": "src/"
-                }
-            },
-            "autoload-dev": {
-                "psr-4": {
-                    "Ozean12\\Smaug\\Client\\Tests\\": "tests/"
-                }
-            },
-            "scripts": {
-                "test": [
-                    "./vendor/bin/phpunit"
-                ],
-                "csfix": [
-                    "./vendor/bin/php-cs-fixer fix --ansi"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "Smaug service PHP client",
-            "support": {
-                "source": "https://github.com/ozean12/smaug-client-php/tree/1.0.1",
-                "issues": "https://github.com/ozean12/smaug-client-php/issues"
-            },
-            "time": "2021-05-12T20:13:51+00:00"
         },
         {
             "name": "ozean12/support",

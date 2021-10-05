@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\ResponseTransformer\Dashboard;
+namespace App\Http\Response\Dashboard;
 
 use App\Application\UseCase\Dashboard\GetOrders\GetOrdersResponse;
 use App\DomainModel\ArrayableInterface;

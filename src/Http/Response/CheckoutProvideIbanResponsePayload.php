@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\ResponseFormatter;
+namespace App\Http\Response;
 
 use App\Application\UseCase\CheckoutProvideIban\CheckoutProvideIbanResponse;
 use OpenApi\Annotations as OA;

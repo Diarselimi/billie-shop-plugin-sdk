@@ -265,9 +265,6 @@
     "ozean12/sepa-client": {
         "version": "1.0.0"
     },
-    "ozean12/smaug-client": {
-        "version": "1.0.0"
-    },
     "ozean12/support": {
         "version": "2.2.0"
     },

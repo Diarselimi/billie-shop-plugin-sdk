@@ -4,7 +4,6 @@ namespace App\DomainModel\Order\Lifecycle\ShipOrder;
 
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceAnnouncer;
-use App\DomainModel\Order\Event\OrderShippedEvent;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface;
@@ -12,7 +11,6 @@ use App\DomainModel\OrderInvoice\OrderInvoiceFactory;
 use App\DomainModel\OrderInvoice\OrderInvoiceRepositoryInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Workflow\Registry;
 
 class ShipOrderService implements ShipOrderInterface, LoggingInterface
@@ -29,22 +27,18 @@ class ShipOrderService implements ShipOrderInterface, LoggingInterface
 
     private OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository;
 
-    private EventDispatcherInterface $eventDispatcher;
-
     public function __construct(
         Registry $workflowRegistry,
         InvoiceAnnouncer $announcer,
         OrderInvoiceFactory $orderInvoiceFactory,
         OrderInvoiceRepositoryInterface $orderInvoiceRepository,
-        OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
-        EventDispatcherInterface $eventDispatcher
+        OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository
     ) {
         $this->workflowRegistry = $workflowRegistry;
         $this->announcer = $announcer;
         $this->orderInvoiceFactory = $orderInvoiceFactory;
         $this->orderInvoiceRepository = $orderInvoiceRepository;
         $this->orderFinancialDetailsRepository = $orderFinancialDetailsRepository;
-        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function ship(OrderContainer $orderContainer, Invoice $invoice): void
@@ -74,6 +68,7 @@ class ShipOrderService implements ShipOrderInterface, LoggingInterface
 
         $this->announcer->announce(
             $invoice,
+            $orderContainer->getOrder()->getUuid(),
             $orderContainer->getDebtorCompany()->getName(),
             $orderContainer->getOrder()->getExternalCode(),
             $orderContainer->getOrder()->getDebtorSepaMandateUuid(),
@@ -89,6 +84,5 @@ class ShipOrderService implements ShipOrderInterface, LoggingInterface
         }
 
         $this->logInfo('Order shipped with {name} workflow', [LoggingInterface::KEY_NAME => $workflow->getName()]);
-        $this->eventDispatcher->dispatch(new OrderShippedEvent($orderContainer, $invoice));
     }
 }
