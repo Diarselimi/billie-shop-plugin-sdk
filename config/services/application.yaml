@@ -1,0 +1,13 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  _instanceof:
+    App\Application\CommandHandler:
+      tags: [ 'app.command_handler' ]
+
+  App\Application\CommandBus: '@App\Infrastructure\CommandBus\SynchronousCommandBus\SynchronousCommandBus'
+
+  App\Application\UseCase\InitiateCheckoutSession\InitiateCheckoutSessionHandler: ~

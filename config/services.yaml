@@ -75,6 +75,7 @@ services:
         '../src/Application/Exception',
         '../src/Application/**/Exception/*Exception.php',
         '../src/Application/UseCase/**/*Exception.php',
+        '../src/Application/UseCase/InitiateCheckoutSession',
         '../src/Http/Response/DTO',
         '../src/Http/Authentication/*User.php',
         '../src/Application/**/*Response.php',
@@ -85,9 +86,13 @@ services:
         '../src/Infrastructure/*Exception.php',
         '../src/Infrastructure/**/*Exception.php',
         '../src/Infrastructure/**/*DTO.php',
+        '../src/Infrastructure/CommandBus',
+        '../src/Infrastructure/UuidGeneration',
         '../src/DomainModel/**/*Event.php',
         '../src/DomainModel/**/**/*Event.php',
-        '../src/DomainEvent'
+        '../src/DomainEvent',
+        '../src/Domain',
+        '../src/UserInterface'
     ]
 
   App\Http\Controller\:
@@ -194,12 +199,3 @@ services:
 
   sandbox_request_matcher:
     class: App\Http\RequestMatcher\SandboxRequestMatcher
-
-  App\Application\CommandBus: '@App\Infrastructure\CommandBus\SynchronousCommandBus\SynchronousCommandBus'
-  App\Infrastructure\CommandBus\SynchronousCommandBus\SynchronousCommandBus: ~
-  App\Infrastructure\CommandBus\SynchronousCommandBus\CommandHandlerLocator:
-    arguments: [ !tagged_locator app.command_handler ]
-  App\Infrastructure\CommandBus\SynchronousCommandBus\Decorators\DbTransactionCommandBusDecorator:
-    decorates: App\Infrastructure\CommandBus\SynchronousCommandBus\SynchronousCommandBus
-    arguments:
-      $dbConn: '@billie_pdo.default_statement_executor'

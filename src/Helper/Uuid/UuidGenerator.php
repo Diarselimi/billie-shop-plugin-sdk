@@ -5,6 +5,9 @@ namespace App\Helper\Uuid;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
+/**
+ * @deprecated use App\Infrastructure\UuidGeneration\UuidGenerator
+ */
 class UuidGenerator implements UuidGeneratorInterface
 {
     /**

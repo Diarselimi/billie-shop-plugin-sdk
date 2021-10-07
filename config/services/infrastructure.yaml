@@ -1,0 +1,16 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  App\Infrastructure\CommandBus\SynchronousCommandBus\SynchronousCommandBus: ~
+  App\Infrastructure\CommandBus\SynchronousCommandBus\CommandHandlerLocator:
+    arguments: [ !tagged_locator app.command_handler ]
+  App\Infrastructure\CommandBus\SynchronousCommandBus\Decorators\DbTransactionCommandBusDecorator:
+    decorates: App\Infrastructure\CommandBus\SynchronousCommandBus\SynchronousCommandBus
+    arguments:
+      $dbConn: '@billie_pdo.default_statement_executor'
+
+  App\Infrastructure\UuidGeneration\UuidGenerator: '@App\Infrastructure\UuidGeneration\RamseyUuidGenerator'
+  App\Infrastructure\UuidGeneration\RamseyUuidGenerator: ~

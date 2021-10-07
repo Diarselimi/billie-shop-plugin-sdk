@@ -99,6 +99,14 @@ security:
         entry_point: App\Http\Authentication\Authenticator\ActiveCheckoutSessionAuthenticator
 
     # ---------------------------------------- #
+    # KLARNA PAYMENT METHOD
+    # ---------------------------------------- #
+
+    klarna_scheme:
+      pattern: ^/klarna/scheme
+      security: false
+
+    # ---------------------------------------- #
     # DEFAULTS
     # ---------------------------------------- #
 

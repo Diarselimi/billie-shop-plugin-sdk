@@ -4,6 +4,9 @@ namespace App\DomainModel\CheckoutSession;
 
 use App\Helper\Uuid\UuidGeneratorInterface;
 
+/**
+ * @deprecated
+ */
 class CheckoutSessionFactory
 {
     private $uuidGenerator;
@@ -24,6 +27,10 @@ class CheckoutSessionFactory
         return $entity;
     }
 
+    /**
+     * This used only for hydrating the entity with data from DB
+     * Move into the Repo implementation
+     */
     public function createFromArray(array $row): CheckoutSessionEntity
     {
         $entity = new CheckoutSessionEntity();

@@ -4,6 +4,9 @@ namespace App\DomainModel\CheckoutSession;
 
 use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 
+/**
+ * @deprecated use CheckoutSession
+ */
 class CheckoutSessionEntity extends AbstractTimestampableEntity
 {
     private $uuid;
@@ -13,6 +16,18 @@ class CheckoutSessionEntity extends AbstractTimestampableEntity
     private $merchantDebtorExternalId;
 
     private $isActive;
+
+    public static function fromNewModel(CheckoutSession $session): self
+    {
+        $self = new self();
+
+        $self->uuid = (string) $session->token();
+        $self->merchantId = $session->merchantId();
+        $self->merchantDebtorExternalId = 'nonexistent'; // TODO
+        $self->isActive = $session->isActive();
+
+        return $self;
+    }
 
     public function getUuid(): string
     {

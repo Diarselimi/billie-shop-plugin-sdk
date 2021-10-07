@@ -83,7 +83,10 @@
             "App\\Tests\\": "tests/",
             "spec\\App\\": "bdd/spec/",
             "App\\Tests\\Functional\\Context\\": "bdd/features/bootstrap/"
-        }
+        },
+        "files": [
+            "./vendor/phpunit/phpunit/src/Framework/Assert/Functions.php"
+        ]
     },
     "replace": {
         "paragonie/random_compat": "2.*",

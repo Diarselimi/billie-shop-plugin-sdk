@@ -11,6 +11,11 @@ api_docs:
   type: openapi_annotation
   name_prefix: docs_
 
+api_klarna_scheme:
+  resource: routes/klarna_scheme.yaml
+  prefix: /klarna/scheme
+  name_prefix: klarna_scheme_
+
 api_v1:
   resource: 'routes/public_api_v1.yaml'
 

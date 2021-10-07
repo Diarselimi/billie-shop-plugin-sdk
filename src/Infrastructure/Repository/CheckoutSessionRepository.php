@@ -2,12 +2,16 @@
 
 namespace App\Infrastructure\Repository;
 
+use App\DomainModel\CheckoutSession\CheckoutSession;
+use App\DomainModel\CheckoutSession\CheckoutSessionRepository as RepositoryInterface;
 use App\DomainModel\CheckoutSession\CheckoutSessionEntity;
 use App\DomainModel\CheckoutSession\CheckoutSessionFactory;
 use App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface;
 use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
-class CheckoutSessionRepository extends AbstractPdoRepository implements CheckoutSessionRepositoryInterface
+class CheckoutSessionRepository extends AbstractPdoRepository implements
+    CheckoutSessionRepositoryInterface,
+    RepositoryInterface
 {
     const TABLE_NAME = "checkout_sessions";
 
@@ -18,6 +22,11 @@ class CheckoutSessionRepository extends AbstractPdoRepository implements Checkou
     public function __construct(CheckoutSessionFactory $checkoutSessionFactory)
     {
         $this->checkoutSessionFactory = $checkoutSessionFactory;
+    }
+
+    public function save(CheckoutSession $session): void
+    {
+        $this->create(CheckoutSessionEntity::fromNewModel($session));
     }
 
     public function create(CheckoutSessionEntity $entity): CheckoutSessionEntity

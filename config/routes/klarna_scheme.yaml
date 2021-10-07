@@ -1,0 +1,4 @@
+initiate:
+  path: /initiate
+  controller: App\UserInterface\Http\KlarnaScheme\Controllers\InitiateController::execute
+  methods: POST

@@ -1,0 +1,10 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  App\UserInterface\Http\KlarnaScheme\Controllers\:
+    public: true
+    resource: '../../src/UserInterface/Http/KlarnaScheme/Controllers'
+    tags: [ 'controller.service_arguments' ]
