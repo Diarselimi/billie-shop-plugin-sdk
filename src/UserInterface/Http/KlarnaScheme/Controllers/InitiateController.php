@@ -6,7 +6,7 @@ use App\Application\CommandBus;
 use App\Application\UseCase\InitiateCheckoutSession\InitiateCheckoutSession;
 use App\DomainModel\CheckoutSession\CountryNotSupported;
 use App\Infrastructure\UuidGeneration\UuidGenerator;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use App\UserInterface\Http\KlarnaScheme\KlarnaResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class InitiateController
@@ -25,18 +25,14 @@ class InitiateController
         $this->uuidGenerator = $uuidGenerator;
     }
 
-    public function execute(Request $request): JsonResponse
+    public function execute(Request $request): KlarnaResponse
     {
         if ($this->isRequestInvalid($request)) {
-            return new JsonResponse([
-                'error_messages' => ['Invalid request'],
-            ]);
+            return KlarnaResponse::withErrorMessage('Invalid request');
         }
 
         if ($this->doesNotSupportCustomerType($request)) {
-            return new JsonResponse([
-                'error_messages' => ['Customer type not supported'],
-            ]);
+            return KlarnaResponse::withErrorMessage('Customer type not supported');
         }
 
         try {
@@ -45,15 +41,13 @@ class InitiateController
                 $request->request->get('country'),
                 1 // TODO
             );
-        } catch (CountryNotSupported $exception) {
-            return new JsonResponse([
-                'error_messages' => [$exception->getMessage()],
-            ]);
+        } catch (CountryNotSupported $ex) {
+            return KlarnaResponse::withErrorFromException($ex);
         }
 
         $this->bus->process($command);
 
-        return new JsonResponse([
+        return new KlarnaResponse([
             'payment_method_session_id' => (string) $command->token(),
         ]);
     }

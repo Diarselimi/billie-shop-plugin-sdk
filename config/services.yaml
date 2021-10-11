@@ -91,7 +91,6 @@ services:
         '../src/DomainModel/**/*Event.php',
         '../src/DomainModel/**/**/*Event.php',
         '../src/DomainEvent',
-        '../src/Domain',
         '../src/UserInterface'
     ]
 

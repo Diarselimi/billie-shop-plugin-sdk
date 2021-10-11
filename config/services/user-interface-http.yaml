@@ -5,6 +5,5 @@ services:
     public: false
 
   App\UserInterface\Http\KlarnaScheme\Controllers\:
-    public: true
     resource: '../../src/UserInterface/Http/KlarnaScheme/Controllers'
     tags: [ 'controller.service_arguments' ]
