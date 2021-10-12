@@ -2,7 +2,7 @@
 
 namespace App\Application\UseCase\NotificationDelivery;
 
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderNotification\Exception\NotificationSenderException;
 use App\DomainModel\OrderNotification\NotificationScheduler;
@@ -30,7 +30,7 @@ class NotificationDeliveryUseCase implements LoggingInterface
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         OrderNotificationRepositoryInterface $notificationRepository,
         NotificationSenderInterface $notificationSender,
         NotificationScheduler $notificationScheduler,

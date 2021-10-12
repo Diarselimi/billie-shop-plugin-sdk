@@ -2,7 +2,7 @@
 
 namespace App\Application\UseCase\GetMerchant;
 
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
 use App\DomainModel\MerchantUser\AuthenticationServiceRequestException;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
@@ -17,7 +17,7 @@ class GetMerchantUseCase implements LoggingInterface
     private $authenticationService;
 
     public function __construct(
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         AuthenticationServiceInterface $authenticationService
     ) {
         $this->merchantRepository = $merchantRepository;

@@ -7,7 +7,7 @@ use App\Application\Exception\MerchantDebtorNotFoundException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\DebtorLimit\DebtorLimitServiceInterface;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -24,7 +24,7 @@ class UpdateMerchantDebtorLimitUseCase implements LoggingInterface, ValidatedUse
 
     public function __construct(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         DebtorLimitServiceInterface $debtorLimitService
     ) {
         $this->merchantDebtorRepository = $merchantDebtorRepository;

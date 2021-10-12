@@ -1,14 +1,14 @@
 <?php
 
 use App\Infrastructure\Phinx\TransactionalMigration;
-use App\Infrastructure\Repository\MerchantRepository;
+use App\Infrastructure\Repository\MerchantPdoRepository;
 
 class SetMerchantCompanyUuidToNotNull extends TransactionalMigration
 {
     public function migrate()
     {
         $this
-            ->table(MerchantRepository::TABLE_NAME)
+            ->table(MerchantPdoRepository::TABLE_NAME)
             ->changeColumn('company_uuid', 'string', ['null' => false, 'limit' => 36])
             ->save()
         ;

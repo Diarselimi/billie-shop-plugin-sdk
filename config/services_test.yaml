@@ -47,8 +47,8 @@ services:
   App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface:
     alias: 'App\Infrastructure\Repository\DebtorExternalDataRepository'
     public: true
-  App\DomainModel\Merchant\MerchantRepositoryInterface:
-    alias: 'App\Infrastructure\Repository\MerchantRepository'
+  App\DomainModel\Merchant\MerchantRepository:
+    alias: 'App\Infrastructure\Repository\MerchantPdoRepository'
     public: true
   App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface:
     alias: 'App\Infrastructure\Repository\MerchantDebtorRepository'

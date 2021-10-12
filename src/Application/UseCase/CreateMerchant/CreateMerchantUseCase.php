@@ -7,7 +7,7 @@ use App\DomainModel\Merchant\DuplicateMerchantCompanyException;
 use App\DomainModel\Merchant\MerchantCompanyNotFoundException;
 use App\DomainModel\Merchant\MerchantCreationDTO;
 use App\DomainModel\Merchant\MerchantCreationService;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\Helper\Uuid\UuidGeneratorInterface;
 
 class CreateMerchantUseCase
@@ -22,7 +22,7 @@ class CreateMerchantUseCase
 
     public function __construct(
         UuidGeneratorInterface $uuidGenerator,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         CompaniesServiceInterface $companiesService,
         MerchantCreationService $merchantCreationService
     ) {

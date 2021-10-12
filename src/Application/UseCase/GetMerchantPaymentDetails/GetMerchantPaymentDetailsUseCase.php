@@ -7,7 +7,7 @@ use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\MerchantPayment\MerchantPaymentResponseTransformer;
 use App\DomainModel\Payment\PaymentsRepositoryInterface;
-use App\Infrastructure\Repository\MerchantRepository;
+use App\Infrastructure\Repository\MerchantPdoRepository;
 
 class GetMerchantPaymentDetailsUseCase implements ValidatedUseCaseInterface
 {
@@ -20,7 +20,7 @@ class GetMerchantPaymentDetailsUseCase implements ValidatedUseCaseInterface
     private $paymentFactory;
 
     public function __construct(
-        MerchantRepository $merchantRepository,
+        MerchantPdoRepository $merchantRepository,
         PaymentsRepositoryInterface $paymentsRepository,
         MerchantPaymentResponseTransformer $paymentFactory
     ) {

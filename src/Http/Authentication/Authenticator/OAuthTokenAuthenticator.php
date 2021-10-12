@@ -2,7 +2,7 @@
 
 namespace App\Http\Authentication\Authenticator;
 
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
 use App\DomainModel\MerchantUser\MerchantUserPermissionsService;
 use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
@@ -24,7 +24,7 @@ class OAuthTokenAuthenticator extends AbstractAuthenticator
 
     public function __construct(
         AuthenticationServiceInterface $authenticationService,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         MerchantUserRepositoryInterface $merchantUserRepository,
         MerchantUserPermissionsService $merchantUserPermissionsService
     ) {

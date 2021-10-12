@@ -59,7 +59,7 @@ class MerchantCreationService
 
     public function __construct(
         UuidGeneratorInterface $uuidGenerator,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         MerchantEntityFactory $merchantEntityFactory,
         MerchantSettingsEntityFactory $merchantSettingsFactory,
         MerchantSettingsRepositoryInterface $merchantSettingsRepository,

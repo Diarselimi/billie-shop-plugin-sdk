@@ -7,7 +7,7 @@ use App\Application\UseCase\OrderOutstandingAmountChange\OrderOutstandingAmountC
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceCollection;
 use App\DomainModel\Merchant\MerchantEntity;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
@@ -40,7 +40,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
 
     public function let(
         OrderContainerFactory $orderContainerFactory,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         NotificationScheduler $notificationScheduler,
         MerchantDebtorLimitsService $limitsService,
         OrderNotificationPayloadFactory $orderEventPayloadFactory,
@@ -60,7 +60,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
 
     public function it_should_schedule_event_if_everything_is_fine(
         OrderContainerFactory $orderContainerFactory,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         NotificationScheduler $notificationScheduler,
         MerchantDebtorLimitsService $limitsService,
         MerchantEntity $merchant,
@@ -135,7 +135,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
 
     public function it_should_schedule_event_and_trigger_paid_event_if_everything_is_fine(
         OrderContainerFactory $orderContainerFactory,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         NotificationScheduler $notificationScheduler,
         MerchantDebtorLimitsService $limitsService,
         MerchantEntity $merchant,
@@ -209,7 +209,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
 
     public function it_should_not_do_anything_if_order_state_is_wrong(
         OrderContainerFactory $orderContainerFactory,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         NotificationScheduler $notificationScheduler,
         MerchantDebtorLimitsService $limitsService,
         OrderContainer $orderContainer,
@@ -246,7 +246,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
 
     public function it_should_not_schedule_event_if_order_not_found(
         OrderContainerFactory $orderContainerFactory,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         NotificationScheduler $notificationScheduler,
         MerchantDebtorLimitsService $limitsService,
         OrderContainer $orderContainer
@@ -281,7 +281,7 @@ class OrderOutstandingAmountChangeUseCaseSpec extends ObjectBehavior
 
     public function it_should_not_schedule_event_and_call_limes_if_amount_change_type_is_not_payment(
         OrderContainerFactory $orderContainerFactory,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         NotificationScheduler $notificationScheduler,
         MerchantDebtorLimitsService $limitsService,
         MerchantEntity $merchant,

@@ -2,7 +2,7 @@
 
 namespace App\Http\Authentication\Authenticator;
 
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\Http\Authentication\MerchantApiUser;
 use App\Http\HttpConstantsInterface;
 use App\Support\TwoWayEncryption\Encryptor;
@@ -13,7 +13,7 @@ class ApiKeyAuthenticator extends AbstractAuthenticator
 {
     private Encryptor $encrypt;
 
-    public function __construct(Encryptor $encrypt, MerchantRepositoryInterface $merchantRepository)
+    public function __construct(Encryptor $encrypt, MerchantRepository $merchantRepository)
     {
         parent::__construct($merchantRepository);
 

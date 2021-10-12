@@ -16,7 +16,7 @@ use App\DomainModel\DebtorCompany\DebtorCompany;
 use App\DomainModel\Merchant\DuplicateMerchantCompanyException;
 use App\DomainModel\Merchant\MerchantCreationDTO;
 use App\DomainModel\Merchant\MerchantCreationService;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\Helper\Uuid\UuidGeneratorInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -45,7 +45,7 @@ class CreateMerchantWithCompanyUseCase implements ValidatedUseCaseInterface
         UuidGeneratorInterface $uuidGenerator,
         MerchantCreationService $merchantCreationService,
         CompaniesServiceInterface $companiesService,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         BankAccountDTOFactory $bankAccountDTOFactory,
         BankAccountCoreAcceptedAnnouncer $announcer,
         SepaMandateReferenceGenerator $mandateReferenceGenerator,

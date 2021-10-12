@@ -6,7 +6,7 @@ use App\DomainModel\Address\AddressEntityFactory;
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
 use App\DomainModel\Merchant\MerchantCompanyNotFoundException;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingContainer;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingContainerFactory;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingTransitionEntity;
@@ -27,7 +27,7 @@ class MerchantUserService
 
     public function __construct(
         MerchantUserRepositoryInterface $merchantUserRepository,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         CompaniesServiceInterface $companiesService,
         AddressEntityFactory $addressEntityFactory,
         MerchantUserPermissionsService $merchantUserPermissionsService,

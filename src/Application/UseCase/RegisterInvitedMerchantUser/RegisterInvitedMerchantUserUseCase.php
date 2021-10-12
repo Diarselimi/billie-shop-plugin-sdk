@@ -8,7 +8,7 @@ use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainEvent\MerchantOnboarding\MerchantOnboardingAdminUserCreated;
 use App\DomainModel\Merchant\MerchantNotFoundException;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantUser\MerchantUserAlreadyExistsException;
 use App\DomainModel\MerchantUser\MerchantUserEntity;
 use App\DomainModel\MerchantUser\MerchantUserEntityFactory;
@@ -34,7 +34,7 @@ class RegisterInvitedMerchantUserUseCase implements ValidatedUseCaseInterface
 
     private EventDispatcherInterface $eventDispatcher;
 
-    private MerchantRepositoryInterface $merchantRepository;
+    private MerchantRepository $merchantRepository;
 
     private MessageBusInterface $messageBus;
 
@@ -44,7 +44,7 @@ class RegisterInvitedMerchantUserUseCase implements ValidatedUseCaseInterface
         MerchantUserLoginService $loginService,
         MerchantUserService $userService,
         EventDispatcherInterface $eventDispatcher,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         MessageBusInterface $messageBus
     ) {
         $this->merchantUserEntityFactory = $merchantUserEntityFactory;

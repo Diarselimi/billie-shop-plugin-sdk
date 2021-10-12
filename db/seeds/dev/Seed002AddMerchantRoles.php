@@ -1,7 +1,7 @@
 <?php
 
 use App\DomainModel\MerchantUser\MerchantUserDefaultRoles;
-use App\Infrastructure\Repository\MerchantRepository;
+use App\Infrastructure\Repository\MerchantPdoRepository;
 use App\Infrastructure\Repository\MerchantUserRoleRepository;
 use Phinx\Seed\AbstractSeed;
 use Ramsey\Uuid\Uuid;
@@ -12,7 +12,7 @@ class Seed002AddMerchantRoles extends AbstractSeed
 
     public function run()
     {
-        $merchants = $this->fetchAll('SELECT * FROM ' . MerchantRepository::TABLE_NAME);
+        $merchants = $this->fetchAll('SELECT * FROM ' . MerchantPdoRepository::TABLE_NAME);
         $now = (new DateTime())->format('Y-m-d H:i:s');
         $table = $this->table(MerchantUserRoleRepository::TABLE_NAME);
 

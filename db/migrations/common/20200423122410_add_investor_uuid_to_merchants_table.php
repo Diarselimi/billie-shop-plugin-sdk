@@ -1,13 +1,13 @@
 <?php
 
-use App\Infrastructure\Repository\MerchantRepository;
+use App\Infrastructure\Repository\MerchantPdoRepository;
 use Phinx\Migration\AbstractMigration;
 
 class AddInvestorUuidToMerchantsTable extends AbstractMigration
 {
     public function change()
     {
-        $this->table(MerchantRepository::TABLE_NAME)
+        $this->table(MerchantPdoRepository::TABLE_NAME)
             ->addColumn(
                 'investor_uuid',
                 'string',

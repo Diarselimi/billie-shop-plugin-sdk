@@ -13,7 +13,7 @@ use App\DomainModel\DebtorSettings\DebtorSettingsRepositoryInterface;
 use App\DomainModel\Invoice\InvoiceCollection;
 use App\DomainModel\Invoice\InvoiceServiceInterface;
 use App\DomainModel\Merchant\MerchantEntity;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantDebtor\Details\MerchantDebtorDetailsDTO;
 use App\DomainModel\MerchantDebtor\Details\MerchantDebtorDetailsRepositoryInterface;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
@@ -72,7 +72,7 @@ class OrderContainerRelationLoader
         DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
         AddressRepositoryInterface $addressRepository,
         PersonRepositoryInterface $personRepository,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         MerchantSettingsRepositoryInterface $merchantSettingsRepository,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,

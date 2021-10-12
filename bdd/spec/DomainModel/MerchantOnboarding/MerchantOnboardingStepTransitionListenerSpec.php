@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace spec\App\DomainModel\MerchantOnboarding;
 
 use App\DomainModel\Merchant\MerchantEntity;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepEntity;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepTransitionEntity;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepTransitionRepositoryInterface;
@@ -27,7 +27,7 @@ class MerchantOnboardingStepTransitionListenerSpec extends ObjectBehavior
     public function let(
         MessageBusInterface $bus,
         MerchantOnboardingStepTransitionRepositoryInterface $transitionRepository,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         LoggerInterface $logger
     ) {
         $this->beConstructedWith(...func_get_args());
@@ -37,7 +37,7 @@ class MerchantOnboardingStepTransitionListenerSpec extends ObjectBehavior
     public function it_dispatches_message(
         MessageBusInterface $bus,
         MerchantOnboardingStepTransitionRepositoryInterface $transitionRepository,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         Event $event,
         LoggerInterface $logger
     ): void {
@@ -93,7 +93,7 @@ class MerchantOnboardingStepTransitionListenerSpec extends ObjectBehavior
 
     public function it_logs_error_when_no_merchant_found(
         MerchantOnboardingStepTransitionRepositoryInterface $transitionRepository,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         Event $event,
         LoggerInterface $logger,
         MessageBusInterface $bus

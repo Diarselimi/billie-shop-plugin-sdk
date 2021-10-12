@@ -6,7 +6,7 @@ use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeReques
 use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestEntity;
 use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestRepositoryInterface;
 use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestTransitionEntity;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -31,7 +31,7 @@ class DebtorInformationChangeRequestManualApprover implements LoggingInterface
         DebtorInformationChangeRequestRepositoryInterface $changeRequestRepository,
         DebtorInformationChangeRequestCreatedAnnouncer $debtorInformationChangeRequestAnnouncer,
         MerchantUserRepositoryInterface $merchantUserRepository,
-        MerchantRepositoryInterface $merchantRepository
+        MerchantRepository $merchantRepository
     ) {
         $this->workflow = $debtorInformationChangeRequestWorkflow;
         $this->changeRequestRepository = $changeRequestRepository;

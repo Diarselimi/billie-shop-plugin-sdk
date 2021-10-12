@@ -4,7 +4,7 @@ namespace App\Application\UseCase\GetSignatoryPowers;
 
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorCompany\CompaniesServiceRequestException;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
 use App\DomainModel\SignatoryPower\UserSignatoryPowerMatcher;
 
@@ -14,14 +14,14 @@ class GetSignatoryPowersUseCase
 
     private MerchantUserRepositoryInterface $merchantUserRepository;
 
-    private MerchantRepositoryInterface $merchantRepository;
+    private MerchantRepository $merchantRepository;
 
     private UserSignatoryPowerMatcher $signatoryPowerMatcher;
 
     public function __construct(
         CompaniesServiceInterface $companiesService,
         MerchantUserRepositoryInterface $merchantUserRepository,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         UserSignatoryPowerMatcher $signatoryPowerMatcher
     ) {
         $this->companiesService = $companiesService;

@@ -14,7 +14,7 @@ use App\DomainModel\BankAccount\BicNotFoundException;
 use App\DomainModel\BankAccount\IbanDTOFactory;
 use App\DomainModel\BankAccount\InvalidIbanException;
 use App\DomainModel\BankAccount\SepaMandateReferenceGenerator;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepEntity;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepRepositoryInterface;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepTransitionEntity;
@@ -46,7 +46,7 @@ class SetupMerchantBankAccountUseCase implements ValidatedUseCaseInterface
     public function __construct(
         MerchantOnboardingStepRepositoryInterface $stepRepository,
         BankAccountDTOFactory $bankAccountDTOFactory,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         BankAccountCoreAcceptedAnnouncer $announcer,
         MerchantStepTransitionService $stepTransitionService,
         SepaB2BGeneratorService $sepaB2BGeneratorService,

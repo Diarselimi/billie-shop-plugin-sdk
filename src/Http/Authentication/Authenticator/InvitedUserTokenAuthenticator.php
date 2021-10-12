@@ -2,7 +2,7 @@
 
 namespace App\Http\Authentication\Authenticator;
 
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantUserInvitation\MerchantUserInvitationRepositoryInterface;
 use App\Http\Authentication\InvitedUser;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,7 +15,7 @@ class InvitedUserTokenAuthenticator extends AbstractAuthenticator
 
     public function __construct(
         MerchantUserInvitationRepositoryInterface $invitationRepository,
-        MerchantRepositoryInterface $merchantRepository
+        MerchantRepository $merchantRepository
     ) {
         $this->invitationRepository = $invitationRepository;
         parent::__construct($merchantRepository);

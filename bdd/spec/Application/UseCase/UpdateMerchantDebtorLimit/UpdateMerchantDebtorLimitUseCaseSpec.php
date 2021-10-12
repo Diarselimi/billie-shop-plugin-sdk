@@ -8,7 +8,7 @@ use App\Application\UseCase\UpdateMerchantDebtorLimit\UpdateMerchantDebtorLimitR
 use App\Application\UseCase\UpdateMerchantDebtorLimit\UpdateMerchantDebtorLimitUseCase;
 use App\DomainModel\DebtorLimit\DebtorLimitServiceInterface;
 use App\DomainModel\Merchant\MerchantEntity;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use PhpSpec\ObjectBehavior;
@@ -34,7 +34,7 @@ class UpdateMerchantDebtorLimitUseCaseSpec extends ObjectBehavior
 
     public function let(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         DebtorLimitServiceInterface $debtorLimitService,
         ValidatorInterface $validator,
         LoggerInterface $logger
@@ -76,7 +76,7 @@ class UpdateMerchantDebtorLimitUseCaseSpec extends ObjectBehavior
 
     public function it_sets_the_new_limit(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         DebtorLimitServiceInterface $debtorLimitService,
         ValidatorInterface $validator,
         UpdateMerchantDebtorLimitRequest $request,

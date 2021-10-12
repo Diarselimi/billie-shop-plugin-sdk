@@ -4,7 +4,7 @@ namespace spec\App\DomainModel\OrderUpdate;
 
 use App\Application\UseCase\UpdateOrderWithInvoice\UpdateOrderWithInvoiceRequest;
 use App\DomainModel\Merchant\MerchantEntity;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
@@ -15,7 +15,7 @@ use PhpSpec\ObjectBehavior;
 class UpdateOrderLimitsServiceSpec extends ObjectBehavior
 {
     public function let(
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         MerchantDebtorLimitsService $merchantDebtorLimitsService
     ) {
         $this->beConstructedWith(...func_get_args());
@@ -25,7 +25,7 @@ class UpdateOrderLimitsServiceSpec extends ObjectBehavior
         OrderContainer $orderContainer,
         MerchantDebtorLimitsService $merchantDebtorLimitsService,
         MerchantEntity $merchant,
-        MerchantRepositoryInterface $merchantRepository
+        MerchantRepository $merchantRepository
     ) {
         // Arrange
         $changeSet = (new UpdateOrderWithInvoiceRequest('', 1))

@@ -12,10 +12,10 @@ use App\DomainModel\Merchant\DuplicateMerchantCompanyException;
 use App\DomainModel\DebtorCompany\IdentifyFirmenwissenFailedException;
 use App\DomainModel\Merchant\MerchantCreationDTO;
 use App\DomainModel\Merchant\MerchantCreationService;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantUser\MerchantUserDefaultRoles;
 use App\DomainModel\MerchantUserInvitation\MerchantUserInvitationPersistenceService;
 use App\Helper\Uuid\UuidGeneratorInterface;
-use App\Infrastructure\Repository\MerchantRepository;
 
 class RegisterMerchantUseCase implements ValidatedUseCaseInterface
 {

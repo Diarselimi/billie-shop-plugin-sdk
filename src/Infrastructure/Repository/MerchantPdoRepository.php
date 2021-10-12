@@ -4,11 +4,12 @@ namespace App\Infrastructure\Repository;
 
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantEntityFactory;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\PartnerIdentifier;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\Support\TwoWayEncryption\Encryptor;
 use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
-class MerchantRepository extends AbstractPdoRepository implements MerchantRepositoryInterface
+class MerchantPdoRepository extends AbstractPdoRepository implements MerchantRepository
 {
     public const TABLE_NAME = "merchants";
 
@@ -20,6 +21,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
         'company_id',
         'company_uuid',
         'payment_merchant_id',
+        'klarna_identifier',
         'sandbox_payment_merchant_id',
         'sepa_b2b_document_uuid',
         'is_active',
@@ -33,7 +35,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
         'investor_uuid',
     ];
 
-    private $factory;
+    private MerchantEntityFactory $factory;
 
     private Encryptor $encryptor;
 
@@ -48,10 +50,10 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
         $id = $this->doInsert('
             INSERT INTO ' . self::TABLE_NAME . '
             (name, api_key, oauth_client_id, is_active, financing_power, available_financing_limit, 
-                company_id, company_uuid, sepa_b2b_document_uuid, payment_merchant_id, webhook_url, webhook_authorization, investor_uuid, created_at, updated_at)
+                company_id, company_uuid, sepa_b2b_document_uuid, payment_merchant_id, klarna_identifier, webhook_url, webhook_authorization, investor_uuid, created_at, updated_at)
             VALUES
             (:name, :api_key, :oauth_client_id, :is_active, :financing_power, :available_financing_limit, 
-                :company_id, :company_uuid, :sepa_b2b_document_uuid, :payment_merchant_id, :webhook_url, :webhook_authorization, :investor_uuid, :created_at, :updated_at)
+                :company_id, :company_uuid, :sepa_b2b_document_uuid, :payment_merchant_id, :klarna_identifier, :webhook_url, :webhook_authorization, :investor_uuid, :created_at, :updated_at)
         ', [
             'name' => $merchant->getName(),
             'company_uuid' => $merchant->getCompanyUuid(),
@@ -62,6 +64,7 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
             'available_financing_limit' => $merchant->getFinancingPower()->getMoneyValue(),
             'company_id' => $merchant->getCompanyId(),
             'payment_merchant_id' => $merchant->getPaymentUuid(),
+            'klarna_identifier' => (string) $merchant->getPartnerIdentifier(),
             'sepa_b2b_document_uuid' => $merchant->getSepaB2BDocumentUuid(),
             'webhook_url' => $merchant->getWebhookUrl(),
             'webhook_authorization' => $merchant->getWebhookAuthorization(),
@@ -206,5 +209,17 @@ class MerchantRepository extends AbstractPdoRepository implements MerchantReposi
         ', ['paymentUuid' => $paymentUuid]);
 
         return $row ? $this->factory->createFromArray($row) : null;
+    }
+
+    public function getByPartnerIdentifier(PartnerIdentifier $identifier): ?MerchantEntity
+    {
+        $r = $this->doFetchOne($this->generateSelectQuery(
+            self::TABLE_NAME,
+            self::SELECT_FIELDS
+        ) . ' WHERE klarna_identifier = :identifier', [
+            'identifier' => (string) $identifier,
+        ]);
+
+        return $r ? $this->factory->createFromArray($r) : null;
     }
 }

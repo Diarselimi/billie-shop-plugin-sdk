@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Console\Command;
 
 use App\DomainModel\Merchant\MerchantEntity;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\Sandbox\SandboxMerchantCreationService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,7 +20,7 @@ class CreateSandboxMerchantsCommand extends Command
     private $creationService;
 
     public function __construct(
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         SandboxMerchantCreationService $creationService
     ) {
         $this->merchantRepository = $merchantRepository;

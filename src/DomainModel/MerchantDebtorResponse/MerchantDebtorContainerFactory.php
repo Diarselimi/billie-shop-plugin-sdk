@@ -6,7 +6,7 @@ use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestRepositoryInterface;
 use App\DomainModel\DebtorLimit\DebtorLimitServiceInterface;
 use App\DomainModel\DebtorLimit\DebtorLimitServiceRequestException;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
@@ -20,7 +20,7 @@ class MerchantDebtorContainerFactory implements LoggingInterface
 
     private MerchantDebtorRepositoryInterface $merchantDebtorRepository;
 
-    private MerchantRepositoryInterface $merchantRepository;
+    private MerchantRepository $merchantRepository;
 
     private PaymentsServiceInterface $paymentService;
 
@@ -32,7 +32,7 @@ class MerchantDebtorContainerFactory implements LoggingInterface
 
     public function __construct(
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         PaymentsServiceInterface $paymentService,
         CompaniesServiceInterface $companiesService,
         DebtorLimitServiceInterface $debtorLimitService,

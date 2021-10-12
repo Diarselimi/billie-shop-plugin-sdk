@@ -9,7 +9,7 @@ use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\Payment\PaymentsRepositoryInterface;
 use App\DomainModel\Payment\SearchPaymentsDTOFactory;
-use App\Infrastructure\Repository\MerchantRepository;
+use App\Infrastructure\Repository\MerchantPdoRepository;
 use App\Support\PaginatedCollection;
 
 class GetMerchantPaymentsUseCase implements ValidatedUseCaseInterface
@@ -25,7 +25,7 @@ class GetMerchantPaymentsUseCase implements ValidatedUseCaseInterface
     private $merchantDebtorRepository;
 
     public function __construct(
-        MerchantRepository $merchantRepository,
+        MerchantPdoRepository $merchantRepository,
         PaymentsRepositoryInterface $paymentsRepository,
         SearchPaymentsDTOFactory $paymentsDTOFactory,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository

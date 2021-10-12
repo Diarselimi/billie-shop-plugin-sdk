@@ -6,7 +6,7 @@ use App\Application\Exception\WorkflowException;
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\OrderNotification\OrderNotificationEntity;
 use App\DomainModel\OrderNotification\OrderNotificationPayloadFactory;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsException;
 use App\DomainModel\Order\OrderEntity;
@@ -20,7 +20,7 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 {
     use LoggingTrait;
 
-    private MerchantRepositoryInterface $merchantRepository;
+    private MerchantRepository $merchantRepository;
 
     private OrderContainerFactory $orderContainerFactory;
 
@@ -32,7 +32,7 @@ class OrderOutstandingAmountChangeUseCase implements LoggingInterface
 
     public function __construct(
         OrderContainerFactory $orderContainerFactory,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         NotificationScheduler $notificationScheduler,
         MerchantDebtorLimitsService $limitsService,
         OrderNotificationPayloadFactory $orderEventPayloadFactory

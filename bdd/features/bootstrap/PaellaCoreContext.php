@@ -13,7 +13,7 @@ use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeReques
 use App\DomainModel\DebtorSettings\DebtorSettingsEntity;
 use App\DomainModel\DebtorSettings\DebtorSettingsRepositoryInterface;
 use App\DomainModel\Merchant\MerchantEntity;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\MerchantFinancialAssessment\MerchantFinancialAssessmentEntity;
@@ -1220,9 +1220,9 @@ class PaellaCoreContext extends MinkContext
         return $this->get(OrderInvoiceRepositoryInterface::class);
     }
 
-    private function getMerchantRepository(): MerchantRepositoryInterface
+    private function getMerchantRepository(): MerchantRepository
     {
-        return $this->get(MerchantRepositoryInterface::class);
+        return $this->get(MerchantRepository::class);
     }
 
     private function getMerchantSettingsRepository(): MerchantSettingsRepositoryInterface

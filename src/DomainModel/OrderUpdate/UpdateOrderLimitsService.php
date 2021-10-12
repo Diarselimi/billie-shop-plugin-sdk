@@ -2,19 +2,19 @@
 
 namespace App\DomainModel\OrderUpdate;
 
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use Ozean12\Money\Money;
 
 class UpdateOrderLimitsService
 {
-    private MerchantRepositoryInterface $merchantRepository;
+    private MerchantRepository $merchantRepository;
 
     private MerchantDebtorLimitsService $merchantDebtorLimitsService;
 
     public function __construct(
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         MerchantDebtorLimitsService $merchantDebtorLimitsService
     ) {
         $this->merchantRepository = $merchantRepository;

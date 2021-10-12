@@ -11,7 +11,7 @@ use App\DomainModel\Sandbox\SandboxMerchantDTO;
 use App\DomainModel\Sandbox\SandboxServiceRequestException;
 use App\Helper\Payment\IbanGenerator;
 use App\DomainModel\Merchant\MerchantEntity;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use Billie\MonitoringBundle\Service\Alerting\Sentry\Raven\RavenClient;
 use EightPoints\Bundle\GuzzleBundle\Log\LoggerInterface;
 use PhpSpec\ObjectBehavior;
@@ -25,7 +25,7 @@ class SandboxMerchantCreationServiceSpec extends ObjectBehavior
     }
 
     public function let(
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         SandboxClientInterface $sandboxClient,
         CompaniesServiceInterface $companiesService,
         IbanGenerator $ibanGenerator,
@@ -40,7 +40,7 @@ class SandboxMerchantCreationServiceSpec extends ObjectBehavior
     public function it_successfully_calls_create_sandbox_and_updates_merchant(
         CompaniesServiceInterface $companiesService,
         SandboxClientInterface $sandboxClient,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         IbanGenerator $ibanGenerator,
         DebtorCompany $company,
         MerchantEntity $merchant
@@ -72,7 +72,7 @@ class SandboxMerchantCreationServiceSpec extends ObjectBehavior
     public function it_fails_to_create_sandbox_and_throws_exception(
         CompaniesServiceInterface $companiesService,
         SandboxClientInterface $sandboxClient,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         IbanGenerator $ibanGenerator,
         DebtorCompany $company,
         MerchantEntity $merchant,

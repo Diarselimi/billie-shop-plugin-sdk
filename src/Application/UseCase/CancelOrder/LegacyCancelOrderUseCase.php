@@ -9,7 +9,7 @@ use App\DomainModel\Invoice\CreditNote\CreditNoteFactory;
 use App\DomainModel\Invoice\CreditNote\InvoiceCreditNoteMessageFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsException;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
@@ -28,7 +28,7 @@ class LegacyCancelOrderUseCase implements LoggingInterface
 
     private OrderContainerFactory $orderContainerFactory;
 
-    private MerchantRepositoryInterface $merchantRepository;
+    private MerchantRepository $merchantRepository;
 
     private Registry $workflowRegistry;
 
@@ -41,7 +41,7 @@ class LegacyCancelOrderUseCase implements LoggingInterface
     public function __construct(
         MerchantDebtorLimitsService $limitsService,
         OrderContainerFactory $orderContainerFactory,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         Registry $workflowRegistry,
         InvoiceCreditNoteMessageFactory $creditNoteMessageFactory,
         CreditNoteFactory $creditNoteFactory,

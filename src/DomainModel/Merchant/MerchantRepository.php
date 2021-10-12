@@ -2,7 +2,7 @@
 
 namespace App\DomainModel\Merchant;
 
-interface MerchantRepositoryInterface
+interface MerchantRepository
 {
     public function insert(MerchantEntity $merchant): void;
 
@@ -27,4 +27,6 @@ interface MerchantRepositoryInterface
     public function getMerchantsWithoutSandbox(): array;
 
     public function getOneByPaymentUuid(string $paymentUuid): ?MerchantEntity;
+
+    public function getByPartnerIdentifier(PartnerIdentifier $identifier): ?MerchantEntity;
 }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace spec\App\Application\UseCase\AuthorizeSandbox;
 
 use App\Application\UseCase\AuthorizeSandbox\AuthorizeSandboxUseCase;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
 use App\DomainModel\MerchantUser\MerchantUserPermissionsService;
 use App\DomainModel\MerchantUser\MerchantUserRepositoryInterface;
@@ -16,7 +16,7 @@ class AuthorizeSandboxUseCaseSpec extends ObjectBehavior
 {
     public function let(
         AuthenticationServiceInterface $authenticationService,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         MerchantUserRepositoryInterface $merchantUserRepository,
         MerchantUserPermissionsService $merchantUserPermissionsService
     ) {

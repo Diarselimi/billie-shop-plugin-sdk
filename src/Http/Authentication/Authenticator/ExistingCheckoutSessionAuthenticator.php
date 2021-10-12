@@ -4,7 +4,7 @@ namespace App\Http\Authentication\Authenticator;
 
 use App\DomainModel\CheckoutSession\CheckoutSessionEntity;
 use App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\Http\Authentication\CheckoutUser;
 use App\Http\HttpConstantsInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,7 +17,7 @@ class ExistingCheckoutSessionAuthenticator extends AbstractAuthenticator
 
     public function __construct(
         CheckoutSessionRepositoryInterface $checkoutSessionRepository,
-        MerchantRepositoryInterface $merchantRepository
+        MerchantRepository $merchantRepository
     ) {
         $this->checkoutSessionRepository = $checkoutSessionRepository;
         parent::__construct($merchantRepository);

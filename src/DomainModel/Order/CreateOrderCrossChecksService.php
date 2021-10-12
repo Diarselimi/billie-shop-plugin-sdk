@@ -3,7 +3,7 @@
 namespace App\DomainModel\Order;
 
 use App\Application\Exception\WorkflowException;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsException;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
@@ -20,7 +20,7 @@ class CreateOrderCrossChecksService implements LoggingInterface
 
     public function __construct(
         MerchantDebtorLimitsService $merchantDebtorLimitsService,
-        MerchantRepositoryInterface $merchantRepository
+        MerchantRepository $merchantRepository
     ) {
         $this->merchantDebtorLimitsService = $merchantDebtorLimitsService;
         $this->merchantRepository = $merchantRepository;

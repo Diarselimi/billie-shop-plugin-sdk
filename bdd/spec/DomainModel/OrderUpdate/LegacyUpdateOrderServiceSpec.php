@@ -11,7 +11,7 @@ use App\DomainModel\Invoice\ExtendInvoiceService;
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceCollection;
 use App\DomainModel\Merchant\MerchantEntity;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
@@ -75,7 +75,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         UpdateOrderRequestValidator $updateOrderRequestValidator,
         UpdateOrderLimitsService $updateOrderLimitsService,
         MerchantEntity $merchant,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         OrderRepositoryInterface $orderRepository,
         InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler

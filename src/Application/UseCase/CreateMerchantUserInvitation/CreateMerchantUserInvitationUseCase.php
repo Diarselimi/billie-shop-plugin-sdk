@@ -7,7 +7,7 @@ namespace App\Application\UseCase\CreateMerchantUserInvitation;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Merchant\MerchantNotFoundException;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantUser\MerchantUserDefaultRoles;
 use App\DomainModel\MerchantUser\MerchantUserRoleRepositoryInterface;
 use App\DomainModel\MerchantUser\RoleNotFoundException;
@@ -25,13 +25,13 @@ class CreateMerchantUserInvitationUseCase implements ValidatedUseCaseInterface
 
     private MerchantUserRoleRepositoryInterface $merchantUserRoleRepository;
 
-    private MerchantRepositoryInterface $merchantRepository;
+    private MerchantRepository $merchantRepository;
 
     private MerchantUserInvitationPersistenceService $invitationPersistenceService;
 
     public function __construct(
         MerchantUserRoleRepositoryInterface $merchantUserRoleRepository,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         MerchantUserInvitationPersistenceService $invitationPersistenceService
     ) {
         $this->merchantUserRoleRepository = $merchantUserRoleRepository;

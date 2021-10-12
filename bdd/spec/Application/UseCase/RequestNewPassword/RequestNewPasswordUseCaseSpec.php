@@ -4,7 +4,7 @@ namespace spec\App\Application\UseCase\RequestNewPassword;
 
 use App\Application\UseCase\RequestNewPassword\RequestNewPasswordRequest;
 use App\DomainModel\Merchant\MerchantEntity;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
 use App\DomainModel\MerchantUser\AuthenticationServiceRequestException;
 use App\DomainModel\MerchantUser\MerchantUserEntity;
@@ -25,7 +25,7 @@ class RequestNewPasswordUseCaseSpec extends ObjectBehavior
     public function let(
         AuthenticationServiceInterface $authenticationService,
         MerchantUserRepositoryInterface $merchantUserRepository,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         PasswordResetRequestAnnouncer $passwordResetRequestAnnouncer,
         ValidatorInterface $validator,
         LoggerInterface $logger,
@@ -41,7 +41,7 @@ class RequestNewPasswordUseCaseSpec extends ObjectBehavior
     public function it_should_announce_password_reset_requested(
         AuthenticationServiceInterface $authenticationService,
         MerchantUserRepositoryInterface $merchantUserRepository,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         PasswordResetRequestAnnouncer $passwordResetRequestAnnouncer
     ): void {
         $email = 'test@billie.dev';

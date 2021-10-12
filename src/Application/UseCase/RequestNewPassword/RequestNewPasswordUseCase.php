@@ -6,7 +6,7 @@ namespace App\Application\UseCase\RequestNewPassword;
 
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
 use App\DomainModel\MerchantUser\AuthenticationServiceRequestException;
 use App\DomainModel\MerchantUser\MerchantUserNotFoundException;
@@ -18,6 +18,7 @@ use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 class RequestNewPasswordUseCase implements LoggingInterface, ValidatedUseCaseInterface
 {
     use LoggingTrait;
+
     use ValidatedUseCaseTrait;
 
     private $authenticationService;
@@ -31,7 +32,7 @@ class RequestNewPasswordUseCase implements LoggingInterface, ValidatedUseCaseInt
     public function __construct(
         AuthenticationServiceInterface $authenticationService,
         MerchantUserRepositoryInterface $merchantUserRepository,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         PasswordResetRequestAnnouncer $passwordResetRequestAnnouncer
     ) {
         $this->authenticationService = $authenticationService;

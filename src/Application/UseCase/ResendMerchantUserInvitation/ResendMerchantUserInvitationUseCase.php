@@ -6,7 +6,7 @@ use App\Application\UseCase\CreateMerchantUserInvitation\CreateMerchantUserInvit
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Merchant\MerchantNotFoundException;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantUser\MerchantUserRoleRepositoryInterface;
 use App\DomainModel\MerchantUser\RoleNotFoundException;
 use App\DomainModel\MerchantUserInvitation\MerchantUserInvitationEntity;
@@ -22,7 +22,7 @@ class ResendMerchantUserInvitationUseCase implements ValidatedUseCaseInterface
 
     private MerchantUserRoleRepositoryInterface $merchantUserRoleRepository;
 
-    private MerchantRepositoryInterface $merchantRepository;
+    private MerchantRepository $merchantRepository;
 
     private MerchantUserInvitationRepositoryInterface $invitationRepository;
 
@@ -32,7 +32,7 @@ class ResendMerchantUserInvitationUseCase implements ValidatedUseCaseInterface
 
     public function __construct(
         MerchantUserRoleRepositoryInterface $merchantUserRoleRepository,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         MerchantUserInvitationRepositoryInterface $invitationRepository,
         MerchantUserInvitationEntityFactory $invitationFactory,
         MessageBusInterface $messageBus

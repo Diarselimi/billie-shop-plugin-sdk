@@ -4,7 +4,7 @@ namespace App\Application\Validator\Constraint;
 
 use App\DomainModel\Invoice\InvoiceServiceException;
 use App\DomainModel\Invoice\InvoiceServiceInterface;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -13,11 +13,11 @@ class InvoiceExternalCodeValidator extends ConstraintValidator
 {
     private InvoiceServiceInterface $invoiceService;
 
-    private MerchantRepositoryInterface $merchantRepository;
+    private MerchantRepository $merchantRepository;
 
     public function __construct(
         InvoiceServiceInterface $invoiceService,
-        MerchantRepositoryInterface $merchantRepository
+        MerchantRepository $merchantRepository
     ) {
         $this->invoiceService = $invoiceService;
         $this->merchantRepository = $merchantRepository;

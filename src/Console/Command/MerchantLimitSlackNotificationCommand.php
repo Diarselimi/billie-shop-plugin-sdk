@@ -2,7 +2,7 @@
 
 namespace App\Console\Command;
 
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use Billie\MonitoringBundle\Service\Alerting\Slack\SlackClientAwareInterface;
 use Billie\MonitoringBundle\Service\Alerting\Slack\SlackClientAwareTrait;
 use Billie\MonitoringBundle\Service\Alerting\Slack\SlackMessageFactory;
@@ -22,7 +22,7 @@ class MerchantLimitSlackNotificationCommand extends Command implements LoggingIn
     private const DESCRIPTION = 'Gives a list of merchants in slack that have lower percentage of power_amount.';
 
     /**
-     * @var MerchantRepositoryInterface
+     * @var MerchantRepository
      */
     private $merchantRepository;
 
@@ -32,7 +32,7 @@ class MerchantLimitSlackNotificationCommand extends Command implements LoggingIn
     private $slackMessageFactory;
 
     public function __construct(
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         SlackMessageFactory $slackMessageFactory
     ) {
         parent::__construct();

@@ -12,7 +12,7 @@ use App\DomainModel\Merchant\MerchantCompanyNotFoundException;
 use App\DomainModel\Merchant\MerchantCreationDTO;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantCreationService;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantUser\AuthenticationServiceCreateClientResponseDTO;
 use App\Helper\Uuid\UuidGeneratorInterface;
 use PhpSpec\ObjectBehavior;
@@ -30,7 +30,7 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
 
     public function let(
         UuidGeneratorInterface $uuidGenerator,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         CompaniesServiceInterface $companiesService,
         MerchantCreationService $merchantCreationService,
         CreateMerchantRequest $request
@@ -55,7 +55,7 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
     }
 
     public function it_throws_exception_if_merchant_exists(
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         CreateMerchantRequest $request,
         MerchantCreationService $merchantCreationService
     ) {
@@ -66,7 +66,7 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
     }
 
     public function it_throws_exception_if_company_was_not_found(
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         CompaniesServiceInterface $companiesService,
         CreateMerchantRequest $request,
         MerchantCreationService $merchantCreationService
@@ -80,7 +80,7 @@ class CreateMerchantUseCaseSpec extends ObjectBehavior
 
     public function it_creates_a_new_merchant(
         UuidGeneratorInterface $uuidGenerator,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         CompaniesServiceInterface $companiesService,
         MerchantCreationService $merchantCreationService,
         CreateMerchantRequest $request

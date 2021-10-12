@@ -3,7 +3,7 @@
 namespace App\Http\Authentication\Authenticator;
 
 use App\Application\UseCase\AuthorizeSandbox\AuthorizeSandboxDTO;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
 use App\DomainModel\MerchantUser\MerchantUserPermissions;
 use App\DomainModel\MerchantUser\MerchantUserPermissionsService;
@@ -27,7 +27,7 @@ class SandboxAuthenticator extends OAuthTokenAuthenticator
         ProdAccessClientInterface $prodAccessClient,
         string $paellaSandboxUrl,
         AuthenticationServiceInterface $authenticationService,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         MerchantUserRepositoryInterface $merchantUserRepository,
         MerchantUserPermissionsService $merchantUserPermissionsService
     ) {

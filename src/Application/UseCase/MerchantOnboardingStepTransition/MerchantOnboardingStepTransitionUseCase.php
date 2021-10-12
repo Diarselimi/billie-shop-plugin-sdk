@@ -7,7 +7,7 @@ namespace App\Application\UseCase\MerchantOnboardingStepTransition;
 use App\Application\UseCase\GetMerchant\MerchantNotFoundException;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantOnboarding\MerchantStepTransitionService;
 
 class MerchantOnboardingStepTransitionUseCase implements ValidatedUseCaseInterface
@@ -18,7 +18,7 @@ class MerchantOnboardingStepTransitionUseCase implements ValidatedUseCaseInterfa
 
     private $merchantRepository;
 
-    public function __construct(MerchantStepTransitionService $stepTransitionService, MerchantRepositoryInterface $merchantRepository)
+    public function __construct(MerchantStepTransitionService $stepTransitionService, MerchantRepository $merchantRepository)
     {
         $this->stepTransitionService = $stepTransitionService;
         $this->merchantRepository = $merchantRepository;

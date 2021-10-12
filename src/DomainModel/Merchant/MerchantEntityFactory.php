@@ -43,8 +43,7 @@ class MerchantEntityFactory extends AbstractFactory
             ->setSandboxPaymentUuid($data['sandbox_payment_merchant_id'])
             ->setInvestorUuid($data['investor_uuid'])
             ->setCreatedAt(new \DateTime($data['created_at']))
-            ->setUpdatedAt(new \DateTime($data['updated_at']))
-        ;
+            ->setUpdatedAt(new \DateTime($data['updated_at']));
     }
 
     public function createFromCreationDTO(MerchantCreationDTO $creationDTO): MerchantEntity
@@ -61,8 +60,7 @@ class MerchantEntityFactory extends AbstractFactory
             ->setWebhookAuthorization($creationDTO->getWebhookAuthorization())
             ->setOauthClientId($creationDTO->getOauthClient()->getClientId())
             ->setIsActive(true)
-            ->setInvestorUuid($this->defaultInvestorUuid)
-        ;
+            ->setInvestorUuid($this->defaultInvestorUuid);
     }
 
     public function createFromMerchantCreationResponse(array $payload): MerchantEntity
@@ -82,7 +80,6 @@ class MerchantEntityFactory extends AbstractFactory
             ->setOauthClientId($payload['oauth_client_id'])
             ->setInvestorUuid($this->defaultInvestorUuid)
             ->setCreatedAt(new \DateTime($payload['created_at']))
-            ->setUpdatedAt(new \DateTime($payload['updated_at']))
-        ;
+            ->setUpdatedAt(new \DateTime($payload['updated_at']));
     }
 }

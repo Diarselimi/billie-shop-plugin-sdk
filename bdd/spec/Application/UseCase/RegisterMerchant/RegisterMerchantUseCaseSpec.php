@@ -9,7 +9,7 @@ use App\DomainModel\DebtorCompany\IdentifyFirmenwissenFailedException;
 use App\DomainModel\Merchant\MerchantCreationService;
 use App\DomainModel\MerchantUserInvitation\MerchantUserInvitationPersistenceService;
 use App\Helper\Uuid\UuidGeneratorInterface;
-use App\Infrastructure\Repository\MerchantRepository;
+use App\Infrastructure\Repository\MerchantPdoRepository;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -20,7 +20,7 @@ class RegisterMerchantUseCaseSpec extends ObjectBehavior
     public function let(
         UuidGeneratorInterface $uuidGenerator,
         CompaniesServiceInterface $companiesService,
-        MerchantRepository $merchantRepository,
+        MerchantPdoRepository $merchantRepository,
         MerchantCreationService $merchantCreationService,
         MerchantUserInvitationPersistenceService $invitationPersistenceService,
         ValidatorInterface $validator

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\DomainModel\MerchantOnboarding;
 
 use App\DomainModel\Merchant\MerchantEntity;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\Support\DateFormat;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -27,7 +27,7 @@ class MerchantOnboardingStepTransitionListener implements LoggingInterface, Even
     public function __construct(
         MessageBusInterface $bus,
         MerchantOnboardingStepTransitionRepositoryInterface $transitionRepository,
-        MerchantRepositoryInterface $merchantRepository
+        MerchantRepository $merchantRepository
     ) {
         $this->bus = $bus;
         $this->transitionRepository = $transitionRepository;

@@ -5,7 +5,7 @@ namespace App\Application\UseCase\RegisterMerchantUser;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Merchant\MerchantNotFoundException;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantUser\MerchantUserEntityFactory;
 use App\DomainModel\MerchantUser\MerchantUserRegistrationService;
 use App\DomainModel\MerchantUser\MerchantUserRoleRepositoryInterface;
@@ -24,7 +24,7 @@ class RegisterMerchantUserUseCase implements ValidatedUseCaseInterface
     private $registrationService;
 
     public function __construct(
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         MerchantUserEntityFactory $merchantUserEntityFactory,
         MerchantUserRoleRepositoryInterface $merchantUserRoleRepository,
         MerchantUserRegistrationService $registrationService

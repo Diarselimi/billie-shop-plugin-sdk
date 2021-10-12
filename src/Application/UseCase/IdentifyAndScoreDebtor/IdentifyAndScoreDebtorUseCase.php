@@ -11,7 +11,7 @@ use App\DomainModel\DebtorScoring\ScoringServiceInterface;
 use App\DomainModel\DebtorLimit\DebtorLimitServiceInterface;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantNotFoundException;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRegistrationService;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
@@ -40,7 +40,7 @@ class IdentifyAndScoreDebtorUseCase
     private $scoringService;
 
     public function __construct(
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         MerchantSettingsRepositoryInterface $merchantSettingsRepository,
         MerchantDebtorRepositoryInterface $merchantDebtorRepository,
         ScoreThresholdsConfigurationRepositoryInterface $scoreThresholdsConfigurationRepository,

@@ -4,7 +4,7 @@ namespace spec\App\DomainModel\Order;
 
 use App\Application\Exception\WorkflowException;
 use App\DomainModel\Merchant\MerchantEntity;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsException;
 use App\DomainModel\MerchantDebtor\Limits\MerchantDebtorLimitsService;
 use App\DomainModel\Order\CreateOrderCrossChecksService;
@@ -24,7 +24,7 @@ class CreateOrderCrossChecksServiceSpec extends ObjectBehavior
 
     public function let(
         MerchantDebtorLimitsService $merchantDebtorLimitsService,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         OrderContainer $orderContainer,
         OrderEntity $order,
         OrderFinancialDetailsEntity $orderFinancialDetails,
@@ -60,7 +60,7 @@ class CreateOrderCrossChecksServiceSpec extends ObjectBehavior
 
     public function it_throws_exception_on_merchant_limit_lock_failure(
         MerchantDebtorLimitsService $merchantDebtorLimitsService,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         OrderContainer $orderContainer,
         MerchantEntity $merchant
     ) {
@@ -74,7 +74,7 @@ class CreateOrderCrossChecksServiceSpec extends ObjectBehavior
 
     public function it_locks_the_limit(
         MerchantDebtorLimitsService $merchantDebtorLimitsService,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         OrderContainer $orderContainer,
         MerchantEntity $merchant
     ) {

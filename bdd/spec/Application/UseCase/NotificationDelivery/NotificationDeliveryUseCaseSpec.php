@@ -5,7 +5,7 @@ namespace spec\App\Application\UseCase\NotificationDelivery;
 use App\Application\UseCase\NotificationDelivery\NotificationDeliveryRequest;
 use App\Application\UseCase\NotificationDelivery\NotificationDeliveryUseCase;
 use App\DomainModel\Merchant\MerchantEntity;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderNotification\Exception\NotificationSenderException;
@@ -41,7 +41,7 @@ class NotificationDeliveryUseCaseSpec extends ObjectBehavior
 
     public function let(
         OrderRepositoryInterface $orderRepository,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         OrderNotificationRepositoryInterface $notificationRepository,
         NotificationSenderInterface $notificationSender,
         NotificationScheduler $notificationScheduler,
@@ -107,7 +107,7 @@ class NotificationDeliveryUseCaseSpec extends ObjectBehavior
     public function it_does_nothing_if_merchant_url_was_not_set(
         OrderNotificationRepositoryInterface $notificationRepository,
         OrderRepositoryInterface $orderRepository,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         NotificationSenderInterface $notificationSender,
         OrderNotificationEntity $notification,
         OrderEntity $order,
@@ -130,7 +130,7 @@ class NotificationDeliveryUseCaseSpec extends ObjectBehavior
     public function it_sent_the_notification_and_faces_terrible_exception(
         OrderNotificationRepositoryInterface $notificationRepository,
         OrderRepositoryInterface $orderRepository,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         NotificationSenderInterface $notificationSender,
         OrderNotificationDeliveryFactory $notificationDeliveryFactory,
         OrderNotificationEntity $notification,
@@ -183,7 +183,7 @@ class NotificationDeliveryUseCaseSpec extends ObjectBehavior
     public function it_sends_the_notification_and_deliver_it(
         OrderNotificationRepositoryInterface $notificationRepository,
         OrderRepositoryInterface $orderRepository,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         NotificationSenderInterface $notificationSender,
         NotificationScheduler $notificationScheduler,
         OrderNotificationDeliveryFactory $notificationDeliveryFactory,

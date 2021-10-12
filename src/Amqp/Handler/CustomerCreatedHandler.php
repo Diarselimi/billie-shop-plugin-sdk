@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Amqp\Handler;
 
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\Sandbox\SandboxMerchantCreationService;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -22,7 +22,7 @@ class CustomerCreatedHandler implements MessageHandlerInterface, LoggingInterfac
     private $paellaSandboxUrl;
 
     public function __construct(
-        MerchantRepositoryInterface $merchantRepopository,
+        MerchantRepository $merchantRepopository,
         SandboxMerchantCreationService $creationService,
         string $paellaSandboxUrl
     ) {

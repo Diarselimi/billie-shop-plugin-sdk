@@ -3,14 +3,14 @@
 declare(strict_types=1);
 
 use App\Infrastructure\Phinx\TransactionalMigration;
-use App\Infrastructure\Repository\MerchantRepository;
+use App\Infrastructure\Repository\MerchantPdoRepository;
 use App\Support\TwoWayEncryption\OpenSslEcbEncryption;
 
 final class AddEncryptedApiKeyColumn extends TransactionalMigration
 {
     protected function migrate()
     {
-        $tbl = $this->table(MerchantRepository::TABLE_NAME);
+        $tbl = $this->table(MerchantPdoRepository::TABLE_NAME);
         $tbl->addColumn(
             'plain_api_key',
             'char',

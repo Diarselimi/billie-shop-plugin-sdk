@@ -6,7 +6,7 @@ namespace App\DomainModel\Sandbox;
 
 use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\Merchant\MerchantEntity;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\Merchant\MerchantWithCompanyCreationDTO;
 use App\Helper\Payment\IbanGenerator;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
@@ -29,7 +29,7 @@ class SandboxMerchantCreationService implements LoggingInterface
     private $ibanGenerator;
 
     public function __construct(
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         SandboxClientInterface $sandboxClient,
         CompaniesServiceInterface $companiesService,
         IbanGenerator $ibanGenerator

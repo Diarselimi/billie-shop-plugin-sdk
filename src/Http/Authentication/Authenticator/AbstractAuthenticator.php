@@ -3,7 +3,7 @@
 namespace App\Http\Authentication\Authenticator;
 
 use App\DomainModel\Merchant\MerchantEntity;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\Http\ApiError\ApiError;
 use App\Http\ApiError\ApiErrorResponse;
 use App\Http\Authentication\AbstractUser;
@@ -18,7 +18,7 @@ abstract class AbstractAuthenticator extends AbstractGuardAuthenticator
 {
     protected $merchantRepository;
 
-    public function __construct(MerchantRepositoryInterface $merchantRepository)
+    public function __construct(MerchantRepository $merchantRepository)
     {
         $this->merchantRepository = $merchantRepository;
     }

@@ -46,6 +46,8 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
 
     private $paymentUuid;
 
+    private ?PartnerIdentifier $partnerIdentifier;
+
     private $sepaB2BDocumentUuid;
 
     private $sandboxPaymentUuid;
@@ -59,6 +61,12 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
     private $oauthClientId;
 
     private $investorUuid;
+
+    public function __construct(?PartnerIdentifier $identifier = null)
+    {
+        parent::__construct();
+        $this->partnerIdentifier = $identifier;
+    }
 
     public function getName(): string
     {
@@ -209,6 +217,11 @@ class MerchantEntity extends AbstractTimestampableEntity implements ArrayableInt
         $this->paymentUuid = $paymentUuid;
 
         return $this;
+    }
+
+    public function getPartnerIdentifier(): ?PartnerIdentifier
+    {
+        return $this->partnerIdentifier;
     }
 
     public function getOauthClientId(): ? string

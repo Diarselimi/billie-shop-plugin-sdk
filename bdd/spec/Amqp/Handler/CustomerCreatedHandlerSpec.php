@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace spec\App\Amqp\Handler;
 
 use App\DomainModel\Merchant\MerchantEntity;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\Sandbox\SandboxMerchantCreationService;
 use Ozean12\Transfer\Message\Customer\CustomerCreated;
 use PhpSpec\ObjectBehavior;
@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
 class CustomerCreatedHandlerSpec extends ObjectBehavior
 {
     public function let(
-        MerchantRepositoryInterface $merchantRepo,
+        MerchantRepository $merchantRepo,
         SandboxMerchantCreationService $creationService,
         LoggerInterface $logger
     ) {
@@ -23,7 +23,7 @@ class CustomerCreatedHandlerSpec extends ObjectBehavior
     }
 
     public function it_should_make_creation_call(
-        MerchantRepositoryInterface $merchantRepo,
+        MerchantRepository $merchantRepo,
         SandboxMerchantCreationService $creationService
     ) {
         $companyUuid = 'dummy-uuid';
@@ -44,7 +44,7 @@ class CustomerCreatedHandlerSpec extends ObjectBehavior
     }
 
     public function it_should_not_make_creation_call(
-        MerchantRepositoryInterface $merchantRepo,
+        MerchantRepository $merchantRepo,
         SandboxMerchantCreationService $creationService
     ) {
         $companyUuid = 'dummy-uuid';

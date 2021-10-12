@@ -2,7 +2,7 @@
 
 namespace App\Application\UseCase\MerchantStartIntegration;
 
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingContainerFactory;
 use App\DomainModel\MerchantOnboarding\MerchantOnboardingStepEntity;
 use App\DomainModel\Sandbox\SandboxClientInterface;
@@ -17,7 +17,7 @@ class MerchantStartIntegrationUseCase
 
     public function __construct(
         MerchantOnboardingContainerFactory $onboardingContainerFactory,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         SandboxClientInterface $sandboxClient
     ) {
         $this->onboardingContainerFactory = $onboardingContainerFactory;

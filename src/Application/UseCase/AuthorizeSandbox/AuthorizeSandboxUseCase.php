@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Application\UseCase\AuthorizeSandbox;
 
 use App\DomainModel\Merchant\MerchantEntity;
-use App\DomainModel\Merchant\MerchantRepositoryInterface;
+use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\MerchantUser\AuthenticationServiceInterface;
 use App\DomainModel\MerchantUser\MerchantUserEntity;
 use App\DomainModel\MerchantUser\MerchantUserPermissionsService;
@@ -25,7 +25,7 @@ class AuthorizeSandboxUseCase
 
     public function __construct(
         AuthenticationServiceInterface $authenticationService,
-        MerchantRepositoryInterface $merchantRepository,
+        MerchantRepository $merchantRepository,
         MerchantUserRepositoryInterface $merchantUserRepository,
         MerchantUserPermissionsService $merchantUserPermissionsService
     ) {
