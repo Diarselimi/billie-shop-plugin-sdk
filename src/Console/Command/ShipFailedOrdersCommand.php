@@ -63,7 +63,7 @@ class ShipFailedOrdersCommand extends Command
         while ($item = $stmt->fetch(\PDO::FETCH_ASSOC)) {
             $orderContainer = $this->orderContainerFactory->loadById((int) $item['id']);
             $financialDetails = $orderContainer->getOrderFinancialDetails();
-            $request = new CreateInvoiceRequest($orderContainer->getMerchant()->getId(), Uuid::uuid4());
+            $request = new CreateInvoiceRequest($orderContainer->getMerchant()->getId(), Uuid::fromString($orderContainer->getOrder()->getPaymentId()));
             $request->setAmount(
                 new TaxedMoney(
                     $financialDetails->getAmountGross(),
