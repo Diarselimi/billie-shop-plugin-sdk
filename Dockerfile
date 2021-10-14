@@ -9,7 +9,7 @@ WORKDIR $APP_ROOT
 
 # >>> builder (installs tools)
 FROM base as builder
-ENV COMPOSER_VERSION 1.10.8
+ENV COMPOSER_VERSION 2.1.8
 RUN docker-install-composer && \
     docker-install-php-cs-fixer && \
     docker-install-swagger-cli

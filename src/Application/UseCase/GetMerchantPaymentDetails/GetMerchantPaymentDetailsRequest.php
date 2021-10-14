@@ -2,43 +2,27 @@
 
 namespace App\Application\UseCase\GetMerchantPaymentDetails;
 
-use App\Application\UseCase\ValidatedRequestInterface;
-use Symfony\Component\Validator\Constraints as Assert;
+use Ramsey\Uuid\UuidInterface;
 
-class GetMerchantPaymentDetailsRequest implements ValidatedRequestInterface
+final class GetMerchantPaymentDetailsRequest
 {
-    /**
-     * @Assert\Type(type="integer")
-     * @Assert\NotBlank()
-     */
-    private $merchantId;
+    private int $merchantId;
 
-    /**
-     * @Assert\Uuid()
-     */
-    private $transactionUuid;
+    private UuidInterface $transactionUuid;
+
+    public function __construct(int $merchantId, UuidInterface $transactionUuid)
+    {
+        $this->merchantId = $merchantId;
+        $this->transactionUuid = $transactionUuid;
+    }
 
     public function getMerchantId(): int
     {
         return $this->merchantId;
     }
 
-    public function setMerchantId(int $merchantId): GetMerchantPaymentDetailsRequest
-    {
-        $this->merchantId = $merchantId;
-
-        return $this;
-    }
-
-    public function getTransactionUuid(): ?string
+    public function getTransactionUuid(): UuidInterface
     {
         return $this->transactionUuid;
-    }
-
-    public function setTransactionUuid(?string $transactionUuid): GetMerchantPaymentDetailsRequest
-    {
-        $this->transactionUuid = $transactionUuid;
-
-        return $this;
     }
 }

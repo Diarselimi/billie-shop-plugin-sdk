@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Graphql;
 
+use App\DomainModel\Payment\BankTransactionDetails;
+use App\DomainModel\Payment\BankTransactionDetailsFactory;
+use App\DomainModel\Payment\BankTransactionNotFoundException;
 use App\DomainModel\Payment\PaymentsRepositoryInterface;
 use App\DomainModel\Payment\RequestDTO\SearchPaymentsDTO;
 use App\Support\PaginatedCollection;
+use Ozean12\GraphQLBundle\GraphQLInterface;
 
 class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements PaymentsRepositoryInterface
 {
@@ -17,6 +21,15 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
     private const GET_PAYMENT_DETAILS_QUERY = 'get_merchant_payment_details';
 
     private const GET_TICKET_PAYMENTS_QUERY = 'get_ticket_payments';
+
+    private BankTransactionDetailsFactory $transactionDetailsFactory;
+
+    public function __construct(GraphQLInterface $graphQL, BankTransactionDetailsFactory $transactionDetailsFactory)
+    {
+        parent::__construct($graphQL);
+
+        $this->transactionDetailsFactory = $transactionDetailsFactory;
+    }
 
     public function searchMerchantPayments(SearchPaymentsDTO $paymentsDTO): PaginatedCollection
     {
@@ -38,8 +51,12 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
             'merchantUuid' => $paymentsDTO->getMerchantPaymentUuid(),
             'paymentDebtorUuid' => $paymentsDTO->getPaymentDebtorUuid(),
             'transactionUuid' => $paymentsDTO->getTransactionUuid(),
-            'isAllocated' => $paymentsDTO->isAllocated() === null ? null : $this->boolToString($paymentsDTO->isAllocated()),
-            'isOverpayment' => $paymentsDTO->isOverpayment() === null ? null : $this->boolToString($paymentsDTO->isOverpayment()),
+            'isAllocated' => $paymentsDTO->isAllocated() === null ? null : $this->boolToString(
+                $paymentsDTO->isAllocated()
+            ),
+            'isOverpayment' => $paymentsDTO->isOverpayment() === null ? null : $this->boolToString(
+                $paymentsDTO->isOverpayment()
+            ),
             'searchString' => $paymentsDTO->getSearchString(),
             'searchCompanyString' => $paymentsDTO->getSearchCompanyString(),
         ];
@@ -50,7 +67,7 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
         return new PaginatedCollection($this->query(self::GET_MERCHANT_PAYMENTS_QUERY, $params), $total);
     }
 
-    public function getPaymentDetails(string $merchantPaymentUuid, string $transactionUuid): array
+    public function getPaymentDetails(string $merchantPaymentUuid, string $transactionUuid): BankTransactionDetails
     {
         $params = [
             'merchantUuid' => $merchantPaymentUuid,
@@ -59,7 +76,11 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
 
         $response = $this->query(self::GET_PAYMENT_DETAILS_QUERY, $params);
 
-        return empty($response) ? [] : $response[0];
+        if (empty($response)) {
+            throw new BankTransactionNotFoundException();
+        }
+
+        return $this->transactionDetailsFactory->fromArray($response[0]);
     }
 
     public function getTicketPayments(string $paymentTicketUuid): PaginatedCollection

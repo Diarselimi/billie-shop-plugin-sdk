@@ -200,6 +200,6 @@ class OrderContainerRelationLoader
 
     public function loadPaymentMethods(OrderContainer $orderContainer): PaymentMethodCollection
     {
-        return $this->paymentMethodResolver->getOrderPaymentMethods($orderContainer);
+        return $this->paymentMethodResolver->getPaymentMethods($orderContainer);
     }
 }

@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\DomainModel\PaymentMethod;
 
-use App\DomainModel\BankAccount\BankAccountServiceException;
-use App\DomainModel\BankAccount\BankAccountServiceInterface;
-use App\DomainModel\BankAccount\BankNotFoundException;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Ozean12\InvoiceButler\Client\DomainModel\PaymentMethod\PaymentMethod as ClientPaymentMethod;
@@ -17,11 +14,11 @@ class BankNameDecorator implements LoggingInterface
 {
     use LoggingTrait;
 
-    private BankAccountServiceInterface $bankAccountService;
+    private BankNameResolver $bankNameResolver;
 
-    public function __construct(BankAccountServiceInterface $bankAccountService)
+    public function __construct(BankNameResolver $bankNameResolver)
     {
-        $this->bankAccountService = $bankAccountService;
+        $this->bankNameResolver = $bankNameResolver;
     }
 
     public function addBankName(ClientCollection $clientCollection): PaymentMethodCollection
@@ -30,22 +27,16 @@ class BankNameDecorator implements LoggingInterface
         foreach ($clientCollection as $clientPaymentMethod) {
             /** @var ClientPaymentMethod $clientPaymentMethod */
             $bankAccount = $clientPaymentMethod->getBankAccount();
-
-            try {
-                $bankName = $bankAccount->getBankName() ?: $this->bankAccountService->getBankByBic(
-                    $bankAccount->getBic()
-                )->getName();
-            } catch (BankAccountServiceException | BankNotFoundException $exception) {
-                $this->logDebug(
-                    'Banco getBankByBic failed: ' . $exception->getMessage()
-                    . '. BIC was ' . $bankAccount->getBic()
-                );
-                $bankName = null;
-            }
+            $bankName = $this->bankNameResolver->resolve($bankAccount)->getBankName();
 
             $paymentMethods[] = new PaymentMethod(
                 $clientPaymentMethod->getType(),
-                new BankAccount($bankAccount->getIban(), $bankAccount->getBic(), $bankName, null),
+                new BankAccount(
+                    $bankAccount->getIban(),
+                    $bankAccount->getBic(),
+                    $bankName,
+                    $bankAccount->getAccountHolder()
+                ),
                 $clientPaymentMethod->getSepaMandate(),
                 $clientPaymentMethod->getSepaMandateExecutionDate()
             );

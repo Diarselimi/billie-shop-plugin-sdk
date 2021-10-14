@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\DomainModel\PaymentMethod;
 
-use App\DomainModel\BankAccount\BankAccountServiceException;
-use App\DomainModel\BankAccount\BankAccountServiceInterface;
-use App\DomainModel\BankAccount\BankNotFoundException;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -25,23 +22,23 @@ class OrderPaymentMethodResolver implements LoggingInterface
 {
     use LoggingTrait;
 
-    private BankAccountServiceInterface $bankAccountService;
+    private BankNameResolver $bankNameResolver;
 
     private SepaClientInterface $sepaService;
 
     private BorschtClientInterface $borschtService;
 
     public function __construct(
-        BankAccountServiceInterface $bankAccountService,
+        BankNameResolver $bankNameResolver,
         SepaClientInterface $sepaService,
         BorschtClientInterface $borschtService
     ) {
-        $this->bankAccountService = $bankAccountService;
+        $this->bankNameResolver = $bankNameResolver;
         $this->sepaService = $sepaService;
         $this->borschtService = $borschtService;
     }
 
-    public function getOrderPaymentMethods(OrderContainer $orderContainer): PaymentMethodCollection
+    public function getPaymentMethods(OrderContainer $orderContainer): PaymentMethodCollection
     {
         if ($orderContainer->getOrder()->getMerchantDebtorId() === null) {
             // Debtor not identified
@@ -74,25 +71,9 @@ class OrderPaymentMethodResolver implements LoggingInterface
             null
         );
 
-        try {
-            $bankName = $vibanAccount->getBankName() ?: $this->bankAccountService->getBankByBic(
-                $vibanAccount->getBic()
-            )->getName();
-        } catch (BankAccountServiceException | BankNotFoundException $exception) {
-            $this->logDebug(
-                'Banco getBankByBic failed: ' . $exception->getMessage() . '. BIC was ' . $vibanAccount->getBic()
-            );
-            $bankName = null;
-        }
-
         return new PaymentMethod(
             PaymentMethod::TYPE_BANK_TRANSFER,
-            new BankAccount(
-                $vibanAccount->getIban(),
-                $vibanAccount->getBic(),
-                $bankName,
-                null
-            )
+            $this->bankNameResolver->resolve($vibanAccount)
         );
     }
 

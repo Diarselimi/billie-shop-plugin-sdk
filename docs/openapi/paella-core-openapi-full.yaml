@@ -5769,45 +5769,6 @@ components:
                 nullable: true
             type: object
       type: object
-    GetMerchantPaymentDetailsResponse:
-      title: 'Merchant Payments Response'
-      properties:
-        uuid:
-          $ref: '#/components/schemas/UUID'
-        amount:
-          $ref: '#/components/schemas/Money'
-        transaction_date:
-          $ref: '#/components/schemas/Date'
-        is_allocated:
-          type: boolean
-        overpaid_amount:
-          $ref: '#/components/schemas/Money'
-        transaction_counterparty_iban:
-          $ref: '#/components/schemas/IBAN'
-        transaction_counterparty_name:
-          type: string
-        transaction_reference:
-          type: string
-        merchant_debtor_uuid:
-          $ref: '#/components/schemas/UUID'
-        orders:
-          type: array
-          items:
-            properties:
-              uuid:
-                $ref: '#/components/schemas/UUID'
-              amount:
-                $ref: '#/components/schemas/Money'
-              mapped_amount:
-                $ref: '#/components/schemas/Money'
-              outstanding_amount:
-                $ref: '#/components/schemas/Money'
-              external_id:
-                type: string
-              invoice_number:
-                type: string
-            type: object
-      type: object
     GetMerchantPaymentsResponse:
       title: 'Merchant Payments Response'
       properties:
@@ -6065,6 +6026,51 @@ components:
           format: float
           minimum: 0
           example: 60.15
+      type: object
+    GetMerchantPaymentDetailsResponse:
+      title: 'Merchant Payment Details'
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        amount:
+          $ref: '#/components/schemas/Money'
+        transaction_date:
+          nullable: true
+          $ref: '#/components/schemas/Date'
+        is_allocated:
+          type: boolean
+        overpaid_amount:
+          $ref: '#/components/schemas/Money'
+        merchant_debtor_uuid:
+          nullable: true
+          $ref: '#/components/schemas/UUID'
+        transaction_counterparty_iban:
+          $ref: '#/components/schemas/IBAN'
+        transaction_counterparty_name:
+          type: string
+        transaction_reference:
+          type: string
+        orders:
+          type: array
+          items:
+            properties:
+              uuid:
+                $ref: '#/components/schemas/UUID'
+              amount:
+                $ref: '#/components/schemas/Money'
+              mapped_amount:
+                $ref: '#/components/schemas/Money'
+              outstanding_amount:
+                $ref: '#/components/schemas/Money'
+              external_id:
+                type: string
+                nullable: true
+              invoice_number:
+                type: string
+                nullable: true
+            type: object
+        payment_method:
+          $ref: '#/components/schemas/PaymentMethod'
       type: object
     GetOrdersResponsePayloadInvoice:
       properties:

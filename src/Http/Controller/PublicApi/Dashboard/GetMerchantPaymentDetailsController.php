@@ -6,36 +6,17 @@ use App\Application\Exception\MerchantDebtorNotFoundException;
 use App\Application\UseCase\GetMerchant\MerchantNotFoundException;
 use App\Application\UseCase\GetMerchantPaymentDetails\GetMerchantPaymentDetailsRequest;
 use App\Application\UseCase\GetMerchantPaymentDetails\GetMerchantPaymentDetailsUseCase;
-use App\Application\UseCase\GetMerchantPaymentDetails\TransactionNotFoundException;
+use App\DomainModel\Payment\BankTransactionNotFoundException;
 use App\Http\HttpConstantsInterface;
+use App\Http\Response\Dashboard\GetMerchantPaymentDetailsPayload;
 use OpenApi\Annotations as OA;
+use Ramsey\Uuid\UuidInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @IsGranted("ROLE_VIEW_PAYMENTS")
- *
- * @OA\Schema(schema="GetMerchantPaymentDetailsResponse", title="Merchant Payments Response", type="object", properties={
- *   @OA\Property(property="uuid", ref="#/components/schemas/UUID"),
- *   @OA\Property(property="amount", ref="#/components/schemas/Money"),
- *   @OA\Property(property="transaction_date", ref="#/components/schemas/Date"),
- *   @OA\Property(property="is_allocated", type="boolean"),
- *   @OA\Property(property="overpaid_amount", ref="#/components/schemas/Money"),
- *   @OA\Property(property="transaction_counterparty_iban", ref="#/components/schemas/IBAN"),
- *   @OA\Property(property="transaction_counterparty_name", type="string"),
- *   @OA\Property(property="transaction_reference", type="string"),
- *   @OA\Property(property="merchant_debtor_uuid", ref="#/components/schemas/UUID"),
- *   @OA\Property(property="orders", type="array", @OA\Items(type="object", properties={
- *      @OA\Property(property="uuid", ref="#/components/schemas/UUID"),
- *      @OA\Property(property="amount", ref="#/components/schemas/Money"),
- *      @OA\Property(property="mapped_amount", ref="#/components/schemas/Money"),
- *      @OA\Property(property="outstanding_amount", ref="#/components/schemas/Money"),
- *      @OA\Property(property="external_id", type="string"),
- *      @OA\Property(property="invoice_number", type="string")
- *   })),
- * })
  *
  * @OA\Get(
  *     path="/payments/{uuid}",
@@ -60,29 +41,27 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     @OA\Response(response=500, ref="#/components/responses/ServerError")
  * )
  */
-class GetMerchantPaymentDetailsController
+final class GetMerchantPaymentDetailsController
 {
-    private $useCase;
+    private GetMerchantPaymentDetailsUseCase $useCase;
 
     public function __construct(GetMerchantPaymentDetailsUseCase $useCase)
     {
         $this->useCase = $useCase;
     }
 
-    public function execute(string $uuid, Request $request): JsonResponse
+    public function execute(UuidInterface $uuid, Request $request): GetMerchantPaymentDetailsPayload
     {
         $merchantId = $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID);
 
-        $useCaseRequest = (new GetMerchantPaymentDetailsRequest())
-            ->setMerchantId($merchantId)
-            ->setTransactionUuid($uuid);
+        $useCaseRequest = (new GetMerchantPaymentDetailsRequest($merchantId, $uuid));
 
         try {
-            $response = $this->useCase->execute($useCaseRequest);
-        } catch (MerchantNotFoundException | MerchantDebtorNotFoundException | TransactionNotFoundException $e) {
+            $useCaseResponse = $this->useCase->execute($useCaseRequest);
+        } catch (MerchantNotFoundException | MerchantDebtorNotFoundException | BankTransactionNotFoundException $e) {
             throw new NotFoundHttpException($e->getMessage());
         }
 
-        return new JsonResponse($response);
+        return new GetMerchantPaymentDetailsPayload($useCaseResponse);
     }
 }

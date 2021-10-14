@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8dc2710f68157adc2037f1cf6075a7c3",
+    "content-hash": "d2918dd04c9a37bf14bb12edb664f640",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -2983,16 +2983,16 @@
         },
         {
             "name": "ozean12/amqp-pack",
-            "version": "2.2.1",
+            "version": "2.3.2",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/amqp-pack.git",
-                "reference": "15a808e6ac9c126f82c005e7cb65e57a2e713c0f"
+                "reference": "4a7a13f79c2e7332b366803f247e5baf8984aa10"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/amqp-pack/zipball/15a808e6ac9c126f82c005e7cb65e57a2e713c0f",
-                "reference": "15a808e6ac9c126f82c005e7cb65e57a2e713c0f",
+                "url": "https://api.github.com/repos/ozean12/amqp-pack/zipball/4a7a13f79c2e7332b366803f247e5baf8984aa10",
+                "reference": "4a7a13f79c2e7332b366803f247e5baf8984aa10",
                 "shasum": ""
             },
             "require": {
@@ -3036,23 +3036,23 @@
             ],
             "description": "A pack for using the AMQP transport within Billie",
             "support": {
-                "source": "https://github.com/ozean12/amqp-pack/tree/2.2.1",
+                "source": "https://github.com/ozean12/amqp-pack/tree/2.3.2",
                 "issues": "https://github.com/ozean12/amqp-pack/issues"
             },
-            "time": "2021-09-29T09:55:06+00:00"
+            "time": "2021-10-06T12:06:46+00:00"
         },
         {
             "name": "ozean12/amqp-transfers",
-            "version": "0.4.86",
+            "version": "0.4.89",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/amqp-transfers.git",
-                "reference": "cbd6409d91f1d08b9d09027bf9bbaa25d4da1f42"
+                "reference": "ae9452d7c9026eb61a9bb59e1aeb54ea2a6da7f4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/amqp-transfers/zipball/cbd6409d91f1d08b9d09027bf9bbaa25d4da1f42",
-                "reference": "cbd6409d91f1d08b9d09027bf9bbaa25d4da1f42",
+                "url": "https://api.github.com/repos/ozean12/amqp-transfers/zipball/ae9452d7c9026eb61a9bb59e1aeb54ea2a6da7f4",
+                "reference": "ae9452d7c9026eb61a9bb59e1aeb54ea2a6da7f4",
                 "shasum": ""
             },
             "require": {
@@ -3072,10 +3072,10 @@
             ],
             "description": "Transfer objects across Billie universe",
             "support": {
-                "source": "https://github.com/ozean12/amqp-transfers/tree/0.4.86",
+                "source": "https://github.com/ozean12/amqp-transfers/tree/0.4.89",
                 "issues": "https://github.com/ozean12/amqp-transfers/issues"
             },
-            "time": "2021-09-30T20:06:29+00:00"
+            "time": "2021-10-12T14:08:22+00:00"
         },
         {
             "name": "ozean12/amqp-transfers-serializer",
@@ -3183,16 +3183,16 @@
         },
         {
             "name": "ozean12/borscht-client",
-            "version": "1.1.0",
+            "version": "1.1.1",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/borscht-client-php.git",
-                "reference": "550e660c52d7faa370ce6a0c26f86f7c5332963a"
+                "reference": "5f517bbbcfca657c13d0498df04aa656716dca40"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/borscht-client-php/zipball/550e660c52d7faa370ce6a0c26f86f7c5332963a",
-                "reference": "550e660c52d7faa370ce6a0c26f86f7c5332963a",
+                "url": "https://api.github.com/repos/ozean12/borscht-client-php/zipball/5f517bbbcfca657c13d0498df04aa656716dca40",
+                "reference": "5f517bbbcfca657c13d0498df04aa656716dca40",
                 "shasum": ""
             },
             "require": {
@@ -3234,10 +3234,10 @@
             ],
             "description": "Borscht service HTTP client for PHP",
             "support": {
-                "source": "https://github.com/ozean12/borscht-client-php/tree/main",
+                "source": "https://github.com/ozean12/borscht-client-php/tree/1.1.1",
                 "issues": "https://github.com/ozean12/borscht-client-php/issues"
             },
-            "time": "2021-09-20T14:55:59+00:00"
+            "time": "2021-10-13T14:40:41+00:00"
         },
         {
             "name": "ozean12/company-strict-match-bundle",

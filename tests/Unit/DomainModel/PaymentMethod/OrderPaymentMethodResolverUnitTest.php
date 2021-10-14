@@ -4,18 +4,16 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\DomainModel\PaymentMethod;
 
-use App\DomainModel\BankAccount\BankAccountServiceException;
-use App\DomainModel\BankAccount\BankAccountServiceInterface;
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceCollection;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Payment\DebtorPaymentDetailsDTO;
+use App\DomainModel\PaymentMethod\BankNameResolver;
 use App\DomainModel\PaymentMethod\OrderPaymentMethodResolver;
 use App\DomainModel\PaymentMethod\PaymentMethod;
 use App\Test\TestSentryClient;
 use App\Tests\Unit\UnitTestCase;
-use Ozean12\BancoSDK\Model\Bank;
 use Ozean12\Borscht\Client\DomainModel\BorschtClientInterface;
 use Ozean12\Borscht\Client\DomainModel\DirectDebit\DirectDebit;
 use Ozean12\Borscht\Client\DomainModel\Ticket\Ticket;
@@ -24,16 +22,13 @@ use Ozean12\Sepa\Client\DomainModel\SepaClientInterface;
 use Ozean12\Support\ValueObject\BankAccount;
 use Ozean12\Support\ValueObject\Exception\InvalidIbanException;
 use Ozean12\Support\ValueObject\Iban;
+use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\NullLogger;
 use Ramsey\Uuid\Uuid;
 
 class OrderPaymentMethodResolverUnitTest extends UnitTestCase
 {
-    /**
-     * @var BankAccountServiceInterface|\Prophecy\Prophecy\ObjectProphecy
-     */
-    private $bankAccountService;
-
     /**
      * @var SepaClientInterface|\Prophecy\Prophecy\ObjectProphecy
      */
@@ -44,9 +39,11 @@ class OrderPaymentMethodResolverUnitTest extends UnitTestCase
      */
     private $borschtClient;
 
+    private ObjectProphecy $bankNameResolver;
+
     protected function setUp(): void
     {
-        $this->bankAccountService = $this->prophesize(BankAccountServiceInterface::class);
+        $this->bankNameResolver = $this->prophesize(BankNameResolver::class);
         $this->sepaClient = $this->prophesize(SepaClientInterface::class);
         $this->borschtClient = $this->prophesize(BorschtClientInterface::class);
     }
@@ -54,7 +51,7 @@ class OrderPaymentMethodResolverUnitTest extends UnitTestCase
     private function createResolver(): OrderPaymentMethodResolver
     {
         $resolver = new OrderPaymentMethodResolver(
-            $this->bankAccountService->reveal(),
+            $this->bankNameResolver->reveal(),
             $this->sepaClient->reveal(),
             $this->borschtClient->reveal()
         );
@@ -78,7 +75,7 @@ class OrderPaymentMethodResolverUnitTest extends UnitTestCase
                 ->setWorkflowName(OrderEntity::WORKFLOW_NAME_V2)
         );
 
-        $this->assertCount(0, $resolver->getOrderPaymentMethods($orderContainer->reveal()));
+        $this->assertCount(0, $resolver->getPaymentMethods($orderContainer->reveal()));
     }
 
     /**
@@ -100,13 +97,20 @@ class OrderPaymentMethodResolverUnitTest extends UnitTestCase
         $debtorPaymentDetails->setBankAccountBic('BICXXXX');
         $debtorPaymentDetails->setOutstandingAmount(0);
 
-        $this->bankAccountService->getBankByBic('BICXXXX')
+        $this->bankNameResolver->resolve(Argument::any())
             ->shouldBeCalledOnce()
-            ->willReturn(new Bank(['name' => 'Test Bank']));
+            ->willReturn(
+                new BankAccount(
+                    new Iban('DE27500105171416939916'),
+                    'BICXXXX',
+                    'Test Bank',
+                    null
+                )
+            );
 
         $orderContainer->getDebtorPaymentDetails()->willReturn($debtorPaymentDetails);
 
-        $paymentMethods = $resolver->getOrderPaymentMethods($orderContainer->reveal());
+        $paymentMethods = $resolver->getPaymentMethods($orderContainer->reveal());
         $this->assertCount(1, $paymentMethods);
 
         /** @var PaymentMethod $bankTransfer */
@@ -136,13 +140,20 @@ class OrderPaymentMethodResolverUnitTest extends UnitTestCase
         $debtorPaymentDetails->setBankAccountBic('BICXXXX');
         $debtorPaymentDetails->setOutstandingAmount(0);
 
-        $this->bankAccountService->getBankByBic('BICXXXX')
+        $this->bankNameResolver->resolve(Argument::any())
             ->shouldBeCalledOnce()
-            ->willThrow(BankAccountServiceException::class);
+            ->willReturn(
+                new BankAccount(
+                    new Iban('DE27500105171416939916'),
+                    'BICXXXX',
+                    null,
+                    null
+                )
+            );
 
         $orderContainer->getDebtorPaymentDetails()->willReturn($debtorPaymentDetails);
 
-        $paymentMethods = $resolver->getOrderPaymentMethods($orderContainer->reveal());
+        $paymentMethods = $resolver->getPaymentMethods($orderContainer->reveal());
         $this->assertCount(1, $paymentMethods);
 
         /** @var PaymentMethod $bankTransfer */
@@ -151,6 +162,51 @@ class OrderPaymentMethodResolverUnitTest extends UnitTestCase
         $this->assertEquals('DE27500105171416939916', $bankTransfer->getBankAccount()->getIban()->toString());
         $this->assertEquals('BICXXXX', $bankTransfer->getBankAccount()->getBic());
         $this->assertEquals(null, $bankTransfer->getBankAccount()->getBankName());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldNotGetDirectDebitInfoFromFirstInvoiceForOrdersV2(): void
+    {
+        $sepaMandateUuid = Uuid::uuid4();
+        $resolver = $this->createResolver();
+
+        $orderContainer = $this->prophesize(OrderContainer::class);
+        $orderContainer->getOrder()->willReturn(
+            (new OrderEntity())
+                ->setMerchantDebtorId(1)
+                ->setDebtorSepaMandateUuid($sepaMandateUuid)
+                ->setWorkflowName(OrderEntity::WORKFLOW_NAME_V2)
+        );
+        $orderContainer->getDebtorPaymentDetails()->willReturn(
+            (new DebtorPaymentDetailsDTO())
+                ->setBankAccountBic('BICXXXX')
+                ->setBankAccountIban('DE27500105171416939916')
+        );
+
+        $invoice = new Invoice();
+        $invoice->setPaymentUuid(Uuid::uuid4()->toString());
+
+        $orderContainer->getInvoices()->willReturn(
+            new InvoiceCollection([$invoice])
+        );
+
+        $this->borschtClient->getTicket(Argument::any())->shouldNotBeCalled();
+
+        $bankAccount = new BankAccount(new Iban('DE27500105171416939916'), 'BICXXXX', 'test', null);
+        $this->sepaClient->getMandate($sepaMandateUuid)->shouldBeCalledOnce()->willReturn(
+            new SepaMandate(
+                $sepaMandateUuid,
+                'REF',
+                'CREDITOR',
+                true,
+                $bankAccount
+            )
+        );
+
+        $this->bankNameResolver->resolve(Argument::any())->shouldBeCalledOnce()->willReturn($bankAccount);
+        $resolver->getPaymentMethods($orderContainer->reveal());
     }
 
     /**
@@ -206,10 +262,18 @@ class OrderPaymentMethodResolverUnitTest extends UnitTestCase
                 )
             );
 
-        $this->bankAccountService->getBankByBic('BICXXXX')
-            ->willReturn(new Bank(['name' => 'Test Bank']));
+        $this->bankNameResolver->resolve(Argument::any())
+            ->shouldBeCalledOnce()
+            ->willReturn(
+                new BankAccount(
+                    new Iban('DE27500105171416939916'),
+                    'BICXXXX',
+                    'Test Bank',
+                    null
+                )
+            );
 
-        $paymentMethods = $resolver->getOrderPaymentMethods($orderContainer->reveal());
+        $paymentMethods = $resolver->getPaymentMethods($orderContainer->reveal());
         $this->assertCount(2, $paymentMethods);
 
         /** @var PaymentMethod $bankTransferMethod */
@@ -223,7 +287,10 @@ class OrderPaymentMethodResolverUnitTest extends UnitTestCase
         /** @var PaymentMethod $directDebitPaymentMethod */
         $directDebitPaymentMethod = $paymentMethods->last();
         $this->assertEquals(PaymentMethod::TYPE_DIRECT_DEBIT, $directDebitPaymentMethod->getType());
-        $this->assertEquals('DE27500105171416939916', $directDebitPaymentMethod->getBankAccount()->getIban()->toString());
+        $this->assertEquals(
+            'DE27500105171416939916',
+            $directDebitPaymentMethod->getBankAccount()->getIban()->toString()
+        );
         $this->assertEquals('BICXXXX', $directDebitPaymentMethod->getBankAccount()->getBic());
         $this->assertNull($directDebitPaymentMethod->getBankAccount()->getBankName());
         $this->assertNotNull($directDebitPaymentMethod->getSepaMandate());
@@ -249,13 +316,13 @@ class OrderPaymentMethodResolverUnitTest extends UnitTestCase
         $debtorPaymentDetails->setBankAccountBic('BICXXXX');
         $debtorPaymentDetails->setOutstandingAmount(0);
 
-        $this->bankAccountService->getBankByBic('BICXXXX')
+        $this->bankNameResolver->resolve(Argument::any())
             ->shouldBeCalledOnce()
             ->willThrow(InvalidIbanException::class);
 
         $orderContainer->getDebtorPaymentDetails()->willReturn($debtorPaymentDetails);
 
-        $paymentMethods = $resolver->getOrderPaymentMethods($orderContainer->reveal());
+        $paymentMethods = $resolver->getPaymentMethods($orderContainer->reveal());
         $this->assertTrue($paymentMethods->isEmpty());
     }
 }

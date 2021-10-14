@@ -2,49 +2,74 @@
 
 namespace App\Application\UseCase\GetMerchantPaymentDetails;
 
+use App\Application\Exception\MerchantDebtorNotFoundException;
 use App\Application\UseCase\GetMerchant\MerchantNotFoundException;
-use App\Application\UseCase\ValidatedUseCaseInterface;
-use App\Application\UseCase\ValidatedUseCaseTrait;
-use App\DomainModel\MerchantPayment\MerchantPaymentResponseTransformer;
+use App\DomainModel\Merchant\MerchantRepository;
+use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\Payment\PaymentsRepositoryInterface;
-use App\Infrastructure\Repository\MerchantPdoRepository;
+use App\DomainModel\PaymentMethod\BankTransactionPaymentMethodResolver;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
-class GetMerchantPaymentDetailsUseCase implements ValidatedUseCaseInterface
+class GetMerchantPaymentDetailsUseCase
 {
-    use ValidatedUseCaseTrait;
+    private MerchantRepository $merchantRepository;
 
-    private $merchantRepository;
+    private PaymentsRepositoryInterface $paymentsRepository;
 
-    private $paymentsRepository;
+    private BankTransactionPaymentMethodResolver $paymentMethodResolver;
 
-    private $paymentFactory;
+    private MerchantDebtorRepositoryInterface $merchantDebtorRepository;
 
     public function __construct(
-        MerchantPdoRepository $merchantRepository,
+        MerchantRepository $merchantRepository,
         PaymentsRepositoryInterface $paymentsRepository,
-        MerchantPaymentResponseTransformer $paymentFactory
+        BankTransactionPaymentMethodResolver $paymentMethodResolver,
+        MerchantDebtorRepositoryInterface $merchantDebtorRepository
     ) {
         $this->merchantRepository = $merchantRepository;
         $this->paymentsRepository = $paymentsRepository;
-        $this->paymentFactory = $paymentFactory;
+        $this->paymentMethodResolver = $paymentMethodResolver;
+        $this->merchantDebtorRepository = $merchantDebtorRepository;
     }
 
-    public function execute(GetMerchantPaymentDetailsRequest $request): array
+    public function execute(GetMerchantPaymentDetailsRequest $request): GetMerchantPaymentDetailsResponse
     {
-        $this->validateRequest($request);
-
         $merchant = $this->merchantRepository->getOneById($request->getMerchantId());
 
-        if (!$merchant) {
+        if ($merchant === null) {
             throw new MerchantNotFoundException();
         }
 
-        $result = $this->paymentsRepository->getPaymentDetails($merchant->getPaymentUuid(), $request->getTransactionUuid());
+        $transactionDetails = $this->paymentsRepository->getPaymentDetails(
+            $merchant->getPaymentUuid(),
+            $request->getTransactionUuid()
+        );
 
-        if (empty($result)) {
-            throw new TransactionNotFoundException("Transaction {$request->getTransactionUuid()} was not found.");
+        $debtorPaymentUuid = $this->getDebtorPaymentUuid($transactionDetails->getMerchantDebtorUuid());
+        $paymentMethod = $this->paymentMethodResolver->getPaymentMethod(
+            $request->getTransactionUuid(),
+            $debtorPaymentUuid
+        );
+
+        return new GetMerchantPaymentDetailsResponse($transactionDetails, $paymentMethod);
+    }
+
+    private function getDebtorPaymentUuid(?UuidInterface $merchantDebtorUuid): ?UuidInterface
+    {
+        if ($merchantDebtorUuid === null) {
+            return null;
         }
 
-        return $this->paymentFactory->expandPaymentItem($result);
+        $merchantDebtor = $this->merchantDebtorRepository->getOneByUuid($merchantDebtorUuid);
+        if ($merchantDebtor === null) {
+            throw new MerchantDebtorNotFoundException();
+        }
+
+        if ($merchantDebtor->getPaymentDebtorId() === null) {
+            return null;
+        }
+
+        return Uuid::fromString($merchantDebtor->getPaymentDebtorId());
     }
 }

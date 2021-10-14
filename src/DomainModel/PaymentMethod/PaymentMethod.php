@@ -21,16 +21,20 @@ class PaymentMethod
 
     private ?\DateTimeInterface $sepaMandateExecutionDate;
 
+    private ?string $sepaMandateState;
+
     public function __construct(
         string $type,
         BankAccount $bank,
         ?SepaMandate $sepaMandate = null,
-        ?\DateTimeInterface $sepaMandateExecutionDate = null
+        ?\DateTimeInterface $sepaMandateExecutionDate = null,
+        ?string $sepaMandateState = null
     ) {
         $this->type = $type;
         $this->bankAccount = $bank;
         $this->sepaMandate = $sepaMandate;
         $this->sepaMandateExecutionDate = $sepaMandateExecutionDate;
+        $this->sepaMandateState = $sepaMandateState;
     }
 
     public function getType(): string
@@ -61,6 +65,11 @@ class PaymentMethod
     public function hasSepaMandateExecutionDate(): bool
     {
         return $this->sepaMandateExecutionDate !== null;
+    }
+
+    public function getSepaMandateState(): ?string
+    {
+        return $this->sepaMandateState;
     }
 
     public function isBankTransfer(): bool

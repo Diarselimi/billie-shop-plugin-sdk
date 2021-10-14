@@ -27,7 +27,7 @@
         "ozean12/amqp-pack": "^2.2",
         "ozean12/amqp-transfers": "^0.4",
         "ozean12/banco-sdk-php": "^1.0",
-        "ozean12/borscht-client": "^1.0",
+        "ozean12/borscht-client": "^1.1",
         "ozean12/company-strict-match-bundle": "^1.0",
         "ozean12/graphql-repository-client": "^1.0",
         "ozean12/invoice-butler-client": "^1.1",
