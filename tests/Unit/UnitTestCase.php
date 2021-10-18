@@ -8,6 +8,7 @@ use DateTimeInterface;
 use Ozean12\Money\Money;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -29,5 +30,10 @@ abstract class UnitTestCase extends TestCase
         $validator->validate(Argument::cetera())->willReturn(new ConstraintViolationList([]));
 
         return $validator->reveal();
+    }
+
+    protected function generateEnvelope(): Envelope
+    {
+        return new Envelope(new \stdClass());
     }
 }

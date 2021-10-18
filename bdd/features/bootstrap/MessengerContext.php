@@ -11,6 +11,7 @@ use Coduo\PHPMatcher\PHPMatcher;
 use Enqueue\MessengerAdapter\EnvelopeItem\TransportConfiguration;
 use Google\Protobuf\Internal\Message;
 use Ozean12\AmqpTransfers\Mapping\Amqp\AmqpMapperInterface;
+use Ozean12\AmqpTransfers\Mapping\Exception\MappingNotFoundException;
 use Ozean12\Transfer\Message\CompanyInformationChangeRequest\CompanyInformationChangeRequestDecisionIssued;
 use Ozean12\Transfer\Message\Identity\IdentityVerificationSucceeded;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -147,7 +148,14 @@ class MessengerContext implements Context
         foreach ($messages as $message) {
             /** @var Message $dispatchedMessage */
             $dispatchedMessage = $message['message'];
-            $routingKey = $this->amqpMapper->mapToKey(get_class($dispatchedMessage));
+
+            try {
+                $routingKey = $this->amqpMapper->mapToKey(get_class($dispatchedMessage));
+            } catch (MappingNotFoundException $exception) {
+                print_r(['unmapped_message' => $dispatchedMessage]);
+
+                continue;
+            }
             print_r(
                 ['routing_key' => $routingKey, 'payload' => $dispatchedMessage->serializeToJsonString()]
             );

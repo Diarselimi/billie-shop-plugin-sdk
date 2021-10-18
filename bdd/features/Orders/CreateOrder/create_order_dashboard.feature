@@ -21,8 +21,8 @@ Feature:
     {
        "debtor_person":{
           "salutation":"m",
-          "first_name":"",
-          "last_name":"else",
+          "first_name":"John",
+          "last_name":"Doe",
           "phone_number":"+491234567",
           "email":"someone@billie.io"
        },
@@ -67,3 +67,19 @@ Feature:
     And the response status code should be 200
     And the JSON response should be file "create_order_response.json"
     And the order "A1" has the same hash "test user company va222 3333 some number some legal berlin 10179 heinrich-heine-platz 10 de"
+    And queue should contain message with routing key order.order_created with below data:
+    """
+    {
+      "uuid":"@string@",
+      "merchantCompanyUuid":"c7be46c0-e049-4312-b274-258ec5aeeb70",
+      "merchantPaymentUuid":"f2ec4d5e-79f4-40d6-b411-31174b6519ac",
+      "debtorCompanyUuid":"c7be46c0-e049-4312-b274-258ec5aeeb70",
+      "debtorPaymentUuid":"test",
+      "buyer":{
+        "firstName":"John",
+        "lastName":"Doe",
+        "gender":"m",
+        "email":"someone@billie.io"
+      }
+    }
+    """
