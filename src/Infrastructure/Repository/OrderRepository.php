@@ -473,9 +473,7 @@ SQL;
     public function getNotYetConfirmedByCheckoutSessionUuid(string $checkoutSessionUuid): ?OrderEntity
     {
         $states = array_map(
-            function ($state) {
-                return "'{$state}'";
-            },
+            static fn ($state) => "'{$state}'",
             [OrderEntity::STATE_PRE_WAITING, OrderEntity::STATE_AUTHORIZED]
         );
 

@@ -6,7 +6,6 @@ namespace App\Http\RequestTransformer\CreateOrder;
 
 use App\Application\UseCase\CreateOrder\CreateOrderRequest;
 use App\Application\UseCase\CreateOrder\LegacyCreateOrderRequest;
-use App\DomainModel\CheckoutSession\CheckoutSession;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
 use App\Http\HttpConstantsInterface;
@@ -66,8 +65,8 @@ class CreateOrderRequestFactory
             ->setDuration($request->request->getInt('duration'))
             ->setComment($request->request->get('comment'))
             ->setExternalCode($request->request->get('order_id'))
-            ->setDebtor($this->debtorRequestFactory->createForLegacyOrder($request))
-            ->setDebtorPerson($this->debtorPersonRequestFactory->create($request));
+            ->setDebtor($this->debtorRequestFactory->createForLegacyOrder($request->request->get('debtor_company')))
+            ->setDebtorPerson($this->debtorPersonRequestFactory->create($request->request->get('debtor_person', [])));
 
         $useCaseRequest->setDeliveryAddress(
             $this->addressRequestFactory->create($request, 'delivery_address')
@@ -78,28 +77,10 @@ class CreateOrderRequestFactory
         );
 
         $useCaseRequest->setLineItems(
-            $this->lineItemsRequestFactory->create($request)
+            $this->lineItemsRequestFactory->create($request->request->get('line_items', []))
         );
 
         return $useCaseRequest;
-    }
-
-    public function createForAuthorizeCheckoutSession(
-        Request $request,
-        CheckoutSession $checkoutSession
-    ): LegacyCreateOrderRequest {
-        $request->request->set(
-            'debtor_company',
-            array_merge(
-                $request->request->get('debtor_company'),
-                ['merchant_customer_id' => $checkoutSession->debtorExternalId()]
-            )
-        );
-
-        $request->attributes->set('checkout_session_id', $checkoutSession->id());
-        $request->attributes->set('workflow_name', $this->getWorkflowName($checkoutSession->merchantId()));
-
-        return $this->createForLegacyCreateOrder($request);
     }
 
     public function createForCreateOrder(Request $request): CreateOrderRequest
@@ -117,7 +98,7 @@ class CreateOrderRequestFactory
             ->setComment($request->request->get('comment'))
             ->setExternalCode($request->request->get('external_code'))
             ->setDebtor($this->debtorRequestFactory->create($request))
-            ->setDebtorPerson($this->debtorPersonRequestFactory->create($request));
+            ->setDebtorPerson($this->debtorPersonRequestFactory->create($request->request->get('debtor_person', [])));
 
         $useCaseRequest->setDeliveryAddress(
             $this->addressRequestFactory->create($request, 'delivery_address')
@@ -130,7 +111,7 @@ class CreateOrderRequestFactory
         }
 
         $useCaseRequest->setLineItems(
-            $this->lineItemsRequestFactory->create($request)
+            $this->lineItemsRequestFactory->create($request->request->get('line_items', []))
         );
 
         return $useCaseRequest;

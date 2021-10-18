@@ -29,10 +29,8 @@ class DebtorRequestFactory
         ;
     }
 
-    public function createForLegacyOrder(Request $request): CreateOrderDebtorCompanyRequest
+    public function createForLegacyOrder(array $requestData): CreateOrderDebtorCompanyRequest
     {
-        $requestData = $request->request->get('debtor_company');
-
         return $this->doCreate($requestData)
             ->setAddress($this->addressRequestFactory->createFromOldFormat($requestData))
         ;

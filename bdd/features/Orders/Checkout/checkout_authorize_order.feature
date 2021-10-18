@@ -45,6 +45,7 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
       }
       """
     And I get from payments service get debtor response
+    And GraphQL will respond to getMerchantDebtorDetails query
 
   Scenario: The order gets declined because of the limit exceeded.
     Given I get from companies service identify match response with similar candidate
@@ -115,7 +116,6 @@ Feature: As a merchant, i should be able to create an order if I provide a valid
        ]
     }
     """
-    Then print last JSON response
     And the JSON response should be:
     """
     {

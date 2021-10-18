@@ -4,7 +4,6 @@ namespace App\Http\RequestTransformer\CreateOrder;
 
 use App\Application\UseCase\CreateOrder\Request\CreateOrderLineItemRequest;
 use App\Http\RequestTransformer\AmountRequestFactory;
-use Symfony\Component\HttpFoundation\Request;
 
 class OrderLineItemsRequestFactory
 {
@@ -16,14 +15,11 @@ class OrderLineItemsRequestFactory
     }
 
     /**
-     * @param  Request                      $request
      * @return CreateOrderLineItemRequest[]
      */
-    public function create(Request $request): array
+    public function create(array $requestData): array
     {
-        $lineItems = $request->request->get('line_items', []);
-
-        return array_map([$this, 'createFromArray'], $lineItems);
+        return array_map([$this, 'createFromArray'], $requestData);
     }
 
     public function createFromArray(array $data): CreateOrderLineItemRequest

@@ -9,9 +9,9 @@ use App\DomainModel\OrderRiskCheck\CheckResultCollection;
 
 class OrderContainerFactory
 {
-    private $orderRepository;
+    private OrderRepositoryInterface $orderRepository;
 
-    private $relationLoader;
+    private OrderContainerRelationLoader $relationLoader;
 
     private ?OrderContainer $cachedOrderContainer;
 
@@ -125,7 +125,7 @@ class OrderContainerFactory
 
     public function createFromNewOrderDTO(OrderCreationDTO $newOrder): OrderContainer
     {
-        return (new OrderContainer($newOrder->getOrder(), $this->relationLoader))
+        return $this->cachedOrderContainer = (new OrderContainer($newOrder->getOrder(), $this->relationLoader))
             ->setDebtorPerson($newOrder->getDebtorPerson())
             ->setDebtorExternalData($newOrder->getDebtorExternalData())
             ->setDebtorExternalDataAddress($newOrder->getDebtorExternalDataAddress())
@@ -133,6 +133,7 @@ class OrderContainerFactory
             ->setOrderFinancialDetails($newOrder->getFinancialDetails())
             ->setLineItems($newOrder->getLineItems())
             ->setBillingAddress($newOrder->getBillingAddress())
-            ->setRiskCheckResultCollection(new CheckResultCollection());
+            ->setRiskCheckResultCollection(new CheckResultCollection())
+        ;
     }
 }

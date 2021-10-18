@@ -2,12 +2,13 @@
 
 namespace App\Http\Controller\PublicApi;
 
-use App\Application\UseCase\CheckoutAuthorizeOrder\CheckoutAuthorizeOrderUseCase;
+use App\Application\CommandBus;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderResponse\CheckoutAuthorizeOrderResponse;
+use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
 use App\Http\Authentication\UserProvider;
-use App\Http\HttpConstantsInterface;
-use App\Http\RequestTransformer\CreateOrder\CreateOrderRequestFactory;
+use App\Http\RequestTransformer\CreateOrder\AuthorizeOrderCommandFactory;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,31 +40,42 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class CheckoutAuthorizeOrderController
 {
-    private CheckoutAuthorizeOrderUseCase $useCase;
-
     private UserProvider $userProvider;
 
-    private CreateOrderRequestFactory $orderRequestFactory;
+    private AuthorizeOrderCommandFactory $commandFactory;
+
+    private LegacyOrderResponseFactory $responseFactory;
+
+    private OrderContainerFactory $orderContainerFactory;
+
+    private CommandBus $bus;
 
     public function __construct(
-        CheckoutAuthorizeOrderUseCase $useCase,
         UserProvider $userProvider,
-        CreateOrderRequestFactory $orderRequestFactory
+        AuthorizeOrderCommandFactory $orderRequestFactory,
+        LegacyOrderResponseFactory $orderResponseFactory,
+        OrderContainerFactory $orderContainerFactory,
+        CommandBus $bus
     ) {
-        $this->useCase = $useCase;
         $this->userProvider = $userProvider;
-        $this->orderRequestFactory = $orderRequestFactory;
+        $this->commandFactory = $orderRequestFactory;
+        $this->responseFactory = $orderResponseFactory;
+        $this->orderContainerFactory = $orderContainerFactory;
+        $this->bus = $bus;
     }
 
     public function execute(Request $request): CheckoutAuthorizeOrderResponse
     {
-        $request->attributes->set(
-            HttpConstantsInterface::REQUEST_ATTRIBUTE_CREATION_SOURCE,
+        $checkoutSession = $this->userProvider->getCheckoutUser()->getCheckoutSession();
+
+        $command = $this->commandFactory->create(
+            $request->request->all(),
+            $checkoutSession,
             OrderEntity::CREATION_SOURCE_CHECKOUT
         );
-        $checkoutSession = $this->userProvider->getCheckoutUser()->getCheckoutSession();
-        $useCaseRequest = $this->orderRequestFactory->createForAuthorizeCheckoutSession($request, $checkoutSession);
 
-        return $this->useCase->execute($useCaseRequest);
+        $this->bus->process($command);
+
+        return $this->responseFactory->createAuthorizeResponse($this->orderContainerFactory->getCachedOrderContainer());
     }
 }

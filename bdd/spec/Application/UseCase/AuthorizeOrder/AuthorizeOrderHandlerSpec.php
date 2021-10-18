@@ -1,8 +1,8 @@
 <?php
 
-namespace spec\App\Application\UseCase\CheckoutAuthorizeOrder;
+namespace spec\App\Application\UseCase\AuthorizeOrder;
 
-use App\Application\UseCase\CheckoutAuthorizeOrder\CheckoutAuthorizeOrderUseCase;
+use App\Application\UseCase\AuthorizeOrder\AuthorizeOrderHandler;
 use App\DomainModel\CheckoutSession\CheckoutSessionRepository;
 use App\DomainModel\Order\IdentifyAndTriggerAsyncIdentification;
 use App\DomainModel\Order\Lifecycle\ApproveOrderService;
@@ -20,7 +20,7 @@ use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Workflow\Registry;
 
-class CheckoutAuthorizeOrderUseCaseSpec extends ObjectBehavior
+class AuthorizeOrderHandlerSpec extends ObjectBehavior
 {
     public function let(
         OrderPersistenceService $persistNewOrderService,
@@ -48,6 +48,6 @@ class CheckoutAuthorizeOrderUseCaseSpec extends ObjectBehavior
 
     public function it_is_initializable()
     {
-        $this->shouldHaveType(CheckoutAuthorizeOrderUseCase::class);
+        $this->shouldHaveType(AuthorizeOrderHandler::class);
     }
 }

@@ -165,6 +165,7 @@ Feature: As a merchant, I should be able to create an order by providing a valid
       | order_id | invoice_uuid                         |
       | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
     And I get from companies service a good debtor strict match response
+    And I get from payments service get order details response
     And Debtor lock limit call succeeded
     And I send a PUT request to "/checkout-session/123123CO123/confirm" with body:
     """
@@ -421,6 +422,7 @@ Feature: As a merchant, I should be able to create an order by providing a valid
       | CO123       | authorized | 100.3 | 99.1 | 1.2 | 30       | 123123CO123      |
     And I get from companies service a good debtor strict match response
     And I get from invoice-butler service good response no CreditNotes
+    And I get from payments service get order details response
     And the following invoice data exists:
       | order_id | invoice_uuid                         |
       | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |

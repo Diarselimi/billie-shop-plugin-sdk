@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Application\UseCase\CheckoutAuthorizeOrder;
+namespace App\Application\UseCase\AuthorizeOrder;
 
+use App\Application\CommandHandler;
 use App\Application\UseCase\CreateOrder\LegacyCreateOrderRequest;
 use App\Application\UseCase\OrderCreationUseCaseTrait;
 use App\Application\UseCase\ValidatedUseCaseInterface;
@@ -15,13 +16,12 @@ use App\DomainModel\Order\OrderChecksRunnerService;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
-use App\DomainModel\OrderResponse\CheckoutAuthorizeOrderResponse;
 use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\Workflow\Registry;
 
-class CheckoutAuthorizeOrderUseCase implements LoggingInterface, ValidatedUseCaseInterface
+class AuthorizeOrderHandler implements LoggingInterface, ValidatedUseCaseInterface, CommandHandler
 {
     use LoggingTrait, ValidatedUseCaseTrait, OrderCreationUseCaseTrait;
 
@@ -51,7 +51,7 @@ class CheckoutAuthorizeOrderUseCase implements LoggingInterface, ValidatedUseCas
         $this->orderResponseFactory = $orderResponseFactory;
     }
 
-    public function execute(LegacyCreateOrderRequest $request): CheckoutAuthorizeOrderResponse
+    public function execute(AuthorizeOrder $request): void
     {
         $this->validateRequest($request, null, ['Default', 'AuthorizeOrder']);
 
@@ -59,7 +59,7 @@ class CheckoutAuthorizeOrderUseCase implements LoggingInterface, ValidatedUseCas
         $order = $orderContainer->getOrder();
 
         if ($order->isDeclined()) {
-            return $this->orderResponseFactory->createAuthorizeResponse($orderContainer);
+            return;
         }
 
         $this->invalidateCheckoutSession($request);
@@ -67,12 +67,10 @@ class CheckoutAuthorizeOrderUseCase implements LoggingInterface, ValidatedUseCas
         if ($this->orderChecksRunnerService->hasFailedSoftDeclinableChecks($orderContainer)) {
             $this->workflowRegistry->get($order)->apply($order, OrderEntity::TRANSITION_PRE_WAITING);
 
-            return $this->orderResponseFactory->createAuthorizeResponse($orderContainer);
+            return;
         }
 
         $this->workflowRegistry->get($order)->apply($order, OrderEntity::TRANSITION_AUTHORIZE);
-
-        return $this->orderResponseFactory->createAuthorizeResponse($orderContainer);
     }
 
     private function invalidateCheckoutSession(LegacyCreateOrderRequest $request): void

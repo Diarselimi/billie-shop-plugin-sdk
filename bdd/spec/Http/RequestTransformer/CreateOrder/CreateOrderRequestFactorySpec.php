@@ -46,7 +46,7 @@ class CreateOrderRequestFactorySpec extends ObjectBehavior
             $taxedMoney
         );
 
-        $request = Request::create('/');
+        $request = Request::create('/', 'POST', ['debtor_company' => []]);
         $this
             ->createForLegacyCreateOrder($request)
             ->getCreationSource()
@@ -72,7 +72,7 @@ class CreateOrderRequestFactorySpec extends ObjectBehavior
 
         $merchantSettingsEntity->getDebtorForgivenessThreshold()->shouldBeCalledOnce()->willReturn(41);
         $merchantSettingsRepository->getOneByMerchant(Argument::any())->shouldBeCalledOnce()->willReturn($merchantSettingsEntity);
-        $request = Request::create('/');
+        $request = Request::create('/', 'POST', ['debtor_company' => []]);
         $request->attributes->set(
             HttpConstantsInterface::REQUEST_ATTRIBUTE_CREATION_SOURCE,
             OrderEntity::CREATION_SOURCE_DASHBOARD
