@@ -4,8 +4,7 @@ namespace App\Tests\Functional\Context;
 
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\Address\AddressRepositoryInterface;
-use App\DomainModel\CheckoutSession\CheckoutSessionEntity;
-use App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface;
+use App\DomainModel\CheckoutSession\CheckoutSessionRepository;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestEntity;
@@ -461,11 +460,11 @@ class PaellaCoreContext extends MinkContext
         ;
 
         if ($checkoutSession) {
-            $checkoutSession = $this->iHaveASessionId(
+            $sessionId = $this->iHaveASessionId(
                 $checkoutSession,
                 stripos('inactive', $checkoutSession) !== false
             );
-            $order->setCheckoutSessionId($checkoutSession->getId());
+            $order->setCheckoutSessionId($sessionId);
         }
 
         $this->getOrderRepository()->insert($order);
@@ -503,7 +502,7 @@ class PaellaCoreContext extends MinkContext
     /**
      * @Given I have an already used checkout_session_id :arg1
      */
-    public function iHaveAInvalidSessionId($sessionId): CheckoutSessionEntity
+    public function iHaveAInvalidSessionId($sessionId): int
     {
         return $this->iHaveASessionId($sessionId, false);
     }
@@ -511,17 +510,21 @@ class PaellaCoreContext extends MinkContext
     /**
      * @Given I have a checkout_session_id :arg1
      */
-    public function iHaveASessionId($sessionId, $active = true): CheckoutSessionEntity
+    public function iHaveASessionId($sessionId, $active = true): int
     {
-        $checkoutSession = new CheckoutSessionEntity();
-        $checkoutSession->setMerchantId(1)
-            ->setMerchantDebtorExternalId($sessionId)
-            ->setUuid($sessionId)
-            ->setIsActive($active)
-            ->setCreatedAt(new \DateTime())
-            ->setUpdatedAt(new \DateTime());
+        $sql = <<<SQL
+            INSERT INTO `checkout_sessions` (`uuid`, `merchant_id`, `merchant_debtor_external_id`, `is_active`, `created_at`, `updated_at`) 
+            VALUES (:uuid, :merchant, :merchant_debtor_external_id, :is_active, :created_at, :updated_at)
+            SQL;
 
-        return $this->getCheckoutSessionRepository()->create($checkoutSession);
+        return $this->dbInsert($sql, [
+            'uuid' => $sessionId,
+            'merchant' => 1,
+            'merchant_debtor_external_id' => 'external_reference',
+            'is_active' => $active ? '1' : '0',
+            'created_at' => (new \DateTime())->format('Y-m-d H:i:s'),
+            'updated_at' => (new \DateTime())->format('Y-m-d H:i:s'),
+        ]);
     }
 
     /**
@@ -636,9 +639,13 @@ class PaellaCoreContext extends MinkContext
      */
     public function theCheckoutSessionIdShouldBeValid($sessionId)
     {
-        $sessionEntity = $this->getCheckoutSessionRepository()->findOneByUuid($sessionId);
-        Assert::notNull($sessionEntity);
-        Assert::true($sessionEntity->isActive());
+        $session = $this->dbQuery("SELECT * FROM `checkout_sessions` WHERE uuid = :uuid", [
+            'uuid' => $sessionId,
+        ]);
+
+        $isActive = $session[0]['is_active'] ?? null;
+
+        Assert::true((bool) $isActive);
     }
 
     /**
@@ -646,9 +653,13 @@ class PaellaCoreContext extends MinkContext
      */
     public function theCheckoutSessionIdShouldBeInValid($sessionId)
     {
-        $sessionEntity = $this->getCheckoutSessionRepository()->findOneByUuid($sessionId);
-        Assert::notNull($sessionEntity);
-        Assert::false($sessionEntity->isActive());
+        $session = $this->dbQuery("SELECT * FROM `checkout_sessions` WHERE uuid = :uuid", [
+            'uuid' => $sessionId,
+        ]);
+
+        $isActive = $session[0]['is_active'] ?? null;
+
+        Assert::false((bool) $isActive);
     }
 
     /**
@@ -1285,9 +1296,9 @@ class PaellaCoreContext extends MinkContext
         return $this->get(MerchantUserInvitationEntityFactory::class);
     }
 
-    private function getCheckoutSessionRepository(): CheckoutSessionRepositoryInterface
+    private function getCheckoutSessionRepository(): CheckoutSessionRepository
     {
-        return $this->get(CheckoutSessionRepositoryInterface::class);
+        return $this->get(CheckoutSessionRepository::class);
     }
 
     private function getOrderFinancialDetailsRepository(): OrderFinancialDetailsRepositoryInterface
@@ -1771,5 +1782,31 @@ class PaellaCoreContext extends MinkContext
         );
         Assert::notNull($extData->getBillingAddressId());
         Assert::true($extData->getBillingAddressId() > 0, 'Billing address ID is not set');
+    }
+
+    /**
+     * TODO find better place for the following three methods
+     */
+    private function dbInsert(string $sql, array $entry): int
+    {
+        $this->dbExecute($sql, $entry);
+
+        $pdo = $this->getConnection();
+
+        return $pdo->lastInsertId();
+    }
+
+    private function dbQuery(string $sql, array $binds): array
+    {
+        return $this->dbExecute($sql, $binds)->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    private function dbExecute(string $sql, array $binds): \PDOStatement
+    {
+        $pdo = $this->getConnection();
+        $sth = $pdo->prepare($sql);
+        $sth->execute($binds);
+
+        return $sth;
     }
 }

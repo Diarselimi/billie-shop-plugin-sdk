@@ -6,7 +6,7 @@ namespace App\Http\RequestTransformer\CreateOrder;
 
 use App\Application\UseCase\CreateOrder\CreateOrderRequest;
 use App\Application\UseCase\CreateOrder\LegacyCreateOrderRequest;
-use App\DomainModel\CheckoutSession\CheckoutSessionEntity;
+use App\DomainModel\CheckoutSession\CheckoutSession;
 use App\DomainModel\MerchantSettings\MerchantSettingsRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
 use App\Http\HttpConstantsInterface;
@@ -86,18 +86,18 @@ class CreateOrderRequestFactory
 
     public function createForAuthorizeCheckoutSession(
         Request $request,
-        CheckoutSessionEntity $checkoutSessionEntity
+        CheckoutSession $checkoutSession
     ): LegacyCreateOrderRequest {
         $request->request->set(
             'debtor_company',
             array_merge(
                 $request->request->get('debtor_company'),
-                ['merchant_customer_id' => $checkoutSessionEntity->getMerchantDebtorExternalId()]
+                ['merchant_customer_id' => $checkoutSession->debtorExternalId()]
             )
         );
 
-        $request->attributes->set('checkout_session_id', $checkoutSessionEntity->getId());
-        $request->attributes->set('workflow_name', $this->getWorkflowName($checkoutSessionEntity->getMerchantId()));
+        $request->attributes->set('checkout_session_id', $checkoutSession->id());
+        $request->attributes->set('workflow_name', $this->getWorkflowName($checkoutSession->merchantId()));
 
         return $this->createForLegacyCreateOrder($request);
     }

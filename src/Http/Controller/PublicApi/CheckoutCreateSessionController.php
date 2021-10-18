@@ -2,12 +2,14 @@
 
 namespace App\Http\Controller\PublicApi;
 
-use App\Application\UseCase\CheckoutCreateSession\CheckoutCreateSessionResponse;
-use App\Application\UseCase\CheckoutCreateSession\CheckoutCreateSessionRequest;
-use App\Application\UseCase\CheckoutCreateSession\CheckoutCreateSessionUseCase;
+use App\Application\CommandBus;
+use App\Application\Exception\RequestValidationException;
+use App\Application\UseCase\InitiateCheckoutSession\InitiateCheckoutSession;
 use App\Http\HttpConstantsInterface;
+use App\Infrastructure\UuidGeneration\UuidGenerator;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -43,19 +45,45 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class CheckoutCreateSessionController
 {
-    private $useCase;
+    private UuidGenerator $uuidGenerator;
 
-    public function __construct(CheckoutCreateSessionUseCase $useCase)
-    {
-        $this->useCase = $useCase;
+    private CommandBus $bus;
+
+    public function __construct(
+        UuidGenerator $uuidGenerator,
+        CommandBus $bus
+    ) {
+        $this->uuidGenerator = $uuidGenerator;
+        $this->bus = $bus;
     }
 
-    public function execute(Request $request): CheckoutCreateSessionResponse
+    public function execute(Request $request): JsonResponse
     {
-        $createCheckoutSession = (new CheckoutCreateSessionRequest())
-            ->setMerchantId($request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID))
-            ->setMerchantDebtorExternalId($request->request->get('merchant_customer_id'));
+        $merchantId = $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID);
+        $externalReference = $request->request->get('merchant_customer_id');
 
-        return $this->useCase->execute($createCheckoutSession);
+        if ($merchantId === null) {
+            $this->throwBlankedFieldException(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID);
+        }
+
+        if ($externalReference === null) {
+            $this->throwBlankedFieldException('merchant_customer_id');
+        }
+
+        $command = new InitiateCheckoutSession(
+            $this->uuidGenerator->generate(),
+            'DE',
+            $merchantId,
+            $externalReference
+        );
+
+        $this->bus->process($command);
+
+        return new JsonResponse(['id' => (string) $command->token()]);
+    }
+
+    private function throwBlankedFieldException(string $field): void
+    {
+        throw RequestValidationException::createForInvalidValue('This value should not be blank.', $field, null);
     }
 }

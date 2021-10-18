@@ -13,11 +13,14 @@ class InitiateCheckoutSession
 
     private int $merchantId;
 
-    public function __construct(string $tokenSeed, string $countryCode, int $merchantId)
+    private ?string $externalReference;
+
+    public function __construct(string $tokenSeed, string $countryCode, int $merchantId, ?string $externalReference)
     {
         $this->token = Token::fromSeed($tokenSeed);
         $this->country = new Country($countryCode);
         $this->merchantId = $merchantId;
+        $this->externalReference = $externalReference;
     }
 
     public function token(): Token
@@ -33,5 +36,10 @@ class InitiateCheckoutSession
     public function merchantId(): int
     {
         return $this->merchantId;
+    }
+
+    public function externalReference(): ?string
+    {
+        return $this->externalReference;
     }
 }

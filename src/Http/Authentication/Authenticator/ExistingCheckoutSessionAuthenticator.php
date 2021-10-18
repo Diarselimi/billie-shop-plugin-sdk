@@ -2,8 +2,10 @@
 
 namespace App\Http\Authentication\Authenticator;
 
-use App\DomainModel\CheckoutSession\CheckoutSessionEntity;
-use App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface;
+use App\DomainModel\CheckoutSession\CheckoutSession;
+use App\DomainModel\CheckoutSession\CheckoutSessionRepository;
+use App\DomainModel\CheckoutSession\Token;
+use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepository;
 use App\Http\Authentication\CheckoutUser;
 use App\Http\HttpConstantsInterface;
@@ -16,7 +18,7 @@ class ExistingCheckoutSessionAuthenticator extends AbstractAuthenticator
     private $checkoutSessionRepository;
 
     public function __construct(
-        CheckoutSessionRepositoryInterface $checkoutSessionRepository,
+        CheckoutSessionRepository $checkoutSessionRepository,
         MerchantRepository $merchantRepository
     ) {
         $this->checkoutSessionRepository = $checkoutSessionRepository;
@@ -33,22 +35,35 @@ class ExistingCheckoutSessionAuthenticator extends AbstractAuthenticator
         return $request->get(HttpConstantsInterface::REQUEST_ATTRIBUTE_CHECKOUT_SESSION_ID);
     }
 
-    protected function validateSession(?CheckoutSessionEntity $checkoutSession): void
+    public function getUser($sessionToken, UserProviderInterface $userProvider)
     {
-        if ($checkoutSession === null) {
+        $checkoutSession = $this->loadSession($sessionToken);
+        $merchant = $this->loadMerchant($checkoutSession);
+
+        return new CheckoutUser($merchant, $checkoutSession);
+    }
+
+    private function loadSession(string $sessionToken): CheckoutSession
+    {
+        $checkoutSession = $this->checkoutSessionRepository->findByToken(Token::fromHash($sessionToken));
+
+        $this->validateSession($checkoutSession);
+
+        return $checkoutSession;
+    }
+
+    protected function validateSession(?CheckoutSession $checkoutSession): void
+    {
+        if (null == $checkoutSession) {
             throw new AuthenticationException();
         }
     }
 
-    public function getUser($checkoutSessionId, UserProviderInterface $userProvider)
+    private function loadMerchant(CheckoutSession $checkoutSession): MerchantEntity
     {
-        $checkoutSession = $this->checkoutSessionRepository->findOneByUuid($checkoutSessionId);
-        $this->validateSession($checkoutSession);
+        $merchant = $this->merchantRepository->getOneById($checkoutSession->merchantId());
+        $merchant = $this->assertValidMerchant($merchant);
 
-        $merchant = $this->assertValidMerchant(
-            $this->merchantRepository->getOneById($checkoutSession->getMerchantId())
-        );
-
-        return new CheckoutUser($merchant, $checkoutSession);
+        return $merchant;
     }
 }

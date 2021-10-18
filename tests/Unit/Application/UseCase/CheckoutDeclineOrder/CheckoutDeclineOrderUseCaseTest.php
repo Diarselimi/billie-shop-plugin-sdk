@@ -8,7 +8,8 @@ use App\Application\Tracking\TrackingEventCollector;
 use App\Application\UseCase\CheckoutDeclineOrder\CheckoutDeclineOrderRequest;
 use App\Application\UseCase\CheckoutDeclineOrder\CheckoutDeclineOrderUseCase;
 use App\DomainModel\Address\AddressEntity;
-use App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface;
+use App\DomainModel\CheckoutSession\CheckoutSession;
+use App\DomainModel\CheckoutSession\CheckoutSessionRepository;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\Order\Lifecycle\DeclineOrderService;
@@ -47,7 +48,7 @@ class CheckoutDeclineOrderUseCaseTest extends UnitTestCase
         $this->workFlowRegistry = $this->prophesize(Registry::class);
         $this->declineOrderService = $this->prophesize(DeclineOrderService::class);
         $this->orderContainerFactory = $this->prophesize(OrderContainerFactory::class);
-        $this->checkoutSessionRepository = $this->prophesize(CheckoutSessionRepositoryInterface::class);
+        $this->checkoutSessionRepository = $this->prophesize(CheckoutSessionRepository::class);
         $this->debtorExternalDataRepository = $this->prophesize(DebtorExternalDataRepositoryInterface::class);
         $this->sepaClient = $this->prophesize(SepaClientInterface::class);
         $orderContainer = $this->prophesize(OrderContainer::class);
@@ -94,7 +95,9 @@ class CheckoutDeclineOrderUseCaseTest extends UnitTestCase
     public function shouldSendEventToTheCollector(): void
     {
         $this->declineOrderService->decline(Argument::any())->shouldBeCalled();
-        $this->checkoutSessionRepository->reActivateSession(Argument::any())->shouldBeCalled();
+        $session = $this->createStub(CheckoutSession::class);
+        $this->checkoutSessionRepository->findByToken(Argument::any())->willReturn($session);
+        $this->checkoutSessionRepository->save(Argument::any())->shouldBeCalled();
 
         $this->debtorExternalDataRepository->invalidateMerchantExternalId(Argument::any())->shouldBeCalled();
         $this->sepaClient->revokeMandate(Argument::any())->shouldBeCalled();
@@ -112,7 +115,9 @@ class CheckoutDeclineOrderUseCaseTest extends UnitTestCase
     public function shouldRevokeMandate(): void
     {
         $this->declineOrderService->decline(Argument::any())->shouldBeCalled();
-        $this->checkoutSessionRepository->reActivateSession(Argument::any())->shouldBeCalled();
+        $session = $this->createStub(CheckoutSession::class);
+        $this->checkoutSessionRepository->findByToken(Argument::any())->willReturn($session);
+        $this->checkoutSessionRepository->save(Argument::any())->shouldBeCalled();
 
         $this->debtorExternalDataRepository->invalidateMerchantExternalId(Argument::any())->shouldBeCalled();
         $this->sepaClient->revokeMandate(Argument::any())->shouldBeCalled();

@@ -39,7 +39,8 @@ class InitiateController
             $command = new InitiateCheckoutSession(
                 $this->uuidGenerator->generate(),
                 $request->request->get('country'),
-                1 // TODO
+                1, // TODO
+                null
             );
         } catch (CountryNotSupported $ex) {
             return KlarnaResponse::withErrorFromException($ex);

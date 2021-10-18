@@ -11,7 +11,8 @@ use App\DomainEvent\AnalyticsEvent\TrackingItsNotUsEvent;
 use App\DomainModel\Address\Address;
 use App\DomainModel\Address\AddressEntity;
 use App\DomainModel\Address\Exception\InvalidAddressException;
-use App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface;
+use App\DomainModel\CheckoutSession\CheckoutSessionRepository;
+use App\DomainModel\CheckoutSession\Token;
 use App\DomainModel\DebtorExternalData\DebtorExternalData;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
@@ -35,7 +36,7 @@ class CheckoutDeclineOrderUseCase implements LoggingInterface
 
     private OrderContainerFactory $orderContainerFactory;
 
-    private CheckoutSessionRepositoryInterface $checkoutSessionRepository;
+    private CheckoutSessionRepository $checkoutSessionRepository;
 
     private DebtorExternalDataRepositoryInterface $debtorExternalDataRepository;
 
@@ -47,7 +48,7 @@ class CheckoutDeclineOrderUseCase implements LoggingInterface
         Registry $workflowRegistry,
         DeclineOrderService $declineOrderService,
         OrderContainerFactory $orderContainerFactory,
-        CheckoutSessionRepositoryInterface $checkoutSessionRepository,
+        CheckoutSessionRepository $checkoutSessionRepository,
         DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
         SepaClientInterface $sepaClient,
         TrackingEventCollector $eventsCollector
@@ -79,7 +80,7 @@ class CheckoutDeclineOrderUseCase implements LoggingInterface
 
         $externalId = $orderContainer->getDebtorExternalData()->getMerchantExternalId();
         $this->declineOrderService->decline($orderContainer);
-        $this->checkoutSessionRepository->reActivateSession($input->getSessionUuid());
+        $this->reactivateCheckoutSession($input->getSessionUuid());
 
         try {
             if ($order->getDebtorSepaMandateUuid() !== null) {
@@ -120,6 +121,14 @@ class CheckoutDeclineOrderUseCase implements LoggingInterface
                 $e->getMessage()
             ));
         }
+    }
+
+    private function reactivateCheckoutSession(string $token): void
+    {
+        $checkoutSession = $this->checkoutSessionRepository->findByToken(Token::fromHash($token));
+
+        $checkoutSession->activate();
+        $this->checkoutSessionRepository->save($checkoutSession);
     }
 
     private function prepareTrackingEvent(

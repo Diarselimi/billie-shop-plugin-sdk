@@ -3,7 +3,7 @@
 namespace spec\App\Application\UseCase\CheckoutAuthorizeOrder;
 
 use App\Application\UseCase\CheckoutAuthorizeOrder\CheckoutAuthorizeOrderUseCase;
-use App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface;
+use App\DomainModel\CheckoutSession\CheckoutSessionRepository;
 use App\DomainModel\Order\IdentifyAndTriggerAsyncIdentification;
 use App\DomainModel\Order\Lifecycle\ApproveOrderService;
 use App\DomainModel\Order\Lifecycle\DeclineOrderService;
@@ -30,7 +30,7 @@ class CheckoutAuthorizeOrderUseCaseSpec extends ObjectBehavior
         Registry $workflowRegistry,
         ApproveOrderService $approveOrderService,
         DeclineOrderService $declineOrderService,
-        CheckoutSessionRepositoryInterface $checkoutSessionRepository,
+        CheckoutSessionRepository $checkoutSessionRepository,
         IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification,
         LegacyOrderResponseFactory $orderResponseFactory,
         ValidatorInterface $validator,

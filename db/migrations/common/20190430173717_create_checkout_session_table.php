@@ -1,13 +1,12 @@
 <?php
 
-use App\Infrastructure\Repository\CheckoutSessionRepository;
 use Phinx\Migration\AbstractMigration;
 
 class CreateCheckoutSessionTable extends AbstractMigration
 {
     public function change()
     {
-        $this->table(CheckoutSessionRepository::TABLE_NAME)
+        $this->table('checkout_sessions')
             ->addColumn('uuid', 'uuid', ['limit' => '36', 'null' => false])
             ->addColumn('merchant_id', 'integer', ['null' => false])
             ->addColumn('merchant_debtor_external_id', 'string', ['null' => false])

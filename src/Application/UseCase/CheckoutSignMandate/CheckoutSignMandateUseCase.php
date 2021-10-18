@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Application\UseCase\CheckoutSignMandate;
 
 use App\Application\Exception\OrderNotFoundException;
-use App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderRepositoryInterface;
@@ -21,20 +20,16 @@ class CheckoutSignMandateUseCase implements LoggingInterface
 
     private OrderRepositoryInterface $orderRepository;
 
-    private CheckoutSessionRepositoryInterface $checkoutSessionRepository;
-
     private SepaClientInterface $sepaClient;
 
     private OrderContainerFactory $orderContainerFactory;
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
-        CheckoutSessionRepositoryInterface $checkoutSessionRepository,
         OrderContainerFactory $orderContainerFactory,
         SepaClientInterface $sepaMandateClient
     ) {
         $this->orderRepository = $orderRepository;
-        $this->checkoutSessionRepository = $checkoutSessionRepository;
         $this->sepaClient = $sepaMandateClient;
         $this->orderContainerFactory = $orderContainerFactory;
     }

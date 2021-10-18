@@ -82,9 +82,6 @@ services:
     public: true
   App\DomainModel\MerchantUserInvitation\MerchantUserInvitationEntityFactory:
     public: true
-  App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface:
-    alias: 'App\Infrastructure\Repository\CheckoutSessionRepository'
-    public: true
   App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface:
     alias: 'App\Infrastructure\Repository\OrderFinancialDetailsRepository'
     public: true

@@ -6,7 +6,7 @@ use App\Application\UseCase\CreateOrder\LegacyCreateOrderRequest;
 use App\Application\UseCase\OrderCreationUseCaseTrait;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
-use App\DomainModel\CheckoutSession\CheckoutSessionRepositoryInterface;
+use App\DomainModel\CheckoutSession\CheckoutSessionRepository;
 use App\DomainModel\Order\IdentifyAndTriggerAsyncIdentification;
 use App\DomainModel\Order\Lifecycle\ApproveOrderService;
 use App\DomainModel\Order\Lifecycle\DeclineOrderService;
@@ -25,7 +25,7 @@ class CheckoutAuthorizeOrderUseCase implements LoggingInterface, ValidatedUseCas
 {
     use LoggingTrait, ValidatedUseCaseTrait, OrderCreationUseCaseTrait;
 
-    private CheckoutSessionRepositoryInterface $checkoutSessionRepository;
+    private CheckoutSessionRepository $checkoutSessionRepository;
 
     public function __construct(
         OrderPersistenceService $orderPersistenceService,
@@ -35,7 +35,7 @@ class CheckoutAuthorizeOrderUseCase implements LoggingInterface, ValidatedUseCas
         Registry $workflowRegistry,
         ApproveOrderService $approveOrderService,
         DeclineOrderService $declineOrderService,
-        CheckoutSessionRepositoryInterface $checkoutSessionRepository,
+        CheckoutSessionRepository $checkoutSessionRepository,
         IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification,
         LegacyOrderResponseFactory $orderResponseFactory
     ) {
@@ -62,16 +62,24 @@ class CheckoutAuthorizeOrderUseCase implements LoggingInterface, ValidatedUseCas
             return $this->orderResponseFactory->createAuthorizeResponse($orderContainer);
         }
 
+        $this->invalidateCheckoutSession($request);
+
         if ($this->orderChecksRunnerService->hasFailedSoftDeclinableChecks($orderContainer)) {
             $this->workflowRegistry->get($order)->apply($order, OrderEntity::TRANSITION_PRE_WAITING);
-            $this->checkoutSessionRepository->invalidateById($request->getCheckoutSessionId());
 
             return $this->orderResponseFactory->createAuthorizeResponse($orderContainer);
         }
 
         $this->workflowRegistry->get($order)->apply($order, OrderEntity::TRANSITION_AUTHORIZE);
-        $this->checkoutSessionRepository->invalidateById($request->getCheckoutSessionId());
 
         return $this->orderResponseFactory->createAuthorizeResponse($orderContainer);
+    }
+
+    private function invalidateCheckoutSession(LegacyCreateOrderRequest $request): void
+    {
+        $checkoutSession = $this->checkoutSessionRepository->findById($request->getCheckoutSessionId());
+
+        $checkoutSession->deactivate();
+        $this->checkoutSessionRepository->save($checkoutSession);
     }
 }

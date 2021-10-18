@@ -2,15 +2,17 @@
 
 namespace App\Http\Authentication\Authenticator;
 
-use App\DomainModel\CheckoutSession\CheckoutSessionEntity;
+use App\DomainModel\CheckoutSession\CheckoutSession;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 class ActiveCheckoutSessionAuthenticator extends ExistingCheckoutSessionAuthenticator
 {
-    protected function validateSession(?CheckoutSessionEntity $checkoutSession): void
+    protected function validateSession(?CheckoutSession $checkoutSession): void
     {
-        if (($checkoutSession === null) || !$checkoutSession->isActive()) {
-            throw new AuthenticationException();
+        if (null !== $checkoutSession && $checkoutSession->isActive()) {
+            return;
         }
+
+        throw new AuthenticationException();
     }
 }

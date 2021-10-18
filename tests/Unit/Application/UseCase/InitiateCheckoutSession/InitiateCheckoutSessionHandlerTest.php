@@ -32,12 +32,13 @@ class InitiateCheckoutSessionHandlerTest extends UnitTestCase
      */
     public function persistNewCheckoutSession(): void
     {
-        $command = new InitiateCheckoutSession('t', 'DE', 1);
+        $command = new InitiateCheckoutSession('t', 'DE', 1, null);
 
         $expected = new CheckoutSession(
             Token::fromHash('e3b98a4da31a127d4bde6e43033f66ba274c'),
             new Country('DE'),
-            1
+            1,
+            null
         );
         $this->repo
             ->expects($this->once())

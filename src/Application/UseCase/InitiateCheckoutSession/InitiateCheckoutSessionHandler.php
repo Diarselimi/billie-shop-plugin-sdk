@@ -20,7 +20,8 @@ class InitiateCheckoutSessionHandler implements CommandHandler
         $newSession = new CheckoutSession(
             $command->token(),
             $command->country(),
-            $command->merchantId()
+            $command->merchantId(),
+            $command->externalReference()
         );
 
         $this->repository->save($newSession);

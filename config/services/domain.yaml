@@ -4,4 +4,4 @@ services:
     autoconfigure: true
     public: false
 
-  App\DomainModel\CheckoutSession\CheckoutSessionRepository: '@App\Infrastructure\Repository\CheckoutSessionRepository'
+  App\DomainModel\CheckoutSession\CheckoutSessionRepository: '@App\Infrastructure\Repository\CheckoutSessionPdoRepository'
