@@ -51,7 +51,7 @@ class AuthorizeOrderCommandFactory
             ->setCreationSource($creationSource)
             ->setWorkflowName($this->getWorkflowName($checkoutSession->merchantId()))
             ->setMerchantId($checkoutSession->merchantId())
-            ->setDuration($request['duration'] ?? null)
+            ->setDuration(empty($request['duration']) ? null : (int) $request['duration'])
             ->setComment($request['comment'] ?? null)
             ->setExternalCode($request['order_id'] ?? null)
             ->setDebtor($this->debtorRequestFactory->createForLegacyOrder($request['debtor_company'] ?? []))
