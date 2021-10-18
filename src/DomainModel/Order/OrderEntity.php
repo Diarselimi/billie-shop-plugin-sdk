@@ -176,7 +176,8 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
     public function __construct()
     {
         parent::__construct();
-
+        $this->amountForgiven = 0;
+        $this->state = self::STATE_NEW;
         $this->orderInvoices = new OrderInvoiceCollection([]);
     }
 

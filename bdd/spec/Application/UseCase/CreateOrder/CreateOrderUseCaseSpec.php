@@ -7,7 +7,7 @@ use App\Application\UseCase\CreateOrder\CreateOrderUseCase;
 use App\Application\UseCase\CreateOrder\LegacyCreateOrderRequest;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
-use App\DomainModel\Order\IdentifyAndTriggerAsyncIdentification;
+use App\DomainModel\Order\CompanyIdentifier;
 use App\DomainModel\Order\Lifecycle\ApproveOrderService;
 use App\DomainModel\Order\Lifecycle\DeclineOrderService;
 use App\DomainModel\Order\Lifecycle\WaitingOrderService;
@@ -34,7 +34,7 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
         ApproveOrderService $approveOrderService,
         WaitingOrderService $waitingOrderService,
         DeclineOrderService $declineOrderService,
-        IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification,
+        CompanyIdentifier $companyIdentifier,
         ValidatorInterface $validator,
         OrderEntity $order,
         OrderCreationDTO $newOrderDTO,
@@ -94,13 +94,13 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
         OrderContainer $orderContainer,
         CreateOrderRequest $request,
         OrderEntity $order,
-        IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification
+        CompanyIdentifier $companyIdentifier
     ) {
         $merchantDebtor = (new MerchantDebtorEntity())->setId(1);
         $orderContainer->getMerchantDebtor()->willReturn($merchantDebtor);
 
         $orderChecksRunnerService->passesPreIdentificationChecks($orderContainer)->shouldBeCalledOnce()->willReturn(true);
-        $identifyAndTriggerAsyncIdentification->identifyDebtor($orderContainer)->shouldBeCalledOnce()->willReturn(true);
+        $companyIdentifier->identify($orderContainer)->shouldBeCalledOnce()->willReturn(true);
         $orderChecksRunnerService->passesPostIdentificationChecks($orderContainer)->shouldBeCalledOnce()->willReturn(false);
 
         $order->isDeclined()->shouldBeCalledOnce()->willReturn(true);
@@ -117,13 +117,13 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
         CreateOrderRequest $request,
         WaitingOrderService $waitingOrderService,
         OrderEntity $order,
-        IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification
+        CompanyIdentifier $companyIdentifier
     ) {
         $merchantDebtor = (new MerchantDebtorEntity())->setId(1);
         $orderContainer->getMerchantDebtor()->willReturn($merchantDebtor);
 
         $orderChecksRunnerService->passesPreIdentificationChecks($orderContainer)->shouldBeCalledOnce()->willReturn(true);
-        $identifyAndTriggerAsyncIdentification->identifyDebtor($orderContainer)->shouldBeCalledOnce()->willReturn(true);
+        $companyIdentifier->identify($orderContainer)->shouldBeCalledOnce()->willReturn(true);
         $orderChecksRunnerService->passesPostIdentificationChecks($orderContainer)->shouldBeCalledOnce()->willReturn(true);
         $orderChecksRunnerService->hasFailedSoftDeclinableChecks($orderContainer)->shouldBeCalledOnce()->willReturn(true);
 
@@ -140,13 +140,13 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
         OrderContainer $orderContainer,
         CreateOrderRequest $request,
         OrderEntity $order,
-        IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification
+        CompanyIdentifier $companyIdentifier
     ) {
         $merchantDebtor = (new MerchantDebtorEntity())->setId(1);
         $orderContainer->getMerchantDebtor()->willReturn($merchantDebtor);
 
         $orderChecksRunnerService->passesPreIdentificationChecks($orderContainer)->shouldBeCalledOnce()->willReturn(true);
-        $identifyAndTriggerAsyncIdentification->identifyDebtor($orderContainer)->shouldBeCalledOnce()->willReturn(true);
+        $companyIdentifier->identify($orderContainer)->shouldBeCalledOnce()->willReturn(true);
         $orderChecksRunnerService->passesPostIdentificationChecks($orderContainer)->shouldBeCalledOnce()->willReturn(true);
         $orderChecksRunnerService->hasFailedSoftDeclinableChecks($orderContainer)->shouldBeCalledOnce()->willReturn(false);
 

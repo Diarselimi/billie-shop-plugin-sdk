@@ -9,20 +9,24 @@ use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 
 class MerchantDebtorFinderResult
 {
-    private $merchantDebtor;
+    private ?MerchantDebtorEntity $merchantDebtor;
 
-    private $identifiedDebtorCompany;
+    private ?IdentifiedDebtorCompany $identifiedDebtorCompany;
 
     private $mostSimilarCandidateDTO;
+
+    private bool $allPreviousOrdersDeclined;
 
     public function __construct(
         MerchantDebtorEntity $merchantDebtor = null,
         IdentifiedDebtorCompany $identifiedDebtorCompany = null,
-        MostSimilarCandidateDTO $mostSimilarCandidateDTO = null
+        MostSimilarCandidateDTO $mostSimilarCandidateDTO = null,
+        bool $allPreviousOrdersDeclined = false
     ) {
         $this->mostSimilarCandidateDTO = $mostSimilarCandidateDTO ?? new NullMostSimilarCandidateDTO();
         $this->merchantDebtor = $merchantDebtor;
         $this->identifiedDebtorCompany = $identifiedDebtorCompany;
+        $this->allPreviousOrdersDeclined = $allPreviousOrdersDeclined;
     }
 
     public function getMostSimilarCandidateDTO(): MostSimilarCandidateDTO
@@ -38,5 +42,10 @@ class MerchantDebtorFinderResult
     public function getIdentifiedDebtorCompany(): ?IdentifiedDebtorCompany
     {
         return $this->identifiedDebtorCompany;
+    }
+
+    public function isAllPreviousOrdersDeclined(): bool
+    {
+        return $this->allPreviousOrdersDeclined;
     }
 }

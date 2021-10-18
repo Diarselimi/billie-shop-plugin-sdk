@@ -168,7 +168,7 @@ class DebtorExternalDataEntity extends AbstractTimestampableEntity
         return $this->merchantExternalId;
     }
 
-    public function setMerchantExternalId(string $merchantExternalId): DebtorExternalDataEntity
+    public function setMerchantExternalId(?string $merchantExternalId): DebtorExternalDataEntity
     {
         $this->merchantExternalId = $merchantExternalId;
 

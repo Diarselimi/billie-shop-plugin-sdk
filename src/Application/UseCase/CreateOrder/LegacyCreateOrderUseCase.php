@@ -5,7 +5,7 @@ namespace App\Application\UseCase\CreateOrder;
 use App\Application\UseCase\OrderCreationUseCaseTrait;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
-use App\DomainModel\Order\IdentifyAndTriggerAsyncIdentification;
+use App\DomainModel\Order\CompanyIdentifier;
 use App\DomainModel\Order\Lifecycle\ApproveOrderService;
 use App\DomainModel\Order\Lifecycle\DeclineOrderService;
 use App\DomainModel\Order\Lifecycle\WaitingOrderService;
@@ -22,6 +22,10 @@ class LegacyCreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInte
 {
     use LoggingTrait, ValidatedUseCaseTrait, OrderCreationUseCaseTrait;
 
+    private ApproveOrderService $approveOrderService;
+
+    private WaitingOrderService $waitingOrderService;
+
     public function __construct(
         OrderPersistenceService $orderPersistenceService,
         OrderContainerFactory $orderContainerFactory,
@@ -31,7 +35,7 @@ class LegacyCreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInte
         ApproveOrderService $approveOrderService,
         WaitingOrderService $waitingOrderService,
         DeclineOrderService $declineOrderService,
-        IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification
+        CompanyIdentifier $companyIdentifier
     ) {
         $this->orderPersistenceService = $orderPersistenceService;
         $this->orderContainerFactory = $orderContainerFactory;
@@ -41,7 +45,7 @@ class LegacyCreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInte
         $this->approveOrderService = $approveOrderService;
         $this->declineOrderService = $declineOrderService;
         $this->waitingOrderService = $waitingOrderService;
-        $this->identifyAndTriggerAsyncIdentification = $identifyAndTriggerAsyncIdentification;
+        $this->companyIdentifier = $companyIdentifier;
     }
 
     public function execute(CreateOrderRequestInterface $request): LegacyOrderResponse

@@ -37,7 +37,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 class CreateOrderDebtorCompanyRequest
 {
     /**
-     * @Assert\NotBlank()
      * @Assert\Length(max=255)
      */
     private $merchantCustomerId;

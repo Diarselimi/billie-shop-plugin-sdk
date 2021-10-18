@@ -2,10 +2,9 @@
 
 namespace spec\App\Application\UseCase\AuthorizeOrder;
 
+use App\DomainModel\Order\CompanyIdentifier;
 use App\Application\UseCase\AuthorizeOrder\AuthorizeOrderHandler;
 use App\DomainModel\CheckoutSession\CheckoutSessionRepository;
-use App\DomainModel\Order\IdentifyAndTriggerAsyncIdentification;
-use App\DomainModel\Order\Lifecycle\ApproveOrderService;
 use App\DomainModel\Order\Lifecycle\DeclineOrderService;
 use App\DomainModel\Order\NewOrder\OrderCreationDTO;
 use App\DomainModel\Order\NewOrder\OrderPersistenceService;
@@ -28,10 +27,9 @@ class AuthorizeOrderHandlerSpec extends ObjectBehavior
         OrderChecksRunnerService $orderChecksRunnerService,
         OrderRepositoryInterface $orderRepository,
         Registry $workflowRegistry,
-        ApproveOrderService $approveOrderService,
         DeclineOrderService $declineOrderService,
+        CompanyIdentifier $companyIdentifier,
         CheckoutSessionRepository $checkoutSessionRepository,
-        IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification,
         LegacyOrderResponseFactory $orderResponseFactory,
         ValidatorInterface $validator,
         OrderCreationDTO $creationDTO,

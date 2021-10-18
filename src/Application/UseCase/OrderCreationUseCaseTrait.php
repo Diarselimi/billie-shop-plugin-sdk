@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace App\Application\UseCase;
 
 use App\Application\UseCase\CreateOrder\CreateOrderRequestInterface;
-use App\DomainModel\Order\IdentifyAndTriggerAsyncIdentification;
-use App\DomainModel\Order\Lifecycle\ApproveOrderService;
+use App\DomainModel\Order\CompanyIdentifier;
 use App\DomainModel\Order\Lifecycle\DeclineOrderService;
-use App\DomainModel\Order\Lifecycle\WaitingOrderService;
 use App\DomainModel\Order\NewOrder\OrderPersistenceService;
 use App\DomainModel\Order\OrderChecksRunnerService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
-use Symfony\Component\Workflow\Registry;
 
+/**
+ * @deprecated we need to remove this trait
+ */
 trait OrderCreationUseCaseTrait
 {
     private OrderPersistenceService $orderPersistenceService;
@@ -27,15 +27,9 @@ trait OrderCreationUseCaseTrait
 
     private OrderRepositoryInterface $orderRepository;
 
-    private Registry $workflowRegistry;
-
-    private ApproveOrderService $approveOrderService;
-
     private DeclineOrderService $declineOrderService;
 
-    private WaitingOrderService $waitingOrderService;
-
-    private IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification;
+    private CompanyIdentifier $companyIdentifier;
 
     private LegacyOrderResponseFactory $orderResponseFactory;
 
@@ -50,7 +44,8 @@ trait OrderCreationUseCaseTrait
             return $orderContainer;
         }
 
-        if ($this->identifyAndTriggerAsyncIdentification->identifyDebtor($orderContainer)) {
+        //TODO, should we move this to a handler which gets triggered by a Domain Event : OrderStarted?
+        if ($this->companyIdentifier->identify($orderContainer)) {
             $this->orderRepository->updateMerchantDebtor(
                 $orderContainer->getOrder()->getId(),
                 $orderContainer->getMerchantDebtor()->getId()

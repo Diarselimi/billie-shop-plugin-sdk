@@ -130,7 +130,7 @@ class MerchantDebtorRepository extends AbstractPdoRepository implements Merchant
         return $row ? $this->factory->createFromArray($row) : null;
     }
 
-    public function getOneByExternalIdAndMerchantId(string $merchantExternalId, string $merchantId, array $excludedOrderStates = []): ?MerchantDebtorEntity
+    public function getOneByExternalIdMerchantIdAndExludedOrderStates(string $merchantExternalId, string $merchantId, array $excludedOrderStates = []): ?MerchantDebtorEntity
     {
         $row = $this->doFetchOne('
             SELECT ' . implode(',', self::SELECT_FIELDS) . '

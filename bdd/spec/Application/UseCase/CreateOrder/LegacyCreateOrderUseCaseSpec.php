@@ -6,7 +6,7 @@ use App\Application\UseCase\CreateOrder\LegacyCreateOrderRequest;
 use App\Application\UseCase\CreateOrder\LegacyCreateOrderUseCase;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantSettings\MerchantSettingsEntity;
-use App\DomainModel\Order\IdentifyAndTriggerAsyncIdentification;
+use App\DomainModel\Order\CompanyIdentifier;
 use App\DomainModel\Order\Lifecycle\ApproveOrderService;
 use App\DomainModel\Order\Lifecycle\DeclineOrderService;
 use App\DomainModel\Order\Lifecycle\WaitingOrderService;
@@ -36,7 +36,7 @@ class LegacyCreateOrderUseCaseSpec extends ObjectBehavior
         ApproveOrderService $approveOrderService,
         WaitingOrderService $waitingOrderService,
         DeclineOrderService $declineOrderService,
-        IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification,
+        CompanyIdentifier $companyIdentifier,
         ValidatorInterface $validator,
         OrderEntity $order,
         OrderCreationDTO $newOrderDTO,
@@ -99,13 +99,13 @@ class LegacyCreateOrderUseCaseSpec extends ObjectBehavior
         LegacyCreateOrderRequest $request,
         OrderEntity $order,
         LegacyOrderResponseFactory $orderResponseFactory,
-        IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification
+        CompanyIdentifier $companyIdentifier
     ) {
         $merchantDebtor = (new MerchantDebtorEntity())->setId(1);
         $orderContainer->getMerchantDebtor()->willReturn($merchantDebtor);
 
         $orderChecksRunnerService->passesPreIdentificationChecks($orderContainer)->shouldBeCalledOnce()->willReturn(true);
-        $identifyAndTriggerAsyncIdentification->identifyDebtor($orderContainer)->shouldBeCalledOnce()->willReturn(true);
+        $companyIdentifier->identify($orderContainer)->shouldBeCalledOnce()->willReturn(true);
         $orderChecksRunnerService->passesPostIdentificationChecks($orderContainer)->shouldBeCalledOnce()->willReturn(false);
 
         $order->isDeclined()->shouldBeCalledOnce()->willReturn(true);
@@ -124,13 +124,13 @@ class LegacyCreateOrderUseCaseSpec extends ObjectBehavior
         WaitingOrderService $waitingOrderService,
         OrderEntity $order,
         LegacyOrderResponseFactory $orderResponseFactory,
-        IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification
+        CompanyIdentifier $companyIdentifier
     ) {
         $merchantDebtor = (new MerchantDebtorEntity())->setId(1);
         $orderContainer->getMerchantDebtor()->willReturn($merchantDebtor);
 
         $orderChecksRunnerService->passesPreIdentificationChecks($orderContainer)->shouldBeCalledOnce()->willReturn(true);
-        $identifyAndTriggerAsyncIdentification->identifyDebtor($orderContainer)->shouldBeCalledOnce()->willReturn(true);
+        $companyIdentifier->identify($orderContainer)->shouldBeCalledOnce()->willReturn(true);
         $orderChecksRunnerService->passesPostIdentificationChecks($orderContainer)->shouldBeCalledOnce()->willReturn(true);
         $orderChecksRunnerService->hasFailedSoftDeclinableChecks($orderContainer)->shouldBeCalledOnce()->willReturn(true);
 
@@ -149,13 +149,13 @@ class LegacyCreateOrderUseCaseSpec extends ObjectBehavior
         LegacyCreateOrderRequest $request,
         OrderEntity $order,
         LegacyOrderResponseFactory $orderResponseFactory,
-        IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification
+        CompanyIdentifier $companyIdentifier
     ) {
         $merchantDebtor = (new MerchantDebtorEntity())->setId(1);
         $orderContainer->getMerchantDebtor()->willReturn($merchantDebtor);
 
         $orderChecksRunnerService->passesPreIdentificationChecks($orderContainer)->shouldBeCalledOnce()->willReturn(true);
-        $identifyAndTriggerAsyncIdentification->identifyDebtor($orderContainer)->shouldBeCalledOnce()->willReturn(true);
+        $companyIdentifier->identify($orderContainer)->shouldBeCalledOnce()->willReturn(true);
         $orderChecksRunnerService->passesPostIdentificationChecks($orderContainer)->shouldBeCalledOnce()->willReturn(true);
         $orderChecksRunnerService->hasFailedSoftDeclinableChecks($orderContainer)->shouldBeCalledOnce()->willReturn(false);
 

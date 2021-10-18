@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace App\Infrastructure\Repository;
 
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderEntityFactory;
 use App\DomainModel\Order\Search\OrderSearchQuery;
 use App\DomainModel\Order\Search\OrderSearchRepositoryInterface;
 use App\DomainModel\Order\Search\OrderSearchResult;
+use App\Infrastructure\Repository\Order\PdoOrderEntityFactory;
 use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class OrderSearchRepository extends AbstractPdoRepository implements OrderSearchRepositoryInterface
 {
     private const ORDERS_COLUMNS = OrderRepository::SELECT_FIELDS;
 
-    private OrderEntityFactory $orderFactory;
+    private PdoOrderEntityFactory $orderFactory;
 
-    public function __construct(OrderEntityFactory $orderFactory)
+    public function __construct(PdoOrderEntityFactory $orderFactory)
     {
         $this->orderFactory = $orderFactory;
     }

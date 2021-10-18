@@ -49,15 +49,12 @@ class CheckoutSessionPdoRepository extends AbstractPdoRepository implements Chec
             return  null;
         }
 
-        $debtorExternalId = $row['merchant_debtor_external_id'];
-        $debtorExternalId = '' === $debtorExternalId ? null : $debtorExternalId;
-
         return $this->hydrate(CheckoutSession::class, [
             'id' => $row['id'],
             'token' => Token::fromHash($row['uuid']),
             'country' => new Country('DE'),
             'merchantId' => (int) $row['merchant_id'],
-            'debtorExternalId' => $debtorExternalId,
+            'debtorExternalId' => $row['merchant_debtor_external_id'] ?? null,
             'isActive' => $row['is_active'] === '1',
         ]);
     }
@@ -72,7 +69,7 @@ class CheckoutSessionPdoRepository extends AbstractPdoRepository implements Chec
         $this->doInsert($sql, [
             'uuid' => (string) $checkoutSession->token(),
             'merchant' => $checkoutSession->merchantId(),
-            'merchant_debtor_external_id' => $checkoutSession->debtorExternalId() ?? '',
+            'merchant_debtor_external_id' => $checkoutSession->debtorExternalId(),
             'is_active' => $checkoutSession->isActive() ? '1' : '0',
             'created_at' => (new \DateTime())->format(self::DATE_FORMAT),
             'updated_at' => (new \DateTime())->format(self::DATE_FORMAT),

@@ -7,8 +7,8 @@ use App\Application\UseCase\CreateOrder\LegacyCreateOrderRequest;
 use App\Application\UseCase\OrderCreationUseCaseTrait;
 use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
+use App\DomainModel\Order\CompanyIdentifier;
 use App\DomainModel\CheckoutSession\CheckoutSessionRepository;
-use App\DomainModel\Order\IdentifyAndTriggerAsyncIdentification;
 use App\DomainModel\Order\Lifecycle\ApproveOrderService;
 use App\DomainModel\Order\Lifecycle\DeclineOrderService;
 use App\DomainModel\Order\NewOrder\OrderPersistenceService;
@@ -27,16 +27,19 @@ class AuthorizeOrderHandler implements LoggingInterface, ValidatedUseCaseInterfa
 
     private CheckoutSessionRepository $checkoutSessionRepository;
 
+    private Registry $workflowRegistry;
+
+    private ApproveOrderService $approveOrderService;
+
     public function __construct(
         OrderPersistenceService $orderPersistenceService,
         OrderContainerFactory $orderContainerFactory,
         OrderChecksRunnerService $orderChecksRunnerService,
         OrderRepositoryInterface $orderRepository,
         Registry $workflowRegistry,
-        ApproveOrderService $approveOrderService,
         DeclineOrderService $declineOrderService,
+        CompanyIdentifier $companyIdentifier,
         CheckoutSessionRepository $checkoutSessionRepository,
-        IdentifyAndTriggerAsyncIdentification $identifyAndTriggerAsyncIdentification,
         LegacyOrderResponseFactory $orderResponseFactory
     ) {
         $this->orderPersistenceService = $orderPersistenceService;
@@ -44,10 +47,9 @@ class AuthorizeOrderHandler implements LoggingInterface, ValidatedUseCaseInterfa
         $this->orderChecksRunnerService = $orderChecksRunnerService;
         $this->orderRepository = $orderRepository;
         $this->workflowRegistry = $workflowRegistry;
-        $this->approveOrderService = $approveOrderService;
         $this->declineOrderService = $declineOrderService;
         $this->checkoutSessionRepository = $checkoutSessionRepository;
-        $this->identifyAndTriggerAsyncIdentification = $identifyAndTriggerAsyncIdentification;
+        $this->companyIdentifier = $companyIdentifier;
         $this->orderResponseFactory = $orderResponseFactory;
     }
 

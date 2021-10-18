@@ -50,7 +50,6 @@ Feature:
             "email":"someone@billie.io"
          },
          "debtor_company":{
-            "merchant_customer_id":"12",
             "name":"billie GmbH",
             "address_addition":"left door",
             "address_house_number":"33",
@@ -131,7 +130,7 @@ Feature:
        "selected_payment_method": null,
        "payment_methods": [],
        "debtor_external_data":{
-          "merchant_customer_id":"12",
+          "merchant_customer_id": null,
           "name":"billie GmbH",
           "address_country":"DE",
           "address_city":"Berlin",

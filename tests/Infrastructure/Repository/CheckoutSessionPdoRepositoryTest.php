@@ -55,7 +55,7 @@ class CheckoutSessionPdoRepositoryTest extends TestCase
             [
                 'uuid' => 'not-active',
                 'merchant_id' => 1,
-                'merchant_debtor_external_id' => '',
+                'merchant_debtor_external_id' => null,
                 'is_active' => '0',
             ],
         );

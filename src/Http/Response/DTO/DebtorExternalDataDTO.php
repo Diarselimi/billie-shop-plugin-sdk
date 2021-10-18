@@ -16,7 +16,7 @@ use App\DomainModel\ArrayableInterface;
  */
 class DebtorExternalDataDTO implements ArrayableInterface
 {
-    private string $merchantCustomerId;
+    private ?string $merchantCustomerId;
 
     private string $name;
 
@@ -24,7 +24,7 @@ class DebtorExternalDataDTO implements ArrayableInterface
 
     private AddressDTO $address;
 
-    public function __construct(string $merchantCustomerId, string $name, ?string $industrySector, AddressDTO $address)
+    public function __construct(?string $merchantCustomerId, string $name, ?string $industrySector, AddressDTO $address)
     {
         $this->merchantCustomerId = $merchantCustomerId;
         $this->name = $name;

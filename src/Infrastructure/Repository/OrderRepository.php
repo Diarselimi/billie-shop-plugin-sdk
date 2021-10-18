@@ -3,9 +3,9 @@
 namespace App\Infrastructure\Repository;
 
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderEntityFactory;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\Order\OrderStateCounterDTO;
+use App\Infrastructure\Repository\Order\PdoOrderEntityFactory;
 use Billie\MonitoringBundle\Service\RidProvider;
 use Billie\PdoBundle\DomainModel\StatefulEntity\StatefulEntityRepositoryInterface;
 use Billie\PdoBundle\DomainModel\StatefulEntity\StatefulEntityRepositoryTrait;
@@ -49,11 +49,11 @@ class OrderRepository extends AbstractPdoRepository implements
         'debtor_sepa_mandate_uuid',
     ];
 
-    private OrderEntityFactory $orderFactory;
+    private PdoOrderEntityFactory $orderFactory;
 
     private RidProvider $ridProvider;
 
-    public function __construct(OrderEntityFactory $orderFactory, RidProvider $ridProvider)
+    public function __construct(PdoOrderEntityFactory $orderFactory, RidProvider $ridProvider)
     {
         $this->orderFactory = $orderFactory;
         $this->ridProvider = $ridProvider;
@@ -159,7 +159,7 @@ class OrderRepository extends AbstractPdoRepository implements
             ]
         );
 
-        return $order ? $this->orderFactory->createFromArray($order) : null;
+        return $order ? $this->orderFactory->create($order) : null;
     }
 
     public function getOneByMerchantIdAndExternalCodeOrUUID(string $id, int $merchantId): ?OrderEntity
@@ -177,7 +177,7 @@ class OrderRepository extends AbstractPdoRepository implements
             ]
         );
 
-        return $order ? $this->orderFactory->createFromArray($order) : null;
+        return $order ? $this->orderFactory->create($order) : null;
     }
 
     public function getOneByMerchantIdAndUUID(string $uuid, int $merchantId): ?OrderEntity
@@ -194,7 +194,7 @@ class OrderRepository extends AbstractPdoRepository implements
             ]
         );
 
-        return $order ? $this->orderFactory->createFromArray($order) : null;
+        return $order ? $this->orderFactory->create($order) : null;
     }
 
     public function getOneByPaymentId(string $paymentId): ?OrderEntity
@@ -210,7 +210,7 @@ class OrderRepository extends AbstractPdoRepository implements
             ]
         );
 
-        return $order ? $this->orderFactory->createFromArray($order) : null;
+        return $order ? $this->orderFactory->create($order) : null;
     }
 
     public function getOneById(int $id): ?OrderEntity
@@ -226,7 +226,7 @@ class OrderRepository extends AbstractPdoRepository implements
             ]
         );
 
-        return $order ? $this->orderFactory->createFromArray($order) : null;
+        return $order ? $this->orderFactory->create($order) : null;
     }
 
     public function getOneByUuid(string $uuid): ?OrderEntity
@@ -242,7 +242,7 @@ class OrderRepository extends AbstractPdoRepository implements
             ]
         );
 
-        return $order ? $this->orderFactory->createFromArray($order) : null;
+        return $order ? $this->orderFactory->create($order) : null;
     }
 
     public function getByInvoice(string $invoiceUuid): array
@@ -255,7 +255,7 @@ class OrderRepository extends AbstractPdoRepository implements
             ['uuid' => $invoiceUuid]
         );
 
-        return $this->orderFactory->createFromArrayMultiple($orders);
+        return $this->orderFactory->createFromRows($orders);
     }
 
     public function getByInvoiceAndMerchant(string $invoiceUuid, int $merchantId): ?OrderEntity
@@ -268,7 +268,7 @@ class OrderRepository extends AbstractPdoRepository implements
             ['uuid' => $invoiceUuid, 'merchant_id' => $merchantId]
         );
 
-        return $order ? $this->orderFactory->createFromArray($order) : null;
+        return $order ? $this->orderFactory->create($order) : null;
     }
 
     public function updateDurationExtension(int $orderId, int $durationExtension): void
@@ -466,7 +466,7 @@ SQL;
         );
 
         while ($row = $stmt->fetch(PdoConnection::FETCH_ASSOC)) {
-            yield $this->orderFactory->createFromArray($row);
+            yield $this->orderFactory->create($row);
         }
     }
 
@@ -489,7 +489,7 @@ SQL;
             ]
         );
 
-        return $row ? $this->orderFactory->createFromArray($row) : null;
+        return $row ? $this->orderFactory->create($row) : null;
     }
 
     public function getOrdersCountByMerchantDebtorAndState(int $merchantDebtorId, string $state): int
