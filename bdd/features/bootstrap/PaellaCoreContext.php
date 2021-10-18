@@ -13,6 +13,7 @@ use App\DomainModel\DebtorSettings\DebtorSettingsEntity;
 use App\DomainModel\DebtorSettings\DebtorSettingsRepositoryInterface;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepository;
+use App\DomainModel\Merchant\PartnerIdentifier;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\MerchantFinancialAssessment\MerchantFinancialAssessmentEntity;
@@ -172,7 +173,7 @@ class PaellaCoreContext extends MinkContext
     private function createMerchant(): MerchantEntity
     {
         $now = new \DateTime();
-        $merchant = (new MerchantEntity())
+        $merchant = (new MerchantEntity(PartnerIdentifier::create('klarna-id')))
             ->setName('Behat Merchant')
             ->setCompanyUuid(self::MERCHANT_COMPANY_UUID)
             ->setIsActive(true)

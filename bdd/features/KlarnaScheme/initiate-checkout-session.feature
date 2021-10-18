@@ -8,7 +8,8 @@ Feature: Initialize new checkout session
       """
       {
         "country": "DE",
-        "customer": { "type": "organization" }
+        "customer": { "type": "organization" },
+        "merchant": { "acquirer_merchant_id": "klarna-id" }
       }
       """
     Then the response is 200 with a token in the field "payment_method_session_id"
@@ -19,7 +20,8 @@ Feature: Initialize new checkout session
       """
       {
         "country": "BR",
-        "customer": { "type": "organization" }
+        "customer": { "type": "organization" },
+        "merchant": { "acquirer_merchant_id": "klarna-id" }
       }
       """
     Then the response is 200 with body:
@@ -33,7 +35,23 @@ Feature: Initialize new checkout session
     When I request "POST /initiate" with body:
       """
       {
-        "country": "DE"
+        "country": "DE",
+        "merchant": { "acquirer_merchant_id": "klarna-id" }
+      }
+      """
+    Then the response is 200 with body:
+      """
+      {
+        "error_messages": [ "Invalid request" ]
+      }
+      """
+
+  Scenario: Return error if merchant id is not informed
+    When I request "POST /initiate" with body:
+      """
+      {
+        "country": "DE",
+        "customer": { "type": "organization" }
       }
       """
     Then the response is 200 with body:

@@ -4,7 +4,9 @@ namespace App\UserInterface\Http\KlarnaScheme\Controllers;
 
 use App\Application\CommandBus;
 use App\Application\UseCase\InitiateCheckoutSession\InitiateCheckoutSession;
+use App\Application\UseCase\InitiateCheckoutSession\MerchantNotFound;
 use App\DomainModel\CheckoutSession\CountryNotSupported;
+use App\DomainModel\CheckoutSession\Token;
 use App\Infrastructure\UuidGeneration\UuidGenerator;
 use App\UserInterface\Http\KlarnaScheme\KlarnaResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,20 +38,13 @@ class InitiateController
         }
 
         try {
-            $command = new InitiateCheckoutSession(
-                $this->uuidGenerator->generate(),
-                $request->request->get('country'),
-                1, // TODO
-                null
-            );
-        } catch (CountryNotSupported $ex) {
+            $token = $this->process($request);
+        } catch (CountryNotSupported | MerchantNotFound $ex) {
             return KlarnaResponse::withErrorFromException($ex);
         }
 
-        $this->bus->process($command);
-
         return new KlarnaResponse([
-            'payment_method_session_id' => (string) $command->token(),
+            'payment_method_session_id' => (string) $token,
         ]);
     }
 
@@ -57,12 +52,26 @@ class InitiateController
     {
         $country = $request->request->get('country');
         $customerType = $request->request->get('customer')['type'] ?? null;
+        $merchantId = $request->request->get('merchant')['acquirer_merchant_id'] ?? null;
 
-        return $country === null || $customerType === null;
+        return $country === null || $customerType === null || $merchantId === null;
     }
 
     private function doesNotSupportCustomerType(Request $request): bool
     {
         return $request->request->get('customer')['type'] !== self::SUPPORTED_CUSTOMER_TYPE;
+    }
+
+    private function process(Request $request): Token
+    {
+        $command = InitiateCheckoutSession::forKlarna(
+            $this->uuidGenerator->generate(),
+            $request->request->get('country'),
+            $request->request->get('merchant')['acquirer_merchant_id']
+        );
+
+        $this->bus->process($command);
+
+        return $command->token();
     }
 }

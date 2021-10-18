@@ -4,6 +4,7 @@ namespace App\Application\UseCase\InitiateCheckoutSession;
 
 use App\DomainModel\CheckoutSession\Country;
 use App\DomainModel\CheckoutSession\Token;
+use App\DomainModel\Merchant\PartnerIdentifier;
 
 class InitiateCheckoutSession
 {
@@ -11,16 +12,33 @@ class InitiateCheckoutSession
 
     private Country $country;
 
-    private int $merchantId;
+    private ?int $merchantId = null;
 
-    private ?string $externalReference;
+    private ?string $debtorExternalId = null;
 
-    public function __construct(string $tokenSeed, string $countryCode, int $merchantId, ?string $externalReference)
+    private ?PartnerIdentifier $partnerIdentifier = null;
+
+    private function __construct(string $tokenSeed, string $countryCode)
     {
         $this->token = Token::fromSeed($tokenSeed);
         $this->country = new Country($countryCode);
-        $this->merchantId = $merchantId;
-        $this->externalReference = $externalReference;
+    }
+
+    public static function forKlarna(string $tokenSeed, string $countryCode, string $klarnaMerchantId): self
+    {
+        $self = new self($tokenSeed, $countryCode);
+        $self->partnerIdentifier = PartnerIdentifier::create($klarnaMerchantId);
+
+        return $self;
+    }
+
+    public static function forDirectIntegration(string $tokenSeed, string $countryCode, int $merchantId, string $debtorExternalId): self
+    {
+        $self = new self($tokenSeed, $countryCode);
+        $self->merchantId = $merchantId;
+        $self->debtorExternalId = $debtorExternalId;
+
+        return $self;
     }
 
     public function token(): Token
@@ -33,13 +51,23 @@ class InitiateCheckoutSession
         return $this->country;
     }
 
-    public function merchantId(): int
+    public function isDirectIntegration(): bool
+    {
+        return null !== $this->merchantId;
+    }
+
+    public function merchantId(): ?int
     {
         return $this->merchantId;
     }
 
-    public function externalReference(): ?string
+    public function debtorExternalId(): ?string
     {
-        return $this->externalReference;
+        return $this->debtorExternalId;
+    }
+
+    public function partnerIdentifier(): ?PartnerIdentifier
+    {
+        return $this->partnerIdentifier;
     }
 }

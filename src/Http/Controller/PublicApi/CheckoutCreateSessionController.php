@@ -70,7 +70,7 @@ class CheckoutCreateSessionController
             $this->throwBlankedFieldException('merchant_customer_id');
         }
 
-        $command = new InitiateCheckoutSession(
+        $command = InitiateCheckoutSession::forDirectIntegration(
             $this->uuidGenerator->generate(),
             'DE',
             $merchantId,
