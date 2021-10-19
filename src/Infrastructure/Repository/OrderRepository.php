@@ -560,6 +560,6 @@ SQL;
             ]
         );
 
-        return array_map([$this->orderFactory, 'createFromArray'], $rows);
+        return array_map([$this->orderFactory, 'createFromRows'], $rows);
     }
 }
