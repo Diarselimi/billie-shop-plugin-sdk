@@ -4,6 +4,8 @@ services:
     autoconfigure: true
     public: false
 
-  App\UserInterface\Http\KlarnaScheme\Controllers\:
-    resource: '../../src/UserInterface/Http/KlarnaScheme/Controllers'
+  App\UserInterface\Http\KlarnaScheme\Initiate\InitiateController:
+    tags: [ 'controller.service_arguments' ]
+
+  App\UserInterface\Http\KlarnaScheme\Authorize\AuthorizeController:
     tags: [ 'controller.service_arguments' ]

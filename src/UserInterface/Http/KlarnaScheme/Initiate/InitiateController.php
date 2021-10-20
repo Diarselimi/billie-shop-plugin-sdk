@@ -1,6 +1,6 @@
 <?php
 
-namespace App\UserInterface\Http\KlarnaScheme\Controllers;
+namespace App\UserInterface\Http\KlarnaScheme\Initiate;
 
 use App\Application\CommandBus;
 use App\Application\UseCase\InitiateCheckoutSession\InitiateCheckoutSession;

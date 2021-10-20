@@ -39,17 +39,17 @@ class OrderContainer
         self::DECLINE_REASON_DEBTOR_LIMIT_EXCEEDED,
     ];
 
+    public const DECLINE_REASON_RISK_POLICY = 'risk_policy';
+
+    public const DECLINE_REASON_RISK_SCORING_FAILED = 'risk_scoring_failed';
+
+    public const DECLINE_REASON_DEBTOR_NOT_IDENTIFIED = 'debtor_not_identified';
+
+    public const DECLINE_REASON_ADDRESS_MISMATCH = 'debtor_address';
+
+    public const DECLINE_REASON_DEBTOR_LIMIT_EXCEEDED = 'debtor_limit_exceeded';
+
     private const DEFAULT_DECLINE_REASON = self::DECLINE_REASON_RISK_POLICY;
-
-    private const DECLINE_REASON_RISK_POLICY = 'risk_policy';
-
-    private const DECLINE_REASON_RISK_SCORING_FAILED = 'risk_scoring_failed';
-
-    private const DECLINE_REASON_DEBTOR_NOT_IDENTIFIED = 'debtor_not_identified';
-
-    private const DECLINE_REASON_ADDRESS_MISMATCH = 'debtor_address';
-
-    private const DECLINE_REASON_DEBTOR_LIMIT_EXCEEDED = 'debtor_limit_exceeded';
 
     private const RISK_CHECK_MAPPING = [
         DebtorIdentifiedCheck::NAME => self::DECLINE_REASON_DEBTOR_NOT_IDENTIFIED,

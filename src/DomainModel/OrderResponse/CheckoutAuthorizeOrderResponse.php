@@ -5,6 +5,8 @@ namespace App\DomainModel\OrderResponse;
 use App\DomainModel\ArrayableInterface;
 use App\DomainModel\DebtorCompany\MostSimilarCandidateDTO;
 use App\DomainModel\DebtorCompany\NullMostSimilarCandidateDTO;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
+use App\DomainModel\Order\OrderEntity;
 use OpenApi\Annotations as OA;
 
 /**
@@ -161,6 +163,20 @@ class CheckoutAuthorizeOrderResponse implements ArrayableInterface
         $this->debtorCompanySuggestion = $debtorCompanySuggestion;
 
         return $this;
+    }
+
+    public function isAuthorized(): bool
+    {
+        return $this->state === OrderEntity::STATE_AUTHORIZED;
+    }
+
+    public function isDeclinedFinally(): bool
+    {
+        $finalDeclineReasons = [OrderContainer::DECLINE_REASON_ADDRESS_MISMATCH, OrderContainer::DECLINE_REASON_DEBTOR_NOT_IDENTIFIED];
+
+        return $this->state === OrderEntity::STATE_DECLINED
+            && !in_array($this->declineReason, $finalDeclineReasons, true)
+        ;
     }
 
     public function toArray(): array

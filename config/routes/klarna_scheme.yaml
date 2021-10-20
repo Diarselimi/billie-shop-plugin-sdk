@@ -1,4 +1,9 @@
 initiate:
   path: /initiate
-  controller: App\UserInterface\Http\KlarnaScheme\Controllers\InitiateController::execute
+  controller: App\UserInterface\Http\KlarnaScheme\Initiate\InitiateController::execute
+  methods: POST
+
+authorize:
+  path: /authorizations
+  controller: App\UserInterface\Http\KlarnaScheme\Authorize\AuthorizeController::execute
   methods: POST
