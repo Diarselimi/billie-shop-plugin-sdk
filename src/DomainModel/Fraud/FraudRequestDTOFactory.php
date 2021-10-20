@@ -25,6 +25,7 @@ final class FraudRequestDTOFactory
             $orderContainer->getDeliveryAddress(),
             $orderContainer->getOrder()->getCreatedAt(),
             $orderContainer->getLineItems(),
+            $orderContainer->getOrder()->getCreationSource(),
             $orderContainer->getDebtorCompany()->getSchufaId()
         );
     }

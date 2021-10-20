@@ -34,6 +34,8 @@ class FraudRequestDTO implements ArrayableInterface
 
     private $lineItems;
 
+    private $creationSource;
+
     private $debtorCompanySchufaId;
 
     public function __construct(
@@ -48,6 +50,7 @@ class FraudRequestDTO implements ArrayableInterface
         AddressEntity $shippingAddress,
         \DateTimeInterface $invoiceCreatedAt,
         array $lineItems,
+        string $creationSource,
         ?string $debtorCompanySchufaId = null
     ) {
         $this->invoiceUuid = $invoiceUuid;
@@ -61,6 +64,7 @@ class FraudRequestDTO implements ArrayableInterface
         $this->shippingAddress = $shippingAddress;
         $this->invoiceCreatedAt = $invoiceCreatedAt;
         $this->lineItems = $lineItems;
+        $this->creationSource = $creationSource;
         $this->debtorCompanySchufaId = $debtorCompanySchufaId;
     }
 
@@ -98,6 +102,7 @@ class FraudRequestDTO implements ArrayableInterface
                 'description' => $lineItem->getDescription(),
                 'brand' => $lineItem->getBrand(),
             ], $this->lineItems),
+            'source' => $this->creationSource,
         ];
     }
 }
