@@ -18,23 +18,23 @@ class InitiateCheckoutSession
 
     private ?PartnerIdentifier $partnerIdentifier = null;
 
-    private function __construct(string $tokenSeed, string $countryCode)
+    private function __construct(string $token, string $countryCode)
     {
-        $this->token = Token::fromSeed($tokenSeed);
+        $this->token = Token::fromHash($token);
         $this->country = new Country($countryCode);
     }
 
-    public static function forKlarna(string $tokenSeed, string $countryCode, string $klarnaMerchantId): self
+    public static function forKlarna(string $token, string $countryCode, string $klarnaMerchantId): self
     {
-        $self = new self($tokenSeed, $countryCode);
+        $self = new self($token, $countryCode);
         $self->partnerIdentifier = PartnerIdentifier::create($klarnaMerchantId);
 
         return $self;
     }
 
-    public static function forDirectIntegration(string $tokenSeed, string $countryCode, int $merchantId, string $debtorExternalId): self
+    public static function forDirectIntegration(string $token, string $countryCode, int $merchantId, string $debtorExternalId): self
     {
-        $self = new self($tokenSeed, $countryCode);
+        $self = new self($token, $countryCode);
         $self->merchantId = $merchantId;
         $self->debtorExternalId = $debtorExternalId;
 

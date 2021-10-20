@@ -49,7 +49,7 @@ class InitiateCheckoutSessionHandlerTest extends UnitTestCase
             ->method('save')
             ->with(
                 new CheckoutSession(
-                    Token::fromHash('e3b98a4da31a127d4bde6e43033f66ba274c'),
+                    Token::fromHash('t'),
                     new Country('DE'),
                     666,
                     null
@@ -93,7 +93,7 @@ class InitiateCheckoutSessionHandlerTest extends UnitTestCase
             ->method('save')
             ->with(
                 new CheckoutSession(
-                    Token::fromHash('e3b98a4da31a127d4bde6e43033f66ba274c'),
+                    Token::fromHash('t'),
                     new Country('DE'),
                     444,
                     'debtor-id'
