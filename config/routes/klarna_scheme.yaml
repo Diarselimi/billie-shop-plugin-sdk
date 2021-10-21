@@ -7,3 +7,8 @@ authorize:
   path: /authorizations
   controller: App\UserInterface\Http\KlarnaScheme\Authorize\AuthorizeController::execute
   methods: POST
+
+updated_not_confirm_adjust:
+  path: /authorizations/{orderId}
+  controller: App\UserInterface\Http\KlarnaScheme\UpdateNotConfirmedAuthorization\UpdateNotConfirmedAuthorizationController::execute
+  methods: POST

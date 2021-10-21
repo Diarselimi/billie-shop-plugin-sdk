@@ -36,9 +36,10 @@ class KlarnaContext implements Context
     }
 
     /**
+     * @When I request :endpoint
      * @When I request :endpoint with body:
      */
-    public function request(string $endpoint, string $body): void
+    public function request(string $endpoint, string $body = null): void
     {
         $request = $this->createRequest($endpoint, $body);
 
@@ -81,7 +82,7 @@ class KlarnaContext implements Context
         Assert::assertCount(1, $checkoutSessions);
     }
 
-    private function createRequest(string $endpoint, string $body): Request
+    private function createRequest(string $endpoint, ?string $body): Request
     {
         [$method, $path] = explode(' ', $endpoint);
 
