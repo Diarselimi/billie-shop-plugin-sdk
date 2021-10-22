@@ -10,5 +10,8 @@ services:
   App\UserInterface\Http\KlarnaScheme\Authorize\AuthorizeController:
     tags: [ 'controller.service_arguments' ]
 
+  App\UserInterface\Http\KlarnaScheme\UpdateConfirmedAuthorization\UpdateConfirmedAuthorizationController:
+    tags: [ 'controller.service_arguments' ]
+
   App\UserInterface\Http\KlarnaScheme\UpdateNotConfirmedAuthorization\UpdateNotConfirmedAuthorizationController:
     tags: [ 'controller.service_arguments' ]

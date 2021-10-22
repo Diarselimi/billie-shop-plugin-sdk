@@ -413,7 +413,7 @@ class PaellaCoreContext extends MinkContext
                 $row['net'],
                 $row['tax'],
                 $row['duration'],
-                $row['comment'],
+                $row['comment'] ?? 'test order',
                 $row['payment_uuid'],
                 $row['checkout_session'],
                 OrderEntity::CREATION_SOURCE_API,

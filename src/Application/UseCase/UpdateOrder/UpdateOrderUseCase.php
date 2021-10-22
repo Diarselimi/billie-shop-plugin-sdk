@@ -45,14 +45,7 @@ class UpdateOrderUseCase implements ValidatedUseCaseInterface, CommandHandler
 
     public function execute(UpdateOrderRequest $input): void
     {
-        try {
-            $orderContainer = $this->orderContainerFactory->loadByMerchantIdAndExternalIdOrUuid(
-                $input->getMerchantId(),
-                $input->getOrderUuid()
-            );
-        } catch (OrderContainerFactoryException $e) {
-            throw new OrderNotFoundException();
-        }
+        $orderContainer = $this->findOrderContainer($input);
 
         $this->validateRequest($input);
         $order = $orderContainer->getOrder();
@@ -78,6 +71,22 @@ class UpdateOrderUseCase implements ValidatedUseCaseInterface, CommandHandler
 
         if ($orderContainer->getOrderFinancialDetails()->getUnshippedAmountGross()->isZero()) {
             $this->transitOrderToTheNextState($orderContainer);
+        }
+    }
+
+    private function findOrderContainer(UpdateOrderRequest $input): OrderContainer
+    {
+        try {
+            if (null === $input->getMerchantId()) {
+                return $this->orderContainerFactory->loadByUuid($input->getOrderUuid());
+            }
+
+            return $this->orderContainerFactory->loadByMerchantIdAndExternalIdOrUuid(
+                $input->getMerchantId(),
+                $input->getOrderUuid()
+            );
+        } catch (OrderContainerFactoryException $e) {
+            throw new OrderNotFoundException();
         }
     }
 

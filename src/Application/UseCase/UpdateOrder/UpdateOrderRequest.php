@@ -25,7 +25,7 @@ class UpdateOrderRequest
 {
     private string $orderUuid;
 
-    private int $merchantId;
+    private ?int $merchantId;
 
     /**
      * @Assert\NotBlank(allowNull=true, message="This value should be null or non-blank string.")
@@ -41,7 +41,7 @@ class UpdateOrderRequest
      */
     private ?TaxedMoney $amount = null;
 
-    public function __construct(string $orderUuid, int $merchantId, ?string $externalCode, ?TaxedMoney $amount)
+    public function __construct(string $orderUuid, ?int $merchantId, ?string $externalCode, ?TaxedMoney $amount)
     {
         $this->externalCode = $externalCode;
         $this->amount = $amount;
@@ -54,7 +54,7 @@ class UpdateOrderRequest
         return $this->orderUuid;
     }
 
-    public function getMerchantId(): int
+    public function getMerchantId(): ?int
     {
         return $this->merchantId;
     }
