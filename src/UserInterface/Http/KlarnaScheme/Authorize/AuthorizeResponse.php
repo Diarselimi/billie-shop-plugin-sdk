@@ -22,10 +22,8 @@ class AuthorizeResponse extends KlarnaResponse
 
         if ($orderResponse->isAuthorized()) {
             $response = array_merge($response, [
-//                'customer_order_reference' => $orderContainer->getOrder()->getUuid(),
-//                'payment_method_reference' => $orderContainer->getOrder()->getUuid(),
-                'customer_order_reference' => 'uuid', // behat tests failing
-                'payment_method_reference' => 'uuid',
+                'customer_order_reference' => $orderContainer->getOrder()->getUuid(),
+                'payment_method_reference' => $orderContainer->getOrder()->getUuid(),
                 'result' => 'accepted',
             ]);
         } elseif ($orderResponse->isDeclinedFinally()) {

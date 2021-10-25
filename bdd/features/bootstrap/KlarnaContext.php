@@ -9,6 +9,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 
 class KlarnaContext implements Context
 {
@@ -20,7 +21,7 @@ class KlarnaContext implements Context
 
     private Response $response;
 
-    private string $generatedToken;
+    private ?string $generatedToken = null;
 
     /**
      * @beforeScenario
@@ -42,10 +43,18 @@ class KlarnaContext implements Context
     public function request(string $endpoint, string $body = null): void
     {
         $request = $this->createRequest($endpoint, $body);
-
         $this->response = $this->kernel->handle($request);
 
         $this->kernel->terminate($request, $this->response);
+    }
+
+    /**
+     * @When I save order uuid
+     */
+    public function setOrderUuid(): void
+    {
+        $orderContainer = $this->kernel->getContainer()->get(OrderContainerFactory::class);
+        $this->generatedToken = $orderContainer->getCachedOrderContainer()->getOrder()->getUuid();
     }
 
     /**
@@ -62,7 +71,15 @@ class KlarnaContext implements Context
     public function assertResponse(int $statusCode, string $body): void
     {
         Assert::assertEquals($statusCode, $this->response->getStatusCode());
-        Assert::assertJsonStringEqualsJsonString($body, $this->response->getContent());
+        Assert::assertJsonStringEqualsJsonString($this->prepareExpectedJsonContent($body), $this->response->getContent());
+    }
+
+    /**
+     * @Then print response
+     */
+    public function printResponse(): void
+    {
+        echo $this->response->getContent();
     }
 
     /**
@@ -95,5 +112,14 @@ class KlarnaContext implements Context
         [$method, $path] = explode(' ', $endpoint);
 
         return Request::create(self::REQUEST_PATH_PREFIX.$path, $method, [], [], [], [], $body);
+    }
+
+    private function prepareExpectedJsonContent(string $body): string
+    {
+        $replacements = [
+            '{order_uuid}' => $this->generatedToken,
+        ];
+
+        return str_replace(array_keys($replacements), array_values($replacements), $body);
     }
 }

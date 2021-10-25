@@ -74,13 +74,67 @@ Feature: Initialize new checkout session
     When I request "POST /authorizations" with body:
       """
       {
+        "amount": 300000,
+        "tax_amount": 60000,
+        "country": "DE",
+        "currency": "EUR",
+        "customer": {
+          "type": "organization",
+          "billing_address": {
+            "organization_name": "Billie GmbH",
+            "street_address": "Charlottenstr.",
+            "street_address2": "4",
+            "city": "Berlin",
+            "postal_code": "10969",
+            "country": "DE",
+            "title": "Mr",
+            "given_name": "Fefas",
+            "family_name": "Possum",
+            "phone": "+49158888890",
+            "email": "info@billie.io"
+          },
+          "history": {
+            "number_of_purchases": 14
+          }
+        },
+        "expires_at": "2021-12-31T01:00:00Z",
+        "final": true,
+        "merchant": {
+          "acquirer_merchant_id": "dummy"
+        },
         "payment_method":
         {
           "payment_method_session_id": "142d6f47-cec2-4768-8de4-f7cbd1642bd1",
+          "payment_method_id": "billie_pay_later",
           "ui":
           {
             "data": {}
           }
+        },
+        "purchase_details": {
+          "locale": "DE",
+          "shipping_address": {
+            "street_address": "Charlottenstr.",
+            "street_address2": "4",
+            "city": "Berlin",
+            "postal_code": "10969",
+            "country": "DE"
+          },
+          "order_lines": [
+            {
+              "reference": "REF456",
+              "name": "iPhone 18",
+              "quantity": "2",
+              "total_amount": "300000",
+              "total_tax_amount": "60000",
+              "product_identifiers": {
+                "category_path": "path",
+                "brand": "brand",
+                "global_trade_item_number": "gtin",
+                "manufacturer_part_number": "mpn"
+              }
+            }
+          ]
         }
       }
       """
@@ -96,11 +150,53 @@ Feature: Initialize new checkout session
             {
               "amount":
               {
-                "gross": 5,
-                "net": 4,
-                "tax": 1
+                "gross": 3000,
+                "net": 2400,
+                "tax": 600
               },
-              "duration": 30
+              "duration": 30,
+              "delivery_address": {
+                "street": "Charlottenstr.",
+                "house_number": "4",
+                "addition": "",
+                "city": "Berlin",
+                "postal_code": "10969",
+                "country": "DE"
+              },
+              "debtor_company": {
+                "name": "Billie GmbH",
+                "established_customer": true,
+                "address_street": "Charlottenstr.",
+                "address_house_number": "4",
+                "address_addition": "",
+                "address_city": "Berlin",
+                "address_postal_code": "10969",
+                "address_country": "DE"
+              },
+              "debtor_person": {
+                "salutation": "m",
+                "first_name": "Fefas",
+                "last_name": "Possum",
+                "phone_number": "+49158888890",
+                "email": "info@billie.io"
+              },
+              "line_items": [
+                {
+                  "external_id": "REF456",
+                  "title": "iPhone 18",
+                  "description": "",
+                  "quantity": "2",
+                  "amount": {
+                    "gross": 3000,
+                    "tax": 600,
+                    "net": 2400
+                  },
+                  "category": "path",
+                  "brand": "brand",
+                  "gtin": "gtin",
+                  "mpn": "mpn"
+                }
+              ]
             }
           }
         }
@@ -186,12 +282,13 @@ Feature: Initialize new checkout session
         }
       }
       """
+    And I save order uuid
     Then the response is 200 with body:
       """
       {
         "result": "accepted",
-        "customer_order_reference": "uuid",
-        "payment_method_reference": "uuid",
+        "customer_order_reference": "{order_uuid}",
+        "payment_method_reference": "{order_uuid}",
         "payment_method":
         {
           "ui":

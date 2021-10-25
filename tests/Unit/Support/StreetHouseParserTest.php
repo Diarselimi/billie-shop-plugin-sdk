@@ -15,8 +15,7 @@ class StreetHouseParserTest extends UnitTestCase
      */
     public function shouldParseStreetAndHouseFromInput(string $input, string $expectedStreet, string $expectedHouse)
     {
-        $parser = new StreetHouseParser();
-        [$street, $house] = $parser->extractStreetAndHouse($input);
+        [$street, $house] = StreetHouseParser::extractStreetAndHouse($input);
 
         self::assertEquals($expectedStreet, $street);
         self::assertEquals($expectedHouse, $house);

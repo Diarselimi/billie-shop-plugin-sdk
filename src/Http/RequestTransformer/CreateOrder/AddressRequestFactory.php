@@ -12,13 +12,6 @@ class AddressRequestFactory implements LoggingInterface
 {
     use LoggingTrait;
 
-    private StreetHouseParser $streetHouseParser;
-
-    public function __construct(StreetHouseParser $streetHouseParser)
-    {
-        $this->streetHouseParser = $streetHouseParser;
-    }
-
     public function create(Request $request, string $fieldName): ?CreateOrderAddressRequest
     {
         $data = $request->request->get($fieldName);
@@ -77,7 +70,7 @@ class AddressRequestFactory implements LoggingInterface
         [$outputStreet, $outputHouse] = [$inputStreet, $inputHouse];
 
         if (empty($inputHouse) && !empty($inputStreet)) {
-            [$outputStreet, $outputHouse] = $this->streetHouseParser->extractStreetAndHouse($inputStreet);
+            [$outputStreet, $outputHouse] = StreetHouseParser::extractStreetAndHouse($inputStreet);
             $this->logInfo('Extracted street and house from input', [
                 LoggingInterface::KEY_SOBAKA => [
                     'input' => $inputStreet,

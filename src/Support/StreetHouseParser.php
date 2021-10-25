@@ -6,7 +6,7 @@ class StreetHouseParser
 {
     private const REGEX = '/^([a-zäöüß\s\d.,-]+?)\s*([\d\s]+(?:\s?[-|+\/]\s?\d+)?\s*[a-z]?)?$/iu';
 
-    public function extractStreetAndHouse(string $input): array
+    public static function extractStreetAndHouse(string $input): array
     {
         $street = $input;
         $houseNumber = null;

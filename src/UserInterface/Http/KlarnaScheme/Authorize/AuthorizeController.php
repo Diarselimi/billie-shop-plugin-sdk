@@ -25,18 +25,22 @@ class AuthorizeController
 
     private LegacyOrderResponseFactory $responseFactory;
 
+    private int $defaultOrderDuration;
+
     public function __construct(
         CommandBus $bus,
         AuthorizeOrderCommandFactory $commandFactory,
         CheckoutSessionRepository $checkoutSessionRepository,
         OrderContainerFactory $orderContainerFactory,
-        LegacyOrderResponseFactory $responseFactory
+        LegacyOrderResponseFactory $responseFactory,
+        int $defaultOrderDuration
     ) {
         $this->bus = $bus;
         $this->commandFactory = $commandFactory;
         $this->checkoutSessionRepository = $checkoutSessionRepository;
         $this->orderContainerFactory = $orderContainerFactory;
         $this->responseFactory = $responseFactory;
+        $this->defaultOrderDuration = $defaultOrderDuration;
     }
 
     public function execute(Request $request): KlarnaResponse
@@ -77,7 +81,7 @@ class AuthorizeController
 
     private function performPreAuthorization(Request $request): KlarnaResponse
     {
-        return new PreAuthorizeResponse($request->request->all());
+        return new PreAuthorizeResponse($request->request->all(), $this->defaultOrderDuration);
     }
 
     private function performAuthorization(Request $request, CheckoutSession $checkoutSession): KlarnaResponse

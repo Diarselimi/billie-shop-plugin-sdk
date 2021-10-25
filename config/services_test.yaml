@@ -128,3 +128,5 @@ services:
   _instanceof:
     App\Application\CommandHandler:
       tags: [ 'app.command_handler' ]
+
+  App\DomainModel\Order\OrderContainer\OrderContainerFactory: ~

@@ -1,8 +1,13 @@
+parameters:
+  default_order_duration: 30
+
 services:
   _defaults:
     autowire: true
     autoconfigure: true
     public: false
+    bind:
+      $defaultOrderDuration: '%default_order_duration%'
 
   App\UserInterface\Http\KlarnaScheme\Initiate\InitiateController:
     tags: [ 'controller.service_arguments' ]
