@@ -15,3 +15,7 @@ services:
 
   App\UserInterface\Http\KlarnaScheme\UpdateNotConfirmedAuthorization\UpdateNotConfirmedAuthorizationController:
     tags: [ 'controller.service_arguments' ]
+
+  App\UserInterface\Http\KlarnaScheme\Controllers\UpdateMerchantReferencesController:
+    tags: [ 'controller.service_arguments' ]
+

@@ -16,3 +16,9 @@ updated_not_confirm_adjust:
   path: /authorizations/{orderId}
   controller: App\UserInterface\Http\KlarnaScheme\UpdateNotConfirmedAuthorization\UpdateNotConfirmedAuthorizationController::execute
   methods: POST
+
+update_merchant_references:
+  path: /authorizations/{orderId}/merchant-references
+  controller: App\UserInterface\Http\KlarnaScheme\Controllers\UpdateMerchantReferencesController::execute
+  methods: POST
+

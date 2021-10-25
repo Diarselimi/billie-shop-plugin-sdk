@@ -4,6 +4,7 @@ namespace App\DomainModel\Order;
 
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderInvoice\OrderInvoiceCollection;
+use App\DomainModel\PartnerMerchant\PartnerExternalData;
 use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 use Billie\PdoBundle\DomainModel\StatefulEntity\StatefulEntityInterface;
 use Billie\PdoBundle\DomainModel\StatefulEntity\StatefulEntityTrait;
@@ -173,12 +174,15 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
 
     private OrderInvoiceCollection $orderInvoices;
 
+    private ?PartnerExternalData $partnerExternalData;
+
     public function __construct()
     {
         parent::__construct();
         $this->amountForgiven = 0;
         $this->state = self::STATE_NEW;
         $this->orderInvoices = new OrderInvoiceCollection([]);
+        $this->partnerExternalData = null;
     }
 
     public function getUuid(): string
@@ -518,6 +522,18 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
     public function setOrderInvoices(OrderInvoiceCollection $orderInvoices): self
     {
         $this->orderInvoices = $orderInvoices;
+
+        return $this;
+    }
+
+    public function getPartnerExternalData(): ?PartnerExternalData
+    {
+        return $this->partnerExternalData;
+    }
+
+    public function setPartnerExternalData(?PartnerExternalData $partnerExternalData): OrderEntity
+    {
+        $this->partnerExternalData = $partnerExternalData;
 
         return $this;
     }

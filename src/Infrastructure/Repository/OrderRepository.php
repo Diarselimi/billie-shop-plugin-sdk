@@ -37,6 +37,7 @@ class OrderRepository extends AbstractPdoRepository implements
         'merchant_id',
         'debtor_person_id',
         'debtor_external_data_id',
+        'partner_external_data',
         'payment_id',
         'workflow_name',
         'created_at',
@@ -76,7 +77,7 @@ class OrderRepository extends AbstractPdoRepository implements
               delivery_address_id, 
               merchant_id, 
               debtor_person_id, 
-              debtor_external_data_id, 
+              debtor_external_data_id,
               merchant_debtor_id,
               payment_id,
               checkout_session_id, 
@@ -299,6 +300,14 @@ class OrderRepository extends AbstractPdoRepository implements
 
     public function update(OrderEntity $order): void
     {
+        $partnerExternalData = null;
+        if ($order->getPartnerExternalData() !== null) {
+            $partnerExternalData = [
+                'merchant_reference1' => $order->getPartnerExternalData()->getMerchantReference1(),
+                'merchant_reference2' => $order->getPartnerExternalData()->getMerchantReference2(),
+            ];
+        }
+
         $this->doUpdate(
             '
             UPDATE ' . self::TABLE_NAME . '
@@ -315,6 +324,7 @@ class OrderRepository extends AbstractPdoRepository implements
               proof_of_delivery_url = :proof_of_delivery_url,
               company_billing_address_uuid = :company_billing_address_uuid,
               creation_source = :creation_source,
+              partner_external_data = :partner_external_data,
               debtor_sepa_mandate_uuid = :debtor_sepa_mandate_uuid
             WHERE id = :id
         ',
@@ -330,6 +340,7 @@ class OrderRepository extends AbstractPdoRepository implements
                 'invoice_url' => $order->getInvoiceUrl(),
                 'proof_of_delivery_url' => $order->getProofOfDeliveryUrl(),
                 'company_billing_address_uuid' => $order->getCompanyBillingAddressUuid(),
+                'partner_external_data' => $partnerExternalData !== null ? json_encode($partnerExternalData) : null,
                 'creation_source' => $order->getCreationSource(),
                 'debtor_sepa_mandate_uuid' => $order->getDebtorSepaMandateUuid() ? $order->getDebtorSepaMandateUuid()->toString() : null,
                 'id' => $order->getId(),

@@ -6,6 +6,7 @@ namespace App\Infrastructure\Repository\Order;
 
 use App\DomainModel\Order\OrderCollection;
 use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\PartnerMerchant\PartnerExternalData;
 use Ramsey\Uuid\Uuid;
 
 class PdoOrderEntityFactory
@@ -30,7 +31,16 @@ class PdoOrderEntityFactory
     {
         $durationExtension = $row['duration_extension'] === null ? null : (int) $row['duration_extension'];
 
+        $partnerExternalData = $row['partner_external_data'] === null ? null : json_decode($row['partner_external_data']);
+        if ($partnerExternalData !== null) {
+            $partnerExternalData = new PartnerExternalData(
+                $partnerExternalData['merchant_reference1'],
+                $partnerExternalData['merchant_reference2']
+            );
+        }
+
         return (new OrderEntity())
+            ->setPartnerExternalData($partnerExternalData)
             ->setId((int) $row['id'])
             ->setUuid($row['uuid'])
             ->setAmountForgiven(floatval($row['amount_forgiven']))

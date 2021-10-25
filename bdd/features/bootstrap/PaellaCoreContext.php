@@ -52,6 +52,7 @@ use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntity;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckRepositoryInterface;
 use App\DomainModel\OrderRiskCheck\RiskCheckDefinitionEntity;
 use App\DomainModel\OrderRiskCheck\RiskCheckDefinitionRepositoryInterface;
+use App\DomainModel\PartnerMerchant\PartnerExternalData;
 use App\DomainModel\Person\PersonEntity;
 use App\DomainModel\Person\PersonRepositoryInterface;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntity;
@@ -242,7 +243,7 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
-     * @Given the order :orderId belongs to company :companyUuid
+     * @Given the order :orderUuid belongs to company :companyUuid
      */
     public function orderBelongsToCompany($orderId, $companyUuid)
     {
@@ -253,7 +254,6 @@ class PaellaCoreContext extends MinkContext
 
     /**
      * @deprecated use iHaveOrdersWithTheFollowingData() instead
-     *
      * @Given I have a(n) :state order with amounts :gross/:net/:tax, duration :duration and comment :comment
      */
     public function iHaveAnOrderWithoutExternalCode($state, $gross, $net, $tax, $duration, $comment)
@@ -323,7 +323,6 @@ class PaellaCoreContext extends MinkContext
 
     /**
      * @deprecated use iHaveOrdersWithTheFollowingData() instead
-     *
      * @Given I have a(n) :state order :externalCode with amounts :gross/:net/:tax, duration :duration and comment :comment
      */
     public function iHaveAnOrder(
@@ -340,7 +339,6 @@ class PaellaCoreContext extends MinkContext
 
     /**
      * @deprecated use iHaveOrdersWithTheFollowingData() instead
-     *
      * @Given I have a(n) :state v2 order :externalCode with amounts :gross/:net/:tax, duration :duration and comment :comment
      */
     public function iHaveAnOrderV2(
@@ -352,12 +350,23 @@ class PaellaCoreContext extends MinkContext
         $duration,
         $comment
     ) {
-        $this->createOrder($state, $externalCode, $gross, $net, $tax, $duration, $comment, null, null, OrderEntity::CREATION_SOURCE_API, OrderEntity::WORKFLOW_NAME_V2);
+        $this->createOrder(
+            $state,
+            $externalCode,
+            $gross,
+            $net,
+            $tax,
+            $duration,
+            $comment,
+            null,
+            null,
+            OrderEntity::CREATION_SOURCE_API,
+            OrderEntity::WORKFLOW_NAME_V2
+        );
     }
 
     /**
      * @deprecated use iHaveOrdersWithTheFollowingData() instead
-     *
      * @Given I have a(n) :state order :externalCode with amounts :gross/:net/:tax, duration :duration and checkout session :checkoutSession
      */
     public function iHaveAnOrderWithCheckoutSession(
@@ -374,7 +383,6 @@ class PaellaCoreContext extends MinkContext
 
     /**
      * @deprecated use iHaveOrdersWithTheFollowingData() instead
-     *
      * @Given I have a(n) :state order :externalCode with amounts :gross/:net/:tax, duration :duration and checkout session :checkoutSession and uuid :uuid
      */
     public function iHaveAnOrderWithCheckoutSessionAndUuid(
@@ -387,7 +395,20 @@ class PaellaCoreContext extends MinkContext
         $checkoutSession,
         $uuid
     ) {
-        $this->createOrder($state, $externalCode, $gross, $net, $tax, $duration, 'test', null, $checkoutSession, OrderEntity::CREATION_SOURCE_CHECKOUT, OrderEntity::WORKFLOW_NAME_V1, $uuid);
+        $this->createOrder(
+            $state,
+            $externalCode,
+            $gross,
+            $net,
+            $tax,
+            $duration,
+            'test',
+            null,
+            $checkoutSession,
+            OrderEntity::CREATION_SOURCE_CHECKOUT,
+            OrderEntity::WORKFLOW_NAME_V1,
+            $uuid
+        );
     }
 
     /**
@@ -457,8 +478,8 @@ class PaellaCoreContext extends MinkContext
             ->setCompanyBillingAddressUuid('c7be46c0-e049-4312-b274-258ec5aeeb71')
             ->setCreationSource($creationSource)
             ->setWorkflowName($workflowName)
-            ->setDebtorSepaMandateUuid($sepaMandateUuid)
-        ;
+            ->setPartnerExternalData(new PartnerExternalData('test', null))
+            ->setDebtorSepaMandateUuid($sepaMandateUuid);
 
         if ($checkoutSession) {
             $sessionId = $this->iHaveASessionId(
@@ -495,8 +516,7 @@ class PaellaCoreContext extends MinkContext
             ->setSandboxPaymentUuid(self::SANDBOX_MERCHANT_PAYMENT_UUID)
             ->setFinancingPower(new Money(1111))
             ->setFinancingLimit(new Money(22222))
-            ->setUpdatedAt(new \DateTime())
-            ;
+            ->setUpdatedAt(new \DateTime());
         $this->getMerchantRepository()->update($merchant);
     }
 
@@ -539,7 +559,7 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
-     * @Given the order :orderId is in state :state
+     * @Given the order :orderUuid is in state :state
      */
     public function orderIsInState($orderId, $state)
     {
@@ -563,7 +583,7 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
-     * @Given the order :orderId workflow name is :workflow_name
+     * @Given the order :orderUuid workflow name is :workflow_name
      */
     public function orderWorkflowNameIs($orderId, $workflowName)
     {
@@ -582,7 +602,7 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
-     * @Then the order :orderId has creation source :creationSource
+     * @Then the order :orderUuid has creation source :creationSource
      */
     public function orderHasCreationSource(string $orderId, string $creationSource)
     {
@@ -591,7 +611,7 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
-     * @Given the order :orderId has invoice data
+     * @Given the order :orderUuid has invoice data
      */
     public function orderHasInvoiceData($orderId)
     {
@@ -608,7 +628,7 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
-     * @Then the order :orderId has no invoice data
+     * @Then the order :orderUuid has no invoice data
      */
     public function orderHasNoInvoiceData($orderId)
     {
@@ -664,7 +684,7 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
-     * @Given the order :orderId has risk check :check failed
+     * @Given the order :orderUuid has risk check :check failed
      */
     public function orderRiskCheckHasFailed($orderId, $check)
     {
@@ -678,7 +698,7 @@ class PaellaCoreContext extends MinkContext
     /**
      * @param $orderId
      * @param $hash
-     * @Given the order :orderId has the same hash :hash
+     * @Given the order :orderUuid has the same hash :hash
      */
     public function orderHasTheSameHash($orderId, $hash)
     {
@@ -697,7 +717,11 @@ class PaellaCoreContext extends MinkContext
         }
 
         if ($debtorExternalData->getDataHash() !== md5($hash)) {
-            throw new \RuntimeException(sprintf("The generated hash is: %s, but %s was expected.", $debtorExternalData->getDataHash(), md5($hash)));
+            throw new \RuntimeException(sprintf(
+                "The generated hash is: %s, but %s was expected.",
+                $debtorExternalData->getDataHash(),
+                md5($hash)
+            ));
         }
     }
 
@@ -806,7 +830,10 @@ class PaellaCoreContext extends MinkContext
         Assert::notNull($merchant);
 
         $pdoQuery = $this->getConnection()
-            ->prepare("select (select count(*) from merchant_risk_check_settings where merchant_id = :merchant_id) = (select count(*) from risk_check_definitions where name != 'debtor_address') as merchant_has_risk_settings", []);
+            ->prepare(
+                "select (select count(*) from merchant_risk_check_settings where merchant_id = :merchant_id) = (select count(*) from risk_check_definitions where name != 'debtor_address') as merchant_has_risk_settings",
+                []
+            );
         $pdoQuery->execute(['merchant_id' => $merchant->getId()]);
         $results = $pdoQuery->fetch(\PDO::FETCH_ASSOC);
 
@@ -901,7 +928,10 @@ class PaellaCoreContext extends MinkContext
 
     private function getOrder($orderExternalCode): OrderEntity
     {
-        $order = $this->getOrderRepository()->getOneByExternalCodeAndMerchantId($orderExternalCode, $this->merchant->getId());
+        $order = $this->getOrderRepository()->getOneByExternalCodeAndMerchantId(
+            $orderExternalCode,
+            $this->merchant->getId()
+        );
 
         if ($order === null) {
             throw new \RuntimeException('Order not found');
@@ -925,7 +955,7 @@ class PaellaCoreContext extends MinkContext
     public function aMerchantUserExistsWithUuidAndRole(string $userUuid, string $roleName, string $permission)
     {
         $role = $this->createRole($roleName, $roleName . '_uuid', [$permission]);
-        $this->createUser($role->getId(), [], $userUuid, 'complete', uniqid() . '@billie.dev');
+        $this->createUser($role->getId(), [], $userUuid, 'complete', uniqid('', true) . '@billie.dev');
     }
 
     /**
@@ -989,11 +1019,16 @@ class PaellaCoreContext extends MinkContext
     /**
      * @Given a merchant user exists with permission :permission and identity verification case uuid :invitationCaseUuid
      */
-    public function aMerchantUserExistsWithPermissionAndIdentifcationCase(string $permission, string $identityVerificationCaseUuid)
-    {
+    public function aMerchantUserExistsWithPermissionAndIdentifcationCase(
+        string $permission,
+        string $identityVerificationCaseUuid
+    ) {
         $role = $this->createRole('test', 'test_uuid', [$permission]);
         $user = $this->createUser($role->getId());
-        $this->getMerchantUserRepository()->assignIdentityVerificationCaseToUser($user->getId(), $identityVerificationCaseUuid);
+        $this->getMerchantUserRepository()->assignIdentityVerificationCaseToUser(
+            $user->getId(),
+            $identityVerificationCaseUuid
+        );
     }
 
     /**
@@ -1031,8 +1066,7 @@ class PaellaCoreContext extends MinkContext
             ->setFrom('new')
             ->setTo('complete')
             ->setTransition('complete')
-            ->setTransitedAt(new \DateTime())
-        ;
+            ->setTransitedAt(new \DateTime());
         $this->getMerchantOnboardingTransitionRepository()->insert($transition);
     }
 
@@ -1390,7 +1424,11 @@ class PaellaCoreContext extends MinkContext
             if ($role['name'] == MerchantUserDefaultRoles::ROLE_BILLIE_ADMIN['name']) {
                 continue;
             }
-            Assert::oneOf($role['name'], $roleNames, "Merchant {$merchant->getId()} has no role with name {$role['name']}");
+            Assert::oneOf(
+                $role['name'],
+                $roleNames,
+                "Merchant {$merchant->getId()} has no role with name {$role['name']}"
+            );
         }
     }
 
@@ -1400,7 +1438,10 @@ class PaellaCoreContext extends MinkContext
     public function theFollowingOnboardingStepsAreInStates(TableNode $table, $merchantId)
     {
         foreach ($table as $row) {
-            $step = $this->getMerchantOnboardingStepRepository()->getOneByStepNameAndMerchant($row['name'], $merchantId);
+            $step = $this->getMerchantOnboardingStepRepository()->getOneByStepNameAndMerchant(
+                $row['name'],
+                $merchantId
+            );
             $step->setState($row['state']);
             $this->getMerchantOnboardingStepRepository()->update($step);
         }
@@ -1573,8 +1614,7 @@ class PaellaCoreContext extends MinkContext
             ->setFrom('new')
             ->setTo('complete')
             ->setTransition('complete')
-            ->setTransitedAt(new \DateTime($date))
-        ;
+            ->setTransitedAt(new \DateTime($date));
         $this->getMerchantOnboardingTransitionRepository()->insert($transition);
     }
 
@@ -1655,7 +1695,7 @@ class PaellaCoreContext extends MinkContext
     public function theDebtorHasAnInformationChangeRequest(string $state)
     {
         $informationChangeRequest = (new DebtorInformationChangeRequestEntity())
-            ->setUuid(uniqid())
+            ->setUuid(uniqid('', true))
             ->setCompanyUuid(self::DEBTOR_COMPANY_UUID)
             ->setName('Some name')
             ->setCity('Berlin')
@@ -1697,8 +1737,7 @@ class PaellaCoreContext extends MinkContext
                 ->setAddressId($row['address_id'])
                 ->setBillingAddressId($row['billing_address_id'])
                 ->setMerchantExternalId($row['merchant_external_id'])
-                ->setDataHash($row['debtor_data_hash'])
-                ;
+                ->setDataHash($row['debtor_data_hash']);
             $this->getDebtorExternalDataRepository()->insert($debtorExternalData);
         }
     }
@@ -1711,7 +1750,10 @@ class PaellaCoreContext extends MinkContext
         $debtorExternalData = $this->getDebtorExternalDataRepository()->getOneById($id);
 
         Assert::eq($debtorExternalData->getDataHash(), DebtorExternalDataRepository::INVALID_DEBTOR_DATA_HASH);
-        Assert::eq($debtorExternalData->getMerchantExternalId(), $merchantExternalId ."-".DebtorExternalDataRepository::INVALID_MERCHANT_EXTERNAL_ID_SUFFIX);
+        Assert::eq(
+            $debtorExternalData->getMerchantExternalId(),
+            $merchantExternalId . "-" . DebtorExternalDataRepository::INVALID_MERCHANT_EXTERNAL_ID_SUFFIX
+        );
     }
 
     /**
@@ -1724,7 +1766,7 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
-     * @Then the order :orderId has an invoice
+     * @Then the order :orderUuid has an invoice
      */
     public function theOrderHasAnInvoice(string $orderId): void
     {
@@ -1738,7 +1780,7 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
-     * @Then the order :orderId has a payment id
+     * @Then the order :orderUuid has a payment id
      */
     public function theOrderHasAPaymentId(string $orderId): void
     {
@@ -1751,7 +1793,7 @@ class PaellaCoreContext extends MinkContext
     }
 
     /**
-     * @Then the order :orderId does not have a payment id
+     * @Then the order :orderUuid does not have a payment id
      */
     public function theOrderHasDoesNotHaveAPaymentId(string $orderId): void
     {
