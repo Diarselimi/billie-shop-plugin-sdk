@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Domain;
+namespace App\Tests\Domain\Merchant;
 
 use App\DomainModel\Merchant\PartnerIdentifier;
 use App\Tests\Unit\UnitTestCase;

@@ -39,7 +39,9 @@ class PdoOrderEntityFactory
             );
         }
 
-        return (new OrderEntity())
+        $expiration = $row['expiration'] ? new \DateTimeImmutable($row['expiration']) : null;
+
+        return (new OrderEntity($expiration))
             ->setPartnerExternalData($partnerExternalData)
             ->setId((int) $row['id'])
             ->setUuid($row['uuid'])

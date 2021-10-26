@@ -176,13 +176,16 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
 
     private ?PartnerExternalData $partnerExternalData;
 
-    public function __construct()
+    private ?\DateTimeImmutable $expiration;
+
+    public function __construct(?\DateTimeImmutable $expiration = null)
     {
         parent::__construct();
         $this->amountForgiven = 0;
         $this->state = self::STATE_NEW;
         $this->orderInvoices = new OrderInvoiceCollection([]);
         $this->partnerExternalData = null;
+        $this->expiration = $expiration;
     }
 
     public function getUuid(): string
@@ -536,5 +539,23 @@ class OrderEntity extends AbstractTimestampableEntity implements StatefulEntityI
         $this->partnerExternalData = $partnerExternalData;
 
         return $this;
+    }
+
+    public function expiration(): ?\DateTimeImmutable
+    {
+        return $this->expiration;
+    }
+
+    public function extendExpiration(\DateTimeImmutable $newExpiration): void
+    {
+        if (null === $this->expiration) {
+            throw new \InvalidArgumentException('Cannot add expiration');
+        }
+
+        if ($this->expiration > $newExpiration) {
+            throw new \InvalidArgumentException('New expiration must be after current one');
+        }
+
+        $this->expiration = $newExpiration;
     }
 }

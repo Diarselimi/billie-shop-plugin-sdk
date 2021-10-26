@@ -4,6 +4,7 @@ namespace App\Tests\Functional\Context;
 
 use App\Kernel;
 use Behat\Behat\Context\Context;
+use Behat\Gherkin\Node\TableNode;
 use Billie\PdoBundle\Infrastructure\Pdo\PdoConnection;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\Dotenv\Dotenv;
@@ -105,6 +106,35 @@ class KlarnaContext implements Context
             ->fetchAll();
 
         Assert::assertCount(1, $checkoutSessions);
+    }
+
+    /**
+     * @Then there should be the following registered orders:
+     */
+    public function assertOrder(TableNode $table): void
+    {
+        $uuidsToBeSelected = [];
+        $expectedDbEntries = [];
+
+        foreach ($table as $row) {
+            $uuidsToBeSelected[] = $row['Id'];
+            $expectedDbEntries[] = [
+                'uuid' => $row['Id'],
+                'external_code' => $row['External Id'],
+                'expiration' => $row['Expires At'],
+                'state' => $row['State'],
+            ];
+        }
+
+        $columns = array_keys($expectedDbEntries[0]);
+        $columns = implode(', ', $columns);
+        $uuids = '\''.implode('\',  \'', $uuidsToBeSelected).'\'';
+
+        $actualDbEntries = $this->pdo
+            ->query("SELECT $columns FROM orders WHERE uuid IN ($uuids)")
+            ->fetchAll(\PDO::FETCH_ASSOC);
+
+        Assert::assertEquals($expectedDbEntries, $actualDbEntries);
     }
 
     private function createRequest(string $endpoint, ?string $body): Request

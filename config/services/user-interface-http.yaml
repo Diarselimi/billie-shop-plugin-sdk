@@ -24,3 +24,5 @@ services:
   App\UserInterface\Http\KlarnaScheme\Controllers\UpdateMerchantReferencesController:
     tags: [ 'controller.service_arguments' ]
 
+  App\UserInterface\Http\KlarnaScheme\ExtendAuthorizationExpiration\ExtendAuthorizationExpirationController:
+    tags: [ 'controller.service_arguments' ]

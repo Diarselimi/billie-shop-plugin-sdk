@@ -48,6 +48,7 @@ class OrderRepository extends AbstractPdoRepository implements
         'creation_source',
         'duration_extension',
         'debtor_sepa_mandate_uuid',
+        'expiration',
     ];
 
     private PdoOrderEntityFactory $orderFactory;
@@ -87,6 +88,7 @@ class OrderRepository extends AbstractPdoRepository implements
               company_billing_address_uuid,
               creation_source,
               debtor_sepa_mandate_uuid,
+              expiration,
               created_at, 
               updated_at
             ) VALUES (
@@ -111,6 +113,7 @@ class OrderRepository extends AbstractPdoRepository implements
               :company_billing_address_uuid,
               :creation_source,
               :debtor_sepa_mandate_uuid,
+              :expiration,
               :created_at, 
               :updated_at
             )
@@ -139,6 +142,7 @@ class OrderRepository extends AbstractPdoRepository implements
                 'company_billing_address_uuid' => $order->getCompanyBillingAddressUuid(),
                 'creation_source' => $order->getCreationSource(),
                 'debtor_sepa_mandate_uuid' => $order->getDebtorSepaMandateUuid() ? $order->getDebtorSepaMandateUuid()->toString() : null,
+                'expiration' => $order->expiration() ? $order->expiration()->format(self::DATE_FORMAT) : null,
             ]
         );
 
@@ -325,7 +329,8 @@ class OrderRepository extends AbstractPdoRepository implements
               company_billing_address_uuid = :company_billing_address_uuid,
               creation_source = :creation_source,
               partner_external_data = :partner_external_data,
-              debtor_sepa_mandate_uuid = :debtor_sepa_mandate_uuid
+              debtor_sepa_mandate_uuid = :debtor_sepa_mandate_uuid,
+              expiration = :expiration
             WHERE id = :id
         ',
             [
@@ -343,6 +348,7 @@ class OrderRepository extends AbstractPdoRepository implements
                 'partner_external_data' => $partnerExternalData !== null ? json_encode($partnerExternalData) : null,
                 'creation_source' => $order->getCreationSource(),
                 'debtor_sepa_mandate_uuid' => $order->getDebtorSepaMandateUuid() ? $order->getDebtorSepaMandateUuid()->toString() : null,
+                'expiration' => $order->expiration() ? $order->expiration()->format(self::DATE_FORMAT) : null,
                 'id' => $order->getId(),
             ]
         );

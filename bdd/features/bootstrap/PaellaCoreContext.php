@@ -433,14 +433,15 @@ class PaellaCoreContext extends MinkContext
                 $row['gross'],
                 $row['net'],
                 $row['tax'],
-                $row['duration'],
+                $row['duration'] ?? 30,
                 $row['comment'] ?? 'test order',
                 $row['payment_uuid'],
                 $row['checkout_session'],
                 OrderEntity::CREATION_SOURCE_API,
                 $row['workflow_name'] ?? OrderEntity::WORKFLOW_NAME_V1,
                 $row['uuid'] ?? null,
-                Uuid::fromString(SepaServiceContext::DUMMY_SEPA_MANDATE_UUID)
+                Uuid::fromString(SepaServiceContext::DUMMY_SEPA_MANDATE_UUID),
+                $row['Expires At'] ?? null
             );
         }
     }
@@ -458,11 +459,14 @@ class PaellaCoreContext extends MinkContext
         string $creationSource = OrderEntity::CREATION_SOURCE_API,
         string $workflowName = OrderEntity::WORKFLOW_NAME_V1,
         string $uuid = null,
-        ?UuidInterface $sepaMandateUuid = null
+        ?UuidInterface $sepaMandateUuid = null,
+        ?string $expiration = null
     ) {
         [$person, $deliveryAddress, $debtor, $merchantDebtor] = $this->debtorData ?? $this->iHaveADebtorWithoutOrders();
 
-        $order = (new OrderEntity())
+        $expiration = $expiration ? new \DateTimeImmutable($expiration) : null;
+
+        $order = (new OrderEntity($expiration))
             ->setExternalCode($externalCode)
             ->setState($state)
             ->setAmountForgiven(0)
