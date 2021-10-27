@@ -65,7 +65,7 @@ class ConfirmInvoicePaymentController
         $useCaseRequest = new ConfirmInvoicePaymentRequest(
             $uuid,
             $this->getMerchantId($request),
-            new Money($request->request->get('paid_amount'))
+            new Money($request->request->get('paid_amount'), 0)
         );
 
         try {

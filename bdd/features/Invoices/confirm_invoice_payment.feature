@@ -14,7 +14,7 @@ Feature: Confirm invoice payments
     When I send a POST request to "/invoices/208cfe7d-046f-4162-b175-748942d6cff4/confirm-payment" with body:
         """
         {
-          "paid_amount": 499.96
+          "paid_amount": "500.00"
         }
         """
     Then the response status code should be 204
