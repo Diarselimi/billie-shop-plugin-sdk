@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\Repository;
 
+use App\DomainModel\Invoice\InvoiceCollection;
 use App\DomainModel\OrderInvoice\OrderInvoiceCollection;
 use App\DomainModel\OrderInvoice\OrderInvoiceEntity;
 use App\DomainModel\OrderInvoice\OrderInvoiceFactory;
@@ -88,5 +89,19 @@ class OrderInvoiceRepository extends AbstractPdoRepository implements OrderInvoi
         );
 
         return $invoice ? $this->factory->createFromArray($invoice) : null;
+    }
+
+    public function getByInvoiceCollection(InvoiceCollection $invoiceCollection): OrderInvoiceCollection
+    {
+        $invoices = $this->doFetchAll(
+            'SELECT ' . implode(', ', array_map(fn ($f) => 'inv.' . $f, self::SELECT_FIELDS)) .
+            ',' . implode(', ', array_map(fn ($f) => 'o.' . $f . ' as order_' . $f, OrderRepository::SELECT_FIELDS)) .
+            ' FROM ' . self::TABLE_NAME . ' inv ' .
+            ' LEFT JOIN orders o ON inv.order_id = o.id ' .
+            ' WHERE inv.invoice_uuid IN (:invoices)',
+            ['invoices' => $im = implode('\', \'', $invoiceCollection->getUuids())]
+        );
+
+        return new OrderInvoiceCollection($invoices ? $this->factory->createFromArrayMultiple($invoices) : []);
     }
 }

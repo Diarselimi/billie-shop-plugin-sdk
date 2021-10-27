@@ -68,7 +68,7 @@ Feature:
         "merchant_debtor_id":1,
         "company_id":1,
         "company_uuid":"c7be46c0-e049-4312-b274-258ec5aeeb70",
-        "payment_id":"test",
+        "payment_id":"9e06e31b-eb65-4e1e-9c96-2f3fc40f4bad",
         "is_trusted_source":true,
         "crefo_id":"123",
         "schufa_id":"123"

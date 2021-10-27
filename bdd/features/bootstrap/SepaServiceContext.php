@@ -52,4 +52,17 @@ class SepaServiceContext implements Context
             )
         ));
     }
+
+    /**
+     * @Given I get from Sepa service for :arg1 mandate valid response
+     */
+    public function iGetFromSepaServiceMandateValidResponse($arg1)
+    {
+        $this->mockRequest('/sepa-mandates/' . $arg1 . '', new ResponseStack(
+            new MockResponse(
+                file_get_contents(__DIR__ . '/../resources/sepa_mandate_valid.json'),
+                ['Content-Type' => 'application/json']
+            )
+        ));
+    }
 }

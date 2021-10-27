@@ -1,0 +1,14 @@
+{
+  "allocated": true,
+  "company_uuid": "d43dc0b4-3d2f-4a6d-bda2-3c3443962b0f",
+  "overpaid_amount": 0,
+  "tickets": [
+    {
+      "uuid": "208cfe7d-046f-4162-b175-748942d6cff4",
+      "direct_debit_execution_date": "2017-03-15",
+      "direct_debit_state": "new",
+      "sepa_mandate_uuid": "9b1d7d4b-766d-4af1-b61f-e422359d13b2",
+      "paid_amount": 200
+    }
+  ]
+}

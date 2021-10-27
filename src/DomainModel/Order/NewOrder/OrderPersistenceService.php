@@ -11,7 +11,7 @@ use App\DomainModel\Address\AddressRepositoryInterface;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntityFactory;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
-use App\DomainModel\Order\OrderFactory;
+use App\DomainModel\Order\RequestOrderFactory;
 use App\DomainModel\Order\OrderRepositoryInterface;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsFactory;
@@ -58,7 +58,7 @@ class OrderPersistenceService
         PersonRepositoryInterface $personRepository,
         AddressRepositoryInterface $addressRepository,
         DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
-        OrderFactory $orderFactory,
+        RequestOrderFactory $orderFactory,
         PersonEntityFactory $personFactory,
         AddressEntityFactory $addressFactory,
         DebtorExternalDataEntityFactory $debtorExternalDataFactory,

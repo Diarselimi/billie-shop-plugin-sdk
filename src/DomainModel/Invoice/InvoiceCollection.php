@@ -133,4 +133,9 @@ class InvoiceCollection implements CollectionInterface
             ;
         })) > 0;
     }
+
+    public function getUuids(): array
+    {
+        return array_map(fn (Invoice $i) => $i->getUuid(), $this->elements);
+    }
 }

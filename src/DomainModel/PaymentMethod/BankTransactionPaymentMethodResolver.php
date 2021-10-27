@@ -6,6 +6,7 @@ namespace App\DomainModel\PaymentMethod;
 
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
+use Ozean12\Borscht\Client\DomainModel\BankTransaction\BankTransaction;
 use Ozean12\Borscht\Client\DomainModel\BankTransaction\BankTransactionTicket;
 use Ozean12\Borscht\Client\DomainModel\BorschtClientInterface;
 use Ozean12\Borscht\Client\DomainModel\Debtor\Debtor;
@@ -33,14 +34,13 @@ class BankTransactionPaymentMethodResolver implements LoggingInterface
     }
 
     public function getPaymentMethod(
-        UuidInterface $transactionUuid,
+        BankTransaction $transaction,
         ?UuidInterface $debtorPaymentUuid
     ): ?PaymentMethod {
         if ($debtorPaymentUuid === null) {
             return null;
         }
 
-        $transaction = $this->borschtService->getBankTransactionDetails($transactionUuid);
         if (!$transaction->isAllocated()) {
             return null;
         }
@@ -69,13 +69,13 @@ class BankTransactionPaymentMethodResolver implements LoggingInterface
 
         if (count($paymentMethods) > 1) {
             $this->logError(
-                sprintf('The associated tickets of transaction "%s" have different payment methods', $transactionUuid)
+                sprintf('The associated tickets of transaction "%s" have different payment methods', $transaction->getUuid()->toString())
             );
         }
 
         if (count($sepaMandateUuids) > 1) {
             $this->logError(
-                sprintf('The associated tickets of transaction "%s" have different SEPA mandates', $transactionUuid)
+                sprintf('The associated tickets of transaction "%s" have different SEPA mandates', $transaction->getUuid()->toString())
             );
         }
 

@@ -29,6 +29,8 @@ final class BankTransactionDetails
 
     private ?string $transactionReference;
 
+    private array $invoicePayments;
+
     public function __construct(
         UuidInterface $uuid,
         Money $amount,
@@ -101,5 +103,10 @@ final class BankTransactionDetails
     public function getTransactionReference(): ?string
     {
         return $this->transactionReference;
+    }
+
+    public function addInvoicePayments(array $invoicePayments)
+    {
+        $this->invoicePayments = $invoicePayments;
     }
 }

@@ -96,6 +96,8 @@ class PaellaCoreContext extends MinkContext
 
     public const INVESTOR_UUID = 'a5cf2662-35a4-11e9-a2c4-02c6850949d6';
 
+    public const PAYMENT_DEBTOR_UUID = '9e06e31b-eb65-4e1e-9c96-2f3fc40f4bad';
+
     private $connection;
 
     /**
@@ -309,7 +311,7 @@ class PaellaCoreContext extends MinkContext
             ->setDebtorId(1)
             ->setCompanyUuid(self::DEBTOR_COMPANY_UUID)
             ->setUuid(self::DEBTOR_UUID)
-            ->setPaymentDebtorId('test')
+            ->setPaymentDebtorId(self::PAYMENT_DEBTOR_UUID)
             ->setCreatedAt(new \DateTime('2019-01-01 12:00:00'));
         $this->getMerchantDebtorRepository()->insert($merchantDebtor);
 

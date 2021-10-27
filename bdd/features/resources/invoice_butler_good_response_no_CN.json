@@ -20,7 +20,7 @@
     "factoring_fee_rate": 20,
     "deferral_fee_rate": 20,
     "discount_rate": 5,
-    "outstanding_amount": 500,
+    "outstanding_amount": 50,
     "collateral_owner": "none",
     "workflow_name": "v1",
     "invoice_discount_rate": 0,

@@ -186,7 +186,7 @@ Feature:
       "customerUuid":"f2ec4d5e-79f4-40d6-b411-31174b6519ac",
       "debtorCompanyUuid":"c7be46c0-e049-4312-b274-258ec5aeeb70",
       "debtorCompanyName":"Test User Company",
-      "paymentDebtorUuid":"test",
+      "paymentDebtorUuid":"9e06e31b-eb65-4e1e-9c96-2f3fc40f4bad",
       "grossAmount":"100000",
       "netAmount":"90000",
       "feeRate":2000,

@@ -72,7 +72,7 @@ Feature: Retrieve and search all orders of a merchant
             "created_at": "2020-10-12 12:12:12",
             "due_date": "2019-06-19",
             "amount": 123.33,
-            "outstanding_amount": 500
+            "outstanding_amount": 50
           },
           "invoices": [
             {
@@ -81,7 +81,7 @@ Feature: Retrieve and search all orders of a merchant
               "created_at": "2020-10-12 12:12:12",
               "due_date": "2020-12-26",
               "amount": 123.33,
-              "outstanding_amount": 500
+              "outstanding_amount": 50
             }
           ],
           "workflow_name": "order_v1"

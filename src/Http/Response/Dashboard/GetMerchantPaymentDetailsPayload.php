@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Http\Response\Dashboard;
 
 use App\Application\UseCase\GetMerchantPaymentDetails\GetMerchantPaymentDetailsResponse;
-use App\DomainModel\Payment\BankTransactionDetailsOrder;
+use App\DomainModel\OrderInvoice\OrderInvoiceEntity;
 use App\Http\Response\DTO\PaymentMethodDTO;
 use OpenApi\Annotations as OA;
+use Ozean12\Money\Money;
 use Ozean12\Support\Formatting\DateFormat;
 use Ozean12\Support\Serialization\ArrayableInterface;
 
@@ -22,13 +23,17 @@ use Ozean12\Support\Serialization\ArrayableInterface;
  *   @OA\Property(property="transaction_counterparty_iban", ref="#/components/schemas/IBAN"),
  *   @OA\Property(property="transaction_counterparty_name", type="string"),
  *   @OA\Property(property="transaction_reference", type="string"),
- *   @OA\Property(property="orders", type="array", @OA\Items(type="object", properties={
+ *   @OA\Property(property="invoices", type="array", @OA\Items(type="object", properties={
  *      @OA\Property(property="uuid", ref="#/components/schemas/UUID"),
  *      @OA\Property(property="amount", ref="#/components/schemas/Money"),
  *      @OA\Property(property="mapped_amount", ref="#/components/schemas/Money"),
  *      @OA\Property(property="outstanding_amount", ref="#/components/schemas/Money"),
- *      @OA\Property(property="external_id", type="string", nullable=true),
- *      @OA\Property(property="invoice_number", type="string", nullable=true)
+ *      @OA\Property(property="invoice_number", type="string", nullable=true),
+ *      @OA\Property(property="order", type="array", @OA\Items(
+ *          @OA\Property(property="uuid", type="#/components/schemas/UUID"),
+ *          @OA\Property(property="external_id", type="string", nullable=true),
+ *          @OA\Property(property="workflow_name", type="string", nullable=true)
+ *     ))
  *   })),
  *   @OA\Property(property="payment_method", ref="#/components/schemas/PaymentMethod"),
  * })
@@ -45,18 +50,32 @@ final class GetMerchantPaymentDetailsPayload implements ArrayableInterface
     public function toArray(): array
     {
         $details = $this->response->getTransactionDetails();
-        $orders = array_map(
-            static function (BankTransactionDetailsOrder $order): array {
+        $totalMappedAmount = new Money(0);
+        $invoices = array_map(
+            function (OrderInvoiceEntity $orderInvoice) use (&$totalMappedAmount): array {
+                $invoice = $orderInvoice->getInvoice();
+                if ($orderInvoice->getInvoice() === null) {
+                    return [];
+                }
+
+                $invoiceAmount = $invoice->getAmount()->getGross()->subtract($invoice->getCreditNotes()->getGrossSum());
+                $mappedAmount = $invoiceAmount->subtract($invoice->getOutstandingAmount())->getMoneyValue();
+                $totalMappedAmount = $totalMappedAmount->add($mappedAmount);
+
                 return [
-                    'uuid' => $order->getUuid()->toString(),
-                    'amount' => $order->getAmount()->getMoneyValue(),
-                    'mapped_amount' => $order->getMappedAmount()->getMoneyValue(),
-                    'outstanding_amount' => $order->getOutstandingAmount()->getMoneyValue(),
-                    'external_id' => $order->getExternalId(),
-                    'invoice_number' => $order->getInvoiceNumber(),
+                    'uuid' => $invoice->getUuid(),
+                    'amount' => $invoiceAmount->getMoneyValue(),
+                    'mapped_amount' => $mappedAmount,
+                    'outstanding_amount' => $orderInvoice->getInvoice()->getOutstandingAmount()->getMoneyValue(),
+                    'invoice_number' => $orderInvoice->getInvoice()->getExternalCode(),
+                    'order' => [
+                        'uuid' => $orderInvoice->getOrder()->getUuid() ?? null,
+                        'external_id' => $orderInvoice->getOrder()->getExternalCode() ?? null,
+                        'workflow_name' => $orderInvoice->getOrder()->getWorkflowName() ?? null,
+                    ],
                 ];
             },
-            $this->response->getTransactionDetails()->getOrders()->toArray()
+            $this->response->getOrderInvoicesCollection()->toArray()
         );
 
         $paymentMethod = $this->response->getPaymentMethod();
@@ -66,14 +85,14 @@ final class GetMerchantPaymentDetailsPayload implements ArrayableInterface
             'transaction_date' => $details->getTransactionDate()
                 ? $details->getTransactionDate()->format(DateFormat::FORMAT_YMD_HIS) : null,
             'amount' => $details->getAmount()->getMoneyValue(),
-            'overpaid_amount' => $details->getOverPaidAmount()->getMoneyValue(),
+            'overpaid_amount' => $details->getOverPaidAmount()->subtract($totalMappedAmount)->getMoneyValue(),
             'is_allocated' => $details->isAllocated(),
             'merchant_debtor_uuid' => $details->getMerchantDebtorUuid()
                 ? $details->getMerchantDebtorUuid()->toString() : null,
             'transaction_counterparty_iban' => $details->getCounterpartyIban(),
             'transaction_counterparty_name' => $details->getCounterpartyName(),
             'transaction_reference' => $details->getTransactionReference(),
-            'orders' => $orders,
+            'invoices' => $invoices,
             'payment_method' => $paymentMethod ? (new PaymentMethodDTO($paymentMethod))->toArray() : null,
         ];
     }

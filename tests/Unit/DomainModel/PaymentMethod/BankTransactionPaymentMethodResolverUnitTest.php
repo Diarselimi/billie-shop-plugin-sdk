@@ -69,25 +69,13 @@ class BankTransactionPaymentMethodResolverUnitTest extends UnitTestCase
 
     public function testGetPaymentMethodReturnsNullIfDebtorPaymentUuidIsNull()
     {
-        self::assertNull($this->resolver->getPaymentMethod(Uuid::uuid4(), null));
-    }
-
-    public function testGetPaymentMethodReturnsNullIfTransactionNotAllocated()
-    {
-        $transactionUuid = Uuid::uuid4();
-        $debtorPaymentUuid = Uuid::uuid4();
-
-        $this->borschtService->getBankTransactionDetails($transactionUuid)->shouldBeCalledOnce()
-            ->willReturn(
-                new BankTransaction(
-                    $transactionUuid,
-                    false,
-                    new Money(),
-                    new BankTransactionTicketCollection()
-                )
-            );
-
-        self::assertNull($this->resolver->getPaymentMethod($transactionUuid, $debtorPaymentUuid));
+        $transaction = new BankTransaction(
+            Uuid::uuid4(),
+            false,
+            new Money(),
+            new BankTransactionTicketCollection()
+        );
+        self::assertNull($this->resolver->getPaymentMethod($transaction, null));
     }
 
     public function testGetPaymentMethodReturnsDirectDebit(): void
@@ -125,9 +113,6 @@ class BankTransactionPaymentMethodResolverUnitTest extends UnitTestCase
 
         $debtor = new Debtor($debtorPaymentUuid, $bankAccount);
 
-        $this->borschtService->getBankTransactionDetails($transactionUuid)
-            ->shouldBeCalledOnce()->willReturn($transaction);
-
         $this->borschtService->getDebtor($debtorPaymentUuid)
             ->shouldBeCalledOnce()->willReturn($debtor);
 
@@ -137,7 +122,7 @@ class BankTransactionPaymentMethodResolverUnitTest extends UnitTestCase
         $this->bankAccountNameResolver->resolve($bankAccount)
             ->shouldBeCalledOnce()->willReturn($bankAccount);
 
-        $paymentMethod = $this->resolver->getPaymentMethod($transactionUuid, $debtorPaymentUuid);
+        $paymentMethod = $this->resolver->getPaymentMethod($transaction, $debtorPaymentUuid);
 
         self::assertEquals(PaymentMethod::TYPE_DIRECT_DEBIT, $paymentMethod->getType());
         self::assertEquals($bankAccount, $paymentMethod->getBankAccount());
@@ -170,9 +155,6 @@ class BankTransactionPaymentMethodResolverUnitTest extends UnitTestCase
 
         $debtor = new Debtor($debtorPaymentUuid, $bankAccount);
 
-        $this->borschtService->getBankTransactionDetails($transactionUuid)
-            ->shouldBeCalledOnce()->willReturn($transaction);
-
         $this->borschtService->getDebtor($debtorPaymentUuid)
             ->shouldBeCalledOnce()->willReturn($debtor);
 
@@ -182,7 +164,7 @@ class BankTransactionPaymentMethodResolverUnitTest extends UnitTestCase
         $this->bankAccountNameResolver->resolve($bankAccount)
             ->shouldBeCalledOnce()->willReturn($bankAccount);
 
-        $paymentMethod = $this->resolver->getPaymentMethod($transactionUuid, $debtorPaymentUuid);
+        $paymentMethod = $this->resolver->getPaymentMethod($transaction, $debtorPaymentUuid);
 
         self::assertEquals(PaymentMethod::TYPE_BANK_TRANSFER, $paymentMethod->getType());
         self::assertEquals($bankAccount, $paymentMethod->getBankAccount());
@@ -225,9 +207,6 @@ class BankTransactionPaymentMethodResolverUnitTest extends UnitTestCase
 
         $debtor = new Debtor($debtorPaymentUuid, $bankAccount);
 
-        $this->borschtService->getBankTransactionDetails($transactionUuid)
-            ->shouldBeCalledOnce()->willReturn($transaction);
-
         $this->borschtService->getDebtor($debtorPaymentUuid)
             ->shouldBeCalledOnce()->willReturn($debtor);
 
@@ -239,7 +218,7 @@ class BankTransactionPaymentMethodResolverUnitTest extends UnitTestCase
 
         $this->logger->error(Argument::cetera())->shouldBeCalledOnce();
 
-        $paymentMethod = $this->resolver->getPaymentMethod($transactionUuid, $debtorPaymentUuid);
+        $paymentMethod = $this->resolver->getPaymentMethod($transaction, $debtorPaymentUuid);
 
         self::assertEquals(PaymentMethod::TYPE_BANK_TRANSFER, $paymentMethod->getType());
         self::assertEquals($bankAccount, $paymentMethod->getBankAccount());
@@ -289,9 +268,6 @@ class BankTransactionPaymentMethodResolverUnitTest extends UnitTestCase
 
         $debtor = new Debtor($debtorPaymentUuid, $bankAccount);
 
-        $this->borschtService->getBankTransactionDetails($transactionUuid)
-            ->shouldBeCalledOnce()->willReturn($transaction);
-
         $this->borschtService->getDebtor($debtorPaymentUuid)
             ->shouldBeCalledOnce()->willReturn($debtor);
 
@@ -306,7 +282,7 @@ class BankTransactionPaymentMethodResolverUnitTest extends UnitTestCase
 
         $this->logger->error(Argument::cetera())->shouldBeCalledOnce();
 
-        $paymentMethod = $this->resolver->getPaymentMethod($transactionUuid, $debtorPaymentUuid);
+        $paymentMethod = $this->resolver->getPaymentMethod($transaction, $debtorPaymentUuid);
 
         self::assertEquals(PaymentMethod::TYPE_DIRECT_DEBIT, $paymentMethod->getType());
         self::assertEquals($bankAccount, $paymentMethod->getBankAccount());

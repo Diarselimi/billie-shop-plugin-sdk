@@ -116,7 +116,7 @@ Feature:
     And the following invoice data exists:
       | order_id | invoice_uuid                         |
       | 1        | 208cfe7d-046f-4162-b175-748942d6cff4 |
-    And I get from invoice-butler service good response no CreditNotes
+    And I get from invoice-butler service good response
     When I send a POST request to "/public/api/v2/orders/CO123/cancel"
     Then the response status code should be 204
     And the response should be empty
@@ -127,8 +127,8 @@ Feature:
     {
       "uuid": "@string@",
       "invoiceUuid": "208cfe7d-046f-4162-b175-748942d6cff4",
-      "grossAmount": "12333",
-      "netAmount": "12333",
+      "grossAmount": "6833",
+      "netAmount": "7333",
       "externalCode": "some_code-CN",
       "internalComment": "cancelation"
     }
