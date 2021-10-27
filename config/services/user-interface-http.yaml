@@ -15,6 +15,9 @@ services:
   App\UserInterface\Http\KlarnaScheme\Authorize\AuthorizeController:
     tags: [ 'controller.service_arguments' ]
 
+  App\UserInterface\Http\KlarnaScheme\DeleteAuthorization\DeleteAuthorizationController:
+    tags: [ 'controller.service_arguments' ]
+
   App\UserInterface\Http\KlarnaScheme\UpdateConfirmedAuthorization\UpdateConfirmedAuthorizationController:
     tags: [ 'controller.service_arguments' ]
 
