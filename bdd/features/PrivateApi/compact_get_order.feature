@@ -66,7 +66,7 @@ Feature:
       "external_code": "some_code",
       "state": "new",
       "amount": 123.33,
-      "outstanding_amount": 50,
+      "outstanding_amount": 500,
       "duration": 30,
       "due_date": "2020-12-26",
       "created_at": "2020-10-12 12:12:12"
@@ -80,7 +80,7 @@ Feature:
   "debtor": {
     "uuid": "ad74bbc4-509e-47d5-9b50-a0320ce3d715",
     "company_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
-    "payment_uuid": "9e06e31b-eb65-4e1e-9c96-2f3fc40f4bad",
+    "payment_uuid": "test",
     "name": "Test User Company"
   },
   "buyer": {

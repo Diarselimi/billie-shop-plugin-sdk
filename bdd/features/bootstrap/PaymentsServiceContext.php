@@ -30,29 +30,15 @@ class PaymentsServiceContext implements Context
     }
 
     /**
-     * @Given /^I get from payments service a transaction "([^"]*)"$/
-     */
-    public function iGetFromPaymentsServiceTransactionForInvoiceResponse($transactionUuid)
-    {
-        $this->mockRequest(
-            $i = sprintf('/transactions/%s.json', $transactionUuid),
-            new ResponseStack(
-                new MockResponse(file_get_contents(__DIR__ . '/../resources/payments_service_get_ticket_transactions.json'), ['content-type' => 'application/json'], 200),
-                new MockResponse(file_get_contents(__DIR__ . '/../resources/payments_service_get_ticket_transactions.json'), ['content-type' => 'application/json'], 200)
-            )
-        );
-    }
-
-    /**
      * @Given /^I get from payments service get debtor response$/
      */
     public function iGetFromPaymentsServiceGetDebtorResponse()
     {
         $this->mockRequest(
-            '/debtor/'.PaellaCoreContext::PAYMENT_DEBTOR_UUID.'.json',
+            '/debtor/test.json',
             new ResponseStack(
-                new MockResponse(file_get_contents(__DIR__ . '/../resources/payments_service_get_debtor.json'), ['content-type' => 'application/json'], 200),
-                new MockResponse(file_get_contents(__DIR__ . '/../resources/payments_service_get_debtor.json'), ['content-type' => 'application/json'], 200)
+                new MockResponse(file_get_contents(__DIR__ . '/../resources/payments_service_get_debtor.json')),
+                new MockResponse(file_get_contents(__DIR__ . '/../resources/payments_service_get_debtor.json'))
             )
         );
     }

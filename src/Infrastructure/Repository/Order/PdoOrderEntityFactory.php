@@ -6,11 +6,10 @@ namespace App\Infrastructure\Repository\Order;
 
 use App\DomainModel\Order\OrderCollection;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderEntityFactory;
 use App\DomainModel\PartnerMerchant\PartnerExternalData;
 use Ramsey\Uuid\Uuid;
 
-class PdoOrderEntityFactory implements OrderEntityFactory
+class PdoOrderEntityFactory
 {
     public function createFromRows(iterable $arrays): array
     {

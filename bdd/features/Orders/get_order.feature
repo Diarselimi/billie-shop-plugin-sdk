@@ -88,7 +88,7 @@ Feature:
         },
         "invoices": [],
         "invoice": {
-            "outstanding_amount": 50,
+            "outstanding_amount": 500,
             "pending_merchant_payment_amount": 0,
             "fee_rate": 20,
             "fee_amount": 123.33,
@@ -195,7 +195,7 @@ Feature:
        },
        "invoices": [],
        "invoice": {
-           "outstanding_amount": 50,
+           "outstanding_amount": 500,
            "pending_merchant_payment_amount": 0,
            "fee_rate": 20,
            "fee_amount": 123.33,
@@ -302,7 +302,7 @@ Feature:
         },
         "invoices": [],
          "invoice": {
-           "outstanding_amount": 50,
+           "outstanding_amount": 500,
            "pending_merchant_payment_amount": 0,
            "fee_rate": 20,
            "fee_amount": 123.33,

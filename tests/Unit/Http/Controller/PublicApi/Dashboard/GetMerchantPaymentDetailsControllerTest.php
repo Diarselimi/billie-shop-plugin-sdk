@@ -7,7 +7,6 @@ namespace App\Tests\Unit\Http\Controller\PublicApi\Dashboard;
 use App\Application\UseCase\GetMerchantPaymentDetails\GetMerchantPaymentDetailsRequest;
 use App\Application\UseCase\GetMerchantPaymentDetails\GetMerchantPaymentDetailsResponse;
 use App\Application\UseCase\GetMerchantPaymentDetails\GetMerchantPaymentDetailsUseCase;
-use App\DomainModel\OrderInvoice\OrderInvoiceCollection;
 use App\DomainModel\Payment\BankTransactionDetails;
 use App\DomainModel\Payment\BankTransactionDetailsOrder;
 use App\DomainModel\Payment\BankTransactionDetailsOrderCollection;
@@ -15,8 +14,6 @@ use App\DomainModel\PaymentMethod\PaymentMethod;
 use App\Http\Controller\PublicApi\Dashboard\GetMerchantPaymentDetailsController;
 use App\Http\HttpConstantsInterface;
 use App\Tests\Unit\UnitTestCase;
-use Ozean12\Borscht\Client\DomainModel\BankTransaction\BankTransaction;
-use Ozean12\Borscht\Client\DomainModel\BankTransaction\BankTransactionTicketCollection;
 use Ozean12\Borscht\Client\DomainModel\DirectDebit\DirectDebit;
 use Ozean12\Money\Money;
 use Ozean12\Sepa\Client\DomainModel\Mandate\SepaMandate;
@@ -49,12 +46,6 @@ class GetMerchantPaymentDetailsControllerTest extends UnitTestCase
     {
         $httpRequest = $this->createRequest();
         $useCase = $this->prophesize(GetMerchantPaymentDetailsUseCase::class);
-        $bankTransaction = new BankTransaction(
-            Uuid::uuid4(),
-            false,
-            new Money(0),
-            new BankTransactionTicketCollection()
-        );
         $transactionUuid = Uuid::uuid4();
         $orderUuid = Uuid::uuid4();
         $merchantDebtorUuid = Uuid::uuid4();
@@ -93,9 +84,7 @@ class GetMerchantPaymentDetailsControllerTest extends UnitTestCase
             new PaymentMethod(
                 PaymentMethod::TYPE_BANK_TRANSFER,
                 $bankAccount
-            ),
-            new OrderInvoiceCollection(),
-            $bankTransaction
+            )
         );
 
         $useCase->execute(
@@ -122,15 +111,24 @@ class GetMerchantPaymentDetailsControllerTest extends UnitTestCase
             'transaction_counterparty_iban' => self::IBAN,
             'transaction_counterparty_name' => 'John Smith',
             'transaction_reference' => 'TRANSACTION-REF',
-            'invoices' => [],
-            'payment_method' => [
-                    'type' => 'bank_transfer',
-                    'data' => [
-                            'iban' => 'DE12500105179542622426',
-                            'bic' => 'INGDDEFFXXX',
-                            'bank_name' => 'Test Bank',
-                        ],
+            'orders' => [
+                [
+                    'uuid' => $orderUuid->toString(),
+                    'amount' => 100.00,
+                    'mapped_amount' => 20.00,
+                    'outstanding_amount' => 80.00,
+                    'external_id' => 'EXT-ID',
+                    'invoice_number' => 'EXT-NUM',
                 ],
+            ],
+            'payment_method' => [
+                'type' => PaymentMethod::TYPE_BANK_TRANSFER,
+                'data' => [
+                    'iban' => self::IBAN,
+                    'bic' => self::BIC,
+                    'bank_name' => 'Test Bank',
+                ],
+            ],
         ];
         $actualResponse = $controller->execute($transactionUuid, $httpRequest)->toArray();
 
@@ -162,46 +160,37 @@ class GetMerchantPaymentDetailsControllerTest extends UnitTestCase
         );
         $sepaMandateExecutionDate = new \DateTimeImmutable('2021-01-15 10:00:00');
         $sepaMandateState = DirectDebit::STATE_COMPLETED;
-        $transactionDetails = new BankTransactionDetails(
-            $transactionUuid,
-            new Money(20),
-            new Money(0),
-            true,
-            new BankTransactionDetailsOrderCollection(
-                [
-                    new BankTransactionDetailsOrder(
-                        $orderUuid,
-                        new Money(100),
-                        new Money(20),
-                        new Money(80),
-                        'EXT-ID',
-                        'EXT-NUM'
-                    ),
-                ]
-            ),
-            $merchantDebtorUuid,
-            $bankAccount->getIban()->toString(),
-            $bankAccount->getAccountHolder(),
-            $transactionDate,
-            'TRANSACTION-REF'
-        );
 
         $useCaseResponse = new GetMerchantPaymentDetailsResponse(
-            $transactionDetails,
+            new BankTransactionDetails(
+                $transactionUuid,
+                new Money(20),
+                new Money(0),
+                true,
+                new BankTransactionDetailsOrderCollection(
+                    [
+                        new BankTransactionDetailsOrder(
+                            $orderUuid,
+                            new Money(100),
+                            new Money(20),
+                            new Money(80),
+                            'EXT-ID',
+                            'EXT-NUM'
+                        ),
+                    ]
+                ),
+                $merchantDebtorUuid,
+                $bankAccount->getIban()->toString(),
+                $bankAccount->getAccountHolder(),
+                $transactionDate,
+                'TRANSACTION-REF'
+            ),
             new PaymentMethod(
                 PaymentMethod::TYPE_DIRECT_DEBIT,
                 $bankAccount,
                 $sepaMandate,
                 $sepaMandateExecutionDate,
                 $sepaMandateState
-            ),
-            new OrderInvoiceCollection(),
-            new BankTransaction(
-                $transactionUuid,
-                $transactionDetails->isAllocated(),
-                $transactionDetails->getOverPaidAmount(),
-                new BankTransactionTicketCollection(),
-                $transactionDetails->getMerchantDebtorUuid()
             )
         );
 
@@ -229,18 +218,27 @@ class GetMerchantPaymentDetailsControllerTest extends UnitTestCase
             'transaction_counterparty_iban' => self::IBAN,
             'transaction_counterparty_name' => 'John Smith',
             'transaction_reference' => 'TRANSACTION-REF',
-            'invoices' => [],
-            'payment_method' => [
-                    'type' => 'direct_debit',
-                    'data' => [
-                            'iban' => 'DE12500105179542622426',
-                            'bic' => 'INGDDEFFXXX',
-                            'bank_name' => 'Test Bank',
-                            'mandate_reference' => 'SEPA_REF',
-                            'mandate_execution_date' => '2021-01-15 10:00:00',
-                            'creditor_identification' => 'CRED_ID',
-                        ],
+            'orders' => [
+                [
+                    'uuid' => $orderUuid->toString(),
+                    'amount' => 100.00,
+                    'mapped_amount' => 20.00,
+                    'outstanding_amount' => 80.00,
+                    'external_id' => 'EXT-ID',
+                    'invoice_number' => 'EXT-NUM',
                 ],
+            ],
+            'payment_method' => [
+                'type' => PaymentMethod::TYPE_DIRECT_DEBIT,
+                'data' => [
+                    'iban' => self::IBAN,
+                    'bic' => self::BIC,
+                    'bank_name' => 'Test Bank',
+                    'mandate_reference' => 'SEPA_REF',
+                    'mandate_execution_date' => '2021-01-15 10:00:00',
+                    'creditor_identification' => 'CRED_ID',
+                ],
+            ],
         ];
         $actualResponse = $controller->execute($transactionUuid, $httpRequest)->toArray();
 

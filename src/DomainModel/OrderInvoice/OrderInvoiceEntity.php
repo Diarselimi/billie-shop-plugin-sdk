@@ -3,7 +3,6 @@
 namespace App\DomainModel\OrderInvoice;
 
 use App\DomainModel\Invoice\Invoice;
-use App\DomainModel\Order\OrderEntity;
 use Billie\PdoBundle\DomainModel\CreatedAtEntityTrait;
 
 class OrderInvoiceEntity
@@ -16,9 +15,7 @@ class OrderInvoiceEntity
 
     private string $invoiceUuid;
 
-    private ?OrderEntity $order;
-
-    private ?Invoice $invoice;
+    private Invoice $invoice;
 
     public function __construct()
     {
@@ -66,26 +63,14 @@ class OrderInvoiceEntity
         return $this;
     }
 
-    public function getInvoice(): ?Invoice
+    public function getInvoice(): Invoice
     {
         return $this->invoice;
     }
 
-    public function setInvoice(?Invoice $invoice): self
+    public function setInvoice(Invoice $invoice): self
     {
         $this->invoice = $invoice;
-
-        return $this;
-    }
-
-    public function getOrder(): ?OrderEntity
-    {
-        return $this->order;
-    }
-
-    public function setOrder(?OrderEntity $order): OrderInvoiceEntity
-    {
-        $this->order = $order;
 
         return $this;
     }

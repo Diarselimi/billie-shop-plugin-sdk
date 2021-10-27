@@ -36,7 +36,7 @@ Feature:
                             "uuid": "ad74bbc4-509e-47d5-9b50-a0320ce3d715",
                             "debtor_id": 1,
                             "company_uuid": "c7be46c0-e049-4312-b274-258ec5aeeb70",
-                            "payment_debtor_id": "9e06e31b-eb65-4e1e-9c96-2f3fc40f4bad",
+                            "payment_debtor_id": "test",
                             "score_thresholds_configuration_id": null,
                             "created_at": "2019-01-01T12:00:00Z",
                             "updated_at": "2019-01-01T12:00:00Z",

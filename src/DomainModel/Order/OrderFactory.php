@@ -5,7 +5,7 @@ namespace App\DomainModel\Order;
 use App\Application\UseCase\CreateOrder\CreateOrderRequestInterface;
 use App\Helper\Uuid\UuidGeneratorInterface;
 
-class RequestOrderFactory
+class OrderFactory
 {
     private UuidGeneratorInterface $uuidGenerator;
 

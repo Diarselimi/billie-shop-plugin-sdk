@@ -3043,16 +3043,16 @@
         },
         {
             "name": "ozean12/amqp-transfers",
-            "version": "0.4.91",
+            "version": "0.4.89",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/amqp-transfers.git",
-                "reference": "76591b3bc0e440d77a73760b80014bbeae78719c"
+                "reference": "ae9452d7c9026eb61a9bb59e1aeb54ea2a6da7f4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/amqp-transfers/zipball/76591b3bc0e440d77a73760b80014bbeae78719c",
-                "reference": "76591b3bc0e440d77a73760b80014bbeae78719c",
+                "url": "https://api.github.com/repos/ozean12/amqp-transfers/zipball/ae9452d7c9026eb61a9bb59e1aeb54ea2a6da7f4",
+                "reference": "ae9452d7c9026eb61a9bb59e1aeb54ea2a6da7f4",
                 "shasum": ""
             },
             "require": {
@@ -3072,10 +3072,10 @@
             ],
             "description": "Transfer objects across Billie universe",
             "support": {
-                "source": "https://github.com/ozean12/amqp-transfers/tree/0.4.91",
+                "source": "https://github.com/ozean12/amqp-transfers/tree/0.4.89",
                 "issues": "https://github.com/ozean12/amqp-transfers/issues"
             },
-            "time": "2021-10-19T09:21:57+00:00"
+            "time": "2021-10-12T14:08:22+00:00"
         },
         {
             "name": "ozean12/amqp-transfers-serializer",
@@ -12205,5 +12205,5 @@
         "ext-pdo": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.0.0"
 }

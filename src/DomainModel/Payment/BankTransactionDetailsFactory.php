@@ -7,15 +7,11 @@ namespace App\DomainModel\Payment;
 use Ozean12\Money\Money;
 use Ramsey\Uuid\Uuid;
 
-/**
- * @deprecated move factory to the infrastructure layer
- */
 class BankTransactionDetailsFactory
 {
-    public function fromGraphQLResponse(array $graphQLResponse): BankTransactionDetails
+    public function fromArray(array $data): BankTransactionDetails
     {
-        // map invoices amounts to orders and calculates overpaid amount
-        $data = $this->mapPaidAmountsToOrders($graphQLResponse);
+        $data = $this->preprocessData($data);
 
         $orders = new BankTransactionDetailsOrderCollection(
             array_map(
@@ -47,7 +43,7 @@ class BankTransactionDetailsFactory
         );
     }
 
-    private function mapPaidAmountsToOrders(array $data): array
+    private function preprocessData(array $data): array
     {
         $overpayment = 0;
         $orders = [];

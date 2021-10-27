@@ -6050,7 +6050,7 @@ components:
           type: string
         transaction_reference:
           type: string
-        invoices:
+        orders:
           type: array
           items:
             properties:
@@ -6062,14 +6062,12 @@ components:
                 $ref: '#/components/schemas/Money'
               outstanding_amount:
                 $ref: '#/components/schemas/Money'
+              external_id:
+                type: string
+                nullable: true
               invoice_number:
                 type: string
                 nullable: true
-              order:
-                type: array
-                items:
-                  properties: { uuid: { type: '#/components/schemas/UUID' }, external_id: { type: string, nullable: true }, workflow_name: { type: string, nullable: true } }
-                  type: object
             type: object
         payment_method:
           $ref: '#/components/schemas/PaymentMethod'

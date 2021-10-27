@@ -85,9 +85,6 @@ services:
   App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface:
     alias: 'App\Infrastructure\Repository\OrderFinancialDetailsRepository'
     public: true
-  App\DomainModel\Order\OrderEntityFactory:
-    alias: 'App\Infrastructure\Repository\Order\PdoOrderEntityFactory'
-    public: true
   App\DomainModel\MerchantNotificationSettings\MerchantNotificationSettingsRepositoryInterface:
     alias: 'App\Infrastructure\Repository\MerchantNotificationSettingsRepository'
     public: true

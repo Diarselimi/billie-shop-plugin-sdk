@@ -24,10 +24,8 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
 
     private BankTransactionDetailsFactory $transactionDetailsFactory;
 
-    public function __construct(
-        GraphQLInterface $graphQL,
-        BankTransactionDetailsFactory $transactionDetailsFactory
-    ) {
+    public function __construct(GraphQLInterface $graphQL, BankTransactionDetailsFactory $transactionDetailsFactory)
+    {
         parent::__construct($graphQL);
 
         $this->transactionDetailsFactory = $transactionDetailsFactory;
@@ -82,7 +80,7 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
             throw new BankTransactionNotFoundException();
         }
 
-        return $this->transactionDetailsFactory->fromGraphQLResponse($response[0]);
+        return $this->transactionDetailsFactory->fromArray($response[0]);
     }
 
     public function getTicketPayments(string $paymentTicketUuid): PaginatedCollection

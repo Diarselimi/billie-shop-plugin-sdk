@@ -98,7 +98,7 @@ Feature:
       "workflow_name":"order_v1",
       "invoices": [],
       "invoice": {
-        "outstanding_amount": 50,
+        "outstanding_amount": 500,
         "pending_merchant_payment_amount": 0,
         "fee_rate": 20,
         "fee_amount": 123.33,
@@ -145,7 +145,7 @@ Feature:
       "customerUuid":"f2ec4d5e-79f4-40d6-b411-31174b6519ac",
       "debtorCompanyUuid":"c7be46c0-e049-4312-b274-258ec5aeeb70",
       "debtorCompanyName":"Test User Company",
-      "paymentDebtorUuid":"9e06e31b-eb65-4e1e-9c96-2f3fc40f4bad",
+      "paymentDebtorUuid":"test",
       "grossAmount":"100000",
       "netAmount":"90000",
       "feeRate":2000,
@@ -176,7 +176,6 @@ Feature:
       | external_order_id | 1233XYZ                          |
       | invoice_file      | @dummy-invoice.png               |
       | amount            | {"gross":500,"net":450,"tax":50} |
-    And print last JSON response
     Then the JSON response should be:
     """
     {
@@ -298,7 +297,7 @@ Feature:
       "customerUuid":"f2ec4d5e-79f4-40d6-b411-31174b6519ac",
       "debtorCompanyUuid":"c7be46c0-e049-4312-b274-258ec5aeeb70",
       "debtorCompanyName":"Test User Company",
-      "paymentDebtorUuid":"9e06e31b-eb65-4e1e-9c96-2f3fc40f4bad",
+      "paymentDebtorUuid":"test",
       "grossAmount":"50000",
       "netAmount":"45000",
       "feeRate":2000,
