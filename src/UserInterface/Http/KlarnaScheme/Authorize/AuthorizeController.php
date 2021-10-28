@@ -89,7 +89,8 @@ class AuthorizeController
         $command = $this->commandFactory->create(
             $request->request->get('payment_method')['ui']['data'],
             $checkoutSession,
-            OrderEntity::CREATION_SOURCE_CHECKOUT
+            OrderEntity::CREATION_SOURCE_CHECKOUT,
+            $request->get('expires_at')
         );
 
         $this->bus->process($command);

@@ -16,7 +16,9 @@ class OrderFactory
 
     public function createFromRequest(CreateOrderRequestInterface $request): OrderEntity
     {
-        return (new OrderEntity())
+        $expiration = $request->getExpiration() ? new \DateTimeImmutable($request->getExpiration()) : null;
+
+        return (new OrderEntity($expiration))
             ->setExternalComment($request->getComment())
             ->setExternalCode($request->getExternalCode())
             ->setMerchantId($request->getMerchantId())

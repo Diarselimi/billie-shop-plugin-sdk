@@ -43,7 +43,8 @@ class AuthorizeOrderCommandFactory
     public function create(
         array $request,
         CheckoutSession $checkoutSession,
-        string $creationSource
+        string $creationSource,
+        ?string $expiration
     ): AuthorizeOrder {
         $command = (new AuthorizeOrder())
             ->setAmount($this->amountRequestFactory->createFromArray($request['amount'] ?? []))
@@ -55,7 +56,8 @@ class AuthorizeOrderCommandFactory
             ->setComment($request['comment'] ?? null)
             ->setExternalCode($request['order_id'] ?? null)
             ->setDebtor($this->debtorRequestFactory->createForLegacyOrder($request['debtor_company'] ?? []))
-            ->setDebtorPerson($this->debtorPersonRequestFactory->create($request['debtor_person'] ?? []));
+            ->setDebtorPerson($this->debtorPersonRequestFactory->create($request['debtor_person'] ?? []))
+            ->setExpiration($expiration);
 
         $command->setDeliveryAddress(
             $this->addressRequestFactory->createFromArray($request['delivery_address'] ?? null)

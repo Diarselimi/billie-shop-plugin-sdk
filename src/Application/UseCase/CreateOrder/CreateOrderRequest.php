@@ -250,6 +250,11 @@ class CreateOrderRequest implements ValidatedRequestInterface, CreateOrderReques
         return $this;
     }
 
+    public function getExpiration(): ?string
+    {
+        return null;
+    }
+
     public function toArray(): array
     {
         return [

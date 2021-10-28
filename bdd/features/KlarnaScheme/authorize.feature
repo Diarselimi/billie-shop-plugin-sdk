@@ -74,6 +74,7 @@ Feature: Initialize new checkout session
     When I request "POST /authorizations" with body:
       """
       {
+        "expires_at": "2022-01-31T10:00:00Z",
         "amount": 300000,
         "tax_amount": 60000,
         "country": "DE",
@@ -212,6 +213,7 @@ Feature: Initialize new checkout session
     When I request "POST /authorizations" with body:
       """
       {
+        "expires_at": "2022-01-31T10:00:00Z",
         "payment_method":
         {
           "payment_method_session_id": "142d6f47-cec2-4768-8de4-f7cbd1642bd1",
@@ -324,6 +326,7 @@ Feature: Initialize new checkout session
     When I request "POST /authorizations" with body:
       """
       {
+        "expires_at": "2022-01-31T10:00:00Z",
         "payment_method":
         {
           "payment_method_session_id": "142d6f47-cec2-4768-8de4-f7cbd1642bd1",
@@ -438,6 +441,7 @@ Feature: Initialize new checkout session
     When I request "POST /authorizations" with body:
       """
       {
+        "expires_at": "2022-01-31T10:00:00Z",
         "payment_method":
         {
           "payment_method_session_id": "142d6f47-cec2-4768-8de4-f7cbd1642bd1",

@@ -100,6 +100,11 @@ class LegacyCreateOrderRequest implements ValidatedRequestInterface, CreateOrder
      */
     private $lineItems;
 
+    /**
+     * @Assert\DateTime(format="Y-m-d\TH:i:sO", groups={"AuthorizeOrder"})
+     */
+    private ?string $expiration = null;
+
     public function getAmount(): TaxedMoney
     {
         return $this->amount;
@@ -257,6 +262,18 @@ class LegacyCreateOrderRequest implements ValidatedRequestInterface, CreateOrder
         $this->lineItems = $lineItems;
 
         return $this;
+    }
+
+    public function setExpiration(?string $expiration): LegacyCreateOrderRequest
+    {
+        $this->expiration = $expiration;
+
+        return $this;
+    }
+
+    public function getExpiration(): ?string
+    {
+        return $this->expiration;
     }
 
     public function toArray(): array

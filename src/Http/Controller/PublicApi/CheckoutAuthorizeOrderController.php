@@ -71,7 +71,8 @@ class CheckoutAuthorizeOrderController
         $command = $this->commandFactory->create(
             $request->request->all(),
             $checkoutSession,
-            OrderEntity::CREATION_SOURCE_CHECKOUT
+            OrderEntity::CREATION_SOURCE_CHECKOUT,
+            null
         );
 
         $this->bus->process($command);
