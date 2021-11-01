@@ -579,4 +579,17 @@ SQL;
 
         return $this->orderFactory->createFromRows($rows);
     }
+
+    public function getOrdersUpToExpirationDateTime(\DateTimeInterface $dateTime): array
+    {
+        $states = ['\'shipped\'', '\'created\'', '\'partially_shipped\''];
+
+        $query = 'SELECT * FROM '
+            . self::TABLE_NAME
+            . ' WHERE `expiration` < :expire_at AND `state` IN (' . implode(', ', $states) . ')';
+
+        return $this->orderFactory->createFromRows($this->doFetchAll($query, [
+            'expire_at' => $dateTime->format(self::DATE_FORMAT),
+        ]));
+    }
 }

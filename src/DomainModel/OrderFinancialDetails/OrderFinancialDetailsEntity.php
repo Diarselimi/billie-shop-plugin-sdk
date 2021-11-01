@@ -2,10 +2,15 @@
 
 namespace App\DomainModel\OrderFinancialDetails;
 
+use App\DomainModel\Order\OrderEntity;
 use Billie\PdoBundle\DomainModel\AbstractTimestampableEntity;
 use Ozean12\Money\Money;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
 
+/**
+ * This should be converted to an Value Object
+ * @deprecated
+ */
 class OrderFinancialDetailsEntity extends AbstractTimestampableEntity
 {
     private int $orderId;
@@ -23,6 +28,28 @@ class OrderFinancialDetailsEntity extends AbstractTimestampableEntity
     private Money $unshippedAmountNet;
 
     private Money $unshippedAmountTax;
+
+    public function __construct(
+        ?OrderEntity $order = null,
+        ?TaxedMoney $amount = null,
+        ?TaxedMoney $unshippedAmount = null,
+        ?int $duration = null
+    ) {
+        parent::__construct();
+
+        if ($order !== null) {
+            $this->orderId = $order->getId();
+        }
+        if ($amount !== null) {
+            $this->setAmount($amount);
+        }
+        if ($unshippedAmount !== null) {
+            $this->setUnshippedAmount($unshippedAmount);
+        }
+        if ($duration !== null) {
+            $this->duration = $duration;
+        }
+    }
 
     public function getOrderId(): int
     {

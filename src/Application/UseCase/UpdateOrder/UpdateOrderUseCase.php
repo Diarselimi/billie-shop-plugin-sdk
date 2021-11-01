@@ -12,8 +12,8 @@ use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
-use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\UpdateOrderStateService;
 use App\DomainModel\OrderUpdate\UpdateOrderAmountException;
 use App\DomainModel\OrderUpdate\UpdateOrderAmountService;
 use App\DomainModel\OrderUpdate\UpdateOrderException;
@@ -31,16 +31,20 @@ class UpdateOrderUseCase implements ValidatedUseCaseInterface, CommandHandler
 
     private Registry $workflow;
 
+    private UpdateOrderStateService $updateOrderStateService;
+
     public function __construct(
         UpdateOrderAmountService $amountService,
         OrderContainerFactory $orderContainerFactory,
         OrderRepositoryInterface $orderRepository,
-        Registry $workflowRegistry
+        Registry $workflowRegistry,
+        UpdateOrderStateService $updateOrderStateService
     ) {
         $this->amountService = $amountService;
         $this->orderContainerFactory = $orderContainerFactory;
         $this->orderRepository = $orderRepository;
         $this->workflow = $workflowRegistry;
+        $this->updateOrderStateService = $updateOrderStateService;
     }
 
     public function execute(UpdateOrderRequest $input): void
@@ -70,7 +74,7 @@ class UpdateOrderUseCase implements ValidatedUseCaseInterface, CommandHandler
         }
 
         if ($orderContainer->getOrderFinancialDetails()->getUnshippedAmountGross()->isZero()) {
-            $this->transitOrderToTheNextState($orderContainer);
+            $this->updateOrderStateService->updateState($orderContainer);
         }
     }
 
@@ -88,24 +92,5 @@ class UpdateOrderUseCase implements ValidatedUseCaseInterface, CommandHandler
         } catch (OrderContainerFactoryException $e) {
             throw new OrderNotFoundException();
         }
-    }
-
-    private function transitOrderToTheNextState(OrderContainer $orderContainer): void
-    {
-        $order = $orderContainer->getOrder();
-
-        if ($orderContainer->getInvoices()->hasOpenInvoices()) {
-            $this->workflow->get($order)->apply($order, OrderEntity::TRANSITION_SHIP_FULLY);
-
-            return;
-        }
-
-        if (!$orderContainer->getInvoices()->hasCompletedInvoice()) {
-            $this->workflow->get($order)->apply($order, OrderEntity::TRANSITION_CANCEL);
-
-            return;
-        }
-
-        $this->workflow->get($order)->apply($order, OrderEntity::TRANSITION_COMPLETE);
     }
 }

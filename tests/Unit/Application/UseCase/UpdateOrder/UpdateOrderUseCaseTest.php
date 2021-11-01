@@ -11,6 +11,7 @@ use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\UpdateOrderStateService;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderUpdate\UpdateOrderAmountService;
 use App\Tests\Unit\UnitTestCase;
@@ -18,9 +19,7 @@ use Ozean12\Money\Money;
 use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
 use Prophecy\Argument;
 use Ramsey\Uuid\Uuid;
-use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\Registry;
-use Symfony\Component\Workflow\Workflow;
 
 class UpdateOrderUseCaseTest extends UnitTestCase
 {
@@ -44,12 +43,18 @@ class UpdateOrderUseCaseTest extends UnitTestCase
      */
     private $registry;
 
+    /**
+     * @var \Prophecy\Prophecy\ObjectProphecy|Registry
+     */
+    private $updateOrderStateService;
+
     public function setUp(): void
     {
         $this->amountService = $this->prophesize(UpdateOrderAmountService::class);
         $this->orderContainerFactory = $this->prophesize(OrderContainerFactory::class);
         $this->orderRepository = $this->prophesize(OrderRepositoryInterface::class);
         $this->registry = $this->prophesize(Registry::class);
+        $this->updateOrderStateService = $this->prophesize(UpdateOrderStateService::class);
     }
 
     /** @test */
@@ -84,18 +89,14 @@ class UpdateOrderUseCaseTest extends UnitTestCase
             ->loadByMerchantIdAndExternalIdOrUuid(Argument::cetera())
             ->willReturn($orderContainer);
 
-        $workflow = $this->prophesize(Workflow::class);
-        $workflow->apply($order, OrderEntity::TRANSITION_COMPLETE)
-            ->shouldBeCalled()
-            ->willReturn(new Marking());
-
-        $this->registry->get(Argument::any())->willReturn($workflow);
+        $this->updateOrderStateService->updateState(Argument::any())->shouldBeCalled();
 
         $useCase = new UpdateOrderUseCase(
             $this->amountService->reveal(),
             $this->orderContainerFactory->reveal(),
             $this->orderRepository->reveal(),
-            $this->registry->reveal()
+            $this->registry->reveal(),
+            $this->updateOrderStateService->reveal()
         );
         $useCase->setValidator($this->createFakeValidator());
         $useCase->execute($input);
@@ -133,18 +134,14 @@ class UpdateOrderUseCaseTest extends UnitTestCase
             ->loadByMerchantIdAndExternalIdOrUuid(Argument::cetera())
             ->willReturn($orderContainer);
 
-        $workflow = $this->prophesize(Workflow::class);
-        $workflow->apply($order, OrderEntity::TRANSITION_CANCEL)
-            ->shouldBeCalled()
-            ->willReturn(new Marking());
-
-        $this->registry->get(Argument::any())->willReturn($workflow);
+        $this->updateOrderStateService->updateState(Argument::any())->shouldBeCalled();
 
         $useCase = new UpdateOrderUseCase(
             $this->amountService->reveal(),
             $this->orderContainerFactory->reveal(),
             $this->orderRepository->reveal(),
-            $this->registry->reveal()
+            $this->registry->reveal(),
+            $this->updateOrderStateService->reveal()
         );
         $useCase->setValidator($this->createFakeValidator());
         $useCase->execute($input);
@@ -182,18 +179,14 @@ class UpdateOrderUseCaseTest extends UnitTestCase
             ->loadByMerchantIdAndExternalIdOrUuid(Argument::cetera())
             ->willReturn($orderContainer);
 
-        $workflow = $this->prophesize(Workflow::class);
-        $workflow->apply($order, OrderEntity::TRANSITION_SHIP_FULLY)
-            ->shouldBeCalled()
-            ->willReturn(new Marking());
-
-        $this->registry->get(Argument::any())->willReturn($workflow);
+        $this->updateOrderStateService->updateState(Argument::any())->shouldBeCalled();
 
         $useCase = new UpdateOrderUseCase(
             $this->amountService->reveal(),
             $this->orderContainerFactory->reveal(),
             $this->orderRepository->reveal(),
-            $this->registry->reveal()
+            $this->registry->reveal(),
+            $this->updateOrderStateService->reveal()
         );
         $useCase->setValidator($this->createFakeValidator());
         $useCase->execute($input);

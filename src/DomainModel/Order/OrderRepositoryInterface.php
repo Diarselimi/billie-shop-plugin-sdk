@@ -60,4 +60,6 @@ interface OrderRepositoryInterface
      * @return OrderEntity[]
      */
     public function geOrdersByMerchantId(int $merchantId, \DateTime $shippedFrom, int $limit): array;
+
+    public function getOrdersUpToExpirationDateTime(\DateTimeInterface $dateTime): array;
 }
