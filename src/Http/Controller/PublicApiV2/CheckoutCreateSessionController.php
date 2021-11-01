@@ -72,7 +72,6 @@ class CheckoutCreateSessionController
 
         $command = InitiateCheckoutSession::forDirectIntegration(
             $this->uuidGenerator->generate(),
-            'DE',
             $merchantId,
             $externalReference
         );

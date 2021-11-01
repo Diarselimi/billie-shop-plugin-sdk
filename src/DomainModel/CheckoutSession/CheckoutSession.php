@@ -8,7 +8,7 @@ class CheckoutSession
 
     private Token $token;
 
-    private Country $country;
+    private Context $context;
 
     private int $merchantId;
 
@@ -16,10 +16,10 @@ class CheckoutSession
 
     private bool $isActive = true;
 
-    public function __construct(Token $token, Country $country, int $merchantId, ?string $debtorExternalId)
+    public function __construct(Token $token, Context $context, int $merchantId, ?string $debtorExternalId)
     {
         $this->token = $token;
-        $this->country = $country;
+        $this->context = $context;
         $this->merchantId = $merchantId;
         $this->debtorExternalId = $debtorExternalId;
     }
@@ -34,9 +34,9 @@ class CheckoutSession
         return $this->token;
     }
 
-    public function country(): Country
+    public function context(): Context
     {
-        return $this->country;
+        return $this->context;
     }
 
     public function merchantId(): int

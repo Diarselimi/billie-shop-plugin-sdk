@@ -5,7 +5,7 @@ namespace App\UserInterface\Http\KlarnaScheme\Initiate;
 use App\Application\CommandBus;
 use App\Application\UseCase\InitiateCheckoutSession\InitiateCheckoutSession;
 use App\Application\UseCase\InitiateCheckoutSession\MerchantNotFound;
-use App\DomainModel\CheckoutSession\CountryNotSupported;
+use App\DomainModel\CheckoutSession\ContextNotSupported;
 use App\DomainModel\CheckoutSession\Token;
 use App\Infrastructure\UuidGeneration\UuidGenerator;
 use App\UserInterface\Http\KlarnaScheme\KlarnaResponse;
@@ -39,7 +39,7 @@ class InitiateController
 
         try {
             $token = $this->process($request);
-        } catch (CountryNotSupported | MerchantNotFound $ex) {
+        } catch (ContextNotSupported | MerchantNotFound $ex) {
             return KlarnaResponse::withErrorFromException($ex);
         }
 
@@ -51,10 +51,11 @@ class InitiateController
     private function isRequestInvalid(Request $request): bool
     {
         $country = $request->request->get('country');
+        $currency = $request->request->get('currency');
         $customerType = $request->request->get('customer')['type'] ?? null;
         $merchantId = $request->request->get('merchant')['acquirer_merchant_id'] ?? null;
 
-        return $country === null || $customerType === null || $merchantId === null;
+        return $country === null || $currency === null || $customerType === null || $merchantId === null;
     }
 
     private function doesNotSupportCustomerType(Request $request): bool
@@ -67,6 +68,7 @@ class InitiateController
         $command = InitiateCheckoutSession::forKlarna(
             $this->uuidGenerator->generate(),
             $request->request->get('country'),
+            $request->request->get('currency'),
             $request->request->get('merchant')['acquirer_merchant_id']
         );
 

@@ -2,7 +2,7 @@
 
 namespace App\Application\UseCase\InitiateCheckoutSession;
 
-use App\DomainModel\CheckoutSession\Country;
+use App\DomainModel\CheckoutSession\Context;
 use App\DomainModel\CheckoutSession\Token;
 use App\DomainModel\Merchant\PartnerIdentifier;
 
@@ -10,7 +10,7 @@ class InitiateCheckoutSession
 {
     private Token $token;
 
-    private Country $country;
+    private Context $context;
 
     private ?int $merchantId = null;
 
@@ -18,27 +18,32 @@ class InitiateCheckoutSession
 
     private ?PartnerIdentifier $partnerIdentifier = null;
 
-    private function __construct(string $token, string $countryCode)
+    private function __construct(string $token, string $country, string $currency)
     {
         $this->token = Token::fromHash($token);
-        $this->country = new Country($countryCode);
+        $this->context = new Context($country, $currency);
     }
 
-    public static function forKlarna(string $token, string $countryCode, string $klarnaMerchantId): self
+    public static function forKlarna(string $token, string $country, string $currency, string $klarnaMerchantId): self
     {
-        $self = new self($token, $countryCode);
+        $self = new self($token, $country, $currency);
         $self->partnerIdentifier = PartnerIdentifier::create($klarnaMerchantId);
 
         return $self;
     }
 
-    public static function forDirectIntegration(string $token, string $countryCode, int $merchantId, string $debtorExternalId): self
+    public static function forDirectIntegration(string $token, int $merchantId, string $debtorExternalId): self
     {
-        $self = new self($token, $countryCode);
+        $self = new self($token, 'DE', 'EUR');
         $self->merchantId = $merchantId;
         $self->debtorExternalId = $debtorExternalId;
 
         return $self;
+    }
+
+    public function isDirectIntegration(): bool
+    {
+        return null !== $this->merchantId;
     }
 
     public function token(): Token
@@ -46,14 +51,9 @@ class InitiateCheckoutSession
         return $this->token;
     }
 
-    public function country(): Country
+    public function context(): Context
     {
-        return $this->country;
-    }
-
-    public function isDirectIntegration(): bool
-    {
-        return null !== $this->merchantId;
+        return $this->context;
     }
 
     public function merchantId(): ?int

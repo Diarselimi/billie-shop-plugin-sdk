@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Application\UseCase\InitiateCheckoutSession;
+namespace App\Tests\Application\InitiateCheckoutSession;
 
 use App\Application\UseCase\InitiateCheckoutSession\InitiateCheckoutSession;
 use App\Application\UseCase\InitiateCheckoutSession\InitiateCheckoutSessionHandler;
 use App\Application\UseCase\InitiateCheckoutSession\MerchantNotFound;
 use App\DomainModel\CheckoutSession\CheckoutSession;
 use App\DomainModel\CheckoutSession\CheckoutSessionRepository;
-use App\DomainModel\CheckoutSession\Country;
+use App\DomainModel\CheckoutSession\Context;
 use App\DomainModel\CheckoutSession\Token;
 use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepository;
@@ -50,13 +50,13 @@ class InitiateCheckoutSessionHandlerTest extends UnitTestCase
             ->with(
                 new CheckoutSession(
                     Token::fromHash('t'),
-                    new Country('DE'),
+                    new Context('DE', 'EUR'),
                     666,
                     null
                 )
             );
 
-        $this->handler->execute(InitiateCheckoutSession::forKlarna('t', 'DE', 'klarna-merchant-id'));
+        $this->handler->execute(InitiateCheckoutSession::forKlarna('t', 'DE', 'EUR', 'klarna-merchant-id'));
     }
 
     /**
@@ -75,7 +75,7 @@ class InitiateCheckoutSessionHandlerTest extends UnitTestCase
         $this->expectException(MerchantNotFound::class);
         $this->expectExceptionMessage('Could not found klarna merchant id \'klarna-merchant-id\'');
 
-        $this->handler->execute(InitiateCheckoutSession::forKlarna('t', 'DE', 'klarna-merchant-id'));
+        $this->handler->execute(InitiateCheckoutSession::forKlarna('t', 'DE', 'EUR', 'klarna-merchant-id'));
     }
 
     /**
@@ -94,13 +94,13 @@ class InitiateCheckoutSessionHandlerTest extends UnitTestCase
             ->with(
                 new CheckoutSession(
                     Token::fromHash('t'),
-                    new Country('DE'),
+                    new Context('DE', 'EUR'),
                     444,
                     'debtor-id'
                 )
             );
 
-        $this->handler->execute(InitiateCheckoutSession::forDirectIntegration('t', 'DE', 444, 'debtor-id'));
+        $this->handler->execute(InitiateCheckoutSession::forDirectIntegration('t', 444, 'debtor-id'));
     }
 
     /**
@@ -119,7 +119,7 @@ class InitiateCheckoutSessionHandlerTest extends UnitTestCase
         $this->expectException(MerchantNotFound::class);
         $this->expectExceptionMessage('Could not found merchant id \'444\'');
 
-        $this->handler->execute(InitiateCheckoutSession::forDirectIntegration('t', 'DE', 444, 'debtor-id'));
+        $this->handler->execute(InitiateCheckoutSession::forDirectIntegration('t', 444, 'debtor-id'));
     }
 
     private function stubMerchantWithId(int $id): MerchantEntity

@@ -3,7 +3,7 @@
 namespace App\Tests\Infrastructure\Repository;
 
 use App\DomainModel\CheckoutSession\CheckoutSession;
-use App\DomainModel\CheckoutSession\Country;
+use App\DomainModel\CheckoutSession\Context;
 use App\DomainModel\CheckoutSession\Token;
 use App\Infrastructure\Repository\CheckoutSessionPdoRepository;
 use App\Tests\Infrastructure\DatabaseConnectionTrait;
@@ -27,8 +27,8 @@ class CheckoutSessionPdoRepositoryTest extends TestCase
 
     public function tokensWithExpectedCheckoutSessions(): array
     {
-        $active = new CheckoutSession(Token::fromHash('active'), new Country('DE'), 1, 'external_code');
-        $notActive = new CheckoutSession(Token::fromHash('not-active'), new Country('DE'), 1, null);
+        $active = new CheckoutSession(Token::fromHash('active'), new Context('DE'), 1, 'external_code');
+        $notActive = new CheckoutSession(Token::fromHash('not-active'), new Context('DE'), 1, null);
         $notActive->deactivate();
 
         return [
@@ -70,7 +70,7 @@ class CheckoutSessionPdoRepositoryTest extends TestCase
      */
     public function saveNewCheckoutSession(): void
     {
-        $checkoutSession = new CheckoutSession(Token::fromHash('token'), new Country('DE'), 1, 'external_code');
+        $checkoutSession = new CheckoutSession(Token::fromHash('token'), new Context('DE'), 1, 'external_code');
 
         $this->repository->save($checkoutSession);
 
@@ -94,7 +94,7 @@ class CheckoutSessionPdoRepositoryTest extends TestCase
             'is_active' => '0',
         ]);
 
-        $checkoutSession = new CheckoutSession(Token::fromHash('token'), new Country('DE'), 1, 'external_code');
+        $checkoutSession = new CheckoutSession(Token::fromHash('token'), new Context('DE'), 1, 'external_code');
         $this->repository->save($checkoutSession);
 
         $this->assertRegisterIsInDbTable('checkout_sessions', [
@@ -107,21 +107,20 @@ class CheckoutSessionPdoRepositoryTest extends TestCase
 
     private function assertCheckoutSessionsAreEqual(?CheckoutSession $expected, ?CheckoutSession $actual): void
     {
-        $expected = null === $expected ? null : [
-            'token' => $expected->token(),
-            'country' => $expected->country(),
-            'merchantId' => $expected->merchantId(),
-            'externalReference' => $expected->debtorExternalId(),
-            'isActive' => $expected->isActive(),
-        ];
-        $actual = null === $actual ? null : [
-            'token' => $actual->token(),
-            'country' => $actual->country(),
-            'merchantId' => $actual->merchantId(),
-            'externalReference' => $actual->debtorExternalId(),
-            'isActive' => $actual->isActive(),
-        ];
+        $expected = $this->entityToArray($expected);
+        $actual = $this->entityToArray($actual);
 
         $this->assertEquals($expected, $actual);
+    }
+
+    private function entityToArray(?CheckoutSession $e): ?array
+    {
+        return null === $e ? null : [
+            'token' => $e->token(),
+            'context' => $e->context(),
+            'merchantId' => $e->merchantId(),
+            'externalReference' => $e->debtorExternalId(),
+            'isActive' => $e->isActive(),
+        ];
     }
 }

@@ -8,6 +8,7 @@ Feature: Initialize new checkout session
       """
       {
         "country": "DE",
+        "currency": "EUR",
         "customer": { "type": "organization" },
         "merchant": { "acquirer_merchant_id": "klarna-id" }
       }
@@ -20,6 +21,7 @@ Feature: Initialize new checkout session
       """
       {
         "country": "BR",
+        "currency": "EUR",
         "customer": { "type": "organization" },
         "merchant": { "acquirer_merchant_id": "klarna-id" }
       }
@@ -27,7 +29,24 @@ Feature: Initialize new checkout session
     Then the response is 200 with body:
       """
       {
-        "error_messages": [ "Country not supported: 'BR'" ]
+        "error_messages": [ "Country 'BR' not supported" ]
+      }
+      """
+
+  Scenario: Return error if it is B2B in Germany but with unsupported currency
+    When I request "POST /initiate" with body:
+      """
+      {
+        "country": "DE",
+        "currency": "USD",
+        "customer": { "type": "organization" },
+        "merchant": { "acquirer_merchant_id": "klarna-id" }
+      }
+      """
+    Then the response is 200 with body:
+      """
+      {
+        "error_messages": [ "Currency 'USD' not supported in country 'DE'" ]
       }
       """
 
@@ -36,6 +55,7 @@ Feature: Initialize new checkout session
       """
       {
         "country": "DE",
+        "currency": "EUR",
         "merchant": { "acquirer_merchant_id": "klarna-id" }
       }
       """
@@ -51,7 +71,24 @@ Feature: Initialize new checkout session
       """
       {
         "country": "DE",
+        "currency": "EUR",
         "customer": { "type": "organization" }
+      }
+      """
+    Then the response is 200 with body:
+      """
+      {
+        "error_messages": [ "Invalid request" ]
+      }
+      """
+
+  Scenario: Return error if currency is not informed
+    When I request "POST /initiate" with body:
+      """
+      {
+        "country": "DE",
+        "customer": { "type": "organization" },
+        "merchant": { "acquirer_merchant_id": "klarna-id" }
       }
       """
     Then the response is 200 with body:

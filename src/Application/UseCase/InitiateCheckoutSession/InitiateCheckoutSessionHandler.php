@@ -29,7 +29,7 @@ class InitiateCheckoutSessionHandler implements CommandHandler
 
         $this->sessionRepository->save(new CheckoutSession(
             $command->token(),
-            $command->country(),
+            $command->context(),
             $merchant->getId(),
             $command->debtorExternalId()
         ));

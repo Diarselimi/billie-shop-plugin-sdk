@@ -4,7 +4,7 @@ namespace App\Infrastructure\Repository;
 
 use App\DomainModel\CheckoutSession\CheckoutSession;
 use App\DomainModel\CheckoutSession\CheckoutSessionRepository;
-use App\DomainModel\CheckoutSession\Country;
+use App\DomainModel\CheckoutSession\Context;
 use App\DomainModel\CheckoutSession\Token;
 use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
@@ -52,7 +52,7 @@ class CheckoutSessionPdoRepository extends AbstractPdoRepository implements Chec
         return $this->hydrate(CheckoutSession::class, [
             'id' => $row['id'],
             'token' => Token::fromHash($row['uuid']),
-            'country' => new Country('DE'),
+            'context' => new Context('DE', 'EUR'),
             'merchantId' => (int) $row['merchant_id'],
             'debtorExternalId' => $row['merchant_debtor_external_id'] ?? null,
             'isActive' => $row['is_active'] === '1',
