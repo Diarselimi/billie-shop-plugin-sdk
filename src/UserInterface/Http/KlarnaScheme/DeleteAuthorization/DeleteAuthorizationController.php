@@ -35,8 +35,6 @@ class DeleteAuthorizationController implements LoggingInterface
             return KlarnaResponse::withErrorMessage('Authorization not found');
         } catch (WorkflowException $ex) {
             $this->logSuppressedException($ex, 'Klarna tried to decline a confirmed authorization.');
-
-            return KlarnaResponse::withErrorMessage('Delete Authorization is not possible.');
         }
 
         return KlarnaResponse::empty();
