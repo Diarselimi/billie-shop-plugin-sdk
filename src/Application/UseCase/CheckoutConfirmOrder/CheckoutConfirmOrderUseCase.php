@@ -15,7 +15,7 @@ use App\DomainModel\Order\Lifecycle\WaitingOrderService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 
 class CheckoutConfirmOrderUseCase implements ValidatedUseCaseInterface
 {
@@ -29,14 +29,14 @@ class CheckoutConfirmOrderUseCase implements ValidatedUseCaseInterface
 
     private CheckoutOrderMatcherInterface $dataMatcher;
 
-    private OrderRepositoryInterface $orderRepository;
+    private OrderRepository $orderRepository;
 
     public function __construct(
         OrderContainerFactory $orderContainerFactory,
         ApproveOrderService $approveOrderService,
         WaitingOrderService $waitingOrderService,
         CheckoutOrderMatcherInterface $dataMatcher,
-        OrderRepositoryInterface $orderRepository
+        OrderRepository $orderRepository
     ) {
         $this->orderContainerFactory = $orderContainerFactory;
         $this->approveOrderService = $approveOrderService;

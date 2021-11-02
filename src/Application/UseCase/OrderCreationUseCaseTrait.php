@@ -11,7 +11,7 @@ use App\DomainModel\Order\NewOrder\OrderPersistenceService;
 use App\DomainModel\Order\OrderChecksRunnerService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
 
 /**
@@ -25,7 +25,7 @@ trait OrderCreationUseCaseTrait
 
     private OrderChecksRunnerService $orderChecksRunnerService;
 
-    private OrderRepositoryInterface $orderRepository;
+    private OrderRepository $orderRepository;
 
     private DeclineOrderService $declineOrderService;
 

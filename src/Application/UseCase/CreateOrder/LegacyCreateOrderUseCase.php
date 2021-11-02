@@ -12,7 +12,7 @@ use App\DomainModel\Order\Lifecycle\WaitingOrderService;
 use App\DomainModel\Order\NewOrder\OrderPersistenceService;
 use App\DomainModel\Order\OrderChecksRunnerService;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\OrderResponse\LegacyOrderResponse;
 use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
@@ -30,7 +30,7 @@ class LegacyCreateOrderUseCase implements LoggingInterface, ValidatedUseCaseInte
         OrderPersistenceService $orderPersistenceService,
         OrderContainerFactory $orderContainerFactory,
         OrderChecksRunnerService $orderChecksRunnerService,
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         LegacyOrderResponseFactory $orderResponseFactory,
         ApproveOrderService $approveOrderService,
         WaitingOrderService $waitingOrderService,

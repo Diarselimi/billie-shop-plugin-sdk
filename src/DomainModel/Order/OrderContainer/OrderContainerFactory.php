@@ -4,19 +4,19 @@ namespace App\DomainModel\Order\OrderContainer;
 
 use App\DomainModel\Order\NewOrder\OrderCreationDTO;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\OrderRiskCheck\CheckResultCollection;
 
 class OrderContainerFactory
 {
-    private OrderRepositoryInterface $orderRepository;
+    private OrderRepository $orderRepository;
 
     private OrderContainerRelationLoader $relationLoader;
 
     private ?OrderContainer $cachedOrderContainer;
 
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         OrderContainerRelationLoader $relationLoader
     ) {
         $this->orderRepository = $orderRepository;

@@ -7,7 +7,7 @@ namespace App\Console\Command;
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerAggregator;
 use App\Infrastructure\OrderInvoice\SnsInvoiceDocumentUploadHandler;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
@@ -34,13 +34,13 @@ class UploadShippedInvoicesCommand extends Command implements LoggingInterface
 
     private SnsInvoiceDocumentUploadHandler $invoiceManager;
 
-    private OrderRepositoryInterface $orderRepository;
+    private OrderRepository $orderRepository;
 
     private OrderContainerFactory $orderContainerFactory;
 
     public function __construct(
         SnsInvoiceDocumentUploadHandler $invoiceManager,
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         OrderContainerFactory $orderContainerFactory
     ) {
         $this->invoiceManager = $invoiceManager;

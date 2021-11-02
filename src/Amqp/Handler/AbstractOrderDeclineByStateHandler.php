@@ -6,7 +6,7 @@ use App\Application\Exception\WorkflowException;
 use App\Application\UseCase\DeclineOrder\DeclineOrderRequest;
 use App\Application\UseCase\DeclineOrder\DeclineOrderUseCase;
 use App\DomainModel\Order\DomainEvent\AbstractOrderStateDomainEvent;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 
@@ -18,7 +18,7 @@ abstract class AbstractOrderDeclineByStateHandler implements LoggingInterface
 
     private $orderRepository;
 
-    public function __construct(DeclineOrderUseCase $useCase, OrderRepositoryInterface $orderRepository)
+    public function __construct(DeclineOrderUseCase $useCase, OrderRepository $orderRepository)
     {
         $this->useCase = $useCase;
         $this->orderRepository = $orderRepository;

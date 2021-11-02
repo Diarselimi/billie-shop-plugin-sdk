@@ -7,7 +7,7 @@ namespace App\Application\UseCase\CheckoutSignMandate;
 use App\Application\Exception\OrderNotFoundException;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Ozean12\Sepa\Client\DomainModel\Mandate\SepaMandateNotFoundException;
@@ -18,14 +18,14 @@ class CheckoutSignMandateUseCase implements LoggingInterface
 {
     use LoggingTrait;
 
-    private OrderRepositoryInterface $orderRepository;
+    private OrderRepository $orderRepository;
 
     private SepaClientInterface $sepaClient;
 
     private OrderContainerFactory $orderContainerFactory;
 
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         OrderContainerFactory $orderContainerFactory,
         SepaClientInterface $sepaMandateClient
     ) {

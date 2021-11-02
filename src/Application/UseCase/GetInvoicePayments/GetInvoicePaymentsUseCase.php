@@ -8,12 +8,12 @@ use App\Application\Exception\InvoiceNotFoundException;
 use App\Application\UseCase\GetInvoicePayments\Response\GetInvoicePaymentsResponse;
 use App\Application\UseCase\GetInvoicePayments\Response\GetInvoicePaymentsResponseFactory;
 use App\DomainModel\Invoice\InvoiceServiceInterface;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\Payment\PaymentsRepositoryInterface;
 
 class GetInvoicePaymentsUseCase
 {
-    private OrderRepositoryInterface $orderRepository;
+    private OrderRepository $orderRepository;
 
     private InvoiceServiceInterface $invoiceService;
 
@@ -22,7 +22,7 @@ class GetInvoicePaymentsUseCase
     private GetInvoicePaymentsResponseFactory $responseFactory;
 
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         InvoiceServiceInterface $invoiceService,
         PaymentsRepositoryInterface $paymentsRepository,
         GetInvoicePaymentsResponseFactory $responseFactory

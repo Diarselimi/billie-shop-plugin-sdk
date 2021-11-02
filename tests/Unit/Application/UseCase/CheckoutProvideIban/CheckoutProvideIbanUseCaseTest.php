@@ -15,7 +15,7 @@ use App\DomainModel\Order\Lifecycle\DeclineOrderService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\Tests\Integration\IntegrationTestCase;
 use Ozean12\Sepa\Client\DomainModel\Mandate\SepaMandate;
 use Ozean12\Support\ValueObject\BankAccount;
@@ -45,7 +45,7 @@ class CheckoutProvideIbanUseCaseTest extends IntegrationTestCase
     private ObjectProphecy $orderContainerFactory;
 
     /**
-     * @var OrderRepositoryInterface|ObjectProphecy
+     * @var OrderRepository|ObjectProphecy
      */
     private ObjectProphecy $orderRepository;
 
@@ -81,7 +81,7 @@ class CheckoutProvideIbanUseCaseTest extends IntegrationTestCase
         parent::setUp();
 
         $this->orderContainerFactory = $this->prophesize(OrderContainerFactory::class);
-        $this->orderRepository = $this->prophesize(OrderRepositoryInterface::class);
+        $this->orderRepository = $this->prophesize(OrderRepository::class);
         $this->ibanFraudCheck = $this->prophesize(IbanFraudCheck::class);
         $this->workflowRegistry = $this->prophesize(Registry::class);
         $this->declineOrderService = $this->prophesize(DeclineOrderService::class);

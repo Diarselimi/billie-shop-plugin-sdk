@@ -5,7 +5,7 @@ namespace App\Application\UseCase\HttpInvoiceUpload;
 use App\DomainModel\FileService\FileServiceInterface;
 use App\DomainModel\FileService\FileServiceRequestException;
 use App\DomainModel\Order\OrderNotFoundException;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentCreator;
 use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentUpload;
 use App\Infrastructure\ClientResponseDecodeException;
@@ -16,13 +16,13 @@ class HttpInvoiceUploadUseCase
 
     private FileServiceInterface $fileService;
 
-    private OrderRepositoryInterface $orderRepository;
+    private OrderRepository $orderRepository;
 
     private InvoiceDocumentCreator $invoiceDocumentCreator;
 
     public function __construct(
         FileServiceInterface $fileService,
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         InvoiceDocumentCreator $invoiceDocumentCreator
     ) {
         $this->fileService = $fileService;

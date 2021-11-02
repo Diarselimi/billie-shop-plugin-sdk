@@ -30,7 +30,7 @@ class KlarnaContext implements Context
     public function bootKernel(): void
     {
         $dotEnv = new Dotenv();
-        $dotEnv->load(__DIR__.'/../../../.env');
+        $dotEnv->load(__DIR__ . '/../../../.env');
 
         $this->kernel = new Kernel('test', true);
         $this->kernel->boot();
@@ -136,7 +136,7 @@ class KlarnaContext implements Context
     {
         [$method, $path] = explode(' ', $endpoint);
 
-        return Request::create(self::REQUEST_PATH_PREFIX.$path, $method, [], [], [], [], $body);
+        return Request::create(self::REQUEST_PATH_PREFIX . $path, $method, [], [], [], [], $body);
     }
 
     private function prepareExpectedJsonContent(string $body): string

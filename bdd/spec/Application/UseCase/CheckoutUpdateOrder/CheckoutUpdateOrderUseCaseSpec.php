@@ -11,7 +11,7 @@ use App\DomainModel\DebtorCompany\CompaniesServiceInterface;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\Infrastructure\Repository\OrderFinancialDetailsRepository;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -25,7 +25,7 @@ class CheckoutUpdateOrderUseCaseSpec extends ObjectBehavior
         CompaniesServiceInterface $companiesService,
         AddressRepositoryInterface $addressRepository,
         DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         OrderFinancialDetailsRepository $financialDetailsRepository,
         ValidatorInterface $validator
     ) {

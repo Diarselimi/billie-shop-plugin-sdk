@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Infrastructure\Repository;
 
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\OrderInvoice\OrderInvoiceEntity;
 use App\DomainModel\OrderInvoice\OrderInvoiceRepositoryInterface;
 use App\Tests\Helpers\FakeDataFiller;
@@ -21,7 +21,7 @@ class OrderRepositoryTest extends DatabaseTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->repository = $this->getContainer()->get(OrderRepositoryInterface::class);
+        $this->repository = $this->getContainer()->get(OrderRepository::class);
     }
 
     /** @test */

@@ -16,7 +16,7 @@ use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\Infrastructure\Repository\OrderFinancialDetailsRepository;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -33,7 +33,7 @@ class CheckoutUpdateOrderUseCase implements ValidatedUseCaseInterface, LoggingIn
 
     private DebtorExternalDataRepositoryInterface $debtorExternalDataRepository;
 
-    private OrderRepositoryInterface $orderRepository;
+    private OrderRepository $orderRepository;
 
     private OrderFinancialDetailsRepository $financialDetailsRepository;
 
@@ -42,7 +42,7 @@ class CheckoutUpdateOrderUseCase implements ValidatedUseCaseInterface, LoggingIn
         CompaniesServiceInterface $companiesService,
         AddressRepositoryInterface $addressRepository,
         DebtorExternalDataRepositoryInterface $debtorExternalDataRepository,
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         OrderFinancialDetailsRepository $financialDetailsRepository
     ) {
         $this->orderContainerFactory = $orderContainerFactory;

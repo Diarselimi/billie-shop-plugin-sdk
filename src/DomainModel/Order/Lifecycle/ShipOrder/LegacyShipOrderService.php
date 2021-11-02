@@ -5,7 +5,7 @@ namespace App\DomainModel\Order\Lifecycle\ShipOrder;
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\Workflow\Registry;
@@ -16,11 +16,11 @@ class LegacyShipOrderService implements ShipOrderInterface, LoggingInterface
 
     private Registry $workflowRegistry;
 
-    private OrderRepositoryInterface $orderRepository;
+    private OrderRepository $orderRepository;
 
     public function __construct(
         Registry $workflowRegistry,
-        OrderRepositoryInterface $orderRepository
+        OrderRepository $orderRepository
     ) {
         $this->workflowRegistry = $workflowRegistry;
         $this->orderRepository = $orderRepository;

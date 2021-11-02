@@ -10,7 +10,7 @@ use App\DomainModel\Invoice\InvoiceCollection;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\Order\UpdateOrderStateService;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderUpdate\UpdateOrderAmountService;
@@ -34,7 +34,7 @@ class UpdateOrderUseCaseTest extends UnitTestCase
     private $orderContainerFactory;
 
     /**
-     * @var OrderRepositoryInterface|\Prophecy\Prophecy\ObjectProphecy
+     * @var OrderRepository|\Prophecy\Prophecy\ObjectProphecy
      */
     private $orderRepository;
 
@@ -52,7 +52,7 @@ class UpdateOrderUseCaseTest extends UnitTestCase
     {
         $this->amountService = $this->prophesize(UpdateOrderAmountService::class);
         $this->orderContainerFactory = $this->prophesize(OrderContainerFactory::class);
-        $this->orderRepository = $this->prophesize(OrderRepositoryInterface::class);
+        $this->orderRepository = $this->prophesize(OrderRepository::class);
         $this->registry = $this->prophesize(Registry::class);
         $this->updateOrderStateService = $this->prophesize(UpdateOrderStateService::class);
     }

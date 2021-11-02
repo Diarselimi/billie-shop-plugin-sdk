@@ -10,7 +10,7 @@ use App\DomainModel\FileService\FileServiceRequestException;
 use App\DomainModel\FileService\FileServiceUploadResponse;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderNotFoundException;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentCreator;
 use App\Infrastructure\ClientResponseDecodeException;
 use PhpSpec\ObjectBehavior;
@@ -36,7 +36,7 @@ class HttpInvoiceUploadUseCaseSpec extends ObjectBehavior
 
     public function let(
         FileServiceInterface $fileService,
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         InvoiceDocumentCreator $invoiceDocumentCreator
     ) {
         $this->beConstructedWith(
@@ -52,7 +52,7 @@ class HttpInvoiceUploadUseCaseSpec extends ObjectBehavior
     }
 
     public function it_throws_exception_on_order_not_found(
-        OrderRepositoryInterface $orderRepository
+        OrderRepository $orderRepository
     ) {
         $request = new HttpInvoiceUploadRequest(1, 'ext-code', 'uuid', 'url', 'num', 'event-src');
         $orderRepository->getOneByMerchantIdAndExternalCodeOrUUID(
@@ -64,7 +64,7 @@ class HttpInvoiceUploadUseCaseSpec extends ObjectBehavior
     }
 
     public function it_throws_upload_exception_on_file_service_exception(
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         FileServiceInterface $fileService
     ) {
         $request = new HttpInvoiceUploadRequest(1, 'ext-code', 'uuid', 'url', 'num', 'event-src');
@@ -79,7 +79,7 @@ class HttpInvoiceUploadUseCaseSpec extends ObjectBehavior
     }
 
     public function it_throws_upload_exception_on_file_service_decode_exception(
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         FileServiceInterface $fileService
     ) {
         $request = new HttpInvoiceUploadRequest(1, 'ext-code', 'uuid', 'url', 'num', 'event-src');
@@ -94,7 +94,7 @@ class HttpInvoiceUploadUseCaseSpec extends ObjectBehavior
     }
 
     public function it_does_everything_amazingly(
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         FileServiceInterface $fileService
     ) {
         $orderId = 100;

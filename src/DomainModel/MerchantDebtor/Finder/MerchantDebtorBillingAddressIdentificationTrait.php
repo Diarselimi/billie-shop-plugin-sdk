@@ -4,12 +4,12 @@ namespace App\DomainModel\MerchantDebtor\Finder;
 
 use App\DomainModel\DebtorCompany\IdentifiedDebtorCompany;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 
 trait MerchantDebtorBillingAddressIdentificationTrait
 {
     /**
-     * @var OrderRepositoryInterface
+     * @var OrderRepository
      */
     private $orderRepository;
 

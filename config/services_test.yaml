@@ -35,8 +35,8 @@ services:
 
   App\Application\Validator\Constraint\UpdateAmountValidator: ~
 
-  App\DomainModel\Order\OrderRepositoryInterface:
-    alias: 'App\Infrastructure\Repository\OrderRepository'
+  App\DomainModel\Order\OrderRepository:
+    alias: 'App\Infrastructure\Repository\OrderPdoRepository'
     public: true
   App\DomainModel\Address\AddressRepositoryInterface:
     alias: 'App\Infrastructure\Repository\AddressRepository'

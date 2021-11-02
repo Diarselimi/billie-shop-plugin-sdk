@@ -17,7 +17,7 @@ use App\DomainModel\Order\OrderChecksRunnerService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -30,7 +30,7 @@ class CreateOrderUseCaseSpec extends ObjectBehavior
         OrderPersistenceService $persistNewOrderService,
         OrderContainerFactory $orderContainerFactory,
         OrderChecksRunnerService $orderChecksRunnerService,
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         ApproveOrderService $approveOrderService,
         WaitingOrderService $waitingOrderService,
         DeclineOrderService $declineOrderService,

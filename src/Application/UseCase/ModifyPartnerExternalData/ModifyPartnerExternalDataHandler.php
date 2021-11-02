@@ -6,14 +6,14 @@ namespace App\Application\UseCase\ModifyPartnerExternalData;
 
 use App\Application\CommandHandler;
 use App\Application\Exception\OrderNotFoundException;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\PartnerMerchant\PartnerExternalData;
 
 class ModifyPartnerExternalDataHandler implements CommandHandler
 {
-    private OrderRepositoryInterface $orderRepository;
+    private OrderRepository $orderRepository;
 
-    public function __construct(OrderRepositoryInterface $orderRepository)
+    public function __construct(OrderRepository $orderRepository)
     {
         $this->orderRepository = $orderRepository;
     }

@@ -7,7 +7,7 @@ namespace App\Application\UseCase\OrderExpiration;
 use App\Application\CommandHandler;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\Order\UpdateOrderStateService;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface;
@@ -23,14 +23,14 @@ class UpdateStateForExpiredOrdersCommandHandler implements CommandHandler, Loggi
 
     private OrderFinancialDetailsRepositoryInterface $financialDetailsRepository;
 
-    private OrderRepositoryInterface $orderRepository;
+    private OrderRepository $orderRepository;
 
     private UpdateOrderStateService $orderStateService;
 
     public function __construct(
         OrderContainerFactory $containerFactory,
         OrderFinancialDetailsRepositoryInterface $financialDetailsRepository,
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         UpdateOrderStateService $orderStateService
     ) {
         $this->containerFactory = $containerFactory;

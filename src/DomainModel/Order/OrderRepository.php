@@ -4,7 +4,7 @@ namespace App\DomainModel\Order;
 
 use Generator;
 
-interface OrderRepositoryInterface
+interface OrderRepository
 {
     public function insert(OrderEntity $order): void;
 

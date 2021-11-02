@@ -14,7 +14,7 @@ use App\DomainModel\Merchant\MerchantEntity;
 use App\DomainModel\Merchant\MerchantRepository;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsPersistenceService;
 use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerAggregator;
@@ -41,7 +41,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
     }
 
     public function let(
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
         UpdateOrderLimitsService $updateOrderLimitsService,
@@ -77,7 +77,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         MerchantEntity $merchant,
         MerchantRepository $merchantRepository,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler
     ) {
         $order->getInvoiceNumber()->willReturn('123');
@@ -143,7 +143,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         UpdateOrderRequestValidator $updateOrderRequestValidator,
         UpdateOrderLimitsService $updateOrderLimitsService,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler
     ) {
         $changeSet = (new LegacyUpdateOrderRequest('order123', 1))->setAmount(
@@ -196,7 +196,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         UpdateOrderRequestValidator $updateOrderRequestValidator,
         UpdateOrderLimitsService $updateOrderLimitsService,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
         Invoice $invoice,
         InvoiceCollection $invoiceCollection
@@ -243,7 +243,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         UpdateOrderRequestValidator $updateOrderRequestValidator,
         UpdateOrderLimitsService $updateOrderLimitsService,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
         Invoice $invoice,
         InvoiceCollection $invoiceCollection
@@ -286,7 +286,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         UpdateOrderRequestValidator $updateOrderRequestValidator,
         UpdateOrderLimitsService $updateOrderLimitsService,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler
     ) {
         $changeSet = (new LegacyUpdateOrderRequest('order123', 1))->setExternalCode('foobar001');
@@ -323,7 +323,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         UpdateOrderRequestValidator $updateOrderRequestValidator,
         UpdateOrderLimitsService $updateOrderLimitsService,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
         OrderEntity $order
     ) {
@@ -360,7 +360,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         UpdateOrderRequestValidator $updateOrderRequestValidator,
         UpdateOrderLimitsService $updateOrderLimitsService,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler
     ) {
         $changeSet = (new LegacyUpdateOrderRequest('order123', 1))->setAmount(
@@ -423,7 +423,7 @@ class LegacyUpdateOrderServiceSpec extends ObjectBehavior
         UpdateOrderRequestValidator $updateOrderRequestValidator,
         UpdateOrderLimitsService $updateOrderLimitsService,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
         ExtendInvoiceService $extendInvoiceService,
         InvoiceCreditNoteMessageFactory $creditNoteAnnouncer,

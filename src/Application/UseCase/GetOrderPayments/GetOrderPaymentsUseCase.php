@@ -3,9 +3,9 @@
 namespace App\Application\UseCase\GetOrderPayments;
 
 use App\Application\Exception\OrderNotFoundException;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\OrderPayments\OrderPaymentsResponseTransformer;
 use App\DomainModel\Payment\PaymentsRepositoryInterface;
-use App\Infrastructure\Repository\OrderRepository;
 use App\Support\PaginatedCollection;
 
 /**

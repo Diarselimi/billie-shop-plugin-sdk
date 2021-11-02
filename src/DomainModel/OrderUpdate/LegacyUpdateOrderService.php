@@ -12,7 +12,7 @@ use App\DomainModel\Invoice\ExtendInvoiceService;
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsPersistenceService;
 use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerAggregator;
 use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerInterface;
@@ -25,7 +25,7 @@ class LegacyUpdateOrderService implements LoggingInterface
 {
     use LoggingTrait;
 
-    private OrderRepositoryInterface $orderRepository;
+    private OrderRepository $orderRepository;
 
     private InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler;
 
@@ -44,7 +44,7 @@ class LegacyUpdateOrderService implements LoggingInterface
     private MessageBusInterface $bus;
 
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         OrderFinancialDetailsPersistenceService $financialDetailsPersistenceService,
         InvoiceDocumentUploadHandlerAggregator $invoiceUrlHandler,
         UpdateOrderLimitsService $updateOrderLimitsService,

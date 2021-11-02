@@ -12,7 +12,7 @@ use App\DomainModel\DebtorExternalData\DebtorExternalDataEntity;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataEntityFactory;
 use App\DomainModel\DebtorExternalData\DebtorExternalDataRepositoryInterface;
 use App\DomainModel\Order\OrderFactory;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsFactory;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface;
@@ -53,7 +53,7 @@ class OrderPersistenceService
     private $orderLineItemRepository;
 
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
         PersonRepositoryInterface $personRepository,
         AddressRepositoryInterface $addressRepository,

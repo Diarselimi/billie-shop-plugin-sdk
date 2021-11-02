@@ -6,7 +6,7 @@ namespace App\DomainModel\Order\Lifecycle;
 
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\Workflow\Registry;
@@ -15,11 +15,11 @@ class OrderTerminalStateChangeService implements LoggingInterface
 {
     use LoggingTrait;
 
-    private OrderRepositoryInterface $orderRepository;
+    private OrderRepository $orderRepository;
 
     private Registry $workflowRegistry;
 
-    public function __construct(OrderRepositoryInterface $orderRepository, Registry $workflowRegistry)
+    public function __construct(OrderRepository $orderRepository, Registry $workflowRegistry)
     {
         $this->orderRepository = $orderRepository;
         $this->workflowRegistry = $workflowRegistry;

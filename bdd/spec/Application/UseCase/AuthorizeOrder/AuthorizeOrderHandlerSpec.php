@@ -11,7 +11,7 @@ use App\DomainModel\Order\NewOrder\OrderPersistenceService;
 use App\DomainModel\Order\OrderChecksRunnerService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -25,7 +25,7 @@ class AuthorizeOrderHandlerSpec extends ObjectBehavior
         OrderPersistenceService $persistNewOrderService,
         OrderContainerFactory $orderContainerFactory,
         OrderChecksRunnerService $orderChecksRunnerService,
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         Registry $workflowRegistry,
         DeclineOrderService $declineOrderService,
         CompanyIdentifier $companyIdentifier,

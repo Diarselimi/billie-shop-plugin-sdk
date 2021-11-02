@@ -8,7 +8,7 @@ use App\Application\UseCase\ValidatedUseCaseInterface;
 use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\Salesforce\PauseDunningRequestBuilder;
 use App\DomainModel\Salesforce\SalesforceInterface;
 use App\Infrastructure\Salesforce\Exception\SalesforceException;
@@ -20,7 +20,7 @@ class PauseOrderDunningUseCase implements ValidatedUseCaseInterface, LoggingInte
 {
     use ValidatedUseCaseTrait, LoggingTrait;
 
-    private OrderRepositoryInterface $orderRepository;
+    private OrderRepository $orderRepository;
 
     private SalesforceInterface $salesforce;
 

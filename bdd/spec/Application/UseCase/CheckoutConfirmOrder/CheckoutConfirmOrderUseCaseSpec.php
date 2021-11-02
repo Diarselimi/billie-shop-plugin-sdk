@@ -14,7 +14,7 @@ use App\DomainModel\Order\Lifecycle\WaitingOrderService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use Ozean12\Money\TaxedMoney\TaxedMoneyFactory;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -28,7 +28,7 @@ class CheckoutConfirmOrderUseCaseSpec extends ObjectBehavior
         ApproveOrderService $approveOrderService,
         WaitingOrderService $waitingOrderService,
         CheckoutOrderMatcherInterface $dataMatcher,
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         ValidatorInterface $validator,
         OrderEntity $order,
         OrderContainer $orderContainer

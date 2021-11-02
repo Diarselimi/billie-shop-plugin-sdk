@@ -14,7 +14,7 @@ use App\DomainModel\Merchant\MerchantCreationService;
 use App\DomainModel\MerchantDebtor\MerchantDebtorEntity;
 use App\DomainModel\MerchantDebtor\MerchantDebtorRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface;
 use App\DomainModel\OrderRiskCheck\OrderRiskCheckEntity;
@@ -253,7 +253,7 @@ trait RandomDataTrait
 
     private function createOrder(OrderEntity $entity): OrderEntity
     {
-        $this->getContainer()->get(OrderRepositoryInterface::class)->insert($entity);
+        $this->getContainer()->get(OrderRepository::class)->insert($entity);
         $this->data['last_order'] = $entity;
 
         return $entity;

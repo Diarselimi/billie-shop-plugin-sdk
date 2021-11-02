@@ -11,7 +11,7 @@ use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceServiceInterface;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\Payment\PaymentRequestFactory;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 
@@ -19,7 +19,7 @@ class ConfirmInvoicePaymentUseCase implements ValidatedUseCaseInterface, Command
 {
     use ValidatedUseCaseTrait;
 
-    private OrderRepositoryInterface $orderRepository;
+    private OrderRepository $orderRepository;
 
     private InvoiceServiceInterface $invoiceService;
 
@@ -28,7 +28,7 @@ class ConfirmInvoicePaymentUseCase implements ValidatedUseCaseInterface, Command
     private PaymentRequestFactory $paymentRequestFactory;
 
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         InvoiceServiceInterface $invoiceService,
         PaymentsServiceInterface $paymentService,
         PaymentRequestFactory $paymentRequestFactory

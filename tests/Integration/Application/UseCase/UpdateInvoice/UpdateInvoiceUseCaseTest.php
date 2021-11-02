@@ -13,7 +13,7 @@ use App\DomainModel\Invoice\InvoiceContainer;
 use App\DomainModel\Invoice\InvoiceContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderInvoiceDocument\UploadHandler\InvoiceDocumentUploadHandlerAggregator;
 use App\Tests\Helpers\FakeDataFiller;
@@ -35,7 +35,7 @@ class UpdateInvoiceUseCaseTest extends IntegrationTestCase
 
         $invoiceDocumentUploader = $this->prophesize(InvoiceDocumentUploadHandlerAggregator::class);
         $invoiceContainerFactory = $this->prophesize(InvoiceContainerFactory::class);
-        $orderRepo = $this->prophesize(OrderRepositoryInterface::class);
+        $orderRepo = $this->prophesize(OrderRepository::class);
         $invoiceContainer = $this->prophesize(InvoiceContainer::class);
         $orderContainer = $this->prophesize(OrderContainer::class);
         $bus = new MessageBus();

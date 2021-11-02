@@ -5,13 +5,13 @@ namespace App\Application\UseCase\ExtendOrderExpiration;
 use App\Application\CommandHandler;
 use App\Application\Exception\OrderNotFoundException;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 
 class ExtendOrderExpirationHandler implements CommandHandler
 {
-    private OrderRepositoryInterface $repository;
+    private OrderRepository $repository;
 
-    public function __construct(OrderRepositoryInterface $repository)
+    public function __construct(OrderRepository $repository)
     {
         $this->repository = $repository;
     }

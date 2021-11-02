@@ -5,16 +5,16 @@ namespace App\DomainModel\OrderRiskCheck\Checker;
 use App\DomainModel\DebtorCompany\IdentifiedDebtorCompany;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\OrderRiskCheck\CheckResult;
 
 class DebtorIdentifiedBillingAddressCheck implements CheckInterface
 {
     const NAME = 'debtor_identified_billing_address';
 
-    private OrderRepositoryInterface $orderRepository;
+    private OrderRepository $orderRepository;
 
-    public function __construct(OrderRepositoryInterface $orderRepository)
+    public function __construct(OrderRepository $orderRepository)
     {
         $this->orderRepository = $orderRepository;
     }

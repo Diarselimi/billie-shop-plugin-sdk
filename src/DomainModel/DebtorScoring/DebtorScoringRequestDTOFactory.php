@@ -3,7 +3,7 @@
 namespace App\DomainModel\DebtorScoring;
 
 use App\DomainModel\Order\OrderContainer\OrderContainer;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationEntity;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationNotFoundException;
 use App\DomainModel\ScoreThresholdsConfiguration\ScoreThresholdsConfigurationRepositoryInterface;
@@ -20,7 +20,7 @@ class DebtorScoringRequestDTOFactory
     public function __construct(
         ScoreThresholdsConfigurationService $scoreThresholdsConfigurationService,
         ScoreThresholdsConfigurationRepositoryInterface $scoreThresholdsConfigurationRepository,
-        OrderRepositoryInterface $orderRepository
+        OrderRepository $orderRepository
     ) {
         $this->scoreThresholdsConfigurationService = $scoreThresholdsConfigurationService;
         $this->scoreThresholdsConfigurationRepository = $scoreThresholdsConfigurationRepository;

@@ -16,7 +16,7 @@ use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Ozean12\Support\ValueObject\Iban;
@@ -31,7 +31,7 @@ final class CheckoutProvideIbanUseCase implements LoggingInterface, ValidatedUse
 
     private OrderContainerFactory $orderContainerFactory;
 
-    private OrderRepositoryInterface $orderRepository;
+    private OrderRepository $orderRepository;
 
     private IbanFraudCheck $ibanFraudCheck;
 
@@ -43,7 +43,7 @@ final class CheckoutProvideIbanUseCase implements LoggingInterface, ValidatedUse
 
     public function __construct(
         OrderContainerFactory $orderContainerFactory,
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         IbanFraudCheck $ibanFraudCheck,
         Registry $workflowRegistry,
         DeclineOrderService $declineOrderService,

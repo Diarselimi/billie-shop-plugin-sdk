@@ -6,18 +6,18 @@ namespace App\Application\UseCase\CreateOrderInvoice;
 
 use App\Application\CommandHandler;
 use App\Application\Exception\OrderNotFoundException;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentCreator;
 use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentUpload;
 
 class CreateOrderInvoiceUseCase implements CommandHandler
 {
-    private OrderRepositoryInterface $orderRepository;
+    private OrderRepository $orderRepository;
 
     private InvoiceDocumentCreator $invoiceDocumentCreator;
 
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         InvoiceDocumentCreator $invoiceDocumentCreator
     ) {
         $this->orderRepository = $orderRepository;

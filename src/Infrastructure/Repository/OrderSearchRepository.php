@@ -13,7 +13,7 @@ use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
 class OrderSearchRepository extends AbstractPdoRepository implements OrderSearchRepositoryInterface
 {
-    private const ORDERS_COLUMNS = OrderRepository::SELECT_FIELDS;
+    private const ORDERS_COLUMNS = OrderPdoRepository::SELECT_FIELDS;
 
     private PdoOrderEntityFactory $orderFactory;
 
@@ -37,7 +37,7 @@ class OrderSearchRepository extends AbstractPdoRepository implements OrderSearch
 
     private function buildSql(OrderSearchQuery $query): array
     {
-        $ordersTable = OrderRepository::TABLE_NAME;
+        $ordersTable = OrderPdoRepository::TABLE_NAME;
 
         $sql = 'SELECT %s FROM ' . $ordersTable;
         $params = [];

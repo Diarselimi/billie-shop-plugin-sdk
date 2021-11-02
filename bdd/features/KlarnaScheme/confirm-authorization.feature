@@ -1,4 +1,7 @@
 Feature: Confirm authorization
+  In order to confirm an authorization
+  As klarna scheme
+  I want to have an endpoint to confirm an existing authorization
 
   Background:
     Given I have orders with the following data

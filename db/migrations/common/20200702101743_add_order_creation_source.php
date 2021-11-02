@@ -1,13 +1,13 @@
 <?php
 
 use App\Infrastructure\Phinx\TransactionalMigration;
-use App\Infrastructure\Repository\OrderRepository;
+use App\Infrastructure\Repository\OrderPdoRepository;
 
 class AddOrderCreationSource extends TransactionalMigration
 {
     public function migrate()
     {
-        $this->table(OrderRepository::TABLE_NAME)
+        $this->table(OrderPdoRepository::TABLE_NAME)
             ->addColumn('creation_source', 'string', ['null' => false])
             ->update();
 

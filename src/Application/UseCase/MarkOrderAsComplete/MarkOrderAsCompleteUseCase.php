@@ -7,16 +7,16 @@ namespace App\Application\UseCase\MarkOrderAsComplete;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\WorkflowException;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use Symfony\Component\Workflow\Registry;
 
 class MarkOrderAsCompleteUseCase
 {
-    private OrderRepositoryInterface $orderRepository;
+    private OrderRepository $orderRepository;
 
     private Registry $workflowRegistry;
 
-    public function __construct(OrderRepositoryInterface $orderRepository, Registry $workflowRegistry)
+    public function __construct(OrderRepository $orderRepository, Registry $workflowRegistry)
     {
         $this->orderRepository = $orderRepository;
         $this->workflowRegistry = $workflowRegistry;

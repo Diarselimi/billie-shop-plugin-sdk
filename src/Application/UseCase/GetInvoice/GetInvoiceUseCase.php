@@ -9,7 +9,7 @@ use App\Application\UseCase\GetInvoice\Factory\GetInvoiceResponseFactory;
 use App\DomainModel\Invoice\InvoiceServiceInterface;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\PaymentMethod\BankNameDecorator;
 use Ozean12\InvoiceButler\Client\DomainModel\InvoiceButlerClientInterface;
 
@@ -19,7 +19,7 @@ class GetInvoiceUseCase
 
     private GetInvoiceResponseFactory $responseFactory;
 
-    private OrderRepositoryInterface $orderRepository;
+    private OrderRepository $orderRepository;
 
     private InvoiceButlerClientInterface $invoiceButler;
 
@@ -30,7 +30,7 @@ class GetInvoiceUseCase
     public function __construct(
         InvoiceServiceInterface $legacyInvoiceButler,
         GetInvoiceResponseFactory $responseFactory,
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         OrderContainerFactory $orderContainerFactory,
         InvoiceButlerClientInterface $invoiceButler,
         BankNameDecorator $bankNameDecorator

@@ -8,7 +8,7 @@ use App\Application\Exception\RequestValidationException;
 use App\Application\UseCase\ConfirmInvoicePayment\ConfirmInvoicePaymentRequest;
 use App\Application\UseCase\ConfirmInvoicePayment\ConfirmInvoicePaymentUseCase;
 use App\DomainModel\Invoice\InvoiceServiceInterface;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\Payment\PaymentRequestFactory;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\Tests\Integration\IntegrationTestCase;
@@ -26,7 +26,7 @@ class ConfirmInvoicePaymentUseCaseTest extends IntegrationTestCase
     private const MERCHANT_ID = 123;
 
     /**
-     * @var OrderRepositoryInterface|ObjectProphecy
+     * @var OrderRepository|ObjectProphecy
      */
     private ObjectProphecy $orderRepository;
 
@@ -51,7 +51,7 @@ class ConfirmInvoicePaymentUseCaseTest extends IntegrationTestCase
     {
         parent::setUp();
 
-        $this->orderRepository = $this->prophesize(OrderRepositoryInterface::class);
+        $this->orderRepository = $this->prophesize(OrderRepository::class);
         $this->invoiceService = $this->prophesize(InvoiceServiceInterface::class);
         $this->paymentsService = $this->prophesize(PaymentsServiceInterface::class);
         $this->paymentRequestFactory = $this->prophesize(PaymentRequestFactory::class);

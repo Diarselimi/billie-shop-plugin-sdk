@@ -13,7 +13,7 @@ use App\Application\UseCase\GetInvoicePayments\GetInvoicePaymentsUseCase;
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceServiceInterface;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\Payment\PaymentRequestFactory;
 use App\DomainModel\Payment\PaymentsServiceInterface;
 use App\DomainModel\Payment\RequestDTO\ConfirmRequestDTO;
@@ -36,7 +36,7 @@ class ConfirmInvoicePaymentUseCaseTest extends UnitTestCase
     private const MERCHANT_ID = 123;
 
     /**
-     * @var OrderRepositoryInterface|ObjectProphecy
+     * @var OrderRepository|ObjectProphecy
      */
     private ObjectProphecy $orderRepository;
 
@@ -61,7 +61,7 @@ class ConfirmInvoicePaymentUseCaseTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->orderRepository = $this->prophesize(OrderRepositoryInterface::class);
+        $this->orderRepository = $this->prophesize(OrderRepository::class);
         $this->invoiceService = $this->prophesize(InvoiceServiceInterface::class);
         $this->paymentsService = $this->prophesize(PaymentsServiceInterface::class);
         $this->paymentRequestFactory = $this->prophesize(PaymentRequestFactory::class);

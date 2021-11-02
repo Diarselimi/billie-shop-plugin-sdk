@@ -12,7 +12,7 @@ use App\Application\UseCase\GetInvoicePayments\Response\GetInvoicePaymentsRespon
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceServiceInterface;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\Payment\PaymentsRepositoryInterface;
 use App\Support\PaginatedCollection;
 use App\Tests\Unit\UnitTestCase;
@@ -30,7 +30,7 @@ class GetInvoicePaymentsUseCaseTest extends UnitTestCase
     private const MERCHANT_ID = 123;
 
     /**
-     * @var OrderRepositoryInterface|ObjectProphecy
+     * @var OrderRepository|ObjectProphecy
      */
     private ObjectProphecy $orderRepository;
 
@@ -55,7 +55,7 @@ class GetInvoicePaymentsUseCaseTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->orderRepository = $this->prophesize(OrderRepositoryInterface::class);
+        $this->orderRepository = $this->prophesize(OrderRepository::class);
         $this->invoiceService = $this->prophesize(InvoiceServiceInterface::class);
         $this->paymentsRepository = $this->prophesize(PaymentsRepositoryInterface::class);
         $this->responseFactory = $this->prophesize(GetInvoicePaymentsResponseFactory::class);

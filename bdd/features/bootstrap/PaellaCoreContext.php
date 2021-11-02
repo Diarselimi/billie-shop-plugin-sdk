@@ -41,7 +41,7 @@ use App\DomainModel\MerchantUserInvitation\MerchantUserInvitationEntity;
 use App\DomainModel\MerchantUserInvitation\MerchantUserInvitationEntityFactory;
 use App\DomainModel\MerchantUserInvitation\MerchantUserInvitationRepositoryInterface;
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsEntity;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface;
 use App\DomainModel\OrderIdentification\OrderIdentificationRepositoryInterface;
@@ -1260,9 +1260,9 @@ class PaellaCoreContext extends MinkContext
         return $this->get(PersonRepositoryInterface::class);
     }
 
-    private function getOrderRepository(): OrderRepositoryInterface
+    private function getOrderRepository(): OrderRepository
     {
-        return $this->get(OrderRepositoryInterface::class);
+        return $this->get(OrderRepository::class);
     }
 
     private function getOrderInvoiceRepository(): OrderInvoiceRepositoryInterface

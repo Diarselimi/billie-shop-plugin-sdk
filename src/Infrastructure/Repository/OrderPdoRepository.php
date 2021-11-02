@@ -3,7 +3,7 @@
 namespace App\Infrastructure\Repository;
 
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\Order\OrderStateCounterDTO;
 use App\Infrastructure\Repository\Order\PdoOrderEntityFactory;
 use Billie\MonitoringBundle\Service\RidProvider;
@@ -13,8 +13,8 @@ use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 use Billie\PdoBundle\Infrastructure\Pdo\PdoConnection;
 use Generator;
 
-class OrderRepository extends AbstractPdoRepository implements
-    OrderRepositoryInterface,
+class OrderPdoRepository extends AbstractPdoRepository implements
+    OrderRepository,
     StatefulEntityRepositoryInterface
 {
     use StatefulEntityRepositoryTrait;

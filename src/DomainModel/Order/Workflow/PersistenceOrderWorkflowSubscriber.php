@@ -3,7 +3,7 @@
 namespace App\DomainModel\Order\Workflow;
 
 use App\DomainModel\Order\OrderEntity;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -13,9 +13,9 @@ class PersistenceOrderWorkflowSubscriber implements EventSubscriberInterface, Lo
 {
     use LoggingTrait;
 
-    private OrderRepositoryInterface $orderRepository;
+    private OrderRepository $orderRepository;
 
-    public function __construct(OrderRepositoryInterface $orderRepository)
+    public function __construct(OrderRepository $orderRepository)
     {
         $this->orderRepository = $orderRepository;
     }

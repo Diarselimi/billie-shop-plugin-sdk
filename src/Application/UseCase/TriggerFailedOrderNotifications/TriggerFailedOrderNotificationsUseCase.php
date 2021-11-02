@@ -5,7 +5,7 @@ namespace App\Application\UseCase\TriggerFailedOrderNotifications;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\NotificationDelivery\NotificationDeliveryRequest;
 use App\Application\UseCase\NotificationDelivery\NotificationDeliveryUseCase;
-use App\DomainModel\Order\OrderRepositoryInterface;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\OrderNotification\OrderNotificationRepositoryInterface;
 
 class TriggerFailedOrderNotificationsUseCase
@@ -17,7 +17,7 @@ class TriggerFailedOrderNotificationsUseCase
     private $notificationDeliveryUseCase;
 
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
+        OrderRepository $orderRepository,
         OrderNotificationRepositoryInterface $orderNotificationRepository,
         NotificationDeliveryUseCase $notificationDeliveryUseCase
     ) {
