@@ -38,6 +38,6 @@ class UpdateMerchantReferencesController
             return KlarnaResponse::withErrorMessage($e->getMessage());
         }
 
-        return new JsonResponse('', JsonResponse::HTTP_OK);
+        return KlarnaResponse::empty();
     }
 }

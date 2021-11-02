@@ -14,7 +14,7 @@ Feature: Modify the merchant references on authorization.
         "payment_method_reference": "00112233-4455-6677-8899-aabbccddeeff"
       }
       """
-    Then the response is 200
+    Then the response is 200 with empty body
 
   Scenario: When merchant-references is called with null merchant_reference1
     When I request "POST /authorizations/test-order-uuid/merchant-references"

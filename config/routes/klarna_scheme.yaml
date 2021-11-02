@@ -13,6 +13,11 @@ delete_authorization:
   controller: App\UserInterface\Http\KlarnaScheme\DeleteAuthorization\DeleteAuthorizationController::execute
   methods: POST
 
+confirm_authorization:
+  path: /authorizations/{orderId}/confirm
+  controller: App\UserInterface\Http\KlarnaScheme\ConfirmAuthorization\ConfirmAuthorizationController::execute
+  methods: POST
+
 update_confirmed_authorization:
   path: /authorizations/{orderId}/adjust-order
   controller: App\UserInterface\Http\KlarnaScheme\UpdateConfirmedAuthorization\UpdateConfirmedAuthorizationController::execute

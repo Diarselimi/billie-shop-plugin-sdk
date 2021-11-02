@@ -39,6 +39,6 @@ class DeleteAuthorizationController implements LoggingInterface
             return KlarnaResponse::withErrorMessage('Delete Authorization is not possible.');
         }
 
-        return new JsonResponse('', JsonResponse::HTTP_OK);
+        return KlarnaResponse::empty();
     }
 }

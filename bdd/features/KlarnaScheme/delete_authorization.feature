@@ -23,11 +23,7 @@ Feature:
       """
 
   Scenario: Successfully delete the authorization.
-    When I request "POST /authorizations/confirmed-order-uuid/delete" with body:
-      """
-      {
-      }
-      """
-    Then the response is 200
+    When I request "POST /authorizations/confirmed-order-uuid/delete"
+    Then the response is 200 with empty body
     And the order "C3PO" is in state "declined"
 

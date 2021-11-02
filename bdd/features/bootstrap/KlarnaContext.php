@@ -59,20 +59,15 @@ class KlarnaContext implements Context
     }
 
     /**
-     * @Then the response is :statusCode
-     */
-    public function assertResponseStatusCode(int $statusCode): void
-    {
-        Assert::assertEquals($statusCode, $this->response->getStatusCode());
-    }
-
-    /**
+     * @Then the response is :statusCode with empty body
      * @Then the response is :statusCode with body:
      */
-    public function assertResponse(int $statusCode, string $body): void
+    public function assertResponseWithBody(int $statusCode, string $body = '{}'): void
     {
+        $body = $this->prepareExpectedJsonContent($body);
+
         Assert::assertEquals($statusCode, $this->response->getStatusCode());
-        Assert::assertJsonStringEqualsJsonString($this->prepareExpectedJsonContent($body), $this->response->getContent());
+        Assert::assertJsonStringEqualsJsonString($body, $this->response->getContent());
     }
 
     /**

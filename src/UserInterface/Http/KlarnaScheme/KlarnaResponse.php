@@ -6,9 +6,14 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class KlarnaResponse extends JsonResponse
 {
-    public function __construct(array $body)
+    public function __construct(?array $body)
     {
         parent::__construct($body);
+    }
+
+    public static function empty(): self
+    {
+        return new self(null);
     }
 
     public static function withErrorMessage(string $message): self
