@@ -166,7 +166,6 @@ Feature: Initialize new checkout session
               },
               "debtor_company": {
                 "name": "Billie GmbH",
-                "established_customer": true,
                 "address_street": "Charlottenstr.",
                 "address_house_number": "4",
                 "address_addition": "",
@@ -175,7 +174,6 @@ Feature: Initialize new checkout session
                 "address_country": "DE"
               },
               "debtor_person": {
-                "salutation": "m",
                 "first_name": "Fefas",
                 "last_name": "Possum",
                 "phone_number": "+49158888890",
@@ -222,7 +220,6 @@ Feature: Initialize new checkout session
             "data":
             {
              "debtor_person":{
-                "salutation":"m",
                 "first_name":"",
                 "last_name":"else",
                 "phone_number":"+491234567",
@@ -243,8 +240,7 @@ Feature: Initialize new checkout session
                 "industry_sector":"some sector",
                 "subindustry_sector":"some sub",
                 "employees_number":"33",
-                "legal_form":"some legal",
-                "established_customer":1
+                "legal_form":"some legal"
              },
              "delivery_address":{
                 "house_number":"22",
@@ -335,7 +331,6 @@ Feature: Initialize new checkout session
             "data":
             {
              "debtor_person":{
-                "salutation":"m",
                 "first_name":"",
                 "last_name":"else",
                 "phone_number":"+491234567",
@@ -356,8 +351,7 @@ Feature: Initialize new checkout session
                 "industry_sector":"some sector",
                 "subindustry_sector":"some sub",
                 "employees_number":"33",
-                "legal_form":"some legal",
-                "established_customer":1
+                "legal_form":"some legal"
              },
              "delivery_address":{
                 "house_number":"22",
@@ -450,7 +444,6 @@ Feature: Initialize new checkout session
             "data":
             {
              "debtor_person":{
-                "salutation":"m",
                 "first_name":"",
                 "last_name":"else",
                 "phone_number":"+491234567",
@@ -471,8 +464,7 @@ Feature: Initialize new checkout session
                 "industry_sector":"some sector",
                 "subindustry_sector":"some sub",
                 "employees_number":"33",
-                "legal_form":"some legal",
-                "established_customer":1
+                "legal_form":"some legal"
              },
              "delivery_address":{
                 "house_number":"22",

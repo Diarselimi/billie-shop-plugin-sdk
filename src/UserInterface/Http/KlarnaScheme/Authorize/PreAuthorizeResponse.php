@@ -76,7 +76,6 @@ class PreAuthorizeResponse extends KlarnaResponse
 
         return [
             'name' => $address['organization_name'],
-            'established_customer' => ($requestData['customer']['history']['number_of_purchases'] ?? 0) > 3, //TODO clarify
             'address_street' => $street,
             'address_house_number' => $house,
             'address_addition' => '',
@@ -95,7 +94,6 @@ class PreAuthorizeResponse extends KlarnaResponse
         $address = $requestData['customer']['billing_address'];
 
         return [
-            'salutation' => $this->mapSalutation($address['salutation'] ?? 'Mr'), //TODO need to map
             'first_name' => $address['given_name'] ?? '',
             'last_name' => $address['family_name'] ?? '',
             'phone_number' => $address['phone'] ?? '',
@@ -103,28 +101,11 @@ class PreAuthorizeResponse extends KlarnaResponse
         ];
     }
 
-    private function mapSalutation(string $salutation): string
-    {
-        $mapping = [
-            'm' => ['Mr'],
-            'f' => ['Ms'],
-        ];
-
-        $salutation = strtolower(trim($salutation));
-        foreach ($mapping as $gender => $salutations) {
-            if (in_array($salutation, $salutations, true)) {
-                return $gender;
-            }
-        }
-
-        return 'm';
-    }
-
     private function mapLineItems(array $requestData): array
     {
         return array_map(function (array $lineItem) {
             return [
-                'external_id' => $lineItem['reference'], // TODO clarify
+                'external_id' => $lineItem['reference'],
                 'title' => $lineItem['name'],
                 'description' => '',
                 'quantity' => $lineItem['quantity'],

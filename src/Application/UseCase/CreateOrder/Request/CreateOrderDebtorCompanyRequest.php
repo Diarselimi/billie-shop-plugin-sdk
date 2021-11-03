@@ -247,12 +247,12 @@ class CreateOrderDebtorCompanyRequest
         return $this;
     }
 
-    public function isEstablishedCustomer(): bool
+    public function isEstablishedCustomer(): ?bool
     {
         return $this->establishedCustomer;
     }
 
-    public function setEstablishedCustomer(bool $establishedCustomer): CreateOrderDebtorCompanyRequest
+    public function setEstablishedCustomer(?bool $establishedCustomer): CreateOrderDebtorCompanyRequest
     {
         $this->establishedCustomer = $establishedCustomer;
 
