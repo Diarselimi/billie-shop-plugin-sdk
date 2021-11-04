@@ -10,7 +10,8 @@ default:
         - json_spec
         - App\Tests\Functional\Context\MockServerContext
         - App\Tests\Functional\Context\GraphQLContext
-        - App\Tests\Functional\Context\KlarnaContext
+        - App\Tests\Functional\Context\KlarnaContext:
+            kernel: '@kernel'
         - App\Tests\Functional\Context\PaellaCoreContext:
             kernel: '@kernel'
             connection: '@billie_pdo.default_connection'

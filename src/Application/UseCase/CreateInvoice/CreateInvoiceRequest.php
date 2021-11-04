@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\UseCase\CreateInvoice;
 
 use App\Application\Validator\Constraint as CustomConstrains;
+use App\DomainModel\Invoice\InvoiceRequest;
 use OpenApi\Annotations as OA;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
 use Ramsey\Uuid\UuidInterface;
@@ -32,7 +33,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     }
  * )
  */
-class CreateInvoiceRequest
+class CreateInvoiceRequest implements InvoiceRequest
 {
     private ?int $merchantId = null;
 
@@ -70,10 +71,13 @@ class CreateInvoiceRequest
 
     private ?array $lineItems;
 
+    private ?\DateTimeInterface $billingDate;
+
     public function __construct(int $merchantId, UuidInterface $invoiceUuid)
     {
         $this->merchantId = $merchantId;
         $this->invoiceUuid = $invoiceUuid;
+        $this->billingDate = new \DateTime();
     }
 
     public function getOrders(): array
@@ -88,7 +92,7 @@ class CreateInvoiceRequest
         return $this;
     }
 
-    public function getExternalCode(): ?string
+    public function getExternalCode(): string
     {
         return $this->externalCode;
     }
@@ -112,7 +116,7 @@ class CreateInvoiceRequest
         return $this;
     }
 
-    public function getAmount(): ?TaxedMoney
+    public function getAmount(): TaxedMoney
     {
         return $this->amount;
     }
@@ -151,6 +155,11 @@ class CreateInvoiceRequest
     public function getMerchantId(): ?int
     {
         return $this->merchantId;
+    }
+
+    public function getBillingDate(): \DateTimeInterface
+    {
+        return $this->billingDate;
     }
 
     public function getInvoiceUuid(): UuidInterface

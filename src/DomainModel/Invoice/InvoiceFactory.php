@@ -40,7 +40,7 @@ class InvoiceFactory extends AbstractFactory
 
     public function create(
         OrderContainer $orderContainer,
-        CreateInvoiceRequest $invoiceRequest
+        InvoiceRequest $invoiceRequest
     ): Invoice {
         $duration = $orderContainer->getOrderFinancialDetails()->getDuration();
         $billingDate = new DateTime('today');

@@ -14,6 +14,7 @@ use App\Tests\Integration\DatabaseTestCase;
 class OrderRepositoryTest extends DatabaseTestCase
 {
     use RandomDataTrait;
+
     use FakeDataFiller;
 
     private $repository;

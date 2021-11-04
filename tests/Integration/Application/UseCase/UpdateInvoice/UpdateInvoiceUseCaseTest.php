@@ -25,6 +25,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class UpdateInvoiceUseCaseTest extends IntegrationTestCase
 {
     use ValidatedUseCaseTrait;
+
     use FakeDataFiller;
 
     private UpdateInvoiceUseCase $useCase;

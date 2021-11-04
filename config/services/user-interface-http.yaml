@@ -35,3 +35,6 @@ services:
 
   App\UserInterface\Http\KlarnaScheme\CancelAuthorization\CancelAuthorizationController:
     tags: [ 'controller.service_arguments' ]
+
+  App\UserInterface\Http\KlarnaScheme\CaptureAuthorizations\CaptureAuthorizationController:
+    tags: [ 'controller.service_arguments' ]

@@ -2,21 +2,20 @@
 
 namespace App\Tests\Functional\Context;
 
-use App\Kernel;
+use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\TableNode;
 use Billie\PdoBundle\Infrastructure\Pdo\PdoConnection;
 use PHPUnit\Framework\Assert;
-use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class KlarnaContext implements Context
 {
-    private const REQUEST_PATH_PREFIX = '/klarna/scheme';
+    protected KernelInterface $kernel;
 
-    private Kernel $kernel;
+    private const REQUEST_PATH_PREFIX = '/klarna/scheme';
 
     private PdoConnection $pdo;
 
@@ -24,16 +23,16 @@ class KlarnaContext implements Context
 
     private ?string $generatedToken = null;
 
+    public function __construct(KernelInterface $kernel)
+    {
+        $this->kernel = $kernel;
+    }
+
     /**
      * @beforeScenario
      */
     public function bootKernel(): void
     {
-        $dotEnv = new Dotenv();
-        $dotEnv->load(__DIR__ . '/../../../.env');
-
-        $this->kernel = new Kernel('test', true);
-        $this->kernel->boot();
         $this->pdo = $this->kernel->getContainer()->get('billie_pdo.default_connection');
     }
 
@@ -41,7 +40,7 @@ class KlarnaContext implements Context
      * @When I request :endpoint
      * @When I request :endpoint with body:
      */
-    public function request(string $endpoint, string $body = null): void
+    public function sendRequest(string $endpoint, string $body = null): void
     {
         $request = $this->createRequest($endpoint, $body);
         $this->response = $this->kernel->handle($request);
@@ -123,7 +122,7 @@ class KlarnaContext implements Context
 
         $columns = array_keys($expectedDbEntries[0]);
         $columns = implode(', ', $columns);
-        $uuids = '\''.implode('\',  \'', $uuidsToBeSelected).'\'';
+        $uuids = '\'' . implode('\',  \'', $uuidsToBeSelected) . '\'';
 
         $actualDbEntries = $this->pdo
             ->query("SELECT $columns FROM orders WHERE uuid IN ($uuids)")
