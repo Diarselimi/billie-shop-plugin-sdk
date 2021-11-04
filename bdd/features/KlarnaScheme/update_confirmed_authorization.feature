@@ -65,7 +65,8 @@ Feature: Post confirm adjust
       """
 
   Scenario: Lower new amount
-    When I request "POST /authorizations/confirmed-order-uuid/adjust-order" with body:
+    When Debtor release limit call succeeded
+    And I request "POST /authorizations/confirmed-order-uuid/adjust-order" with body:
       """
       {
         "amount": 1000,

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\UserInterface\Http\KlarnaScheme\Controllers;
+namespace App\UserInterface\Http\KlarnaScheme\UpdateMerchantReferences;
 
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\UseCase\ModifyPartnerExternalData\ModifyPartnerExternalDataCommand;

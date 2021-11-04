@@ -6,6 +6,7 @@ use App\Application\CommandHandler;
 use App\Application\Exception\OrderNotFoundException;
 use App\Application\Exception\WorkflowException;
 use App\DomainModel\Invoice\InvoiceCancellationService;
+use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
@@ -40,14 +41,7 @@ class CancelOrderUseCase implements LoggingInterface, CommandHandler
 
     public function execute(CancelOrderRequest $request): void
     {
-        try {
-            $orderContainer = $this->orderContainerFactory->loadByMerchantIdAndExternalIdOrUuid(
-                $request->getMerchantId(),
-                $request->getOrderId()
-            );
-        } catch (OrderContainerFactoryException $exception) {
-            throw new OrderNotFoundException($exception);
-        }
+        $orderContainer = $this->findOrderContainer($request);
 
         $order = $orderContainer->getOrder();
         $workflow = $this->workflowRegistry->get($order);
@@ -80,6 +74,22 @@ class CancelOrderUseCase implements LoggingInterface, CommandHandler
             $workflow->apply($order, OrderEntity::TRANSITION_CANCEL_WAITING);
         } else {
             throw new CancelOrderException("Order #{$request->getOrderId()} can not be cancelled");
+        }
+    }
+
+    private function findOrderContainer(CancelOrderRequest $input): OrderContainer
+    {
+        try {
+            if (null === $input->getMerchantId()) {
+                return $this->orderContainerFactory->loadByUuid($input->getOrderId());
+            }
+
+            return $this->orderContainerFactory->loadByMerchantIdAndExternalIdOrUuid(
+                $input->getMerchantId(),
+                $input->getOrderId()
+            );
+        } catch (OrderContainerFactoryException $e) {
+            throw new OrderNotFoundException();
         }
     }
 }

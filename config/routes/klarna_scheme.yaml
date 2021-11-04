@@ -35,10 +35,15 @@ update_customer_details:
 
 update_merchant_references:
   path: /authorizations/{orderId}/merchant-references
-  controller: App\UserInterface\Http\KlarnaScheme\Controllers\UpdateMerchantReferencesController::execute
+  controller: App\UserInterface\Http\KlarnaScheme\UpdateMerchantReferences\UpdateMerchantReferencesController::execute
   methods: POST
 
 extend_authorization_expiration:
   path: /authorizations/{orderId}/extend-expiration
   controller: App\UserInterface\Http\KlarnaScheme\ExtendAuthorizationExpiration\ExtendAuthorizationExpirationController::execute
+  methods: POST
+
+cancel_authorization:
+  path: /authorizations/{orderId}/cancel
+  controller: App\UserInterface\Http\KlarnaScheme\CancelAuthorization\CancelAuthorizationController::execute
   methods: POST
