@@ -244,7 +244,7 @@ Feature: As a merchant, I should be able to create an order by providing a valid
                     "street": "Heinrich-Heine-Platz",
                     "postal_code": "10179",
                     "country": "DE",
-                    "addition": null,
+                    "addition": "lorem ipsum",
                     "city": "Somewhere"
                 },
                 "source": "delivery_address",
@@ -259,7 +259,7 @@ Feature: As a merchant, I should be able to create an order by providing a valid
                         "street": "Heinrich-Heine-Platz",
                         "postal_code": "10179",
                         "country": "DE",
-                        "addition": null,
+                        "addition": "lorem ipsum",
                         "city": "Berlin"
                     }
                 },

@@ -389,7 +389,7 @@ Feature: As a merchant, I should be able to create an order by providing a valid
           "code": "request_validation_error",
           "source": "delivery_address",
           "source_value": {
-            "addition": null,
+            "addition": "lorem ipsum",
             "house_number": "10",
             "street": "Heinrich-Heine-Platz",
             "city": "Somewhere",
