@@ -3241,16 +3241,16 @@
         },
         {
             "name": "ozean12/company-strict-match-bundle",
-            "version": "1.0.2",
+            "version": "1.0.3",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ozean12/CompanyStrictMatchBundle.git",
-                "reference": "be1d9e24f0cadc16efb81a58e3ee8bda3f217b95"
+                "reference": "a6ac606caba86ffcef7e21835556cbdaf9dfdc55"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ozean12/CompanyStrictMatchBundle/zipball/be1d9e24f0cadc16efb81a58e3ee8bda3f217b95",
-                "reference": "be1d9e24f0cadc16efb81a58e3ee8bda3f217b95",
+                "url": "https://api.github.com/repos/ozean12/CompanyStrictMatchBundle/zipball/a6ac606caba86ffcef7e21835556cbdaf9dfdc55",
+                "reference": "a6ac606caba86ffcef7e21835556cbdaf9dfdc55",
                 "shasum": ""
             },
             "require": {
@@ -3300,9 +3300,9 @@
             ],
             "description": "Company Strict Match Bundle",
             "support": {
-                "source": "https://github.com/ozean12/CompanyStrictMatchBundle/tree/1.0.2"
+                "source": "https://github.com/ozean12/CompanyStrictMatchBundle/tree/1.0.3"
             },
-            "time": "2021-02-05T19:02:28+00:00"
+            "time": "2021-11-08T10:14:21+00:00"
         },
         {
             "name": "ozean12/graphql-repository-client",
@@ -12205,5 +12205,5 @@
         "ext-pdo": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.0.0"
+    "plugin-api-version": "2.1.0"
 }
