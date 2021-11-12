@@ -35,7 +35,7 @@ class AddressRequestFactory implements LoggingInterface
         );
 
         return (new CreateOrderAddressRequest())
-            ->setAddition($data['addition'] ?? null)
+            ->setAddition(empty($data['addition']) ? null : $data['addition'])
             ->setHouseNumber($house)
             ->setStreet($street)
             ->setPostalCode($data['postal_code'] ?? null)
