@@ -33,7 +33,7 @@ class KlarnaContext implements Context
     /**
      * @beforeScenario
      */
-    public function bootKernel(): void
+    public function loadPdo(): void
     {
         $this->pdo = $this->kernel->getContainer()->get('billie_pdo.default_connection');
     }
@@ -100,7 +100,7 @@ class KlarnaContext implements Context
         $body = json_decode($this->response->getContent(), true);
         $this->generatedToken = $body[$tokenField] ?? null;
 
-        Assert::assertNotNull($tokenField);
+        Assert::assertNotNull($this->generatedToken);
     }
 
     /**
