@@ -11,7 +11,7 @@ class GetMerchantPaymentsRequest implements ValidatedRequestInterface, Paginatio
 {
     use PaginationAwareTrait;
 
-    const DEFAULT_SORTING_FIELD = 'priority';
+    public const DEFAULT_SORTING_FIELD = 'transaction_date';
 
     /**
      * @Assert\Type(type="integer")
@@ -35,7 +35,7 @@ class GetMerchantPaymentsRequest implements ValidatedRequestInterface, Paginatio
     private $transactionUuid;
 
     /**
-     * @Assert\Choice({"priority", "transaction_date"})
+     * @Assert\Choice({"transaction_date"})
      */
     private $sortBy;
 

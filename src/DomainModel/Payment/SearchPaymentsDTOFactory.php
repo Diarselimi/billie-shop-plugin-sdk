@@ -17,8 +17,6 @@ class SearchPaymentsDTOFactory
 
     public function create(GetMerchantPaymentsRequest $request): SearchPaymentsDTO
     {
-        $sortBy = ($request->getSortBy() === 'priority') ? 'is_allocated ASC, transaction_date' : 'transaction_date';
-
         return (new SearchPaymentsDTO())
             ->setMerchantPaymentUuid($request->getMerchantPaymentUuid())
             ->setTransactionUuid($request->getTransactionUuid())
@@ -27,10 +25,9 @@ class SearchPaymentsDTOFactory
             ->setIsOverpayment($request->isOverpayment())
             ->setOffset($request->getOffset())
             ->setLimit($request->getLimit())
-            ->setSortBy($sortBy)
+            ->setSortBy($request->getSortBy())
             ->setSortDirection($request->getSortDirection())
             ->setSearchString($this->stringSearch->cleanString($request->getSearchKeyword()))
-            ->setSearchCompanyString(null)
         /**
          * DISABLED due to slow query, implementation kept so it can be revisited,
          * search by company name is highly requested feature by many customers

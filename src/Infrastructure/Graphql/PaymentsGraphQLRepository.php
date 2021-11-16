@@ -39,12 +39,12 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
             'transactionUuid' => $paymentsDTO->getTransactionUuid(),
             'isAllocated' => $paymentsDTO->isAllocated() === null ? null : (int) $paymentsDTO->isAllocated(),
             'isOverpayment' => $paymentsDTO->isOverpayment() === null ? null : (int) $paymentsDTO->isOverpayment(),
-            'offset' => (string) $paymentsDTO->getOffset(),
-            'limit' => (string) $paymentsDTO->getLimit(),
+            'offset' => $paymentsDTO->getOffset(),
+            'limit' => $paymentsDTO->getLimit(),
             'sortBy' => $paymentsDTO->getSortBy(),
             'sortDirection' => $paymentsDTO->getSortDirection(),
             'searchString' => $paymentsDTO->getSearchString(),
-            'searchCompanyString' => $paymentsDTO->getSearchCompanyString(),
+            'searchCompanyString' => null,
         ];
 
         $countParams = [
@@ -58,7 +58,7 @@ class PaymentsGraphQLRepository extends AbstractGraphQLRepository implements Pay
                 $paymentsDTO->isOverpayment()
             ),
             'searchString' => $paymentsDTO->getSearchString(),
-            'searchCompanyString' => $paymentsDTO->getSearchCompanyString(),
+            'searchCompanyString' => null,
         ];
 
         $countResult = $this->query(self::GET_MERCHANT_PAYMENTS_TOTAL_QUERY, $countParams);

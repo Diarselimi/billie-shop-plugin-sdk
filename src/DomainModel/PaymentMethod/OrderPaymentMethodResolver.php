@@ -41,7 +41,7 @@ class OrderPaymentMethodResolver implements LoggingInterface
     public function getPaymentMethods(OrderContainer $orderContainer): PaymentMethodCollection
     {
         if ($orderContainer->getOrder()->getMerchantDebtorId() === null) {
-            // Debtor not identified
+            // Order with not identified debtor
             return new PaymentMethodCollection([]);
         }
 
