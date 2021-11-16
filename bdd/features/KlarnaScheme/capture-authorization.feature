@@ -5,6 +5,11 @@ Feature:
   A refund may optionally be associated with a capture_id. In that case, validation will simply be that the capture exists. The amount does not have to match that of the refund.
   Scheme operations - Internal accounting will increase the captured amount in the Authorization. The capture should always be accepted by the Payment Method.
 
+  Background:
+    When I add header "Authorization" with "Basic a2xhcm5hJTQwYmlsbGllLmlvOmtsYXJuYTEyMzQ="
+    And GraphQL will respond to getMerchantDebtorDetails query
+
+
   Scenario: Attempt to capture a non existing authorization
     When I request "POST /authorizations/non-existing-uuid/captures"
     Then the response is 200 with body:

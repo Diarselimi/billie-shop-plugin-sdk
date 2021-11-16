@@ -8,6 +8,8 @@ Feature: Cancel authorization
       | uuid              | external_id | state      | gross | net | tax | duration | workflow_name |
       | authorized-order  | KLRN1       | authorized | 1000  | 900 | 100 | 30       | order_v2      |
       | created-order     | KLRN2       | created    | 1000  | 900 | 100 | 30       | order_v2      |
+    And I add header "Authorization" with "Basic a2xhcm5hJTQwYmlsbGllLmlvOmtsYXJuYTEyMzQ="
+    And GraphQL will respond to getMerchantDebtorDetails query
 
   Scenario: No order found
     When I request "POST /authorizations/unknown-order/cancel"

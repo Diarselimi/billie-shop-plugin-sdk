@@ -4,6 +4,7 @@ Feature: Extend authorization expiration
     Given I have orders with the following data
       | uuid               | external_id | Expires At          | state   |
       | confirmed-order-id | C3PO        | 2021-10-02 12:00:00 | created |
+    And I add header "Authorization" with "Basic a2xhcm5hJTQwYmlsbGllLmlvOmtsYXJuYTEyMzQ="
     And GraphQL will respond to getMerchantDebtorDetails query
 
   Scenario: Missing expires_at

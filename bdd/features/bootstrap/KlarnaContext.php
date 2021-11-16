@@ -23,6 +23,8 @@ class KlarnaContext implements Context
 
     private ?string $generatedToken = null;
 
+    private array $headers = [];
+
     public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;
@@ -43,6 +45,7 @@ class KlarnaContext implements Context
     public function sendRequest(string $endpoint, string $body = null): void
     {
         $request = $this->createRequest($endpoint, $body);
+        $request->headers->add($this->headers);
         $this->response = $this->kernel->handle($request);
 
         $this->kernel->terminate($request, $this->response);
@@ -67,6 +70,16 @@ class KlarnaContext implements Context
 
         Assert::assertEquals($statusCode, $this->response->getStatusCode());
         Assert::assertJsonStringEqualsJsonString($body, $this->response->getContent());
+    }
+
+    /**
+     * Add an header element
+     *
+     * @Then I add header :name with :value
+     */
+    public function iAddHeader($name, $value)
+    {
+        $this->headers[$name] = $value;
     }
 
     /**

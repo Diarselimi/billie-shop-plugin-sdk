@@ -4,6 +4,7 @@ Feature: Post confirm adjust
     Given I have orders with the following data
       | uuid                 | external_id | state   | gross | net | tax | duration | payment_uuid                         |
       | confirmed-order-uuid | C3PO        | created | 1000  | 900 | 100 | 30       | 6d6b4222-be8c-11e9-9cb5-2a2ae2dbcce4 |
+    And I add header "Authorization" with "Basic a2xhcm5hJTQwYmlsbGllLmlvOmtsYXJuYTEyMzQ="
     And GraphQL will respond to getMerchantDebtorDetails query
 
   Scenario: Missing amount

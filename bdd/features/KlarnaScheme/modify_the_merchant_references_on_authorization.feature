@@ -4,6 +4,10 @@ Feature: Modify the merchant references on authorization.
   No internal information will be updated.
   This notification should always be accepted by the Payment Method.
 
+  Background:
+    And I add header "Authorization" with "Basic a2xhcm5hJTQwYmlsbGllLmlvOmtsYXJuYTEyMzQ="
+    And GraphQL will respond to getMerchantDebtorDetails query
+
   Scenario: When merchant-references is called we get the info and save them into order external id
     Given I have a created order with amounts 1000/900/100, duration 30 and comment "test order"
     When I request "POST /authorizations/test-order-uuid/merchant-references"

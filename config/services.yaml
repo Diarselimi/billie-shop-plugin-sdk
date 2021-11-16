@@ -59,6 +59,8 @@ services:
       $encryptionKey: '%env(ENCRYPTION_KEY)%'
       $bancoPrivateApi: '@private_bank_api'
       $bancoPublicApi: '@public_bank_api'
+      $klarnaUser: '%env(KLARNA_USERNAME)%'
+      $klarnaPassword: '%env(KLARNA_PASSWORD)%'
 
   _instanceof:
     App\Application\UseCase\ValidatedUseCaseInterface:
@@ -91,7 +93,7 @@ services:
         '../src/DomainModel/**/*Event.php',
         '../src/DomainModel/**/**/*Event.php',
         '../src/DomainEvent',
-        '../src/UserInterface'
+        '../src/UserInterface/Http'
     ]
 
   App\Http\Controller\:

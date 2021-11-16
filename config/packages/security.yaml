@@ -104,7 +104,11 @@ security:
 
     klarna_scheme:
       pattern: ^/klarna/scheme
-      security: false
+      anonymous: false
+      stateless: true
+      guard:
+        authenticators:
+          - App\Http\Authentication\Authenticator\BasicAuthentication
 
     # ---------------------------------------- #
     # DEFAULTS

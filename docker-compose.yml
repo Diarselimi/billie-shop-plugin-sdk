@@ -57,6 +57,8 @@ services:
       - SEPA_URL=
       - BANCO_URL=
       - WATSON_URL=
+      - KLARNA_USER=klarna@billie.io
+      - KLARNA_PASSWORD=klarna1234
 
   mysql:
     image: mysql:5.7

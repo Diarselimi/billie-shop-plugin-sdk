@@ -3,6 +3,10 @@ Feature: Initialize new checkout session
   As klarna scheme
   I want to have an endpoint to get a new session token
 
+  Background:
+    Given I add header "Authorization" with "Basic a2xhcm5hJTQwYmlsbGllLmlvOmtsYXJuYTEyMzQ="
+    And GraphQL will respond to getMerchantDebtorDetails query
+
   Scenario: Return new checkout session token if request is supported
     When I request "POST /initiate" with body:
       """

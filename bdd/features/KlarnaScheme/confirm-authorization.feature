@@ -8,6 +8,7 @@ Feature: Confirm authorization
       | uuid              | external_id | state    | gross | net | tax | duration | payment_uuid |
       | unconfirmed-order | C3PO        | new      | 1000  | 900 | 100 | 30       | payment-id-1 |
       | confirmed-order   | R2D2        | declined | 1000  | 900 | 100 | 30       | payment-id-2 |
+    And I add header "Authorization" with "Basic a2xhcm5hJTQwYmlsbGllLmlvOmtsYXJuYTEyMzQ="
     And GraphQL will respond to getMerchantDebtorDetails query
 
   Scenario: No order found

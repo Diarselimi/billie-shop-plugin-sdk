@@ -46,6 +46,7 @@ Feature: Initialize new checkout session
       }
       """
     And I get from payments service get debtor response
+    And I add header "Authorization" with "Basic a2xhcm5hJTQwYmlsbGllLmlvOmtsYXJuYTEyMzQ="
     And GraphQL will respond to getMerchantDebtorDetails query
 
   Scenario: Authorize call fails because session not found
