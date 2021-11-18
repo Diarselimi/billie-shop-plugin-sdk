@@ -17,7 +17,18 @@ Feature: Update invoices data
     """
     {
       "external_code": "EXTERNA_CODE",
-      "invoice_url": "https://billie.io"
+      "invoice_url": "https://billie.io",
+      "shipping_info": [
+        {
+            "tracking_number": "tracking_number_1",
+            "return_shipping_company": "Billie io",
+            "return_tracking_url": "Tracking_2",
+            "shipping_method": "Post",
+            "shipping_company": "Billie gmbh",
+            "return_tracking_number": "Tracking_3",
+            "tracking_url": "google.com"
+        }
+      ]
     }
     """
     Then the response status code should be 204

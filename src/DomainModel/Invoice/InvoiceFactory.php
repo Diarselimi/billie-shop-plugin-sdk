@@ -76,7 +76,7 @@ class InvoiceFactory extends AbstractFactory
             ->setBillingDate($billingDate)
             ->setDueDate($dueDate)
             ->setCreatedAt(new \DateTime())
-            ->setProofOfDeliveryUrl($invoiceRequest->getShippingDocumentUrl())
+            ->setShippingInfo($invoiceRequest->getShippingInfo())
             ->setExternalCode($invoiceRequest->getExternalCode())
             ->setInvoicePendingCancellationAmount(new Money(0))
             ->setMerchantPendingPaymentAmount(new Money(0));
@@ -131,7 +131,11 @@ class InvoiceFactory extends AbstractFactory
             $invoiceUuid = $this->uuidGenerator->uuid();
         }
 
-        $input = new CreateInvoiceRequest($orderContainer->getMerchant()->getId(), $invoiceUuid);
+        $input = new CreateInvoiceRequest(
+            $orderContainer->getMerchant()->getId(),
+            $invoiceUuid,
+            $request->getShippingInfo()
+        );
         $input->setAmount(
             new TaxedMoney(
                 $financialDetails->getAmountGross(),

@@ -16,9 +16,9 @@ use App\Helper\Uuid\UuidGeneratorInterface;
 use App\Http\HttpConstantsInterface;
 use App\Http\RequestTransformer\AmountRequestFactory;
 use App\Http\RequestTransformer\CreateInvoice\InvoiceLineItemsFactory;
+use App\Http\RequestTransformer\CreateInvoice\ShippingInfoFactory;
 use App\Infrastructure\CommandBus\SynchronousCommandBus\Decorators\DbTransactionCommandBusDecorator;
 use OpenApi\Annotations as OA;
-use Ramsey\Uuid\Uuid;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -68,27 +68,31 @@ class CreateInvoiceController
 
     private UuidGeneratorInterface $uuidGenerator;
 
+    private ShippingInfoFactory $shippingInfoFactory;
+
     public function __construct(
         AmountRequestFactory $requestFactory,
         InvoiceLineItemsFactory $lineItemsFactory,
         DbTransactionCommandBusDecorator $synchronousCommandBus,
-        UuidGeneratorInterface $uuidGenerator
+        UuidGeneratorInterface $uuidGenerator,
+        ShippingInfoFactory $shippingInfoFactory
     ) {
         $this->requestFactory = $requestFactory;
         $this->lineItemsFactory = $lineItemsFactory;
         $this->synchronousCommandBus = $synchronousCommandBus;
         $this->uuidGenerator = $uuidGenerator;
+        $this->shippingInfoFactory = $shippingInfoFactory;
     }
 
     public function execute(Request $request): JsonResponse
     {
         $shipRequest = (new CreateInvoiceRequest(
             $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID),
-            $this->uuidGenerator->uuid()
+            $this->uuidGenerator->uuid(),
+            $this->shippingInfoFactory->create($request)
         ))
             ->setExternalCode($request->request->get('external_code'))
             ->setInvoiceUrl($request->request->get('invoice_url'))
-            ->setShippingDocumentUrl($request->request->get('shipping_document_url'))
             ->setAmount($this->requestFactory->create($request))
             ->setOrders($request->request->get('orders', []))
             ->setLineItems($this->lineItemsFactory->create($request));
@@ -115,7 +119,7 @@ class CreateInvoiceController
             );
         } catch (ShipOrderOrderExternalCodeNotSetException $exception) {
             throw new BadRequestHttpException('Order external code should be set beforehand.', $exception);
-        } catch (WorkflowException | ShipOrderMerchantFeeNotSetException $exception) {
+        } catch (WorkflowException|ShipOrderMerchantFeeNotSetException $exception) {
             throw new BadRequestHttpException('Invoice could not be created.', $exception);
         }
     }

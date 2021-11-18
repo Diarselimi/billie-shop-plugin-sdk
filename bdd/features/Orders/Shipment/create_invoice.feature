@@ -28,9 +28,21 @@ Feature:
         "gross": 260.27,
         "net": 255.12,
         "tax": 5.15
-      }
+      },
+      "shipping_info": [
+        {
+            "tracking_number": "tracking_number_1",
+            "return_shipping_company": "Billie io",
+            "return_tracking_url": "Tracking_2",
+            "shipping_method": "Post",
+            "shipping_company": "Billie gmbh",
+            "return_tracking_number": "Tracking_3",
+            "tracking_url": "google.com"
+        }
+      ]
     }
     """
+    And print last JSON response
     Then the response status code should be 201
     And the order CO124 is in state partially_shipped
 

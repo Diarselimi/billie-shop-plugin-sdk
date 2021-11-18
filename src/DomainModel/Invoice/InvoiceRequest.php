@@ -15,5 +15,8 @@ interface InvoiceRequest
 
     public function getExternalCode(): string;
 
+    public function getShippingInfo(): ?ShippingInfo;
+
+    /** @deprecated */
     public function getShippingDocumentUrl(): ?string;
 }

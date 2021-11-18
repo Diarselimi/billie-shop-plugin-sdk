@@ -6,6 +6,7 @@ namespace App\Application\UseCase\CreateInvoice;
 
 use App\Application\Validator\Constraint as CustomConstrains;
 use App\DomainModel\Invoice\InvoiceRequest;
+use App\DomainModel\Invoice\ShippingInfo;
 use OpenApi\Annotations as OA;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
 use Ramsey\Uuid\UuidInterface;
@@ -23,7 +24,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          ),
  *          @OA\Property(property="external_code", ref="#/components/schemas/TinyText", nullable=false, example="M-0002126", description="External code for the invoice to be identified by."),
  *          @OA\Property(property="invoice_url", ref="#/components/schemas/TinyText", example="ftp://some_server.com/invoices/M-0002126", description="The url of the generated invoice from merchant."),
- *          @OA\Property(property="shipping_document_url", ref="#/components/schemas/TinyText", example="TRACK-0002126", description="The tracking url of the shipping."),
+ *          @OA\Property(property="shipping_info", ref="#/components/schemas/ShippingInfo", description="Shipping information for tracking, delivery, method."),
  *          @OA\Property(property="amount", ref="#/components/schemas/AmountDTO", nullable=false, description="The amount of the Invoice in Gross, Net, Tax."),
  *          @OA\Property(
  *              property="line_items",
@@ -73,11 +74,14 @@ class CreateInvoiceRequest implements InvoiceRequest
 
     private ?\DateTimeInterface $billingDate;
 
-    public function __construct(int $merchantId, UuidInterface $invoiceUuid)
+    private ?ShippingInfo $shippingInfo;
+
+    public function __construct(int $merchantId, UuidInterface $invoiceUuid, ?ShippingInfo $shippingInfo = null)
     {
         $this->merchantId = $merchantId;
         $this->invoiceUuid = $invoiceUuid;
         $this->billingDate = new \DateTime();
+        $this->shippingInfo = $shippingInfo;
     }
 
     public function getOrders(): array
@@ -133,6 +137,9 @@ class CreateInvoiceRequest implements InvoiceRequest
         return $this->shippingDocumentUrl;
     }
 
+    /**
+     * @deprecated use ShippingInfo instead
+     */
     public function setShippingDocumentUrl(?string $shippingDocumentUrl): CreateInvoiceRequest
     {
         $this->shippingDocumentUrl = $shippingDocumentUrl;
@@ -150,6 +157,11 @@ class CreateInvoiceRequest implements InvoiceRequest
         $this->lineItems = $lineItems;
 
         return $this;
+    }
+
+    public function getShippingInfo(): ?ShippingInfo
+    {
+        return $this->shippingInfo;
     }
 
     public function getMerchantId(): ?int

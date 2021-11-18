@@ -11,6 +11,7 @@ use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Fee\FeeCalculationException;
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceFactory;
+use App\DomainModel\Invoice\ShippingInfo\ShippingInfoRepository;
 use App\DomainModel\Order\Lifecycle\ShipOrder\LegacyShipOrderService;
 use App\DomainModel\Order\Lifecycle\ShipOrder\ShipOrderService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
@@ -45,6 +46,8 @@ class ShipOrderUseCaseV1 implements ValidatedUseCaseInterface, LoggingInterface
 
     private UuidGeneratorInterface $uuidGenerator;
 
+    private ShippingInfoRepository $shippingInfoRepository;
+
     public function __construct(
         InvoiceDocumentUploadHandlerAggregator $invoiceManager,
         OrderContainerFactory $orderContainerFactory,
@@ -53,7 +56,8 @@ class ShipOrderUseCaseV1 implements ValidatedUseCaseInterface, LoggingInterface
         LegacyShipOrderService $legacyShipOrderService,
         LegacyOrderResponseFactory $orderResponseFactory,
         InvoiceFactory $invoiceFactory,
-        UuidGeneratorInterface $uuidGenerator
+        UuidGeneratorInterface $uuidGenerator,
+        ShippingInfoRepository $shippingInfoRepository
     ) {
         $this->invoiceManager = $invoiceManager;
         $this->orderContainerFactory = $orderContainerFactory;
@@ -63,6 +67,7 @@ class ShipOrderUseCaseV1 implements ValidatedUseCaseInterface, LoggingInterface
         $this->orderResponseFactory = $orderResponseFactory;
         $this->invoiceFactory = $invoiceFactory;
         $this->uuidGenerator = $uuidGenerator;
+        $this->shippingInfoRepository = $shippingInfoRepository;
     }
 
     public function execute(ShipOrderRequestV1 $request): LegacyOrderResponse
@@ -80,6 +85,7 @@ class ShipOrderUseCaseV1 implements ValidatedUseCaseInterface, LoggingInterface
         $this->ship($orderContainer, $invoice);
 
         $this->uploadInvoice($order, $request, $invoice->getUuid());
+        $this->shippingInfoRepository->save($invoice);
 
         return $this->orderResponseFactory->create($orderContainer);
     }
@@ -119,8 +125,7 @@ class ShipOrderUseCaseV1 implements ValidatedUseCaseInterface, LoggingInterface
 
         $order
             ->setInvoiceNumber($request->getInvoiceNumber())
-            ->setInvoiceUrl($request->getInvoiceUrl())
-            ->setProofOfDeliveryUrl($request->getShippingDocumentUrl());
+            ->setInvoiceUrl($request->getInvoiceUrl());
     }
 
     private function makeInvoice(OrderContainer $orderContainer, ShipOrderRequestV1 $request): Invoice

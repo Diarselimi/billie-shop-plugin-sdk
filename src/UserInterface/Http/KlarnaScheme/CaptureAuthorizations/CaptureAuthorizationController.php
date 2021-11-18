@@ -11,6 +11,7 @@ use App\Application\UseCase\CreateInvoice\CreateInvoiceCommand;
 use App\Application\UseCase\ShipOrder\Exception\ShipOrderAmountExceededException;
 use App\Application\UseCase\ShipOrder\Exception\ShipOrderMerchantFeeNotSetException;
 use App\Helper\Uuid\UuidGenerator;
+use App\Http\RequestTransformer\CreateInvoice\ShippingInfoFactory;
 use App\UserInterface\Http\KlarnaScheme\KlarnaResponse;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
@@ -25,10 +26,13 @@ class CaptureAuthorizationController implements LoggingInterface
 
     private UuidGenerator $uuidGenerator;
 
-    public function __construct(CommandBus $bus, UuidGenerator $uuidGenerator)
+    private ShippingInfoFactory $shippingInfoFactory;
+
+    public function __construct(CommandBus $bus, UuidGenerator $uuidGenerator, ShippingInfoFactory $shippingInfoFactory)
     {
         $this->bus = $bus;
         $this->uuidGenerator = $uuidGenerator;
+        $this->shippingInfoFactory = $shippingInfoFactory;
     }
 
     public function execute(Request $request, string $orderId): JsonResponse
@@ -39,7 +43,8 @@ class CaptureAuthorizationController implements LoggingInterface
                 $request->get('amount'),
                 $request->get('capture_id'),
                 $request->get('captured_at'),
-                $this->uuidGenerator->uuid()
+                $this->uuidGenerator->uuid(),
+                $this->shippingInfoFactory->create($request)
             );
 
             $this->bus->process($command);

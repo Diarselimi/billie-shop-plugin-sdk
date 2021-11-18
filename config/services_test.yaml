@@ -114,6 +114,9 @@ services:
   App\DomainModel\DebtorInformationChangeRequest\DebtorInformationChangeRequestRepositoryInterface:
     alias: 'App\Infrastructure\Repository\DebtorInformationChangeRequestRepository'
     public: true
+  App\DomainModel\Invoice\ShippingInfo\ShippingInfoRepository:
+    alias: 'App\Infrastructure\Repository\ShippingInfoPdoRepository'
+    public: true
   App\Tests\Helpers\TestUuidGenerator: ~
   App\Helper\Uuid\UuidGeneratorInterface: '@App\Tests\Helpers\TestUuidGenerator'
 

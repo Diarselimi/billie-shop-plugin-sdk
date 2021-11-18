@@ -742,6 +742,25 @@ components:
           minimum: 0
           example: 60.15
       type: object
+    ShippingInfo:
+      title: 'Shipping information for tracking, delivery, method.'
+      description: 'Shipping information for tracking, delivery, method.'
+      properties:
+        return_shipping_company:
+          description: 'Name of the shipping company for the return shipment (as specific as possible). Maximum 100 characters. Example: ''DHL US'' and not only ''DHL'''
+        return_tracking_number:
+          description: 'Tracking number for the return shipment. Maximum 100 characters.'
+        return_tracking_url:
+          description: 'URL where the customer can track the return shipment. Maximum 1024 characters.'
+        shipping_company:
+          description: 'Name of the shipping company (as specific as possible). Maximum 100 characters. Example: ''DHL US'' and not only ''DHL'''
+        shipping_method:
+          description: 'Shipping method. Example ''PickUpStore'' or ''Postal''.'
+        tracking_number:
+          description: 'Tracking number for the shipment. Maximum 100 characters.'
+        tracking_url:
+          description: 'URI where the customer can track their shipment. Maximum 1024 characters.'
+      type: object
     AddressStrictPostalCode:
       title: 'Address data are all required except house number.'
       required:
@@ -973,10 +992,9 @@ components:
           description: 'The url of the generated invoice from merchant.'
           example: 'ftp://some_server.com/invoices/M-0002126'
           $ref: '#/components/schemas/TinyText'
-        shipping_document_url:
-          description: 'The tracking url of the shipping.'
-          example: TRACK-0002126
-          $ref: '#/components/schemas/TinyText'
+        shipping_info:
+          description: 'Shipping information for tracking, delivery, method.'
+          $ref: '#/components/schemas/ShippingInfo'
         amount:
           description: 'The amount of the Invoice in Gross, Net, Tax.'
           nullable: false

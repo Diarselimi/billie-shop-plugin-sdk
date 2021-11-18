@@ -276,6 +276,21 @@ use OpenApi\Annotations as OA;
  */
 
 /**
+ * @OA\Schema(schema="ShippingInfo", title="Shipping information for tracking, delivery, method.",
+ *     description="Shipping information for tracking, delivery, method.",
+ *     properties={
+ *          @OA\Property(property="return_shipping_company", description="Name of the shipping company for the return shipment (as specific as possible). Maximum 100 characters. Example: 'DHL US' and not only 'DHL'"),
+ *          @OA\Property(property="return_tracking_number", description="Tracking number for the return shipment. Maximum 100 characters."),
+ *          @OA\Property(property="return_tracking_url", description="URL where the customer can track the return shipment. Maximum 1024 characters."),
+ *          @OA\Property(property="shipping_company", description="Name of the shipping company (as specific as possible). Maximum 100 characters. Example: 'DHL US' and not only 'DHL'"),
+ *          @OA\Property(property="shipping_method", description="Shipping method. Example 'PickUpStore' or 'Postal'."),
+ *          @OA\Property(property="tracking_number", description="Tracking number for the shipment. Maximum 100 characters."),
+ *          @OA\Property(property="tracking_url", description="URI where the customer can track their shipment. Maximum 1024 characters.")
+ *     }
+ * )
+ */
+
+/**
  * @OA\Schema(schema="NullableAmountDTO", title="object <net, gross, tax>",
  *     required={"net", "gross", "tax"},
  *     description="The amount object with split values for net, gross and tax",

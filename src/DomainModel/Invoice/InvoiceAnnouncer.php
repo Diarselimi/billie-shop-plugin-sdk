@@ -31,6 +31,7 @@ class InvoiceAnnouncer implements LoggingInterface
         ?UuidInterface $debtorSepaMandateUuid,
         ?UuidInterface $investorUuid
     ): void {
+        $trackingUrl = $invoice->getShippingInfo() ? $invoice->getShippingInfo()->getTrackingUrl() : null;
         $message = (new CreateInvoice())
             ->setUuid($invoice->getUuid())
             ->setOrderUuid($orderUuid)
@@ -47,7 +48,7 @@ class InvoiceAnnouncer implements LoggingInterface
             ->setFeeRate($invoice->getFeeRate()->shift(2)->toInt())
             ->setDuration($invoice->getDuration())
             ->setBillingDate($invoice->getBillingDate()->format('Y-m-d'))
-            ->setProofOfDeliveryUrl($invoice->getProofOfDeliveryUrl())
+            ->setProofOfDeliveryUrl($trackingUrl)
             ->setServices(self::SERVICES)
             ->setExternalCode($invoice->getExternalCode())
             ->setOrderExternalCode($orderExternalCode)

@@ -52,7 +52,6 @@ class PdoOrderEntityFactory
             ->setInternalComment($row['internal_comment'])
             ->setInvoiceNumber($row['invoice_number'])
             ->setInvoiceUrl($row['invoice_url'])
-            ->setProofOfDeliveryUrl($row['proof_of_delivery_url'])
             ->setDeliveryAddressId((int) $row['delivery_address_id'])
             ->setMerchantDebtorId($row['merchant_debtor_id'] ? ((int) $row['merchant_debtor_id']) : null)
             ->setMerchantId((int) $row['merchant_id'])

@@ -15,6 +15,7 @@ use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Fee\FeeCalculationException;
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceFactory;
+use App\DomainModel\Invoice\ShippingInfo\ShippingInfoRepository;
 use App\DomainModel\Order\Lifecycle\ShipOrder\ShipOrderService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
@@ -39,18 +40,22 @@ class CreateInvoiceUseCase implements ValidatedUseCaseInterface, LoggingInterfac
 
     private InvoiceFactory $invoiceFactory;
 
+    private ShippingInfoRepository $shippingInfoRepository;
+
     public function __construct(
         InvoiceDocumentUploadHandlerAggregator $invoiceManager,
         OrderContainerFactory $orderContainerFactory,
         Registry $workflowRegistry,
         ShipOrderService $shipOrderService,
-        InvoiceFactory $invoiceFactory
+        InvoiceFactory $invoiceFactory,
+        ShippingInfoRepository $shippingInfoRepository
     ) {
         $this->invoiceManager = $invoiceManager;
         $this->orderContainerFactory = $orderContainerFactory;
         $this->workflowRegistry = $workflowRegistry;
         $this->shipOrderService = $shipOrderService;
         $this->invoiceFactory = $invoiceFactory;
+        $this->shippingInfoRepository = $shippingInfoRepository;
     }
 
     public function execute(CreateInvoiceRequest $request): void
@@ -73,6 +78,7 @@ class CreateInvoiceUseCase implements ValidatedUseCaseInterface, LoggingInterfac
 
         $this->logInfo('Ship order v2');
         $this->shipOrderService->ship($orderContainer, $invoice);
+        $this->shippingInfoRepository->save($invoice);
 
         $this->uploadInvoice($order, $request, $invoice->getUuid());
     }

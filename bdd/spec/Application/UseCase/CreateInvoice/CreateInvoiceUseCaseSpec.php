@@ -7,6 +7,7 @@ use App\Application\UseCase\CreateInvoice\CreateInvoiceRequest;
 use App\Application\UseCase\CreateInvoice\CreateInvoiceUseCase;
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceFactory;
+use App\DomainModel\Invoice\ShippingInfo\ShippingInfoRepository;
 use App\DomainModel\Order\Lifecycle\ShipOrder\ShipOrderInterface;
 use App\DomainModel\Order\Lifecycle\ShipOrder\ShipOrderService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
@@ -47,6 +48,7 @@ class CreateInvoiceUseCaseSpec extends ObjectBehavior
         Registry $workflowRegistry,
         ShipOrderService $shipOrderService,
         InvoiceFactory $invoiceFactory,
+        ShippingInfoRepository $shippingInfoRepository,
         OrderContainer $orderContainer,
         OrderEntity $order,
         LegacyOrderResponse $orderResponse,
@@ -63,7 +65,6 @@ class CreateInvoiceUseCaseSpec extends ObjectBehavior
         $request->getExternalCode()->willReturn(self::EXTERNAL_CODE);
         $request->getExternalCode()->willReturn(self::INVOICE_NUMBER);
         $request->getInvoiceUrl()->willReturn(self::INVOICE_URL);
-        $request->getShippingDocumentUrl()->willReturn(self::PROOF_OF_DELIVERY_URL);
 
         $orderContainerFactory
             ->loadByMerchantIdAndExternalIdOrUuid(Argument::any(), Argument::any())

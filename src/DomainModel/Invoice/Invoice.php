@@ -61,6 +61,8 @@ class Invoice
 
     private CreditNoteCollection $creditNoteCollection;
 
+    private ?ShippingInfo $shippingInfo;
+
     public function __construct()
     {
         $this->creditNoteCollection = new CreditNoteCollection([]);
@@ -330,6 +332,18 @@ class Invoice
     public function getGrossAmount(): Money
     {
         return $this->amount->getGross();
+    }
+
+    public function getShippingInfo(): ?ShippingInfo
+    {
+        return $this->shippingInfo;
+    }
+
+    public function setShippingInfo(?ShippingInfo $shippingInfo): Invoice
+    {
+        $this->shippingInfo = $shippingInfo;
+
+        return $this;
     }
 
     public function canBeExtendedWith(Duration $newDuration): bool
