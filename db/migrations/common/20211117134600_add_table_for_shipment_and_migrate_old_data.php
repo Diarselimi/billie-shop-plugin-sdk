@@ -15,8 +15,8 @@ final class AddTableForShipmentAndMigrateOldData extends TransactionalMigration
             ->addColumn('shipping_method', 'string', ['null' => true])
             ->addColumn('tracking_number', 'string', ['null' => true])
             ->addColumn('tracking_url', 'string', ['null' => true])
-            ->addColumn('created_at', 'datetime', ['null' => false])
             ->addColumn('updated_at', 'datetime', ['null' => false])
+            ->addColumn('created_at', 'datetime', ['null' => false])
             ->create();
 
         //migrate query
@@ -30,7 +30,9 @@ SELECT
        null as return_shipping_company,
        null as shipping_method,
        null as tracking_number,
-       orders.proof_of_delivery_url as tracking_url 
+       orders.proof_of_delivery_url as tracking_url,
+       now() as updated_at,
+       now() as created_at
 from orders 
 LEFT JOIN order_invoices_v2 i ON i.order_id = orders.id
 WHERE proof_of_delivery_url is not null;

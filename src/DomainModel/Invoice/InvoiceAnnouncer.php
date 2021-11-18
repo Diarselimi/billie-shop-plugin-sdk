@@ -31,7 +31,7 @@ class InvoiceAnnouncer implements LoggingInterface
         ?UuidInterface $debtorSepaMandateUuid,
         ?UuidInterface $investorUuid
     ): void {
-        $trackingUrl = $invoice->getShippingInfo() ? $invoice->getShippingInfo()->getTrackingUrl() : null;
+        $trackingUrl = $invoice->getShippingInfo() !== null ? $invoice->getShippingInfo()->getTrackingUrl() : null;
         $message = (new CreateInvoice())
             ->setUuid($invoice->getUuid())
             ->setOrderUuid($orderUuid)
