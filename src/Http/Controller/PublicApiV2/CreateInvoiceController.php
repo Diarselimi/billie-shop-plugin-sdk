@@ -119,7 +119,7 @@ class CreateInvoiceController
             );
         } catch (ShipOrderOrderExternalCodeNotSetException $exception) {
             throw new BadRequestHttpException('Order external code should be set beforehand.', $exception);
-        } catch (WorkflowException|ShipOrderMerchantFeeNotSetException $exception) {
+        } catch (WorkflowException | ShipOrderMerchantFeeNotSetException $exception) {
             throw new BadRequestHttpException('Invoice could not be created.', $exception);
         }
     }
