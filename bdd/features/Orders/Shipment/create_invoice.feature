@@ -42,7 +42,6 @@ Feature:
       ]
     }
     """
-    And print last JSON response
     Then the response status code should be 201
     And the order CO124 is in state partially_shipped
 
