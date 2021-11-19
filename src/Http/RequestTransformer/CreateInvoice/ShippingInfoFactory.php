@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ShippingInfoFactory
 {
-    public function create(Request $request, UuidInterface $invoiceUuid): ShippingInfo
+    public function create(Request $request, UuidInterface $invoiceUuid): ?ShippingInfo
     {
         if ($request->request->has('shipping_info')) {
             $shippingInfo = $request->get('shipping_info', []);
@@ -18,6 +18,10 @@ class ShippingInfoFactory
             $shippingInfo = [
                 'tracking_url' => $request->get('shipping_document_url'),
             ];
+        }
+
+        if ($this->noDataProvided($shippingInfo)) {
+            return null;
         }
 
         return new ShippingInfo(
@@ -30,5 +34,12 @@ class ShippingInfoFactory
             $shippingInfo['return_tracking_url'] ?? null,
             $shippingInfo['return_shipping_company'] ?? null,
         );
+    }
+
+    private function noDataProvided($shippingInfo): bool
+    {
+        return empty(array_filter($shippingInfo, static function ($value): bool {
+            return null !== $value;
+        }));
     }
 }

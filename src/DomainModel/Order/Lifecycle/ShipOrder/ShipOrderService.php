@@ -80,6 +80,7 @@ class ShipOrderService implements ShipOrderInterface, LoggingInterface
             $orderContainer->getMerchantDebtor()->getInvestorUuid()
         );
 
+        //TODO simplify this with a guard
         if ($order->isWorkflowV2()) {
             $isFullyShipped = $unshippedAmountGross->isZero() && $unshippedAmountNet->isZero()
                 && $unshippedAmountTax->isZero();

@@ -71,7 +71,7 @@ class ShipOrderRequestV1 extends AbstractShipOrderRequestV1 implements Arrayable
 
     public function toArray(): array
     {
-        $shippingInfo = $this->getShippingInfo() === null ? null : $this->getShippingInfo()->getTrackingUrl();
+        $trackingUrl = $this->getShippingInfo() === null ? null : $this->getShippingInfo()->getTrackingUrl();
 
         return [
             'order_id' => $this->getOrderId(),
@@ -79,7 +79,7 @@ class ShipOrderRequestV1 extends AbstractShipOrderRequestV1 implements Arrayable
             'merchant_id' => $this->getMerchantId(),
             'invoice_number' => $this->getInvoiceNumber(),
             'invoice_url' => $this->getInvoiceUrl(),
-            'shipping_document_url' => $shippingInfo,
+            'shipping_document_url' => $trackingUrl,
         ];
     }
 }

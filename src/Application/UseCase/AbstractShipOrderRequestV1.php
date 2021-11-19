@@ -32,7 +32,7 @@ abstract class AbstractShipOrderRequestV1 extends AbstractOrderRequest implement
      */
     private ?string $invoiceNumber = null;
 
-    private ?UuidInterface $invoiceUuid;
+    private ?UuidInterface $invoiceUuid = null;
 
     private ?ShippingInfo $shippingInfo = null;
 

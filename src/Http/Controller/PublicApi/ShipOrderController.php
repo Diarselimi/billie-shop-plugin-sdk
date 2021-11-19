@@ -82,7 +82,7 @@ class ShipOrderController
             return $this->useCase->execute($orderRequest);
         } catch (OrderContainerFactoryException $exception) {
             throw new NotFoundHttpException($exception->getMessage());
-        } catch (WorkflowException|ShipOrderMerchantFeeNotSetException $exception) {
+        } catch (WorkflowException | ShipOrderMerchantFeeNotSetException $exception) {
             throw new BadRequestHttpException('Shipment is not allowed', $exception);
         }
     }
