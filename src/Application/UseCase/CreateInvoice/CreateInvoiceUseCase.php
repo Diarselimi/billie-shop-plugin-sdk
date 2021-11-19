@@ -78,7 +78,9 @@ class CreateInvoiceUseCase implements ValidatedUseCaseInterface, LoggingInterfac
 
         $this->logInfo('Ship order v2');
         $this->shipOrderService->ship($orderContainer, $invoice);
-        $this->shippingInfoRepository->save($invoice);
+        if ($request->getShippingInfo() !== null) {
+            $this->shippingInfoRepository->save($invoice->getShippingInfo());
+        }
 
         $this->uploadInvoice($order, $request, $invoice->getUuid());
     }

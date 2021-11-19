@@ -8,6 +8,7 @@ use App\Application\UseCase\ShipOrder\ShipOrderRequestV1;
 use App\Application\UseCase\ShipOrder\ShipOrderUseCaseV1;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\OrderResponse\LegacyOrderResponse;
+use App\Helper\Uuid\UuidGeneratorInterface;
 use App\Http\HttpConstantsInterface;
 use App\Http\RequestTransformer\CreateInvoice\ShippingInfoFactory;
 use OpenApi\Annotations as OA;
@@ -52,19 +53,27 @@ class ShipOrderController
 
     private ShippingInfoFactory $shippingInfoFactory;
 
-    public function __construct(ShipOrderUseCaseV1 $useCase, ShippingInfoFactory $shippingInfoFactory)
-    {
+    private UuidGeneratorInterface $uuidGenerator;
+
+    public function __construct(
+        ShipOrderUseCaseV1 $useCase,
+        ShippingInfoFactory $shippingInfoFactory,
+        UuidGeneratorInterface $uuidGenerator
+    ) {
         $this->useCase = $useCase;
         $this->shippingInfoFactory = $shippingInfoFactory;
+        $this->uuidGenerator = $uuidGenerator;
     }
 
     public function execute(string $id, Request $request): LegacyOrderResponse
     {
+        $generatedUuid = $this->uuidGenerator->uuid();
         $orderRequest = (new ShipOrderRequestV1(
             $id,
             $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID)
         ))
-            ->setShippingInfo($this->shippingInfoFactory->create($request))
+            ->setInvoiceUuid($generatedUuid)
+            ->setShippingInfo($this->shippingInfoFactory->create($request, $generatedUuid))
             ->setExternalCode($request->request->get('external_order_id'))
             ->setInvoiceNumber($request->request->get('invoice_number'))
             ->setInvoiceUrl($request->request->get('invoice_url'));
@@ -73,7 +82,7 @@ class ShipOrderController
             return $this->useCase->execute($orderRequest);
         } catch (OrderContainerFactoryException $exception) {
             throw new NotFoundHttpException($exception->getMessage());
-        } catch (WorkflowException | ShipOrderMerchantFeeNotSetException $exception) {
+        } catch (WorkflowException|ShipOrderMerchantFeeNotSetException $exception) {
             throw new BadRequestHttpException('Shipment is not allowed', $exception);
         }
     }

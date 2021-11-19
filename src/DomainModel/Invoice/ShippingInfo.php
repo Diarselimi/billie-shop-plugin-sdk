@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace App\DomainModel\Invoice;
 
+use Ramsey\Uuid\UuidInterface;
+
 class ShippingInfo
 {
+    private UuidInterface $invoiceUuid;
+
     private ?string $returnShippingCompany;
 
     private ?string $returnTrackingNumber;
@@ -21,6 +25,7 @@ class ShippingInfo
     private ?string $trackingUrl;
 
     public function __construct(
+        UuidInterface $invoiceUuid,
         ?string $trackingUrl = null,
         ?string $trackingNumber = null,
         ?string $shippingMethod = null,
@@ -36,6 +41,12 @@ class ShippingInfo
         $this->returnTrackingNumber = $returnTrackingNumber;
         $this->returnTrackingUrl = $returnTrackingUrl;
         $this->returnShippingCompany = $returnShippingCompany;
+        $this->invoiceUuid = $invoiceUuid;
+    }
+
+    public function getInvoiceUuid(): UuidInterface
+    {
+        return $this->invoiceUuid;
     }
 
     public function getReturnShippingCompany(): ?string

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Repository;
 
-use App\DomainModel\Invoice\Invoice;
+use App\DomainModel\Invoice\ShippingInfo;
 use App\DomainModel\Invoice\ShippingInfo\ShippingInfoRepository;
 use Billie\PdoBundle\Infrastructure\Pdo\AbstractPdoRepository;
 
@@ -25,12 +25,8 @@ class ShippingInfoPdoRepository extends AbstractPdoRepository implements Shippin
         'updated_at',
     ];
 
-    public function save(Invoice $invoice): void
+    public function save(ShippingInfo $shippingInfo): void
     {
-        $shippingInfo = $invoice->getShippingInfo();
-        if ($shippingInfo === null) {
-            return;
-        }
         $timeStamp = new \DateTime();
 
         $this->doInsert(
@@ -38,7 +34,7 @@ class ShippingInfoPdoRepository extends AbstractPdoRepository implements Shippin
             ' (' . implode(', ', self::SELECT_FIELDS) . ') VALUES (' .
             ':' . implode(',:', self::SELECT_FIELDS) . ')',
             [
-                'invoice_uuid' => $invoice->getUuid(),
+                'invoice_uuid' => $shippingInfo->getInvoiceUuid(),
                 'tracking_url' => $shippingInfo->getTrackingUrl(),
                 'tracking_number' => $shippingInfo->getTrackingNumber(),
                 'return_shipping_company' => $shippingInfo->getReturnShippingCompany(),

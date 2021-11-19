@@ -6,7 +6,7 @@ use App\Application\UseCase\CreateInvoice\CreateInvoiceRequest;
 use App\Application\UseCase\ShipOrderWithInvoice\ShipOrderWithInvoiceRequest;
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceFactory;
-use App\DomainModel\Order\Lifecycle\ShipOrder\LegacyShipOrderService;
+use App\DomainModel\Invoice\ShippingInfo\ShippingInfoRepository;
 use App\DomainModel\Order\Lifecycle\ShipOrder\ShipOrderService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
@@ -33,11 +33,11 @@ class ShipOrderWithInvoiceUseCaseSpec extends ObjectBehavior
     public function let(
         InvoiceDocumentCreator $invoiceManager,
         OrderContainerFactory $orderContainerFactory,
-        LegacyShipOrderService $legacyShipOrderService,
         ShipOrderService $shipOrderService,
         Registry $workflowRegistry,
         LegacyOrderResponseFactory $orderResponseFactory,
         InvoiceFactory $invoiceFactory,
+        ShippingInfoRepository $shippingInfoRepository,
         ValidatorInterface $validator
     ) {
         $args = func_get_args();
@@ -81,13 +81,14 @@ class ShipOrderWithInvoiceUseCaseSpec extends ObjectBehavior
                 new Money(450),
                 new Money(50)
             ))
+            ->setInvoiceUuid(Uuid::uuid4())
             ->setInvoiceNumber(123)
             ->setInvoiceFile($uploadedFile);
 
         $invoice = (new Invoice())
-            ->setUuid(Uuid::uuid4()->toString());
+            ->setUuid($request->getInvoiceUuid()->toString());
 
-        $input = new CreateInvoiceRequest($merchantId, Uuid::uuid4());
+        $input = new CreateInvoiceRequest($merchantId, $request->getInvoiceUuid());
         $input->setAmount($request->getAmount())
             ->setExternalCode($request->getInvoiceNumber());
 

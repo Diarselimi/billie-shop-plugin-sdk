@@ -6,6 +6,7 @@ use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceAnnouncer;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderEntity;
+use App\DomainModel\Order\OrderRepository;
 use App\DomainModel\OrderFinancialDetails\OrderFinancialDetailsRepositoryInterface;
 use App\DomainModel\OrderInvoice\OrderInvoiceFactory;
 use App\DomainModel\OrderInvoice\OrderInvoiceRepositoryInterface;
@@ -27,18 +28,22 @@ class ShipOrderService implements ShipOrderInterface, LoggingInterface
 
     private OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository;
 
+    private OrderRepository $orderRepository;
+
     public function __construct(
         Registry $workflowRegistry,
         InvoiceAnnouncer $announcer,
         OrderInvoiceFactory $orderInvoiceFactory,
         OrderInvoiceRepositoryInterface $orderInvoiceRepository,
-        OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository
+        OrderFinancialDetailsRepositoryInterface $orderFinancialDetailsRepository,
+        OrderRepository $orderRepository
     ) {
         $this->workflowRegistry = $workflowRegistry;
         $this->announcer = $announcer;
         $this->orderInvoiceFactory = $orderInvoiceFactory;
         $this->orderInvoiceRepository = $orderInvoiceRepository;
         $this->orderFinancialDetailsRepository = $orderFinancialDetailsRepository;
+        $this->orderRepository = $orderRepository;
     }
 
     public function ship(OrderContainer $orderContainer, Invoice $invoice): void
@@ -46,6 +51,7 @@ class ShipOrderService implements ShipOrderInterface, LoggingInterface
         $order = $orderContainer->getOrder();
         $workflow = $this->workflowRegistry->get($order);
         $orderContainer->addInvoice($invoice);
+        var_dump($invoice->getUuid());
 
         $orderInvoice = $this->orderInvoiceFactory->create($order->getId(), $invoice->getUuid());
         $this->orderInvoiceRepository->insert($orderInvoice);
@@ -81,8 +87,21 @@ class ShipOrderService implements ShipOrderInterface, LoggingInterface
             $transition = $isFullyShipped ? OrderEntity::TRANSITION_SHIP_FULLY : OrderEntity::TRANSITION_SHIP_PARTIALLY;
 
             $workflow->apply($order, $transition);
+        } elseif ($order->isWorkflowV1()) {
+            $this->updateOrderPaymentUuid($order, $invoice);
+            $workflow->apply($order, OrderEntity::TRANSITION_SHIP);
         }
 
         $this->logInfo('Order shipped with {name} workflow', [LoggingInterface::KEY_NAME => $workflow->getName()]);
+    }
+
+    private function updateOrderPaymentUuid(OrderEntity $order, Invoice $invoice): void
+    {
+        if ($order->getPaymentId() === null) {
+            $order
+                ->setPaymentId($invoice->getPaymentUuid())
+                ->setShippedAt(new \DateTime());
+            $this->orderRepository->update($order);
+        }
     }
 }

@@ -13,6 +13,7 @@ use App\Application\UseCase\ValidatedUseCaseTrait;
 use App\DomainModel\Fee\FeeCalculationException;
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceFactory;
+use App\DomainModel\Invoice\ShippingInfo\ShippingInfoRepository;
 use App\DomainModel\Order\Lifecycle\ShipOrder\LegacyShipOrderService;
 use App\DomainModel\Order\Lifecycle\ShipOrder\ShipOrderService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
@@ -21,7 +22,6 @@ use App\DomainModel\Order\OrderEntity;
 use App\DomainModel\OrderInvoiceDocument\InvoiceDocumentCreator;
 use App\DomainModel\OrderResponse\LegacyOrderResponse;
 use App\DomainModel\OrderResponse\LegacyOrderResponseFactory;
-use App\Helper\Uuid\UuidGeneratorInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingInterface;
 use Billie\MonitoringBundle\Service\Logging\LoggingTrait;
 use Ozean12\Money\TaxedMoney\TaxedMoney;
@@ -46,26 +46,24 @@ class ShipOrderWithInvoiceUseCase implements ValidatedUseCaseInterface, LoggingI
 
     private InvoiceFactory $invoiceFactory;
 
-    private UuidGeneratorInterface $uuidGenerator;
+    private ShippingInfoRepository $shippingInfoRepository;
 
     public function __construct(
         InvoiceDocumentCreator $invoiceManager,
         OrderContainerFactory $orderContainerFactory,
-        LegacyShipOrderService $legacyShipOrderService,
         ShipOrderService $shipOrderService,
         Registry $workflowRegistry,
         LegacyOrderResponseFactory $orderResponseFactory,
         InvoiceFactory $invoiceFactory,
-        UuidGeneratorInterface $uuidGenerator
+        ShippingInfoRepository $shippingInfoRepository
     ) {
         $this->invoiceManager = $invoiceManager;
         $this->orderContainerFactory = $orderContainerFactory;
-        $this->legacyShipOrderService = $legacyShipOrderService;
         $this->shipOrderService = $shipOrderService;
         $this->workflowRegistry = $workflowRegistry;
         $this->orderResponseFactory = $orderResponseFactory;
         $this->invoiceFactory = $invoiceFactory;
-        $this->uuidGenerator = $uuidGenerator;
+        $this->shippingInfoRepository = $shippingInfoRepository;
     }
 
     public function execute(ShipOrderWithInvoiceRequest $request): LegacyOrderResponse
@@ -81,9 +79,11 @@ class ShipOrderWithInvoiceUseCase implements ValidatedUseCaseInterface, LoggingI
         $invoice = $this->makeInvoice($orderContainer, $request);
         $this->addRequestDataToOrder($request, $order);
 
-        $this->legacyShipOrderService->ship($orderContainer, $invoice);
         $orderContainer->addInvoice($invoice);
         $this->shipOrderService->ship($orderContainer, $invoice);
+        if ($request->getShippingInfo() !== null) {
+            $this->shippingInfoRepository->save($invoice->getShippingInfo());
+        }
 
         $this->invoiceManager->createFromUpload(
             $order->getId(),
@@ -150,12 +150,9 @@ class ShipOrderWithInvoiceUseCase implements ValidatedUseCaseInterface, LoggingI
                 $financialDetails->getAmountTax()
             );
 
-        $input = (new CreateInvoiceRequest($orderContainer->getOrder()->getMerchantId(), $this->uuidGenerator->uuid()))
-            ->setAmount(
-                $amount
-            )
-            ->setExternalCode($request->getInvoiceNumber())
-            ->setShippingDocumentUrl(null);
+        $input = (new CreateInvoiceRequest($orderContainer->getOrder()->getMerchantId(), $request->getInvoiceUuid()))
+            ->setAmount($amount)
+            ->setExternalCode($request->getInvoiceNumber());
 
         try {
             $invoice = $this->invoiceFactory->create(

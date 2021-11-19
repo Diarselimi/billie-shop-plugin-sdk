@@ -9,7 +9,6 @@ use App\DomainModel\Fee\FeeCalculatorInterface;
 use App\DomainModel\Invoice\CreditNote\CreditNoteCollection;
 use App\DomainModel\Invoice\CreditNote\CreditNoteFactory;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
-use App\Helper\Uuid\UuidGeneratorInterface;
 use App\Infrastructure\Volt\VoltServiceException;
 use App\Support\AbstractFactory;
 use DateTime;
@@ -22,18 +21,14 @@ class InvoiceFactory extends AbstractFactory
 {
     private const INITIAL_INVOICE_STATE = 'new';
 
-    private UuidGeneratorInterface $uuidGenerator;
-
     private FeeCalculatorInterface $feeCalculator;
 
     private CreditNoteFactory $creditNoteFactory;
 
     public function __construct(
-        UuidGeneratorInterface $uuidGenerator,
         FeeCalculatorInterface $feeCalculator,
         CreditNoteFactory $creditNoteFactory
     ) {
-        $this->uuidGenerator = $uuidGenerator;
         $this->feeCalculator = $feeCalculator;
         $this->creditNoteFactory = $creditNoteFactory;
     }
@@ -127,8 +122,19 @@ class InvoiceFactory extends AbstractFactory
 
         if ($order->getPaymentId() !== null) {
             $invoiceUuid = Uuid::fromString($order->getPaymentId());
+            //This old logic makes things harder, soon we need to remove all this condition
+            $request->setShippingInfo(new ShippingInfo(
+                $invoiceUuid,
+                $request->getShippingInfo()->getTrackingUrl(),
+                $request->getShippingInfo()->getTrackingNumber(),
+                $request->getShippingInfo()->getShippingMethod(),
+                $request->getShippingInfo()->getShippingCompany(),
+                $request->getShippingInfo()->getReturnTrackingNumber(),
+                $request->getShippingInfo()->getReturnTrackingUrl(),
+                $request->getShippingInfo()->getReturnShippingCompany()
+            ));
         } else {
-            $invoiceUuid = $this->uuidGenerator->uuid();
+            $invoiceUuid = $request->getInvoiceUuid();
         }
 
         $input = new CreateInvoiceRequest(
@@ -136,6 +142,7 @@ class InvoiceFactory extends AbstractFactory
             $invoiceUuid,
             $request->getShippingInfo()
         );
+
         $input->setAmount(
             new TaxedMoney(
                 $financialDetails->getAmountGross(),
@@ -143,8 +150,7 @@ class InvoiceFactory extends AbstractFactory
                 $financialDetails->getAmountTax()
             )
         )
-            ->setExternalCode($request->getInvoiceNumber())
-            ->setShippingDocumentUrl($request->getShippingDocumentUrl());
+            ->setExternalCode($request->getInvoiceNumber());
 
         return $this->create($orderContainer, $input);
     }

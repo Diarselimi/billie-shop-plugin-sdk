@@ -37,14 +37,16 @@ class CaptureAuthorizationController implements LoggingInterface
 
     public function execute(Request $request, string $orderId): JsonResponse
     {
+        $generatedInvoiceUuid = $this->uuidGenerator->uuid();
+
         try {
             $command = new CreateInvoiceCommand(
                 $orderId,
                 $request->get('amount'),
                 $request->get('capture_id'),
                 $request->get('captured_at'),
-                $this->uuidGenerator->uuid(),
-                $this->shippingInfoFactory->create($request)
+                $generatedInvoiceUuid,
+                $this->shippingInfoFactory->create($request, $generatedInvoiceUuid)
             );
 
             $this->bus->process($command);

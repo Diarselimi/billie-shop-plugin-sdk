@@ -2,9 +2,9 @@
 
 namespace App\DomainModel\Invoice\ShippingInfo;
 
-use App\DomainModel\Invoice\Invoice;
+use App\DomainModel\Invoice\ShippingInfo;
 
 interface ShippingInfoRepository
 {
-    public function save(Invoice $invoice): void;
+    public function save(ShippingInfo $shippingInfo): void;
 }

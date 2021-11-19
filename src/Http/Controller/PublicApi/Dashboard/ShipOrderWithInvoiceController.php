@@ -10,7 +10,9 @@ use App\Application\UseCase\ShipOrderWithInvoice\ShipOrderWithInvoiceRequest;
 use App\Application\UseCase\ShipOrderWithInvoice\ShipOrderWithInvoiceUseCase;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactoryException;
 use App\DomainModel\OrderResponse\LegacyOrderResponse;
+use App\Helper\Uuid\UuidGeneratorInterface;
 use App\Http\HttpConstantsInterface;
+use App\Http\RequestTransformer\CreateInvoice\ShippingInfoFactory;
 use App\Http\RequestTransformer\UpdateOrder\UpdateOrderAmountRequestFactory;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -52,18 +54,29 @@ class ShipOrderWithInvoiceController
 
     private UpdateOrderAmountRequestFactory $updateOrderAmountRequestFactory;
 
+    private UuidGeneratorInterface $uuidGenerator;
+
+    private ShippingInfoFactory $shippingInfoFactory;
+
     public function __construct(
         ShipOrderWithInvoiceUseCase $useCase,
-        UpdateOrderAmountRequestFactory $updateOrderAmountRequestFactory
+        UpdateOrderAmountRequestFactory $updateOrderAmountRequestFactory,
+        UuidGeneratorInterface $uuidGenerator,
+        ShippingInfoFactory $shippingInfoFactory
     ) {
         $this->useCase = $useCase;
         $this->updateOrderAmountRequestFactory = $updateOrderAmountRequestFactory;
+        $this->uuidGenerator = $uuidGenerator;
+        $this->shippingInfoFactory = $shippingInfoFactory;
     }
 
     public function execute(string $uuid, Request $request): LegacyOrderResponse
     {
+        $generatedInvoiceUuid = $this->uuidGenerator->uuid();
         $merchantId = $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID);
         $orderRequest = (new ShipOrderWithInvoiceRequest($uuid, $merchantId))
+            ->setInvoiceUuid($generatedInvoiceUuid)
+            ->setShippingInfo($this->shippingInfoFactory->create($request, $generatedInvoiceUuid))
             ->setExternalCode($request->request->get('external_order_id'))
             ->setInvoiceNumber($request->request->get('invoice_number'))
             ->setInvoiceFile($request->files->get('invoice_file'));
@@ -93,7 +106,7 @@ class ShipOrderWithInvoiceController
             );
 
             throw new RequestValidationException(new ConstraintViolationList([$constraint]));
-        } catch (WorkflowException | ShipOrderMerchantFeeNotSetException $exception) {
+        } catch (WorkflowException|ShipOrderMerchantFeeNotSetException $exception) {
             throw new BadRequestHttpException('Shipment is not allowed', $exception);
         }
     }

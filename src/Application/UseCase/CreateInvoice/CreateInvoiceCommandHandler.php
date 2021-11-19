@@ -12,6 +12,7 @@ use App\Application\UseCase\ShipOrder\Exception\ShipOrderMerchantFeeNotSetExcept
 use App\DomainModel\Fee\FeeCalculationException;
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceFactory;
+use App\DomainModel\Invoice\ShippingInfo\ShippingInfoRepository;
 use App\DomainModel\Order\Lifecycle\ShipOrder\ShipOrderService;
 use App\DomainModel\Order\OrderContainer\OrderContainer;
 use App\DomainModel\Order\OrderContainer\OrderContainerFactory;
@@ -35,16 +36,20 @@ class CreateInvoiceCommandHandler implements CommandHandler
 
     private InvoiceFactory $invoiceFactory;
 
+    private ShippingInfoRepository $shippingInfoRepository;
+
     public function __construct(
         Registry $workflowRegistry,
         OrderContainerFactory $orderContainerFactory,
         ShipOrderService $shipOrderService,
-        InvoiceFactory $invoiceFactory
+        InvoiceFactory $invoiceFactory,
+        ShippingInfoRepository $shippingInfoRepository
     ) {
         $this->workflowRegistry = $workflowRegistry;
         $this->orderContainerFactory = $orderContainerFactory;
         $this->shipOrderService = $shipOrderService;
         $this->invoiceFactory = $invoiceFactory;
+        $this->shippingInfoRepository = $shippingInfoRepository;
     }
 
     public function execute(CreateInvoiceCommand $input): void
@@ -67,6 +72,9 @@ class CreateInvoiceCommandHandler implements CommandHandler
 
         $invoice = $this->makeInvoice($orderContainer, $input);
         $this->shipOrderService->ship($orderContainer, $invoice);
+        if ($input->getShippingInfo() !== null) {
+            $this->shippingInfoRepository->save($invoice->getShippingInfo());
+        }
     }
 
     private function isOrderInTheSupportedState(OrderEntity $order): bool

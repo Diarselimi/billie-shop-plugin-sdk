@@ -86,10 +86,11 @@ class CreateInvoiceController
 
     public function execute(Request $request): JsonResponse
     {
+        $generatedInvoiceUuid = $this->uuidGenerator->uuid();
         $shipRequest = (new CreateInvoiceRequest(
             $request->attributes->getInt(HttpConstantsInterface::REQUEST_ATTRIBUTE_MERCHANT_ID),
-            $this->uuidGenerator->uuid(),
-            $this->shippingInfoFactory->create($request)
+            $generatedInvoiceUuid,
+            $this->shippingInfoFactory->create($request, $generatedInvoiceUuid)
         ))
             ->setExternalCode($request->request->get('external_code'))
             ->setInvoiceUrl($request->request->get('invoice_url'))

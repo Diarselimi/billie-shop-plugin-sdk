@@ -3,8 +3,10 @@
 namespace App\Application\UseCase;
 
 use App\Application\Validator\Constraint as CustomAssert;
-use Symfony\Component\Validator\Constraints as Assert;
+use App\DomainModel\Invoice\ShippingInfo;
 use OpenApi\Annotations as OA;
+use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @OA\Schema(schema="AbstractShipOrderRequestV1", title="Order Shipping plain Object", type="object", properties={
@@ -30,6 +32,10 @@ abstract class AbstractShipOrderRequestV1 extends AbstractOrderRequest implement
      */
     private ?string $invoiceNumber = null;
 
+    private ?UuidInterface $invoiceUuid;
+
+    private ?ShippingInfo $shippingInfo = null;
+
     public function getExternalCode(): ?string
     {
         return $this->externalOrderId;
@@ -38,6 +44,30 @@ abstract class AbstractShipOrderRequestV1 extends AbstractOrderRequest implement
     public function setExternalCode($externalCode): self
     {
         $this->externalOrderId = $externalCode;
+
+        return $this;
+    }
+
+    public function getInvoiceUuid(): ?UuidInterface
+    {
+        return $this->invoiceUuid;
+    }
+
+    public function setInvoiceUuid(?UuidInterface $invoiceUuid): AbstractShipOrderRequestV1
+    {
+        $this->invoiceUuid = $invoiceUuid;
+
+        return $this;
+    }
+
+    public function getShippingInfo(): ?ShippingInfo
+    {
+        return $this->shippingInfo;
+    }
+
+    public function setShippingInfo(?ShippingInfo $shippingInfo): self
+    {
+        $this->shippingInfo = $shippingInfo;
 
         return $this;
     }

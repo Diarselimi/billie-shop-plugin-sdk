@@ -53,20 +53,16 @@ class ShipOrderUseCaseV1 implements ValidatedUseCaseInterface, LoggingInterface
         OrderContainerFactory $orderContainerFactory,
         Registry $workflowRegistry,
         ShipOrderService $shipOrderService,
-        LegacyShipOrderService $legacyShipOrderService,
         LegacyOrderResponseFactory $orderResponseFactory,
         InvoiceFactory $invoiceFactory,
-        UuidGeneratorInterface $uuidGenerator,
         ShippingInfoRepository $shippingInfoRepository
     ) {
         $this->invoiceManager = $invoiceManager;
         $this->orderContainerFactory = $orderContainerFactory;
         $this->workflowRegistry = $workflowRegistry;
         $this->shipOrderService = $shipOrderService;
-        $this->legacyShipOrderService = $legacyShipOrderService;
         $this->orderResponseFactory = $orderResponseFactory;
         $this->invoiceFactory = $invoiceFactory;
-        $this->uuidGenerator = $uuidGenerator;
         $this->shippingInfoRepository = $shippingInfoRepository;
     }
 
@@ -85,7 +81,9 @@ class ShipOrderUseCaseV1 implements ValidatedUseCaseInterface, LoggingInterface
         $this->ship($orderContainer, $invoice);
 
         $this->uploadInvoice($order, $request, $invoice->getUuid());
-        $this->shippingInfoRepository->save($invoice);
+        if ($request->getShippingInfo() !== null) {
+            $this->shippingInfoRepository->save($invoice->getShippingInfo());
+        }
 
         return $this->orderResponseFactory->create($orderContainer);
     }
@@ -146,9 +144,6 @@ class ShipOrderUseCaseV1 implements ValidatedUseCaseInterface, LoggingInterface
 
     private function ship(OrderContainer $orderContainer, Invoice $invoice): void
     {
-        $this->logInfo('Ship order v1 in paella'); // PRE-BUTLER HACK TODO (partial-activation) remove on migration
-        $this->legacyShipOrderService->ship($orderContainer, $invoice);
-
         $this->logInfo('Ship order v1 in core');
         $this->shipOrderService->ship($orderContainer, $invoice);
     }

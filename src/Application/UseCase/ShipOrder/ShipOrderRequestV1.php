@@ -4,8 +4,8 @@ namespace App\Application\UseCase\ShipOrder;
 
 use App\Application\UseCase\AbstractShipOrderRequestV1;
 use App\DomainModel\ArrayableInterface;
-use App\DomainModel\Invoice\ShippingInfo;
 use OpenApi\Annotations as OA;
+use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -31,7 +31,19 @@ class ShipOrderRequestV1 extends AbstractShipOrderRequestV1 implements Arrayable
      */
     private ?string $shippingDocumentUrl = null;
 
-    private ?ShippingInfo $shippingInfo;
+    private ?UuidInterface $invoiceUuid;
+
+    public function getInvoiceUuid(): ?UuidInterface
+    {
+        return $this->invoiceUuid;
+    }
+
+    public function setInvoiceUuid(?UuidInterface $invoiceUuid): ShipOrderRequestV1
+    {
+        $this->invoiceUuid = $invoiceUuid;
+
+        return $this;
+    }
 
     public function getInvoiceUrl(): string
     {
@@ -50,18 +62,6 @@ class ShipOrderRequestV1 extends AbstractShipOrderRequestV1 implements Arrayable
         return $this;
     }
 
-    public function getShippingInfo(): ?ShippingInfo
-    {
-        return $this->shippingInfo;
-    }
-
-    public function setShippingInfo(?ShippingInfo $shippingInfo): ShipOrderRequestV1
-    {
-        $this->shippingInfo = $shippingInfo;
-
-        return $this;
-    }
-
     public function setShippingDocumentUrl(?string $shippingDocumentUrl): ShipOrderRequestV1
     {
         $this->shippingDocumentUrl = $shippingDocumentUrl;
@@ -71,13 +71,15 @@ class ShipOrderRequestV1 extends AbstractShipOrderRequestV1 implements Arrayable
 
     public function toArray(): array
     {
+        $shippingInfo = $this->getShippingInfo() === null ? null : $this->getShippingInfo()->getTrackingUrl();
+
         return [
             'order_id' => $this->getOrderId(),
             'external_code' => $this->getExternalCode(),
             'merchant_id' => $this->getMerchantId(),
             'invoice_number' => $this->getInvoiceNumber(),
             'invoice_url' => $this->getInvoiceUrl(),
-            'shipping_document_url' => $this->shippingInfo->getTrackingUrl(),
+            'shipping_document_url' => $shippingInfo,
         ];
     }
 }

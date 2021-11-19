@@ -7,6 +7,7 @@ use App\Application\UseCase\CreateInvoice\CreateInvoiceRequest;
 use App\Application\UseCase\CreateInvoice\CreateInvoiceUseCase;
 use App\DomainModel\Invoice\Invoice;
 use App\DomainModel\Invoice\InvoiceFactory;
+use App\DomainModel\Invoice\ShippingInfo;
 use App\DomainModel\Invoice\ShippingInfo\ShippingInfoRepository;
 use App\DomainModel\Order\Lifecycle\ShipOrder\ShipOrderInterface;
 use App\DomainModel\Order\Lifecycle\ShipOrder\ShipOrderService;
@@ -21,6 +22,7 @@ use Ozean12\Money\TaxedMoney\TaxedMoney;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Workflow\Registry;
@@ -60,6 +62,8 @@ class CreateInvoiceUseCaseSpec extends ObjectBehavior
         $order->isWorkflowV1()->willReturn(false);
         $orderContainer->getOrder()->willReturn($order);
 
+        $request->getInvoiceUuid()->willReturn($uuid = Uuid::uuid4());
+        $request->getShippingInfo()->willReturn(new ShippingInfo($uuid, 'test'));
         $request->getOrders()->willReturn([self::ID]);
         $request->getMerchantId()->willReturn(self::MERCHANT_ID);
         $request->getExternalCode()->willReturn(self::EXTERNAL_CODE);
@@ -107,6 +111,8 @@ class CreateInvoiceUseCaseSpec extends ObjectBehavior
         $request->getExternalCode()->willReturn(self::INVOICE_NUMBER);
         $request->getShippingDocumentUrl()->willReturn(self::PROOF_OF_DELIVERY_URL);
         $request->getInvoiceUrl()->willReturn(self::PROOF_OF_DELIVERY_URL);
+        $request->getInvoiceUuid()->willReturn($uuid = Uuid::uuid4());
+        $request->getShippingInfo()->willReturn(new ShippingInfo($uuid, 'test'));
 
         $financialDetailsEntity->getUnshippedAmountGross()->willReturn(new Money(1000));
         $financialDetailsEntity->getUnshippedAmountNet()->willReturn(new Money(1100));
@@ -123,6 +129,7 @@ class CreateInvoiceUseCaseSpec extends ObjectBehavior
         $order->getPaymentId()->willReturn(self::PAYMENT_DETAILS_ID);
 
         $invoice->getUuid()->willReturn('3c5593cb-04a6-41e6-b57b-1d65dd98e252');
+        $invoice->getShippingInfo()->willReturn(new ShippingInfo($uuid, 'test'));
 
         $workflow->can($order, OrderEntity::TRANSITION_SHIP_FULLY)->shouldBeCalled()->willReturn(true);
         $shipOrderService->ship($orderContainer, $invoice)->shouldBeCalled();
