@@ -51,7 +51,6 @@ class ShipOrderService implements ShipOrderInterface, LoggingInterface
         $order = $orderContainer->getOrder();
         $workflow = $this->workflowRegistry->get($order);
         $orderContainer->addInvoice($invoice);
-        var_dump($invoice->getUuid());
 
         $orderInvoice = $this->orderInvoiceFactory->create($order->getId(), $invoice->getUuid());
         $this->orderInvoiceRepository->insert($orderInvoice);
