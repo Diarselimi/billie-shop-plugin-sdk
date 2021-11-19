@@ -39,9 +39,5 @@ LEFT JOIN order_invoices_v2 i ON i.order_id = orders.id
 WHERE proof_of_delivery_url is not null;
 SQL;
         $this->execute($sql);
-
-        $this->table('orders')
-            ->removeColumn('proof_of_delivery_url')
-            ->save();
     }
 }
