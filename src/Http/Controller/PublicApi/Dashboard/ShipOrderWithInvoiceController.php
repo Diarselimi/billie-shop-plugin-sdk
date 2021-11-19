@@ -106,7 +106,7 @@ class ShipOrderWithInvoiceController
             );
 
             throw new RequestValidationException(new ConstraintViolationList([$constraint]));
-        } catch (WorkflowException|ShipOrderMerchantFeeNotSetException $exception) {
+        } catch (WorkflowException | ShipOrderMerchantFeeNotSetException $exception) {
             throw new BadRequestHttpException('Shipment is not allowed', $exception);
         }
     }
