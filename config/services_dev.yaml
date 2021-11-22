@@ -11,9 +11,6 @@ services:
 
   App\Http\ApiError\ApiErrorResponseFactory: '@App\Http\ApiError\VerboseApiErrorResponseFactory'
 
-  App\Tests\Helpers\TestUuidGenerator: ~
-  App\Helper\Uuid\UuidGeneratorInterface: '@App\Tests\Helpers\TestUuidGenerator'
-
   App\Test\TestGuzzleSubscriber:
     arguments:
       $mockServerUrl: '%env(MOCKSERVER_URL)%'
